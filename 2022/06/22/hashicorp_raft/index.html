@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>hashicorp_raft learning | Fish Tank</title>
+  <meta name="keywords" content=" raft ">
+  <meta name="description" content="hashicorp_raft learning | Fish Tank">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="1.入门1.1 fmt基础包fmt.Scn()  fmt.Scan(&amp;a,&amp;b,&amp;c)     格式字符串 含义    %d 转换十进制输出   %x,%o,%b 转换16,8,2进制   %f,%g,%e 浮点数，小数点后六位，后15位输出   %t 布尔类型输出   %c 字符（rune） (Unicode码点)   %s 字符串   %q quote,带双引号的字符串">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go语言圣经">
+<meta property="og:url" content="https://simonteo58.github.io/2022/06/22/go%E5%9C%A3%E7%BB%8F/index.html">
+<meta property="og:site_name" content="Fish Tank">
+<meta property="og:description" content="1.入门1.1 fmt基础包fmt.Scn()  fmt.Scan(&amp;a,&amp;b,&amp;c)     格式字符串 含义    %d 转换十进制输出   %x,%o,%b 转换16,8,2进制   %f,%g,%e 浮点数，小数点后六位，后15位输出   %t 布尔类型输出   %c 字符（rune） (Unicode码点)   %s 字符串   %q quote,带双引号的字符串">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-22T13:16:20.661Z">
+<meta property="article:modified_time" content="2022-06-22T13:16:47.061Z">
+<meta property="article:author" content="SimonTeo">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="icon" href="/img/avatar.jpg">
+
+<link href="/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/css/hl_theme/sublime.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/img/avatar.jpg"/>
+</a>
+<div class="author">
+    <span>SimonTeo</span>
+</div>
+
+<div class="icon">
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="All">All
+            
+                <small>(7)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="CPP">
+                        
+                        CPP
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="非技术类">
+                        
+                        非技术类
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="CICD">
+                        
+                        CICD
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="code_learning">
+                        
+                        code_learning
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="golang">
+                        
+                        golang
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+            <a class="about  "
+               target="_blank"
+                    
+               href="/about">About</a>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="7">
+
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        Links
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="/null">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">All</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>非技术类</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>ansible</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>CPP</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>Docker</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>golang</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>raft</a>
+            </li>
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a  class="All golang "
+           href="/2022/06/22/go%E5%9C%A3%E7%BB%8F/"
+           data-tag="golang"
+           data-author="" >
+            <span class="post-title" title="go语言圣经">go语言圣经</span>
+            <span class="post-date" title="2022-06-22 21:16:20">2022/06/22</span>
+        </a>
+        
+        <a  class="All 非技术类 "
+           href="/2022/06/22/%E5%A6%82%E4%BD%95%E5%9C%A8%E8%AF%BB%E7%A0%94%E7%9A%84%E9%81%93%E8%B7%AF%E4%B8%8A%E5%BF%AB%E9%80%9F%E5%A4%B1%E8%B4%A5/"
+           data-tag="非技术类"
+           data-author="" >
+            <span class="post-title" title="如何在读研的道路上快速失败">如何在读研的道路上快速失败</span>
+            <span class="post-date" title="2022-06-22 21:14:38">2022/06/22</span>
+        </a>
+        
+        <a  class="All code_learning "
+           href="/2022/06/22/hashicorp_raft/"
+           data-tag="raft"
+           data-author="" >
+            <span class="post-title" title="hashicorp_raft learning">hashicorp_raft learning</span>
+            <span class="post-date" title="2022-06-22 21:04:15">2022/06/22</span>
+        </a>
+        
+        <a  class="All 非技术类 "
+           href="/2022/06/22/%E4%BB%8E0%E5%88%B01_%E5%BC%80%E5%90%AF%E5%95%86%E4%B8%9A%E4%B8%8E%E6%9C%AA%E6%9D%A5%E7%9A%84%E7%A7%98%E5%AF%86/"
+           data-tag="非技术类"
+           data-author="" >
+            <span class="post-title" title="从0到1:开启商业与未来的秘密">从0到1:开启商业与未来的秘密</span>
+            <span class="post-date" title="2022-06-22 20:51:26">2022/06/22</span>
+        </a>
+        
+        <a  class="All CICD "
+           href="/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
+           data-tag="Docker"
+           data-author="" >
+            <span class="post-title" title="docker从入门到实践">docker从入门到实践</span>
+            <span class="post-date" title="2022-06-22 20:47:28">2022/06/22</span>
+        </a>
+        
+        <a  class="All CICD "
+           href="/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/"
+           data-tag="ansible"
+           data-author="" >
+            <span class="post-title" title="奔跑吧ansible">奔跑吧ansible</span>
+            <span class="post-date" title="2022-06-22 20:45:28">2022/06/22</span>
+        </a>
+        
+        <a  class="All CPP "
+           href="/2022/06/22/C++_Primer_Plus/"
+           data-tag="CPP"
+           data-author="" >
+            <span class="post-title" title="C++ Primer Plus">C++ Primer Plus</span>
+            <span class="post-date" title="2022-06-22 01:01:03">2022/06/22</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-hashicorp_raft" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">hashicorp_raft learning</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="code_learning">code_learning</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color5">raft</a>
+            
+        </span>
+        
+    </div>
+    <div class="article-meta">
+        
+            Created At : <time class="date" title='Updated At: 2022-06-22 21:06:50'>2022-06-22 21:04</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            Views 👀 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#archive-x2F-tar"><span class="toc-text">archive&#x2F;tar</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Index"><span class="toc-text">Index</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Constants"><span class="toc-text">Constants</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Variables"><span class="toc-text">Variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-Header"><span class="toc-text">type Header</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#func-FileInfoHeader"><span class="toc-text">func FileInfoHeader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Header-FileInfo"><span class="toc-text">func (*Header) FileInfo</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-Reader"><span class="toc-text">type Reader</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#func-NewReader"><span class="toc-text">func NewReader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Reader-Next"><span class="toc-text">func (*Reader) Next</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Reader-Read"><span class="toc-text">func (*Reader) Read</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-Writer"><span class="toc-text">type Writer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#func-NewWriter"><span class="toc-text">func NewWriter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-WriteHeader"><span class="toc-text">func (*Writer) WriteHeader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-Write"><span class="toc-text">func (*Writer) Write</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-Flush"><span class="toc-text">func (*Writer) Flush</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-Close"><span class="toc-text">func (*Writer) Close</span></a></li></ol></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="archive-x2F-tar"><a href="#archive-x2F-tar" class="headerlink" title="archive&#x2F;tar"></a>archive&#x2F;tar</h2><blockquote>
+<p>原文链接：<a target="_blank" rel="noopener" href="https://studygolang.com/pkgdoc">https://studygolang.com/pkgdoc</a></p>
+</blockquote>
+<pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F; Create a buffer to write our archive to.
+buf :&#x3D; new(bytes.Buffer)
+&#x2F;&#x2F; Create a new tar archive.
+tw :&#x3D; tar.NewWriter(buf)
+&#x2F;&#x2F; Add some files to the archive.
+var files &#x3D; []struct &#123;
+    Name, Body string
+&#125;&#123;
+    &#123;&quot;readme.txt&quot;, &quot;This archive contains some text files.&quot;&#125;,
+    &#123;&quot;gopher.txt&quot;, &quot;Gopher names:\nGeorge\nGeoffrey\nGonzo&quot;&#125;,
+    &#123;&quot;todo.txt&quot;, &quot;Get animal handling licence.&quot;&#125;,
+&#125;
+for _, file :&#x3D; range files &#123;
+    hdr :&#x3D; &amp;tar.Header&#123;
+        Name: file.Name,
+        Size: int64(len(file.Body)),
+    &#125;
+    if err :&#x3D; tw.WriteHeader(hdr); err !&#x3D; nil &#123;
+        log.Fatalln(err)
+    &#125;
+    if _, err :&#x3D; tw.Write([]byte(file.Body)); err !&#x3D; nil &#123;
+        log.Fatalln(err)
+    &#125;
+&#125;
+&#x2F;&#x2F; Make sure to check the error on Close.
+if err :&#x3D; tw.Close(); err !&#x3D; nil &#123;
+    log.Fatalln(err)
+&#125;
+&#x2F;&#x2F; Open the tar archive for reading.
+r :&#x3D; bytes.NewReader(buf.Bytes())
+tr :&#x3D; tar.NewReader(r)
+&#x2F;&#x2F; Iterate through the files in the archive.
+for &#123;
+    hdr, err :&#x3D; tr.Next()
+    if err &#x3D;&#x3D; io.EOF &#123;
+        &#x2F;&#x2F; end of tar archive
+        break
+    &#125;
+    if err !&#x3D; nil &#123;
+        log.Fatalln(err)
+    &#125;
+    fmt.Printf(&quot;Contents of %s:\n&quot;, hdr.Name)
+    if _, err :&#x3D; io.Copy(os.Stdout, tr); err !&#x3D; nil &#123;
+        log.Fatalln(err)
+    &#125;
+    fmt.Println()
+&#125;</code></pre>
+<p>Output:</p>
+<pre class="language-none"><code class="language-none">Contents of readme.txt:
+This archive contains some text files.
+Contents of gopher.txt:
+Gopher names:
+George
+Geoffrey
+Gonzo
+Contents of todo.txt:
+Get animal handling licence.</code></pre>
+
+<h3 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h3><ul>
+<li>Constants</li>
+<li>Variables</li>
+<li>type Header<ul>
+<li>func FileInfoHeader(fi os.FileInfo, link string) (*Header, error)</li>
+<li>func (h *Header) FileInfo() os.FileInfo</li>
+</ul>
+</li>
+<li>type Reader<ul>
+<li>func NewReader(r io.Reader) *Reader</li>
+<li>func (tr *Reader) Next() (*Header, error)</li>
+<li>func (tr *Reader) Read(b []byte) (n int, err error)</li>
+</ul>
+</li>
+<li>type Writer<ul>
+<li>func NewWriter(w io.Writer) *Writer</li>
+<li>func (tw *Writer) WriteHeader(hdr *Header) error</li>
+<li>func (tw *Writer) Write(b []byte) (n int, err error)</li>
+<li>func (tw *Writer) Flush() error</li>
+<li>func (tw *Writer) Close() error</li>
+</ul>
+</li>
+</ul>
+<h3 id="Constants"><a href="#Constants" class="headerlink" title="Constants"></a>Constants</h3><pre class="language-none"><code class="language-none">const (
+    &#x2F;&#x2F; 类型
+    TypeReg           &#x3D; &#39;0&#39;    &#x2F;&#x2F; 普通文件
+    TypeRegA          &#x3D; &#39;\x00&#39; &#x2F;&#x2F; 普通文件
+    TypeLink          &#x3D; &#39;1&#39;    &#x2F;&#x2F; 硬链接
+    TypeSymlink       &#x3D; &#39;2&#39;    &#x2F;&#x2F; 符号链接
+    TypeChar          &#x3D; &#39;3&#39;    &#x2F;&#x2F; 字符设备节点
+    TypeBlock         &#x3D; &#39;4&#39;    &#x2F;&#x2F; 块设备节点
+    TypeDir           &#x3D; &#39;5&#39;    &#x2F;&#x2F; 目录
+    TypeFifo          &#x3D; &#39;6&#39;    &#x2F;&#x2F; 先进先出队列节点
+    TypeCont          &#x3D; &#39;7&#39;    &#x2F;&#x2F; 保留位
+    TypeXHeader       &#x3D; &#39;x&#39;    &#x2F;&#x2F; 扩展头
+    TypeXGlobalHeader &#x3D; &#39;g&#39;    &#x2F;&#x2F; 全局扩展头
+    TypeGNULongName   &#x3D; &#39;L&#39;    &#x2F;&#x2F; 下一个文件记录有个长名字
+    TypeGNULongLink   &#x3D; &#39;K&#39;    &#x2F;&#x2F; 下一个文件记录指向一个具有长名字的文件
+    TypeGNUSparse     &#x3D; &#39;S&#39;    &#x2F;&#x2F; 稀疏文件
+)</code></pre>
+
+<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><pre class="language-none"><code class="language-none">var (
+    ErrWriteTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: write too long&quot;)
+    ErrFieldTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: header field too long&quot;)
+    ErrWriteAfterClose &#x3D; errors.New(&quot;archive&#x2F;tar: write after close&quot;)
+)</code></pre>
+
+<pre class="language-none"><code class="language-none">var (
+    ErrHeader &#x3D; errors.New(&quot;archive&#x2F;tar: invalid tar header&quot;)
+)</code></pre>
+
+<h3 id="type-Header"><a href="#type-Header" class="headerlink" title="type Header"></a>type Header</h3><pre class="language-none"><code class="language-none">type Header struct &#123;
+    Name       string    &#x2F;&#x2F; 记录头域的文件名
+    Mode       int64     &#x2F;&#x2F; 权限和模式位
+    Uid        int       &#x2F;&#x2F; 所有者的用户ID
+    Gid        int       &#x2F;&#x2F; 所有者的组ID
+    Size       int64     &#x2F;&#x2F; 字节数（长度）
+    ModTime    time.Time &#x2F;&#x2F; 修改时间
+    Typeflag   byte      &#x2F;&#x2F; 记录头的类型
+    Linkname   string    &#x2F;&#x2F; 链接的目标名
+    Uname      string    &#x2F;&#x2F; 所有者的用户名
+    Gname      string    &#x2F;&#x2F; 所有者的组名
+    Devmajor   int64     &#x2F;&#x2F; 字符设备或块设备的major number
+    Devminor   int64     &#x2F;&#x2F; 字符设备或块设备的minor number
+    AccessTime time.Time &#x2F;&#x2F; 访问时间
+    ChangeTime time.Time &#x2F;&#x2F; 状态改变时间
+    Xattrs     map[string]string
+&#125;</code></pre>
+
+<p>Header代表tar档案文件里的单个头。Header类型的某些字段可能未使用。</p>
+<h4 id="func-FileInfoHeader"><a href="#func-FileInfoHeader" class="headerlink" title="func FileInfoHeader"></a>func FileInfoHeader</h4><pre class="language-none"><code class="language-none">func FileInfoHeader(fi os.FileInfo, link string) (*Header, error)</code></pre>
+
+<p>FileInfoHeader返回一个根据fi填写了部分字段的Header。 如果fi描述一个符号链接，FileInfoHeader函数将link参数作为链接目标。如果fi描述一个目录，会在名字后面添加斜杠。因为os.FileInfo接口的Name方法只返回它描述的文件的无路径名，有可能需要将返回值的Name字段修改为文件的完整路径名。</p>
+<h4 id="func-Header-FileInfo"><a href="#func-Header-FileInfo" class="headerlink" title="func (*Header) FileInfo"></a>func (*Header) FileInfo</h4><pre class="language-none"><code class="language-none">func (h *Header) FileInfo() os.FileInfo</code></pre>
+
+<p>FileInfo返回该Header对应的文件信息。（os.FileInfo类型）</p>
+<h3 id="type-Reader"><a href="#type-Reader" class="headerlink" title="type Reader"></a>type Reader</h3><pre class="language-none"><code class="language-none">type Reader struct &#123;
+    &#x2F;&#x2F; 内含隐藏或非导出字段
+&#125;</code></pre>
+
+<p>Reader提供了对一个tar档案文件的顺序读取。一个tar档案文件包含一系列文件。Next方法返回档案中的下一个文件（包括第一个），返回值可以被视为io.Reader来获取文件的数据。</p>
+<h4 id="func-NewReader"><a href="#func-NewReader" class="headerlink" title="func NewReader"></a>func NewReader</h4><pre class="language-none"><code class="language-none">func NewReader(r io.Reader) *Reader</code></pre>
+
+<p>NewReader创建一个从r读取的Reader。</p>
+<h4 id="func-Reader-Next"><a href="#func-Reader-Next" class="headerlink" title="func (*Reader) Next"></a>func (*Reader) Next</h4><pre class="language-none"><code class="language-none">func (tr *Reader) Next() (*Header, error)</code></pre>
+
+<p>转入tar档案文件下一记录，它会返回下一记录的头域。</p>
+<h4 id="func-Reader-Read"><a href="#func-Reader-Read" class="headerlink" title="func (*Reader) Read"></a>func (*Reader) Read</h4><pre class="language-none"><code class="language-none">func (tr *Reader) Read(b []byte) (n int, err error)</code></pre>
+
+<p>从档案文件的当前记录读取数据，到达记录末端时返回(0, EOF)，直到调用Next方法转入下一记录。</p>
+<h3 id="type-Writer"><a href="#type-Writer" class="headerlink" title="type Writer"></a>type Writer</h3><pre class="language-none"><code class="language-none">type Writer struct &#123;
+    &#x2F;&#x2F; 内含隐藏或非导出字段
+&#125;</code></pre>
+
+<p>Writer类型提供了POSIX.1格式的tar档案文件的顺序写入。一个tar档案文件包含一系列文件。调用WriteHeader来写入一个新的文件，然后调用Write写入文件的数据，该记录写入的数据不能超过hdr.Size字节。</p>
+<h4 id="func-NewWriter"><a href="#func-NewWriter" class="headerlink" title="func NewWriter"></a>func NewWriter</h4><pre class="language-none"><code class="language-none">func NewWriter(w io.Writer) *Writer</code></pre>
+
+<p>NewWriter创建一个写入w的*Writer。</p>
+<h4 id="func-Writer-WriteHeader"><a href="#func-Writer-WriteHeader" class="headerlink" title="func (*Writer) WriteHeader"></a>func (*Writer) WriteHeader</h4><pre class="language-none"><code class="language-none">func (tw *Writer) WriteHeader(hdr *Header) error</code></pre>
+
+<p>WriteHeader写入hdr并准备接受文件内容。如果不是第一次调用本方法，会调用Flush。在Close之后调用本方法会返回ErrWriteAfterClose。</p>
+<h4 id="func-Writer-Write"><a href="#func-Writer-Write" class="headerlink" title="func (*Writer) Write"></a>func (*Writer) Write</h4><pre class="language-none"><code class="language-none">func (tw *Writer) Write(b []byte) (n int, err error)</code></pre>
+
+<p>Write向tar档案文件的当前记录中写入数据。如果写入的数据总数超出上一次调用WriteHeader的参数hdr.Size字节，返回ErrWriteTooLong错误。</p>
+<h4 id="func-Writer-Flush"><a href="#func-Writer-Flush" class="headerlink" title="func (*Writer) Flush"></a>func (*Writer) Flush</h4><pre class="language-none"><code class="language-none">func (tw *Writer) Flush() error</code></pre>
+
+<p>Flush结束当前文件的写入。（可选的）</p>
+<h4 id="func-Writer-Close"><a href="#func-Writer-Close" class="headerlink" title="func (*Writer) Close"></a>func (*Writer) Close</h4><pre class="language-none"><code class="language-none">func (tw *Writer) Close() error</code></pre>
+
+<p>Close关闭tar档案文件，会将缓冲中未写入下层的io.Writer接口的数据刷新到下层。</p>
+<p><a target="_blank" rel="noopener" href="http://studygolang.com/">Go语言中文网</a> | <a target="_blank" rel="noopener" href="http://golang.org/">Go Language</a><a target="_blank" rel="noopener" href="https://studygolang.com/static/pkgdoc/pkg/archive_tar.htm#">Back to top</a></p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 jaytp@qq.com </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2016-2020 Yelog
+</p>
+<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>

@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Fish Tank</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="Fish Tank">
+  <title>go语言圣经 | Fish Tank</title>
+  <meta name="keywords" content=" golang ">
+  <meta name="description" content="go语言圣经 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="1.入门1.1 fmt基础包fmt.Scn()  fmt.Scan(&amp;a,&amp;b,&amp;c)     格式字符串 含义    %d 转换十进制输出   %x,%o,%b 转换16,8,2进制   %f,%g,%e 浮点数，小数点后六位，后15位输出   %t 布尔类型输出   %c 字符（rune） (Unicode码点)   %s 字符串   %q quote,带双引号的字符串">
 <meta property="og:type" content="article">
@@ -57,7 +57,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/"
    class="avatar_target">
@@ -355,12 +355,58 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-go圣经" class="article article-type-post" itemscope itemprop="blogPost">
     
+        <h1 class="article-title">go语言圣经</h1>
+    
+    <div class="article-meta">
         
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="golang">golang</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color2">golang</a>
+            
+        </span>
+        
+    </div>
+    <div class="article-meta">
+        
+            Created At : <time class="date" title='Updated At: 2022-06-22 21:16:47'>2022-06-22 21:16</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            Views 👀 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%85%A5%E9%97%A8"><span class="toc-text">1.入门</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-fmt%E5%9F%BA%E7%A1%80%E5%8C%85"><span class="toc-text">1.1 fmt基础包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E5%9F%BA%E7%A1%80%E5%8C%85%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">1.2 基础包的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E5%9F%BA%E7%A1%80%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">1.3 基础关键字的使用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84"><span class="toc-text">2.程序结构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F"><span class="toc-text">2.1 初始化变量</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -373,11 +419,199 @@
     }
 </style>
 </div>
-            <p>hello  world ,this is web index page</p>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-入门"><a href="#1-入门" class="headerlink" title="1.入门"></a>1.入门</h1><h2 id="1-1-fmt基础包"><a href="#1-1-fmt基础包" class="headerlink" title="1.1 fmt基础包"></a>1.1 fmt基础包</h2><p>fmt.Scn()</p>
+<ul>
+<li>fmt.Scan(&amp;a,&amp;b,&amp;c)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>格式字符串</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>%d</td>
+<td>转换十进制输出</td>
+</tr>
+<tr>
+<td>%x,%o,%b</td>
+<td>转换16,8,2进制</td>
+</tr>
+<tr>
+<td>%f,%g,%e</td>
+<td>浮点数，小数点后六位，后15位输出</td>
+</tr>
+<tr>
+<td>%t</td>
+<td>布尔类型输出</td>
+</tr>
+<tr>
+<td>%c</td>
+<td>字符（rune） (Unicode码点)</td>
+</tr>
+<tr>
+<td>%s</td>
+<td>字符串</td>
+</tr>
+<tr>
+<td>%q</td>
+<td>quote,带双引号的字符串”abc”或带单引号的字符’c’</td>
+</tr>
+<tr>
+<td>%v</td>
+<td>变量的自然形式（natural format)字符的自然类型是数字</td>
+</tr>
+<tr>
+<td>%T</td>
+<td>变量的类型,字符&#x3D;uint8</td>
+</tr>
+<tr>
+<td>%%</td>
+<td>字面意义的百分号标志（无操作数）</td>
+</tr>
+</tbody></table>
+<h2 id="1-2-基础包的使用"><a href="#1-2-基础包的使用" class="headerlink" title="1.2 基础包的使用"></a>1.2 基础包的使用</h2><p>os包用来与操作系统交互</p>
+<ul>
+<li>os.Arge[0] 指的是文件本身</li>
+</ul>
+<p>bufio - 基础包</p>
+<ul>
+<li>input :&#x3D; bufio.NewScanner(os.Stdin) 没地用一次就会读取下一行</li>
+<li>input.Scan() 读标准输入</li>
+<li>input.Text() 输出读取内容</li>
+</ul>
+<p>image</p>
+<p>image&#x2F;color</p>
+<p>image&#x2F;gif</p>
+<p>net&#x2F;http</p>
+<p>io&#x2F;ioutil - 基础包</p>
+<p>go build - 构建工具</p>
+<p>go get - fetch第三方包工具</p>
+<h2 id="1-3-基础关键字的使用"><a href="#1-3-基础关键字的使用" class="headerlink" title="1.3 基础关键字的使用"></a>1.3 基础关键字的使用</h2><p>定义变量基础关键字 -var &#x2F; func &#x2F; const &#x2F; type struct {}</p>
+<p>for 关键字</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">for i:&#x3D; 0 ; i&lt;m ; i++&#123;
+    statement
+&#125;
 
-        </article>
-        
-        
+for i !&#x3D; true &#123;
+    statement
+&#125;
+
+for &#123;
+    statement
+    break or continue
+&#125;
+
+for _,_ :&#x3D; range varable&#123;
+    statement
+&#125;</code></pre>
+<p>定义切片 slicp</p>
+<ul>
+<li>var loc_list []int</li>
+<li>loc_list :&#x3D; make([]int,len)</li>
+<li>loc_list:&#x3D; make([]int, length, capacity)<br>初始化切片</li>
+<li>loc_list :&#x3D; []int{1,2,3}</li>
+<li>loc_list :&#x3D; arr[:]</li>
+<li>loc_list :&#x3D; arr[start；end]</li>
+<li>loc_list :&#x3D; arr[start；]</li>
+<li>loc_list :&#x3D; arr[:end]</li>
+<li>new_arr；&#x3D; loc_list[start:end] 旧切片初始化新切片<br>len() 和 cap() 函数 - 计算切片长度和容量<br>append() copy()</li>
+<li>numbers &#x3D; append(numbers, 0)&#x2F;numbers &#x3D; append(numbers, 1)&#x2F;numbers &#x3D; append(numbers, 1,2,3)</li>
+<li>copy(numbers1,numbers) numbers1 的容量比numbers的大<br>切片截取</li>
+<li>截取数字截取区间，包头不包尾</li>
+</ul>
+<p>map - 存储了键&#x2F;值（key&#x2F;value）的集合</p>
+<ul>
+<li>m :&#x3D; make(map[string]int)</li>
+</ul>
+<h1 id="2-程序结构"><a href="#2-程序结构" class="headerlink" title="2.程序结构"></a>2.程序结构</h1><pre class="language-none"><code class="language-none">break      default       func     interface   select
+case       defer         go       map         struct
+chan       else          goto     package     switch
+const      fallthrough   if       range       type
+continue   for           import   return      var</code></pre>
+<p>如下都是golang预定义类型，可以通过var直接和简短式直接申明变量实例</p>
+<pre class="language-none"><code class="language-none">内建常量: true false iota nil
+
+内建类型: int int8 int16 int32 int64
+          uint uint8 uint16 uint32 uint64 uintptr
+          float32 float64 complex128 complex64
+          bool byte rune string error
+
+内建函数: make len cap new append copy close delete
+          complex real imag
+          panic recover</code></pre>
+<p>这些是golang使用的关键字，所函数命名时候要避免冲突</p>
+<h2 id="2-1-初始化变量"><a href="#2-1-初始化变量" class="headerlink" title="2.1 初始化变量"></a>2.1 初始化变量</h2><p>、<strong>type</strong>和<strong>func</strong>， 定义函数变量类型</p>
+<ol>
+<li>传统式  <strong>var</strong>、<strong>const</strong>, <strong>new()</strong> 函数<br>var 变量名 类型 &#x3D; 表达式 ， 类型和表达式可以省略，golang会自己推断变量名类型</li>
+</ol>
+<pre class="language-none"><code class="language-none">var b, f, s &#x3D; true, 2.3, &quot;four&quot;
+
+var f, err &#x3D; os.Open(name) 
+
+i, j &#x3D; j, i &#x2F;&#x2F; 交换 i 和 j 的值
+
+var newname &#x3D; newtype&#123;&#125;
+
+p :&#x3D; new(int)  &#x2F;&#x2F; 创建匿名变量并赋值，切记返回的是指针 *int
+
+</code></pre>
+<p>包级别声明的变量会在main入口 函数执行前完成初始化，局部变量将在语句执行前完成初始化</p>
+<ol start="2">
+<li><p>golang简短式</p>
+<pre class="language-none"><code class="language-none">x :&#x3D; 1
+p :&#x3D; &amp;x         &#x2F;&#x2F; p, of type *int, points to x
+*p &#x3D; 2          &#x2F;&#x2F; equivalent to x &#x3D; 2
+anim :&#x3D; gif.GIF&#123;LoopCount: nframes&#125;
+freq :&#x3D; rand.Float64() * 3.0
+t :&#x3D; 0.0</code></pre>
+</li>
+<li><p>指针<br>函数签名传递指针也会修改函数外参数值</p>
+</li>
+</ol>
+<ul>
+<li>flag包的关键技术<pre class="language-golang" data-language="golang"><code class="language-golang">
+&#x2F;&#x2F; Echo4 prints its command-line arguments.
+package main
+
+import (
+    &quot;flag&quot;
+    &quot;fmt&quot;
+    &quot;strings&quot;
+)
+
+var n &#x3D; flag.Bool(&quot;n&quot;, false, &quot;omit trailing newline&quot;)
+var sep &#x3D; flag.String(&quot;s&quot;, &quot; &quot;, &quot;separator&quot;)
+
+func main() &#123;
+    flag.Parse()
+    fmt.Print(strings.Join(flag.Args(), *sep))
+    if !*n &#123;
+        fmt.Println()
+    &#125;
+&#125;</code></pre></li>
+</ul>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 jaytp@qq.com </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -386,11 +620,11 @@
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>
