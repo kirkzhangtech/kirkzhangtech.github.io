@@ -384,7 +384,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-06-22 21:27:56'>2022-06-22 20:47</time>
+            Created At : <time class="date" title='Updated At: 2022-06-22 21:29:08'>2022-06-22 20:47</time>
         
     </div>
     <div class="article-meta">
@@ -437,34 +437,22 @@
 </ul>
 <h1 id="2-docker镜像基本概念与基本命令"><a href="#2-docker镜像基本概念与基本命令" class="headerlink" title="2.docker镜像基本概念与基本命令"></a>2.docker镜像基本概念与基本命令</h1><h2 id="2-1-镜像基本命令"><a href="#2-1-镜像基本命令" class="headerlink" title="2.1 镜像基本命令"></a>2.1 镜像基本命令</h2><p>拉取镜像: </p>
 <ul>
-<li><p>docker pull [OPTION] NAME</p>
-<pre class="language-text" data-language="text"><code class="language-text">&lt;域名/IP>[:端口号]</code></pre>
-<p>运行镜像： </p>
-</li>
-<li><p>docker run -it –rm 镜像 [命令 &#x2F;bin&#x2F;bash]  参数<br>列举镜像： </p>
-</li>
-<li><p>docker image ls</p>
-</li>
-<li><p>docker images</p>
-</li>
-<li><p>docker image ls -f since&#x3D;mongo:3.2 &#x2F;&#x2F;查看某个镜像之前创建的镜像，同理也有查看某个镜像之后的镜像</p>
-</li>
-<li><p>docker ps &#x3D; docker container ls &#x2F;&#x2F;现实运行中的容器<br>查看镜像体积</p>
-</li>
-<li><p>docker system df<br>虚悬镜像<br>仓库名和版本号都是none，这是因为新版本的镜像跟旧镜像冲突，，删除虚悬镜像</p>
-</li>
-<li><p>docker image prune</p>
-</li>
-<li><p>docker image ls -f dangling&#x3D;true &#x2F;&#x2F;列举虚悬镜像</p>
-</li>
-<li><p>docker image ls -a &#x2F;&#x2F;有些none镜像不是虚悬镜像是中间镜像<br>以特定格式显示</p>
-</li>
-<li><p>docker image ls -q</p>
-</li>
-<li><p>docker image rm [选项] &lt;镜像1&gt; [&lt;镜像2&gt; …]</p>
-</li>
-<li><p>docker image rm $(docker image ls -q redis)  &#x2F;&#x2F;使用docker image ls命令配合使用</p>
-</li>
+<li>docker pull [OPTION] NAME<pre class="language-text" data-language="text"><code class="language-text">&lt;域名/IP>[:端口号]</code></pre>
+运行镜像： </li>
+<li>docker run -it –rm 镜像 [命令 &#x2F;bin&#x2F;bash]  参数<br>列举镜像： </li>
+<li>docker image ls</li>
+<li>docker images</li>
+<li>docker image ls -f since&#x3D;mongo:3.2 &#x2F;&#x2F;查看某个镜像之前创建的镜像，同理也有查看某个镜像之后的镜像</li>
+<li>docker ps &#x3D; docker container ls &#x2F;&#x2F;现实运行中的容器<br>查看镜像体积</li>
+<li>docker system df<br>虚悬镜像<br>仓库名和版本号都是none，这是因为新版本的镜像跟旧镜像冲突，，删除虚悬镜像</li>
+<li>docker image prune</li>
+<li>docker image ls -f dangling&#x3D;true &#x2F;&#x2F;列举虚悬镜像</li>
+<li>docker image ls -a &#x2F;&#x2F;有些none镜像不是虚悬镜像是中间镜像<br>以特定格式显示</li>
+<li>docker image ls -q</li>
+<li>docker image ls –format “: “ &#x2F;&#x2F;支持go模板用法,方便其他程序调用</li>
+<li>docker image ls –format “table \t\t“ &#x2F;&#x2F; 会显示title<br>删除镜像</li>
+<li>docker image rm [选项] &lt;镜像1&gt; [&lt;镜像2&gt; …]</li>
+<li>docker image rm $(docker image ls -q redis)  &#x2F;&#x2F;使用docker image ls命令配合使用</li>
 </ul>
 <p>untageged和删除  </p>
 <ul>
