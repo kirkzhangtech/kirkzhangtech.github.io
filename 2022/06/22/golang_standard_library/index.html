@@ -2,21 +2,20 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>golang standard library - tar | Fish Tank</title>
+  <title>golang standard library | Fish Tank</title>
   <meta name="keywords" content=" raft ">
-  <meta name="description" content="golang standard library - tar | Fish Tank">
+  <meta name="description" content="golang standard library | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1.入门1.1 fmt基础包fmt.Scn()  fmt.Scan(&amp;a,&amp;b,&amp;c)     格式字符串 含义    %d 转换十进制输出   %x,%o,%b 转换16,8,2进制   %f,%g,%e 浮点数，小数点后六位，后15位输出   %t 布尔类型输出   %c 字符（rune） (Unicode码点)   %s 字符串   %q quote,带双引号的字符串">
+<meta name="description" content="1. API介绍1.1 什么是API定义一组与系统交互的界面,是的用户有相对较小的权限操作系统 1.2 为什么API重要不需要像GUI那样很”cosmetic” 1.3 什么是面向资源API RPC-APIRPC APIs are often designed in terms of interfaces and methods. As more and more of these are add">
 <meta property="og:type" content="article">
-<meta property="og:title" content="go语言圣经">
-<meta property="og:url" content="https://simonteo58.github.io/2022/06/22/go%E5%9C%A3%E7%BB%8F/index.html">
+<meta property="og:title" content="API Design Patterns">
+<meta property="og:url" content="https://simonteo58.github.io/2022/06/22/API_design%E5%8E%9F%E5%88%99/index.html">
 <meta property="og:site_name" content="Fish Tank">
-<meta property="og:description" content="1.入门1.1 fmt基础包fmt.Scn()  fmt.Scan(&amp;a,&amp;b,&amp;c)     格式字符串 含义    %d 转换十进制输出   %x,%o,%b 转换16,8,2进制   %f,%g,%e 浮点数，小数点后六位，后15位输出   %t 布尔类型输出   %c 字符（rune） (Unicode码点)   %s 字符串   %q quote,带双引号的字符串">
+<meta property="og:description" content="1. API介绍1.1 什么是API定义一组与系统交互的界面,是的用户有相对较小的权限操作系统 1.2 为什么API重要不需要像GUI那样很”cosmetic” 1.3 什么是面向资源API RPC-APIRPC APIs are often designed in terms of interfaces and methods. As more and more of these are add">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-06-22T13:16:20.661Z">
-<meta property="article:modified_time" content="2022-06-22T13:16:47.061Z">
+<meta property="article:published_time" content="2022-06-22T13:55:02.261Z">
+<meta property="article:modified_time" content="2022-06-22T13:58:42.521Z">
 <meta property="article:author" content="SimonTeo">
-<meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
 
 
@@ -113,7 +112,7 @@
     <li>
         <div class="all active" data-rel="All">All
             
-                <small>(7)</small>
+                <small>(9)</small>
             
         </div>
     </li>
@@ -188,6 +187,55 @@
             
         
     
+        
+            
+                <li>
+                    <div data-rel="linux">
+                        <i class="fold iconfont icon-right"></i>
+                        
+                        linux
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                        <ul class="sub hide">
+                            
+                                <li>
+                                    <div data-rel="linux<--->script">
+                                        
+                                        script
+                                        
+                                            <small>(1
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                        </ul>
+                    
+                </li>
+            
+        
+    
+        
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="WEB API">
+                        
+                        WEB API
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
 </ul>
 <div class="left-bottom">
     <div class="menus">
@@ -206,7 +254,7 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="7">
+<input type="hidden" id="yelog_site_posts_number" value="9">
 
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
@@ -273,7 +321,15 @@
             </li>
         
             <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>linux</a>
+            </li>
+        
+            <li class="article-tag-list-item">
                 <i class="iconfont icon-tag"></i><a>raft</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>script</a>
             </li>
         
     </div>
@@ -282,6 +338,22 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="All WEB API "
+           href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="API Design Patterns">API Design Patterns</span>
+            <span class="post-date" title="2022-06-22 21:55:02">2022/06/22</span>
+        </a>
+        
+        <a  class="All linux script "
+           href="/2022/06/22/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%88%87shell%E8%85%B3%E6%9C%AC%E7%B7%A8%E7%A8%8B%E5%A4%A7%E5%85%A8/"
+           data-tag="linux,script"
+           data-author="" >
+            <span class="post-title" title="Linux命令行與shell腳本編程大全">Linux命令行與shell腳本編程大全</span>
+            <span class="post-date" title="2022-06-22 21:53:01">2022/06/22</span>
+        </a>
         
         <a  class="All golang "
            href="/2022/06/22/go%E5%9C%A3%E7%BB%8F/"
@@ -303,7 +375,7 @@
            href="/2022/06/22/golang_standard_library/"
            data-tag="raft"
            data-author="" >
-            <span class="post-title" title="golang standard library - tar">golang standard library - tar</span>
+            <span class="post-title" title="golang standard library">golang standard library</span>
             <span class="post-date" title="2022-06-22 21:04:15">2022/06/22</span>
         </a>
         
@@ -359,7 +431,7 @@
     <div class="pjax">
         <article id="post-golang_standard_library" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">golang standard library - tar</h1>
+        <h1 class="article-title">golang standard library</h1>
     
     <div class="article-meta">
         
@@ -384,7 +456,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-06-22 21:37:54'>2022-06-22 21:04</time>
+            Created At : <time class="date" title='Updated At: 2022-06-22 22:00:32'>2022-06-22 21:04</time>
         
     </div>
     <div class="article-meta">
@@ -471,9 +543,11 @@ for &#123;
         log.Fatalln(err)
     &#125;
     fmt.Println()
-&#125;</code></pre>
-<p>Output:</p>
-<pre class="language-none"><code class="language-none">Contents of readme.txt:
+&#125;
+
+&#96;&#96;&#96;text
+Output:
+Contents of readme.txt:
 This archive contains some text files.
 Contents of gopher.txt:
 Gopher names:
@@ -499,14 +573,14 @@ Get animal handling licence.</code></pre>
 </li>
 <li>type Writer<ul>
 <li>func NewWriter(w io.Writer) *Writer</li>
-<li>func (tw *Writer) WriteHeader(hdr *Header) error</li>
-<li>func (tw *Writer) Write(b []byte) (n int, err error)</li>
-<li>func (tw *Writer) Flush() error</li>
-<li>func (tw *Writer) Close() error</li>
+<li>func (tw <em>Writer)WriteHeader(hdr \t</em>Header)error</li>
+<li>func (tw *Writer)Write(b []byte)(n int, err error)</li>
+<li>func (tw *Writer)Flush() error</li>
+<li>func (tw *Writer)Close() error</li>
 </ul>
 </li>
 </ul>
-<h3 id="Constants"><a href="#Constants" class="headerlink" title="Constants"></a>Constants</h3><pre class="language-none"><code class="language-none">const (
+<h3 id="Constants"><a href="#Constants" class="headerlink" title="Constants"></a>Constants</h3><pre class="language-golang" data-language="golang"><code class="language-golang">const (
     &#x2F;&#x2F; 类型
     TypeReg           &#x3D; &#39;0&#39;    &#x2F;&#x2F; 普通文件
     TypeRegA          &#x3D; &#39;\x00&#39; &#x2F;&#x2F; 普通文件
@@ -524,17 +598,17 @@ Get animal handling licence.</code></pre>
     TypeGNUSparse     &#x3D; &#39;S&#39;    &#x2F;&#x2F; 稀疏文件
 )</code></pre>
 
-<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><pre class="language-none"><code class="language-none">var (
+<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><pre class="language-golang" data-language="golang"><code class="language-golang">var (
     ErrWriteTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: write too long&quot;)
     ErrFieldTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: header field too long&quot;)
     ErrWriteAfterClose &#x3D; errors.New(&quot;archive&#x2F;tar: write after close&quot;)
 )</code></pre>
 
-<pre class="language-none"><code class="language-none">var (
+<pre class="language-golang" data-language="golang"><code class="language-golang">var (
     ErrHeader &#x3D; errors.New(&quot;archive&#x2F;tar: invalid tar header&quot;)
 )</code></pre>
 
-<h3 id="type-Header"><a href="#type-Header" class="headerlink" title="type Header"></a>type Header</h3><pre class="language-none"><code class="language-none">type Header struct &#123;
+<h3 id="type-Header"><a href="#type-Header" class="headerlink" title="type Header"></a>type Header</h3><pre class="language-golang" data-language="golang"><code class="language-golang">type Header struct &#123;
     Name       string    &#x2F;&#x2F; 记录头域的文件名
     Mode       int64     &#x2F;&#x2F; 权限和模式位
     Uid        int       &#x2F;&#x2F; 所有者的用户ID
@@ -553,44 +627,44 @@ Get animal handling licence.</code></pre>
 &#125;</code></pre>
 
 <p>Header代表tar档案文件里的单个头。Header类型的某些字段可能未使用。</p>
-<h4 id="func-FileInfoHeader"><a href="#func-FileInfoHeader" class="headerlink" title="func FileInfoHeader"></a>func FileInfoHeader</h4><pre class="language-none"><code class="language-none">func FileInfoHeader(fi os.FileInfo, link string) (*Header, error)</code></pre>
+<h4 id="func-FileInfoHeader"><a href="#func-FileInfoHeader" class="headerlink" title="func FileInfoHeader"></a>func FileInfoHeader</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func FileInfoHeader(fi os.FileInfo, link string) (*Header, error)</code></pre>
 
 <p>FileInfoHeader返回一个根据fi填写了部分字段的Header。 如果fi描述一个符号链接，FileInfoHeader函数将link参数作为链接目标。如果fi描述一个目录，会在名字后面添加斜杠。因为os.FileInfo接口的Name方法只返回它描述的文件的无路径名，有可能需要将返回值的Name字段修改为文件的完整路径名。</p>
-<h4 id="func-Header-FileInfo"><a href="#func-Header-FileInfo" class="headerlink" title="func (*Header) FileInfo"></a>func (*Header) FileInfo</h4><pre class="language-none"><code class="language-none">func (h *Header) FileInfo() os.FileInfo</code></pre>
+<h4 id="func-Header-FileInfo"><a href="#func-Header-FileInfo" class="headerlink" title="func (*Header) FileInfo"></a>func (*Header) FileInfo</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (h *Header) FileInfo() os.FileInfo</code></pre>
 
 <p>FileInfo返回该Header对应的文件信息。（os.FileInfo类型）</p>
-<h3 id="type-Reader"><a href="#type-Reader" class="headerlink" title="type Reader"></a>type Reader</h3><pre class="language-none"><code class="language-none">type Reader struct &#123;
+<h3 id="type-Reader"><a href="#type-Reader" class="headerlink" title="type Reader"></a>type Reader</h3><pre class="language-golang" data-language="golang"><code class="language-golang">type Reader struct &#123;
     &#x2F;&#x2F; 内含隐藏或非导出字段
 &#125;</code></pre>
 
 <p>Reader提供了对一个tar档案文件的顺序读取。一个tar档案文件包含一系列文件。Next方法返回档案中的下一个文件（包括第一个），返回值可以被视为io.Reader来获取文件的数据。</p>
-<h4 id="func-NewReader"><a href="#func-NewReader" class="headerlink" title="func NewReader"></a>func NewReader</h4><pre class="language-none"><code class="language-none">func NewReader(r io.Reader) *Reader</code></pre>
+<h4 id="func-NewReader"><a href="#func-NewReader" class="headerlink" title="func NewReader"></a>func NewReader</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func NewReader(r io.Reader) *Reader</code></pre>
 
 <p>NewReader创建一个从r读取的Reader。</p>
-<h4 id="func-Reader-Next"><a href="#func-Reader-Next" class="headerlink" title="func (*Reader) Next"></a>func (*Reader) Next</h4><pre class="language-none"><code class="language-none">func (tr *Reader) Next() (*Header, error)</code></pre>
+<h4 id="func-Reader-Next"><a href="#func-Reader-Next" class="headerlink" title="func (*Reader) Next"></a>func (*Reader) Next</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tr *Reader) Next() (*Header, error)</code></pre>
 
 <p>转入tar档案文件下一记录，它会返回下一记录的头域。</p>
-<h4 id="func-Reader-Read"><a href="#func-Reader-Read" class="headerlink" title="func (*Reader) Read"></a>func (*Reader) Read</h4><pre class="language-none"><code class="language-none">func (tr *Reader) Read(b []byte) (n int, err error)</code></pre>
+<h4 id="func-Reader-Read"><a href="#func-Reader-Read" class="headerlink" title="func (*Reader) Read"></a>func (*Reader) Read</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tr *Reader) Read(b []byte) (n int, err error)</code></pre>
 
 <p>从档案文件的当前记录读取数据，到达记录末端时返回(0, EOF)，直到调用Next方法转入下一记录。</p>
-<h3 id="type-Writer"><a href="#type-Writer" class="headerlink" title="type Writer"></a>type Writer</h3><pre class="language-none"><code class="language-none">type Writer struct &#123;
+<h3 id="type-Writer"><a href="#type-Writer" class="headerlink" title="type Writer"></a>type Writer</h3><pre class="language-golang" data-language="golang"><code class="language-golang">type Writer struct &#123;
     &#x2F;&#x2F; 内含隐藏或非导出字段
 &#125;</code></pre>
 
 <p>Writer类型提供了POSIX.1格式的tar档案文件的顺序写入。一个tar档案文件包含一系列文件。调用WriteHeader来写入一个新的文件，然后调用Write写入文件的数据，该记录写入的数据不能超过hdr.Size字节。</p>
-<h4 id="func-NewWriter"><a href="#func-NewWriter" class="headerlink" title="func NewWriter"></a>func NewWriter</h4><pre class="language-none"><code class="language-none">func NewWriter(w io.Writer) *Writer</code></pre>
+<h4 id="func-NewWriter"><a href="#func-NewWriter" class="headerlink" title="func NewWriter"></a>func NewWriter</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func NewWriter(w io.Writer) *Writer</code></pre>
 
 <p>NewWriter创建一个写入w的*Writer。</p>
-<h4 id="func-Writer-WriteHeader"><a href="#func-Writer-WriteHeader" class="headerlink" title="func (*Writer) WriteHeader"></a>func (*Writer) WriteHeader</h4><pre class="language-none"><code class="language-none">func (tw *Writer) WriteHeader(hdr *Header) error</code></pre>
+<h4 id="func-Writer-WriteHeader"><a href="#func-Writer-WriteHeader" class="headerlink" title="func (*Writer) WriteHeader"></a>func (*Writer) WriteHeader</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) WriteHeader(hdr *Header) error</code></pre>
 
 <p>WriteHeader写入hdr并准备接受文件内容。如果不是第一次调用本方法，会调用Flush。在Close之后调用本方法会返回ErrWriteAfterClose。</p>
-<h4 id="func-Writer-Write"><a href="#func-Writer-Write" class="headerlink" title="func (*Writer) Write"></a>func (*Writer) Write</h4><pre class="language-none"><code class="language-none">func (tw *Writer) Write(b []byte) (n int, err error)</code></pre>
+<h4 id="func-Writer-Write"><a href="#func-Writer-Write" class="headerlink" title="func (*Writer) Write"></a>func (*Writer) Write</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) Write(b []byte) (n int, err error)</code></pre>
 
 <p>Write向tar档案文件的当前记录中写入数据。如果写入的数据总数超出上一次调用WriteHeader的参数hdr.Size字节，返回ErrWriteTooLong错误。</p>
-<h4 id="func-Writer-Flush"><a href="#func-Writer-Flush" class="headerlink" title="func (*Writer) Flush"></a>func (*Writer) Flush</h4><pre class="language-none"><code class="language-none">func (tw *Writer) Flush() error</code></pre>
+<h4 id="func-Writer-Flush"><a href="#func-Writer-Flush" class="headerlink" title="func (*Writer) Flush"></a>func (*Writer) Flush</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) Flush() error</code></pre>
 
 <p>Flush结束当前文件的写入。（可选的）</p>
-<h4 id="func-Writer-Close"><a href="#func-Writer-Close" class="headerlink" title="func (*Writer) Close"></a>func (*Writer) Close</h4><pre class="language-none"><code class="language-none">func (tw *Writer) Close() error</code></pre>
+<h4 id="func-Writer-Close"><a href="#func-Writer-Close" class="headerlink" title="func (*Writer) Close"></a>func (*Writer) Close</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) Close() error</code></pre>
 
 <p>Close关闭tar档案文件，会将缓冲中未写入下层的io.Writer接口的数据刷新到下层。</p>
 <p><a target="_blank" rel="noopener" href="http://studygolang.com/">Go语言中文网</a> | <a target="_blank" rel="noopener" href="http://golang.org/">Go Language</a><a target="_blank" rel="noopener" href="https://studygolang.com/static/pkgdoc/pkg/archive_tar.htm#">Back to top</a></p>

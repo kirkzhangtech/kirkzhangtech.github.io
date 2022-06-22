@@ -6,17 +6,16 @@
   <meta name="keywords" content=" ansible ">
   <meta name="description" content="奔跑吧ansible | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1.入门1.1 fmt基础包fmt.Scn()  fmt.Scan(&amp;a,&amp;b,&amp;c)     格式字符串 含义    %d 转换十进制输出   %x,%o,%b 转换16,8,2进制   %f,%g,%e 浮点数，小数点后六位，后15位输出   %t 布尔类型输出   %c 字符（rune） (Unicode码点)   %s 字符串   %q quote,带双引号的字符串">
+<meta name="description" content="1. API介绍1.1 什么是API定义一组与系统交互的界面,是的用户有相对较小的权限操作系统 1.2 为什么API重要不需要像GUI那样很”cosmetic” 1.3 什么是面向资源API RPC-APIRPC APIs are often designed in terms of interfaces and methods. As more and more of these are add">
 <meta property="og:type" content="article">
-<meta property="og:title" content="go语言圣经">
-<meta property="og:url" content="https://simonteo58.github.io/2022/06/22/go%E5%9C%A3%E7%BB%8F/index.html">
+<meta property="og:title" content="API Design Patterns">
+<meta property="og:url" content="https://simonteo58.github.io/2022/06/22/API_design%E5%8E%9F%E5%88%99/index.html">
 <meta property="og:site_name" content="Fish Tank">
-<meta property="og:description" content="1.入门1.1 fmt基础包fmt.Scn()  fmt.Scan(&amp;a,&amp;b,&amp;c)     格式字符串 含义    %d 转换十进制输出   %x,%o,%b 转换16,8,2进制   %f,%g,%e 浮点数，小数点后六位，后15位输出   %t 布尔类型输出   %c 字符（rune） (Unicode码点)   %s 字符串   %q quote,带双引号的字符串">
+<meta property="og:description" content="1. API介绍1.1 什么是API定义一组与系统交互的界面,是的用户有相对较小的权限操作系统 1.2 为什么API重要不需要像GUI那样很”cosmetic” 1.3 什么是面向资源API RPC-APIRPC APIs are often designed in terms of interfaces and methods. As more and more of these are add">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-06-22T13:16:20.661Z">
-<meta property="article:modified_time" content="2022-06-22T13:16:47.061Z">
+<meta property="article:published_time" content="2022-06-22T13:55:02.261Z">
+<meta property="article:modified_time" content="2022-06-22T13:58:42.521Z">
 <meta property="article:author" content="SimonTeo">
-<meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
 
 
@@ -113,7 +112,7 @@
     <li>
         <div class="all active" data-rel="All">All
             
-                <small>(7)</small>
+                <small>(9)</small>
             
         </div>
     </li>
@@ -188,6 +187,55 @@
             
         
     
+        
+            
+                <li>
+                    <div data-rel="linux">
+                        <i class="fold iconfont icon-right"></i>
+                        
+                        linux
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                        <ul class="sub hide">
+                            
+                                <li>
+                                    <div data-rel="linux<--->script">
+                                        
+                                        script
+                                        
+                                            <small>(1
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                        </ul>
+                    
+                </li>
+            
+        
+    
+        
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="WEB API">
+                        
+                        WEB API
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
 </ul>
 <div class="left-bottom">
     <div class="menus">
@@ -206,7 +254,7 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="7">
+<input type="hidden" id="yelog_site_posts_number" value="9">
 
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
@@ -273,7 +321,15 @@
             </li>
         
             <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>linux</a>
+            </li>
+        
+            <li class="article-tag-list-item">
                 <i class="iconfont icon-tag"></i><a>raft</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>script</a>
             </li>
         
     </div>
@@ -282,6 +338,22 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="All WEB API "
+           href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="API Design Patterns">API Design Patterns</span>
+            <span class="post-date" title="2022-06-22 21:55:02">2022/06/22</span>
+        </a>
+        
+        <a  class="All linux script "
+           href="/2022/06/22/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%88%87shell%E8%85%B3%E6%9C%AC%E7%B7%A8%E7%A8%8B%E5%A4%A7%E5%85%A8/"
+           data-tag="linux,script"
+           data-author="" >
+            <span class="post-title" title="Linux命令行與shell腳本編程大全">Linux命令行與shell腳本編程大全</span>
+            <span class="post-date" title="2022-06-22 21:53:01">2022/06/22</span>
+        </a>
         
         <a  class="All golang "
            href="/2022/06/22/go%E5%9C%A3%E7%BB%8F/"
@@ -303,7 +375,7 @@
            href="/2022/06/22/golang_standard_library/"
            data-tag="raft"
            data-author="" >
-            <span class="post-title" title="golang standard library - tar">golang standard library - tar</span>
+            <span class="post-title" title="golang standard library">golang standard library</span>
             <span class="post-date" title="2022-06-22 21:04:15">2022/06/22</span>
         </a>
         
@@ -384,7 +456,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-06-22 20:46:39'>2022-06-22 20:45</time>
+            Created At : <time class="date" title='Updated At: 2022-06-22 21:57:09'>2022-06-22 20:45</time>
         
     </div>
     <div class="article-meta">
@@ -406,7 +478,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E7%AC%AC%E4%B8%89%E7%AB%A0-inventory-%E6%8F%8F%E8%BF%B0%E4%BD%A0%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-text">3. 第三章 inventory:描述你的服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-inventory%E5%9F%BA%E6%9C%AC%E5%8F%82%E6%95%B0%E5%90%AB%E4%B9%89"><span class="toc-text">3.1 inventory基本参数含义</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-%E4%B8%BB%E6%9C%BA%E5%88%AB%E5%90%8D%E5%92%8C%E7%BE%A4%E7%BB%84"><span class="toc-text">3.1.1 主机别名和群组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-%E4%B8%BB%E6%9C%BA%E5%92%8C%E7%BE%A4%E7%BB%84%E5%8F%98%E9%87%8F%EF%BC%8C%E5%9C%A8inventory%E5%90%84%E8%87%AA%E6%96%87%E4%BB%B6%E4%B8%AD"><span class="toc-text">3.1.2 主机和群组变量，在inventory各自文件中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-%E5%8A%A8%E6%80%81inventory%E8%84%9A%E6%9C%AC%E6%8E%A5%E5%8F%A3"><span class="toc-text">3.1.3 动态inventory脚本接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-4-add-host%E6%A8%A1%E5%9D%97%E5%92%8Cgroup-by%E6%A8%A1%E5%9D%97"><span class="toc-text">3.1.4 add_host模块和group_by模块</span></a></li></ol></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%AC%AC%E4%B8%89%E7%AB%A0-inventory-%E6%8F%8F%E8%BF%B0%E4%BD%A0%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-text">3. 第三章 inventory:描述你的服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-inventory%E5%9F%BA%E6%9C%AC%E5%8F%82%E6%95%B0%E5%90%AB%E4%B9%89"><span class="toc-text">3.1 inventory基本参数含义</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-1-%E4%B8%BB%E6%9C%BA%E5%88%AB%E5%90%8D%E5%92%8C%E7%BE%A4%E7%BB%84"><span class="toc-text">3.1.1 主机别名和群组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-2-%E4%B8%BB%E6%9C%BA%E5%92%8C%E7%BE%A4%E7%BB%84%E5%8F%98%E9%87%8F%EF%BC%8C%E5%9C%A8inventory%E5%90%84%E8%87%AA%E6%96%87%E4%BB%B6%E4%B8%AD"><span class="toc-text">3.1.2 主机和群组变量，在inventory各自文件中</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-%E5%8A%A8%E6%80%81inventory%E8%84%9A%E6%9C%AC%E6%8E%A5%E5%8F%A3"><span class="toc-text">3.1.3 动态inventory脚本接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-4-add-host%E6%A8%A1%E5%9D%97%E5%92%8Cgroup-by%E6%A8%A1%E5%9D%97"><span class="toc-text">3.1.4 add_host模块和group_by模块</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -422,8 +494,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="3-第三章-inventory-描述你的服务器"><a href="#3-第三章-inventory-描述你的服务器" class="headerlink" title="3. 第三章 inventory:描述你的服务器"></a>3. 第三章 inventory:描述你的服务器</h1><p>ansible管理的多台主机文件叫inventory</p>
-<h2 id="3-1-inventory基本参数含义"><a href="#3-1-inventory基本参数含义" class="headerlink" title="3.1 inventory基本参数含义"></a>3.1 inventory基本参数含义</h2><p>inventory文件通常是.ini格式的，常用inventory参数如下</p>
+        <h2 id="3-第三章-inventory-描述你的服务器"><a href="#3-第三章-inventory-描述你的服务器" class="headerlink" title="3. 第三章 inventory:描述你的服务器"></a>3. 第三章 inventory:描述你的服务器</h2><p>ansible管理的多台主机文件叫inventory</p>
+<h3 id="3-1-inventory基本参数含义"><a href="#3-1-inventory基本参数含义" class="headerlink" title="3.1 inventory基本参数含义"></a>3.1 inventory基本参数含义</h3><p>inventory文件通常是.ini格式的，常用inventory参数如下</p>
 <pre class="language-txt" data-language="txt"><code class="language-txt">ansible_ssh_host     #用于指定被管理的主机的真实IP和将要连接的远程主机名.与你想要设定的主机的别名不同的话,可通过此变量设置.
 ansible_ssh_port     #用于指定连接到被管理主机的ssh端口号，默认是22，如果不是默认的端口号,通过此变量设置.
 ansible_ssh_user     #ssh连接时默认使用的用户名
@@ -437,7 +509,7 @@ ansible_python_interpreter     #用来指定python解释器的路径，默认为
 ansible_*_interpreter     #其他解释器路径，用法与ansible_python_interpreter类似，这里"*"可以是ruby或才perl等其他语言
 以上是2.0版本之前的参数，2.0之后有更换，但是向下兼容</code></pre>
 
-<h3 id="3-1-1-主机别名和群组"><a href="#3-1-1-主机别名和群组" class="headerlink" title="3.1.1 主机别名和群组"></a>3.1.1 主机别名和群组</h3><p>inventory支持群组,类似于下面</p>
+<h4 id="3-1-1-主机别名和群组"><a href="#3-1-1-主机别名和群组" class="headerlink" title="3.1.1 主机别名和群组"></a>3.1.1 主机别名和群组</h4><p>inventory支持群组,类似于下面</p>
 <pre class="language-yaml" data-language="yaml"><code class="language-yaml"><span class="token punctuation">[</span>webservers<span class="token punctuation">]</span>
 testserver ansible_port=2202
 
@@ -450,8 +522,9 @@ ansible_private_key_file = .vagrant/machines/default/virtualbox/private_key
 <span class="token punctuation">[</span>web<span class="token punctuation">]</span>
 web<span class="token punctuation">[</span><span class="token datetime number">1:20</span><span class="token punctuation">]</span>.example.com
 </code></pre>
-<h3 id="3-1-2-主机和群组变量，在inventory各自文件中"><a href="#3-1-2-主机和群组变量，在inventory各自文件中" class="headerlink" title="3.1.2 主机和群组变量，在inventory各自文件中"></a>3.1.2 主机和群组变量，在inventory各自文件中</h3><p>在inventory目录下我们根据环境，将不同阶段的变量放进文件，<code>group_vars</code>文件夹下文件名要与<code>hosts</code>文件中的群组保持一致</p>
-<pre class="language-none"><code class="language-none">group_vars
+
+<h4 id="3-1-2-主机和群组变量，在inventory各自文件中"><a href="#3-1-2-主机和群组变量，在inventory各自文件中" class="headerlink" title="3.1.2 主机和群组变量，在inventory各自文件中"></a>3.1.2 主机和群组变量，在inventory各自文件中</h4><p>在inventory目录下我们根据环境，将不同阶段的变量放进文件，<code>group_vars</code>文件夹下文件名要与<code>hosts</code>文件中的群组保持一致</p>
+<pre class="language-text" data-language="text"><code class="language-text">group_vars
 |----production
 |      |- db_primary_host: rhodeisland.example.com
 |      |- db_replica_host: virginia.example.com
@@ -466,8 +539,10 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
 |      |- db_user: widgetuser
 |      |- db_password: L@4Ryz8cRUXedj
 |      |- rabbitmq_host: chicago.example.com</code></pre>
-<h3 id="3-1-3-动态inventory脚本接口"><a href="#3-1-3-动态inventory脚本接口" class="headerlink" title="3.1.3 动态inventory脚本接口"></a>3.1.3 动态inventory脚本接口</h3><p>对于用何种语言实现脚本，没有要求，但必须支持传<code>--list</code>和<code>--host=&lt;hostname&gt;</code>参数,同时<code>--list</code>输出的json字符串也有要求。有群组和主机键值对，<code>_meta</code>要保存主机变量  </p>
+
+<h3 id="3-1-3-动态inventory脚本接口"><a href="#3-1-3-动态inventory脚本接口" class="headerlink" title="3.1.3 动态inventory脚本接口"></a>3.1.3 动态inventory脚本接口</h3><p>对于用何种语言实现脚本，没有要求，但必须支持传<code>--list</code>和<code>--host=&lt;hostname&gt;</code>参数,同时<code>--list</code>输出的json字符串也有要求。有群组和主机键值对，<code>_meta</code>要保存主机变量</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">./dynamic.py  --list</code></pre>
+
 <p>output</p>
 <pre class="language-json" data-language="json"><code class="language-json">
 <span class="token punctuation">&#123;</span>
@@ -493,15 +568,17 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
             <span class="token punctuation">&#125;</span>
         <span class="token punctuation">&#125;</span>
     <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span>
-</code></pre>
+<span class="token punctuation">&#125;</span></code></pre>
+
 <pre class="language-bash" data-language="bash"><code class="language-bash">./dynamic.py  --host<span class="token operator">=</span><span class="token number">192.168</span>.28.71</code></pre>
+
 <p>output</p>
 <pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
     <span class="token property">"host_specific_var"</span><span class="token operator">:</span> <span class="token string">"foo"</span>
 <span class="token punctuation">&#125;</span></code></pre>
+
 <p>ansible支持将动态inventory和动态的inventory放在同一文件夹下(名为inventory的文件夹)通过ansible.cfg的hostfile进行控制，也可以使用<code>-i</code>参数进行控制</p>
-<h3 id="3-1-4-add-host模块和group-by模块"><a href="#3-1-4-add-host模块和group-by模块" class="headerlink" title="3.1.4 add_host模块和group_by模块"></a>3.1.4 add_host模块和group_by模块</h3><p><code>add_host</code><br>playbook运行时，主机被创建是无法追加新主机的。使用<code>add_host</code>模块就可以添加新主机并在此次playbook中生效<br><code>group_by</code><br>书上使用group_by 实现了按照OS系统类型进行分组执行(像if语句)，yml中具体参数不知道什么意思</p>
+<h4 id="3-1-4-add-host模块和group-by模块"><a href="#3-1-4-add-host模块和group-by模块" class="headerlink" title="3.1.4 add_host模块和group_by模块"></a>3.1.4 add_host模块和group_by模块</h4><p><code>add_host</code><br>playbook运行时，主机被创建是无法追加新主机的。使用<code>add_host</code>模块就可以添加新主机并在此次playbook中生效<br><code>group_by</code><br>书上使用group_by 实现了按照OS系统类型进行分组执行(像if语句)，yml中具体参数不知道什么意思.</p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 jaytp@qq.com </span>

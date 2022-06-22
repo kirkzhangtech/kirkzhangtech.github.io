@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>如何在读研的道路上快速失败 | Fish Tank</title>
-  <meta name="keywords" content=" 非技术类 ">
-  <meta name="description" content="如何在读研的道路上快速失败 | Fish Tank">
+  <title>API Design Patterns | Fish Tank</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="API Design Patterns | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="1. API介绍1.1 什么是API定义一组与系统交互的界面,是的用户有相对较小的权限操作系统 1.2 为什么API重要不需要像GUI那样很”cosmetic” 1.3 什么是面向资源API RPC-APIRPC APIs are often designed in terms of interfaces and methods. As more and more of these are add">
 <meta property="og:type" content="article">
@@ -429,9 +429,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-如何在读研的道路上快速失败" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-API_design原则" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">如何在读研的道路上快速失败</h1>
+        <h1 class="article-title">API Design Patterns</h1>
     
     <div class="article-meta">
         
@@ -441,22 +441,15 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="非技术类">非技术类</a>
+            <a  data-rel="WEB API">WEB API</a>
             
         </span>
         
-        
-        <span class="tag">
-            <i class="iconfont icon-tag"></i>
-            
-            <a class="color5">非技术类</a>
-            
-        </span>
         
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-06-22 21:15:32'>2022-06-22 21:14</time>
+            Created At : <time class="date" title='Updated At: 2022-06-22 21:58:42'>2022-06-22 21:55</time>
         
     </div>
     <div class="article-meta">
@@ -478,7 +471,7 @@
     
     <div class="toc-ref">
     
-        
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-API%E4%BB%8B%E7%BB%8D"><span class="toc-text">1. API介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AFAPI"><span class="toc-text">1.1 什么是API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E4%B8%BA%E4%BB%80%E4%B9%88API%E9%87%8D%E8%A6%81"><span class="toc-text">1.2 为什么API重要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E4%BB%80%E4%B9%88%E6%98%AF%E9%9D%A2%E5%90%91%E8%B5%84%E6%BA%90API"><span class="toc-text">1.3 什么是面向资源API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9Dgood%E2%80%9DAPI"><span class="toc-text">1.4 什么是”good”API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#summary"><span class="toc-text">summary</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -494,22 +487,29 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>原创： 陈怡然 陈老师有话说</p>
-<ol>
-<li>为自己找出一堆把其他个人兴趣爱好或者其他事情放在学习之上的理由：比如人活着就是为了享受生活，要事业家庭平衡之类（说真的，这是人生观问题。也许一开始你就根本不需要&#x2F;不应该读研）；</li>
-<li>认为很多必须要做的事情或者要解决的问题拖到最后会不了了之、奇迹般迎刃而解、或者导师会忘（这怎么可能）；</li>
-<li>为导师不经常找自己而沾沾自喜（其实大部分时候那只是因为他觉得不值得在你身上瞎耽误功夫）；</li>
-<li>花很多时间计算到底怎么做才能快速达到最低毕业要求赶紧毕业（易经：取法乎上，仅得其中；取法乎中，仅得其下）；</li>
-<li>每次都指望从师兄师姐那里临时榨点什么以混过和导师的1-on-1（以为导师和师兄师姐傻啊？）；</li>
-<li>总觉得别人做的东西简单容易上手好发文章，不断在不同的题目中跳来跳去（世上那有什么容易的东西，只有你看不到的努力）；</li>
-<li>对导师和同学的建议与帮助出于本能的拒绝并试图证明别人是错的（自尊&#x2F;自信&#x2F;自负&#x2F;自卑大多数时候其实我们自己不是那么容易分的清楚，但别人的善心只会offer一次）；</li>
-<li>总觉得自己比别人聪明，研究做不出来或者文章总不中只是一时粗心或者运气不好（不断重复发生的事情其实就是规律）；</li>
-<li>在每次觉得做不出来、或者做不完的时候玩消失，或者对更大、更复杂的任务说No（盖章：此人难当大任）；</li>
-<li>每次都刚刚做到最低要求，把剩余的工作扔给导师或者合作的同学，并为自己节省下的时间和努力沾沾自喜（你可能还没认识到别人对你的支持永远和你自己的付出成正比这一事实）；</li>
-<li>觉得自己很努力了，但是却怎么也达不到目标或者导师要求（如果确实不是你还有没有挤出来的时间，而你也不愿意承认自己确实不行，那么就多花点时间观察别人学习的方法和效率吧）；</li>
-<li>开始承认自己确实不行，并把全部精力放在劝说老师降低标准放自己毕业上（你可能没理解这件事情的难度在于你要求他降低的是对所有人的标准，而不单单是对你自己的）；</li>
-<li>觉得导师是个傻X（这个其实也不是没有可能。强扭的瓜不甜，我支持你用脚投票。或许到时双方都会大大的松了一口气，多年以后江湖再见还能把酒言欢）。</li>
-</ol>
+        <h2 id="1-API介绍"><a href="#1-API介绍" class="headerlink" title="1. API介绍"></a>1. API介绍</h2><h3 id="1-1-什么是API"><a href="#1-1-什么是API" class="headerlink" title="1.1 什么是API"></a>1.1 什么是API</h3><p>定义一组与系统交互的界面,是的用户有相对较小的权限操作系统</p>
+<h3 id="1-2-为什么API重要"><a href="#1-2-为什么API重要" class="headerlink" title="1.2 为什么API重要"></a>1.2 为什么API重要</h3><p>不需要像GUI那样很”cosmetic”</p>
+<h3 id="1-3-什么是面向资源API"><a href="#1-3-什么是面向资源API" class="headerlink" title="1.3 什么是面向资源API"></a>1.3 什么是面向资源API</h3><ul>
+<li>RPC-API<br>RPC APIs are often designed in terms of interfaces and methods. As more and more of these are added over time, the end result can be an overwhelming and confusing API surface due to the fact that developers must learn each method individually. Obviously this is both time consuming and error-prone.<br>RPC的命名没有严格的要求，无状态的，随着RPC的接口增加，接口管理就会面临混乱结果</li>
+<li>HTTP-API<br>The architectural style of REST was introduced, primarily designed to work well with HTTP&#x2F;1.1, but also to help tackle this problem. Its core principle is to define named resources that can be manipulated using a small number of methods. The resources and methods are known as nouns and verbs of APIs. With the HTTP protocol, the resource names naturally map to URLs, and methods naturally map to HTTP methods POST, GET, PUT, PATCH, and DELETE. This results in much fewer things to learn, since developers can focus on the resources and their relationship, and assume that they have the same small number of standard methods.<br>通常url就是资源的映射，对资源的CRUD就是对应HTTP的PATCH,POST,GET DELETE</li>
+</ul>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://cloud.google.com/apis/design/resources">https://cloud.google.com/apis/design/resources</a></p>
+</blockquote>
+<h3 id="1-4-什么是”good”API"><a href="#1-4-什么是”good”API" class="headerlink" title="1.4 什么是”good”API"></a>1.4 什么是”good”API</h3><ul>
+<li>Operational<br>你的API必须得work,高效。</li>
+<li>Expressive<br>你的method必须是具有描述意义的，告诉用户你能做什么</li>
+<li>Simple<br>Another common position on simplicity takes the old saying about the “common<br>case” (“Make the common case fast”) but focuses instead on usability while leaving<br>room for edge cases. This restatement is to “make the common case awesome and the<br>advanced case possible.” This means that whenever you add something that might<br>complicate an API for the benefit of an advanced user, it’s best to keep this complication sufficiently hidden from a typical user only interested in the common case. This<br>keeps the more frequent scenarios simple and easy, while still enabling more<br>advanced features for those who want them</li>
+<li>Predictable<br>方法和参数需要见名知意<br>APIs built using well-known, well-defined, clear</li>
+</ul>
+<h3 id="summary"><a href="#summary" class="headerlink" title="summary"></a>summary</h3><ul>
+<li>Interfaces are contracts that define how two systems should interact with one another.</li>
+<li>APIs are special types of interfaces that define how two computer systems interact with one another, coming in many forms, such as downloadable libraries and web APIs.</li>
+<li>Web APIs are special because they expose functionality over a network, hiding the specific implementation or computational requirements needed for that functionality.</li>
+<li>Resource-oriented APIs are a way of designing APIs to reduce complexity byrelying on a standard set of actions, called methods, across a limited set of things, called resources.</li>
+<li>What makes APIs “good” is a bit ambiguous, but generally good APIs are operational, expressive, simple, and predictable.</li>
+<li>对数据和系统的抽象会决定你的API – 李沐</li>
+</ul>
 
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 jaytp@qq.com </span>
