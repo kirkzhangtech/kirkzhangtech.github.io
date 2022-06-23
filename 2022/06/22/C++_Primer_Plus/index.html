@@ -642,7 +642,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-06-24 01:18:03'>2022-06-22 01:01</time>
+            Created At : <time class="date" title='Updated At: 2022-06-24 01:21:43'>2022-06-22 01:01</time>
         
     </div>
     <div class="article-meta">
@@ -1542,56 +1542,56 @@ v1<span class="token operator">!=</span>v2<span class="token punctuation">;</spa
   </details></li>
 </ul>
 <h3 id="2-5-数组"><a href="#2-5-数组" class="headerlink" title="2.5 数组"></a>2.5 数组</h3><p>如果不清楚元素的确切个数,请使用vector,数组的大小确定不变,不能随意向数组中增加元素.因为数组的大小固定,因此对某些特殊的应用来说程序的运行时性能较好,但是相应地也损失了一些灵活性.</p>
-<h4 id="2-5-1-定义和初始化内置数组"><a href="#2-5-1-定义和初始化内置数组" class="headerlink" title="2.5.1 定义和初始化内置数组"></a>2.5.1 定义和初始化内置数组</h4><ul>
+<h4 id="2-5-1-定义和初始化内置数组"><a href="#2-5-1-定义和初始化内置数组" class="headerlink" title="2.5.1 定义和初始化内置数组"></a>2.5.1 定义和初始化内置数组</h4><ol>
 <li><p>显示初始化数组</p>
-  <details>
-  <summary>数组初始化示例</summary>
-  <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">const</span> <span class="token keyword">unsigned</span> sz<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">;</span> 定义常量
+ <details>
+ <summary>数组初始化示例</summary>
+ <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">const</span> <span class="token keyword">unsigned</span> sz<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">;</span> 定义常量
 <span class="token keyword">int</span> ia1 <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span>，<span class="token number">2</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token keyword">int</span> a2<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token keyword">int</span> a3<span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 string a4<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">"hi"</span><span class="token punctuation">,</span><span class="token string">"byte"</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token keyword">int</span> a5<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">&#125;</span>  <span class="token comment">//错误，超出容量</span></code></pre>
 
-  </details></li>
+ </details></li>
 <li><p>字符数组的特殊性</p>
- <details>
- <summary>字符数组特殊性初始化示例</summary>
+<details>
+<summary>字符数组特殊性初始化示例</summary>
 
- <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">char</span> a1<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token char">'c'</span><span class="token punctuation">,</span><span class="token char">'+'</span><span class="token punctuation">,</span><span class="token char">'+'</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">char</span> a1<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token char">'c'</span><span class="token punctuation">,</span><span class="token char">'+'</span><span class="token punctuation">,</span><span class="token char">'+'</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token keyword">char</span> a2<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token char">'c'</span><span class="token punctuation">,</span><span class="token char">'+'</span><span class="token punctuation">,</span><span class="token char">'+'</span><span class="token punctuation">,</span><span class="token char">'\0'</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span class="token comment">//显示胡世华空字符</span>
 <span class="token keyword">char</span> a3<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"C++"</span><span class="token punctuation">;</span> <span class="token comment">//自动初始化空字符</span>
 <span class="token keyword">const</span> a4<span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">]</span>  <span class="token operator">=</span> <span class="token string">"Daneil"</span>  <span class="token comment">//错误没有空间存放空字符</span>
 </code></pre>
 
- </details></li>
+</details></li>
 <li><p>不允许拷贝赋值</p>
-  <details>
-  <summary>不允许拷贝赋值示例</summary>
+ <details>
+ <summary>不允许拷贝赋值示例</summary>
 
-  <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> a<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">&#125;</span> <span class="token comment">//含有三个元素的数组</span>
+ <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> a<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">&#125;</span> <span class="token comment">//含有三个元素的数组</span>
 <span class="token keyword">int</span> a2<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> a1<span class="token punctuation">;</span> <span class="token comment">// 错误: 不允许使用一个数组给另一个数组进行初始化</span>
     a2 <span class="token operator">=</span> a1 <span class="token comment">//错误: 不允许两个数组之间直接赋值计算</span>
  </code></pre>
 
-  </details>
+ </details>
 </li>
 <li><p>复杂数组声明</p>
-  <details>
-  <summary>复杂数组声明示例</summary>
+ <details>
+ <summary>复杂数组声明示例</summary>
 
-  <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> <span class="token operator">*</span>ptrs<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span>  <span class="token comment">// 指向含有10个整型指针的数组</span>
+ <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> <span class="token operator">*</span>ptrs<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span>  <span class="token comment">// 指向含有10个整型指针的数组</span>
 <span class="token keyword">int</span> <span class="token operator">&amp;</span>refs<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span><span class="token comment">/*?*/</span> 不存在引用的数组
 <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>Parrary<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">&amp;</span>arr<span class="token punctuation">;</span> <span class="token comment">// 指向一个含有是个整数的数组</span>
 <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>arrRef<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span> arr <span class="token punctuation">;</span> <span class="token comment">//arrRef 引用指向一个含有是个整数的数组</span>
 <span class="token keyword">int</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>arry<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span> ptrs <span class="token punctuation">;</span> <span class="token comment">// 首先知道arry是一个引用，然后观察右边知道，arry引用的对象是一个大小为10的数组，最后观察左边知道，数组的元素类型是指向int的指针。这样，arry就是一个含有10个int型指针的数组的引用</span></code></pre>
 
-  </details></li>
-</ul>
-<h4 id="2-5-2-访问数组元素"><a href="#2-5-2-访问数组元素" class="headerlink" title="2.5.2 访问数组元素"></a>2.5.2 访问数组元素</h4><ul>
+ </details></li>
+</ol>
+<h4 id="2-5-2-访问数组元素"><a href="#2-5-2-访问数组元素" class="headerlink" title="2.5.2 访问数组元素"></a>2.5.2 访问数组元素</h4><ol>
 <li>在使用数组下标的时候，通常将其定义为size_t类型</li>
 <li>检查下标的值, CPP要检查数组下标</li>
-</ul>
+</ol>
 <h2 id="3-CPP流程控制"><a href="#3-CPP流程控制" class="headerlink" title="3. CPP流程控制"></a>3. CPP流程控制</h2><ul>
 <li>如果标准输入输出作为<code>if</code>,<code>while</code>条件，读到文件结束符判断假，或者是无效输入</li>
 </ul>
