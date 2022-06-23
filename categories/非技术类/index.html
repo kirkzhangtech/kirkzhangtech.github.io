@@ -371,6 +371,10 @@
 </div>
 
     
+    <div id="local-search-result">
+
+    </div>
+    
     <nav id="title-list-nav">
         
         <a  class="All leetcode leetcode题解 "
@@ -632,7 +636,7 @@
 </style>
 </div>
             <h1 id="张士明-SimonTeo"><a href="#张士明-SimonTeo" class="headerlink" title="张士明(SimonTeo)"></a>张士明(SimonTeo)</h1><ul>
-<li>email <a href="mailto:&#x7a;&#x78;&#x63;&#55;&#x34;&#49;&#x32;&#48;&#56;&#53;&#56;&#52;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;">&#x7a;&#x78;&#x63;&#55;&#x34;&#49;&#x32;&#48;&#56;&#53;&#56;&#52;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;</a></li>
+<li>email <a href="mailto:&#122;&#120;&#99;&#x37;&#52;&#49;&#x32;&#x30;&#56;&#x35;&#x38;&#x34;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#109;">&#122;&#120;&#99;&#x37;&#52;&#49;&#x32;&#x30;&#56;&#x35;&#x38;&#x34;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#109;</a></li>
 <li>homepage <a href="https://simonteo58.github.io/">https://simonteo58.github.io/</a></li>
 </ul>
 <!--
@@ -684,7 +688,7 @@ Supported arguments:
     </div>
     <div class="copyright">
         <p class="footer-entry">
-    ©2016-2020 Yelog
+    i hear i forget, i look i remember , i do i understand
 </p>
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
@@ -705,7 +709,7 @@ Supported arguments:
     function initArticle() {
         /*渲染对应的表格样式*/
         
-            $("#post .pjax table").addClass("green_title");
+            $("#post .pjax table").addClass("green");
         
 
         /*渲染打赏样式*/
@@ -798,6 +802,24 @@ Supported arguments:
     
 
     /*列表样式*/
+    
+    #post .pjax article .article-entry>ol, #post .pjax article .article-entry>ul, #post .pjax article>ol, #post .pjax article>ul{
+        border: #e2dede solid 1px;
+        border-radius: 10px;
+        padding: 10px 32px 10px 56px;
+    }
+    #post .pjax article .article-entry li>ol, #post .pjax article .article-entry li>ul,#post .pjax article li>ol, #post .pjax article li>ul{
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    #post .pjax article .article-entry>ol>li, #post .pjax article .article-entry>ul>li,#post .pjax article>ol>li, #post .pjax article>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
+    #post .pjax article .article-entry li>ol>li, #post .pjax article .article-entry li>ul>li,#post .pjax article li>ol>li, #post .pjax article li>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
     
 
     /* 背景图样式 */

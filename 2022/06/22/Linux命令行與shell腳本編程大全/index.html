@@ -371,6 +371,10 @@
 </div>
 
     
+    <div id="local-search-result">
+
+    </div>
+    
     <nav id="title-list-nav">
         
         <a  class="All leetcode leetcode题解 "
@@ -1006,7 +1010,7 @@ print <span class="token string">"This concludes the listing"</span>
 <p>替换指定行<br>sed ‘2s&#x2F;dog&#x2F;cat&#x2F;‘ data1.txt        这个命令的意思就是将data1.txt替换第二行中的dog，替换成cat<br>sed ‘2,3s&#x2F;dog&#x2F;cat&#x2F;‘ data1.txt    以此类推是第二行，第三行<br>sed ‘2,$s&#x2F;dog&#x2F;cat&#x2F;‘ data1.txt    从第二行开始到最后一行<br>sed ‘&#x2F;Samantha&#x2F;s&#x2F;bash&#x2F;csh&#x2F;‘ &#x2F;etc&#x2F;passwd   推过模式匹配<br>sed ‘3,${<br>  s&#x2F;brown&#x2F;green&#x2F;<br>  s&#x2F;lazy&#x2F;active&#x2F;<br>  }’ data1.txt</p>
 
       
-       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 jaytp@qq.com </span>
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>
 </article>
 
@@ -1045,7 +1049,7 @@ print <span class="token string">"This concludes the listing"</span>
     </div>
     <div class="copyright">
         <p class="footer-entry">
-    ©2016-2020 Yelog
+    i hear i forget, i look i remember , i do i understand
 </p>
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
@@ -1066,7 +1070,7 @@ print <span class="token string">"This concludes the listing"</span>
     function initArticle() {
         /*渲染对应的表格样式*/
         
-            $("#post .pjax table").addClass("green_title");
+            $("#post .pjax table").addClass("green");
         
 
         /*渲染打赏样式*/
@@ -1159,6 +1163,24 @@ print <span class="token string">"This concludes the listing"</span>
     
 
     /*列表样式*/
+    
+    #post .pjax article .article-entry>ol, #post .pjax article .article-entry>ul, #post .pjax article>ol, #post .pjax article>ul{
+        border: #e2dede solid 1px;
+        border-radius: 10px;
+        padding: 10px 32px 10px 56px;
+    }
+    #post .pjax article .article-entry li>ol, #post .pjax article .article-entry li>ul,#post .pjax article li>ol, #post .pjax article li>ul{
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    #post .pjax article .article-entry>ol>li, #post .pjax article .article-entry>ul>li,#post .pjax article>ol>li, #post .pjax article>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
+    #post .pjax article .article-entry li>ol>li, #post .pjax article .article-entry li>ul>li,#post .pjax article li>ol>li, #post .pjax article li>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
     
 
     /* 背景图样式 */

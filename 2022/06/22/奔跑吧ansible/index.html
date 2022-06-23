@@ -371,6 +371,10 @@
 </div>
 
     
+    <div id="local-search-result">
+
+    </div>
+    
     <nav id="title-list-nav">
         
         <a  class="All leetcode leetcode题解 "
@@ -778,7 +782,7 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
 <h4 id="3-1-4-add-host模块和group-by模块"><a href="#3-1-4-add-host模块和group-by模块" class="headerlink" title="3.1.4 add_host模块和group_by模块"></a>3.1.4 add_host模块和group_by模块</h4><p><code>add_host</code><br>playbook运行时，主机被创建是无法追加新主机的。使用<code>add_host</code>模块就可以添加新主机并在此次playbook中生效<br><code>group_by</code><br>书上使用group_by 实现了按照OS系统类型进行分组执行(像if语句)，yml中具体参数不知道什么意思.</p>
 
       
-       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 jaytp@qq.com </span>
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>
 </article>
 
@@ -817,7 +821,7 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
     </div>
     <div class="copyright">
         <p class="footer-entry">
-    ©2016-2020 Yelog
+    i hear i forget, i look i remember , i do i understand
 </p>
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
@@ -838,7 +842,7 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
     function initArticle() {
         /*渲染对应的表格样式*/
         
-            $("#post .pjax table").addClass("green_title");
+            $("#post .pjax table").addClass("green");
         
 
         /*渲染打赏样式*/
@@ -931,6 +935,24 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
     
 
     /*列表样式*/
+    
+    #post .pjax article .article-entry>ol, #post .pjax article .article-entry>ul, #post .pjax article>ol, #post .pjax article>ul{
+        border: #e2dede solid 1px;
+        border-radius: 10px;
+        padding: 10px 32px 10px 56px;
+    }
+    #post .pjax article .article-entry li>ol, #post .pjax article .article-entry li>ul,#post .pjax article li>ol, #post .pjax article li>ul{
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    #post .pjax article .article-entry>ol>li, #post .pjax article .article-entry>ul>li,#post .pjax article>ol>li, #post .pjax article>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
+    #post .pjax article .article-entry li>ol>li, #post .pjax article .article-entry li>ul>li,#post .pjax article li>ol>li, #post .pjax article li>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
     
 
     /* 背景图样式 */
