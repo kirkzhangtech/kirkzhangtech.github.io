@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Fish Tank</title>
+  <title>二叉树的中序排序 | Fish Tank</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Fish Tank">
+  <meta name="description" content="二叉树的中序排序 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang  *  * [13] 罗马数字转整数   2. I X C 也是写成从大到小  3. 左高位，右低位  4. 输入: s &#x3D; &quot;MC MX CI V&quot;              1100 1010 101 5 	输">
 <meta property="og:type" content="article">
@@ -56,7 +56,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/"
    class="avatar_target">
@@ -625,12 +625,64 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-leetcode/94.二叉树的中序遍历" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%A0%E5%A3%AB%E6%98%8E-SimonTeo"><span class="toc-text">张士明(SimonTeo)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Education"><span class="toc-text">Education</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B9%96%E5%8D%97%E5%B7%A5%E5%AD%A6%E9%99%A2-2014-9-2018-09"><span class="toc-text">湖南工学院 2014.9 - 2018.09</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Experience"><span class="toc-text">Experience</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HSBC-Tech-China-contractor-2020-6-present"><span class="toc-text">HSBC Tech China(contractor) 2020.6 - present</span></a></li></ol></li></ol></li></ol>
+        <h1 class="article-title">二叉树的中序排序</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="leetcode">leetcode</a> > 
+            
+            <a  data-rel="leetcode&lt;---&gt;leetcode题解">leetcode题解</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            Created At : <time class="date" title='Updated At: 2022-06-24 07:34:20'>2022-06-23 00:10</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            Views 👀 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+        <span class="top-comment" title="跳转至评论区">
+            <a href="#comments">
+                Comment:<span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </a>
+        </span>
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        
     
 <style>
     .left-col .switch-btn,
@@ -643,35 +695,123 @@
     }
 </style>
 </div>
-            <h1 id="张士明-SimonTeo"><a href="#张士明-SimonTeo" class="headerlink" title="张士明(SimonTeo)"></a>张士明(SimonTeo)</h1><ul>
-<li>email <a href="mailto:&#122;&#120;&#x63;&#55;&#52;&#x31;&#50;&#48;&#x38;&#53;&#56;&#x34;&#64;&#103;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#109;">&#122;&#120;&#x63;&#55;&#52;&#x31;&#50;&#48;&#x38;&#53;&#56;&#x34;&#64;&#103;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#109;</a></li>
-<li>homepage <a href="https://simonteo58.github.io/">https://simonteo58.github.io/</a></li>
-</ul>
-<!--
-include contact information from the front matter
-Supported arguments:
-    - homepage: url, text
-    - phone
-    - email
--->
-
-<p>{% include cv-contact.html %}</p>
-<h2 id="Education"><a href="#Education" class="headerlink" title="Education"></a>Education</h2><h3 id="湖南工学院-2014-9-2018-09"><a href="#湖南工学院-2014-9-2018-09" class="headerlink" title="湖南工学院 2014.9 - 2018.09"></a><strong>湖南工学院</strong> <code>2014.9 - 2018.09</code></h3><pre><code>学士学位
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre class="language-text" data-language="text"><code class="language-text">/*
+ * @lc app=leetcode.cn id=94 lang=cpp
+ *
+ * [94] 二叉树的中序遍历
+ *
+ * https://leetcode.cn/problems/binary-tree-inorder-traversal/description/
+ *
+ * algorithms
+ * Easy (75.91%)
+ * Likes:    1465
+ * Dislikes: 0
+ * Total Accepted:    855.6K
+ * Total Submissions: 1.1M
+ * Testcase Example:  '[1,null,2,3]'
+ *
+ * 给定一个二叉树的根节点 root ，返回 它的 中序 遍历 。
+ * 
+ * 
+ * 
+ * 示例 1：
+ * 
+ * 
+ * 输入：root = [1,null,2,3]
+ * 输出：[1,3,2]
+ * 
+ * 
+ * 示例 2：
+ * 
+ * 
+ * 输入：root = []
+ * 输出：[]
+ * 
+ * 
+ * 示例 3：
+ * 
+ * 
+ * 输入：root = [1]
+ * 输出：[1]
+ * 
+ * 
+ * 
+ * 
+ * 提示：
+ * 
+ * 
+ * 树中节点数目在范围 [0, 100] 内
+ * -100 &lt;= Node.val &lt;= 100
+ * 
+ * 
+ * 
+ * 
+ * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+ * 
+ */
+// @lc code=start
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode &#123;
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;
+ * &#125;;
+ */
 </code></pre>
-<ul>
-<li>无机非金属材料学士学位</li>
-</ul>
-<h2 id="Experience"><a href="#Experience" class="headerlink" title="Experience"></a>Experience</h2><h3 id="HSBC-Tech-China-contractor-2020-6-present"><a href="#HSBC-Tech-China-contractor-2020-6-present" class="headerlink" title="HSBC Tech China(contractor) 2020.6 - present"></a><strong>HSBC Tech China(contractor)</strong> <code>2020.6 - present</code></h3><p><em>Mid-software-engineer</em><br></p>
-<ol>
-<li>as a software-engineer solving xxxxxxx</li>
-<li>commonly using shell script figured out testing cases</li>
-<li>keep testing envirement stable ,and located root casuse of testing cases that tester put them in</li>
-<li>associated with software vendor to change system setup, more like source code and configuration</li>
-</ol>
 
-        </article>
-        
-        
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span><span class="token string">&lt;stack></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span><span class="token string">&lt;vector></span></span>
+
+ <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> val<span class="token punctuation">;</span>
+      TreeNode <span class="token operator">*</span>left<span class="token punctuation">;</span> 
+      TreeNode <span class="token operator">*</span>right<span class="token punctuation">;</span>
+      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">,</span> TreeNode <span class="token operator">*</span>left<span class="token punctuation">,</span> TreeNode <span class="token operator">*</span>right<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span>left<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span>right<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+ <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">inorderTraversal</span><span class="token punctuation">(</span>TreeNode<span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        std<span class="token double-colon punctuation">::</span>stack<span class="token operator">&lt;</span>TreeNode<span class="token operator">*</span><span class="token operator">></span>  treeStack <span class="token punctuation">;</span>
+        std<span class="token double-colon punctuation">::</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> nodes<span class="token punctuation">;</span>
+
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>root <span class="token operator">||</span> <span class="token operator">!</span>treeStack<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+                treeStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                root <span class="token operator">=</span> root<span class="token operator">-></span>left<span class="token punctuation">;</span>
+
+            <span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+                root <span class="token operator">=</span> treeStack<span class="token punctuation">.</span><span class="token function">top</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                treeStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                nodes<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>root <span class="token operator">-></span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                root <span class="token operator">=</span> root <span class="token operator">-></span> right<span class="token punctuation">;</span>
+
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> nodes<span class="token punctuation">;</span>
+
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// @lc code=end</span></code></pre>
+      
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
+    </div>
+</article>
+
+
+
+
+
     <div id="comments"></div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
 
@@ -693,6 +833,13 @@ Supported arguments:
 </script>
 
 
+
+
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -701,11 +848,11 @@ Supported arguments:
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>
