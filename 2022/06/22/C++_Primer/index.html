@@ -496,14 +496,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"
            data-tag=""
            data-author="" >
@@ -512,10 +504,10 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
+           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
+            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -524,6 +516,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="9.回文数">9.回文数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -676,7 +676,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-07-12 10:54:16'>2022-06-22 01:01</time>
+            Created At : <time class="date" title='Updated At: 2022-07-12 11:15:13'>2022-06-22 01:01</time>
         
     </div>
     <div class="article-meta">
@@ -730,41 +730,39 @@
 
 <!-- /TOC -->
 
-<h1 id="1-变量及基本类型"><a href="#1-变量及基本类型" class="headerlink" title="1. 变量及基本类型"></a>1. 变量及基本类型</h1><pre><code>- g++ -o hello_world  -std=c++11  hello_world.cpp  
-将源代码cpp文件编程成二进制程序,并支持C++11
-- CPP保留字
-
-    |1|2|3|4|
-    | ------------ | --------- | ---------------- | -------- |
-    |asm          | else      | new              | this / 自身地址     |
-    | auto         | enum      | operator         | throw    |
-    | bool         | explicit  | private          | true / 真 / 0     |
-    | break        | export    | protected        | try      |
-    | case         | extern    | public           | typedef / 别名定义  |
-    | catch        | false     | register         | typeid   |
-    | char         | float /单精度    | reinterpret_cast | typename |
-    | class        | for       | return           | union    |
-    | const        | friend    | short            | unsigned / 无符号 |
-    | const_cast   | goto      | signed / 有符号          | using / 使用命名空间   |
-    | continue     | if        | sizeof           | virtual  |
-    | default      | inline    | static           | void / 空类型    |
-    | delete       | int       | static_cast      | volatile |
-    | do           | long      | struct           | wchar_t  |
-    | double       | mutable   | switch /           | while / 循环   |
-    | dynamic_cast | namespace | template|
-</code></pre>
-<ol>
-<li><p>typedef声明</p>
- <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">typedef</span> <span class="token keyword">short</span> <span class="token keyword">int</span> s_int<span class="token punctuation">;</span></code></pre>
-
- <pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">typedef</span> <span class="token keyword">int</span> feet<span class="token punctuation">;</span></code></pre>
-
- <pre class="language-cpp" data-language="cpp"><code class="language-cpp">feet distance <span class="token comment">//合法声明</span></code></pre>
+<h1 id="1-变量及基本类型"><a href="#1-变量及基本类型" class="headerlink" title="1. 变量及基本类型"></a>1. 变量及基本类型</h1><ol>
+<li><p>g++ -o hello_world  -std&#x3D;c++11  hello_world.cpp<br>将源代码cpp文件编程成二进制程序,并支持C++11</p>
 </li>
-<li><p>枚举类型<br> 所谓”枚举”是指将变量的值一一列举出来，变量赋值时候只能是特定的变量才能赋值</p>
- <details><summary>枚举类型demo</summary>
+<li><p>CPP保留字</p>
+<pre><code>|1|2|3|4|
+| ------------ | --------- | ---------------- | -------- |
+|asm          | else      | new              | this / 自身地址     |
+| auto         | enum      | operator         | throw    |
+| bool         | explicit  | private          | true / 真 / 0     |
+| break        | export    | protected        | try      |
+| case         | extern    | public           | typedef / 别名定义  |
+| catch        | false     | register         | typeid   |
+| char         | float /单精度    | reinterpret_cast | typename |
+| class        | for       | return           | union    |
+| const        | friend    | short            | unsigned / 无符号 |
+| const_cast   | goto      | signed / 有符号          | using / 使用命名空间   |
+| continue     | if        | sizeof           | virtual  |
+| default      | inline    | static           | void / 空类型    |
+| delete       | int       | static_cast      | volatile |
+| do           | long      | struct           | wchar_t  |
+| double       | mutable   | switch /           | while / 循环   |
+| dynamic_cast | namespace | template|
+</code></pre>
+</li>
+<li><p>typedef声明</p>
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">typedef</span> <span class="token keyword">short</span> <span class="token keyword">int</span> s_int<span class="token punctuation">;</span>
+<span class="token keyword">typedef</span> <span class="token keyword">int</span> feet<span class="token punctuation">;</span>
+feet distance <span class="token comment">//合法声明</span></code></pre>
+</li>
+<li><p>枚举类型<br>所谓”枚举”是指将变量的值一一列举出来，变量赋值时候只能是特定的变量才能赋值</p>
+<details><summary>枚举类型demo</summary>
 
- <pre class="language-cpp" data-language="cpp"><code class="language-cpp">
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp">
 <span class="token keyword">enum</span> 枚举名<span class="token punctuation">&#123;</span> 
     标识符<span class="token punctuation">[</span><span class="token operator">=</span>整型常数<span class="token punctuation">]</span><span class="token punctuation">,</span> 
     标识符<span class="token punctuation">[</span><span class="token operator">=</span>整型常数<span class="token punctuation">]</span><span class="token punctuation">,</span> 
@@ -777,10 +775,10 @@ c <span class="token operator">=</span> blue
 <span class="token comment">//默认情况下，是从0开始初始化</span>
 </code></pre>
 
- </details></li>
-</ol>
-<ul>
-<li><p>三字符组<br>以前为了表示键盘上没有的字符</p>
+</details>
+</li>
+<li><p>三字符组</p>
+<p>以前为了表示键盘上没有的字符</p>
 <table>
 <thead>
 <tr>
@@ -826,86 +824,7 @@ c <span class="token operator">=</span> blue
 </tr>
 </tbody></table>
 </li>
-<li><p>基本的内置数据类型</p>
-</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>类型</th>
-<th>关键字</th>
-<th>长度</th>
-<th>备注</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>布尔型</td>
-<td>bool</td>
-<td>1字节</td>
-<td></td>
-</tr>
-<tr>
-<td>字符型</td>
-<td>char</td>
-<td>1字节</td>
-<td>sign char，char是两种类型，只是字符表示相同</td>
-</tr>
-<tr>
-<td>整型</td>
-<td>int</td>
-<td>4字节</td>
-<td></td>
-</tr>
-<tr>
-<td>短整型</td>
-<td>short int</td>
-<td>2字节</td>
-<td></td>
-</tr>
-<tr>
-<td>长整型</td>
-<td>long int</td>
-<td>8字节</td>
-<td></td>
-</tr>
-<tr>
-<td>长长整型</td>
-<td>long long</td>
-<td>16字节</td>
-<td>long long &#x3D; long long int</td>
-</tr>
-<tr>
-<td>浮点型</td>
-<td>float</td>
-<td>4字节</td>
-<td></td>
-</tr>
-<tr>
-<td>双浮点型</td>
-<td>double</td>
-<td>8字节</td>
-<td></td>
-</tr>
-<tr>
-<td>长双浮点型</td>
-<td>long double</td>
-<td>16字节</td>
-<td></td>
-</tr>
-<tr>
-<td>无类型</td>
-<td>void</td>
-<td>null</td>
-<td></td>
-</tr>
-<tr>
-<td>宽字符型</td>
-<td>wchar_t</td>
-<td>2 或 4 个字节</td>
-<td></td>
-</tr>
-</tbody></table>
-<p><code>long</code>,<code>short</code>,<code>unsigned</code>,<code>signed</code>，定义在1.2有介绍</p>
+</ol>
 <h2 id="1-1-基本内置类型"><a href="#1-1-基本内置类型" class="headerlink" title="1.1 基本内置类型"></a>1.1 基本内置类型</h2><h3 id="1-1-1-算术类型"><a href="#1-1-1-算术类型" class="headerlink" title="1.1.1 算术类型"></a>1.1.1 算术类型</h3><p><code>整形（布尔/字符）</code>和<code>浮点型</code></p>
 <table>
 <thead>
