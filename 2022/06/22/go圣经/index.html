@@ -454,18 +454,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="21.合并两个有序链表">21.合并两个有序链表</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="20.有效的括号">20.有效的括号</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="21.合并两个有序链表">21.合并两个有序链表</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -714,7 +714,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-07-20 00:45:45'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-07-20 00:47:46'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -1088,8 +1088,12 @@ t :&#x3D; 0.0  &#x2F;&#x2F;float
 f, err :&#x3D; os.Open(name) &#x2F;&#x2F;通过函数进行声明，并初始化
 if err !&#x3D; nil &#123;
     return err
-&#125;
-&#x2F;&#x2F;例子1
+&#125;</code></pre>
+
+<ul>
+<li>例子1中声明的err是重复,第二个简短声明符的err就是赋值操作，注意该操作是在变量相同作用例子2中这种情况编译不通过,至少有一个是新声明的.[ 实际工程中尽量不要出现例子2 ]</li>
+</ul>
+  <pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F;例子1
 in, err :&#x3D; os.Open(infile)
 &#x2F;&#x2F; ...
 out, err :&#x3D; os.Create(outfile)
@@ -1097,9 +1101,8 @@ out, err :&#x3D; os.Create(outfile)
 f, err :&#x3D; os.Open(infile)
 &#x2F;&#x2F; ...
 f, err :&#x3D; os.Create(outfile) &#x2F;&#x2F; compile error: no new variables</code></pre>
-<ul>
-<li>例子1中声明的err是重复,第二个简短声明符的err就是赋值操作，注意该操作是在变量相同作用例子2中这种情况编译不通过,至少有一个是新声明的.[ 实际工程中尽量不要出现例子2 ]</li>
-</ul>
+
+
 <h3 id="2-3-2-指针"><a href="#2-3-2-指针" class="headerlink" title="2.3.2 指针"></a>2.3.2 指针</h3><ul>
 <li><p><code>任何类型</code>的指针的<code>零值</code>都是<code>nil</code>。如果p指向某个有效变量，那么<code>p != nil</code>测试为<code>真</code>。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。</p>
 </li>
