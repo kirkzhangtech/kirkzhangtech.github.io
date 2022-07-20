@@ -454,14 +454,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
            data-tag=""
            data-author="" >
@@ -478,10 +470,10 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
+           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
+            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -490,6 +482,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -714,7 +714,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-07-21 00:22:43'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-07-21 00:34:52'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -1251,7 +1251,12 @@ var pc [256]byte &#x3D; func() (pc [256]byte) &#123;
 <li>不要将作用域和生命周期混为一谈，作用域是指文本域，而生命周期是指运行有效时段</li>
 <li>任何在<code>函数</code>外部（也就是包级语法域）声明的名字可以在同一个<code>包</code>的任何源文件中访问的</li>
 <li>对于导入的包，例如tempconv导入的fmt包，则是对应源文件级的作用域，因此只能在当前的文件中访问导入的fmt包，当前包的其它源文件无法访问在当前源文件导入的包</li>
-<li>控制流标号，就是break、continue或goto语句后面跟着的那种标号，则是函数级的作用域  <pre class="language-golang" data-language="golang"><code class="language-golang">func f() &#123;&#125;
+<li>控制流标号，就是break、continue或goto语句后面跟着的那种标号，则是<br>函数级的作用域</li>
+</ul>
+<p>几种常见作用域例子</p>
+<ul>
+<li><p>正常情况下作用域例子</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func f() &#123;&#125;
 
 var g &#x3D; &quot;g&quot;
 
@@ -1261,7 +1266,8 @@ func main() &#123;
     fmt.Println(g) &#x2F;&#x2F; &quot;g&quot;; package-level var
     fmt.Println(h) &#x2F;&#x2F; compile error: undefined: h
 &#125;</code></pre></li>
-<li>函数中可以进行词法域嵌套  <pre class="language-golang" data-language="golang"><code class="language-golang">func main() &#123;
+<li><p>作用域嵌套,函数中可以进行词法域嵌套</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func main() &#123;
   x :&#x3D; &quot;hello!&quot;
   for i :&#x3D; 0; i &lt; len(x); i++ &#123;
       x :&#x3D; x[i]
@@ -1270,15 +1276,21 @@ func main() &#123;
           fmt.Printf(&quot;%c&quot;, x) &#x2F;&#x2F; &quot;HELLO&quot; (one letter per iteration)
         &#125;
     &#125;
-&#125;</code></pre>
-  上述代码<code>x[]</code>和<code>x + &#39;A&#39; - &#39;a&#39;</code>都是引用了外部作用域声明的x变量。再比如下面的例子,有三个不同的x变量，每个声明在不同的词法域，一个在函数体词法域，一个在for隐式的初始化词法域，一个在for循环体词法域；只有两个块是显式创建的：  <pre class="language-golang" data-language="golang"><code class="language-golang">func main() &#123;
+&#125;
+&#x2F;&#x2F;上述代码&#96;x[]&#96;和&#96;x + &#39;A&#39; - &#39;a&#39;&#96;都是引用了外部作用域声明的x变量。
+&#x2F;&#x2F;再比如下面的例子,有三个不同的x变量，</code></pre>
+
+<pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F;每个声明在不同的词法域，一个在函数体词法域，一个在for隐式的初始化
+&#x2F;&#x2F;词法域，一个在for循环体词法域；只有两个块是显式创建的：
+func main() &#123;
   x :&#x3D; &quot;hello&quot;
   for _, x :&#x3D; range x &#123;
       x :&#x3D; x + &#39;A&#39; - &#39;a&#39;
       fmt.Printf(&quot;%c&quot;, x) &#x2F;&#x2F; &quot;HELLO&quot; (one letter per iteration)
   &#125;
-&#125;</code></pre>
-  if和switch语句也会在条件部分创建隐式词法域，代码例子如下.第二个if语句嵌套在第一个内部，因此第一个if语句条件初始化词法域声明的变量在第二个if中也可以访问  <pre class="language-golang" data-language="golang"><code class="language-golang">if x :&#x3D; f(); x &#x3D;&#x3D; 0 &#123;
+&#125;</code></pre></li>
+<li><p>建隐式词法域,隐式作用域<br>  if和switch语句也会在条件部分创建隐式词法域，代码例子如下.第二个if语句嵌套在第一个内部，因此第一个if语句条件初始化词法域声明的变量在第二个if中也可以访问</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">if x :&#x3D; f(); x &#x3D;&#x3D; 0 &#123;
   fmt.Println(x)
 &#125; else if y :&#x3D; g(x); x &#x3D;&#x3D; y &#123;
     fmt.Println(x, y)
@@ -1286,14 +1298,16 @@ func main() &#123;
     fmt.Println(x, y)
 &#125;
 fmt.Println(x, y) &#x2F;&#x2F; compile error: x and y are not visible here</code></pre>
-  如果不想提前声明变量还可以选择如下方式，但这不是Go语言推荐的做法，Go语言的习惯是在if中处理错误然后直接返回  <pre class="language-golang" data-language="golang"><code class="language-golang">if f, err :&#x3D; os.Open(fname); err !&#x3D; nil &#123;
+<p>如果不想提前声明变量还可以选择如下方式，但这不是Go语言推荐的做法，Go语言的习惯是在if中处理错误然后直接返回</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">if f, err :&#x3D; os.Open(fname); err !&#x3D; nil &#123;
   return err
 &#125; else &#123;
     &#x2F;&#x2F; f and err are visible here too
     f.ReadByte()
     f.Close()
-&#125;</code></pre>
-  cwd在外部已经声明的包级变量，但是:&#x3D;语句还是将cwd和err重新声明为新的局部变量  <pre class="language-golang" data-language="golang"><code class="language-golang">var cwd string
+&#125;</code></pre></li>
+<li><p>屏蔽其他作用域变暗亮<br>cwd在外部已经声明的包级变量，但是:&#x3D;语句还是将cwd和err重新声明为新的局部变量</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">var cwd string
 
 func init() &#123;
     cwd, err :&#x3D; os.Getwd() &#x2F;&#x2F; compile error: unused: cwd
@@ -1301,9 +1315,8 @@ func init() &#123;
         log.Fatalf(&quot;os.Getwd failed: %v&quot;, err)
     &#125;
 &#125;</code></pre>
-  可以用赋值运算符，就不会屏蔽<code>cwd</code>变量</li>
-</ul>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">var cwd string
+<p>可以用赋值运算符，就不会屏蔽<code>cwd</code>变量</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">var cwd string
 
 func init() &#123;
     var err error &#x2F;&#x2F;因为是赋值运算符所以需要定义error变量
@@ -1311,7 +1324,9 @@ func init() &#123;
     if err !&#x3D; nil &#123;
         log.Fatalf(&quot;os.Getwd failed: %v&quot;, err)
     &#125;
-&#125;</code></pre>
+&#125;</code></pre></li>
+</ul>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>
