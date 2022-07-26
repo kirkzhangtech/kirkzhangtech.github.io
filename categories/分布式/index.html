@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>API Design Patterns | Fish Tank</title>
+  <title>Fish Tank</title>
   <meta name="keywords" content="">
-  <meta name="description" content="API Design Patterns | Fish Tank">
+  <meta name="description" content="Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SAF mechanism replication">
@@ -54,7 +54,7 @@
 
 
 <body>
-<aside class="nav">
+<aside class="nav mobile">
     <div class="nav-left">
         <a href="/"
    class="avatar_target">
@@ -705,62 +705,12 @@
         </div>
     </div>
 </aside>
-<div id="post">
+<div id="post" class="index">
     <div class="pjax">
-        <article id="post-API_design原则" class="article article-type-post" itemscope itemprop="blogPost">
+        <article class="index">
+            <div class="toc-ref">
     
-        <h1 class="article-title">API Design Patterns</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
-            
-            
-            <a  data-rel="WEB API">WEB API</a>
-            
-        </span>
-        
-        
-    </div>
-    <div class="article-meta">
-        
-            Created At : <time class="date" title='Updated At: 2022-06-22 21:58:42'>2022-06-22 21:55</time>
-        
-    </div>
-    <div class="article-meta">
-        
-        
-        <span id="busuanzi_container_page_pv">
-            Views 👀 :<span id="busuanzi_value_page_pv">
-                <span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </span>
-        </span>
-        
-        
-        <span class="top-comment" title="跳转至评论区">
-            <a href="#comments">
-                Comment:<span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </a>
-        </span>
-        
-    </div>
-    
-    <div class="toc-ref">
-    
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-API%E4%BB%8B%E7%BB%8D"><span class="toc-text">1. API介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AFAPI"><span class="toc-text">1.1 什么是API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E4%B8%BA%E4%BB%80%E4%B9%88API%E9%87%8D%E8%A6%81"><span class="toc-text">1.2 为什么API重要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E4%BB%80%E4%B9%88%E6%98%AF%E9%9D%A2%E5%90%91%E8%B5%84%E6%BA%90API"><span class="toc-text">1.3 什么是面向资源API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9Dgood%E2%80%9DAPI"><span class="toc-text">1.4 什么是”good”API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#summary"><span class="toc-text">summary</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%A0%E5%A3%AB%E6%98%8E-SimonTeo"><span class="toc-text">张士明(SimonTeo)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Education"><span class="toc-text">Education</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B9%96%E5%8D%97%E5%B7%A5%E5%AD%A6%E9%99%A2-2014-9-2018-09"><span class="toc-text">湖南工学院 2014.9 - 2018.09</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Experience"><span class="toc-text">Experience</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HSBC-Tech-China-contractor-2020-6-present"><span class="toc-text">HSBC Tech China(contractor) 2020.6 - present</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -773,42 +723,35 @@
     }
 </style>
 </div>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="1-API介绍"><a href="#1-API介绍" class="headerlink" title="1. API介绍"></a>1. API介绍</h2><h3 id="1-1-什么是API"><a href="#1-1-什么是API" class="headerlink" title="1.1 什么是API"></a>1.1 什么是API</h3><p>定义一组与系统交互的界面,是的用户有相对较小的权限操作系统</p>
-<h3 id="1-2-为什么API重要"><a href="#1-2-为什么API重要" class="headerlink" title="1.2 为什么API重要"></a>1.2 为什么API重要</h3><p>不需要像GUI那样很”cosmetic”</p>
-<h3 id="1-3-什么是面向资源API"><a href="#1-3-什么是面向资源API" class="headerlink" title="1.3 什么是面向资源API"></a>1.3 什么是面向资源API</h3><ul>
-<li>RPC-API<br>RPC APIs are often designed in terms of interfaces and methods. As more and more of these are added over time, the end result can be an overwhelming and confusing API surface due to the fact that developers must learn each method individually. Obviously this is both time consuming and error-prone.<br>RPC的命名没有严格的要求，无状态的，随着RPC的接口增加，接口管理就会面临混乱结果</li>
-<li>HTTP-API<br>The architectural style of REST was introduced, primarily designed to work well with HTTP&#x2F;1.1, but also to help tackle this problem. Its core principle is to define named resources that can be manipulated using a small number of methods. The resources and methods are known as nouns and verbs of APIs. With the HTTP protocol, the resource names naturally map to URLs, and methods naturally map to HTTP methods POST, GET, PUT, PATCH, and DELETE. This results in much fewer things to learn, since developers can focus on the resources and their relationship, and assume that they have the same small number of standard methods.<br>通常url就是资源的映射，对资源的CRUD就是对应HTTP的PATCH,POST,GET DELETE</li>
+            <h1 id="张士明-SimonTeo"><a href="#张士明-SimonTeo" class="headerlink" title="张士明(SimonTeo)"></a>张士明(SimonTeo)</h1><ul>
+<li>email <a href="mailto:&#x7a;&#x78;&#99;&#55;&#x34;&#x31;&#x32;&#48;&#56;&#53;&#x38;&#x34;&#64;&#103;&#x6d;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;">&#x7a;&#x78;&#99;&#55;&#x34;&#x31;&#x32;&#48;&#56;&#53;&#x38;&#x34;&#64;&#103;&#x6d;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;</a></li>
+<li>homepage <a href="https://simonteo58.github.io/">https://simonteo58.github.io/</a></li>
 </ul>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://cloud.google.com/apis/design/resources">https://cloud.google.com/apis/design/resources</a></p>
-</blockquote>
-<h3 id="1-4-什么是”good”API"><a href="#1-4-什么是”good”API" class="headerlink" title="1.4 什么是”good”API"></a>1.4 什么是”good”API</h3><ul>
-<li>Operational<br>你的API必须得work,高效。</li>
-<li>Expressive<br>你的method必须是具有描述意义的，告诉用户你能做什么</li>
-<li>Simple<br>Another common position on simplicity takes the old saying about the “common<br>case” (“Make the common case fast”) but focuses instead on usability while leaving<br>room for edge cases. This restatement is to “make the common case awesome and the<br>advanced case possible.” This means that whenever you add something that might<br>complicate an API for the benefit of an advanced user, it’s best to keep this complication sufficiently hidden from a typical user only interested in the common case. This<br>keeps the more frequent scenarios simple and easy, while still enabling more<br>advanced features for those who want them</li>
-<li>Predictable<br>方法和参数需要见名知意<br>APIs built using well-known, well-defined, clear</li>
+<!--
+include contact information from the front matter
+Supported arguments:
+    - homepage: url, text
+    - phone
+    - email
+-->
+
+<p>{% include cv-contact.html %}</p>
+<h2 id="Education"><a href="#Education" class="headerlink" title="Education"></a>Education</h2><h3 id="湖南工学院-2014-9-2018-09"><a href="#湖南工学院-2014-9-2018-09" class="headerlink" title="湖南工学院 2014.9 - 2018.09"></a><strong>湖南工学院</strong> <code>2014.9 - 2018.09</code></h3><pre><code>学士学位
+</code></pre>
+<ul>
+<li>无机非金属材料学士学位</li>
 </ul>
-<h3 id="summary"><a href="#summary" class="headerlink" title="summary"></a>summary</h3><ul>
-<li>Interfaces are contracts that define how two systems should interact with one another.</li>
-<li>APIs are special types of interfaces that define how two computer systems interact with one another, coming in many forms, such as downloadable libraries and web APIs.</li>
-<li>Web APIs are special because they expose functionality over a network, hiding the specific implementation or computational requirements needed for that functionality.</li>
-<li>Resource-oriented APIs are a way of designing APIs to reduce complexity byrelying on a standard set of actions, called methods, across a limited set of things, called resources.</li>
-<li>What makes APIs “good” is a bit ambiguous, but generally good APIs are operational, expressive, simple, and predictable.</li>
-<li>对数据和系统的抽象会决定你的API – 李沐</li>
-</ul>
+<h2 id="Experience"><a href="#Experience" class="headerlink" title="Experience"></a>Experience</h2><h3 id="HSBC-Tech-China-contractor-2020-6-present"><a href="#HSBC-Tech-China-contractor-2020-6-present" class="headerlink" title="HSBC Tech China(contractor) 2020.6 - present"></a><strong>HSBC Tech China(contractor)</strong> <code>2020.6 - present</code></h3><p><em>Mid-software-engineer</em><br></p>
+<ol>
+<li>as a software-engineer solving xxxxxxx</li>
+<li>commonly using shell script figured out testing cases</li>
+<li>keep testing envirement stable ,and located root casuse of testing cases that tester put them in</li>
+<li>associated with software vendor to change system setup, more like source code and configuration</li>
+</ol>
 
-      
-       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
-    </div>
-</article>
-
-
-
-
-
+        </article>
+        
+        
     <div id="comments"></div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
 
@@ -830,13 +773,6 @@
 </script>
 
 
-
-
-    
-
-
-
-
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -845,11 +781,11 @@
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
     </div>
-    <div class="full-toc">
-        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+</div>
+<div class="full-toc">
+    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
-    </div>
 </div>
 
 </body>
