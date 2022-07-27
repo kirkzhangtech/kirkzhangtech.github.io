@@ -458,6 +458,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
            data-tag=""
            data-author="" >
@@ -466,10 +474,10 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
+            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -546,18 +554,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="83.删除排序链表中的重复元素">83.删除排序链表中的重复元素</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -582,14 +590,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -727,7 +727,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-07-27 23:15:29'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-07-28 00:49:49'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1110,7 +1110,41 @@
 </ol>
 <h1 id="6-环境变量"><a href="#6-环境变量" class="headerlink" title="6. 环境变量"></a>6. 环境变量</h1><ul>
 <li>全局环境变量<ul>
-<li>全局环境变量对于所有shell绘画都是可见的</li>
+<li>全局环境变量对于所有shell都是可见的,对于子shell来说这是非常重要的</li>
+<li><code>printenv</code>or<code>env</code>命令查看全局命令</li>
+<li><code>set</code>返回局部变量，全局变量，用户自定义变量<ul>
+<li>用户自定义变量<ul>
+<li><code>echo $my_variable -&gt; my_variable=Hello </code>可赋值</li>
+</ul>
+</li>
+<li>设置全局环境变量<ul>
+<li><code>export my_variable</code>导出为全局变量，在子shell中修改该值，只会在子shell中生效</li>
+</ul>
+</li>
+<li>删除环境变量<ul>
+<li>unset my_variable(如果要用到变量，使用 $ ；如果要操作变量，不使用 $ 。这条规则的一个例外就是使用 printenv 显示某个变量的值)</li>
+</ul>
+</li>
+<li>默认的环境变量，直接使用就好了<ul>
+<li>tobe</li>
+</ul>
+</li>
+<li>设置path环境变量,修改后的环境变量要<code>导出</code></li>
+<li>定位环境变量<ul>
+<li>在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作启动文件或环境文件。bash检查的启动文件取决于你启动bash shell的方式。启动bash shell有3种方式<ul>
+<li>登录时作为默认登录shell</li>
+<li>作为非登录shell的交互式shell</li>
+<li>作为运行脚本的非交互shell</li>
+</ul>
+</li>
+<li><code>/etc/profile</code>文件是系统上默认的bash shell的主启动文件。只要你登录了Linux系统,系统上的每个用户登录时都会执行这个启动文件,ubuntu涉及<code>/etc/bash.bashrc</code>的文件,会迭代<code>/etc/profile.d</code>目录下所有文件,这个文件包含了系统环境变量,<code>$HOME/.bash_profile</code>,<code>$HOME/.bash_login</code>,<code>$HOME/.profile</code>,<code>$HOME/.bashrc</code>,shell按照顺序查找环境变量</li>
+<li>交互式shell<br>如果你的bash shell不是登录系统时启动的（比如是在命令行提示符下敲入 bash 时启动），那么你启动的shell叫作交互式shell，不执行<code>/etc/profile</code>,只会检查用户HOME目录中的<code>.bashrc</code>文件</li>
+<li>非交互式shell(系统用)<br>系统执行shell脚本时用的就是这种shell,举例来说，如果父shell是登录shell，在&#x2F;etc&#x2F;profile、&#x2F;etc&#x2F;profile.d&#x2F; * .sh和$HOME&#x2F;.bashrc文件中设置并导出了变量，用于执行脚本的子shell就能够继承这些变量。要记住，由父shell设置但并未导出的变量都是局部变量。子shell无法继承局部变量</li>
+<li>环境变量的持久化<br>对全局环境变量来说（Linux系统中所有用户都需要使用的变量），可能更倾向于将新的或修改过的变量设置放在&#x2F;etc&#x2F;profile文件中，但这可不是什么好主意。如果你升级了所用的发行版，这个文件也会跟着更新，那你所有定制过的变量设置可就都没有了。最好是在&#x2F;etc&#x2F;profile.d目录中创建一个以.sh结尾的文件。把所有新的或修改过的全局环境变量设置放在这个文件中。在大多数发行版中，存储个人用户永久性bash shell变量的地方是$HOME&#x2F;.bashrc文件。这一点适用于所有类型的shell进程。但如果设置了 BASH_ENV 变量，那么记住，除非它指向的是$HOME&#x2F;.bashrc，否则你应该将非交互式shell的用户变量放在别的地方。</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
