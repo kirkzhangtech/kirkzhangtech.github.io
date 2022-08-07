@@ -581,18 +581,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="9.回文数">9.回文数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="9.回文数">9.回文数</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -737,7 +737,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-06 21:06:58'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-08-07 19:00:34'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -2430,8 +2430,23 @@ fmt.Println(err)         &#x2F;&#x2F; &quot;no such file or directory&quot;</cod
 <p>用有限几个进行描述，并且它满足标准错误接口</p>
 <h2 id="7-9-类型断言"><a href="#7-9-类型断言" class="headerlink" title="7.9. 类型断言"></a>7.9. 类型断言</h2><p>语法上它看起来像<code>x.(T)</code>被称为断言类型，这里<code>x</code>表示一个接口的类型和T表示一个类型,详细解释，一个类型断言检查它操作对象的动态类型是否和断言的类型是否匹配,分两种情况</p>
 <ul>
-<li>(T传入的是具体类型，X是动态类型),然后类型断言检查x的动态类型是否和T相同.如果这个检查成功了,如果检查成功了类型断言的结果就是<code>x</code>的动态值<br>  换句话说就是检查具体类型<code>T</code>有没有实现<code>X</code>的接口</li>
-<li>(T传入的是接口类型，X是动态类型),然后类型断言检查是否x的动态类型满足T,如果这个检查成功了，动态值没有获取到；这个结果仍然是一个有相同动态类型和值部分的接口值</li>
+<li><p>(T传入的是具体类型，X是动态类型),然后类型断言检查<code>X</code>的动态类型是否和<code>T</code>相同.如果检查成功了类型断言的结果就是<code>X</code>的动态值</p>
+</li>
+<li><p>(T传入的是接口类型，X是动态类型),然后类型断言检查是否<code>x</code>的动态类型满足T,如果这个检查成功了，动态值没有获取到；这个结果仍然是一个有相同动态类型和值部分的接口值</p>
+  <pre class="language-golang" data-language="golang"><code class="language-golang">
+var w io.Writer
+w &#x3D; os.Stdout   &#x2F;&#x2F;能赋值说明os.Stdout 实现了Write()方法
+rw :&#x3D; w.(io.ReadWriter) &#x2F;&#x2F; success: *os.File has both Read and Write,断言w是否实现了接口(io.ReadWriter)的Read和Write接口
+w &#x3D; new(ByteCounter)
+rw &#x3D; w.(io.ReadWriter) &#x2F;&#x2F; panic: *ByteCounter has no Read method
+&#x2F;&#x2F;如果对预期结果只是个判断就可以用第二个返回参数bool.
+var w io.Writer &#x3D; os.Stdout
+f, ok :&#x3D; w.(*os.File)      &#x2F;&#x2F; success:  ok, f &#x3D;&#x3D; os.Stdout
+b, ok :&#x3D; w.(*bytes.Buffer) &#x2F;&#x2F; failure: !ok, b &#x3D;&#x3D; nil
+&#x2F;&#x2F; if 后面的w变量不会覆盖外层的w
+if w, ok :&#x3D; w.(*os.File); ok &#123;
+&#x2F;&#x2F; ...use w...
+&#125;</code></pre></li>
 </ul>
 <h2 id="7-10-基于类型断言区别错误类型"><a href="#7-10-基于类型断言区别错误类型" class="headerlink" title="7.10. 基于类型断言区别错误类型"></a>7.10. 基于类型断言区别错误类型</h2><h1 id="8-Goroutines和Channels"><a href="#8-Goroutines和Channels" class="headerlink" title="8. Goroutines和Channels"></a>8. Goroutines和Channels</h1><p>(多看看本章代码)</p>
 <h2 id="8-1-goroutine"><a href="#8-1-goroutine" class="headerlink" title="8.1 goroutine"></a>8.1 goroutine</h2><p>通过代码示例了解<code>goroutine</code>的使用</p>
