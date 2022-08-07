@@ -581,18 +581,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="9.回文数">9.回文数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -737,7 +737,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-07 19:00:34'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-08-07 19:18:35'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -2448,7 +2448,47 @@ if w, ok :&#x3D; w.(*os.File); ok &#123;
 &#x2F;&#x2F; ...use w...
 &#125;</code></pre></li>
 </ul>
-<h2 id="7-10-基于类型断言区别错误类型"><a href="#7-10-基于类型断言区别错误类型" class="headerlink" title="7.10. 基于类型断言区别错误类型"></a>7.10. 基于类型断言区别错误类型</h2><h1 id="8-Goroutines和Channels"><a href="#8-Goroutines和Channels" class="headerlink" title="8. Goroutines和Channels"></a>8. Goroutines和Channels</h1><p>(多看看本章代码)</p>
+<h2 id="7-10-基于类型断言区别错误类型"><a href="#7-10-基于类型断言区别错误类型" class="headerlink" title="7.10. 基于类型断言区别错误类型"></a>7.10. 基于类型断言区别错误类型</h2><p>对这些判断的一个缺乏经验的实现可能会去检查错误消息是否包含了特定的子字符串，但是处理I&#x2F;O错误的逻辑可能一个和另一个平台非常的不同，所以这种方案并不健壮，并且对相同的失败可能会报出各种不同的错误消息。在测试的过程中，通过检查错误消息的子字符串来保证特定的函数以期望的方式失败是非常有用的，但对于线上的代码是不够的。</p>
+<p>一个更可靠的方式是使用一个专门的类型来描述结构化的错误。os包中定义了一个PathError类型来描述在文件路径操作中涉及到的失败，像Open或者Delete操作；并且定义了一个叫LinkError的变体来描述涉及到两个文件路径的操作，像Symlink和Rename。这下面是os.PathError：</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">
+
+package main
+
+import (
+	&quot;errors&quot;
+	&quot;fmt&quot;
+	&quot;os&quot;
+	&quot;syscall&quot;
+)
+
+type PathError struct &#123;
+	Op   string
+	Path string
+	Err  error
+&#125;
+
+func (e *PathError) Error() string &#123;
+	return e.Op + &quot; &quot; + e.Path + &quot;: &quot; + e.Err.Error()
+&#125;
+
+var ErrNotExist &#x3D; errors.New(&quot;file does not exist&quot;)
+
+&#x2F;&#x2F; IsNotExist returns a boolean indicating whether the error is known to
+&#x2F;&#x2F; report that a file or directory does not exist. It is satisfied by
+&#x2F;&#x2F; ErrNotExist as well as some syscall errors.
+func IsNotExist(err error) bool &#123;
+	if pe, ok :&#x3D; err.(*PathError); ok &#123;
+		err &#x3D; pe.Err
+	&#125;
+	return err &#x3D;&#x3D; syscall.ENOENT || err &#x3D;&#x3D; ErrNotExist
+&#125;
+
+func main() &#123;
+	_, err :&#x3D; os.Open(&quot;&#x2F;no&#x2F;such&#x2F;file&quot;)
+	fmt.Println(os.IsNotExist(err)) &#x2F;&#x2F; &quot;true&quot;
+&#125;</code></pre>
+
+<h1 id="8-Goroutines和Channels"><a href="#8-Goroutines和Channels" class="headerlink" title="8. Goroutines和Channels"></a>8. Goroutines和Channels</h1><p>(多看看本章代码)</p>
 <h2 id="8-1-goroutine"><a href="#8-1-goroutine" class="headerlink" title="8.1 goroutine"></a>8.1 goroutine</h2><p>通过代码示例了解<code>goroutine</code>的使用</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">func main() &#123;
     go spinner(100 * time.Millisecond)
