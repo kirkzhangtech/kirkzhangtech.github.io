@@ -469,14 +469,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
            data-tag=""
            data-author="" >
@@ -493,14 +485,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
            data-tag=""
            data-author="" >
@@ -509,10 +493,10 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
+            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -541,10 +525,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
+           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
+            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -593,6 +585,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -737,7 +737,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-08 01:22:23'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-08-08 09:51:10'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -2835,6 +2835,24 @@ $ GOMAXPROCS&#x3D;2 go run hacker-cliché.go
 010101010101010101011001100101011010010100110...</code></pre></li>
 </ul>
 <h1 id="10-包和工具"><a href="#10-包和工具" class="headerlink" title="10. 包和工具"></a>10. 包和工具</h1><p>互联网上已经发布了非常多的Go语言开源包，它们可以通过 <a target="_blank" rel="noopener" href="http://godoc.org/">http://godoc.org</a> 检索</p>
+<ul>
+<li>包的声明 ： 通过<code>package.struct</code>的形式访问我们的下载的<code>package</code>,但是也有同名的例如<code>math/rand</code>和<code>crypto/rand</code>，这种要重新指定包名，只影响当前文件，同时也解决了那些又臭又长的包名</li>
+<li>文件开头以<code>_</code>和<code>.</code>的会被忽略</li>
+<li>以<code>_test</code>结尾的通常是测试包</li>
+<li>一些依赖版本号的管理工具会在导入路径后追加版本号信息，例如“gopkg.in&#x2F;yaml.v2”。这种情况下包的名字并不包含版本号后缀，而是yaml</li>
+<li><code>包的匿名导入</code>:<ul>
+<li>解决包的依赖顺序</li>
+<li>初始化包级声明的变量</li>
+<li>按顺序初始化包中每个文件里的 init 函数</li>
+<li>每个文件中可以包含多个 init 函数，按顺序执行(所以你导和不导包差距很大，匿名导入只是表明你无法使用相应包内函数)</li>
+<li>包名和成员名要尽量的短，并且能见名知意</li>
+</ul>
+</li>
+<li>go的工具<ul>
+<li>工作区结构</li>
+</ul>
+</li>
+</ul>
 
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
