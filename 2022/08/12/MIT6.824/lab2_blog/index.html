@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>66.加一 | Fish Tank</title>
+  <title>MIT6.824之lab2 | Fish Tank</title>
   <meta name="keywords" content="">
-  <meta name="description" content="66.加一 | Fish Tank">
+  <meta name="description" content="MIT6.824之lab2 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT6.824之lab2">
@@ -736,9 +736,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-leetcode/66.加一" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-MIT6.824/lab2_blog" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">66.加一</h1>
+        <h1 class="article-title">MIT6.824之lab2</h1>
     
     <div class="article-meta">
         
@@ -748,9 +748,9 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="leetcode">leetcode</a> > 
+            <a  data-rel="分布式">分布式</a> > 
             
-            <a  data-rel="leetcode&lt;---&gt;leetcode题解">leetcode题解</a>
+            <a  data-rel="分布式&lt;---&gt;MIT6.824">MIT6.824</a>
             
         </span>
         
@@ -758,7 +758,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-06-24 07:40:42'>2022-06-23 00:10</time>
+            Created At : <time class="date" title='Updated At: 2022-08-12 21:59:20'>2022-08-12 21:57</time>
         
     </div>
     <div class="article-meta">
@@ -807,41 +807,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <pre class="language-golang" data-language="golang"><code class="language-golang">
-package main
-
-import &quot;fmt&quot;
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;66 lang&#x3D;golang
- *
- * [66] 加一
- *&#x2F;
-&#x2F;&#x2F;  9 9 9 9 9
-&#x2F;&#x2F; @lc code&#x3D;start
-func plusOne(digits []int) []int &#123;
-
-	l :&#x3D; len(digits)
-	&#x2F;&#x2F;遍历数组
-	for i :&#x3D; l - 1; i &gt;&#x3D; 0; i-- &#123;
-		digits[i] &#x3D; (digits[i] + 1) % 10
-		fmt.Println(digits[i])
-		&#x2F;&#x2F;判断取模10是否等于零
-		if digits[i] !&#x3D; 0 &#123;
-			return digits
-		&#125;
-	&#125;
-	&#x2F;&#x2F;new一个新数组
-	newArr :&#x3D; make([]int, l+1)
-	&#x2F;&#x2F; digits&#x3D; new int[l + 1];
-	&#x2F;&#x2F;设定第一位为1
-	newArr[0] &#x3D; 1
-	return newArr
-
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-
+        
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>
