@@ -6,13 +6,15 @@
   <meta name="keywords" content=" golang ">
   <meta name="description" content="go语言圣经 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="raft共识算法的认识与实现阅读助教文档">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT6.824之lab2">
 <meta property="og:url" content="https://simonteo58.github.io/2022/08/12/MIT6.824/lab2_blog/index.html">
 <meta property="og:site_name" content="Fish Tank">
+<meta property="og:description" content="raft共识算法的认识与实现阅读助教文档">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-08-12T13:57:38.288Z">
-<meta property="article:modified_time" content="2022-08-12T13:59:20.448Z">
+<meta property="article:modified_time" content="2022-08-13T02:42:47.933Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 
@@ -567,6 +569,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
            data-tag=""
            data-author="" >
@@ -579,14 +589,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -763,7 +765,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-10 23:46:35'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-08-13 12:21:50'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -2898,6 +2900,18 @@ go list -f &#39;&#123;&#123;.ImportPath&#125;&#125; -&gt; &#123;&#123;join .Impo
 <li><p><code>go test -v </code>会打印每个函数的名字和运行时间</p>
 </li>
 <li><p><code>go test -run= </code>会去匹配正则表达式，只有被匹配到的才会被执行</p>
+</li>
+<li><p><code>go test -v ./...</code> 执行所有当前目录下测试cases</p>
+</li>
+<li><p><code>go test -v foo/...</code> 执行foo目录下所有cases</p>
+</li>
+<li><p><code>go test -v foo...</code> 执行指定前缀的测试cases</p>
+</li>
+<li><p><code>go test ...</code> gopath下所有测试cases</p>
+</li>
+<li><p><code>go test -v hello_test.go</code> 执行某一文件下的测试cases,但是该文件中如果调用了其它文件中的模块会报错</p>
+</li>
+<li><p><code>go test -v hello_test.go -test.run TestHello</code> 测试单个函数</p>
 </li>
 <li><p>组织多个测试用例</p>
 <p>即使表格中前面的数据导致了测试的失败，表格后面的测试数据依然会运行测试，因此在一个测试中我们可能了解多个失败的信息,可以使用<code>t.Fatal</code>或<code>t.Fatalf</code>停止当前测试函数</p>
