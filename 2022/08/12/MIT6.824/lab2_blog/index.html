@@ -6,16 +6,16 @@
   <meta name="keywords" content="">
   <meta name="description" content="MIT6.824之lab2 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="raft共识算法的认识与实现阅读助教文档 阅读raft论文      raft extend论文     可理解的一致性算法研究摘要  raft是一种通过管理冗余日志的一致性算法，它产生的结果等价于paxos,与paxos具有相同的效率,但结构却与paxos不同,这个结构也使raft更加容易理解相比于paxos，对于构建实际的系统提供了更好的基础。为了使其变得更加容易理解，raft将共识的关键因素">
+<meta name="description" content="raft共识算法的认识与实现阅读助教文档 阅读raft论文      raft extend论文        可理解的一致性算法研究摘要  raft是一种通过管理冗余日志的一致性算法，它产生的结果等价于paxos,与paxos具有相同的效率,但结构却与paxos不同,这个结构也使raft更加容易理解相比于paxos，对于构建实际的系统提供了更好的基础。为了使其变得更加容易理解，raft将共识的关">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT6.824之lab2">
 <meta property="og:url" content="https://simonteo58.github.io/2022/08/12/MIT6.824/lab2_blog/index.html">
 <meta property="og:site_name" content="Fish Tank">
-<meta property="og:description" content="raft共识算法的认识与实现阅读助教文档 阅读raft论文      raft extend论文     可理解的一致性算法研究摘要  raft是一种通过管理冗余日志的一致性算法，它产生的结果等价于paxos,与paxos具有相同的效率,但结构却与paxos不同,这个结构也使raft更加容易理解相比于paxos，对于构建实际的系统提供了更好的基础。为了使其变得更加容易理解，raft将共识的关键因素">
+<meta property="og:description" content="raft共识算法的认识与实现阅读助教文档 阅读raft论文      raft extend论文        可理解的一致性算法研究摘要  raft是一种通过管理冗余日志的一致性算法，它产生的结果等价于paxos,与paxos具有相同的效率,但结构却与paxos不同,这个结构也使raft更加容易理解相比于paxos，对于构建实际的系统提供了更好的基础。为了使其变得更加容易理解，raft将共识的关">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_1.png">
 <meta property="article:published_time" content="2022-08-12T13:57:38.288Z">
-<meta property="article:modified_time" content="2022-08-14T16:05:30.419Z">
+<meta property="article:modified_time" content="2022-08-16T03:49:29.064Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_1.png">
@@ -547,14 +547,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
            data-tag=""
            data-author="" >
@@ -575,6 +567,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -762,7 +762,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-15 00:05:30'>2022-08-12 21:57</time>
+            Created At : <time class="date" title='Updated At: 2022-08-16 11:49:29'>2022-08-12 21:57</time>
         
     </div>
     <div class="article-meta">
@@ -816,6 +816,7 @@
   <details>
   <summary>raft extend论文</summary>
   <pre>
+  <textarea>
 
 <h1 id="可理解的一致性算法研究"><a href="#可理解的一致性算法研究" class="headerlink" title="可理解的一致性算法研究"></a>可理解的一致性算法研究</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>  raft是一种通过管理冗余日志的一致性算法，它产生的结果等价于paxos,与paxos具有相同的效率,但结构却与paxos不同,这个结构也使raft更加容易理解相比于paxos，对于构建实际的系统提供了更好的基础。为了使其变得更加容易理解，raft将共识的关键因素问题分离开,诸如,选举,log复制和安全性,它强制执行更强一致性，以减少必须考虑的状态数量。来自一名用户研究证明raft相对于paxos更容易理解,raft的新特性包括成员变更,通过使用重叠大部分节点来保证集群的安全性</p>
 <h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1 介绍"></a>1 介绍</h2><p>  一致性算法允许多台机器组合为一个秩序的集群有序工作，并且能在成员失效时继续正常运行，因为这特性，在构建大范围可靠的软件系统扮演重要角色，paxos在过去几年中统治者一致性算法领域：大部分基于paxo的一致性实现或者受它影响，paxos过去常常成为主要的一致性教学工具.</p>
@@ -852,12 +853,13 @@
 <p>  在Raft的设计中，有许多地方我们必须在备选方法中做出选择。在这些情况下，我们根据以下因素对备选方案进行评估可理解性：解释每个备选方案有多难（例如，其状态空间有多复杂，是否有微妙的影响？它是否有微妙的影响？），以及读者完全理解该方法及其影响有多容易？</p>
 <p>  我们认识到，这种分析有很大程度的主观性；然而，我们使用了两种普遍适用的技术是普遍适用的。第一种技术是众所周知的问题分解方法。众所周知的问题分解方法：在可能的情况下，我们将问题分为独立的部分这些问题可以相对独立地被解决、解释和理解。独立的。例如，在Raft中，我们将领导者选举、日志复制、安全和成员变更。</p>
 <p>  我们的第二个方法是简化状态空间通过减少需要考虑的状态数量来简化状态空间，使得 系统更加连贯，并尽可能消除不确定性。在可能的情况下。具体来说，日志不允许有洞，并且Raft限制了日志可能变得彼此不一致的方式。尽管在大多数情况下，我们试图消除不确定性，但在某些情况下，不确定性实际上提高了可理解性。特别是，随机化的方法引入了不确定性，但它们倾向于通过处理所有可能的选择来减少状态的空间，以一种类似的方式处理所有可能的选择 (“选择什么；这并不重要”)。我们使用随机化来简化Raft领袖选举算法。</p>
-<p>  </pre><br>  </details></p>
+<p>  </textarea><br>  </pre><br>  </details></p>
 </li>
 <li><p>Students’ Guide to Raft</p>
   <details>
   <summary>Students' Guide to Raf文档</summary>
   <pre>
+  <textarea>
 
 <blockquote>
 <p><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">https://thesquareplanet.com/blog/students-guide-to-raft/</a> 原文链接</p>
@@ -980,9 +982,10 @@ There are many ways of assigning such identifiers. One simple and fairly efficie
 
 Your Raft code, however it is structured, likely has a Start()-like function that allows the application to add new commands to the Raft log. It also likely has a loop that, when commitIndex is updated, calls apply() on the application for every element in the log between lastApplied and commitIndex. These routines probably both take some lock a. In your Raft-based application, you probably call Raft’s Start() function somewhere in your RPC handlers, and you have some code somewhere else that is informed whenever Raft applies a new log entry. Since these two need to communicate (i.e., the RPC method needs to know when the operation it put into the log completes), they both probably take some lock b.
 
-In Go, these four code segments probably look something like this:</code></pre></li>
+In Go, these four code segments probably look something like this:</code></pre>
+<p>  </textarea><br>  </pre></p>
+  </details></li>
 </ul>
-<p>  </pre><br>  </details></p>
 </li>
 </ul>
 
