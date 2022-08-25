@@ -16,7 +16,7 @@
 <meta property="og:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_1.png">
 <meta property="og:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_6.png">
 <meta property="article:published_time" content="2022-08-12T13:57:38.288Z">
-<meta property="article:modified_time" content="2022-08-21T16:02:15.717Z">
+<meta property="article:modified_time" content="2022-08-21T16:20:56.587Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_1.png">
@@ -580,14 +580,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
            data-tag=""
            data-author="" >
@@ -604,6 +596,22 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
            data-tag=""
            data-author="" >
@@ -616,14 +624,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -768,7 +768,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-13 12:55:56'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-08-25 18:56:17'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -851,6 +851,11 @@
 </li>
 <li><a href="#43-map">4.3-map</a></li>
 <li><a href="#44-%E7%BB%93%E6%9E%84%E4%BD%93">4.4-结构体</a></li>
+</ul>
+</li>
+<li><a href="#7-%E6%8E%A5%E5%8F%A3">接口</a><ul>
+<li><a href="#71-%E6%8E%A5%E5%8F%A3%E7%BA%A6%E5%AE%9A">接口约定</a></li>
+<li><a href="#72-%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B">接口类型</a></li>
 <li><a href="#73-%E5%AE%9E%E7%8E%B0%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%9D%A1%E4%BB%B6">7.3-实现接口的条件</a></li>
 <li><a href="#74-flagvalue%E6%8E%A5%E5%8F%A3">7.4-flagvalue接口</a></li>
 <li><a href="#75-%E6%8E%A5%E5%8F%A3%E5%80%BC">7.5-接口值</a></li>
@@ -2209,30 +2214,61 @@ func (b *Buffer) Grow(n int) &#123;
 <li><p>只暴漏关键信息给外部使用者</p>
 </li>
 </ol>
-<h1 id="7-接口"><a href="#7-接口" class="headerlink" title="7. 接口"></a>7. 接口</h1><p>很多面向对象的语言都有相似的接口概念，但Go语言中接口类型的独特之处在于它是满足隐式实现的。也就是说，我们没有必要对于给定的具体类型定义所有满足的接口类型；简单地拥有一些必需的方法就足够了。这种设计可以让你创建一个新的接口类型满足已经存在的具体类型却不会去改变这些类型的定义；当我们使用的类型来自于不受我们控制的包时这种设计尤其有用</p>
+<h1 id="7-接口"><a href="#7-接口" class="headerlink" title="7. 接口"></a>7. 接口</h1><p>很多面向对象的语言都有相似的接口概念，但Go语言中接口类型的独特之处在于它是满足隐式实现的。也就是说，我们没有必要对于给定的具体类型定义所有满足的接口类型；简单地拥有一些必需的方法就足够了。这种设计可以让你创建一个新的接口类型满足已经存在的具体类型却不会去改变这些类型的定义；当我们使用的类型来自于不受我们控制的包时这种设计尤其有用  </p>
+<p>只要一个物体能像鸭子一样叫那我们就可以称它为鸭子；只要一个软件能存储和查询数据我们就可以称它为数据库；只要一台机器有洗衣服和甩干的功能我们就可以称它为洗衣机。  </p>
+<p>为了保护你的Go语言职业生涯，请牢记接口（interface）是一种类型</p>
 <h2 id="7-1-接口约定"><a href="#7-1-接口约定" class="headerlink" title="7.1. 接口约定"></a>7.1. 接口约定</h2><p>例如<code>fmt</code>包</p>
-<pre><code><pre class="language-golang" data-language="golang"><code class="language-golang">package fmt
+<pre class="language-golang" data-language="golang"><code class="language-golang">package fmt
 
 func Fprintf(w io.Writer, format string, args ...interface&#123;&#125;) (int, error)
+&#x2F;&#x2F;Printf 最后调用Fprintf 函数
 func Printf(format string, args ...interface&#123;&#125;) (int, error) &#123;
     return Fprintf(os.Stdout, format, args...)
 &#125;
+&#x2F;&#x2F; Sprintf函数最后也是调用Fprintf
 func Sprintf(format string, args ...interface&#123;&#125;) string &#123;
     var buf bytes.Buffer
     Fprintf(&amp;buf, format, args...)
     return buf.String()
 &#125;</code></pre>
-</code></pre>
-<p><code>Fprintf</code>函数的<code>F</code>说明了文件类型也说明了所有信息要被写入到文件当中，在<code>Printf</code>函数中的第一个参数<code>os.Stdout</code>是<code>*os.File</code>类型；在<code>Sprintf</code>函数中的第一个参数<code>&amp;buf</code>是一个指向可以写入字节的内存缓冲区，然而它 并不是一个文件类型尽管它在某种意义上和文件类型相似.<br>用户可以自定义一个函数并实现<code>Writer</code>接口</p>
+
+<p><code>Fprintf</code>函数的<code>F</code>说明了文件类型也说明了所有信息要被写入到文件当中，在<code>Printf</code>函数中的第一个参数<code>os.Stdout</code>是<code>*os.File</code>类型实现了<code>io.Writer</code>接口，在<code>Sprintf</code>函数中的第一个参数<code>&amp;buf</code>是一个指向可以写入字节的内存缓冲区也该类型也是实现了<code>io.Writer</code>接口,用户可以自定义一个函数并实现<code>io.Writer</code>接口。<br>LSP里氏替换 : <code>fmt.Fprintf</code>通过使用接口类型<code>io.Writer</code>使得只要调用者只要传入实现了该接口的类型就可以实现自由替换</p>
+<details><summary>自定义bytecounter函数，实现计算int转byte长度</summary>
+
 <pre class="language-golang" data-language="golang"><code class="language-golang">
+package main
+
+import (
+	&quot;fmt&quot;
+)
+
+&#x2F;&#x2F;!+bytecounter
+
 type ByteCounter int
 
 func (c *ByteCounter) Write(p []byte) (int, error) &#123;
-    *c +&#x3D; ByteCounter(len(p)) &#x2F;&#x2F; convert int to ByteCounter
-    return len(p), nil
+	*c +&#x3D; ByteCounter(len(p)) &#x2F;&#x2F; convert int to ByteCounter
+	return len(p), nil
+&#125;
+
+&#x2F;&#x2F;!-bytecounter
+
+func main() &#123;
+	&#x2F;&#x2F;!+main
+	var c ByteCounter
+	c.Write([]byte(&quot;hello&quot;))
+	fmt.Println(c) &#x2F;&#x2F; &quot;5&quot;, &#x3D; len(&quot;hello&quot;)
+
+	c &#x3D; 0 &#x2F;&#x2F; reset the counter
+	var name &#x3D; &quot;Dolly&quot;
+	fmt.Fprintf(&amp;c, &quot;hello, %s&quot;, name)
+	fmt.Println(c) &#x2F;&#x2F; &quot;12&quot;, &#x3D; len(&quot;hello, Dolly&quot;)
+	&#x2F;&#x2F;!-main
 &#125;</code></pre>
 
-<p>因为他是显示了<code>writer</code>接口就可以传入到<code>Fprintf</code>函数中.总结来说，接口约定了包使用者的行为，但是使用者想创建什么样的实例需要他自己去实现。</p>
+</details>
+
+<p>因为它实现了<code>writer</code>接口就可以传入到<code>Fprintf</code>函数中.总结来说，接口约定了包使用者的行为，但是使用者想创建什么样的实例需要他自己去实现。</p>
 <h2 id="7-2-接口类型"><a href="#7-2-接口类型" class="headerlink" title="7.2 接口类型"></a>7.2 接口类型</h2><p>通过组合定义接口</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">package io
 type Reader interface &#123;
