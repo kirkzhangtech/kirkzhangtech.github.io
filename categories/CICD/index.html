@@ -6,20 +6,22 @@
   <meta name="keywords" content="">
   <meta name="description" content="Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="raft共识算法的认识与实现阅读助教文档 阅读raft论文      raft extend论文        可理解的一致性算法研究摘要  raft是一种通过管理冗余日志的一致性算法，它产生的结果等价于paxos,与paxos具有相同的效率,但结构却与paxos不同,这个结构也使raft更加容易理解相比于paxos，对于构建实际的系统提供了更好的基础。为了使其变得更加容易理解，raft将共识的关">
+<meta name="description" content="Golang编写内存高效和CPU优化的Go结构结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个strcut有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义结构类型上的函数来实现行为。 这篇博客我将尝试解释我们如何在内存使用和CPU周期方面有效地编写结构。 让我们考虑下面这个结构，为我的一些奇怪的用例定义畸形资源类型。 type TerraformRe">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MIT6.824之lab2">
-<meta property="og:url" content="https://simonteo58.github.io/2022/08/12/MIT6.824/lab2_blog/index.html">
+<meta property="og:title" content="内存高效golang">
+<meta property="og:url" content="https://simonteo58.github.io/2022/08/26/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E5%BD%92%E6%A1%A3/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/index.html">
 <meta property="og:site_name" content="Fish Tank">
-<meta property="og:description" content="raft共识算法的认识与实现阅读助教文档 阅读raft论文      raft extend论文        可理解的一致性算法研究摘要  raft是一种通过管理冗余日志的一致性算法，它产生的结果等价于paxos,与paxos具有相同的效率,但结构却与paxos不同,这个结构也使raft更加容易理解相比于paxos，对于构建实际的系统提供了更好的基础。为了使其变得更加容易理解，raft将共识的关">
+<meta property="og:description" content="Golang编写内存高效和CPU优化的Go结构结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个strcut有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义结构类型上的函数来实现行为。 这篇博客我将尝试解释我们如何在内存使用和CPU周期方面有效地编写结构。 让我们考虑下面这个结构，为我的一些奇怪的用例定义畸形资源类型。 type TerraformRe">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_1.png">
-<meta property="og:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_6.png">
-<meta property="article:published_time" content="2022-08-12T13:57:38.288Z">
-<meta property="article:modified_time" content="2022-08-21T16:20:56.587Z">
+<meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--HubwVUeX--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-memory-map.jpeg">
+<meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--S_4mkd0a--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/02-golang-struct-memory-map.jpeg">
+<meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--V9hRLdR1--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/03-golang-struct-memory-map.jpeg">
+<meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--YxrCrSAs--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-word-length.jpeg">
+<meta property="article:published_time" content="2022-08-26T13:18:06.856Z">
+<meta property="article:modified_time" content="2022-08-26T13:58:15.666Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://simonteo58.github.io/picture/mit6.824/raft_figure_1.png">
+<meta name="twitter:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--HubwVUeX--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-memory-map.jpeg">
 
 
 <link rel="icon" href="/img/avatar.jpg">
@@ -115,7 +117,7 @@
     <li>
         <div class="all active" data-rel="All">All
             
-                <small>(35)</small>
+                <small>(37)</small>
             
         </div>
     </li>
@@ -213,7 +215,7 @@
                     <div data-rel="archive">
                         
                         archive
-                        <small>(1)</small>
+                        <small>(3)</small>
                         
                     </div>
                     
@@ -362,7 +364,7 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="35">
+<input type="hidden" id="yelog_site_posts_number" value="37">
 
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
@@ -443,6 +445,22 @@
     
     <nav id="title-list-nav">
         
+        <a  class="All archive "
+           href="/2022/08/26/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E5%BD%92%E6%A1%A3/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存高效golang">内存高效golang</span>
+            <span class="post-date" title="2022-08-26 21:18:06">2022/08/26</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/08/26/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E5%BD%92%E6%A1%A3/remote_github/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="更新remote位置">更新remote位置</span>
+            <span class="post-date" title="2022-08-26 21:14:30">2022/08/26</span>
+        </a>
+        
         <a  class="All 分布式 MIT6.824 "
            href="/2022/08/12/MIT6.824/lab2_blog/"
            data-tag=""
@@ -492,18 +510,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -556,14 +574,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
            data-tag=""
            data-author="" >
@@ -576,6 +586,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -759,7 +777,7 @@
 </div>
             <h1 id="张士明-kirkzhang"><a href="#张士明-kirkzhang" class="headerlink" title="张士明(kirkzhang)"></a>张士明(kirkzhang)</h1><p>Knowledge isn’t free. You have to pay attention. 🧠</p>
 <ul>
-<li>email: <a href="mailto:&#x7a;&#120;&#x63;&#x37;&#x34;&#x31;&#x32;&#48;&#x38;&#x35;&#x38;&#52;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#99;&#x6f;&#x6d;">&#x7a;&#120;&#x63;&#x37;&#x34;&#x31;&#x32;&#48;&#x38;&#x35;&#x38;&#52;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#99;&#x6f;&#x6d;</a></li>
+<li>email: <a href="mailto:&#122;&#x78;&#99;&#x37;&#52;&#x31;&#50;&#x30;&#56;&#x35;&#56;&#x34;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;">&#122;&#x78;&#99;&#x37;&#52;&#x31;&#50;&#x30;&#56;&#x35;&#56;&#x34;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;</a></li>
 <li>homepag: <a href="https://simonteo58.github.io/">https://simonteo58.github.io/</a></li>
 <li>github: <a target="_blank" rel="noopener" href="https://github.com/SimonTeo58">https://github.com/SimonTeo58</a><!--
 include contact information from the front matter
