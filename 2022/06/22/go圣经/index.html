@@ -524,18 +524,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="27.移除元素">27.移除元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="27.移除元素">27.移除元素</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -768,7 +768,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-26 00:35:59'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-08-26 16:37:54'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -2292,21 +2292,27 @@ type ReadWriter interface &#123;
     Writer
 &#125;</code></pre>
 
-<h2 id="7-3-实现接口的条件"><a href="#7-3-实现接口的条件" class="headerlink" title="7.3 实现接口的条件"></a>7.3 实现接口的条件</h2><p>一个类型如果拥有一个接口需要的所有方法，那么这个类型就实现了这个接口.</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">var w io.Writer
+<h2 id="7-3-实现接口的条件"><a href="#7-3-实现接口的条件" class="headerlink" title="7.3 实现接口的条件"></a>7.3 实现接口的条件</h2><ul>
+<li><p>一个类型如果拥有一个接口需要的所有方法，那么这个类型就实现了这个接口.</p>
+  <pre class="language-golang" data-language="golang"><code class="language-golang">var w io.Writer
+&#x2F;&#x2F;只实现了Write 方法
 w &#x3D; os.Stdout           &#x2F;&#x2F; OK: *os.File has Write method
+&#x2F;&#x2F;只实现了Write方法
 w &#x3D; new(bytes.Buffer)   &#x2F;&#x2F; OK: *bytes.Buffer has Write method
+&#x2F;&#x2F; time.Duration没有Write方法
 w &#x3D; time.Second         &#x2F;&#x2F; compile error: time.Duration lacks Write method
 
 var rwc io.ReadWriteCloser
 rwc &#x3D; os.Stdout         &#x2F;&#x2F; OK: *os.File has Read, Write, Close methods
-rwc &#x3D; new(bytes.Buffer) &#x2F;&#x2F; compile error: *bytes.Buffer lacks Close method</code></pre>
-<p>这个规则甚至适用于等式右边本身也是一个接口类型</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F; rwc io.ReadWriteCloser
+rwc &#x3D; new(bytes.Buffer) &#x2F;&#x2F; compile error: *bytes.Buffer lacks Close method
+&#x2F;&#x2F; 这个规则甚至适用于等式右边本身也是一个接口类型
+&#x2F;&#x2F; rwc io.ReadWriteCloser
 w &#x3D; rwc                 &#x2F;&#x2F; OK: io.ReadWriteCloser has Write method
 &#x2F;&#x2F; w 只有Write方法
 rwc &#x3D; w                 &#x2F;&#x2F; compile error: io.Writer lacks Close method</code></pre>
-
+</li>
+<li></li>
+</ul>
 <h2 id="7-4-flag-Value接口"><a href="#7-4-flag-Value接口" class="headerlink" title="7.4 flag.Value接口"></a>7.4 flag.Value接口</h2><p>(翻译的太差劲，要去读原文)</p>
 <ul>
 <li><p>简单的<code>flag</code>包支持命令行的例子</p>
