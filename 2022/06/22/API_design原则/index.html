@@ -6,19 +6,20 @@
   <meta name="keywords" content="">
   <meta name="description" content="API Design Patterns | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="Golang编写内存高效和CPU优化的Go结构结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个strcut有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义结构类型上的函数来实现行为。 这篇博客我将尝试解释我们如何在内存使用和CPU周期方面有效地编写结构。 让我们考虑下面这个结构，为我的一些奇怪的用例定义畸形资源类型。 type TerraformRe">
+<meta name="description" content="原文链接 : https:&#x2F;&#x2F;dev.to&#x2F;deadlock&#x2F;golang-writing-memory-efficient-and-cpu-optimized-go-structs-2ick  Golang编写内存高效和CPU优化的Go结构结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个strcut有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内存高效golang">
 <meta property="og:url" content="https://simonteo58.github.io/2022/08/26/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E5%BD%92%E6%A1%A3/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/index.html">
 <meta property="og:site_name" content="Fish Tank">
-<meta property="og:description" content="Golang编写内存高效和CPU优化的Go结构结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个strcut有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义结构类型上的函数来实现行为。 这篇博客我将尝试解释我们如何在内存使用和CPU周期方面有效地编写结构。 让我们考虑下面这个结构，为我的一些奇怪的用例定义畸形资源类型。 type TerraformRe">
+<meta property="og:description" content="原文链接 : https:&#x2F;&#x2F;dev.to&#x2F;deadlock&#x2F;golang-writing-memory-efficient-and-cpu-optimized-go-structs-2ick  Golang编写内存高效和CPU优化的Go结构结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个strcut有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--HubwVUeX--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-memory-map.jpeg">
 <meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--S_4mkd0a--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/02-golang-struct-memory-map.jpeg">
 <meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--V9hRLdR1--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/03-golang-struct-memory-map.jpeg">
 <meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--YxrCrSAs--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-word-length.jpeg">
+<meta property="og:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--_N8r3Z9U--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/02-golang-struct-word-length.jpeg">
 <meta property="article:published_time" content="2022-08-26T13:18:06.856Z">
-<meta property="article:modified_time" content="2022-08-26T13:58:15.666Z">
+<meta property="article:modified_time" content="2022-08-26T14:57:37.196Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://res.cloudinary.com/practicaldev/image/fetch/s--HubwVUeX--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-memory-map.jpeg">
@@ -574,6 +575,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
            data-tag=""
            data-author="" >
@@ -586,14 +595,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
