@@ -542,18 +542,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -805,7 +805,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-28 00:54:39'>2022-08-12 21:57</time>
+            Created At : <time class="date" title='Updated At: 2022-08-28 16:46:45'>2022-08-12 21:57</time>
         
     </div>
     <div class="article-meta">
@@ -856,10 +856,9 @@
       
         <h1 id="raft共识算法的认识与实现"><a href="#raft共识算法的认识与实现" class="headerlink" title="raft共识算法的认识与实现"></a>raft共识算法的认识与实现</h1><h2 id="阅读相关文档"><a href="#阅读相关文档" class="headerlink" title="阅读相关文档"></a>阅读相关文档</h2><ul>
 <li><p>阅读raft论文</p>
-  <details>
-  <summary>可理解的一致性算法研究</summary>
-  
-  <text>
+<details>
+<summary>raft论文总结</summary>
+<text>
 
 <h1 id="可理解的一致性算法研究"><a href="#可理解的一致性算法研究" class="headerlink" title="可理解的一致性算法研究"></a>可理解的一致性算法研究</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
 <li>raft比paxos更容易理解,在构建大型系统的时候方便实现</li>
@@ -911,7 +910,7 @@
 <li>提供正确的理论基础，方便理解</li>
 <li>减少开发时间，并易于扩展</li>
 <li>在斟酌备选方案时，主要是从可理解性，会不会raft(状态空间，系统)变得复杂，但是这种分析是很主观的(想想作者与我们的硬实力差距)，所以作者选择了两种研究方式。<ul>
-<li>问题分解方式，将共识分解为独立的子问题，分别为选举，日志复制，安全和成员变成。</li>
+<li>问题分解，将共识分解为独立的子问题，分别为选举，日志复制，安全和成员变成。</li>
 <li>减少状态空间(只有leader,candidate,follower,以及优化提到的prevote&#x2F;vote&#x2F;appendentry),不允许日志有漏洞(index1和3之间是空的日志)，raft通过冲突检测来矫正不一致情况。随机化的方法引入了非确定性，但它们倾向于通过处理所有可能的选择来减少状态的空间，以一种类似的方式处理所有可能的选择 (“选择什么；这并不重要”)。我们使用随机化 来简化Raft领袖选举算法</li>
 </ul>
 </li>
@@ -919,7 +918,7 @@
 </li>
 </ol>
 <h2 id="5-raft一致性算法"><a href="#5-raft一致性算法" class="headerlink" title="5. raft一致性算法"></a>5. raft一致性算法</h2><ol>
-<li>领导接受来自客户端的日志条目，将其复制到其他服务器上，并告诉服务器何时可以将日志条目应用到他们的状态机上。</li>
+<li>leader接受来自客户端的日志条目，将其复制到其他服务器上，并告诉服务器何时可以将日志条目应用到他们的状态机上。</li>
 <li>有一个领导者可以简化对复制日志的管理。例如只允许数据从领导者流向其他服务器。</li>
 <li>一个领导者可能失败或与其他服务器断开连接，在这种情况下 选举一个新的领导者</li>
 </ol>
@@ -939,7 +938,74 @@
 </ul>
 <p>  总结</p>
 <ol>
-<li>TBC</li>
+<li>所有节点都需要持久化的参数<ul>
+<li><code>currentTerm</code>持久化参数，第一次初始化为0然后单调递增</li>
+<li><code>voteFor</code>当前term记录投票的candidateId</li>
+<li><code>commitIndex</code>记录当前节点可以提交的日志index</li>
+<li><code>lastApplied</code>记录当前节点可以提交给上层状态机的index</li>
+<li><code>nextIndex[]</code>当leader被选出时需要初始化的参数，且是leader最新log+1的位置</li>
+<li><code>matchIndex[]</code>初始化为0，表示leader与follower匹配的日志位置</li>
+</ul>
+</li>
+<li>reqeustVote RPC细节<ol>
+<li>requestVote的请求参数<ul>
+<li><code>term</code>请求的term</li>
+<li><code>candidateId</code></li>
+<li><code>lastLogIndex</code>candidate最新的log</li>
+<li><code>lastLogTerm</code>candidate最新的term</li>
+</ul>
+</li>
+<li>reqeustVote response参数<ul>
+<li><code>term</code>投票时候的term</li>
+<li><code>voteGranted</code>布尔类型，true说明follower同意投票</li>
+</ul>
+</li>
+<li>重要交互逻辑<ul>
+<li>如果rpc的term小于follower的current term，follower拒绝投票</li>
+<li>如果voteFor是空或者为candaditeID,并且candaidate的log至少与follower是一样，也可以比Follower多，新</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>AppendEntry RPC细节<ol>
+<li>AppendEntry请求参数<ul>
+<li><code>term</code>post RPC时的term</li>
+<li><code>leaderID</code></li>
+<li><code>preLogIndex</code>leader进行一致性检测日志的index</li>
+<li><code>preLogTerm</code>leader进行一致性检测时日志的term</li>
+<li><code>entries</code>搬运的日志</li>
+<li><code>leaderCommit</code>leader的commitIndex</li>
+</ul>
+</li>
+<li>AppendEntry的response参数<ul>
+<li><code>term</code>RPC的当前term</li>
+<li><code>success</code>布尔类型返回true说明preLogIndex和preLogTerm是匹配的</li>
+</ul>
+</li>
+<li>AppendEntry RPC的实现<ul>
+<li>rpc’s term小于follower’s的term则返回false</li>
+<li>如果preLogIndex，preLogTerm不匹配返回false</li>
+<li>preLogIndex匹配但是preLogTerm不匹配则删掉后面所有的存在的log</li>
+<li>append新log</li>
+<li>leaderCommit大于follower的commitIndex时候要把follower的commitIndex设置为min(leaderCommit,len(logs))</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>提交给状态机的规则<ol>
+<li>如果follower节点的commitIndex大于lastApplied 那么就可以将log提交给状态机</li>
+<li>如果发现有大的term,那么一定要更新RPC中term参数,RPC term  &gt; currentTerm,然后candidate或者leader转变为follower</li>
+<li>Follower收不到心跳就进行选举</li>
+<li>Follower负责响应candidate和leader,言外之意就是处理requestVote RPC和AppendEntry RPC</li>
+<li>Candadite会增加自己的term,给自己投票，重置选举超时时间，发送requestVote RPC,得到多数投票就变成leader</li>
+<li>Candidate收到其他的AppendEntry的RPC就变成follower</li>
+<li>Candidate在选举超时时间内没有完成选举就重新再来一轮</li>
+<li>Leader在位时会不间断的发送心跳抑制Follower选举</li>
+<li>Leader接收来自client的命令，然后走共识层进行</li>
+<li>Leader的logIndex大于nextIndex就开始进行发送AppendEntry的RPC,如果匹配成功就更新Leader的matchIndex和nextIndex,如果没成功就增加nextIndex然后重试</li>
+<li>如果存在一个整数N&gt;commitIndex,然后大部分matchIndex[i]&gt;&#x3D;N，那么log[N]&#x3D;&#x3D;currentTerm，然后将Leader设置commitIndex&#x3D;N</li>
+</ol>
+</li>
 </ol>
 <h2 id="5-1-raft基础"><a href="#5-1-raft基础" class="headerlink" title="5.1 raft基础"></a>5.1 raft基础</h2><p>  一个Raft集群包含几个服务器；五个是典型集群结构，每个服务器都处于三种状态之一: leader、Candiate或Follower。在任何时候，每台服务器都处于三种状态之一：领导者、追随者或候选者。 在正常运行中，正好有一个领导者，其他所有的服务器都是追随者。跟随者是被动的：他们不发出任何请求 他们自己没有发出任何请求，而只是对领导者和候选人的请求作出回应。和候选者的请求。领导者处理所有客户的请求（如果 如果客户联系追随者，追随者会将其重定向到领导者）。第三种状态，候选人，被用来选举一个新的leader 如第5.2节所述。图4显示了这些状态和它们的转换；下面将讨论这些角色转换。</p>
 <p>  Raft将时间划分为任意长度，如图5所示。term是连续的 整数编号。每个任期以选举开始，在选举中，一个或多个候选人试图成为领导人。一个或多个候选人试图成为领袖，如第5.2节所述 5.2节中描述的那样。如果某位候选人在选举中获胜，那么他将在剩余的任期内担任领袖。在剩下的任期内担任领导者。在某些情况下选举将导致投票的分裂。在这种情况下，任期 将在没有领袖的情况下结束；新的任期（重新选举）将很快开始。筏子确保在一个特定的任期内最多有一个领导人，在一个给定的任期内</p>
@@ -966,8 +1032,8 @@
 <p>  在Raft中，领导者通过强迫跟随者重复自己的日志来处理不一致的问题。跟随者的日志与自己的日志重复。这意味着 跟随者日志中的冲突条目将被覆盖 用领导者日志中的条目覆盖。第5.4节将表明 如果再加上一个限制，这就是安全的。</p>
 <p>  为了使追随者的日志与自己的日志保持一致，领导者必须找到两个日志一致的最新日志条目，删除追随者日志中此后的所有条目，并向追随者发送此后领导者的所有条目。所有这些动作都是为了响应AppendEntries RPCs所进行的一致性检查而发生的。领导为每个跟随者维护一个nextIndex，它是领导将发送给该跟随者的下一个日志条目的索引。当一个领导者第一次上台时。它将所有的nextIndex值初始化为其日志中最后一条的索引（feature 7中的11）。如果跟随者的日志与领导者的日志不一致，在下一个AppendEntries RPC中，AppendEntries一致性检查将失败。在拒绝之后，领导者会减少NextIndex并重试 AppendEntries RPC。最终，NextIndex将达到 一个领导者和追随者日志匹配的点。当 当这种情况发生时，AppendEntries就会成功，这就删除了 移除跟随者日志中任何冲突的条目，并从领导者日志中添加 从领导者的日志中添加条目（如果有的话）。一旦AppendEntries 成功后，跟随者的日志就与领导者的一致了。并且在余下的时间里保持这种状态。</p>
 <p>  如果需要，该协议可以被优化以减少被拒绝的AppendEntries RPC的数量。例如，当拒绝一个AppendEntries请求时，跟随者可以包括冲突条目的term和它为该term存储的第一个索引。有了这些信息，领导者可以递减 nextIndex 以绕过该术语中的所有冲突条目；每个有冲突条目的术语将需要一个 AppendEntries RPC 而不是每个词条一个RPC。而不是每个条目一个RPC。在实践中，我们怀疑这种优化是否有必要，因为故障发生的频率很低而且不太可能有很多不一致的条目</p>
-<p>  这种日志复制机制表现出了第2节中所描述的理想的 第2节中描述的共识属性：只要大多数服务器都在运行，Raft就可以接受、复制和应用新的日志条目；在正常情况下，一个新条目 在正常情况下，一个新条目可以通过单轮RPCs复制到集群的大部分；而且一个缓慢的跟随者也不会 影响性能。<br>  </text></p>
-  </details>
+<p>  这种日志复制机制表现出了第2节中所描述的理想的 第2节中描述的共识属性：只要大多数服务器都在运行，Raft就可以接受、复制和应用新的日志条目；在正常情况下，一个新条目 在正常情况下，一个新条目可以通过单轮RPCs复制到集群的大部分；而且一个缓慢的跟随者也不会 影响性能。<br></text></p>
+</details>
 </li>
 <li><p>Students’ Guide to Raft</p>
   <details>
