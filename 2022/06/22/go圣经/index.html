@@ -534,18 +534,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -810,7 +810,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-26 21:12:55'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-08-28 23:36:10'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -1945,6 +1945,14 @@ var issueList &#x3D; template.Must(template.New(&quot;issuelist&quot;).Parse(&#9
 &#96;))</code></pre>
 <p>注意，html&#x2F;template包已经自动将特殊字符转义，因此我们依然可以看到正确的字面值。如果我们使用text&#x2F;template包的话，这2个issue将会产生错误，其中“&lt;”四个字符将会被当作小于字符“&lt;”处理，同时“<link>”字符串将会被当作一个链接元素处理，它们都会导致HTML文档结构的改变，从而导致有未知的风险。</p>
 <h1 id="5-函数"><a href="#5-函数" class="headerlink" title="5. 函数"></a>5. 函数</h1><p>声明和定义</p>
+<ul>
+<li><p>switch 控制语句</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">switch cond&#123;
+  case a :
+  case b :
+  case c :
+&#125;</code></pre></li>
+</ul>
 <h2 id="5-1-错误"><a href="#5-1-错误" class="headerlink" title="5.1 错误"></a>5.1 错误</h2><p>通常，导致失败的原因不止一种，尤其是对I&#x2F;O操作而言，用户需要了解更多的错误信息。因此，额外的返回值不再是简单的布尔类型，而是error类型。</p>
 <p>我们有几种处理错误的策略</p>
 <ol>
