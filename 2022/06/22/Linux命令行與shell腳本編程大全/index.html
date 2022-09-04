@@ -830,7 +830,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-04 16:16:37'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-04 16:28:46'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1468,6 +1468,8 @@ cd &#x2F;home&#x2F;kirkzhang  &#x2F;&#x2F;使用绝对路径进入家目录
 <h1 id="6-环境变量"><a href="#6-环境变量" class="headerlink" title="6. 环境变量"></a>6. 环境变量</h1><ul>
 <li>login shell : 用户成功登陆后使用的是 Login shell。例如，当你通过终端、SSH 或使用 “su -“ 命令来切换账号时都会使用的Login Shell</li>
 <li>non-login shell : Non Login Shell 是指通过 login shell 开启的shell,Non-login shell执行<code>~/.bashrc</code>脚本来初始shell环境</li>
+<li>交互式shell ： 就是终端等待你输入命令的就是交互式shell</li>
+<li>非交互式shell : 非交互式模式，以shell script(非交互)方式执行。在这种模式 下，shell不与你进行交互，而是读取存放在文件中的命令,并且执行它们。当它读到文件的结尾EOF，shell也就终止了</li>
 </ul>
 <p>如何快速辨别是login shell 还是non-login shell ,可通过<code>echo $0</code>如果是输出<code>-bash</code>说明是login shell,<code>bash</code>说明是non-login shell  </p>
 <ul>
