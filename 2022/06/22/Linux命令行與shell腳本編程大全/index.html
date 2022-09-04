@@ -673,18 +673,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="9.回文数">9.回文数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="9.回文数">9.回文数</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -830,7 +830,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-04 15:06:43'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-04 15:32:37'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1480,18 +1480,20 @@ cd &#x2F;home&#x2F;kirkzhang  &#x2F;&#x2F;使用绝对路径进入家目录
 </li>
 <li><p>设置全局环境变量</p>
 <ul>
-<li><p><code>export my_variable</code>导出为全局变量，在子shell中修改该值，只会在子shell中生效</p>
+<li><code>export my_variable</code>导出为全局变量，在子shell中修改该值，只会在子shell中生效</li>
+<li><code>unset my_variable</code>删除环境变量,这条规则的一个例外就是使用 printenv 显示某个变量的值)</li>
+<li>默认的环境变量，直接使用就好了<br><img src="/./../picture/linux_%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC/linux_default_variables.png" alt="linux_default_variables"><br><img src="/./../picture/linux_%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC/linux_default_variables_1.png" alt="linux_default_variables_1"></li>
+<li>设置<code>path</code>环境变量,当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序.<code>PATH</code>环境变量定义了用于进行命令和程序查找的目录</li>
+<li>定位环境变量<ul>
+<li>在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作<code>启动文件</code>或<code>环境文件</code>。bash检查启动文件的方式取决于你启动bash的<br>方式，启动bash shell有3种方式<ul>
+<li>登录时作为默认登录shell(login shell)<br>当你登录系统的时候，bash shell会作为登陆式shell进行启动，会在如下文件五个不同启动文件读取命令<ul>
+<li>&#x2F;etc&#x2F;profile  是系统默认的bash shell主启动文件，系统上每个用户登陆时候都会读取这个主启动文件，<br>两个发行版的&#x2F;etc&#x2F;profile文件都用到了同一个特性：for语句。它用来迭代&#x2F;etc&#x2F;profile.d目录，这为Linux系统提供了一个放置特定应用程序启动文件的地方，<br>当用户登录时，shell会执行这些文件。在本书所用的Ubuntu Linux系统中，<br>&#x2F;etc&#x2F;profile.d目录下包含以下文件</li>
+<li>$HOME&#x2F;.bash_profile</li>
+<li>$HOME&#x2F;.bashrc</li>
+<li>$HOME&#x2F;.bash_login</li>
+<li>$HOME&#x2F;.profile<br>NOTE : 要留意的是有些Linux发行版使用了可拆卸式认证模块（Pluggable AuthenticationModules ，PAM）。在这种情况下，PAM文件会在bash shell启动之前处理，这些文件中可能会包含环境变量。PAM文件包括&#x2F;etc&#x2F;environment文 件 和$HOME&#x2F;.pam_environment文件</li>
+</ul>
 </li>
-<li><p><code>unset my_variable</code>删除环境变量,这条规则的一个例外就是使用 printenv 显示某个变量的值)</p>
-</li>
-<li><p>默认的环境变量，直接使用就好了</p>
-</li>
-<li><p>设置path环境变量,当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序.<code>PATH</code>环境变量定义了用于进行命令和程序查找的目录</p>
-</li>
-<li><p>定位环境变量</p>
-<ul>
-<li>在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作启动文件或环境文件。bash检查的启动文件取决于你启动bash shell的方式。启动bash shell有3种方式<ul>
-<li>登录时作为默认登录shell(login shell)</li>
 <li>作为非登录shell的交互式shell(non-login shell)</li>
 <li>作为运行脚本的非交互shell</li>
 </ul>
