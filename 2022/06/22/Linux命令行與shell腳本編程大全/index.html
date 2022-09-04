@@ -830,7 +830,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-04 17:07:16'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-04 19:56:23'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1488,7 +1488,7 @@ cd &#x2F;home&#x2F;kirkzhang  &#x2F;&#x2F;使用绝对路径进入家目录
 <li>设置<code>path</code>环境变量,当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序.<code>PATH</code>环境变量定义了用于进行命令和程序查找的目录</li>
 <li>定位环境变量<ul>
 <li>登录式shell<br>在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作<code>启动文件</code>或<code>环境文件</code>。bash检查启动文件的方式取决于你启动bash的方式，启动bash shell有3种方式<ul>
-<li><p>登录时作为默认登录shell(login shell)<br>当你登录系统的时候，bash shell会作为登陆式shell进行启动，会在如下文件五个不同启动文件读取命令</p>
+<li><p>登录时作为默认登录shell(login shell)<br>当你登录系统的时候，bash shell会作为登陆式shell进行启动，会在如下文件五个不同启动文件读取命令<code>/etc/profile</code>,<code>$HOME/.bash_profile</code>,<code>$HOME/.bash_login</code>,<code>$HOME/.profile</code>,<code>$HOME/.bashrc</code></p>
 <ul>
 <li><code>/etc/profile</code>  是系统默认的bash shell主启动文件，系统上每个用户登陆时候都会读取这个主启动文件，<br>两个发行版的<code>/etc/profile</code>文件都用到了同一个特性：for语句。它用来迭代<code>/etc/profile.d</code>目录，这为Linux系统提供了一个放置特定应用程序启动文件的地方，<br>当用户登录时，shell会执行这些文件。在本书所用的Ubuntu Linux系统中，<br><code>/etc/profile.d</code>目录下包含以下文件  </li>
 <li>shell会按照按照下列顺序，运行第一个被找到的文件，余下的则被忽略,这里没提到<code>$HOME/.bashrc</code>文件，这个文件通常是通过其他文件运行  <ul>
