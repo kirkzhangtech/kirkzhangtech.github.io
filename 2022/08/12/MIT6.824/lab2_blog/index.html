@@ -561,10 +561,10 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
+           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
+            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -573,14 +573,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -597,6 +589,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="27.移除元素">27.移除元素</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -832,7 +832,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-03 18:30:09'>2022-08-12 21:57</time>
+            Created At : <time class="date" title='Updated At: 2022-09-04 12:20:39'>2022-08-12 21:57</time>
         
     </div>
     <div class="article-meta">
@@ -1066,7 +1066,7 @@
 <!-- </details> -->
 </li>
 <li><p>Students’ Guide to Raft</p>
-  <details>
+  <!-- <details> -->
   <summary>Students' Guide to Raf文档</summary>
   
   <text>
@@ -1074,30 +1074,20 @@
 <blockquote>
 <p><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">https://thesquareplanet.com/blog/students-guide-to-raft/</a> 原文链接</p>
 </blockquote>
-<p>  For the past few months, I have been a Teaching Assistant for MIT’s 6.824 Distributed Systems class. The class has traditionally had a number of labs building on the Paxos consensus algorithm, but this year, we decided to make the move to Raft. Raft was “designed to be easy to understand”, and our hope was that the change might make the students’ lives easier.</p>
-<p>  This post, and the accompanying <strong>Instructors’ Guide to Raft</strong> post, chronicles our journey with Raft, and will hopefully be useful to implementers of the Raft protocol and students trying to get a better understanding of Raft’s internals. If you are looking for a Paxos vs Raft comparison, or for a more pedagogical analysis of Raft, you should go read the Instructors’ Guide. The bottom of this post contains a list of questions commonly asked by 6.824 students, as well as answers to those questions. If you run into an issue that is not listed in the main content of this post, check out the Q&amp;A. The post is quite long, but all the points it makes are real problems that a lot of 6.824 students (and TAs) ran into. It is a worthwhile read.</p>
 <p>  在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活更简单[在过去的几个月里，我一直是麻省理工学院6.824分布式系统课的教学助理。这门课传统上有一些建立在Paxos共识算法上的实验，但今年，我们决定改用Raft。Raft是 “设计成易于理解的”，我们希望这一改变能使学生的生活更轻松]</p>
 <p>  这篇实验指南,对应着”教师教学指南”，印证着我们实验室与raft的journey，也希望对学生更好的理解raft内部运行机制，实现raft分布式协议起到帮助,如果你正在寻找Raft和Paxos的对比，或者raft的教学(pedagogical)分析,请前去阅读《教师教学指南》.文章底部包含一些学生提问的关于raft的共性问题的问题列表。如果你遇到的问题不在那些问题之内，请前去检查Q&amp;A系统，这篇文章非常的长,但是它提出的所有点，都是现实中学生(助教)碰到过的问题，这是一篇值得阅读的文章。</p>
-<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>  Before we dive into Raft, some context may be useful. 6.824 used to have a set of Paxos-based labs that were built in Go; Go was chosen both because it is easy to learn for students, and because is pretty well-suited for writing concurrent, distributed applications (goroutines come in particularly handy). Over the course of four labs, students build a fault-tolerant, sharded key-value store. The first lab had them build a consensus-based log library, the second added a key value store on top of that, and the third sharded the key space among multiple fault-tolerant clusters, with a fault-tolerant shard master handling configuration changes. We also had a fourth lab in which the students had to handle the failure and recovery of machines, both with and without their disks intact. This lab was available as a default final project for students.</p>
-<p>  This year, we decided to rewrite all these labs using Raft. The first three labs were all the same, but the fourth lab was dropped as persistence and failure recovery is already built into Raft. This article will mainly discuss our experiences with the first lab, as it is the one most directly related to Raft, though I will also touch on building applications on top of Raft (as in the second lab).</p>
-<p>  Raft, for those of you who are just getting to know it, is best described by the text on the protocol’s <a target="_blank" rel="noopener" href="https://raft.github.io/">web site</a>:</p>
-<blockquote>
-<p>Raft is a consensus algorithm that is designed to be easy to understand. It’s equivalent to Paxos in fault-tolerance and performance. The difference is that it’s decomposed into relatively independent subproblems, and it cleanly addresses all major pieces needed for practical systems. We hope Raft will make consensus available to a wider audience, and that this wider audience will be able to develop a variety of higher quality consensus-based systems than are available today.</p>
-</blockquote>
-<p>  Visualizations like <a target="_blank" rel="noopener" href="http://thesecretlivesofdata.com/raft/">this one</a> give a good overview of the principal components of the protocol, and the paper gives good intuition for why the various pieces are needed. If you haven’t already read the extended Raft paper, you should go read that before continuing this article, as I will assume a decent familiarity with Raft.</p>
-<p>  As with all distributed consensus protocols, the devil is very much in the details. In the steady state where there are no failures, Raft’s behavior is easy to understand, and can be explained in an intuitive manner. For example, it is simple to see from the visualizations that, assuming no failures, a leader will eventually be elected, and eventually all operations sent to the leader will be applied by the followers in the right order. However, when delayed messages, network partitions, and failed servers are introduced, each and every if, but, become crucial. In particular, there are a number of bugs that we see repeated over and over again, simply due to misunderstandings or oversights when reading the paper. This problem is not unique to Raft, and is one that comes up in all complex distributed systems that provide correctness.</p>
-<p>  开始深入研究raft之前,一些前情提要或许是有用的，6.824过去有一些基于用golang实现的Paxos实验，之所以选择go是因为它易于理解和学习的，它非常适合实现高并发，分布式应用(goroutine是特别便利的)，通过这门课程的四门实验课程，学生构建一个容错的，共享key-value存储系统，第一个实验让你构建一个基于log的一致性算法库,第二门实验在一致性算法库智商添加了key-value的存储，第三们实验课是实验构建共享的key-value容错集群,使用共享master节点解决集群成员变更，同时第四们实验,学生不得不实现失败和恢复机制，包括磁盘完整和磁盘不完整的情况这个实现曾作为学生默认的最后实验</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>  开始深入研究raft之前,一些前情提要或许是有用的，6.824过去有一些基于用golang实现的Paxos实验，之所以选择go是因为它易于理解和学习的，它非常适合实现高并发，分布式应用(goroutine是特别便利的)，通过这门课程的四门实验课程，学生构建一个容错的，共享key-value存储系统，第一个实验让你构建一个基于log的一致性算法库,第二门实验在一致性算法库智商添加了key-value的存储，第三们实验课是实验构建共享的key-value容错集群,使用共享master节点解决集群成员变更，同时第四们实验,学生不得不实现失败和恢复机制，包括磁盘完整和磁盘不完整的情况这个实现曾作为学生默认的最后实验</p>
 <p>  这些年我们决定使用raft重写所有mit6.824的实验，前三个实验跟以前是相同的,但是删除了第四个已经在raft中实现了关于失败与持久化的实验,这篇文章主要讨论了我们第一个实验的经验，一个直接跟raft相关的的实验，虽然我们也会接触到构建raft之上的应用层,(第二门实验)。</p>
 <p>  如果想了解raft的简单的运行逻辑，这个<a target="_blank" rel="noopener" href="https://raft.github.io/">web site</a>网站演示的raft协议是最好的文字材料.</p>
 <p>  raft是一种被设计为容易理解的一致性算法,在容错,性能方面等价于paxos算法,他们的不同点是raft将问题解耦为相对独立的问题,它也在实际的系统中清晰的解决了很多实际问题.我们也希望跟多的读者实现raft,以及构建更多的基于raft一致性系统</p>
 <p>  这个网站的可视化raft协议提供了很好的主要组件的概括,论文提供了更直观的说明为什么需要这些组件,如果你还没有阅读raft extend 论文,请有限阅读那篇论文然后再阅读这份&lt;&lt;raft指南&gt;&gt;,由于我假设你对raft有了个大致的了解(ps:这段要翻译成”你对raft有一定程度的熟悉”).</p>
 <p>  正如其他的分布式一致性协议一样,协议细节有很多的”坑”,在稳定的状态下,没有节点失效,raft协议就很好理解,可以很直观的理解,可以从上面的可视化网站了解其运行机制,假设没有节点失效,一个leader会最终被选出来,客户端所有发给raft的请求都会最终发送给follower,但是当网络出现通信延迟,网络分区,节点宕机等等假设发生,但是在特定情况下,我们看到有很多bugs一次次的重复出现,由于直接的错误理解和疏忽,当阅读论文的时候,这不是raft独有的,而是所有提出正确复杂分布式系统都存在的问题</p>
-<h2 id="实现raft"><a href="#实现raft" class="headerlink" title="实现raft"></a>实现raft</h2><p>  raft论文的figure2是最好的guide，figure2指定每个RPC的工作的方式，当你读完figure2就可以着手实现raft，但是问题也就接踵而至。实际上，figure2是极其严格的，论文中有些叙述是must而不是should，举个例子，Request vote and Append entry RPC,这两个RPC说明，其他的server其中一个是leader，另一个是candidate在尝试成为leader，这不允许人为干预或者推理。</p>
+<h2 id="实现raft"><a href="#实现raft" class="headerlink" title="实现raft"></a>实现raft</h2><p>  raft论文的figure2是最好的guide，figure2指定每个RPC的工作的方式，当你读完figure2就可以着手实现raft，但是问题也就接踵而至。实际上，figure2是极其严格的，论文中有些叙述是must而不是should，举个例子，你也会有理由重置election timer, 无论什么时候收到 Request vote and Append entry RPC,这两个RPC说明，其他的server其中一个是leader，另一个是candidate在尝试成为leader，这不允许人为干预或者推理。</p>
 <blockquote>
 <p>If election timeout elapses without receiving AppendEntries RPC from current leader or granting vote to candidate: convert to candidate.</p>
 </blockquote>
-<p>  这两者的区别变得很重要，在正式的实现当中（工业级实现）在特定环境中会显著的减少leader活性。 to be continue</p>
-<h2 id="重要的细节"><a href="#重要的细节" class="headerlink" title="重要的细节"></a>重要的细节</h2><p>  raft会把没有newtry的appendEntry的RPC视为hearbeat,很多同学假设AppendEntry RPC是某种特殊的RPC,尤其是很多人是指简单的reset计时器，然后返回success，而不进行任何的冲突检测，接受accept就承认follower承认没有冲突，leader根据返回的response来提交logEntry,另外一个问题就是，follower根据收到冲突的prevLogIndex，就会删掉那个点的log，然后吧entries直接进行复制。</p>
+<p>  他们之间是有很大区别的，之前的实现可能有某些特定场景下有严重的活性问题</p>
+<h2 id="重要的细节"><a href="#重要的细节" class="headerlink" title="重要的细节"></a>重要的细节</h2><p>  raft会把没有entry的appendEntry的RPC视为hearbeat,很多同学假设AppendEntry RPC是某种特殊的RPC,尤其是很多人是指简单的reset计时器，然后返回success，而不进行任何的冲突检测，接受accept就承认follower承认没有冲突，leader根据返回的response来提交logEntry,另外一个问题就是，follower根据收到冲突的prevLogIndex，就会删掉那个点的log，然后吧entries直接进行复制。</p>
 <blockquote>
 <p>If an existing entry conflicts with a new one (same index but different terms), delete the existing entry and all that follow it.</p>
 </blockquote>
@@ -1113,8 +1103,8 @@
 </li>
 <li><p>不正确的RPC</p>
 <ol>
-<li>防现不对逻辑的RPC就尽快返回false</li>
-<li>发现follower的日志少了，follower就返回false，然后将最新index更新给leader的nextIndex</li>
+<li>发现不对逻辑的RPC就尽快返回false</li>
+<li>发现follower比leader日志少了，follower就返回false，然后将最新index更新给leader的nextIndex</li>
 <li>leader即使没有发送entry，也要检查prevLogIndex</li>
 <li>AppendEntries的最后一步（#5）中的min是必要的，它需要用最后一个新条目的索引来计算。仅仅让应用lastApplied和commitIndex之间的日志内容的函数在到达日志的末尾时停止，是不够的。这是因为你的日志中可能会有与领导者的日志不同的条目，在领导者发给你的条目之后（这些条目都与你的日志中的条目一致）。因为 #3 决定了你只在有冲突的条目时才截断你的日志，那些条目不会被删除，如果 leaderCommit 超出了领导者发给你的条目，你可能会应用不正确的条目。发送高leader commit index和空的entry的RPC就会导致apply出现问题</li>
 <li>要完全按照第5.4节中描述的方式实现 “最新日志”检查。老老实实的实现，不要只只检查长度!</li>
@@ -1194,7 +1184,7 @@ Your Raft code, however it is structured, likely has a Start()-like function tha
 
 In Go, these four code segments probably look something like this:</code></pre>
   </text>
-  </details></li>
+  <!-- </details> --></li>
 </ul>
 </li>
 </ul>
