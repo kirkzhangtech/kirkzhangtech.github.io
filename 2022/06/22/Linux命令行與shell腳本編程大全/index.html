@@ -830,7 +830,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-04 15:32:37'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-04 15:40:56'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1489,9 +1489,9 @@ cd &#x2F;home&#x2F;kirkzhang  &#x2F;&#x2F;使用绝对路径进入家目录
 <li>登录时作为默认登录shell(login shell)<br>当你登录系统的时候，bash shell会作为登陆式shell进行启动，会在如下文件五个不同启动文件读取命令<ul>
 <li>&#x2F;etc&#x2F;profile  是系统默认的bash shell主启动文件，系统上每个用户登陆时候都会读取这个主启动文件，<br>两个发行版的&#x2F;etc&#x2F;profile文件都用到了同一个特性：for语句。它用来迭代&#x2F;etc&#x2F;profile.d目录，这为Linux系统提供了一个放置特定应用程序启动文件的地方，<br>当用户登录时，shell会执行这些文件。在本书所用的Ubuntu Linux系统中，<br>&#x2F;etc&#x2F;profile.d目录下包含以下文件</li>
 <li>$HOME&#x2F;.bash_profile</li>
-<li>$HOME&#x2F;.bashrc</li>
 <li>$HOME&#x2F;.bash_login</li>
-<li>$HOME&#x2F;.profile<br>NOTE : 要留意的是有些Linux发行版使用了可拆卸式认证模块（Pluggable AuthenticationModules ，PAM）。在这种情况下，PAM文件会在bash shell启动之前处理，这些文件中可能会包含环境变量。PAM文件包括&#x2F;etc&#x2F;environment文 件 和$HOME&#x2F;.pam_environment文件</li>
+<li>$HOME&#x2F;.profile</li>
+<li>$HOME&#x2F;.bashrc<br>shell会按照按照下列顺序，运行第一个被找到的文件，余下的则被忽略,这里没提到<code>.bashrc</code>文件，这个文件通常是通过其他文件运行<br>NOTE : 要留意的是有些Linux发行版使用了可拆卸式认证模块（Pluggable AuthenticationModules ，PAM）。在这种情况下，PAM文件会在bash shell启动之前处理，这些文件中可能会包含环境变量。PAM文件包括&#x2F;etc&#x2F;environment文 件 和$HOME&#x2F;.pam_environment文件</li>
 </ul>
 </li>
 <li>作为非登录shell的交互式shell(non-login shell)</li>
