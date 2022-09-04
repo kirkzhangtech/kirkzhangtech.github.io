@@ -6,17 +6,16 @@
   <meta name="keywords" content="">
   <meta name="description" content="Linux命令行與shell腳本編程大全 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1. 数据库额启动与关闭oracle server分为两部分(database: 这部分是指文件系统上的数据，instance则是指后台运行的线程和部分共享内存)。并且数据启动分为三部分：1. nomount  2. mount  3. open 状态  启动到nomount状态">
+<meta name="description" content="原文链接 : https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_44723724&#x2F;article&#x2F;details&#x2F;125600165  场景将不同渠道的api日志入库，方便日后分析和检查系统行为 挑战 api返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构. json格式的嵌套问题.通过额外定义表进行关联. 单表形式 json字段就是表字段   多表详细存储 关联字段通过外层">
 <meta property="og:type" content="article">
-<meta property="og:title" content="深入浅出_Oracle_DBA_入门_进阶与诊断案例">
-<meta property="og:url" content="https://simonteo58.github.io/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/index.html">
+<meta property="og:title" content="API数据自动入库">
+<meta property="og:url" content="https://simonteo58.github.io/2022/08/27/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E5%BD%92%E6%A1%A3/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/index.html">
 <meta property="og:site_name" content="Fish Tank">
-<meta property="og:description" content="1. 数据库额启动与关闭oracle server分为两部分(database: 这部分是指文件系统上的数据，instance则是指后台运行的线程和部分共享内存)。并且数据启动分为三部分：1. nomount  2. mount  3. open 状态  启动到nomount状态">
+<meta property="og:description" content="原文链接 : https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_44723724&#x2F;article&#x2F;details&#x2F;125600165  场景将不同渠道的api日志入库，方便日后分析和检查系统行为 挑战 api返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构. json格式的嵌套问题.通过额外定义表进行关联. 单表形式 json字段就是表字段   多表详细存储 关联字段通过外层">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-08-31T09:35:04.687Z">
-<meta property="article:modified_time" content="2022-08-31T09:44:50.597Z">
+<meta property="article:published_time" content="2022-08-27T05:35:51.409Z">
+<meta property="article:modified_time" content="2022-08-27T08:39:39.759Z">
 <meta property="article:author" content="kirkzhang">
-<meta property="article:tag" content="Oracle">
 <meta name="twitter:card" content="summary">
 
 
@@ -609,14 +608,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
            data-tag=""
            data-author="" >
@@ -629,6 +620,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -830,7 +829,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-04 16:49:54'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-04 16:55:06'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1490,19 +1489,19 @@ cd &#x2F;home&#x2F;kirkzhang  &#x2F;&#x2F;使用绝对路径进入家目录
 <li>登录式shell<br>在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作<code>启动文件</code>或<code>环境文件</code>。bash检查启动文件的方式取决于你启动bash的方式，启动bash shell有3种方式<ul>
 <li><p>登录时作为默认登录shell(login shell)<br>当你登录系统的时候，bash shell会作为登陆式shell进行启动，会在如下文件五个不同启动文件读取命令</p>
 <ul>
-<li>&#x2F;etc&#x2F;profile  是系统默认的bash shell主启动文件，系统上每个用户登陆时候都会读取这个主启动文件，<br>两个发行版的&#x2F;etc&#x2F;profile文件都用到了同一个特性：for语句。它用来迭代&#x2F;etc&#x2F;profile.d目录，这为Linux系统提供了一个放置特定应用程序启动文件的地方，<br>当用户登录时，shell会执行这些文件。在本书所用的Ubuntu Linux系统中，<br>&#x2F;etc&#x2F;profile.d目录下包含以下文件  </li>
+<li><code>/etc/profile</code>  是系统默认的bash shell主启动文件，系统上每个用户登陆时候都会读取这个主启动文件，<br>两个发行版的<code>/etc/profile</code>文件都用到了同一个特性：for语句。它用来迭代<code>/etc/profile.d</code>目录，这为Linux系统提供了一个放置特定应用程序启动文件的地方，<br>当用户登录时，shell会执行这些文件。在本书所用的Ubuntu Linux系统中，<br><code>/etc/profile.d</code>目录下包含以下文件  </li>
 <li>shell会按照按照下列顺序，运行第一个被找到的文件，余下的则被忽略,这里没提到<code>$HOME/.bashrc</code>文件，这个文件通常是通过其他文件运行  <ul>
-<li>$HOME&#x2F;.bash_profile</li>
-<li>$HOME&#x2F;.bash_login</li>
-<li>$HOME&#x2F;.profile</li>
+<li><code>$HOME/.bash_profile</code></li>
+<li><code>$HOME/.bash_login</code></li>
+<li><code>$HOME/.profile</code></li>
 </ul>
 </li>
 </ul>
-<p><strong>NOTE</strong> : 要留意的是有些Linux发行版使用了可拆卸式认证模块（Pluggable AuthenticationModules ，PAM）。在这种情况下，PAM文件会在bash shell启动之前处理，这些文件中可能会包含环境变量。PAM文件包括&#x2F;etc&#x2F;environment文 件 和$HOME&#x2F;.pam_environment文件</p>
+<p><strong>NOTE</strong> : 要留意的是有些Linux发行版使用了可拆卸式认证模块(Pluggable AuthenticationModules ，PAM)。在这种情况下，PAM文件会在bash shell启动之前处理，这些文件中可能会包含环境变量。PAM文件包括<code>/etc/environment</code>文 件 和<code>$HOME/.pam_environment</code>文件</p>
 </li>
 </ul>
 </li>
-<li>交互式shell(non-login shell)<br>如果你的shell不是登录系统时候启动的，那么你启动的shell就是交互式shell，它不会访问<code>/etc/profile</code>只会检查<code>.bashrc</code>文件，<code>.bashrc</code>文件有两个作用：一是查看&#x2F;etc目录下通用的bashrc文件，二是为用户提供一个定制自</li>
+<li>交互式shell(non-login shell)<br>如果你的shell不是登录系统时候启动的，那么你启动的shell就是交互式shell，它不会访问<code>/etc/profile</code>只会检查<code>.bashrc</code>文件，<code>.bashrc</code>文件有两个作用：一是查看&#x2F;etc目录下通用的<code>bashrc</code>文件，二是为用户提供一个定制自</li>
 </ul>
 </li>
 </ul>
