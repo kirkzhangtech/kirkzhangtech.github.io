@@ -6,16 +6,17 @@
   <meta name="keywords" content="">
   <meta name="description" content="MIT6.824之lab2 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="原文链接 : https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_44723724&#x2F;article&#x2F;details&#x2F;125600165  场景将不同渠道的api日志入库，方便日后分析和检查系统行为 挑战 api返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构. json格式的嵌套问题.通过额外定义表进行关联. 单表形式 json字段就是表字段   多表详细存储 关联字段通过外层">
+<meta name="description" content="1. 数据库额启动与关闭oracle server分为两部分(database: 这部分是指文件系统上的数据，instance则是指后台运行的线程和部分共享内存)。并且数据启动分为三部分：1. nomount  2. mount  3. open 状态  启动到nomount状态">
 <meta property="og:type" content="article">
-<meta property="og:title" content="API数据自动入库">
-<meta property="og:url" content="https://simonteo58.github.io/2022/08/27/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E5%BD%92%E6%A1%A3/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/index.html">
+<meta property="og:title" content="深入浅出_Oracle_DBA_入门_进阶与诊断案例">
+<meta property="og:url" content="https://simonteo58.github.io/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/index.html">
 <meta property="og:site_name" content="Fish Tank">
-<meta property="og:description" content="原文链接 : https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_44723724&#x2F;article&#x2F;details&#x2F;125600165  场景将不同渠道的api日志入库，方便日后分析和检查系统行为 挑战 api返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构. json格式的嵌套问题.通过额外定义表进行关联. 单表形式 json字段就是表字段   多表详细存储 关联字段通过外层">
+<meta property="og:description" content="1. 数据库额启动与关闭oracle server分为两部分(database: 这部分是指文件系统上的数据，instance则是指后台运行的线程和部分共享内存)。并且数据启动分为三部分：1. nomount  2. mount  3. open 状态  启动到nomount状态">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-08-27T05:35:51.409Z">
-<meta property="article:modified_time" content="2022-08-27T08:39:39.759Z">
+<meta property="article:published_time" content="2022-08-31T09:35:04.687Z">
+<meta property="article:modified_time" content="2022-08-31T09:44:50.597Z">
 <meta property="article:author" content="kirkzhang">
+<meta property="article:tag" content="Oracle">
 <meta name="twitter:card" content="summary">
 
 
@@ -568,18 +569,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="20.有效的括号">20.有效的括号</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -600,38 +601,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="66.加一">66.加一</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
            data-tag=""
            data-author="" >
@@ -648,10 +617,42 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="66.加一">66.加一</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -831,7 +832,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-04 23:33:14'>2022-08-12 21:57</time>
+            Created At : <time class="date" title='Updated At: 2022-09-05 22:31:52'>2022-08-12 21:57</time>
         
     </div>
     <div class="article-meta">
@@ -864,7 +865,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#raft%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%AE%A4%E8%AF%86%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-text">raft共识算法的认识与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%85%E8%AF%BB%E7%9B%B8%E5%85%B3%E6%96%87%E6%A1%A3"><span class="toc-text">阅读相关文档</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E7%90%86%E8%A7%A3%E7%9A%84%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%E7%A0%94%E7%A9%B6"><span class="toc-text">可理解的一致性算法研究</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%91%98%E8%A6%81"><span class="toc-text">摘要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%8B%E7%BB%8D"><span class="toc-text">1 介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%8D%E5%88%B6%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="toc-text">2. 复制状态机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Paxos%E6%80%8E%E4%B9%88%E4%BA%86%EF%BC%9F"><span class="toc-text">3 Paxos怎么了？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%8F%AF%E7%90%86%E8%A7%A3%E6%80%A7"><span class="toc-text">4. 设计的可理解性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-raft%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95"><span class="toc-text">5. raft一致性算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-raft%E5%9F%BA%E7%A1%80"><span class="toc-text">5.1 raft基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-Leader-election"><span class="toc-text">5.2  Leader election</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-Log-replication"><span class="toc-text">5.3 Log replication</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-text">5.4 安全性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0raft"><span class="toc-text">实现raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E7%BB%86%E8%8A%82"><span class="toc-text">重要的细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debugging-Raft"><span class="toc-text">Debugging Raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Applications-on-top-of-Raft"><span class="toc-text">Applications on top of Raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AppendIndex"><span class="toc-text">AppendIndex</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#raft%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%AE%A4%E8%AF%86%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-text">raft共识算法的认识与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%85%E8%AF%BB%E7%9B%B8%E5%85%B3%E6%96%87%E6%A1%A3"><span class="toc-text">阅读相关文档</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E7%90%86%E8%A7%A3%E7%9A%84%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%E7%A0%94%E7%A9%B6"><span class="toc-text">可理解的一致性算法研究</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%91%98%E8%A6%81"><span class="toc-text">摘要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%8B%E7%BB%8D"><span class="toc-text">1 介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%8D%E5%88%B6%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="toc-text">2. 复制状态机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Paxos%E6%80%8E%E4%B9%88%E4%BA%86%EF%BC%9F"><span class="toc-text">3 Paxos怎么了？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%8F%AF%E7%90%86%E8%A7%A3%E6%80%A7"><span class="toc-text">4. 设计的可理解性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-raft%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95"><span class="toc-text">5. raft一致性算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-raft%E5%9F%BA%E7%A1%80"><span class="toc-text">5.1 raft基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-Leader-election"><span class="toc-text">5.2  Leader election</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-Log-replication"><span class="toc-text">5.3 Log replication</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-text">5.4 安全性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-1-%E9%80%89%E4%B8%BE%E9%99%90%E5%88%B6"><span class="toc-text">5.4.1 选举限制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-2-%E6%8F%90%E4%BA%A4%E4%B9%8B%E5%89%8D%E4%BB%BB%E6%9C%9F%E5%86%85%E7%9A%84%E6%97%A5%E5%BF%97%E6%9D%A1%E7%9B%AE"><span class="toc-text">5.4.2 提交之前任期内的日志条目</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0raft"><span class="toc-text">实现raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E7%BB%86%E8%8A%82"><span class="toc-text">重要的细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debugging-Raft"><span class="toc-text">Debugging Raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Applications-on-top-of-Raft"><span class="toc-text">Applications on top of Raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AppendIndex"><span class="toc-text">AppendIndex</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -1083,7 +1084,10 @@
 <li><p>这种日志复制机制表现出了第2节中所描述的理想的共识属性：只要大多数服务器都在运行，Raft就可以接受、复制和应用新的日志条目；在正常情况下，一个新条目可以通过单轮RPCs复制到集群的大部分；而且一个缓慢的跟随者也不会影响性能。</p>
 </li>
 </ol>
-<h2 id="5-4-安全性"><a href="#5-4-安全性" class="headerlink" title="5.4 安全性"></a>5.4 安全性</h2></text>
+<h2 id="5-4-安全性"><a href="#5-4-安全性" class="headerlink" title="5.4 安全性"></a>5.4 安全性</h2><p>  目前来说已经说明raft是如何选举和复制日志的，但是这并不能保证不同的状态机执行不同的log，还是会因为follower进入不可用状态然后恢复活性并竞选为leader，这时候leader的日志就会不一致</p>
+<h3 id="5-4-1-选举限制"><a href="#5-4-1-选举限制" class="headerlink" title="5.4.1 选举限制"></a>5.4.1 选举限制</h3><p>  VSR算法一开始日志不全的情况下成为leader，然后当某台服务器成为leader之后会额外的同步这些未同步的日志，而raft则会检查candidate和follower的日志，因为如果集群保证半数node提交日志，那么就会有半数服务器是拥有最新的日志的，两份日志，任期号大的比较新，任期号相同，索引大的比较新</p>
+<h3 id="5-4-2-提交之前任期内的日志条目"><a href="#5-4-2-提交之前任期内的日志条目" class="headerlink" title="5.4.2 提交之前任期内的日志条目"></a>5.4.2 提交之前任期内的日志条目</h3><p>  熟读figure 8 的图，为了消除figure 8的情况，raft不会通过计算副本数量来提交日志，只有当前任期的日志会通过计算副本数量来进行提交日志，而raft使用了一种更加保守办法，为每个logEntry都保留任期号，想提交之前日志，leader必须使用当前任期号，与其他算法相比，raft只需要发送更少的日志条目</p>
+</text>
 
 <!-- </details> -->
 </li>
