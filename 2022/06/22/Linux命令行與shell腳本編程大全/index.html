@@ -555,6 +555,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
            data-tag=""
            data-author="" >
@@ -571,34 +579,10 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -611,10 +595,26 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="66.加一">66.加一</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -808,7 +808,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-06 19:24:26'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-07 15:46:25'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -2142,7 +2142,50 @@ $ ./test16.sh -c -a -b -- test1 test2 test3</code></pre>
 $ ./test17.sh -a -b test1 -d</code></pre>
 <p>case语句定义了三个它要处理的选项。-b选项还需要一个额外的参数值。由于要处理的参数是$1，额外的参数值就应该位于$2（因为所有的参数在处理完之后都会被移出）。只要将参数值从$2变量中提取出来就可以了</p>
 </li>
-<li><p>使用getopt与getopts命令</p>
+<li><p>使用getopt与getopts命令<br>getopts命令会用到两个环境变量。如果选项需要跟一个参数值，OPTARG环境变量就会保存这个值。<br>OPTIND环境变量保存了参数列表中getopts正在处理的参数位置。<br>这样你就能在处理完选项之后继续处理其他命令行参数了。</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token comment"># simple demonstration of the getopts command </span>
+<span class="token comment"># </span>
+<span class="token builtin class-name">echo</span> 
+  <span class="token keyword">while</span> <span class="token builtin class-name">getopts</span> :ab:c opt 
+<span class="token keyword">do</span> 
+  <span class="token keyword">case</span> <span class="token string">"<span class="token variable">$opt</span>"</span> <span class="token keyword">in</span> 
+  a<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Found the -a option"</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  b<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Found the -b option, with value <span class="token variable">$OPTARG</span>"</span><span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  c<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Found the -c option"</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  *<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Unknown option: <span class="token variable">$opt</span>"</span><span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  <span class="token keyword">esac</span> 
+<span class="token keyword">done</span>
+$ <span class="token function">bash</span> ./test19.sh -a -b <span class="token string">"1 2"</span> -c  <span class="token comment"># 在参数中加空格</span>
+$ <span class="token function">bash</span> ./test19.sh -abtest1        <span class="token comment"># 可以挨在一起</span>
+$ <span class="token function">bash</span> ./test19.sh -d              <span class="token comment"># 返回问号</span>
+$ <span class="token function">bash</span> ./test19.sh -a -b <span class="token number">456</span> -cdefg<span class="token comment"># 如果有参数的就要分开写</span></code></pre>
+<ul>
+<li>使用OPTIND参数和OPTARG参数<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token comment"># Processing options &amp; parameters with getopts </span>
+<span class="token comment"># </span>
+<span class="token builtin class-name">echo</span> 
+<span class="token keyword">while</span> <span class="token builtin class-name">getopts</span> :ab:cd opt 
+<span class="token keyword">do</span> 
+<span class="token keyword">case</span> <span class="token string">"<span class="token variable">$opt</span>"</span> <span class="token keyword">in</span> 
+  a<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Found the -a option"</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  b<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Found the -b option, with value <span class="token variable">$OPTARG</span>"</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  c<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Found the -c option"</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  d<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Found the -d option"</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> 
+  *<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Unknown option: <span class="token variable">$opt</span>"</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> 
+<span class="token keyword">esac</span> 
+<span class="token keyword">done</span> 
+<span class="token comment"># </span>
+<span class="token builtin class-name">shift</span> $<span class="token punctuation">[</span> <span class="token environment constant">$OPTIND</span> - <span class="token number">1</span> <span class="token punctuation">]</span> 
+<span class="token comment"># </span>
+<span class="token builtin class-name">echo</span> 
+<span class="token assign-left variable">count</span><span class="token operator">=</span><span class="token number">1</span> 
+<span class="token keyword">for</span> <span class="token for-or-select variable">param</span> <span class="token keyword">in</span> <span class="token string">"<span class="token variable">$@</span>"</span> 
+<span class="token keyword">do</span> 
+<span class="token builtin class-name">echo</span> <span class="token string">"Parameter <span class="token variable">$count</span>: <span class="token variable">$param</span>"</span> 
+<span class="token assign-left variable">count</span><span class="token operator">=</span>$<span class="token punctuation">[</span> <span class="token variable">$count</span> + <span class="token number">1</span> <span class="token punctuation">]</span> 
+<span class="token keyword">done</span></code></pre></li>
+</ul>
 </li>
 <li><p>选项标准化</p>
 <table>
