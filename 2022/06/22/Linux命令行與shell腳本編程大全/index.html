@@ -808,7 +808,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-08 16:59:56'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-08 18:58:44'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1107,8 +1107,7 @@
 </li>
 </ul>
 </li>
-<li><p>目录列表(ls命令)</p>
-<p><code>ls</code>按照字母序列,参数<code>-l</code> 显示长列表,更多参数查看ls手册</p>
+<li><p>目录列表(ls命令)<br><code>ls</code>按照字母序列,参数<code>-l</code> 显示长列表,更多参数查看ls手册</p>
 <ul>
 <li>问号（?）代表一个字符</li>
 <li>星号（*）代表零个或多个字符</li>
@@ -1116,16 +1115,13 @@
 </li>
 <li><p>文件链接</p>
 <ul>
-<li><p>软连接</p>
-<p>当我们需要相同文件时,不必要在每个文件夹下都放一份文件夹，只需要使用软链接<br>ls -s &#x2F;usr&#x2F;local&#x2F;mysql&#x2F;bin&#x2F;mysql &#x2F;usr&#x2F;bin</p>
-</li>
-<li><p>硬链接</p>
-</li>
+<li>软连接<br>当我们需要相同文件时,不必要在每个文件夹下都放一份文件夹，只需要使用软链接<br>ls -s &#x2F;usr&#x2F;local&#x2F;mysql&#x2F;bin&#x2F;mysql &#x2F;usr&#x2F;bin</li>
+<li>硬链接</li>
 </ul>
 </li>
 </ul>
 <h1 id="4-其他shell命令"><a href="#4-其他shell命令" class="headerlink" title="4. 其他shell命令"></a>4. 其他shell命令</h1><h2 id="4-1-监控程序"><a href="#4-1-监控程序" class="headerlink" title="4.1 监控程序"></a>4.1 监控程序</h2><ul>
-<li><p>查看进程(ps)</p>
+<li><p>ps查看进程</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">-A 显示所有进程 
 -N 显示与指定参数不符的所有进程 
 -a 显示除控制进程（session leader①）和无终端进程外的所有进程 
@@ -1178,7 +1174,7 @@
 </tr>
 </tbody></table>
 </li>
-<li><p>实时监控(top)</p>
+<li><p>top实时监控</p>
 <ul>
 <li>第一行：当前时间，系统运行时间，登录用户数，系统的平均负载(15分钟的参数越大且超过，说明有问题)  </li>
 <li>第二行：进程状态  </li>
@@ -1241,7 +1237,7 @@
 </tr>
 </tbody></table>
 </li>
-<li><p>结束进程(kill)</p>
+<li><p>kill结束进程</p>
 <table>
 <thead>
 <tr>
@@ -1312,7 +1308,7 @@
 </li>
 </ul>
 <h2 id="4-2-磁盘空间监控"><a href="#4-2-磁盘空间监控" class="headerlink" title="4.2 磁盘空间监控"></a>4.2 磁盘空间监控</h2><ul>
-<li>mount - 挂在存储媒体<br><code>mount</code>提供如下信息<code>媒体设备名</code>,<code>挂载点</code>,<code>文件类型</code>,<code>访问方式</code>  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#将A设备挂在到B目录上,type 参数指定了磁盘被格式化的文件系统类型,如`vfat`,`iso9660`,`ntfs`,例如`mount -t vfat /dev/sdb1 /media/  disk`</span>
+<li>mount挂在存储媒体<br><code>mount</code>提供如下信息<code>媒体设备名</code>,<code>挂载点</code>,<code>文件类型</code>,<code>访问方式</code>  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#将A设备挂在到B目录上,type 参数指定了磁盘被格式化的文件系统类型,如`vfat`,`iso9660`,`ntfs`,例如`mount -t vfat /dev/sdb1 /media/  disk`</span>
 <span class="token function">mount</span> -t <span class="token builtin class-name">type</span>  A  B  </code></pre></li>
 <li>mount参数列表，详情见man手册，或者如下<table>
 <thead>
@@ -1388,11 +1384,12 @@ rw <span class="token comment">#读写挂载</span>
 user <span class="token comment">#允许普通用户挂在</span>
 loop <span class="token comment">#挂载一个文件</span>
 <span class="token assign-left variable">check</span><span class="token operator">=</span>none <span class="token comment">#挂载时进行完整性校验</span></code></pre></li>
-<li>unmount - 卸载设备<pre class="language-bash" data-language="bash"><code class="language-bash">unmount <span class="token punctuation">[</span>directory <span class="token operator">|</span> device<span class="token punctuation">]</span> <span class="token comment"># //卸载文件应在外侧目录完成,命令行提示符仍然在挂载设备的文件系统目录中，`umount` 命令无法卸载该镜像</span></code></pre></li>
-<li>df - 查看文件大小  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">df</span> -h <span class="token comment">#以M,G描述问价大小</span></code></pre></li>
-<li>du - 查看文件大小<pre class="language-bash" data-language="bash"><code class="language-bash">-c <span class="token comment">#显示所有已列出文件总的大小(还是不宜读)</span>
+<li>unmount 卸载设备<pre class="language-bash" data-language="bash"><code class="language-bash">unmount <span class="token punctuation">[</span>directory <span class="token operator">|</span> device<span class="token punctuation">]</span> <span class="token comment"># //卸载文件应在外侧目录完成,命令行提示符仍然在挂载设备的文件系统目录中，`umount` 命令无法卸载该镜像</span></code></pre></li>
+<li>df 查看文件大小  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">df</span> -h <span class="token comment">#以M,G描述问价大小</span></code></pre></li>
+<li>du 查看文件大小<pre class="language-bash" data-language="bash"><code class="language-bash">-c <span class="token comment">#显示所有已列出文件总的大小(还是不宜读)</span>
 -h <span class="token comment">#按用户易读的格式输出大小，即用K替代千字节</span>
 -s <span class="token comment">#显示每个输出参数的总计</span></code></pre></li>
+<li>find</li>
 </ul>
 <h2 id="4-3-处理文件"><a href="#4-3-处理文件" class="headerlink" title="4.3 处理文件"></a>4.3 处理文件</h2><ul>
 <li>sort - 文件排序  <pre class="language-bash" data-language="bash"><code class="language-bash">-n  <span class="token comment">#sort命令会把数字当做字符来执行标准的字符排序,解决</span>
