@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>更新remote位置 | Fish Tank</title>
+  <title>更新origin 和upstream url链接 | Fish Tank</title>
   <meta name="keywords" content="">
-  <meta name="description" content="更新remote位置 | Fish Tank">
+  <meta name="description" content="更新origin 和upstream url链接 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="摘要学习下别人如何写的golang的concurrent map实现并于官方版本的进行对比。接下来的内容来自于作者的readme—-在Go 1.9之前，go语言标准库中并没有实现并发map。在Go 1.9中，引入了sync.Map。新的sync.Map与此concurrent-map有几个关键区别。标准库中的sync.Map是专为append-only场景设计的。因此，如果您想将Map用于一个类似">
 <meta property="og:type" content="article">
@@ -501,7 +501,7 @@
            href="/2022/08/26/archive/remote_github/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="更新remote位置">更新remote位置</span>
+            <span class="post-title" title="更新origin 和upstream url链接">更新origin 和upstream url链接</span>
             <span class="post-date" title="2022-08-26 21:14:30">2022/08/26</span>
         </a>
         
@@ -797,7 +797,7 @@
     <div class="pjax">
         <article id="post-archive/remote_github" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">更新remote位置</h1>
+        <h1 class="article-title">更新origin 和upstream url链接</h1>
     
     <div class="article-meta">
         
@@ -815,7 +815,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-26 21:17:12'>2022-08-26 21:14</time>
+            Created At : <time class="date" title='Updated At: 2022-09-09 19:07:29'>2022-08-26 21:14</time>
         
     </div>
     <div class="article-meta">
@@ -864,8 +864,11 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>本地想把change 推到远程仓库但是repo的url变了。<br><code>remote: This repository moved. Please use the new location [new location]</code> 的警示。因為你的git連結位置有變動因此要修改本機端的git remote位置。</p>
-<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><p><code>git remote set-url origin https://XXX.git</code><br>检查绑定情况<br><code>git remote -v</code></p>
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>本地想更改项目代码的绑定的github链接，但是repo的url变了。<br><code>remote: This repository moved. Please use the new location [new location]</code> 的警示。因為你的git連結位置有變動因此要修改本機端的git remote位置。另外一种场景下载别人的代码库，并做修改最后推到自己的github，这个github repo</p>
+<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><ul>
+<li>绑定本地origin仓库  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> remote set-url origin https://XXX.git</code></pre></li>
+<li>绑定upstream仓库  <pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">git</span> remote <span class="token function">add</span> upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git</code></pre></li>
+</ul>
 
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
