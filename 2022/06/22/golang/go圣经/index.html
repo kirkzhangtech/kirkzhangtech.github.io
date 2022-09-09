@@ -6,13 +6,15 @@
   <meta name="keywords" content=" golang ">
   <meta name="description" content="go语言圣经 | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="摘要学习下别人如何写的golang的concurrent map实现并于广钢版本的进行对比。 第三方conrrency map理解 原文 : https:&#x2F;&#x2F;github.com&#x2F;orcaman&#x2F;concurrent-map   golang-concurrency-map  package cmap  import ( 	&quot;encoding&#x2F;json&quot; 	&amp;quot">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pro_git">
-<meta property="og:url" content="https://simonteo58.github.io/2022/09/09/pro_git/index.html">
+<meta property="og:title" content="deep dive golang concurreny map">
+<meta property="og:url" content="https://simonteo58.github.io/2022/09/09/archive/golang_concurrency_map/index.html">
 <meta property="og:site_name" content="Fish Tank">
+<meta property="og:description" content="摘要学习下别人如何写的golang的concurrent map实现并于广钢版本的进行对比。 第三方conrrency map理解 原文 : https:&#x2F;&#x2F;github.com&#x2F;orcaman&#x2F;concurrent-map   golang-concurrency-map  package cmap  import ( 	&quot;encoding&#x2F;json&quot; 	&amp;quot">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-09-09T04:21:02.133Z">
-<meta property="article:modified_time" content="2022-09-09T04:41:11.843Z">
+<meta property="article:published_time" content="2022-09-09T08:43:34.983Z">
+<meta property="article:modified_time" content="2022-09-09T09:54:25.253Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 
@@ -209,7 +211,7 @@
                         <i class="fold iconfont icon-right"></i>
                         
                         archive
-                        <small>(4)</small>
+                        <small>(5)</small>
                         
                     </div>
                     
@@ -253,7 +255,7 @@
                     <div data-rel="golang">
                         
                         golang
-                        <small>(2)</small>
+                        <small>(1)</small>
                         
                     </div>
                     
@@ -455,6 +457,14 @@
     
     <nav id="title-list-nav">
         
+        <a  class="All archive "
+           href="/2022/09/09/archive/golang_concurrency_map/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="deep dive golang concurreny map">deep dive golang concurreny map</span>
+            <span class="post-date" title="2022-09-09 16:43:34">2022/09/09</span>
+        </a>
+        
         <a  class="All "
            href="/2022/09/09/pro_git/"
            data-tag=""
@@ -624,6 +634,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="66.加一">66.加一</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
            data-tag=""
            data-author="" >
@@ -671,14 +689,6 @@
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="66.加一">66.加一</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
         <a  class="All TED "
            href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E4%B8%93%E6%B3%A8%E5%8A%9B/"
            data-tag=""
@@ -720,7 +730,7 @@
         </a>
         
         <a  class="All golang "
-           href="/2022/06/22/go%E5%9C%A3%E7%BB%8F/"
+           href="/2022/06/22/golang/go%E5%9C%A3%E7%BB%8F/"
            data-tag="golang"
            data-author="" >
             <span class="post-title" title="go语言圣经">go语言圣经</span>
@@ -733,14 +743,6 @@
            data-author="" >
             <span class="post-title" title="如何在读研的道路上快速失败">如何在读研的道路上快速失败</span>
             <span class="post-date" title="2022-06-22 21:14:38">2022/06/22</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/06/22/golang_standard_library/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="golang standard library">golang standard library</span>
-            <span class="post-date" title="2022-06-22 21:04:15">2022/06/22</span>
         </a>
         
         <a  class="All 非技术类 "
@@ -793,7 +795,7 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-go圣经" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-golang/go圣经" class="article article-type-post" itemscope itemprop="blogPost">
     
         <h1 class="article-title">go语言圣经</h1>
     
@@ -820,7 +822,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-06 19:20:14'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-09-09 18:27:58'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -853,7 +855,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%85%A5%E9%97%A8"><span class="toc-text">1. 入门</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84"><span class="toc-text">2. 程序结构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%91%BD%E5%90%8D"><span class="toc-text">2.1 命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%A3%B0%E6%98%8E"><span class="toc-text">2.2 声明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E5%8F%98%E9%87%8F"><span class="toc-text">2.3 变量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E7%AE%80%E7%9F%AD%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E"><span class="toc-text">2.3.1 简短变量声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E6%8C%87%E9%92%88"><span class="toc-text">2.3.2 指针</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-3-new%E5%87%BD%E6%95%B0"><span class="toc-text">2.3.3 new函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-4-%E5%8F%98%E9%87%8F%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-text">2.3.4. 变量的生命周期</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-%E8%B5%8B%E5%80%BC"><span class="toc-text">2.4 赋值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-1-%E5%85%83%E7%BB%84%E8%B5%8B%E5%80%BC"><span class="toc-text">2.4.1 元组赋值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.5 类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E5%8C%85%E5%92%8C%E6%96%87%E4%BB%B6"><span class="toc-text">2.6 包和文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="toc-text">2.7. 作用域</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">3.基础数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%95%B4%E5%9E%8B"><span class="toc-text">3.1 整型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E6%B5%AE%E7%82%B9%E6%95%B0"><span class="toc-text">3.2 浮点数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E5%A4%8D%E6%95%B0"><span class="toc-text">3.3 复数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B"><span class="toc-text">3.4 布尔类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-text">3.5 字符串</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%A4%8D%E5%90%88%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">4. 复合数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E6%95%B0%E7%BB%84"><span class="toc-text">4.1 数组</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-slice"><span class="toc-text">4.2 slice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-append%E5%87%BD%E6%95%B0"><span class="toc-text">4.2.1 append函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-Map"><span class="toc-text">4.3 Map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-text">4.4 结构体</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-1-%E7%BB%93%E6%9E%84%E4%BD%93%E5%AD%97%E9%9D%A2%E5%80%BC"><span class="toc-text">4.4.1 结构体字面值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-2-%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-text">4.4.2 结构体的比较</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-3-%E7%BB%93%E6%9E%84%E4%BD%93%E5%B5%8C%E5%85%A5%E5%92%8C%E5%8C%BF%E5%90%8D%E6%88%90%E5%91%98"><span class="toc-text">4.4.3 结构体嵌入和匿名成员</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-json%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-text">4.5 json字符串</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-%E6%96%87%E6%9C%AC%E5%92%8CHTML%E6%A8%A1%E6%9D%BF"><span class="toc-text">4.6 文本和HTML模板</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%87%BD%E6%95%B0"><span class="toc-text">5. 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-%E9%94%99%E8%AF%AF"><span class="toc-text">5.1 错误</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-%E5%87%BD%E6%95%B0%E5%80%BC"><span class="toc-text">5.2 函数值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0"><span class="toc-text">5.3 匿名函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0"><span class="toc-text">5.4 可变参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5-defer%E5%87%BD%E6%95%B0"><span class="toc-text">5.5 defer函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-6-panic%E5%BC%82%E5%B8%B8"><span class="toc-text">5.6 panic异常</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-7-Recovery%E6%8D%95%E8%8E%B7%E5%BC%82%E5%B8%B8"><span class="toc-text">5.7 Recovery捕获异常</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E6%96%B9%E6%B3%95"><span class="toc-text">6. 方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1-%E6%96%B9%E6%B3%95%E5%A3%B0%E6%98%8E"><span class="toc-text">6.1 方法声明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2-%E5%9F%BA%E4%BA%8E%E6%8C%87%E9%92%88%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-text">6.2 基于指针对象的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3-%E9%80%9A%E8%BF%87%E5%B5%8C%E5%85%A5%E7%BB%93%E6%9E%84%E4%BD%93%E6%9D%A5%E6%89%A9%E5%B1%95%E7%B1%BB%E5%9E%8B"><span class="toc-text">6.3. 通过嵌入结构体来扩展类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-4-%E5%B0%81%E8%A3%85"><span class="toc-text">6.4 封装</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E6%8E%A5%E5%8F%A3"><span class="toc-text">7. 接口</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1-%E6%8E%A5%E5%8F%A3%E7%BA%A6%E5%AE%9A"><span class="toc-text">7.1. 接口约定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2-%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B"><span class="toc-text">7.2 接口类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-3-%E5%AE%9E%E7%8E%B0%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-text">7.3 实现接口的条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-4-flag-Value%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.4 flag.Value接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-5-%E6%8E%A5%E5%8F%A3%E5%80%BC"><span class="toc-text">7.5 接口值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-6-sort-Interface%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.6. sort.Interface接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-7-http-Handler%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.7. http.Handler接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-8-error%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.8. error接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-9-%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80"><span class="toc-text">7.9. 类型断言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-10-%E5%9F%BA%E4%BA%8E%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80%E5%8C%BA%E5%88%AB%E9%94%99%E8%AF%AF%E7%B1%BB%E5%9E%8B"><span class="toc-text">7.10. 基于类型断言区别错误类型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-Goroutines%E5%92%8CChannels"><span class="toc-text">8. Goroutines和Channels</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1-goroutine"><span class="toc-text">8.1 goroutine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2-channel"><span class="toc-text">8.2 channel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3-%E5%9F%BA%E4%BA%8Eselect%E7%9A%84%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8"><span class="toc-text">8.3 基于select的多路复用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-4-%E5%B9%B6%E5%8F%91%E7%9A%84%E9%80%80%E5%87%BA"><span class="toc-text">8.4. 并发的退出</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-%E5%9F%BA%E4%BA%8E%E5%85%B1%E4%BA%AB%E5%8F%98%E9%87%8F%E7%9A%84%E5%B9%B6%E5%8F%91"><span class="toc-text">9. 基于共享变量的并发</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1-sync-Mutex%E4%B8%8Esync-RMutex%E4%BA%92%E6%96%A5%E9%94%81"><span class="toc-text">9.1 sync.Mutex与sync.RMutex互斥锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2-sync-Once%E6%83%B0%E6%80%A7%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-text">9.2 sync.Once惰性初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-3-sync-Cond%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">9.3 sync.Cond的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-4-Goroutines%E5%92%8C%E7%BA%BF%E7%A8%8B"><span class="toc-text">9.4. Goroutines和线程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E5%8C%85%E5%92%8C%E5%B7%A5%E5%85%B7"><span class="toc-text">10. 包和工具</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-%E6%B5%8B%E8%AF%95"><span class="toc-text">11. 测试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#11-1-go-test"><span class="toc-text">11.1 go test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-2-%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87"><span class="toc-text">11.2 测试覆盖率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-3-%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-text">11.3 基准测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-4-%E5%88%A8%E6%9E%90"><span class="toc-text">11.4 刨析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-5-%E7%A4%BA%E4%BE%8B%E5%87%BD%E6%95%B0"><span class="toc-text">11.5 示例函数</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%85%A5%E9%97%A8"><span class="toc-text">1. 入门</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84"><span class="toc-text">2. 程序结构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%91%BD%E5%90%8D"><span class="toc-text">2.1 命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%A3%B0%E6%98%8E"><span class="toc-text">2.2 声明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E5%8F%98%E9%87%8F"><span class="toc-text">2.3 变量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E7%AE%80%E7%9F%AD%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E"><span class="toc-text">2.3.1 简短变量声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E6%8C%87%E9%92%88"><span class="toc-text">2.3.2 指针</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-3-new%E5%87%BD%E6%95%B0"><span class="toc-text">2.3.3 new函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-4-%E5%8F%98%E9%87%8F%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-text">2.3.4. 变量的生命周期</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-%E8%B5%8B%E5%80%BC"><span class="toc-text">2.4 赋值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-1-%E5%85%83%E7%BB%84%E8%B5%8B%E5%80%BC"><span class="toc-text">2.4.1 元组赋值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.5 类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E5%8C%85%E5%92%8C%E6%96%87%E4%BB%B6"><span class="toc-text">2.6 包和文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="toc-text">2.7. 作用域</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">3.基础数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%95%B4%E5%9E%8B"><span class="toc-text">3.1 整型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E6%B5%AE%E7%82%B9%E6%95%B0"><span class="toc-text">3.2 浮点数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E5%A4%8D%E6%95%B0"><span class="toc-text">3.3 复数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B"><span class="toc-text">3.4 布尔类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-text">3.5 字符串</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%A4%8D%E5%90%88%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">4. 复合数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E6%95%B0%E7%BB%84"><span class="toc-text">4.1 数组</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-slice"><span class="toc-text">4.2 slice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-append%E5%87%BD%E6%95%B0"><span class="toc-text">4.2.1 append函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-Map"><span class="toc-text">4.3 Map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-text">4.4 结构体</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-1-%E7%BB%93%E6%9E%84%E4%BD%93%E5%AD%97%E9%9D%A2%E5%80%BC"><span class="toc-text">4.4.1 结构体字面值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-2-%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-text">4.4.2 结构体的比较</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-3-%E7%BB%93%E6%9E%84%E4%BD%93%E5%B5%8C%E5%85%A5%E5%92%8C%E5%8C%BF%E5%90%8D%E6%88%90%E5%91%98"><span class="toc-text">4.4.3 结构体嵌入和匿名成员</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-json%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-text">4.5 json字符串</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-%E6%96%87%E6%9C%AC%E5%92%8CHTML%E6%A8%A1%E6%9D%BF"><span class="toc-text">4.6 文本和HTML模板</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%87%BD%E6%95%B0"><span class="toc-text">5. 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-%E9%94%99%E8%AF%AF"><span class="toc-text">5.1 错误</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-%E5%87%BD%E6%95%B0%E5%80%BC"><span class="toc-text">5.2 函数值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0"><span class="toc-text">5.3 匿名函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0"><span class="toc-text">5.4 可变参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5-defer%E5%87%BD%E6%95%B0"><span class="toc-text">5.5 defer函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-6-panic%E5%BC%82%E5%B8%B8"><span class="toc-text">5.6 panic异常</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-7-Recovery%E6%8D%95%E8%8E%B7%E5%BC%82%E5%B8%B8"><span class="toc-text">5.7 Recovery捕获异常</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E6%96%B9%E6%B3%95"><span class="toc-text">6. 方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1-%E6%96%B9%E6%B3%95%E5%A3%B0%E6%98%8E"><span class="toc-text">6.1 方法声明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2-%E5%9F%BA%E4%BA%8E%E6%8C%87%E9%92%88%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-text">6.2 基于指针对象的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3-%E9%80%9A%E8%BF%87%E5%B5%8C%E5%85%A5%E7%BB%93%E6%9E%84%E4%BD%93%E6%9D%A5%E6%89%A9%E5%B1%95%E7%B1%BB%E5%9E%8B"><span class="toc-text">6.3. 通过嵌入结构体来扩展类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-4-%E5%B0%81%E8%A3%85"><span class="toc-text">6.4 封装</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E6%8E%A5%E5%8F%A3"><span class="toc-text">7. 接口</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1-%E6%8E%A5%E5%8F%A3%E7%BA%A6%E5%AE%9A"><span class="toc-text">7.1. 接口约定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2-%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B"><span class="toc-text">7.2 接口类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-3-%E5%AE%9E%E7%8E%B0%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-text">7.3 实现接口的条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-4-flag-Value%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.4 flag.Value接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-5-%E6%8E%A5%E5%8F%A3%E5%80%BC"><span class="toc-text">7.5 接口值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-6-sort-Interface%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.6. sort.Interface接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-7-http-Handler%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.7. http.Handler接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-8-error%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.8. error接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-9-%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80"><span class="toc-text">7.9. 类型断言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-10-%E5%9F%BA%E4%BA%8E%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80%E5%8C%BA%E5%88%AB%E9%94%99%E8%AF%AF%E7%B1%BB%E5%9E%8B"><span class="toc-text">7.10. 基于类型断言区别错误类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-11-any%E5%85%B3%E9%94%AE%E5%AD%97%E4%B8%8E%E6%B3%9B%E5%9E%8B"><span class="toc-text">7.11. any关键字与泛型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-Goroutines%E5%92%8CChannels"><span class="toc-text">8. Goroutines和Channels</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1-goroutine"><span class="toc-text">8.1 goroutine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2-channel"><span class="toc-text">8.2 channel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3-%E5%9F%BA%E4%BA%8Eselect%E7%9A%84%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8"><span class="toc-text">8.3 基于select的多路复用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-4-%E5%B9%B6%E5%8F%91%E7%9A%84%E9%80%80%E5%87%BA"><span class="toc-text">8.4. 并发的退出</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-%E5%9F%BA%E4%BA%8E%E5%85%B1%E4%BA%AB%E5%8F%98%E9%87%8F%E7%9A%84%E5%B9%B6%E5%8F%91"><span class="toc-text">9. 基于共享变量的并发</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1-sync-Mutex%E4%B8%8Esync-RMutex%E4%BA%92%E6%96%A5%E9%94%81"><span class="toc-text">9.1 sync.Mutex与sync.RMutex互斥锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2-sync-Once%E6%83%B0%E6%80%A7%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-text">9.2 sync.Once惰性初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-3-sync-Cond%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">9.3 sync.Cond的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-4-Goroutines%E5%92%8C%E7%BA%BF%E7%A8%8B"><span class="toc-text">9.4. Goroutines和线程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E5%8C%85%E5%92%8C%E5%B7%A5%E5%85%B7"><span class="toc-text">10. 包和工具</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-%E6%B5%8B%E8%AF%95"><span class="toc-text">11. 测试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#11-1-go-test"><span class="toc-text">11.1 go test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-2-%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87"><span class="toc-text">11.2 测试覆盖率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-3-%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-text">11.3 基准测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-4-%E5%88%A8%E6%9E%90"><span class="toc-text">11.4 刨析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-5-%E7%A4%BA%E4%BE%8B%E5%87%BD%E6%95%B0"><span class="toc-text">11.5 示例函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12-appendIn"><span class="toc-text">12. appendIn</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -943,6 +945,7 @@
 <li><a href="#78-error%E6%8E%A5%E5%8F%A3">7.8. error接口</a></li>
 <li><a href="#79-%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80">7.9. 类型断言</a></li>
 <li><a href="#710-%E5%9F%BA%E4%BA%8E%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80%E5%8C%BA%E5%88%AB%E9%94%99%E8%AF%AF%E7%B1%BB%E5%9E%8B">7.10. 基于类型断言区别错误类型</a></li>
+<li><a href="#711-any%E5%85%B3%E9%94%AE%E5%AD%97%E4%B8%8E%E6%B3%9B%E5%9E%8B">7.11. any关键字与泛型</a></li>
 </ul>
 </li>
 <li><a href="#8-goroutines%E5%92%8Cchannels">8. Goroutines和Channels</a><ul>
@@ -968,6 +971,7 @@
 <li><a href="#115-%E7%A4%BA%E4%BE%8B%E5%87%BD%E6%95%B0">11.5 示例函数</a></li>
 </ul>
 </li>
+<li><a href="#12-appendin">12. appendIn</a></li>
 </ul>
 <h1 id="1-入门"><a href="#1-入门" class="headerlink" title="1. 入门"></a>1. 入门</h1><h1 id="2-程序结构"><a href="#2-程序结构" class="headerlink" title="2. 程序结构"></a>2. 程序结构</h1><h2 id="2-1-命名"><a href="#2-1-命名" class="headerlink" title="2.1 命名"></a>2.1 命名</h2><table>
 <thead>
@@ -2675,6 +2679,86 @@ func main() &#123;
 	fmt.Println(os.IsNotExist(err)) &#x2F;&#x2F; &quot;true&quot;
 &#125;</code></pre>
 
+<h2 id="7-11-any关键字与泛型"><a href="#7-11-any关键字与泛型" class="headerlink" title="7.11. any关键字与泛型"></a>7.11. any关键字与泛型</h2><p>类型定义时不限制<code>形参类型</code>，在函数调用的时候再指定<code>具体类型</code>.  <code>any</code>其实是<code>interface&#123;&#125;</code>的别名<br>泛型好处:  (1).在编译期间对类型进行检查以提高类型安全(2).通过指定类型消除强制类型转换(3).能够减少代码重复性，提供更通用的功能函数。</p>
+<ul>
+<li>类型泛型<pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+import &quot;fmt&quot;
+
+type ListType[T int | int32 | int64 | string] []T
+
+type MapType[K int | int32, V int64 | string] map[K]V
+
+func main() &#123;
+    var intList ListType[int]
+    intList &#x3D; []int&#123;1, 2, 3&#125;
+    fmt.Println(intList)
+    strList :&#x3D; ListType[string]&#123;&quot;1&quot;, &quot;2&quot;, &quot;3&quot;&#125;
+    fmt.Println(strList)
+
+    intMap :&#x3D; MapType[int, string]&#123;1: &quot;1&quot;, 2: &quot;2&quot;&#125;
+    int32Map :&#x3D; MapType[int32, int64]&#123;1: 2, 3: 4&#125;
+    fmt.Println(intMap)
+    fmt.Println(int32Map)
+&#125;</code></pre>
+这里面的T,K,V都是占位符号,<code>ListType</code>只能在那三种类型中选择,同理<code>MapType</code>也是</li>
+<li>接口泛型<pre class="language-golang" data-language="golang"><code class="language-golang">type GenericStackInterface[T any] interface &#123;
+  Push(element T)
+  Pop() T
+&#125;</code></pre></li>
+<li>泛型函数<pre class="language-golang" data-language="golang"><code class="language-golang">func minInt[T int | int8 | int16 | int32](a, b T) T &#123;
+if a &lt; b &#123;
+    return a
+&#125;
+    return b
+&#125;
+
+func maxInt[T int | int8 | int16 | int32](a, b T) T &#123;
+    if a &gt; b &#123;
+        return a
+    &#125;
+    return b
+&#125;
+func Mix(a any) any &#123;
+
+&#125;
+&#x2F;&#x2F;还可以简化一下
+type Numeric interface &#123;
+    int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64
+&#125;
+func min[T Numeric](a, b T) T &#123;
+if a &lt; b &#123;
+    return a
+&#125;
+    return b
+&#125;
+
+func max[T Numeric](a, b T) T &#123;
+    if a &gt; b &#123;
+        return a
+    &#125;
+    return b
+&#125;
+&#x2F;&#x2F; go.18内置了数字类型的集合，故可以
+import (
+&quot;golang.org&#x2F;x&#x2F;exp&#x2F;constraints&quot;
+)
+
+func minType[T constraints.Ordered](a, b T) T &#123;
+    if a &lt; b &#123;
+        return a
+    &#125;
+    return b
+&#125;
+
+func maxType[T constraints.Ordered](a, b T) T &#123;
+    if a &gt; b &#123;
+        return a
+    &#125;
+    return b
+&#125;</code></pre>
+如果进入<code>constraints</code>源代码查看其具体代码的话，会发现在 Ordered 类型中也是有各种数字类型组合起来的。但是有一点奇怪的地方就是这里的类型集合中，各种类型前加了一个波浪线~, 表示衍生类型，即使用 type 自定义的类型也可以被识别到，只要底层类型一致即可。比如 ~int 可以包含 int 和 type MyInt int 等多种类型</li>
+</ul>
 <h1 id="8-Goroutines和Channels"><a href="#8-Goroutines和Channels" class="headerlink" title="8. Goroutines和Channels"></a>8. Goroutines和Channels</h1><p>(多看看本章代码)</p>
 <h2 id="8-1-goroutine"><a href="#8-1-goroutine" class="headerlink" title="8.1 goroutine"></a>8.1 goroutine</h2><p>通过代码示例了解<code>goroutine</code>的使用</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">func main() &#123;
@@ -3311,7 +3395,7 @@ import &quot;math&#x2F;rand&quot;
 <li>在go test执行测试的时候也会运行示例函数测试。如果示例函数内含有类似上面例子中的&#x2F;&#x2F; Output:格式的注释，那么测试工具会执行这个示例函数，然后检查示例函数的标准输出与注释是否匹配</li>
 <li>提供一个真实的演练场，它使用了Go Playground让用户可以在浏览器中在线编辑和运行每个示例函数</li>
 </ol>
-
+<h1 id="12-appendIn"><a href="#12-appendIn" class="headerlink" title="12. appendIn"></a>12. appendIn</h1>
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>

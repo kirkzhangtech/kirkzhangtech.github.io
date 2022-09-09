@@ -2,17 +2,19 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>golang standard library | Fish Tank</title>
+  <title>deep dive golang concurreny map | Fish Tank</title>
   <meta name="keywords" content="">
-  <meta name="description" content="golang standard library | Fish Tank">
+  <meta name="description" content="deep dive golang concurreny map | Fish Tank">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="摘要学习下别人如何写的golang的concurrent map实现并于广钢版本的进行对比。 第三方conrrency map理解 原文 : https:&#x2F;&#x2F;github.com&#x2F;orcaman&#x2F;concurrent-map   golang-concurrency-map  package cmap  import ( 	&quot;encoding&#x2F;json&quot; 	&amp;quot">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pro_git">
-<meta property="og:url" content="https://simonteo58.github.io/2022/09/09/pro_git/index.html">
+<meta property="og:title" content="deep dive golang concurreny map">
+<meta property="og:url" content="https://simonteo58.github.io/2022/09/09/archive/golang_concurrency_map/index.html">
 <meta property="og:site_name" content="Fish Tank">
+<meta property="og:description" content="摘要学习下别人如何写的golang的concurrent map实现并于广钢版本的进行对比。 第三方conrrency map理解 原文 : https:&#x2F;&#x2F;github.com&#x2F;orcaman&#x2F;concurrent-map   golang-concurrency-map  package cmap  import ( 	&quot;encoding&#x2F;json&quot; 	&amp;quot">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-09-09T04:21:02.133Z">
-<meta property="article:modified_time" content="2022-09-09T04:41:11.843Z">
+<meta property="article:published_time" content="2022-09-09T08:43:34.983Z">
+<meta property="article:modified_time" content="2022-09-09T09:54:25.253Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 
@@ -209,7 +211,7 @@
                         <i class="fold iconfont icon-right"></i>
                         
                         archive
-                        <small>(4)</small>
+                        <small>(5)</small>
                         
                     </div>
                     
@@ -253,7 +255,7 @@
                     <div data-rel="golang">
                         
                         golang
-                        <small>(2)</small>
+                        <small>(1)</small>
                         
                     </div>
                     
@@ -455,6 +457,14 @@
     
     <nav id="title-list-nav">
         
+        <a  class="All archive "
+           href="/2022/09/09/archive/golang_concurrency_map/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="deep dive golang concurreny map">deep dive golang concurreny map</span>
+            <span class="post-date" title="2022-09-09 16:43:34">2022/09/09</span>
+        </a>
+        
         <a  class="All "
            href="/2022/09/09/pro_git/"
            data-tag=""
@@ -624,6 +634,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="66.加一">66.加一</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
            data-tag=""
            data-author="" >
@@ -671,14 +689,6 @@
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="66.加一">66.加一</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
         <a  class="All TED "
            href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E4%B8%93%E6%B3%A8%E5%8A%9B/"
            data-tag=""
@@ -720,7 +730,7 @@
         </a>
         
         <a  class="All golang "
-           href="/2022/06/22/go%E5%9C%A3%E7%BB%8F/"
+           href="/2022/06/22/golang/go%E5%9C%A3%E7%BB%8F/"
            data-tag="golang"
            data-author="" >
             <span class="post-title" title="go语言圣经">go语言圣经</span>
@@ -733,14 +743,6 @@
            data-author="" >
             <span class="post-title" title="如何在读研的道路上快速失败">如何在读研的道路上快速失败</span>
             <span class="post-date" title="2022-06-22 21:14:38">2022/06/22</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/06/22/golang_standard_library/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="golang standard library">golang standard library</span>
-            <span class="post-date" title="2022-06-22 21:04:15">2022/06/22</span>
         </a>
         
         <a  class="All 非技术类 "
@@ -793,9 +795,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-golang_standard_library" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-archive/golang_concurrency_map" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">golang standard library</h1>
+        <h1 class="article-title">deep dive golang concurreny map</h1>
     
     <div class="article-meta">
         
@@ -805,7 +807,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="golang">golang</a>
+            <a  data-rel="archive">archive</a>
             
         </span>
         
@@ -813,7 +815,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-06 17:38:45'>2022-06-22 21:04</time>
+            Created At : <time class="date" title='Updated At: 2022-09-09 17:54:25'>2022-09-09 16:43</time>
         
     </div>
     <div class="article-meta">
@@ -846,7 +848,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#archive-x2F-tar"><span class="toc-text">archive&#x2F;tar</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Index"><span class="toc-text">Index</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Constants"><span class="toc-text">Constants</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Variables"><span class="toc-text">Variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-Header"><span class="toc-text">type Header</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#func-FileInfoHeader"><span class="toc-text">func FileInfoHeader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Header-FileInfo"><span class="toc-text">func (*Header) FileInfo</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-Reader"><span class="toc-text">type Reader</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#func-NewReader"><span class="toc-text">func NewReader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Reader-Next"><span class="toc-text">func (*Reader) Next</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Reader-Read"><span class="toc-text">func (*Reader) Read</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-Writer"><span class="toc-text">type Writer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#func-NewWriter"><span class="toc-text">func NewWriter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-WriteHeader"><span class="toc-text">func (*Writer) WriteHeader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-Write"><span class="toc-text">func (*Writer) Write</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-Flush"><span class="toc-text">func (*Writer) Flush</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#func-Writer-Close"><span class="toc-text">func (*Writer) Close</span></a></li></ol></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%91%98%E8%A6%81"><span class="toc-text">摘要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B9conrrency-map%E7%90%86%E8%A7%A3"><span class="toc-text">第三方conrrency map理解</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -862,181 +864,360 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="archive-x2F-tar"><a href="#archive-x2F-tar" class="headerlink" title="archive&#x2F;tar"></a>archive&#x2F;tar</h2><blockquote>
-<p>原文链接：<a target="_blank" rel="noopener" href="https://studygolang.com/pkgdoc">https://studygolang.com/pkgdoc</a></p>
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>学习下别人如何写的golang的concurrent map实现并于广钢版本的进行对比。</p>
+<h2 id="第三方conrrency-map理解"><a href="#第三方conrrency-map理解" class="headerlink" title="第三方conrrency map理解"></a>第三方conrrency map理解</h2><blockquote>
+<p>原文 : <a target="_blank" rel="noopener" href="https://github.com/orcaman/concurrent-map">https://github.com/orcaman/concurrent-map</a></p>
 </blockquote>
-<pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F; Create a buffer to write our archive to.
-buf :&#x3D; new(bytes.Buffer)
-&#x2F;&#x2F; Create a new tar archive.
-tw :&#x3D; tar.NewWriter(buf)
-&#x2F;&#x2F; Add some files to the archive.
-var files &#x3D; []struct &#123;
-    Name, Body string
-&#125;&#123;
-    &#123;&quot;readme.txt&quot;, &quot;This archive contains some text files.&quot;&#125;,
-    &#123;&quot;gopher.txt&quot;, &quot;Gopher names:\nGeorge\nGeoffrey\nGonzo&quot;&#125;,
-    &#123;&quot;todo.txt&quot;, &quot;Get animal handling licence.&quot;&#125;,
-&#125;
-for _, file :&#x3D; range files &#123;
-    hdr :&#x3D; &amp;tar.Header&#123;
-        Name: file.Name,
-        Size: int64(len(file.Body)),
-    &#125;
-    if err :&#x3D; tw.WriteHeader(hdr); err !&#x3D; nil &#123;
-        log.Fatalln(err)
-    &#125;
-    if _, err :&#x3D; tw.Write([]byte(file.Body)); err !&#x3D; nil &#123;
-        log.Fatalln(err)
-    &#125;
-&#125;
-&#x2F;&#x2F; Make sure to check the error on Close.
-if err :&#x3D; tw.Close(); err !&#x3D; nil &#123;
-    log.Fatalln(err)
-&#125;
-&#x2F;&#x2F; Open the tar archive for reading.
-r :&#x3D; bytes.NewReader(buf.Bytes())
-tr :&#x3D; tar.NewReader(r)
-&#x2F;&#x2F; Iterate through the files in the archive.
-for &#123;
-    hdr, err :&#x3D; tr.Next()
-    if err &#x3D;&#x3D; io.EOF &#123;
-        &#x2F;&#x2F; end of tar archive
-        break
-    &#125;
-    if err !&#x3D; nil &#123;
-        log.Fatalln(err)
-    &#125;
-    fmt.Printf(&quot;Contents of %s:\n&quot;, hdr.Name)
-    if _, err :&#x3D; io.Copy(os.Stdout, tr); err !&#x3D; nil &#123;
-        log.Fatalln(err)
-    &#125;
-    fmt.Println()
+<details>
+<summary>golang-concurrency-map</summary>
+
+<pre class="language-golang" data-language="golang"><code class="language-golang">package cmap
+
+import (
+	&quot;encoding&#x2F;json&quot;
+	&quot;sync&quot;
+)
+
+var SHARD_COUNT &#x3D; 32
+
+
+&#x2F;&#x2F; A &quot;thread&quot; safe string to anything map.
+type ConcurrentMapShared[V any] struct &#123;
+	items        map[string]V
+	sync.RWMutex &#x2F;&#x2F; Read Write mutex, guards access to internal 
+
 &#125;
 
-&#96;&#96;&#96;text
-Output:
-Contents of readme.txt:
-This archive contains some text files.
-Contents of gopher.txt:
-Gopher names:
-George
-Geoffrey
-Gonzo
-Contents of todo.txt:
-Get animal handling licence.</code></pre>
+&#x2F;&#x2F; A &quot;thread&quot; safe map of type string:Anything.
+&#x2F;&#x2F; To avoid lock bottlenecks this map is dived to several (SHARD_COUNT) map shards.
+type ConcurrentMap[V any] []*ConcurrentMapShared[V]
 
-<h3 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h3><ul>
-<li>Constants</li>
-<li>Variables</li>
-<li>type Header<ul>
-<li>func FileInfoHeader(fi os.FileInfo, link string) (*Header, error)</li>
-<li>func (h *Header) FileInfo() os.FileInfo</li>
-</ul>
-</li>
-<li>type Reader<ul>
-<li>func NewReader(r io.Reader) *Reader</li>
-<li>func (tr *Reader) Next() (*Header, error)</li>
-<li>func (tr *Reader) Read(b []byte) (n int, err error)</li>
-</ul>
-</li>
-<li>type Writer<ul>
-<li>func NewWriter(w io.Writer) *Writer</li>
-<li>func (tw <em>Writer)WriteHeader(hdr \t</em>Header)error</li>
-<li>func (tw *Writer)Write(b []byte)(n int, err error)</li>
-<li>func (tw *Writer)Flush() error</li>
-<li>func (tw *Writer)Close() error</li>
-</ul>
-</li>
-</ul>
-<h3 id="Constants"><a href="#Constants" class="headerlink" title="Constants"></a>Constants</h3><pre class="language-golang" data-language="golang"><code class="language-golang">const (
-    &#x2F;&#x2F; 类型
-    TypeReg           &#x3D; &#39;0&#39;    &#x2F;&#x2F; 普通文件
-    TypeRegA          &#x3D; &#39;\x00&#39; &#x2F;&#x2F; 普通文件
-    TypeLink          &#x3D; &#39;1&#39;    &#x2F;&#x2F; 硬链接
-    TypeSymlink       &#x3D; &#39;2&#39;    &#x2F;&#x2F; 符号链接
-    TypeChar          &#x3D; &#39;3&#39;    &#x2F;&#x2F; 字符设备节点
-    TypeBlock         &#x3D; &#39;4&#39;    &#x2F;&#x2F; 块设备节点
-    TypeDir           &#x3D; &#39;5&#39;    &#x2F;&#x2F; 目录
-    TypeFifo          &#x3D; &#39;6&#39;    &#x2F;&#x2F; 先进先出队列节点
-    TypeCont          &#x3D; &#39;7&#39;    &#x2F;&#x2F; 保留位
-    TypeXHeader       &#x3D; &#39;x&#39;    &#x2F;&#x2F; 扩展头
-    TypeXGlobalHeader &#x3D; &#39;g&#39;    &#x2F;&#x2F; 全局扩展头
-    TypeGNULongName   &#x3D; &#39;L&#39;    &#x2F;&#x2F; 下一个文件记录有个长名字
-    TypeGNULongLink   &#x3D; &#39;K&#39;    &#x2F;&#x2F; 下一个文件记录指向一个具有长名字的文件
-    TypeGNUSparse     &#x3D; &#39;S&#39;    &#x2F;&#x2F; 稀疏文件
-)</code></pre>
 
-<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><pre class="language-golang" data-language="golang"><code class="language-golang">var (
-    ErrWriteTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: write too long&quot;)
-    ErrFieldTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: header field too long&quot;)
-    ErrWriteAfterClose &#x3D; errors.New(&quot;archive&#x2F;tar: write after close&quot;)
-)</code></pre>
 
-<pre class="language-golang" data-language="golang"><code class="language-golang">var (
-    ErrHeader &#x3D; errors.New(&quot;archive&#x2F;tar: invalid tar header&quot;)
-)</code></pre>
+&#x2F;&#x2F; Creates a new concurrent map.
+func New[V any]() ConcurrentMap[V] &#123;
+	m :&#x3D; make(ConcurrentMap[V], SHARD_COUNT)
+	for i :&#x3D; 0; i &lt; SHARD_COUNT; i++ &#123;
+		m[i] &#x3D; &amp;ConcurrentMapShared[V]&#123;items: make(map[string]V)&#125;
+	&#125;
+	return m
+&#125;
 
-<h3 id="type-Header"><a href="#type-Header" class="headerlink" title="type Header"></a>type Header</h3><pre class="language-golang" data-language="golang"><code class="language-golang">type Header struct &#123;
-    Name       string    &#x2F;&#x2F; 记录头域的文件名
-    Mode       int64     &#x2F;&#x2F; 权限和模式位
-    Uid        int       &#x2F;&#x2F; 所有者的用户ID
-    Gid        int       &#x2F;&#x2F; 所有者的组ID
-    Size       int64     &#x2F;&#x2F; 字节数（长度）
-    ModTime    time.Time &#x2F;&#x2F; 修改时间
-    Typeflag   byte      &#x2F;&#x2F; 记录头的类型
-    Linkname   string    &#x2F;&#x2F; 链接的目标名
-    Uname      string    &#x2F;&#x2F; 所有者的用户名
-    Gname      string    &#x2F;&#x2F; 所有者的组名
-    Devmajor   int64     &#x2F;&#x2F; 字符设备或块设备的major number
-    Devminor   int64     &#x2F;&#x2F; 字符设备或块设备的minor number
-    AccessTime time.Time &#x2F;&#x2F; 访问时间
-    ChangeTime time.Time &#x2F;&#x2F; 状态改变时间
-    Xattrs     map[string]string
+&#x2F;&#x2F; GetShard returns shard under given key
+func (m ConcurrentMap[V]) GetShard(key string) *ConcurrentMapShared[V] &#123;
+	return m[uint(fnv32(key))%uint(SHARD_COUNT)]
+&#125;
+
+func (m ConcurrentMap[V]) MSet(data map[string]V) &#123;
+	for key, value :&#x3D; range data &#123;
+		shard :&#x3D; m.GetShard(key)
+		shard.Lock()
+		shard.items[key] &#x3D; value
+		shard.Unlock()
+	&#125;
+&#125;
+
+&#x2F;&#x2F; Sets the given value under the specified key.
+func (m ConcurrentMap[V]) Set(key string, value V) &#123;
+	&#x2F;&#x2F; Get map shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	shard.items[key] &#x3D; value
+	shard.Unlock()
+&#125;
+
+&#x2F;&#x2F; Callback to return new element to be inserted into the map
+&#x2F;&#x2F; It is called while lock is held, therefore it MUST NOT
+&#x2F;&#x2F; try to access other keys in same map, as it can lead to deadlock since
+&#x2F;&#x2F; Go sync.RWLock is not reentrant
+type UpsertCb[V any] func(exist bool, valueInMap V, newValue V) V
+
+&#x2F;&#x2F; Insert or Update - updates existing element or inserts a new one using UpsertCb
+func (m ConcurrentMap[V]) Upsert(key string, value V, cb UpsertCb[V]) (res V) &#123;
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	v, ok :&#x3D; shard.items[key]
+	res &#x3D; cb(ok, v, value)
+	shard.items[key] &#x3D; res
+	shard.Unlock()
+	return res
+&#125;
+
+&#x2F;&#x2F; Sets the given value under the specified key if no value was associated with it.
+func (m ConcurrentMap[V]) SetIfAbsent(key string, value V) bool &#123;
+	&#x2F;&#x2F; Get map shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	_, ok :&#x3D; shard.items[key]
+	if !ok &#123;
+		shard.items[key] &#x3D; value
+	&#125;
+	shard.Unlock()
+	return !ok
+&#125;
+
+&#x2F;&#x2F; Get retrieves an element from map under given key.
+func (m ConcurrentMap[V]) Get(key string) (V, bool) &#123;
+	&#x2F;&#x2F; Get shard
+	shard :&#x3D; m.GetShard(key)
+	shard.RLock()
+	&#x2F;&#x2F; Get item from shard.
+	val, ok :&#x3D; shard.items[key]
+	shard.RUnlock()
+	return val, ok
+&#125;
+
+&#x2F;&#x2F; Count returns the number of elements within the map.
+func (m ConcurrentMap[V]) Count() int &#123;
+	count :&#x3D; 0
+	for i :&#x3D; 0; i &lt; SHARD_COUNT; i++ &#123;
+		shard :&#x3D; m[i]
+		shard.RLock()
+		count +&#x3D; len(shard.items)
+		shard.RUnlock()
+	&#125;
+	return count
+&#125;
+
+&#x2F;&#x2F; Looks up an item under specified key
+func (m ConcurrentMap[V]) Has(key string) bool &#123;
+	&#x2F;&#x2F; Get shard
+	shard :&#x3D; m.GetShard(key)
+	shard.RLock()
+	&#x2F;&#x2F; See if element is within shard.
+	_, ok :&#x3D; shard.items[key]
+	shard.RUnlock()
+	return ok
+&#125;
+
+&#x2F;&#x2F; Remove removes an element from the map.
+func (m ConcurrentMap[V]) Remove(key string) &#123;
+	&#x2F;&#x2F; Try to get shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	delete(shard.items, key)
+	shard.Unlock()
+&#125;
+
+&#x2F;&#x2F; RemoveCb is a callback executed in a map.RemoveCb() call, while Lock is held
+&#x2F;&#x2F; If returns true, the element will be removed from the map
+type RemoveCb[V any] func(key string, v V, exists bool) bool
+
+&#x2F;&#x2F; RemoveCb locks the shard containing the key, retrieves its current value and calls the callback with those params
+&#x2F;&#x2F; If callback returns true and element exists, it will remove it from the map
+&#x2F;&#x2F; Returns the value returned by the callback (even if element was not present in the map)
+func (m ConcurrentMap[V]) RemoveCb(key string, cb RemoveCb[V]) bool &#123;
+	&#x2F;&#x2F; Try to get shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	v, ok :&#x3D; shard.items[key]
+	remove :&#x3D; cb(key, v, ok)
+	if remove &amp;&amp; ok &#123;
+		delete(shard.items, key)
+	&#125;
+	shard.Unlock()
+	return remove
+&#125;
+
+&#x2F;&#x2F; Pop removes an element from the map and returns it
+func (m ConcurrentMap[V]) Pop(key string) (v V, exists bool) &#123;
+	&#x2F;&#x2F; Try to get shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	v, exists &#x3D; shard.items[key]
+	delete(shard.items, key)
+	shard.Unlock()
+	return v, exists
+&#125;
+
+&#x2F;&#x2F; IsEmpty checks if map is empty.
+func (m ConcurrentMap[V]) IsEmpty() bool &#123;
+	return m.Count() &#x3D;&#x3D; 0
+&#125;
+
+&#x2F;&#x2F; Used by the Iter &amp; IterBuffered functions to wrap two variables together over a channel,
+type Tuple[V any] struct &#123;
+	Key string
+	Val V
+&#125;
+
+&#x2F;&#x2F; Iter returns an iterator which could be used in a for range loop.
+&#x2F;&#x2F;
+&#x2F;&#x2F; Deprecated: using IterBuffered() will get a better performence
+func (m ConcurrentMap[V]) Iter() &lt;-chan Tuple[V] &#123;
+	chans :&#x3D; snapshot(m)
+	ch :&#x3D; make(chan Tuple[V])
+	go fanIn(chans, ch)
+	return ch
+&#125;
+
+&#x2F;&#x2F; IterBuffered returns a buffered iterator which could be used in a for range loop.
+func (m ConcurrentMap[V]) IterBuffered() &lt;-chan Tuple[V] &#123;
+	chans :&#x3D; snapshot(m)
+	total :&#x3D; 0
+	for _, c :&#x3D; range chans &#123;
+		total +&#x3D; cap(c)
+	&#125;
+	ch :&#x3D; make(chan Tuple[V], total)
+	go fanIn(chans, ch)
+	return ch
+&#125;
+
+&#x2F;&#x2F; Clear removes all items from map.
+func (m ConcurrentMap[V]) Clear() &#123;
+	for item :&#x3D; range m.IterBuffered() &#123;
+		m.Remove(item.Key)
+	&#125;
+&#125;
+
+&#x2F;&#x2F; Returns a array of channels that contains elements in each shard,
+&#x2F;&#x2F; which likely takes a snapshot of &#96;m&#96;.
+&#x2F;&#x2F; It returns once the size of each buffered channel is determined,
+&#x2F;&#x2F; before all the channels are populated using goroutines.
+func snapshot[V any](m ConcurrentMap[V]) (chans []chan Tuple[V]) &#123;
+	&#x2F;&#x2F;When you access map items before initializing.
+	if len(m) &#x3D;&#x3D; 0 &#123;
+		panic(&#96;cmap.ConcurrentMap is not initialized. Should run New() before usage.&#96;)
+	&#125;
+	chans &#x3D; make([]chan Tuple[V], SHARD_COUNT)
+	wg :&#x3D; sync.WaitGroup&#123;&#125;
+	wg.Add(SHARD_COUNT)
+	&#x2F;&#x2F; Foreach shard.
+	for index, shard :&#x3D; range m &#123;
+		go func(index int, shard *ConcurrentMapShared[V]) &#123;
+			&#x2F;&#x2F; Foreach key, value pair.
+			shard.RLock()
+			chans[index] &#x3D; make(chan Tuple[V], len(shard.items))
+			wg.Done()
+			for key, val :&#x3D; range shard.items &#123;
+				chans[index] &lt;- Tuple[V]&#123;key, val&#125;
+			&#125;
+			shard.RUnlock()
+			close(chans[index])
+		&#125;(index, shard)
+	&#125;
+	wg.Wait()
+	return chans
+&#125;
+
+&#x2F;&#x2F; fanIn reads elements from channels &#96;chans&#96; into channel &#96;out&#96;
+func fanIn[V any](chans []chan Tuple[V], out chan Tuple[V]) &#123;
+	wg :&#x3D; sync.WaitGroup&#123;&#125;
+	wg.Add(len(chans))
+	for _, ch :&#x3D; range chans &#123;
+		go func(ch chan Tuple[V]) &#123;
+			for t :&#x3D; range ch &#123;
+				out &lt;- t
+			&#125;
+			wg.Done()
+		&#125;(ch)
+	&#125;
+	wg.Wait()
+	close(out)
+&#125;
+
+&#x2F;&#x2F; Items returns all items as map[string]V
+func (m ConcurrentMap[V]) Items() map[string]V &#123;
+	tmp :&#x3D; make(map[string]V)
+
+	&#x2F;&#x2F; Insert items to temporary map.
+	for item :&#x3D; range m.IterBuffered() &#123;
+		tmp[item.Key] &#x3D; item.Val
+	&#125;
+
+	return tmp
+&#125;
+
+&#x2F;&#x2F; Iterator callbacalled for every key,value found in
+&#x2F;&#x2F; maps. RLock is held for all calls for a given shard
+&#x2F;&#x2F; therefore callback sess consistent view of a shard,
+&#x2F;&#x2F; but not across the shards
+type IterCb[V any] func(key string, v V)
+
+&#x2F;&#x2F; Callback based iterator, cheapest way to read
+&#x2F;&#x2F; all elements in a map.
+func (m ConcurrentMap[V]) IterCb(fn IterCb[V]) &#123;
+	for idx :&#x3D; range m &#123;
+		shard :&#x3D; (m)[idx]
+		shard.RLock()
+		for key, value :&#x3D; range shard.items &#123;
+			fn(key, value)
+		&#125;
+		shard.RUnlock()
+	&#125;
+&#125;
+
+&#x2F;&#x2F; Keys returns all keys as []string
+func (m ConcurrentMap[V]) Keys() []string &#123;
+	count :&#x3D; m.Count()
+	ch :&#x3D; make(chan string, count)
+	go func() &#123;
+		&#x2F;&#x2F; Foreach shard.
+		wg :&#x3D; sync.WaitGroup&#123;&#125;
+		wg.Add(SHARD_COUNT)
+		for _, shard :&#x3D; range m &#123;
+			go func(shard *ConcurrentMapShared[V]) &#123;
+				&#x2F;&#x2F; Foreach key, value pair.
+				shard.RLock()
+				for key :&#x3D; range shard.items &#123;
+					ch &lt;- key
+				&#125;
+				shard.RUnlock()
+				wg.Done()
+			&#125;(shard)
+		&#125;
+		wg.Wait()
+		close(ch)
+	&#125;()
+
+	&#x2F;&#x2F; Generate keys
+	keys :&#x3D; make([]string, 0, count)
+	for k :&#x3D; range ch &#123;
+		keys &#x3D; append(keys, k)
+	&#125;
+	return keys
+&#125;
+
+&#x2F;&#x2F;Reviles ConcurrentMap &quot;private&quot; variables to json marshal.
+func (m ConcurrentMap[V]) MarshalJSON() ([]byte, error) &#123;
+	&#x2F;&#x2F; Create a temporary map, which will hold all item spread across shards.
+	tmp :&#x3D; make(map[string]V)
+
+	&#x2F;&#x2F; Insert items to temporary map.
+	for item :&#x3D; range m.IterBuffered() &#123;
+		tmp[item.Key] &#x3D; item.Val
+	&#125;
+	return json.Marshal(tmp)
+&#125;
+
+func fnv32(key string) uint32 &#123;
+	hash :&#x3D; uint32(2166136261)
+	const prime32 &#x3D; uint32(16777619)
+	keyLength :&#x3D; len(key)
+	for i :&#x3D; 0; i &lt; keyLength; i++ &#123;
+		hash *&#x3D; prime32
+		hash ^&#x3D; uint32(key[i])
+	&#125;
+	return hash
+&#125;
+
+&#x2F;&#x2F; Reverse process of Marshal.
+func (m *ConcurrentMap[V]) UnmarshalJSON(b []byte) (err error) &#123;
+ 	tmp :&#x3D; make(map[string]V)
+
+ 	&#x2F;&#x2F; Unmarshal into a single map.
+ 	if err :&#x3D; json.Unmarshal(b, &amp;tmp); err !&#x3D; nil &#123;
+ 		return err
+ 	&#125;
+
+ 	&#x2F;&#x2F; foreach key,value pair in temporary map insert into our concurrent map.
+ 	for key, val :&#x3D; range tmp &#123;
+ 		m.Set(key, val)
+ 	&#125;
+	return nil
 &#125;</code></pre>
 
-<p>Header代表tar档案文件里的单个头。Header类型的某些字段可能未使用。</p>
-<h4 id="func-FileInfoHeader"><a href="#func-FileInfoHeader" class="headerlink" title="func FileInfoHeader"></a>func FileInfoHeader</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func FileInfoHeader(fi os.FileInfo, link string) (*Header, error)</code></pre>
-
-<p>FileInfoHeader返回一个根据fi填写了部分字段的Header。 如果fi描述一个符号链接，FileInfoHeader函数将link参数作为链接目标。如果fi描述一个目录，会在名字后面添加斜杠。因为os.FileInfo接口的Name方法只返回它描述的文件的无路径名，有可能需要将返回值的Name字段修改为文件的完整路径名。</p>
-<h4 id="func-Header-FileInfo"><a href="#func-Header-FileInfo" class="headerlink" title="func (*Header) FileInfo"></a>func (*Header) FileInfo</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (h *Header) FileInfo() os.FileInfo</code></pre>
-
-<p>FileInfo返回该Header对应的文件信息。（os.FileInfo类型）</p>
-<h3 id="type-Reader"><a href="#type-Reader" class="headerlink" title="type Reader"></a>type Reader</h3><pre class="language-golang" data-language="golang"><code class="language-golang">type Reader struct &#123;
-    &#x2F;&#x2F; 内含隐藏或非导出字段
-&#125;</code></pre>
-
-<p>Reader提供了对一个tar档案文件的顺序读取。一个tar档案文件包含一系列文件。Next方法返回档案中的下一个文件（包括第一个），返回值可以被视为io.Reader来获取文件的数据。</p>
-<h4 id="func-NewReader"><a href="#func-NewReader" class="headerlink" title="func NewReader"></a>func NewReader</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func NewReader(r io.Reader) *Reader</code></pre>
-
-<p>NewReader创建一个从r读取的Reader。</p>
-<h4 id="func-Reader-Next"><a href="#func-Reader-Next" class="headerlink" title="func (*Reader) Next"></a>func (*Reader) Next</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tr *Reader) Next() (*Header, error)</code></pre>
-
-<p>转入tar档案文件下一记录，它会返回下一记录的头域。</p>
-<h4 id="func-Reader-Read"><a href="#func-Reader-Read" class="headerlink" title="func (*Reader) Read"></a>func (*Reader) Read</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tr *Reader) Read(b []byte) (n int, err error)</code></pre>
-
-<p>从档案文件的当前记录读取数据，到达记录末端时返回(0, EOF)，直到调用Next方法转入下一记录。</p>
-<h3 id="type-Writer"><a href="#type-Writer" class="headerlink" title="type Writer"></a>type Writer</h3><pre class="language-golang" data-language="golang"><code class="language-golang">type Writer struct &#123;
-    &#x2F;&#x2F; 内含隐藏或非导出字段
-&#125;</code></pre>
-
-<p>Writer类型提供了POSIX.1格式的tar档案文件的顺序写入。一个tar档案文件包含一系列文件。调用WriteHeader来写入一个新的文件，然后调用Write写入文件的数据，该记录写入的数据不能超过hdr.Size字节。</p>
-<h4 id="func-NewWriter"><a href="#func-NewWriter" class="headerlink" title="func NewWriter"></a>func NewWriter</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func NewWriter(w io.Writer) *Writer</code></pre>
-
-<p>NewWriter创建一个写入w的*Writer。</p>
-<h4 id="func-Writer-WriteHeader"><a href="#func-Writer-WriteHeader" class="headerlink" title="func (*Writer) WriteHeader"></a>func (*Writer) WriteHeader</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) WriteHeader(hdr *Header) error</code></pre>
-
-<p>WriteHeader写入hdr并准备接受文件内容。如果不是第一次调用本方法，会调用Flush。在Close之后调用本方法会返回ErrWriteAfterClose。</p>
-<h4 id="func-Writer-Write"><a href="#func-Writer-Write" class="headerlink" title="func (*Writer) Write"></a>func (*Writer) Write</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) Write(b []byte) (n int, err error)</code></pre>
-
-<p>Write向tar档案文件的当前记录中写入数据。如果写入的数据总数超出上一次调用WriteHeader的参数hdr.Size字节，返回ErrWriteTooLong错误。</p>
-<h4 id="func-Writer-Flush"><a href="#func-Writer-Flush" class="headerlink" title="func (*Writer) Flush"></a>func (*Writer) Flush</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) Flush() error</code></pre>
-
-<p>Flush结束当前文件的写入。（可选的）</p>
-<h4 id="func-Writer-Close"><a href="#func-Writer-Close" class="headerlink" title="func (*Writer) Close"></a>func (*Writer) Close</h4><pre class="language-golang" data-language="golang"><code class="language-golang">func (tw *Writer) Close() error</code></pre>
-
-<p>Close关闭tar档案文件，会将缓冲中未写入下层的io.Writer接口的数据刷新到下层。</p>
-<p><a target="_blank" rel="noopener" href="http://studygolang.com/">Go语言中文网</a> | <a target="_blank" rel="noopener" href="http://golang.org/">Go Language</a><a target="_blank" rel="noopener" href="https://studygolang.com/static/pkgdoc/pkg/archive_tar.htm#">Back to top</a></p>
-
+</details>
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>
