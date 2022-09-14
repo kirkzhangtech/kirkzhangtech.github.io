@@ -1,0 +1,29 @@
+language: node_js
+ 
+node_js: stable # 要安装的node版本为当前的稳定版。
+ 
+cache:
+  directories:
+  - node_modules # 要缓存的文件夹
+ 
+install:
+- npm install # install阶段执行的命令。
+ 
+script:
+- npx hexo generate # script阶段执行的命令
+ 
+after_script: # 最后执行的命令
+- cd public
+- echo blog.ladyrick.com > CNAME # github pages服务，自定义域名
+- git init
+- git config user.name "ladyrick" # 配置git参数
+- git config user.email "ladyrick@qq.com" # 配置git参数
+- git add .
+- git commit -m "travis"
+- git push -f "https://${My_Github_Token}@github.com/SimonTeo58/SimonTeo58.github.io.git"  master:gh-pages
+# 强制push到gh-pages分支。注意这里使用了环境变量 ${MY_TOKEN}
+# 另外，注意修改仓库地址。
+ 
+branches:
+  only:
+  - master # 触发持续集成的分支
