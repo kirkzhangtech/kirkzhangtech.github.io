@@ -465,7 +465,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   - 系统会将/etc/skel目录下的内容复制到用户的HOME目录下；
   - 系统为该用户账户在mail目录下创建一个用于接收邮件的文件
 
-  `/etc/skel`下面它们是bash shell环境的标准启动文件,允许管理员把它作为创建新用户HOME目录的模板。这样就能自动在每个新用户的HOME目录里放置默认的系统文件,`useradd`参数可以控制这些默认值,ubuntu系统在`/etc/skel`下，默认情况下
+  `/etc/skel`下面它们是bash shell环境的标准启动文件,允许管理员把它作为创建新用户HOME目录的模板。这样就能自动在每个新用户的HOME目录里放置默认的系统文件,`useradd`参数可以控制这些默认值,ubuntu系统在`/etc/skel`下，默认命令行参数
   ```bash
   -c comment 给新用户添加备注
   -d home_dir 为主目录指定一个名字（如果不想用登录名作为主目录名的话）
@@ -477,6 +477,20 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   -m 创建用户的HOME目录
   -M 不创建用户的HOME目录（当默认设置里要求创建时才使用这个选项）
   -n 创建一个与用户登录名同名的新组
+  -r 创建系统账户
+  -p passwd 为用户账户指定默认密码
+  -s shell 指定默认的登录shell 
+  -u uid 为账户指定唯一的UID 
+  ```
+  同时也可以更改默认值的参数
+  ```bash
+  -b default_home  更改默认的创建用户HOME目录的位置
+  -e expiration_date  更改默认的新账户的过期日期
+  -f inactive  更改默认的新用户从密码过期到账户被禁用的天数
+  -g group  更改默认的组名称或GID 
+  -s shell  更改默认的登录shell 
+  # 更改用户默认shell
+  useradd -D -s /bin/tsch
   ```
 
 ### 7.1.2 删除用户
