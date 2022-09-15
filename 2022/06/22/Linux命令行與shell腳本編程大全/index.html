@@ -251,10 +251,6 @@
     
         
             
-        
-    
-        
-            
                 <li>
                     <div data-rel="golang">
                         
@@ -264,6 +260,10 @@
                     </div>
                     
                 </li>
+            
+        
+    
+        
             
         
     
@@ -815,7 +815,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-14 22:08:48'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-15 22:18:54'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1566,7 +1566,7 @@ root固定分配UID是0，Linux系统会为各种各样的功能创建不同的�
 <li>系统会将&#x2F;etc&#x2F;skel目录下的内容复制到用户的HOME目录下；</li>
 <li>系统为该用户账户在mail目录下创建一个用于接收邮件的文件</li>
 </ul>
-<p><code>/etc/skel</code>下面它们是bash shell环境的标准启动文件,允许管理员把它作为创建新用户HOME目录的模板。这样就能自动在每个新用户的HOME目录里放置默认的系统文件,<code>useradd</code>参数可以控制这些默认值,ubuntu系统在<code>/etc/skel</code>下，默认情况下</p>
+<p><code>/etc/skel</code>下面它们是bash shell环境的标准启动文件,允许管理员把它作为创建新用户HOME目录的模板。这样就能自动在每个新用户的HOME目录里放置默认的系统文件,<code>useradd</code>参数可以控制这些默认值,ubuntu系统在<code>/etc/skel</code>下，默认命令行参数</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">-c comment 给新用户添加备注
 -d home_dir 为主目录指定一个名字（如果不想用登录名作为主目录名的话）
 -e expire_date 用YYYY-MM-DD格式指定一个账户过期的日期
@@ -1576,7 +1576,19 @@ root固定分配UID是0，Linux系统会为各种各样的功能创建不同的�
 -k 必须和-m一起使用，将/etc/skel目录的内容复制到用户的<span class="token environment constant">HOME</span>目录
 -m 创建用户的<span class="token environment constant">HOME</span>目录
 -M 不创建用户的<span class="token environment constant">HOME</span>目录（当默认设置里要求创建时才使用这个选项）
--n 创建一个与用户登录名同名的新组</code></pre></li>
+-n 创建一个与用户登录名同名的新组
+-r 创建系统账户
+-p <span class="token function">passwd</span> 为用户账户指定默认密码
+-s shell 指定默认的登录shell 
+-u uid 为账户指定唯一的<span class="token environment constant">UID</span> </code></pre>
+<p>同时也可以更改默认值的参数</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">-b default_home  更改默认的创建用户<span class="token environment constant">HOME</span>目录的位置
+-e expiration_date  更改默认的新账户的过期日期
+-f inactive  更改默认的新用户从密码过期到账户被禁用的天数
+-g group  更改默认的组名称或GID 
+-s shell  更改默认的登录shell 
+<span class="token comment"># 更改用户默认shell</span>
+<span class="token function">useradd</span> -D -s /bin/tsch</code></pre></li>
 </ul>
 <h3 id="7-1-2-删除用户"><a href="#7-1-2-删除用户" class="headerlink" title="7.1.2 删除用户"></a>7.1.2 删除用户</h3><p>to_be_continue</p>
 <h3 id="7-1-2-修改用户"><a href="#7-1-2-修改用户" class="headerlink" title="7.1.2 修改用户"></a>7.1.2 修改用户</h3><p>to_be_continue</p>
