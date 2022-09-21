@@ -282,46 +282,22 @@ categories:
         3. `AppendEntries`RPC并不是因为log不一致被reject,应该立刻降级为follower,不要更新`nextIndex`，如果这个时候立刻选举你可能会面对数据竞争的问题
         4. `commitIndex`不能设置为旧的term，你一定要checklog[N].Term ==currentTerm.这是因为leader不知道follower是否在当前任期提交了日志,Figure 8会详细阐述这个问题
 
-        ```text
-        One common source of confusion is the difference between nextIndex and matchIndex. In particular, you may observe that matchIndex = nextIndex - 1, and simply not implement matchIndex. This is not safe. While nextIndex and matchIndex are generally updated at the same time to a similar value (specifically, nextIndex = matchIndex + 1), the two serve quite different purposes. nextIndex is a guess as to what prefix the leader shares with a given follower. It is generally quite optimistic (we share everything), and is moved backwards only on negative responses. For example, when a leader has just been elected, nextIndex is set to be index index at the end of the log. In a way, nextIndex is used for performance – you only need to send these things to this peer.matchIndex is used for safety. It is a conservative measurement of what prefix of the log the leader shares with a given follower. matchIndex cannot ever be set to a value that is too high, as this may cause the commitIndex to be moved too far forward. This is why matchIndex is initialized to -1 (i.e., we agree on no prefix), and only updated when a follower positively acknowledges an AppendEntries RPC.
-        ```
-
         正常情况下确实是`matchIndex = nextIndex - 1`,然后就不实现`matchIndex`是不安全的,`nextIndex`只是简单的认为leader已经提交了发送了哪些以前的logEntry，比如leader被选举出来只是讲nextIndex设置为log的长度，而`matchIndex`则是安全的方法，确定leader已经提交了多少的日志，`matchIndex`不会设置的太高，这会导致`commitIndex`移动的太快
     - term混乱（term不稳定)
 
-        ```text
-        Term confusion refers to servers getting confused by RPCs that come from old terms. In general, this is not a problem when receiving an RPC, since the rules in Figure 2 say exactly what you should do when you see an old term. However, Figure 2 generally doesn’t discuss what you should do when you get old RPC replies. From experience, we have found that by far the simplest thing to do is to first record the term in the reply (it may be higher than your current term), and then to compare the current term with the term you sent in your original RPC. If the two are different, drop the reply and return. Only if the two terms are the same should you continue processing the reply. There may be further optimizations you can do here with some clever protocol reasoning, but this approach seems to work well. And not doing it leads down a long, winding path of blood, sweat, tears and despair.
-
-        A related, but not identical problem is that of assuming that your state has not changed between when you sent the RPC, and when you received the reply. A good example of this is setting matchIndex = nextIndex - 1, or matchIndex = len(log) when you receive a response to an RPC. This is not safe, because both of those values could have been updated since when you sent the RPC. Instead, the correct thing to do is update matchIndex to be prevLogIndex + len(entries[]) from the arguments you sent in the RPC originally.
-        ```
         因为网络导致的RPC过期问题，term混淆是指服务器被来自旧term的RPC所迷惑。一般来说，在收到RPC时，因为图2中的规则确切地说明了当你看到一个旧term时你应该做什么。然而，图2一般没有讨论当你收到旧的RPC回复时你应该做什么。根据经验，我们发现，到目前为止，最简单的做法是首先记录回复中的术语（它可能比你当前的term高），然后将当前term与你在原始RPC中发送的term进行比较。如果两者不同，就放弃回复并返回。只有当这两个术语相同时，你才应该继续处理回复。也许你可以通过一些巧妙的协议推理在这里做进一步的优化，但这种方法似乎很有效。而不这样做会导致一条漫长而曲折的血汗、泪水和绝望的道路。
 
 
     - 优化
 
-        ```text
-        An aside on optimizations
-        The Raft paper includes a couple of optional features of interest. In 6.824, we require the students to implement two of them: log compaction (section 7) and accelerated log backtracking (top left hand side of page 8). The former is necessary to avoid the log growing without bound, and the latter is useful for bringing stale followers up to date quickly.
-
-        These features are not a part of “core Raft”, and so do not receive as much attention in the paper as the main consensus protocol. Log compaction is covered fairly thoroughly (in Figure 13), but leaves out some design details that you might miss if you read it too casually:
-
-        When snapshotting application state, you need to make sure that the application state corresponds to the state following some known index in the Raft log. This means that the application either needs to communicate to Raft what index the snapshot corresponds to, or that Raft needs to delay applying additional log entries until the snapshot has been completed.
-        The text does not discuss the recovery protocol for when a server crashes and comes back up now that snapshots are involved. In particular, if Raft state and snapshots are committed separately, a server could crash between persisting a snapshot and persisting the updated Raft state. This is a problem, because step 7 in Figure 13 dictates that the Raft log covered by the snapshot must be discarded.
-
-        If, when the server comes back up, it reads the updated snapshot, but the outdated log, it may end up applying some log entries that are already contained within the snapshot. This happens since the commitIndex and lastApplied are not persisted, and so Raft doesn’t know that those log entries have already been applied. The fix for this is to introduce a piece of persistent state to Raft that records what “real” index the first entry in Raft’s persisted log corresponds to. This can then be compared to the loaded snapshot’s lastIncludedIndex to determine what elements at the head of the log to discard.
-
-        The accelerated log backtracking optimization is very underspecified, probably because the authors do not see it as being necessary for most deployments. It is not clear from the text exactly how the conflicting index and term sent back from the client should be used by the leader to determine what nextIndex to use. We believe the protocol the authors probably want you to follow is:
-
-        If a follower does not have prevLogIndex in its log, it should return with conflictIndex = len(log) and conflictTerm = None.
-        If a follower does have prevLogIndex in its log, but the term does not match, it should return conflictTerm = log[prevLogIndex].Term, and then search its log for the first index whose entry has term equal to conflictTerm.
-        Upon receiving a conflict response, the leader should first search its log for conflictTerm. If it finds an entry in its log with that term, it should set nextIndex to be the one beyond the index of the last entry in that term in its log.
-        If it does not find an entry with that term, it should set nextIndex = conflictIndex.
-        A half-way solution is to just use conflictIndex (and ignore conflictTerm), which simplifies the implementation, but then the leader will sometimes end up sending more log entries to the follower than is strictly necessary to bring them up to date.
-        ```
-
         - 当快照应用程序状态时，你需要确保应用程序状态与Raft日志中某个已知索引之后的状态相对应，这意味着应用程序要么需要向Raft传达快照所对应的索引，要么Raft需要推迟应用额外的日志条目，直到快照完成。
 
         - 该文本没有讨论当服务器崩溃并重新启动时的恢复协议，因为现在涉及到快照。特别是，如果Raft状态和快照是分开提交的，服务器可能会在坚持快照和坚持更新的Raft状态之间崩溃。这是一个问题，因为图13中的第7步决定了快照所覆盖的Raft日志必须被丢弃。如果当服务器重新启动时，它读取的是更新的快照，而不是过时的日志，那么它最终可能会应用一些已经包含在快照中的日志条目。这种情况会发生，因为commitIndex和lastApplied没有被持久化，所以Raft不知道这些日志条目已经被应用。解决这个问题的方法是在Raft中引入一个持久化状态，记录Raft持久化日志中的第一个条目所对应的 "真实 "索引。然后，这可以与加载的快照的lastIncludedIndex进行比较，以确定在日志的头部有哪些元素需要丢弃.
+        -  如果当服务器重新启动时，它读取的是更新的快照，而不是过时的日志，那么它最终可能会应用一些已经包含在快照中的日志条目。这种情况会发生，因为commitIndex和lastApplied没有被持久化，所以Raft不知道这些日志条目已经被应用。解决这个问题的方法是给Raft引入一个持久化状态，记录Raft持久化日志中的第一个条目对应的 "真实 "索引。然后，这可以与加载的快照的lastIncludedIndex进行比较，以确定要丢弃日志头部的哪些元素。
+
+        加速日志回溯的优化是非常不明确的，可能是因为作者认为这对大多数部署来说是不必要的。文本中并没有明确说明领导者应该如何使用从客户端发回的冲突索引和术语来决定使用哪一个NextIndex。我们认为作者可能希望你遵循的协议是。
+
+        - 如果一个跟随者的日志中没有prevLogIndex，它应该以conflictIndex = len(log)和conflictTerm = None返回。如果一个跟随者在其日志中确实有prevLogIndex，但是术语不匹配，它应该返回conflictTerm = log[prevLogIndex].Term，然后在其日志中搜索其条目中术语等于conflictTerm的第一个索引。在收到冲突响应时，领导者应该首先搜索其日志中的conflictTerm。如果它在日志中找到一个具有该term的条目，它应该将nextIndex设置为其日志中该term的最后一个条目的索引之外的那个索引。如果它没有找到该术语的条目，它应该设置 nextIndex = conflictIndex。一个半途而废的解决方案是只使用conflictIndex（而忽略conflictTerm），这简化了实现，但这样一来，领导者有时会向跟随者发送更多的日志条目，而不是严格意义上所需要的，以使他们达到最新状态。
 
     ## Applications on top of Raft
 

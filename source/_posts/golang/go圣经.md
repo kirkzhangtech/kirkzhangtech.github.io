@@ -2207,13 +2207,13 @@ func dirents(dir string) []os.FileInfo {
     (多看看本章代码)
 
 ## 9.1 sync.Mutex与sync.RMutex互斥锁
-
+比如银行存款查询余额的场景，因为所有的余额查询请求是顺序执行的，这样会互斥地获得锁，并且会暂时阻止其它的goroutine运行。由于Balance函数只需要读取变量的状态，所以我们同时让多个Balance调用并发运行事实上是安全的，只要在运行的时候没有存款或者取款(这句话很关键要没有)操作就行。在这种场景下我们需要一种特殊类型的锁，其允许多个只读操作并行执行，但写操作会完全互斥。这种锁叫作“多读单写”锁
 - 总结
     - 避免临界区中的变量在中途被其他的goroutine修改
     - 使用mutex包进行互斥goroutine
     - 一个deferred Unlock即使在临界区发生`panic`时依然会执行
     - golang不支持重入锁
-    - sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的sync.RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞
+    - sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞，但是sync.RWMutex.RLock()阻塞之间不阻塞
 
 ## 9.2 sync.Once惰性初始化
 如果初始化的成本太高，需要延迟的初始化对象。可考虑使用`sync.Once`
@@ -2238,10 +2238,8 @@ func dirents(dir string) []os.FileInfo {
     // A Cond must not be copied after first use.
     type Cond struct {
             noCopy noCopy
-
             // L is held while observing or changing the condition
             L Locker
-
             notify  notifyList
             checker copyChecker
     }

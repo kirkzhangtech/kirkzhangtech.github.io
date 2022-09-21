@@ -162,7 +162,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
 
 
 # 4. 其他shell命令
-- date 
+- date
   ```bash
   echo  `date --date="-5 day" +%Y%m%d`
   echo  `date --date="-5 month" +%Y%m%d`

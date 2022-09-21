@@ -5,11 +5,11 @@ categories:
 tag: ansible
 ---
 
-## 3. 第三章 inventory:描述你的服务器
+# 3. 第三章 inventory:描述你的服务器
 
 ansible管理的多台主机文件叫inventory
 
-### 3.1 inventory基本参数含义
+## 3.1 inventory基本参数含义
 
 inventory文件通常是.ini格式的，常用inventory参数如下
 
@@ -28,7 +28,7 @@ ansible_*_interpreter     #其他解释器路径，用法与ansible_python_inter
 以上是2.0版本之前的参数，2.0之后有更换，但是向下兼容
 ```
 
-#### 3.1.1 主机别名和群组
+### 3.1.1 主机别名和群组
 
 inventory支持群组,类似于下面
 
@@ -47,7 +47,7 @@ web[1:20].example.com
 
 ```
 
-#### 3.1.2 主机和群组变量，在inventory各自文件中
+### 3.1.2 主机和群组变量，在inventory各自文件中
 
 在inventory目录下我们根据环境，将不同阶段的变量放进文件，`group_vars`文件夹下文件名要与`hosts`文件中的群组保持一致
 
@@ -121,7 +121,7 @@ output
 
 ansible支持将动态inventory和动态的inventory放在同一文件夹下(名为inventory的文件夹)通过ansible.cfg的hostfile进行控制，也可以使用`-i`参数进行控制
 
-#### 3.1.4 add_host模块和group_by模块
+### 3.1.4 add_host模块和group_by模块
 
 `add_host`  
 playbook运行时，主机被创建是无法追加新主机的。使用`add_host`模块就可以添加新主机并在此次playbook中生效  
