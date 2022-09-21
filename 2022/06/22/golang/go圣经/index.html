@@ -822,7 +822,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-09 18:27:58'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-09-21 22:15:59'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -3043,13 +3043,14 @@ func dirents(dir string) []os.FileInfo &#123;
 </ul>
 </li>
 </ul>
-<h2 id="9-1-sync-Mutex与sync-RMutex互斥锁"><a href="#9-1-sync-Mutex与sync-RMutex互斥锁" class="headerlink" title="9.1 sync.Mutex与sync.RMutex互斥锁"></a>9.1 sync.Mutex与sync.RMutex互斥锁</h2><ul>
+<h2 id="9-1-sync-Mutex与sync-RMutex互斥锁"><a href="#9-1-sync-Mutex与sync-RMutex互斥锁" class="headerlink" title="9.1 sync.Mutex与sync.RMutex互斥锁"></a>9.1 sync.Mutex与sync.RMutex互斥锁</h2><p>比如银行存款查询余额的场景，因为所有的余额查询请求是顺序执行的，这样会互斥地获得锁，并且会暂时阻止其它的goroutine运行。由于Balance函数只需要读取变量的状态，所以我们同时让多个Balance调用并发运行事实上是安全的，只要在运行的时候没有存款或者取款(这句话很关键要没有)操作就行。在这种场景下我们需要一种特殊类型的锁，其允许多个只读操作并行执行，但写操作会完全互斥。这种锁叫作“多读单写”锁</p>
+<ul>
 <li>总结<ul>
 <li>避免临界区中的变量在中途被其他的goroutine修改</li>
 <li>使用mutex包进行互斥goroutine</li>
 <li>一个deferred Unlock即使在临界区发生<code>panic</code>时依然会执行</li>
 <li>golang不支持重入锁</li>
-<li>sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的sync.RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞</li>
+<li>sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞，但是sync.RWMutex.RLock()阻塞之间不阻塞</li>
 </ul>
 </li>
 </ul>
@@ -3072,10 +3073,8 @@ func dirents(dir string) []os.FileInfo &#123;
 &#x2F;&#x2F; A Cond must not be copied after first use.
 type Cond struct &#123;
         noCopy noCopy
-
         &#x2F;&#x2F; L is held while observing or changing the condition
         L Locker
-
         notify  notifyList
         checker copyChecker
 &#125;
