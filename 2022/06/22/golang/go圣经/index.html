@@ -610,18 +610,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -666,18 +666,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="9.回文数">9.回文数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="9.回文数">9.回文数</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -822,7 +822,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-24 14:39:09'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-09-24 15:52:23'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -3218,24 +3218,27 @@ go list -f &#39;&#123;&#123;.ImportPath&#125;&#125; -&gt; &#123;&#123;join .Impo
 </ul>
 </li>
 </ul>
-<h1 id="11-测试"><a href="#11-测试" class="headerlink" title="11. 测试"></a>11. 测试</h1><h2 id="11-1-go-test"><a href="#11-1-go-test" class="headerlink" title="11.1 go test"></a>11.1 go test</h2><p>一个测试函数是以<code>Test</code>为函数名前缀的函数<br>一个基准测试函数是以<code>Benchmark</code>为函数名前缀的函数<br>一个示例函数是以<code>Example</code>为函数名前缀的函数，提供一个由编译器保证正确性的示例文档</p>
+<h1 id="11-测试"><a href="#11-测试" class="headerlink" title="11. 测试"></a>11. 测试</h1><p>go test选项含义</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">
+-args 传递参数到test binary<span class="token punctuation">(</span>到时候补一个demo<span class="token punctuation">)</span>
+-c 编译test binary,但是不执行
+-exec xprog  运行test binary ,原理如同 go run
+-i 安装test binary的相关依赖
+-json 将测试输出转化为json为了自动化处理
+-c <span class="token function">file</span>   定义编译后的binary的文件名
+</code></pre>
+
+
+<h2 id="11-1-go-test"><a href="#11-1-go-test" class="headerlink" title="11.1 go test"></a>11.1 go test</h2><p>一个测试函数是以<code>Test</code>为函数名前缀的函数<br>一个基准测试函数是以<code>Benchmark</code>为函数名前缀的函数<br>一个示例函数是以<code>Example</code>为函数名前缀的函数，提供一个由编译器保证正确性的示例文档</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">- &#96;go test -v &#96;会打印每个函数的名字和运行时间
+- &#96;go test -run&#x3D; &#96;会去匹配正则表达式，只有被匹配到的才会被执行
+- &#96;go test -v .&#x2F;...&#96; 执行所有当前目录下测试cases
+- &#96;go test -v foo&#x2F;...&#96; 执行foo目录下所有cases
+- &#96;go test -v foo...&#96; 执行指定前缀的测试cases
+- &#96;go test ...&#96; gopath下所有测试cases
+- &#96;go test -v hello_test.go&#96; 执行某一文件下的测试cases,但是该文件中如果调用了其它文件中的模块会报错
+- &#96;go test -v hello_test.go -test.run TestHello&#96; 测试单个函数</code></pre>
 <ul>
-<li><p><code>go test -v </code>会打印每个函数的名字和运行时间</p>
-</li>
-<li><p><code>go test -run= </code>会去匹配正则表达式，只有被匹配到的才会被执行</p>
-</li>
-<li><p><code>go test -v ./...</code> 执行所有当前目录下测试cases</p>
-</li>
-<li><p><code>go test -v foo/...</code> 执行foo目录下所有cases</p>
-</li>
-<li><p><code>go test -v foo...</code> 执行指定前缀的测试cases</p>
-</li>
-<li><p><code>go test ...</code> gopath下所有测试cases</p>
-</li>
-<li><p><code>go test -v hello_test.go</code> 执行某一文件下的测试cases,但是该文件中如果调用了其它文件中的模块会报错</p>
-</li>
-<li><p><code>go test -v hello_test.go -test.run TestHello</code> 测试单个函数</p>
-</li>
 <li><p>组织多个测试用例</p>
 <p>即使表格中前面的数据导致了测试的失败，表格后面的测试数据依然会运行测试，因此在一个测试中我们可能了解多个失败的信息,可以使用<code>t.Fatal</code>或<code>t.Fatalf</code>停止当前测试函数</p>
   <details>
