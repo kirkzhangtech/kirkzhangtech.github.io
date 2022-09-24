@@ -2392,11 +2392,24 @@ func dirents(dir string) []os.FileInfo {
 
 # 11. 测试
 
+go test选项含义
+```bash
+
+-args 传递参数到test binary(到时候补一个demo)
+-c 编译test binary,但是不执行
+-exec xprog  运行test binary ,原理如同 go run
+-i 安装test binary的相关依赖
+-json 将测试输出转化为json为了自动化处理
+-c file   定义编译后的binary的文件名
+
+```
+
+
 ## 11.1 go test
 一个测试函数是以`Test`为函数名前缀的函数
 一个基准测试函数是以`Benchmark`为函数名前缀的函数
 一个示例函数是以`Example`为函数名前缀的函数，提供一个由编译器保证正确性的示例文档
-
+```golang
 - `go test -v `会打印每个函数的名字和运行时间
 - `go test -run= `会去匹配正则表达式，只有被匹配到的才会被执行
 - `go test -v ./...` 执行所有当前目录下测试cases
@@ -2405,7 +2418,7 @@ func dirents(dir string) []os.FileInfo {
 - `go test ...` gopath下所有测试cases
 - `go test -v hello_test.go` 执行某一文件下的测试cases,但是该文件中如果调用了其它文件中的模块会报错
 - `go test -v hello_test.go -test.run TestHello` 测试单个函数
-
+```
 - 组织多个测试用例
   
   即使表格中前面的数据导致了测试的失败，表格后面的测试数据依然会运行测试，因此在一个测试中我们可能了解多个失败的信息,可以使用`t.Fatal`或`t.Fatalf`停止当前测试函数
@@ -2580,4 +2593,5 @@ TBC
 3. 提供一个真实的演练场，它使用了Go Playground让用户可以在浏览器中在线编辑和运行每个示例函数
 
 
-# 12. appendIn
+# 12. appendIndex
+1. 线程内再重启一个线程，然后就可以通过加锁，进行隔离开，但此时任然是两个线程的间的交替

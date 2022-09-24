@@ -251,7 +251,7 @@ categories:
     他们之间是有很大区别的，之前的实现可能有某些特定场景下有严重的活性问题
     
 
-    ## 重要的细节
+    ### 重要的细节
 
     raft会把没有entry的appendEntry的RPC视为hearbeat,很多同学假设AppendEntry RPC是某种特殊的RPC,尤其是很多人是指简单的reset计时器，然后返回success，而不进行任何的冲突检测，接受accept就承认follower承认没有冲突，leader根据返回的response来提交logEntry,另外一个问题就是，follower根据收到冲突的prevLogIndex，就会删掉那个点的log，然后吧entries直接进行复制。
     > If an existing entry conflicts with a new one (same index but different terms), delete the existing entry and all that follow it.
@@ -260,86 +260,57 @@ categories:
 
     ## Debugging Raft
 
-    第一版的实现肯定是问题摆出，我们需要慢慢的迭代实现， 问题大致有如下几点，
+    第一版的实现肯定是问题百出,我们需要慢慢的迭代实现,问题大致有如下几点，通常有如下四种主要的bugs`活锁`，`不正确或者不完整的RPC`,`fail_follow_rule`,`term confusion`,还有`死锁`
 
-    - 活锁
-        1. 当你的系统活锁时，你系统中的每个节点都在做一些事情，但你的节点集体处于这样一种状态，没有任何进展。这种情况在Raft中很容易发生，尤其是当你没有虔诚地遵循图2时。
-        2. 有一种活锁情况特别经常出现；没有选举领导人，或者一旦选举了领导人，其他节点又开始选举，迫使最近当选的领导人立即退位。
-        通常情况下是拥有最新log的服务器和过期服务器同时竞争服务器，但是通常是拥有最新log服务器竞选成功。
-        1. 遇到高term就变成follower
-    - 不正确的RPC
-        1. 发现不对逻辑的RPC就尽快返回false
-        2. 发现follower比leader日志少了，follower就返回false，然后将最新index更新给leader的nextIndex
-        3. leader即使没有发送entry，也要检查prevLogIndex
-        4. AppendEntries的最后一步（#5）中的min是必要的，它需要用最后一个新条目的索引来计算。仅仅让应用lastApplied和commitIndex之间的日志内容的函数在到达日志的末尾时停止，是不够的。这是因为你的日志中可能会有与领导者的日志不同的条目，在领导者发给你的条目之后（这些条目都与你的日志中的条目一致）。因为 #3 决定了你只在有冲突的条目时才截断你的日志，那些条目不会被删除，如果 leaderCommit 超出了领导者发给你的条目，你可能会应用不正确的条目。发送高leader commit index和空的entry的RPC就会导致apply出现问题
-        5. 要完全按照第5.4节中描述的方式实现 "最新日志"检查。老老实实的实现，不要只只检查长度!
-
-
-    -  没有按照论文的理论实现raft
-
-        1. 在任何阶段`commitIndex>lastApplied`你都可以直接`apply`log到上层状态机,提交日志的时候不持有锁或者设置数据保护区，保证其他程序不apply日志
-        2. 将`commitIndex>lastApplied`解耦,每次sentout心跳的时候检查`commitIndex`你必须要等`appendlog`动作完成
-        3. `AppendEntries`RPC并不是因为log不一致被reject,应该立刻降级为follower,不要更新`nextIndex`，如果这个时候立刻选举你可能会面对数据竞争的问题
-        4. `commitIndex`不能设置为旧的term，你一定要checklog[N].Term ==currentTerm.这是因为leader不知道follower是否在当前任期提交了日志,Figure 8会详细阐述这个问题
-
-        正常情况下确实是`matchIndex = nextIndex - 1`,然后就不实现`matchIndex`是不安全的,`nextIndex`只是简单的认为leader已经提交了发送了哪些以前的logEntry，比如leader被选举出来只是讲nextIndex设置为log的长度，而`matchIndex`则是安全的方法，确定leader已经提交了多少的日志，`matchIndex`不会设置的太高，这会导致`commitIndex`移动的太快
-    - term混乱（term不稳定)
-
-        因为网络导致的RPC过期问题，term混淆是指服务器被来自旧term的RPC所迷惑。一般来说，在收到RPC时，因为图2中的规则确切地说明了当你看到一个旧term时你应该做什么。然而，图2一般没有讨论当你收到旧的RPC回复时你应该做什么。根据经验，我们发现，到目前为止，最简单的做法是首先记录回复中的术语（它可能比你当前的term高），然后将当前term与你在原始RPC中发送的term进行比较。如果两者不同，就放弃回复并返回。只有当这两个术语相同时，你才应该继续处理回复。也许你可以通过一些巧妙的协议推理在这里做进一步的优化，但这种方法似乎很有效。而不这样做会导致一条漫长而曲折的血汗、泪水和绝望的道路。
+    ### 活锁
+    当你的系统活锁时，你系统中的每个节点都在做一些事情，但你的节点集体处于这样一种状态，没有任何进展。这种情况在Raft中很容易发生，尤其是当你没有虔诚地遵循图2时。有一种活锁情况特别经常出现；没有选举领导人，或者一旦选举了领导人，其他节点又开始选举，迫使最近当选的领导人立即退位。  
+    
+    出现这种情况的原因有很多，但有几个错误是我们看到无数学生犯的。
+    - 确保你在图2说的时候准确地重置你的选举计时器。具体来说，你只应该在以下情况下重启你的选举计时器：a）你从当前的领导者那里得到一个AppendEntries RPC（即，如果AppendEntries参数中的term已经过时，你不应该重启你的计时器）；b）你正在开始一个选举；或者c）你授予另一个candidate(requestVote RPC)一个投票。最后一种情况在不可靠的网络中尤其重要，因为在这种网络中，跟随者很可能有不同的日志；在这些情况下，你最终往往只有少数服务器，而大多数服务器都愿意为其投票。如果你每当有人要求你为他投票时就重置选举计时器，这就使得一个有过时日志的服务器和一个有较长日志的服务器同样有可能站出来。事实上，由于具有足够最新的日志的服务器太少，这些服务器很不可能在正常的情况下举行选举而当选。如果按照图2的规则，拥有较多最新日志的服务器不会被过时的服务器的选举打断，因此更有可能完成选举，成为领导者。
+    - 按照图2的指示，你应该何时开始选举。特别要注意的是，如果你是一个候选人（即，你目前正在进行选举），但选举计时器启动了，你应该开始另一次选举。这一点很重要，可以避免系统因RPC的延迟或放弃而停滞。
+    - 在处理传入的RPC之前，请确保你遵循 "服务器规则 "中的第二条规则。第二条规则指出。
+        > If RPC request or response contains term T > currentTerm: set currentTerm = T, convert to follower (§5.1)  
+    
+        例如，如果你已经在当前任期内投票，而传入的RequestVote RPC的任期比你高，你应该首先下台，采用他们的任期（从而重新设置 votedFor），然后处理RPC，这将导致你授予投票权
+    ### 不正确的RPC
+    尽管图2清楚地说明了每个RPC处理程序应该做什么，但一些细微之处仍然容易被忽略。以下是我们反复看到的一些情况，你应该在你的实现中注意这些情况.  
+    - 发现不对逻辑的RPC就尽快返回false
+    - 发现follower比leader日志少了，follower就返回false，然后将最新index更新给leader的nextIndex
+    - leader即使没有发送entry，也要检查prevLogIndex
+    - AppendEntries的最后一步（#5）中的min是必要的，它需要用最后一个新条目的索引来计算。仅仅让应用lastApplied和commitIndex之间的日志内容的函数在到达日志的末尾时停止，是不够的。这是因为你的日志中可能会有与领导者的日志不同的条目，在领导者发给你的条目之后（这些条目都与你的日志中的条目一致）。因为 #3 决定了你只在有冲突的条目时才截断你的日志，那些条目不会被删除，如果 leaderCommit 超出了领导者发给你的条目，你可能会应用不正确的条目。发送高leader commit index和空的entry的RPC就会导致apply出现问题
+    - 要完全按照第5.4节中描述的方式实现 "最新日志"检查。老老实实的实现，不要只只检查长度!
 
 
-    - 优化
+    ### 没有按照论文的理论实现raft
+    虽然Raft论文对如何实现每个RPC处理程序非常明确，但它也没有对一些规则和不变因素的实现进行说明。这些都列在图2右侧的 "服务器规则 "部分。虽然其中一些规则是不言自明的，但也有一些需要非常仔细地设计你的应用程序，使其不违反规则.  
+    - 在任何阶段`commitIndex>lastApplied`你都可以直接`apply`log到上层状态机,提交日志的时候不持有锁或者设置数据保护区，保证其他程序不apply日志
+    - 将`commitIndex>lastApplied`解耦,每次sentout心跳的时候检查`commitIndex`你必须要等`appendlog`动作完成
+    - `AppendEntries`RPC并不是因为log不一致被reject,应该立刻降级为follower,不要更新`nextIndex`，如果这个时候立刻选举你可能会面对数据竞争的问题
+    - `commitIndex`不能设置为旧的term，你一定要checklog[N].Term ==currentTerm.这是因为leader不知道follower是否在当前任期提交了日志,Figure 8会详细阐述这个问题
 
-        - 当快照应用程序状态时，你需要确保应用程序状态与Raft日志中某个已知索引之后的状态相对应，这意味着应用程序要么需要向Raft传达快照所对应的索引，要么Raft需要推迟应用额外的日志条目，直到快照完成。
+    一个常见的混淆是`nextIndex`和`matchIndex`之间的区别。特别是，你可能会观察到`matchIndex` = `nextIndex` - 1，而干脆不实现`matchIndex`。这是不安全的。虽然nextIndex和matchIndex通常在同一时间被更新为类似的值（具体来说，nextIndex = matchIndex + 1），但两者的作用完全不同。它通常是乐观的（我们分享一切），并且只在消极的反应中向后移动。例如，当一个领导者刚刚当选时，`nextIndex`被设置为日志末尾的索引指数。在某种程度上，`nextIndex`是用于性能的--你只需要将这些东西发送给这个peer。  
 
-        - 该文本没有讨论当服务器崩溃并重新启动时的恢复协议，因为现在涉及到快照。特别是，如果Raft状态和快照是分开提交的，服务器可能会在坚持快照和坚持更新的Raft状态之间崩溃。这是一个问题，因为图13中的第7步决定了快照所覆盖的Raft日志必须被丢弃。如果当服务器重新启动时，它读取的是更新的快照，而不是过时的日志，那么它最终可能会应用一些已经包含在快照中的日志条目。这种情况会发生，因为commitIndex和lastApplied没有被持久化，所以Raft不知道这些日志条目已经被应用。解决这个问题的方法是在Raft中引入一个持久化状态，记录Raft持久化日志中的第一个条目所对应的 "真实 "索引。然后，这可以与加载的快照的lastIncludedIndex进行比较，以确定在日志的头部有哪些元素需要丢弃.
-        -  如果当服务器重新启动时，它读取的是更新的快照，而不是过时的日志，那么它最终可能会应用一些已经包含在快照中的日志条目。这种情况会发生，因为commitIndex和lastApplied没有被持久化，所以Raft不知道这些日志条目已经被应用。解决这个问题的方法是给Raft引入一个持久化状态，记录Raft持久化日志中的第一个条目对应的 "真实 "索引。然后，这可以与加载的快照的lastIncludedIndex进行比较，以确定要丢弃日志头部的哪些元素。
+    `matchIndex`是用于安全的。`matchIndex`不能被设置为一个太高的值，因为这可能会导致`commitIndex`被向前移动得太远。这就是为什么`matchIndex`被初始化为-1（也就是说，我们不同意任何前缀），并且只在跟随者肯定地确认AppendEntries RPC时才更新。  
 
-        加速日志回溯的优化是非常不明确的，可能是因为作者认为这对大多数部署来说是不必要的。文本中并没有明确说明领导者应该如何使用从客户端发回的冲突索引和术语来决定使用哪一个NextIndex。我们认为作者可能希望你遵循的协议是。
+    ### term混乱(term不稳定)  
+    因为网络导致的RPC过期问题，term混淆是指服务器被来自旧term的RPC所迷惑。一般来说，在收到RPC时，因为图2中的规则确切地说明了当你看到一个旧term时你应该做什么。然而，图2一般没有讨论当你收到旧的RPC回复时你应该做什么。根据经验，我们发现，到目前为止，最简单的做法是首先记录回复中的term(它可能比你当前的term高),然后将当前term与你在原始RPC中发送的term进行比较。如果两者不同，就放弃回复并返回。只有当这两个术term相同时，你才应该继续处理回复。也许你可以通过一些巧妙的协议推理在这里做进一步的优化，但这种方法似乎很有效。而不这样做会导致一条漫长而曲折的血汗、泪水和绝望的道路。  
+    NOTE:A节点无论是RV还是AE的RPC,在回复中都要进行与A节点的currenTerm进行比对,如果发现不对，就立即放弃回复并返回。
 
-        - 如果一个跟随者的日志中没有prevLogIndex，它应该以conflictIndex = len(log)和conflictTerm = None返回。如果一个跟随者在其日志中确实有prevLogIndex，但是术语不匹配，它应该返回conflictTerm = log[prevLogIndex].Term，然后在其日志中搜索其条目中术语等于conflictTerm的第一个索引。在收到冲突响应时，领导者应该首先搜索其日志中的conflictTerm。如果它在日志中找到一个具有该term的条目，它应该将nextIndex设置为其日志中该term的最后一个条目的索引之外的那个索引。如果它没有找到该术语的条目，它应该设置 nextIndex = conflictIndex。一个半途而废的解决方案是只使用conflictIndex（而忽略conflictTerm），这简化了实现，但这样一来，领导者有时会向跟随者发送更多的日志条目，而不是严格意义上所需要的，以使他们达到最新状态。
-
+    ### 优化  
+    Raft论文包括几个感兴趣的可选功能。在6.824中，我们要求学生实现其中的两个：日志压缩（第7节）和加速日志回溯（第8页的左上方）。前者对于避免日志无限制地增长是必要的，而后者对于使落后的追随者快速更新是有用的。  
+    这些功能不是 "核心Raft "的一部分，因此在论文中没有得到像主要共识协议那样的关注。日志压缩的内容相当全面（在图13中），但遗漏了一些设计细节，如果你太随意地阅读，可能会错过。  
+    - 当快照应用程序状态时，你需要确保应用程序状态与Raft日志中某个已知索引之后的状态相对应，这意味着应用程序要么需要向Raft传达快照所对应的索引，要么Raft需要推迟应用额外的日志条目，直到快照完成。
+    - 该文本没有讨论当服务器崩溃并重新启动时的恢复协议，因为现在涉及到快照。特别是，如果Raft状态和快照是分开提交的，服务器可能会在坚持快照和坚持更新的Raft状态之间崩溃。这是一个问题，因为图13中的第7步决定了快照所覆盖的Raft日志必须被丢弃。如果当服务器重新启动时，它读取的是更新的快照，而不是过时的日志，那么它最终可能会应用一些已经包含在快照中的日志条目。这种情况会发生，因为commitIndex和lastApplied没有被持久化，所以Raft不知道这些日志条目已经被应用。解决这个问题的方法是在Raft中引入一个持久化状态，记录Raft持久化日志中的第一个条目所对应的 "真实 "索引。然后，这可以与加载的快照的lastIncludedIndex进行比较，以确定在日志的头部有哪些元素需要丢弃.
+    -  如果当服务器重新启动时，它读取的是更新的快照，而不是过时的日志，那么它最终可能会应用一些已经包含在快照中的日志条目。这种情况会发生，因为commitIndex和lastApplied没有被持久化，所以Raft不知道这些日志条目已经被应用。解决这个问题的方法是给Raft引入一个持久化状态，记录Raft持久化日志中的第一个条目对应的 "真实 "索引。然后，这可以与加载的快照的lastIncludedIndex进行比较，以确定要丢弃日志头部的哪些元素。  
+    
+    加速日志回溯的优化是非常不明确的，可能是因为作者认为这对大多数部署来说是不必要的。文本中并没有明确说明领导者应该如何使用从客户端发回的冲突索引和术语来决定使用哪一个NextIndex。我们认为作者可能希望你遵循的协议是。
+    
+    - 如果一个跟随者的日志中没有prevLogIndex，它应该以conflictIndex = len(log)和conflictTerm = None返回。
+    - 如果一个跟随者在其日志中确实有prevLogIndex，但是术语不匹配，它应该返回conflictTerm = log[prevLogIndex].Term，然后在其日志中搜索其条目中术语等于conflictTerm的第一个索引。
+    - 在收到冲突响应时，领导者应该首先搜索其日志中的conflictTerm。如果它在日志中找到一个具有该term的条目，它应该将nextIndex设置为其日志中该term的最后一个条目的索引之外的那个索引。
+    - 如果它没有找到该术语的条目，它应该设置 nextIndex = conflictIndex。一个半途而废的解决方案是只使用conflictIndex（而忽略conflictTerm），这简化了实现，但这样一来，领导者有时会向跟随者发送更多的日志条目，而不是严格意义上所需要的，以使他们达到最新状态。
     ## Applications on top of Raft
 
-    - Applying client operations
-
-        ```text
-        You may be confused about how you would even implement an application in terms of a replicated log. You might start off by having your service, whenever it receives a client request, send that request to the leader, wait for Raft to apply something, do the operation the client asked for, and then return to the client. While this would be fine in a single-client system, it does not work for concurrent clients.
-
-        Instead, the service should be constructed as a state machine where client operations transition the machine from one state to another. You should have a loop somewhere that takes one client operation at the time (in the same order on all servers – this is where Raft comes in), and applies each one to the state machine in order. This loop should be the only part of your code that touches the application state (the key/value mapping in 6.824). This means that your client-facing RPC methods should simply submit the client’s operation to Raft, and then wait for that operation to be applied by this “applier loop”. Only when the client’s command comes up should it be executed, and any return values read out. Note that this includes read requests!
-
-        This brings up another question: how do you know when a client operation has completed? In the case of no failures, this is simple – you just wait for the thing you put into the log to come back out (i.e., be passed to apply()). When that happens, you return the result to the client. However, what happens if there are failures? For example, you may have been the leader when the client initially contacted you, but someone else has since been elected, and the client request you put in the log has been discarded. Clearly you need to have the client try again, but how do you know when to tell them about the error?
-
-        One simple way to solve this problem is to record where in the Raft log the client’s operation appears when you insert it. Once the operation at that index is sent to apply(), you can tell whether or not the client’s operation succeeded based on whether the operation that came up for that index is in fact the one you put there. If it isn’t, a failure has happened and an error can be returned to the client.
-        ```
-
-        解决这个问题的一个简单方法是，当你插入客户操作时，记录客户操作在Raft日志中出现的位置。一旦该索引的操作被发送到apply()，你可以根据该索引出现的操作是否是你放在那里的操作来判断客户的操作是否成功。如果不是，就说明发生了失败，可以向客户返回一个错误。
-
-    - Duplicate detection
-
-        ```text
-        As soon as you have clients retry operations in the face of errors, you need some kind of duplicate detection scheme – if a client sends an APPEND to your server, doesn’t hear back, and re-sends it to the next server, your apply() function needs to ensure that the APPEND isn’t executed twice. To do so, you need some kind of unique identifier for each client request, so that you can recognize if you have seen, and more importantly, applied, a particular operation in the past. Furthermore, this state needs to be a part of your state machine so that all your Raft servers eliminate the same duplicates.
-
-        There are many ways of assigning such identifiers. One simple and fairly efficient one is to give each client a unique identifier, and then have them tag each request with a monotonically increasing sequence number. If a client re-sends a request, it re-uses the same sequence number. Your server keeps track of the latest sequence number it has seen for each client, and simply ignores any operation that it has already seen.
-        ```
-
-    - Hairy corner-cases
-
-        ```text
-        If your implementation follows the general outline given above, there are at least two subtle issues you are likely to run into that may be hard to identify without some serious debugging. To save you some time, here they are:
-        ```
-        
-        - Re-appearing indices
-
-
-    - The four-way deadlock
-        ```text
-        All credit for finding this goes to Steven Allen, another 6.824 TA. He found the following nasty four-way deadlock that you can easily get into when building applications on top of Raft.
-
-        Your Raft code, however it is structured, likely has a Start()-like function that allows the application to add new commands to the Raft log. It also likely has a loop that, when commitIndex is updated, calls apply() on the application for every element in the log between lastApplied and commitIndex. These routines probably both take some lock a. In your Raft-based application, you probably call Raft’s Start() function somewhere in your RPC handlers, and you have some code somewhere else that is informed whenever Raft applies a new log entry. Since these two need to communicate (i.e., the RPC method needs to know when the operation it put into the log completes), they both probably take some lock b.
-
-        In Go, these four code segments probably look something like this:
-        ```
     </text>
     <!-- </details> -->
 
