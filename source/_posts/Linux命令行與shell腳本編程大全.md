@@ -61,7 +61,7 @@ categories:
 
 linux是一款开源操作系统统称，其有很多发行版本，像ubuntu..，它的核心是其`内核`，早期由linus torvalds开发
 
-![linux本人](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da5122af2d44d499197cd6eafe8fc02~tplv-k3u1fbpfcp-watermark.image?)
+![linus本人](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da5122af2d44d499197cd6eafe8fc02~tplv-k3u1fbpfcp-watermark.image?)
 
 内核主要负责以下四种功能:
 
@@ -173,6 +173,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
 
 - ps查看进程
   ```bash
+  ps 选项
   -A 显示所有进程 
   -N 显示与指定参数不符的所有进程 
   -a 显示除控制进程（session leader①）和无终端进程外的所有进程 
@@ -185,6 +186,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   -p pidlist 显示PID在pidlist列表中的进程
   -f 完整格式输出
   ```
+  命令输出关键词意义
   |名词|解释|
   |---|---|
   |UID|启动这些进程的用户  |
@@ -405,6 +407,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   - `export my_variable`导出为全局变量，在子shell中修改该值，只会在子shell中生效
   - `unset my_variable`删除环境变量,这条规则的一个例外就是使用 printenv 显示某个变量的值)
   - 默认的环境变量，直接使用就好了
+
     ![linux_default_variables](./../picture/linux_命令行与shell脚本/linux_default_variables.png)
     ![linux_default_variables_1](./../picture/linux_命令行与shell脚本/linux_default_variables_1.png)
   - 设置`path`环境变量,当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序.`PATH`环境变量定义了用于进行命令和程序查找的目录
@@ -518,28 +521,32 @@ to_be_continue
 
 ## 7.3 理解文件权限
 - 理解文件权限符号
-  - `-`代表文件
-  - `d` 代表目录
-  - `l` 代表链接
-  - `c` 代表字符型设备
-  - `b` 代表块设备
-  - `n` 代表网络设备
-  - `r` 可写
-  - `w` 可写
-  - `x` 可执行
-  - 文件owner,和对象组
+  ```bash
+  `-`代表文件
+  `d` 代表目录
+  `l` 代表链接
+  `c` 代表字符型设备
+  `b` 代表块设备
+  `n` 代表网络设备
+  `r` 可写
+  `w` 可写
+  `x` 可执行
+  文件owner,和对象组
+  ```
 - 设置默认文件权限
   设置`umask`的值,默认文件权限等于文件最大权限，减去`umask`值，第一位代表了一项特别的安全特性，叫作粘着位（sticky bit）
   rwx = 4 + 2 + 1 = 7, rw = 4 + 2 = 6, rx = 4 +1 = 5.
 
 ## 7.4 改变安全性设置
 - chmod 改文件权限，如果使用的符号模式设置就是`u`代表用户，`g`代表组，`o`代表其他，`a`代表所有，`+`代表增加权限，`-`代表移除权限，`=`将权限设置成后面的值，额外的第三作用符号如下
-  - `X` ：如果对象是目录或者它已有执行权限，赋予执行权限。
-  - `s` ：运行时重新设置UID或GID。
-  - `t` ：保留文件或目录。
-  - `u` ：将权限设置为跟属主一样。
-  - `g` ：将权限设置为跟属组一样。
-  - `o` ：将权限设置为跟其他用户一样
+  ```bash
+  `X` ：如果对象是目录或者它已有执行权限，赋予执行权限。
+  `s` ：运行时重新设置UID或GID。
+  `t` ：保留文件或目录。
+  `u` ：将权限设置为跟属主一样。
+  `g` ：将权限设置为跟属组一样。
+  `o` ：将权限设置为跟其他用户一样
+  ```
 - chown 改文件所属
   `chown option owner file[.group] file`
   `chown owner.group file`直接改属主和组
@@ -621,32 +628,36 @@ C++编译要使用CMake
 ## 10.1 vim 编辑器
 
 1. 移动光标
-  - 文件很大,用方向键移动
-  - gg 移动到最后一行
-  - num G 移动到指定行数
-  - G 移动到第一行
-  - w file_name 将文件保存到另一个文件中
-  - Pagedown + Pageup 翻页
-  - w file_name 保存为另一个文件
+   ```bash
+   文件很大,用方向键移动
+   gg 移动到最后一行
+   num G 移动到指定行数
+   G 移动到第一行
+   w file_name 将文件保存到另一个文件中
+   Pagedown + Pageup 翻页
+   w file_name 保存为另一个文件
+  ```
 
 2. 编辑数据
-  - x 删除光标当前所在字符(剪切)
-  - dd 是切除当前行, p 是粘贴(剪切)
-  - dw 删除光标当前所在当前字符(剪切)
-  - yw 复制一个单词  y$复制整个行 
-  - u 撤销
-  - a 在文件尾追加数据
-  - A 在当前行尾追加数据
-  - r char 用char 替换当前光标位置字符
-  - R char 用text文本替换当前文本字符
-
+   ```
+   x 删除光标当前所在字符(剪切)
+   dd 是切除当前行, p 是粘贴(剪切)
+   dw 删除光标当前所在当前字符(剪切)
+   yw 复制一个单词  y$复制整个行 
+   u 撤销
+   a 在文件尾追加数据
+   A 在当前行尾追加数据
+   r char 用char 替换当前光标位置字符
+   R char 用text文本替换当前文本字符
+  ```
 3. 替换数据
-  - :s/old/new/  替换数据
-  - :s/olr/new/g  替换文件中一行所有old
-  - :m,ns/old/new/g 替换行号之间的所有old
-  - :$s/old/new/g 替换整个文件中的old
-  - :$s/old/new/gc 替换整个文件中的old，但是每次都提醒
-
+  ```bash
+  :s/old/new/  替换数据
+  :s/olr/new/g  替换文件中一行所有old
+  :m,ns/old/new/g 替换行号之间的所有old
+  :$s/old/new/g 替换整个文件中的old
+  :$s/old/new/gc 替换整个文件中的old，但是每次都提醒
+  ```
 # 11.基本脚本
 
 - 创建shell脚本
