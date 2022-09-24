@@ -815,7 +815,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-20 01:15:57'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-09-24 12:52:34'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -944,7 +944,7 @@
 </li>
 </ul>
 <h1 id="1-linux入门"><a href="#1-linux入门" class="headerlink" title="1. linux入门"></a>1. linux入门</h1><p>linux是一款开源操作系统统称，其有很多发行版本，像ubuntu..，它的核心是其<code>内核</code>，早期由linus torvalds开发</p>
-<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da5122af2d44d499197cd6eafe8fc02~tplv-k3u1fbpfcp-watermark.image" alt="linux本人"></p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da5122af2d44d499197cd6eafe8fc02~tplv-k3u1fbpfcp-watermark.image" alt="linus本人"></p>
 <p>内核主要负责以下四种功能:</p>
 <ul>
 <li><p>系统内存管理</p>
@@ -1135,7 +1135,8 @@
 </ul>
 <h2 id="4-1-监控程序"><a href="#4-1-监控程序" class="headerlink" title="4.1 监控程序"></a>4.1 监控程序</h2><ul>
 <li><p>ps查看进程</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">-A 显示所有进程 
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">ps</span> 选项
+-A 显示所有进程 
 -N 显示与指定参数不符的所有进程 
 -a 显示除控制进程（session leader①）和无终端进程外的所有进程 
 -d 显示除控制进程外的所有进程 
@@ -1146,6 +1147,7 @@
 -g grplist 显示会话或组ID在grplist列表中的进程② 
 -p pidlist 显示PID在pidlist列表中的进程
 -f 完整格式输出</code></pre>
+<p>命令输出关键词意义</p>
 <table>
 <thead>
 <tr>
@@ -1508,11 +1510,17 @@ gunzip <span class="token comment">#用来解压文件  </span></code></pre></li
 </li>
 <li><p>设置全局环境变量</p>
 <ul>
-<li><code>export my_variable</code>导出为全局变量，在子shell中修改该值，只会在子shell中生效</li>
-<li><code>unset my_variable</code>删除环境变量,这条规则的一个例外就是使用 printenv 显示某个变量的值)</li>
-<li>默认的环境变量，直接使用就好了<br><img src="/./../picture/linux_%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC/linux_default_variables.png" alt="linux_default_variables"><br><img src="/./../picture/linux_%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC/linux_default_variables_1.png" alt="linux_default_variables_1"></li>
-<li>设置<code>path</code>环境变量,当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序.<code>PATH</code>环境变量定义了用于进行命令和程序查找的目录</li>
-<li>定位环境变量<ul>
+<li><p><code>export my_variable</code>导出为全局变量，在子shell中修改该值，只会在子shell中生效</p>
+</li>
+<li><p><code>unset my_variable</code>删除环境变量,这条规则的一个例外就是使用 printenv 显示某个变量的值)</p>
+</li>
+<li><p>默认的环境变量，直接使用就好了</p>
+<p><img src="/./../picture/linux_%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC/linux_default_variables.png" alt="linux_default_variables"><br><img src="/./../picture/linux_%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC/linux_default_variables_1.png" alt="linux_default_variables_1"></p>
+</li>
+<li><p>设置<code>path</code>环境变量,当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序.<code>PATH</code>环境变量定义了用于进行命令和程序查找的目录</p>
+</li>
+<li><p>定位环境变量</p>
+<ul>
 <li>登录式shell<br>在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作<code>启动文件</code>或<code>环境文件</code>。bash检查启动文件的方式取决于你启动bash的方式，启动bash shell有3种方式<ul>
 <li><p>登录时作为默认登录shell(login shell)<br>当你登录系统的时候，bash shell会作为登陆式shell进行启动，会在如下文件五个不同启动文件读取命令<code>/etc/profile</code>,<code>$HOME/.bash_profile</code>,<code>$HOME/.bash_login</code>,<code>$HOME/.profile</code>,<code>$HOME/.bashrc</code></p>
 <ul>
@@ -1609,31 +1617,25 @@ root固定分配UID是0，Linux系统会为各种各样的功能创建不同的�
 <li>修改组</li>
 </ul>
 <h2 id="7-3-理解文件权限"><a href="#7-3-理解文件权限" class="headerlink" title="7.3 理解文件权限"></a>7.3 理解文件权限</h2><ul>
-<li>理解文件权限符号<ul>
-<li><code>-</code>代表文件</li>
-<li><code>d</code> 代表目录</li>
-<li><code>l</code> 代表链接</li>
-<li><code>c</code> 代表字符型设备</li>
-<li><code>b</code> 代表块设备</li>
-<li><code>n</code> 代表网络设备</li>
-<li><code>r</code> 可写</li>
-<li><code>w</code> 可写</li>
-<li><code>x</code> 可执行</li>
-<li>文件owner,和对象组</li>
-</ul>
-</li>
+<li>理解文件权限符号<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token variable"><span class="token variable">`</span>-<span class="token variable">`</span></span>代表文件
+<span class="token variable"><span class="token variable">`</span>d<span class="token variable">`</span></span> 代表目录
+<span class="token variable"><span class="token variable">`</span>l<span class="token variable">`</span></span> 代表链接
+<span class="token variable"><span class="token variable">`</span>c<span class="token variable">`</span></span> 代表字符型设备
+<span class="token variable"><span class="token variable">`</span>b<span class="token variable">`</span></span> 代表块设备
+<span class="token variable"><span class="token variable">`</span>n<span class="token variable">`</span></span> 代表网络设备
+<span class="token variable"><span class="token variable">`</span>r<span class="token variable">`</span></span> 可写
+<span class="token variable"><span class="token variable">`</span>w<span class="token variable">`</span></span> 可写
+<span class="token variable"><span class="token variable">`</span>x<span class="token variable">`</span></span> 可执行
+文件owner,和对象组</code></pre></li>
 <li>设置默认文件权限<br>设置<code>umask</code>的值,默认文件权限等于文件最大权限，减去<code>umask</code>值，第一位代表了一项特别的安全特性，叫作粘着位（sticky bit）<br>rwx &#x3D; 4 + 2 + 1 &#x3D; 7, rw &#x3D; 4 + 2 &#x3D; 6, rx &#x3D; 4 +1 &#x3D; 5.</li>
 </ul>
 <h2 id="7-4-改变安全性设置"><a href="#7-4-改变安全性设置" class="headerlink" title="7.4 改变安全性设置"></a>7.4 改变安全性设置</h2><ul>
-<li>chmod 改文件权限，如果使用的符号模式设置就是<code>u</code>代表用户，<code>g</code>代表组，<code>o</code>代表其他，<code>a</code>代表所有，<code>+</code>代表增加权限，<code>-</code>代表移除权限，<code>=</code>将权限设置成后面的值，额外的第三作用符号如下<ul>
-<li><code>X</code> ：如果对象是目录或者它已有执行权限，赋予执行权限。</li>
-<li><code>s</code> ：运行时重新设置UID或GID。</li>
-<li><code>t</code> ：保留文件或目录。</li>
-<li><code>u</code> ：将权限设置为跟属主一样。</li>
-<li><code>g</code> ：将权限设置为跟属组一样。</li>
-<li><code>o</code> ：将权限设置为跟其他用户一样</li>
-</ul>
-</li>
+<li>chmod 改文件权限，如果使用的符号模式设置就是<code>u</code>代表用户，<code>g</code>代表组，<code>o</code>代表其他，<code>a</code>代表所有，<code>+</code>代表增加权限，<code>-</code>代表移除权限，<code>=</code>将权限设置成后面的值，额外的第三作用符号如下<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token variable"><span class="token variable">`</span>X<span class="token variable">`</span></span> ：如果对象是目录或者它已有执行权限，赋予执行权限。
+<span class="token variable"><span class="token variable">`</span>s<span class="token variable">`</span></span> ：运行时重新设置<span class="token environment constant">UID</span>或GID。
+<span class="token variable"><span class="token variable">`</span>t<span class="token variable">`</span></span> ：保留文件或目录。
+<span class="token variable"><span class="token variable">`</span>u<span class="token variable">`</span></span> ：将权限设置为跟属主一样。
+<span class="token variable"><span class="token variable">`</span>g<span class="token variable">`</span></span> ：将权限设置为跟属组一样。
+<span class="token variable"><span class="token variable">`</span>o<span class="token variable">`</span></span> ：将权限设置为跟其他用户一样</code></pre></li>
 <li>chown 改文件所属<br><code>chown option owner file[.group] file</code><br><code>chown owner.group file</code>直接改属主和组<br><code>chown owner .</code> 属主和组都同名<br><code>chgrp</code> 更改文件目录的默认属组</li>
 </ul>
 <h2 id="7-5-共享文件"><a href="#7-5-共享文件" class="headerlink" title="7.5 共享文件"></a>7.5 共享文件</h2><p>Linux还为每个文件和目录存储了3个额外的信息位。</p>
@@ -1727,41 +1729,32 @@ total <span class="token number">0</span>
 <p>dpkg -L vim  显示vim的所有安装信息<br>dpkg –search vim</p>
 <h2 id="9-3-基于源码安装"><a href="#9-3-基于源码安装" class="headerlink" title="9.3 基于源码安装"></a>9.3 基于源码安装</h2><p>C++编译要使用CMake</p>
 <h1 id="10-使用编辑器"><a href="#10-使用编辑器" class="headerlink" title="10. 使用编辑器"></a>10. 使用编辑器</h1><h2 id="10-1-vim-编辑器"><a href="#10-1-vim-编辑器" class="headerlink" title="10.1 vim 编辑器"></a>10.1 vim 编辑器</h2><ol>
-<li>移动光标</li>
+<li><p>移动光标</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">文件很大,用方向键移动
+gg 移动到最后一行
+num G 移动到指定行数
+G 移动到第一行
+w file_name 将文件保存到另一个文件中
+Pagedown + Pageup 翻页
+w file_name 保存为另一个文件</code></pre>
+</li>
+<li><p>编辑数据</p>
+<pre class="language-none"><code class="language-none">x 删除光标当前所在字符(剪切)
+dd 是切除当前行, p 是粘贴(剪切)
+dw 删除光标当前所在当前字符(剪切)
+yw 复制一个单词  y$复制整个行 
+u 撤销
+a 在文件尾追加数据
+A 在当前行尾追加数据
+r char 用char 替换当前光标位置字符
+R char 用text文本替换当前文本字符</code></pre></li>
+<li><p>替换数据</p>
+  <pre class="language-bash" data-language="bash"><code class="language-bash">:s/old/new/  替换数据
+:s/olr/new/g  替换文件中一行所有old
+:m,ns/old/new/g 替换行号之间的所有old
+<span class="token builtin class-name">:</span><span class="token variable">$s</span>/old/new/g 替换整个文件中的old
+<span class="token builtin class-name">:</span><span class="token variable">$s</span>/old/new/gc 替换整个文件中的old，但是每次都提醒</code></pre></li>
 </ol>
-<ul>
-<li>文件很大,用方向键移动</li>
-<li>gg 移动到最后一行</li>
-<li>num G 移动到指定行数</li>
-<li>G 移动到第一行</li>
-<li>w file_name 将文件保存到另一个文件中</li>
-<li>Pagedown + Pageup 翻页</li>
-<li>w file_name 保存为另一个文件</li>
-</ul>
-<ol start="2">
-<li>编辑数据</li>
-</ol>
-<ul>
-<li>x 删除光标当前所在字符(剪切)</li>
-<li>dd 是切除当前行, p 是粘贴(剪切)</li>
-<li>dw 删除光标当前所在当前字符(剪切)</li>
-<li>yw 复制一个单词  y$复制整个行 </li>
-<li>u 撤销</li>
-<li>a 在文件尾追加数据</li>
-<li>A 在当前行尾追加数据</li>
-<li>r char 用char 替换当前光标位置字符</li>
-<li>R char 用text文本替换当前文本字符</li>
-</ul>
-<ol start="3">
-<li>替换数据</li>
-</ol>
-<ul>
-<li>:s&#x2F;old&#x2F;new&#x2F;  替换数据</li>
-<li>:s&#x2F;olr&#x2F;new&#x2F;g  替换文件中一行所有old</li>
-<li>:m,ns&#x2F;old&#x2F;new&#x2F;g 替换行号之间的所有old</li>
-<li>:$s&#x2F;old&#x2F;new&#x2F;g 替换整个文件中的old</li>
-<li>:$s&#x2F;old&#x2F;new&#x2F;gc 替换整个文件中的old，但是每次都提醒</li>
-</ul>
 <h1 id="11-基本脚本"><a href="#11-基本脚本" class="headerlink" title="11.基本脚本"></a>11.基本脚本</h1><ul>
 <li><p>创建shell脚本<br><code>#!/bin/bash</code>,bash找你的文件都是从path目录下，如果没有设置path目录那么就需要通过绝对路径和相对路径引用你的命令。然后是注意你的文件权限<code>umask</code>决定了你文件创建时候的默认权限</p>
 </li>
