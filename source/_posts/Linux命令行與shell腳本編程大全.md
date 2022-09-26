@@ -52,9 +52,30 @@ categories:
   - [14.2 处理选项](#142-处理选项)
   - [14.3 获取用户输入](#143-获取用户输入)
 - [15. 呈现数据](#15-呈现数据)
+  - [15.1 理解输入和输出](#151-理解输入和输出)
+    - [15.1.1 标准文件描述符](#1511-标准文件描述符)
+  - [15.1.2 重定向错误](#1512-重定向错误)
+  - [15.2 在脚本中重定向输出](#152-在脚本中重定向输出)
+    - [15.2.1 临时重定向](#1521-临时重定向)
+    - [15.2.2 永久重定向](#1522-永久重定向)
+  - [15.3 在脚本中重定向输入](#153-在脚本中重定向输入)
+  - [15.4 创建自己的重定向](#154-创建自己的重定向)
+    - [15.4.1 创建输出文件描述符](#1541-创建输出文件描述符)
 - [19.初识sed和gawk](#19初识sed和gawk)
   - [19.1 sed and gawk基础](#191-sed-and-gawk基础)
   - [19.2 sed and gawk进阶](#192-sed-and-gawk进阶)
+- [20.正则表达式](#20正则表达式)
+  - [20.1 什么是正则表达式](#201-什么是正则表达式)
+  - [20.2 定义BRE模式](#202-定义bre模式)
+    - [20.2.1. 纯文本](#2021-纯文本)
+    - [20.2.2 特殊字符](#2022-特殊字符)
+    - [20.2.3 锚定字符](#2023-锚定字符)
+    - [20.2.4 点字符](#2024-点字符)
+    - [20.2.5 字符数组](#2025-字符数组)
+    - [20.2.6 排除型字符](#2026-排除型字符)
+    - [20.2.7 区间](#2027-区间)
+    - [20.2.8 特殊的字符数组](#2028-特殊的字符数组)
+    - [20.2.9 星号](#2029-星号)
 
 
 # 1. linux入门
@@ -1131,6 +1152,99 @@ bash命令提供了`选项`和`参数`来控制,可以通过`shift`命令来控�
   ```
   
 # 15. 呈现数据
+这一章主要是讲如何将脚本输出重定型向到系统其他位置
+
+## 15.1 理解输入和输出
+### 15.1.1 标准文件描述符
+Linux系统将每个对象(操作的文件，linux万物皆文件)当作文件处理。这包括输入和输出进程。Linux用文件描述符（filedescriptor）来标识每个文件对象
+```bash
+文件描述符  缩 写   描 述
+0           STDIN   标准输入
+1           STDOUT  标准输出
+2           STDERR  标准错误
+```
+1. STDIN实例  
+   `cat` 就会从STDIN输入数据，这时候你输入什么屏幕就会显示什么  
+   `cat < file.txt`通过STDIN通过重定向符号使`cat`查看一个非STDIN文件的输入
+2. STDOUT  
+3. STDERR
+   shell通过特殊的`STDERR`文件描述符来处理错误消息。`STDERR`文件描述符代表shell的标准错误输出。shell或shell中运行的程序和脚本出错时生成的错误消息都会发送到这个位置
+
+## 15.1.2 重定向错误
+1. 只重定向错误
+通过`2> file.txt`的方式将错误信息重定向到文件中
+2. 重定向错误和数据   
+` ls -al test test2 test3 badtest 2> test6 1> test7` 这种就是将`STDERR`重定向到test6,然后将`STDOUT`重定向到test7.  
+也可以将STDERR和STDOUT的输出重定向到同一个输出文件使用`&>`,比如`ls -al test test2 test3 badtest &> test7`，bash消息赋予error更高的优先级
+
+## 15.2 在脚本中重定向输出
+可以在脚本中用STDOUT和STDERR文件描述符以在多个位置生成输出，只要简单地重定向相应的文件描述符就行了。有两种方法来在脚本中重定向输出：
+- 临时重定向行输出
+- 永久重定向脚本中的所有命令
+
+### 15.2.1 临时重定向
+如果使用上文提到的`STDERR`重定向方法就会将全局的`STDERR`信息都重定向到文件中，但是如果只重定向自己特定某些error信息就可以使用临时重定向，必须在文件描述符数字之前加一个`&`
+```bash
+# 举个例子 ./test8
+#!/bin/bash
+# testing STDERR messages 
+echo "This is an error" >&2 
+echo "This is normal output" 
+```
+如果像平常一样运行这个脚本，你可能看不出什么区别,因为所有输出都到了STDOUT,但是默认情况下，linux会将STDERR导向STDOUT,但是，如果你在运行脚本时重定向了STDERR，脚本中所有导向STDERR的文本都会被重定向。
+```bash
+$ ./test8 2> test9
+This is normal output 
+$ cat test9 
+This is an error 
+```
+
+
+### 15.2.2 永久重定向
+如果脚本中有大量数据需要重定向，那重定向每个echo语句就会很烦琐。取而代之，你可以用`exec`命令告诉shell在脚本执行期间重定向某个特定文件描述符。
+```bash
+#!/bin/bash
+# redirecting all output to a file 
+exec 1>testout 
+echo "This is a test of redirecting all output" 
+echo "from a script to another file." 
+echo "without having to redirect every individual line" 
+```
+## 15.3 在脚本中重定向输入
+`exec`命令允许你将STDIN重定向到Linux系统上的文件中`exec 0< testfile`
+```bash
+# redirecting file input 
+exec 0< testfile 
+count=1 
+while read line 
+do 
+ echo "Line #$count: $line" 
+ count=$[ $count + 1 ] 
+done 
+```
+## 15.4 创建自己的重定向
+### 15.4.1 创建输出文件描述符
+可以用exec命令来给输出分配文件描述符。和标准的文件描述符一样，一旦将另一个文件
+描述符分配给一个文件，这个重定向就会一直有效，直到你重新分配。这里有个在脚本中使用其
+他文件描述符的简单例子。(不是太理解这句话)
+```bash
+#./test13
+#!/bin/bash
+# using an alternative file descriptor 
+exec 3>test13out 
+echo "This should display on the monitor" 
+echo "and this should be stored in the file" >&3 
+echo "Then this should be back on the monitor" 
+
+```
+这个脚本用exec命令将文件描述符3重定向到另一个文件。当脚本执行echo语句时，输出内
+容会像预想中那样显示在STDOUT上。但你重定向到文件描述符3的那行echo语句的输出却进入
+了另一个文件。这样你就可以在显示器上保持正常的输出，而将特定信息重定向到文件中（比如
+日志文件）。
+
+
+
+
 
 
 
@@ -1148,12 +1262,12 @@ bash命令提供了`选项`和`参数`来控制,可以通过`shift`命令来控�
 
 echo 'this is a test' | sed  's/test/big test/'  使用s命令将test替换为big test
 
-sed 's/dog/cat/'  data.txt    这是修改文件中dog为cart
+sed 's/dog/cat/'  data.txt    这是修改文件中dog为cat
 sed  -e  's/brown/red;  s/blue/yellow/'   data/txt
 
 从文件中读取编辑器命令
 
-sed   -f   script.sed  data.txt
+sed -f script.sed  data.txt
 
 **gawk**
 
@@ -1227,3 +1341,142 @@ sed '3,${
   s/brown/green/
   s/lazy/active/
   }' data1.txt
+
+# 20.正则表达式
+
+## 20.1 什么是正则表达式
+正则表达式就是某种模板(筛子)，正则表达式是通过正则表达式引擎（regular expression engine）实现的。正则表达式引擎是
+一套底层软件，负责解释正则表达式模式并使用这些模式进行文本匹配。
+- POSIX基础正则表达式（basic regular expression，BRE）引擎
+- POSIX扩展正则表达式（extended regular expression，ERE）引擎
+
+## 20.2 定义BRE模式
+
+### 20.2.1. 纯文本
+`echo "This is a test" | sed -n '/this/p'` 这里面p是print,少了-n是打印两条，this没匹配到所以没有显示  
+空格也是普通的字符，比如`sed -n /  /p data.set`
+
+### 20.2.2 特殊字符
+` echo "3 / 2" | sed -n '///p' ` 正斜线也需要转义字符，故正确的是` echo "3 / 2" | sed -n '/\//p'`
+
+### 20.2.3 锚定字符
+1. `^`锚定字符  
+主要是锚定字符串行首。如果模式出现在行首之外的位置则不匹配，如果你将脱字符放到模式开头之外的其他位置，那么它就跟普通字符一样，不再是特殊字符了`echo "This is ^ a test" | sed -n '/s ^/p'`
+``
+2. `$`锚定结尾
+特殊字符美元符`$`定义了行尾锚点。将这个特殊字符放在文本模式之后来指明数据行必须以该文本模式结尾。`echo "This is a good book" | sed -n '/book$/p'`
+3. 组合锚定
+    ```bash
+    $ cat data4
+    this is a test of using both anchors  # 这一行会被忽略
+    I said this is a test 
+    this is a test 
+    I'm sure this is a test. 
+    $ sed -n '/^this is a test$/p' data4 
+    this is a test
+    ```
+    第二种情况
+    ```bash
+    $ cat data5
+    This is one test line. 
+    This is another test line. 
+    $ sed '/^$/d' data5 
+    This is one test line. 
+    This is another test line. 
+    ```
+    定义的正则表达式模式会查找行首和行尾之间什么都没有的那些行。由于空白行在两个换行符之间没有文本，刚好匹配了正则表达式模式。sed编辑器用删除命令d来删除匹配该正则表达式模式的行，因此删除了文本中的所有空白行。这是从文档中删除空白行的有效方法
+### 20.2.4 点字符
+特殊字符点号用来匹配除换行符之外的任意单个字符。它必须匹配一个字符，如果在点号字符的位置没有字符，那么模式就不成立。
+```bash
+$ cat data6
+This is a test of a line. 
+The cat is sleeping. 
+That is a very nice hat. 
+This test is at line four. 
+at ten o'clock we'll go home. 
+$ sed -n '/.at/p' data6 
+The cat is sleeping. 
+That is a very nice hat. 
+This test is at line four. 
+
+```
+### 20.2.5 字符数组
+点字符在模糊匹配上很有用，但是你想在某一位置上指定字符范围，那么字符数组就会很有用
+```bash
+$ sed -n '/[ch]at/p' data6
+The cat is sleeping. 
+That is a very nice hat. 
+
+```
+### 20.2.6 排除型字符
+```bash
+$ sed -n '/[
+ch]at/p' data6
+This test is at line four. 
+```
+通过排除型字符组，正则表达式模式会匹配c或h之外的任何字符以及文本模式。由于空格字
+符属于这个范围，它通过了模式匹配。但即使是排除，字符组仍然必须匹配一个字符，所以以at
+开头的行仍然未能匹配模式
+
+### 20.2.7 区间
+想想匹配邮编那个case，实在是太麻烦，我们可以简化为`区间`表示  
+```bash
+sed -n '/^[0-9][0-9][0-9][0-9][0-9]$/p' data8 
+```
+也可以指定多个区间`sed -n '/[a-ch-m]at/p' data6 `,该字符组允许区间a~c、h~m中的字母出现在at文本前
+
+### 20.2.8 特殊的字符数组
+
+```bash
+#BRE特殊字符组
+组                      描 述
+[[:alpha:]]             匹配任意字母字符，不管是大写还是小写
+[[:alnum:]]             匹配任意字母数字字符0~9、A~Z或a~z 
+[[:blank:]]             匹配空格或制表符
+[[:digit:]]             匹配0~9之间的数字
+[[:lower:]]             匹配小写字母字符a~z 
+[[:print:]]             匹配任意可打印字符
+[[:punct:]]             匹配标点符号    
+[[:space:]]             匹配任意空白字符：空格、制表符、NL、FF、VT和CR 
+[[:upper:]]             匹配任意大写字母字符A~Z 
+```
+
+### 20.2.9 星号
+在字符后面放置**星号**表明该字符必须在匹配模式的文本中出现0次或多次
+```bash
+$ echo "ik" | sed -n '/ie*k/p'
+ik 
+$ echo "iek" | sed -n '/ie*k/p' 
+iek 
+$ echo "ieek" | sed -n '/ie*k/p' 
+ieek 
+$ echo "ieeek" | sed -n '/ie*k/p'
+```
+另一个方便的特性是将点号特殊字符和星号特殊字符组合起来。这个组合能够匹配任意数量
+的任意字符。它通常用在数据流中两个可能相邻或不相邻的文本字符串之间。
+```bash
+$ echo "this is a regular pattern expression" | sed -n '
+> /regular.*expression/p' 
+this is a regular pattern expression 
+```
+星号还能用在字符组上。它允许指定可能在文本中出现多次的字符组或字符区间。  
+```bash
+$ echo "bt" | sed -n '/b[ae]*t/p'
+bt 
+$ echo "bat" | sed -n '/b[ae]*t/p' 
+bat 
+$ echo "bet" | sed -n '/b[ae]*t/p' 
+bet 
+$ echo "btt" | sed -n '/b[ae]*t/p' 
+btt 
+$ 
+$ echo "baat" | sed -n '/b[ae]*t/p' 
+baat 
+$ echo "baaeeet" | sed -n '/b[ae]*t/p' 
+baaeeet 
+$ echo "baeeaeeat" | sed -n '/b[ae]*t/p' 
+baeeaeeat 
+$ echo "baakeeet" | sed -n '/b[ae]*t/p' 
+$ 
+```
+只要a和e字符以任何组合形式出现在b和t字符之间（就算完全不出现也行），模式就能够匹配。如果出现了字符组之外的字符，该模式匹配就会不成立。
