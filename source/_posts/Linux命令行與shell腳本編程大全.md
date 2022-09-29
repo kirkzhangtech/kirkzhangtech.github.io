@@ -61,6 +61,7 @@ categories:
   - [15.3 在脚本中重定向输入](#153-在脚本中重定向输入)
   - [15.4 创建自己的重定向](#154-创建自己的重定向)
     - [15.4.1 创建输出文件描述符](#1541-创建输出文件描述符)
+    - [15.4.2 重定向文件描述符](#1542-重定向文件描述符)
 - [19.初识sed和gawk](#19初识sed和gawk)
   - [19.1 sed and gawk基础](#191-sed-and-gawk基础)
   - [19.2 sed and gawk进阶](#192-sed-and-gawk进阶)
@@ -1235,16 +1236,39 @@ exec 3>test13out
 echo "This should display on the monitor" 
 echo "and this should be stored in the file" >&3 
 echo "Then this should be back on the monitor" 
-
+$ ./test13 
 ```
 这个脚本用exec命令将文件描述符3重定向到另一个文件。当脚本执行echo语句时，输出内
 容会像预想中那样显示在STDOUT上。但你重定向到文件描述符3的那行echo语句的输出却进入
 了另一个文件。这样你就可以在显示器上保持正常的输出，而将特定信息重定向到文件中（比如
 日志文件）。
 
+### 15.4.2 重定向文件描述符
+现在介绍怎么恢复已重定向的文件描述符。你可以分配另外一个文件描述符给标准文件描述
+符，反之亦然。这意味着你可以将STDOUT的原来位置重定向到另一个文件描述符，然后再利用
+该文件描述符重定向回STDOUT。听起来可能有点复杂，但实际上相当直接。这个简单的例子能
+帮你理清楚。
+```bash
+# ./test14 
+#!/bin/bash
+# storing STDOUT, then coming back to it 
+exec 3>&1
+exec 1>test14out 
+echo "This should store in the output file" 
+echo "along with this line." 
+exec 1>&3
+echo "Now things should be back to normal" 
+$ 
+$ ./test14 
+Now things should be back to normal 
+$ cat test14out 
+This should store in the output file 
+along with this line. 
+$ 
+```
 
-
-
+这个方法可能有点叫人困惑，但这是一种在脚本中临时重定向输出，然后恢复默认输出设置
+的常用方法。
 
 
 
