@@ -6,19 +6,17 @@
   <meta name="keywords" content="">
   <meta name="description" content="Linux命令行与shell腳本編程大全 | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="费曼：任何伟大的科学成就，都源于思想自由 原文地址 : https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s&#x2F;p_l9_Z54jewLN6SEjio1Tw   科学的价值当我年轻的时候，我认为科学会有利于每个人。科学显然很有用，也是很有益的。在第二次世界大战中，我参与了原子弹的制造工作。科学的发展导致了原子弹的产生，这显然是一个具有极其严肃意味的事件：它代表着对人类的毁灭。 战后，我对原子弹忧心忡">
+<meta name="description" content="摘要学习下别人如何写的golang的concurrent map实现并于官方版本的进行对比。接下来的内容来自于作者的readme—-在Go 1.9之前，go语言标准库中并没有实现并发map。在Go 1.9中，引入了sync.Map。新的sync.Map与此concurrent-map有几个关键区别。标准库中的sync.Map是专为append-only场景设计的。因此，如果您想将Map用于一个类似">
 <meta property="og:type" content="article">
-<meta property="og:title" content="费曼:任何伟大的科学成就，都源于思想自由">
-<meta property="og:url" content="https://simonteo58.github.io/2022/09/26/archive/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/index.html">
+<meta property="og:title" content="concurreny-map代码阅读">
+<meta property="og:url" content="https://simonteo58.github.io/2022/09/09/archive/golang_concurrency_map/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="费曼：任何伟大的科学成就，都源于思想自由 原文地址 : https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s&#x2F;p_l9_Z54jewLN6SEjio1Tw   科学的价值当我年轻的时候，我认为科学会有利于每个人。科学显然很有用，也是很有益的。在第二次世界大战中，我参与了原子弹的制造工作。科学的发展导致了原子弹的产生，这显然是一个具有极其严肃意味的事件：它代表着对人类的毁灭。 战后，我对原子弹忧心忡">
+<meta property="og:description" content="摘要学习下别人如何写的golang的concurrent map实现并于官方版本的进行对比。接下来的内容来自于作者的readme—-在Go 1.9之前，go语言标准库中并没有实现并发map。在Go 1.9中，引入了sync.Map。新的sync.Map与此concurrent-map有几个关键区别。标准库中的sync.Map是专为append-only场景设计的。因此，如果您想将Map用于一个类似">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://simonteo58.github.io/picture/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20220926005909.jpg">
-<meta property="article:published_time" content="2022-09-25T16:05:55.165Z">
-<meta property="article:modified_time" content="2022-09-25T17:12:37.265Z">
+<meta property="article:published_time" content="2022-09-09T08:43:34.983Z">
+<meta property="article:modified_time" content="2022-09-10T06:18:57.744Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://simonteo58.github.io/picture/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20220926005909.jpg">
 
 
 <link rel="icon" href="/img/avatar.jpg">
@@ -644,6 +642,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
            data-tag=""
            data-author="" >
@@ -660,18 +666,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -704,14 +710,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -841,7 +839,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-05 16:15:48'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-10-05 17:10:43'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1019,7 +1017,12 @@
 <li><a href="#1652-renice-%E5%91%BD%E4%BB%A4">16.5.2 renice 命令</a></li>
 </ul>
 </li>
-<li><a href="#166-%E5%AE%9A%E6%97%B6%E8%BF%90%E8%A1%8C%E4%BD%9C%E4%B8%9A">16.6 定时运行作业</a></li>
+<li><a href="#166-%E5%AE%9A%E6%97%B6%E8%BF%90%E8%A1%8C%E4%BD%9C%E4%B8%9A">16.6 定时运行作业</a><ul>
+<li><a href="#1661-%E7%94%A8at%E5%91%BD%E4%BB%A4%E6%9D%A5%E8%AE%A1%E5%88%92%E6%89%A7%E8%A1%8C%E4%BD%9C%E4%B8%9A">16.6.1 用at命令来计划执行作业</a></li>
+<li><a href="#1662-%E5%AE%89%E6%8E%92%E9%9C%80%E8%A6%81%E5%AE%9A%E6%9C%9F%E6%89%A7%E8%A1%8C%E7%9A%84%E8%84%9A%E6%9C%AC">16.6.2 安排需要定期执行的脚本</a></li>
+<li><a href="#1663-%E4%BD%BF%E7%94%A8%E6%96%B0shell%E5%90%AF%E5%8A%A8%E8%84%9A%E6%9C%AC">16.6.3 使用新shell启动脚本</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#19%E5%88%9D%E8%AF%86sed%E5%92%8Cgawk">19.初识sed和gawk</a><ul>
@@ -2722,10 +2725,10 @@ $ <span class="token function">bg</span> <span class="token comment"># 这时候
 <li>root用户可以通过renice来任意调整进程的优先级。<br>如果想完全控制运行进程，必须以root账户身份登录或使用sudo命令</li>
 </ul>
 <h2 id="16-6-定时运行作业"><a href="#16-6-定时运行作业" class="headerlink" title="16.6 定时运行作业"></a>16.6 定时运行作业</h2><h3 id="16-6-1-用at命令来计划执行作业"><a href="#16-6-1-用at命令来计划执行作业" class="headerlink" title="16.6.1 用at命令来计划执行作业"></a>16.6.1 用at命令来计划执行作业</h3><ol>
-<li>at命令的格式<br>at命令只执行一次，区别于cron</li>
-</ol>
-<pre class="language-bash" data-language="bash"><code class="language-bash">at <span class="token punctuation">[</span>-f filename<span class="token punctuation">]</span> <span class="token function">time</span> <span class="token comment"># -f 后面用来指定读取命令</span></code></pre>
-<p>time : 参数指定运行时间，如果错过就会在第二天同一时间再运行<br>time能识别多种时间格式</p>
+<li><p>at命令的格式<br> at命令只执行一次，区别于cron</p>
+ <pre class="language-bash" data-language="bash"><code class="language-bash">at <span class="token punctuation">[</span>-f filename<span class="token punctuation">]</span> <span class="token function">time</span> <span class="token comment"># -f 后面用来指定读取命令</span></code></pre>
+
+<p> time : 参数指定运行时间，如果错过就会在第二天同一时间再运行<br> time能识别多种时间格式</p>
 <ul>
 <li>标准小时和分钟的格式，比如10：15</li>
 <li>AM&#x2F;PM指示符，比如10：15PM</li>
@@ -2735,61 +2738,60 @@ $ <span class="token function">bg</span> <span class="token comment"># 这时候
 <li>你也可以指定增量时间<ul>
 <li>当前时间+25 min</li>
 <li>明天10：15 PM</li>
-<li>10：15+7天</li>
+<li>10：15+7天<br> 通过<code>at</code>命令都会被提交到作业队列，针对不同的优先级存在26种不同的作业队列，使用<br> a-z和A-Z来指代，即使通过at命令提交过作业，也可以通过-q参数指定不同的队列字母<br> 作业队列的字母排序越高，作业运行的优先级就越低（更高的nice值）。默认情况下，at的<br> 作业会被提交到a作业队列</li>
 </ul>
 </li>
 </ul>
-<p>通过<code>at</code>命令都会被提交到作业队列，针对不同的优先级存在26种不同的作业队列，使用<br>a-z和A-Z来指代，即使通过at命令提交过作业，也可以通过-q参数指定不同的队列字母<br>作业队列的字母排序越高，作业运行的优先级就越低（更高的nice值）。默认情况下，at的<br>作业会被提交到a作业队列</p>
-<ol start="2">
-<li>获取作业的输出</li>
+</li>
+<li><p>获取作业的输出<br>at命令利用sendemail应用程序发送邮件，这样其实很麻烦，但是可以将输出重定向到STDOUT<br>和STDERR,再如果可以使用<code>-M</code>屏蔽输出</p>
+</li>
+<li><p>列出等待的作业<br>atq命令可以查看系统中哪些作业处于等待状态</p>
+</li>
+<li><p>删除作业<br>atrm删除等待种的作业</p>
+</li>
 </ol>
-<p>at命令利用sendemail应用程序发送邮件，这样其实很麻烦，但是可以将输出重定向到STDOUT<br>和STDERR,再如果可以使用<code>-M</code>屏蔽输出</p>
-<ol start="3">
-<li>列出等待的作业</li>
-</ol>
-<p>atq命令可以查看系统中哪些作业处于等待状态</p>
-<ol start="4">
-<li>删除作业</li>
-</ol>
-<p>atrm删除等待种的作业</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#demo</span>
 atq 命令可以列出作业编号
-
-atrm 作业编号 <span class="token comment"># 只能删除你提交的作业，不能删除其他人的。</span>
-</code></pre>
+atrm 作业编号 <span class="token comment"># 只能删除你提交的作业，不能删除其他人的。</span></code></pre>
 
 <h3 id="16-6-2-安排需要定期执行的脚本"><a href="#16-6-2-安排需要定期执行的脚本" class="headerlink" title="16.6.2 安排需要定期执行的脚本"></a>16.6.2 安排需要定期执行的脚本</h3><ol>
-<li>cron时间表</li>
-</ol>
-<pre class="language-bash" data-language="bash"><code class="language-bash">min hour dayofmonth month dayofweek <span class="token builtin class-name">command</span></code></pre>
-<p>比如你想每天10：15运行一个命令可以使用cron时间表条目</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">min hour dayofmonth  month dayofweek  <span class="token builtin class-name">command</span>
+<li><p>cron时间表</p>
+ <pre class="language-bash" data-language="bash"><code class="language-bash">min hour dayofmonth month dayofweek <span class="token builtin class-name">command</span></code></pre>
+
+<p> 比如你想每天10：15运行一个命令可以使用cron时间表条目</p>
+ <pre class="language-bash" data-language="bash"><code class="language-bash">min hour dayofmonth  month dayofweek  <span class="token builtin class-name">command</span>
 <span class="token number">15</span>  <span class="token number">10</span>   *           *     *          <span class="token builtin class-name">command</span></code></pre>
-<p>但是如果想在每周一的下午4点15分执行，可写为</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token number">15</span> <span class="token number">16</span> * * <span class="token number">1</span> <span class="token builtin class-name">command</span></code></pre>
-<p>可以用三字符的文本值（mon、tue、wed、thu、fri、sat、sun）<br>或数值（0为周日，6为周六）,dayofmonth表项指定月份中的日期值（1~31）。</p>
-<p>聪明的读者可能会问如何设置一个在每个月的最后一天执行的命令，因为你无法设置<br>dayofmonth的值来涵盖所有的月份。这个问题困扰着Linux和Unix程序员，也激发了不少解<br>决办法。常用的方法是加一条使用date命令的if-then语句来检查明天的日期是不是01：<br>  00 12 * * * if [ <code>date +%d -d tomorrow</code> &#x3D; 01 ] ; then ; command<br>它会在每天中午12点来检查是不是当月的最后一天，如果是，cron将会运行该命令。</p>
-<p>命令必须要指定要运行的脚本名字，或者添加重定向符号<br>cron程序会用提交作业的用户账户运行该脚本。因此，你必须有访问该命令和命令中指定的<br>输出文件的权限。</p>
-<ol start="2">
+
+<p> 但是如果想在每周一的下午4点15分执行，可写为</p>
+ <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token number">15</span> <span class="token number">16</span> * * <span class="token number">1</span> <span class="token builtin class-name">command</span></code></pre>
+
+<p> 可以用三字符的文本值（mon、tue、wed、thu、fri、sat、sun）<br> 或数值（0为周日，6为周六）,dayofmonth表项指定月份中的日期值（1~31）。</p>
+<p> 聪明的读者可能会问如何设置一个在每个月的最后一天执行的命令，因为你无法设置<br> dayofmonth的值来涵盖所有的月份。这个问题困扰着Linux和Unix程序员，也激发了不少解<br> 决办法。常用的方法是加一条使用date命令的if-then语句来检查明天的日期是不是01：</p>
+ <pre class="language-bash" data-language="bash"><code class="language-bash">00 <span class="token number">12</span> * * * <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable"><span class="token variable">`</span><span class="token function">date</span> +%d -d tomorrow<span class="token variable">`</span></span> <span class="token operator">=</span> 01 <span class="token punctuation">]</span> <span class="token punctuation">;</span> <span class="token keyword">then</span> <span class="token punctuation">;</span> <span class="token builtin class-name">command</span></code></pre>
+
+<p> 它会在每天中午12点来检查是不是当月的最后一天，如果是，cron将会运行该命令。</p>
+<p> 命令必须要指定要运行的脚本名字，或者添加重定向符号<br> cron程序会用提交作业的用户账户运行该脚本。因此，你必须有访问该命令和命令中指定的<br> 输出文件的权限。</p>
+</li>
 <li><p>构建cron时间表<br>可以使用crontab -l来处理cron时间表<br>默认情况下，用户的cron时间表文件并不存在。要为cron时间表添加条目，可以用-e选项。<br>在添加条目时，crontab命令会启用一个文本编辑器（参见第10章），使用已有的cron时间表作<br>为文件内容（或者是一个空文件，如果时间表不存在的话）。</p>
 </li>
 <li><p>浏览cron目录</p>
-</li>
-</ol>
-<p>如果你创建的脚本对精确的执行时间要求不高，用预配置的cron脚本目录会更方便。有4个<br>基本目录：hourly、daily、monthly和weekly。</p>
+<p> 如果你创建的脚本对精确的执行时间要求不高，用预配置的cron脚本目录会更方便。有4个<br> 基本目录：hourly、daily、monthly和weekly。</p>
 <ul>
 <li>&#x2F;etc&#x2F;cron.daily</li>
 <li>&#x2F;etc&#x2F;cron.hourly</li>
 <li>&#x2F;etc&#x2F;cron.monthly</li>
-<li>&#x2F;etc&#x2F;cron.weekly<br>因此，如果脚本需要每天运行一次，只要将脚本复制到daily目录，cron就会每天执行它</li>
+<li>&#x2F;etc&#x2F;cron.weekly<br> 因此，如果脚本需要每天运行一次，只要将脚本复制到daily目录，cron就会每天执行它</li>
 </ul>
-<ol start="4">
-<li>anacron程序<br>如果某个作业在cron时间表中安排运行的时间已到，但这时候Linux系统处于关机状态，那么<br>这个作业就不会被运行。当系统开机时，cron程序不会再去运行那些错过的作业。要解决这个问<br>题，许多Linux发行版还包含了anacron程序。<br>anacron<br>程序只会处理位于cron目录的程序，比如&#x2F;etc&#x2F;cron.monthly。它用时间戳来决定作业<br>是否在正确的计划间隔内运行了。每个cron目录都有个时间戳文件，该文件位于&#x2F;var&#x2F;spool&#x2F;<br>anacron。  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">cat</span> /var/spool/anacron/cron.monthly
-<span class="token number">20150626</span></code></pre>
-anacron<br>程序使用自己的时间表（通常位于&#x2F;etc&#x2F;anacrontab）来检查作业目录。</li>
+</li>
+<li><p>anacron程序<br>如果某个作业在cron时间表中安排运行的时间已到，但这时候Linux系统处于关机状态，那么<br>这个作业就不会被运行。当系统开机时，cron程序不会再去运行那些错过的作业。要解决这个问<br>题，许多Linux发行版还包含了anacron程序。<br>anacron<br>程序只会处理位于cron目录的程序，比如&#x2F;etc&#x2F;cron.monthly。它用时间戳来决定作业<br>是否在正确的计划间隔内运行了。每个cron目录都有个时间戳文件，该文件位于&#x2F;var&#x2F;spool&#x2F;anacron。</p>
+</li>
 </ol>
-<p>anacron时间表的基本格式和cron时间表略有不同：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">cat</span> /var/spool/anacron/cron.monthly
+<span class="token number">20150626</span></code></pre>
+
+<p>anacron程序使用自己的时间表（通常位于&#x2F;etc&#x2F;anacrontab）来检查作业目录。<br>anacron时间表的基本格式和cron时间表略有不同：</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">period delay identifier <span class="token builtin class-name">command</span></code></pre>
+
 <p>period条目定义了作业多久运行一次，以天为单位。anacron程序用此条目来检查作业的时间<br>戳文件。delay条目会指定系统启动后anacron程序需要等待多少分钟再开始运行错过的脚本。<br>command条目包含了run-parts程序和一个cron脚本目录名。run-parts程序负责运行目录中传给它的<br>任何脚本。<br>注意，anacron不会运行位于&#x2F;etc&#x2F;cron.hourly的脚本。这是因为anacron程序不会处理执行时间<br>需求小于一天的脚本。<br>identifier条目是一种特别的非空字符串，如cron-weekly。它用于唯一标识日志消息和错误<br>邮件中的作业。</p>
 <h3 id="16-6-3-使用新shell启动脚本"><a href="#16-6-3-使用新shell启动脚本" class="headerlink" title="16.6.3 使用新shell启动脚本"></a>16.6.3 使用新shell启动脚本</h3><p>.bashrc文件通常也是通过某个bash启动文件来运行的。因为.bashrc文件会运行两次：一次是<br>当你登入bash shell时，另一次是当你启动一个bash shell时。如果你需要一个脚本在两个时刻都得<br>以运行，可以把这个脚本放进该文件中。</p>
 <h1 id="19-初识sed和gawk"><a href="#19-初识sed和gawk" class="headerlink" title="19.初识sed和gawk"></a>19.初识sed和gawk</h1><h2 id="19-1-sed-and-gawk基础"><a href="#19-1-sed-and-gawk基础" class="headerlink" title="19.1 sed and gawk基础"></a>19.1 sed and gawk基础</h2><p><strong>sed</strong></p>
