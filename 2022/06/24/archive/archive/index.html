@@ -6,15 +6,15 @@
   <meta name="keywords" content="">
   <meta name="description" content="手册阅读归档 | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplanet.com&#x2F;blog&#x2F;students-guide-to-raft&#x2F; 原文链接  在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活">
+<meta name="description" content="二.Students’ Guide to Raf文档 背景 实现raft 重要的细节   Debugging Raft 活锁 不正确的RPC 没有按照论文的理论实现raft term混乱(term不稳定) 优化   Applications on top of Raft AppendIndex    二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplan">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT6.824之lab2_raft_guide">
 <meta property="og:url" content="https://simonteo58.github.io/2022/10/05/MIT6.824/lab2_raft_guide/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplanet.com&#x2F;blog&#x2F;students-guide-to-raft&#x2F; 原文链接  在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活">
+<meta property="og:description" content="二.Students’ Guide to Raf文档 背景 实现raft 重要的细节   Debugging Raft 活锁 不正确的RPC 没有按照论文的理论实现raft term混乱(term不稳定) 优化   Applications on top of Raft AppendIndex    二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplan">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-10-05T12:21:56.280Z">
-<meta property="article:modified_time" content="2022-10-05T12:22:44.520Z">
+<meta property="article:modified_time" content="2022-10-05T12:38:05.080Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 
@@ -706,18 +706,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="9.回文数">9.回文数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         

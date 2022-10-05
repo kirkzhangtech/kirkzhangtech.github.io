@@ -6,15 +6,15 @@
   <meta name="keywords" content=" golang ">
   <meta name="description" content="go语言圣经 | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplanet.com&#x2F;blog&#x2F;students-guide-to-raft&#x2F; 原文链接  在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活">
+<meta name="description" content="二.Students’ Guide to Raf文档 背景 实现raft 重要的细节   Debugging Raft 活锁 不正确的RPC 没有按照论文的理论实现raft term混乱(term不稳定) 优化   Applications on top of Raft AppendIndex    二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplan">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT6.824之lab2_raft_guide">
 <meta property="og:url" content="https://simonteo58.github.io/2022/10/05/MIT6.824/lab2_raft_guide/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplanet.com&#x2F;blog&#x2F;students-guide-to-raft&#x2F; 原文链接  在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活">
+<meta property="og:description" content="二.Students’ Guide to Raf文档 背景 实现raft 重要的细节   Debugging Raft 活锁 不正确的RPC 没有按照论文的理论实现raft term混乱(term不稳定) 优化   Applications on top of Raft AppendIndex    二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplan">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-10-05T12:21:56.280Z">
-<meta property="article:modified_time" content="2022-10-05T12:22:44.520Z">
+<meta property="article:modified_time" content="2022-10-05T12:38:05.080Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 
@@ -706,18 +706,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="9.回文数">9.回文数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -854,7 +854,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-09-24 15:52:23'>2022-06-22 21:16</time>
+            Created At : <time class="date" title='Updated At: 2022-10-05 21:41:57'>2022-06-22 21:16</time>
         
     </div>
     <div class="article-meta">
@@ -1003,7 +1003,7 @@
 <li><a href="#115-%E7%A4%BA%E4%BE%8B%E5%87%BD%E6%95%B0">11.5 示例函数</a></li>
 </ul>
 </li>
-<li><a href="#12-appendin">12. appendIn</a></li>
+<li><a href="#12-appendindex">12. appendIndex</a></li>
 </ul>
 <h1 id="1-入门"><a href="#1-入门" class="headerlink" title="1. 入门"></a>1. 入门</h1><h1 id="2-程序结构"><a href="#2-程序结构" class="headerlink" title="2. 程序结构"></a>2. 程序结构</h1><h2 id="2-1-命名"><a href="#2-1-命名" class="headerlink" title="2.1 命名"></a>2.1 命名</h2><table>
 <thead>
@@ -1292,11 +1292,14 @@
 <li>var</li>
 <li>const</li>
 <li>type</li>
-<li>func  <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+<li>func</li>
+</ul>
+<pre class="language-golang" data-language="golang"><code class="language-golang">package main
 
 import &quot;fmt&quot;
 
 const boilingF &#x3D; 212.0
+const var a &#x3D; 0
 
 func main() &#123;
     var f &#x3D; boilingF
@@ -1305,10 +1308,12 @@ func main() &#123;
     &#x2F;&#x2F; Output:
     &#x2F;&#x2F; boiling point &#x3D; 212°F or 100°C
 &#125;</code></pre>
-  <code>boilingF</code>是包一级的变量在包内可以访问。如果函数没有返回值，那么返回值列表是省略的。函数顺序执行直到遇到return返回语句，如果没有返回语句则是执行到函数末尾，然后返回到函数调用者</li>
-</ul>
-<h2 id="2-3-变量"><a href="#2-3-变量" class="headerlink" title="2.3 变量"></a>2.3 变量</h2><p>  常规声明变量<br>  <pre class="language-golang" data-language="golang"><code class="language-golang">var 变量名字 类型 &#x3D; 表达式</code></pre></p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">var i ,j , k int &#x2F;&#x2F; 都是int类型
+
+<p><code>boilingF</code>是包一级的变量在包内可以访问。如果函数没有返回值，那么返回值列表是省略的。函数顺序执行直到遇到return返回语句，如果没有返回语句则是执行到函数末尾，然后返回到函数调用者</p>
+<h2 id="2-3-变量"><a href="#2-3-变量" class="headerlink" title="2.3 变量"></a>2.3 变量</h2><p>常规声明变量</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">var 变量名字 类型 &#x3D; 表达式</code></pre>
+
+<pre class="language-golang" data-language="golang"><code class="language-golang">var i ,j , k int &#x2F;&#x2F; 都是int类型
 var b,f,s &#x3D;true , 2.3 ,&quot;four&quot; &#x2F;&#x2F;bool , float 64,string
 var f, err &#x3D; os.Open(name) &#x2F;&#x2F; os.Open returns a file and an error</code></pre>
 

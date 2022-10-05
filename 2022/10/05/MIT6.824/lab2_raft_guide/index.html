@@ -6,15 +6,15 @@
   <meta name="keywords" content="">
   <meta name="description" content="MIT6.824之lab2_raft_guide | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplanet.com&#x2F;blog&#x2F;students-guide-to-raft&#x2F; 原文链接  在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活">
+<meta name="description" content="二.Students’ Guide to Raf文档 背景 实现raft 重要的细节   Debugging Raft 活锁 不正确的RPC 没有按照论文的理论实现raft term混乱(term不稳定) 优化   Applications on top of Raft AppendIndex    二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplan">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT6.824之lab2_raft_guide">
 <meta property="og:url" content="https://simonteo58.github.io/2022/10/05/MIT6.824/lab2_raft_guide/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplanet.com&#x2F;blog&#x2F;students-guide-to-raft&#x2F; 原文链接  在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活">
+<meta property="og:description" content="二.Students’ Guide to Raf文档 背景 实现raft 重要的细节   Debugging Raft 活锁 不正确的RPC 没有按照论文的理论实现raft term混乱(term不稳定) 优化   Applications on top of Raft AppendIndex    二.Students’ Guide to Raf文档 https:&#x2F;&#x2F;thesquareplan">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-10-05T12:21:56.280Z">
-<meta property="article:modified_time" content="2022-10-05T12:22:44.520Z">
+<meta property="article:modified_time" content="2022-10-05T12:38:05.080Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 
@@ -706,18 +706,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="9.回文数">9.回文数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -849,7 +849,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-05 20:22:44'>2022-10-05 20:21</time>
+            Created At : <time class="date" title='Updated At: 2022-10-05 20:38:05'>2022-10-05 20:21</time>
         
     </div>
     <div class="article-meta">
@@ -898,7 +898,27 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="二-Students’-Guide-to-Raf文档"><a href="#二-Students’-Guide-to-Raf文档" class="headerlink" title="二.Students’ Guide to Raf文档"></a>二.Students’ Guide to Raf文档</h1><blockquote>
+        <ul>
+<li><a href="#%E4%BA%8Cstudents-guide-to-raf%E6%96%87%E6%A1%A3">二.Students’ Guide to Raf文档</a><ul>
+<li><a href="#%E8%83%8C%E6%99%AF">背景</a></li>
+<li><a href="#%E5%AE%9E%E7%8E%B0raft">实现raft</a><ul>
+<li><a href="#%E9%87%8D%E8%A6%81%E7%9A%84%E7%BB%86%E8%8A%82">重要的细节</a></li>
+</ul>
+</li>
+<li><a href="#debugging-raft">Debugging Raft</a><ul>
+<li><a href="#%E6%B4%BB%E9%94%81">活锁</a></li>
+<li><a href="#%E4%B8%8D%E6%AD%A3%E7%A1%AE%E7%9A%84rpc">不正确的RPC</a></li>
+<li><a href="#%E6%B2%A1%E6%9C%89%E6%8C%89%E7%85%A7%E8%AE%BA%E6%96%87%E7%9A%84%E7%90%86%E8%AE%BA%E5%AE%9E%E7%8E%B0raft">没有按照论文的理论实现raft</a></li>
+<li><a href="#term%E6%B7%B7%E4%B9%B1term%E4%B8%8D%E7%A8%B3%E5%AE%9A">term混乱(term不稳定)</a></li>
+<li><a href="#%E4%BC%98%E5%8C%96">优化</a></li>
+</ul>
+</li>
+<li><a href="#applications-on-top-of-raft">Applications on top of Raft</a></li>
+<li><a href="#appendindex">AppendIndex</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="二-Students’-Guide-to-Raf文档"><a href="#二-Students’-Guide-to-Raf文档" class="headerlink" title="二.Students’ Guide to Raf文档"></a>二.Students’ Guide to Raf文档</h1><blockquote>
 <p><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">https://thesquareplanet.com/blog/students-guide-to-raft/</a> 原文链接</p>
 </blockquote>
 <p>在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是”理解门槛低”，并且我们也希望这项决定使同学们的生活更简单[在过去的几个月里，我一直是麻省理工学院6.824分布式系统课的教学助理。这门课传统上有一些建立在Paxos共识算法上的实验，但今年，我们决定改用Raft。Raft是 “设计成易于理解的”，我们希望这一改变能使学生的生活更轻松]</p>
@@ -939,7 +959,7 @@
 <li>AppendEntries的最后一步（#5）中的min是必要的，它需要用最后一个新条目的索引来计算。仅仅让应用lastApplied和commitIndex之间的日志内容的函数在到达日志的末尾时停止，是不够的。这因为你的日志中可能会有与领导者的日志不同的条目，在领导者发给你的条目之后（这些条目都与你的日志中的条目一致）。因为 #3 决定了你只在有冲突的条目时才截断你的日志，那些条目不会被除，如果 leaderCommit 超出了领导者发给你的条目，你可能会应用不正确的条目。发送高leader commit index和空的entry的RPC就会导致apply出现问题</li>
 <li>要完全按照第5.4节中描述的方式实现 “最新日志”检查。老老实实的实现，不要只只检查长度!</li>
 </ul>
-<h3 id="没有按照论文的理论实现raft"><a href="#没有按照论文的理论实现raft" class="headerlink" title="没有按照论文的理论实现raft"></a>没有按照论文的理论实现raft</h3><p>虽然Raft论文对如何实现每个RPC处理程序非常明确，但它也没有对一些规则和不变因素的实现进行说明。这些都列在图2右侧的 “服务器规则 “部分。虽然其中一些规则是不言自明的，但也有一些需要非常仔细地设计你的应用程序，使其不违反规则.  </p>
+<h3 id="没有按照论文的理论实现raft"><a href="#没有按照论文的理论实现raft" class="headerlink" title="没有按照论文的理论实现raft"></a>没有按照论文的理论实现raft</h3><p>虽然Raft论文对如何实现每个RPC处理程序非常明确，但它也没有对一些规则和不变因素的实现进行说明。这些都列在图2右侧的 “服务器规则 “部分。虽然其中一些规则是不言自明的，但也有一些需要非常仔细地设计你的应用程序，使其不违反规则.</p>
 <ul>
 <li>在任何阶段<code>commitIndex&gt;lastApplied</code>你都可以直接<code>apply</code>log到上层状态机,提交日志的时候不持有锁或者设置数据保护区，保证其他程序不apply日志</li>
 <li>将<code>commitIndex&gt;lastApplied</code>解耦,每次sentout心跳的时候检查<code>commitIndex</code>你必须要等<code>appendlog</code>动作完成</li>
