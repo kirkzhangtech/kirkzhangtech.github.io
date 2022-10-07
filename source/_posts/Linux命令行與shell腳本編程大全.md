@@ -94,6 +94,17 @@ categories:
     - [16.6.1 用at命令来计划执行作业](#1661-用at命令来计划执行作业)
     - [16.6.2 安排需要定期执行的脚本](#1662-安排需要定期执行的脚本)
     - [16.6.3 使用新shell启动脚本](#1663-使用新shell启动脚本)
+- [17. 创建函数](#17-创建函数)
+  - [17.1 基本的脚本函数](#171-基本的脚本函数)
+    - [17.1.1 创建函数](#1711-创建函数)
+    - [17.1.2 使用函数](#1712-使用函数)
+  - [17.2 返回值](#172-返回值)
+    - [17.2.1 默认退出状态码](#1721-默认退出状态码)
+    - [17.2.2 使用return命令](#1722-使用return命令)
+    - [17.2.3 使用函数输出](#1723-使用函数输出)
+  - [17.3 在函数中使用变量](#173-在函数中使用变量)
+    - [17.3.1 向函数传递参数](#1731-向函数传递参数)
+    - [17.3.2 在函数中处理变量](#1732-在函数中处理变量)
 - [19.初识sed和gawk](#19初识sed和gawk)
   - [19.1 sed and gawk基础](#191-sed-and-gawk基础)
   - [19.2 sed and gawk进阶](#192-sed-and-gawk进阶)
@@ -1928,6 +1939,7 @@ name(){
 command;
 }
 ```
+
 ### 17.1.2 使用函数
 
 正常情况就像是其他高级语言一样，但是bash的函数有个特殊情况。如果是重定义了一个旧函数，
@@ -1958,6 +1970,7 @@ echo "This is the end of the script"
 ### 17.2.2 使用return命令
 
 return的demo如下
+
 ```bash
 #!/bin/bash
 # using the return command in a function 
@@ -1970,9 +1983,12 @@ dbl
 echo "The new value is $?"
 
 ```
+
 dbl函数会将$value的值翻倍，然后返回，有两点要小心
+
 - 记住，函数一结束就取返回值
 - 记住，退出码必须是0~255
+
 也可以返回字符串和较大的数值，可以看下一节
 
 ### 17.2.3 使用函数输出
@@ -1991,12 +2007,67 @@ echo "The new value is $result"
 #Enter a value: 200 
 #The new value is 400
 ```
+
 可以看到是将一函数结果执行取值运算得到返回值。
 通过这种技术，你还可以返回浮点值和字符串值。这使它成为一种获取函数返回值的强
 大方法。
 
 ## 17.3 在函数中使用变量
 
+### 17.3.1 向函数传递参数
+
+错误传递参数代码
+```bash
+#!/bin/bash 
+# trying to access script parameters inside a function 
+function badfunc1 { 
+ echo $[ $1 * $2 ] 
+} 
+if [ $# -eq 2 ] 
+then 
+ value=$(badfunc1) 
+ echo "The result is $value" 
+else 
+ echo "Usage: badtest1 a b" 
+fi 
+# $ ./badtest1
+# Usage: badtest1 a b 
+# $ ./badtest1 10 15 
+# ./badtest1: * : syntax error: operand expected (error token is "* 
+# ") 
+# The result is 
+# 脚本的$1和$2和函数调用的$1,$2变量是不一样的
+```
+
+接下来是正确的代码
+
+```bash
+#!/bin/bash 
+# trying to access script parameters inside a function 
+function func7 { 
+ echo $[ $1 * $2 ] 
+} 
+if [ $# -eq 2 ] 
+then 
+ value=$(func7 $1 $2) 
+ echo "The result is $value" 
+else 
+ echo "Usage: badtest1 a b" 
+fi 
+#$ 
+#$ ./test7 
+#Usage: badtest1 a b 
+#$ ./test7 10 15 
+#The result is 150 
+
+```
+
+通过将$1和$2变量传给函数，它们就能跟其他变量一样供函数使用了
+
+### 17.3.2 在函数中处理变量
+
+- 全局变量
+- 局部变量
 
 # 19.初识sed和gawk
 
