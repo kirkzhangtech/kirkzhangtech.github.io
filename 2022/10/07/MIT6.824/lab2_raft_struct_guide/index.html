@@ -2,19 +2,19 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Eden</title>
+  <title>MIT6.824之lab2_raft_structure_guide | Eden</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Eden">
+  <meta name="description" content="MIT6.824之lab2_raft_structure_guide | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="Raft Structure Advice A Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (election">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Eden">
+<meta property="og:title" content="MIT6.824之lab2_raft_structure_guide">
 <meta property="og:url" content="https://simonteo58.github.io/2022/10/07/MIT6.824/lab2_raft_struct_guide/index.html">
 <meta property="og:site_name" content="Eden">
 <meta property="og:description" content="Raft Structure Advice A Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (election">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-10-07T00:40:25.771Z">
-<meta property="article:modified_time" content="2022-10-07T01:18:56.671Z">
+<meta property="article:modified_time" content="2022-10-07T01:25:47.401Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 
@@ -133,10 +133,6 @@
     
         
             
-        
-    
-        
-            
                 <li>
                     <div data-rel="非技术类">
                         
@@ -151,12 +147,16 @@
     
         
             
+        
+    
+        
+            
                 <li>
                     <div data-rel="分布式">
                         <i class="fold iconfont icon-right"></i>
                         
                         分布式
-                        <small>(4)</small>
+                        <small>(5)</small>
                         
                     </div>
                     
@@ -167,7 +167,7 @@
                                         
                                         MIT6.824
                                         
-                                            <small>(3
+                                            <small>(4
                                                 )</small>
                                         
                                     </div>
@@ -473,16 +473,16 @@
     
     <nav id="title-list-nav">
         
-        <a  class="All "
+        <a  class="All 分布式 MIT6.824 "
            href="/2022/10/07/MIT6.824/lab2_raft_struct_guide/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title=""></span>
+            <span class="post-title" title="MIT6.824之lab2_raft_structure_guide">MIT6.824之lab2_raft_structure_guide</span>
             <span class="post-date" title="2022-10-07 08:40:25">2022/10/07</span>
         </a>
         
         <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2b_lock_advice/"
+           href="/2022/10/05/MIT6.824/lab2_lock_advice/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="MIT6.824之lab2_raft_lock_advice">MIT6.824之lab2_raft_lock_advice</span>
@@ -490,10 +490,10 @@
         </a>
         
         <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2_raft_guide/"
+           href="/2022/10/05/MIT6.824/lab2_raft_students_guide/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_guide">MIT6.824之lab2_raft_guide</span>
+            <span class="post-title" title="MIT6.824之lab2_raft_students_guide">MIT6.824之lab2_raft_students_guide</span>
             <span class="post-date" title="2022-10-05 20:21:56">2022/10/05</span>
         </a>
         
@@ -682,6 +682,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
            data-tag=""
            data-author="" >
@@ -694,14 +702,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -845,15 +845,27 @@
     <div class="pjax">
         <article id="post-MIT6.824/lab2_raft_struct_guide" class="article article-type-post" itemscope itemprop="blogPost">
     
+        <h1 class="article-title">MIT6.824之lab2_raft_structure_guide</h1>
+    
     <div class="article-meta">
         
         
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="分布式">分布式</a> > 
+            
+            <a  data-rel="分布式&lt;---&gt;MIT6.824">MIT6.824</a>
+            
+        </span>
         
         
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-07 09:18:56'>2022-10-07 08:40</time>
+            Created At : <time class="date" title='Updated At: 2022-10-07 09:25:47'>2022-10-07 08:40</time>
         
     </div>
     <div class="article-meta">
