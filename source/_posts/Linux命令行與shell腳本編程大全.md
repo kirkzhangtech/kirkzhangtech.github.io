@@ -14,6 +14,7 @@ categories:
   - [4.1 监控程序](#41-监控程序)
   - [4.2 磁盘空间监控](#42-磁盘空间监控)
   - [4.3 处理文件](#43-处理文件)
+  - [4.4 date命令及其格式化](#44-date命令及其格式化)
 - [5. 理解shell](#5-理解shell)
   - [5.1 shell的类型](#51-shell的类型)
   - [5.2 shell的父子关系](#52-shell的父子关系)
@@ -105,8 +106,22 @@ categories:
   - [17.3 在函数中使用变量](#173-在函数中使用变量)
     - [17.3.1 向函数传递参数](#1731-向函数传递参数)
     - [17.3.2 在函数中处理变量](#1732-在函数中处理变量)
+  - [17.4 数组变量和函数](#174-数组变量和函数)
+    - [17.4.2 从函数中返回数组](#1742-从函数中返回数组)
+  - [17.5 函数递归](#175-函数递归)
+  - [17.6 创建库](#176-创建库)
+  - [17.7 在命令行上使用函数](#177-在命令行上使用函数)
+    - [17.7.1 在命令上创建函数](#1771-在命令上创建函数)
+    - [17.7.2 在.bashrc 文件中定义函数](#1772-在bashrc-文件中定义函数)
+  - [17.8 实例](#178-实例)
+    - [17.8.1 下载安装第三方库](#1781-下载安装第三方库)
+    - [17.8.2 构建库](#1782-构建库)
+    - [17.8.3 shtool库函数](#1783-shtool库函数)
+    - [17.8.4 使用库](#1784-使用库)
+- [18. 图形化界面中脚本编程](#18-图形化界面中脚本编程)
 - [19.初识sed和gawk](#19初识sed和gawk)
-  - [19.1 sed and gawk基础](#191-sed-and-gawk基础)
+  - [19.1 文本处理](#191-文本处理)
+    - [19.1.1 sed编辑器](#1911-sed编辑器)
   - [19.2 sed and gawk进阶](#192-sed-and-gawk进阶)
 - [20.正则表达式](#20正则表达式)
   - [20.1 什么是正则表达式](#201-什么是正则表达式)
@@ -234,13 +249,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
 
 # 4. 其他shell命令
 
-- date
 
-  ```bash
-  echo  `date --date="-5 day" +%Y%m%d`
-  echo  `date --date="-5 month" +%Y%m%d`
-  echo  `date --date="-5 year" +%Y%m%d`
-  ```
 
 ## 4.1 监控程序
 
@@ -422,6 +431,75 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   -C #指定具体目录
   tar -xvf test.tar`令从tar文件test.tar中提取内容。如果tar文件是从一个目录结构创建的，那整个目录结构都会在当前目录下重新创建
   ```
+
+## 4.4 date命令及其格式化
+
+- 格式化占位符
+
+  ```bash
+    %D – Display date as mm/dd/yy
+    %Y – Year (e.g., 2020)
+    %m – Month (01-12)
+    %B – Long month name (e.g., November)
+    %b – Short month name (e.g., Nov)
+    %d – Day of month (e.g., 01)
+    %j – Day of year (001-366)
+    %u – Day of week (1-7)
+    %A – Full weekday name (e.g., Friday)
+    %a – Short weekday name (e.g., Fri)
+    %H – Hour (00-23)
+    %I – Hour (01-12)
+    %M – Minute (00-59)
+    %S – Second (00-60)
+  ```
+
+- date时间加减
+
+  ```bash
+    echo  `date --date="-5 day" +%Y%m%d`
+    echo  `date --date="-5 month" +%Y%m%d`
+    echo  `date --date="-5 year" +%Y%m%d`
+  ```
+
+- set和change系统时间
+
+  `date --set="20100513 05:30"`谨慎使用 
+
+- 展示某一日期文件的日期
+
+  `--file`选项打印出文件中每一行存在的日期字符串。
+
+  ```bash
+  date --file=
+  ```
+
+- 重写日期
+
+  ```bash
+  date -d 'TZ="Australia/Sydney" 04:30 next Monday'
+  ```
+
+  下面命令可以列出`timezone`
+
+  ```bash
+  timedatectl list-timezones
+  ```
+
+- 与其他shell混用
+
+  ```bash
+  mysqldump  database_name > database_name-$(date +%Y%m%d).sql
+
+  ```
+
+- 使用Unix纪元时间（纪元转换）。
+
+  ```bash
+  date +%s # To show the number of seconds from the epoch to the current day, use the %s format control
+  date -d "1984-04-08" +"%s" # To see how many seconds passed from epoch to a specific date, enter
+  ```
+
+一个完整的带有详细时间的`date`命令是`date --date="-5 day"  +"%Y-%m-%d %H:%M:%S"`
 
 # 5. 理解shell
 
@@ -2067,15 +2145,246 @@ fi
 ### 17.3.2 在函数中处理变量
 
 - 全局变量
+全局变量被覆盖
+
+```bash
+#!/bin/bash 
+# demonstrating a bad use of variables 
+function func1 { 
+ temp=$[ $value + 5 ] 
+ result=$[ $temp * 2 ] 
+} 
+temp=4 
+value=6 
+func1 
+echo "The result is $result" 
+if [ $temp -gt $value ] 
+then 
+ echo "temp is larger" 
+else 
+ echo "temp is smaller" 
+fi 
+
+#$ ./badtest2
+#The result is 22 
+#temp is larger 
+# 说明TEMP变量受到了影响，读和写都是改变的全局变量
+```
+
 - 局部变量
+local关键字保证了变量只局限在该函数中。如果脚本中在该函数之外有同样名字的变量，
+那么shell将会保持这两个变量的值是分离的
+
+```bash
+#!/bin/bash
+# demonstrating the local keyword 
+function func1 { 
+ local temp=$[ $value + 5 ] 
+ result=$[ $temp * 2 ] 
+} 
+temp=4 
+value=6 
+func1 
+echo "The result is $result" 
+if [ $temp -gt $value ] 
+then 
+ echo "temp is larger" 
+else 
+ echo "temp is smaller" 
+fi 
+#$ ./test9
+#The result is 22 
+#temp is smaller 
+```
+
+if里面的$temp参数是全局的，因为已经在函数外
+
+## 17.4 数组变量和函数
+
+直接传入只会传入数组的第一个值，可考虑如下方法
+
+```bash
+#!/bin/bash 
+# array variable to function test 
+function testit { 
+ local newarray 
+ newarray=(;'echo "$@"') 
+ echo "The new array value is: ${newarray[*]}" 
+} 
+myarray=(1 2 3 4 5) 
+echo "The original array is ${myarray[*]}" 
+testit ${myarray[*]} 
+#$ 
+#$ ./test10 
+#The original array is 1 2 3 4 5 
+#The new array value is: 1 2 3 4 5 
+
+```
+第二种也可以
+```bash
+#!/bin/bash
+# adding values in an array 
+function addarray { 
+ local sum=0 
+ local newarray 
+ newarray=($(echo "$@")) 
+ for value in ${newarray[*]} 
+ do 
+      sum=$[ $sum + $value ] 
+ done
+ echo $sum 
+}
+myarray=(1 2 3 4 5)
+echo "The original array is: ${myarray[*]}" 
+arg1=$(echo ${myarray[*]}) 
+result=$(addarray $arg1) 
+echo "The result is $result" 
+
+#$ ./test11 
+#The original array is: 1 2 3 4 5 
+#The result is 15 
+```
+
+### 17.4.2 从函数中返回数组
+
+```bash
+#!/bin/bash
+# returning an array value 
+function arraydblr { 
+ local origarray 
+ local newarray 
+ local elements 
+ local i 
+ origarray=($(echo "$@")) 
+ newarray=($(echo "$@")) 
+ elements=$[ $# - 1 ] 
+ for (( i = 0; i <= $elements; i++ )) 
+ { 
+ newarray[$i]=$[ ${origarray[$i]} * 2 ] 
+ } 
+ echo ${newarray[*]} 
+} 
+myarray=(1 2 3 4 5) 
+echo "The original array is: ${myarray[*]}" 
+arg1=$(echo ${myarray[*]}) 
+result=($(arraydblr $arg1)) 
+echo "The new array is: ${result[*]}" 
+
+```
+arraydblr函数使用echo语句来输出每个数组元素的值。脚本用arraydblr函数的输出来
+重新生成一个新的数组变量。
+
+## 17.5 函数递归
+
+```bash
+#!/bin/bash
+# using recursion 
+function factorial { 
+ if [ $1 -eq 1 ] 
+ then 
+ echo 1 
+ else 
+ local temp=$[ $1 - 1 ] 
+ local result=$(factorial $temp) 
+ echo $[ $result * $1 ] 
+fi 
+}
+read -p "Enter value: " value 
+result=$(factorial $value) 
+echo "The factorial of $value is: $result" 
+
+#$ ./test13
+#Enter value: 5 
+#The factorial of 5 is: 120 
+
+```
+
+## 17.6 创建库
+
+问题出在shell函数的作用域上。和环境变量一样，shell函数仅在定义它的shell会话内有效。如果你在shell命令行界面的提示符下运行myfuncs shell脚本，shell会创建一个新的shell并在其中运行这个脚本。它会为那个新shell定义这三个函数，但当你运行另外一个要用到这些函数的脚本时，它们是无法使用的
+
+```bash
+#!/bin/bash
+# using a library file the wrong way 
+./myfuncs 
+result=$(addem 10 15) 
+echo "The result is $result"
+
+$ ./badtest4 
+./badtest4: addem: command not found 
+The result is 
+```
+
+使用函数库的关键在于source命令。source命令会在当前shell上下文中执行命令，而不是
+创建一个新shell。可以用source命令来在shell脚本中运行库文件脚本。这样脚本就可以使用库中的函数了。
+
+## 17.7 在命令行上使用函数
+
+和在shell脚本中将脚本函数当命令使用一样，在命令行界面中你也可以这样做。这个功能很，不错，因为一旦在shell中定义了函数，你就可以在整个系统中使用它了，无需担心脚本是不是在PATH环境变量里。重点在于让shell能够识别这些函数。有几种方法可以实现。
+
+### 17.7.1 在命令上创建函数
+
+- 简单点直接定义 `function divem { echo $[ $1 / $2 ]; } `
+- 另一种采用多行式
+
+  ```bash
+  $ function multem { 
+  > echo $[ $1 * $2 ] 
+  > } 
+  $ multem 2 5 
+  ```
+
+### 17.7.2 在.bashrc 文件中定义函数
+
+1. 直接定义函数
+
+   ```bash
+    $ cat .bashrc
+    # .bashrc 
+    # Source global definitions 
+    if [ -r /etc/bashrc ]; then 
+    . /etc/bashrc 
+    fi 
+    function addem { 
+    echo $[ $1 + $2 ] 
+    } 
+   ```
+
+2. 读取函数文件
+直接定义在特地的文件内，然后读取在`.bashrc`中读取
+
+## 17.8 实例
+
+### 17.8.1 下载安装第三方库
+
+### 17.8.2 构建库
+
+下载，编译，安装。这里面涉及到`CMAKE`的相关知识
+
+### 17.8.3 shtool库函数
+
+这里就是介绍些shtool提供的一些函数，后面会很有用，但是需要与公司内的环境做适配
+
+### 17.8.4 使用库
+
+编译，安装完后，就可以在脚本中使用了
+
+# 18. 图形化界面中脚本编程
+
+暂时不需要
 
 # 19.初识sed和gawk
+你得熟悉Linux中的sed和gawk工具。这两个工具能够极大简化需要进行的数据处
+理任务。
+## 19.1 文本处理
 
-## 19.1 sed and gawk基础
-
-**sed**
+### 19.1.1 sed编辑器
+sed编辑器被称作流编辑器（stream editor），和普通的交互式文本编辑器恰好相反。在交互式
+文本编辑器中（比如vim），你可以用键盘命令来交互式地插入、删除或替换数据中的文本。流编
+辑器则会在编辑器处理数据之前基于预先提供的一组规则来编辑数据流。
 
 - 一次输入一行
+- 根据所提供的编辑器命令匹配数据。
 - 按照命令修改流中数据
 - 将最后结果输出到STDOUT
 
@@ -2090,7 +2399,7 @@ sed  -e  's/brown/red;  s/blue/yellow/'   data/txt
 
 sed -f script.sed  data.txt
 
-**gawk**
+gawk
 
 option
 
