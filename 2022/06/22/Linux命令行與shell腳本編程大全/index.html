@@ -871,7 +871,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-07 21:31:29'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-10-07 21:59:40'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -1630,8 +1630,7 @@ gunzip <span class="token comment">#用来解压文件  </span></code></pre>
 <span class="token function">tar</span> -xvf test.tar`令从tar文件test.tar中提取内容。如果tar文件是从一个目录结构创建的，那整个目录结构都会在当前目录下重新创建</code></pre></li>
 </ul>
 <h2 id="4-4-date命令及其格式化"><a href="#4-4-date命令及其格式化" class="headerlink" title="4.4 date命令及其格式化"></a>4.4 date命令及其格式化</h2><ul>
-<li>占位符</li>
-</ul>
+<li><p>格式化占位符</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">%D – Display <span class="token function">date</span> as mm/dd/yy
 %Y – Year <span class="token punctuation">(</span>e.g., <span class="token number">2020</span><span class="token punctuation">)</span>
 %m – Month <span class="token punctuation">(</span>01-12<span class="token punctuation">)</span>
@@ -1646,44 +1645,33 @@ gunzip <span class="token comment">#用来解压文件  </span></code></pre>
 %I – Hour <span class="token punctuation">(</span>01-12<span class="token punctuation">)</span>
 %M – Minute <span class="token punctuation">(</span>00-59<span class="token punctuation">)</span>
 %S – Second <span class="token punctuation">(</span>00-60<span class="token punctuation">)</span></code></pre>
-
-<ul>
-<li>date时间加减</li>
-</ul>
+</li>
+<li><p>date时间加减</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span>  <span class="token variable"><span class="token variable">`</span><span class="token function">date</span> --date<span class="token operator">=</span><span class="token string">"-5 day"</span> +%Y%m%d<span class="token variable">`</span></span>
 <span class="token builtin class-name">echo</span>  <span class="token variable"><span class="token variable">`</span><span class="token function">date</span> --date<span class="token operator">=</span><span class="token string">"-5 month"</span> +%Y%m%d<span class="token variable">`</span></span>
 <span class="token builtin class-name">echo</span>  <span class="token variable"><span class="token variable">`</span><span class="token function">date</span> --date<span class="token operator">=</span><span class="token string">"-5 year"</span> +%Y%m%d<span class="token variable">`</span></span></code></pre>
-
-<ul>
-<li>set和change系统时间</li>
-</ul>
-<p>date –set&#x3D;”20100513 05:30”</p>
-<ul>
-<li>展示某一日期文件的日期</li>
-</ul>
-<p>–file选项打印出文件中每一行存在的日期字符串。</p>
+</li>
+<li><p>set和change系统时间</p>
+<p><code>date --set=&quot;20100513 05:30&quot;</code>谨慎使用 </p>
+</li>
+<li><p>展示某一日期文件的日期</p>
+<p><code>--file</code>选项打印出文件中每一行存在的日期字符串。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">date</span> --file<span class="token operator">=</span></code></pre>
-
-<ul>
-<li>重写日期</li>
-</ul>
+</li>
+<li><p>重写日期</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">date</span> -d <span class="token string">'TZ="Australia/Sydney" 04:30 next Monday'</span></code></pre>
 
 <p>下面命令可以列出<code>timezone</code></p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">timedatectl list-timezones</code></pre>
-
-<ul>
-<li>与其他shell混用</li>
-</ul>
+</li>
+<li><p>与其他shell混用</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">mysqldump  database_name <span class="token operator">></span> database_name-<span class="token variable"><span class="token variable">$(</span><span class="token function">date</span> +%Y%m%d<span class="token variable">)</span></span>.sql
 </code></pre>
-
-<ul>
-<li>使用Unix纪元时间（纪元转换）。</li>
-</ul>
+</li>
+<li><p>使用Unix纪元时间（纪元转换）。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">date</span> +%s <span class="token comment"># To show the number of seconds from the epoch to the current day, use the %s format control</span>
-<span class="token function">date</span> -d <span class="token string">"1984-04-08"</span> +<span class="token string">"%s"</span> <span class="token comment"># To see how many seconds passed from epoch to a specific date, enter</span></code></pre>
-
+<span class="token function">date</span> -d <span class="token string">"1984-04-08"</span> +<span class="token string">"%s"</span> <span class="token comment"># To see how many seconds passed from epoch to a specific date, enter</span></code></pre></li>
+</ul>
 <p>一个完整的带有详细时间的<code>date</code>命令是<code>date --date=&quot;-5 day&quot;  +&quot;%Y-%m-%d %H:%M:%S&quot;</code></p>
 <h1 id="5-理解shell"><a href="#5-理解shell" class="headerlink" title="5. 理解shell"></a>5. 理解shell</h1><h2 id="5-1-shell的类型"><a href="#5-1-shell的类型" class="headerlink" title="5.1 shell的类型"></a>5.1 shell的类型</h2><p>不同Linux系统有很多种shell,<code>cat /etc/passwd</code>可以看到用户默认登录默认的shell</p>
 <ul>
