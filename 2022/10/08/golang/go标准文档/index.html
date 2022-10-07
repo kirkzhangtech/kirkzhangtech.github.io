@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>go语言圣经-chapter07-接口 | Eden</title>
+  <title>go标准库及其demo | Eden</title>
   <meta name="keywords" content=" golang ">
-  <meta name="description" content="go语言圣经-chapter07-接口 | Eden">
+  <meta name="description" content="go标准库及其demo | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="rand function not method of rand func ExpFloat64() float64 func Float32() float32 func Float64() float64 func Int() int func Int31() int32 func Int31n(n int32) int32 func Int63() int64 func Int63n(n">
 <meta property="og:type" content="article">
@@ -940,9 +940,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-golang/go语言圣经/go圣经_ch07" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-golang/go标准文档" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">go语言圣经-chapter07-接口</h1>
+        <h1 class="article-title">go标准库及其demo</h1>
     
     <div class="article-meta">
         
@@ -967,7 +967,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-07 23:26:14'>2022-10-07 23:25</time>
+            Created At : <time class="date" title='Updated At: 2022-10-08 07:56:20'>2022-10-08 07:48</time>
         
     </div>
     <div class="article-meta">
@@ -1000,7 +1000,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E6%8E%A5%E5%8F%A3"><span class="toc-text">7. 接口</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1-%E6%8E%A5%E5%8F%A3%E7%BA%A6%E5%AE%9A"><span class="toc-text">7.1. 接口约定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2-%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B"><span class="toc-text">7.2 接口类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-3-%E5%AE%9E%E7%8E%B0%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-text">7.3 实现接口的条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-4-flag-Value%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.4 flag.Value接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-5-%E6%8E%A5%E5%8F%A3%E5%80%BC"><span class="toc-text">7.5 接口值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-6-sort-Interface%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.6. sort.Interface接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-7-http-Handler%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.7. http.Handler接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-8-error%E6%8E%A5%E5%8F%A3"><span class="toc-text">7.8. error接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-9-%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80"><span class="toc-text">7.9. 类型断言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-10-%E5%9F%BA%E4%BA%8E%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80%E5%8C%BA%E5%88%AB%E9%94%99%E8%AF%AF%E7%B1%BB%E5%9E%8B"><span class="toc-text">7.10. 基于类型断言区别错误类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-11-any%E5%85%B3%E9%94%AE%E5%AD%97%E4%B8%8E%E6%B3%9B%E5%9E%8B"><span class="toc-text">7.11. any关键字与泛型</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#rand"><span class="toc-text">rand</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#function-not-method-of-rand"><span class="toc-text">function not method of rand</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-ExpFloat64-float64"><span class="toc-text">func ExpFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Float32-float32"><span class="toc-text">func Float32() float32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Float64-float64"><span class="toc-text">func Float64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Int-int"><span class="toc-text">func Int() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Int31-int32"><span class="toc-text">func Int31() int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Int31n-n-int32-int32"><span class="toc-text">func Int31n(n int32) int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Int63-int64"><span class="toc-text">func Int63() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Int63n-n-int64-int64"><span class="toc-text">func Int63n(n int64) int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Intn-n-int-int"><span class="toc-text">func Intn(n int) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-NormFloat64-float64"><span class="toc-text">func NormFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Perm-n-int-int"><span class="toc-text">func Perm(n int) []int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Read-p-byte-n-int-err-error"><span class="toc-text">func Read(p []byte) (n int, err error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Seed-seed-int64"><span class="toc-text">func Seed(seed int64)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Shuffle-n-int-swap-func-i-j-int"><span class="toc-text">func Shuffle(n int, swap func(i, j int))</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Uint32-uint32"><span class="toc-text">func Uint32() uint32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Uint64-uint64"><span class="toc-text">func Uint64() uint64</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-Rand"><span class="toc-text">type Rand</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-New-src-Source-Rand"><span class="toc-text">func New(src Source) *Rand</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-ExpFloat64-float64"><span class="toc-text">func (r *Rand) ExpFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Float32-float32"><span class="toc-text">func (r *Rand) Float32() float32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Float64-float64"><span class="toc-text">func (r *Rand) Float64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Int-int"><span class="toc-text">func (r *Rand) Int() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Int31-int32"><span class="toc-text">func (r *Rand) Int31() int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Int31n-n-int32-int32"><span class="toc-text">func (r *Rand) Int31n(n int32) int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Int63-int64"><span class="toc-text">func (r *Rand) Int63() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Int63n-n-int64-int64"><span class="toc-text">func (r *Rand) Int63n(n int64) int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Intn-n-int-int"><span class="toc-text">func (r *Rand) Intn(n int) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-NormFloat64-float64"><span class="toc-text">func (r *Rand) NormFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Perm-n-int-int"><span class="toc-text">func (r *Rand) Perm(n int) []int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Read-p-byte-n-int-err-error"><span class="toc-text">func (r *Rand) Read(p []byte) (n int, err error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Seed-seed-int64"><span class="toc-text">func (r *Rand) Seed(seed int64)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Shuffle-n-int-swap-func-i-j-int"><span class="toc-text">func (r *Rand) Shuffle(n int, swap func(i, j int))</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Uint32-uint32"><span class="toc-text">func (r *Rand) Uint32() uint32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-r-Rand-Uint64-uint64"><span class="toc-text">func (r *Rand) Uint64() uint64</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-Source"><span class="toc-text">type Source</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-NewSource-seed-int64-Source"><span class="toc-text">func NewSource(seed int64) Source</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-Source64"><span class="toc-text">type Source64</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-Zipf"><span class="toc-text">type Zipf</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-NewZipf-r-Rand-s-float64-v-float64-imax-uint64-Zipf"><span class="toc-text">func NewZipf(r *Rand, s float64, v float64, imax uint64) *Zipf</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-z-Zipf-Uint64-uint64"><span class="toc-text">func (z *Zipf) Uint64() uint64</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -1016,454 +1016,67 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="7-接口"><a href="#7-接口" class="headerlink" title="7. 接口"></a>7. 接口</h1><p>很多面向对象的语言都有相似的接口概念，但Go语言中接口类型的独特之处在于它是满足隐式实现的。也就是说，我们没有必要对于给定的具体类型定义所有满足的接口类型；简单地拥有一些必需的方法就足够了。这种设计可以让你创建一个新的接口类型满足已经存在的具体类型却不会去改变这些类型的定义；当我们使用的类型来自于不受我们控制的包时这种设计尤其有用  </p>
-<p>只要一个物体能像鸭子一样叫那我们就可以称它为鸭子；只要一个软件能存储和查询数据我们就可以称它为数据库；只要一台机器有洗衣服和甩干的功能我们就可以称它为洗衣机。  </p>
-<p>为了保护你的Go语言职业生涯，请牢记接口（interface）是一种类型</p>
-<h2 id="7-1-接口约定"><a href="#7-1-接口约定" class="headerlink" title="7.1. 接口约定"></a>7.1. 接口约定</h2><p>例如<code>fmt</code>包</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">package fmt
-
-func Fprintf(w io.Writer, format string, args ...interface&#123;&#125;) (int, error)
-&#x2F;&#x2F;Printf 最后调用Fprintf 函数
-func Printf(format string, args ...interface&#123;&#125;) (int, error) &#123;
-    return Fprintf(os.Stdout, format, args...)
-&#125;
-&#x2F;&#x2F; Sprintf函数最后也是调用Fprintf
-func Sprintf(format string, args ...interface&#123;&#125;) string &#123;
-    var buf bytes.Buffer
-    Fprintf(&amp;buf, format, args...)
-    return buf.String()
-&#125;</code></pre>
-
-<p><code>Fprintf</code>函数的<code>F</code>说明了文件类型也说明了所有信息要被写入到文件当中，在<code>Printf</code>函数中的第一个参数<code>os.Stdout</code>是<code>*os.File</code>类型实现了<code>io.Writer</code>接口，在<code>Sprintf</code>函数中的第一个参数<code>&amp;buf</code>是一个指向可以写入字节的内存缓冲区也该类型也是实现了<code>io.Writer</code>接口,用户可以自定义一个函数并实现<code>io.Writer</code>接口。<br><strong>LSP里氏替换</strong> : <code>fmt.Fprintf</code>通过使用接口类型<code>io.Writer</code>使得只要调用者只要传入实现了该接口的类型就可以实现自由替换</p>
-<details><summary>自定义bytecounter函数，实现计算int转byte长度</summary>
-
-<pre class="language-golang" data-language="golang"><code class="language-golang">
-package main
-
-import (
-	&quot;fmt&quot;
-)
-
-&#x2F;&#x2F;!+bytecounter
-
-type ByteCounter int
-
-func (c *ByteCounter) Write(p []byte) (int, error) &#123;
-	*c +&#x3D; ByteCounter(len(p)) &#x2F;&#x2F; convert int to ByteCounter
-	return len(p), nil
-&#125;
-
-&#x2F;&#x2F;!-bytecounter
-
-func main() &#123;
-	&#x2F;&#x2F;!+main
-	var c ByteCounter
-	c.Write([]byte(&quot;hello&quot;))
-	fmt.Println(c) &#x2F;&#x2F; &quot;5&quot;, &#x3D; len(&quot;hello&quot;)
-
-	c &#x3D; 0 &#x2F;&#x2F; reset the counter
-	var name &#x3D; &quot;Dolly&quot;
-	fmt.Fprintf(&amp;c, &quot;hello, %s&quot;, name)
-	fmt.Println(c) &#x2F;&#x2F; &quot;12&quot;, &#x3D; len(&quot;hello, Dolly&quot;)
-	&#x2F;&#x2F;!-main
-&#125;</code></pre>
-
-</details>
-
-<p>因为它实现了<code>writer</code>接口就可以传入到<code>Fprintf</code>函数中.总结来说，接口约定了包使用者的行为，但是使用者想创建什么样的实例需要他自己去实现。</p>
-<h2 id="7-2-接口类型"><a href="#7-2-接口类型" class="headerlink" title="7.2 接口类型"></a>7.2 接口类型</h2><p>通过组合定义接口</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">package io
-type Reader interface &#123;
-    Read(p []byte) (n int, err error)
-&#125;
-type Closer interface &#123;
-    Close() error
-&#125;
-
-type ReadWriter interface &#123;
-    Reader
-    Writer
-&#125;
-type ReadWriteCloser interface &#123;
-    Reader
-    Writer
-    Closer
-&#125;
-&#x2F;&#x2F; 另一种命名风格
-type ReadWriter interface &#123;
-    Read(p []byte) (n int, err error)
-    Write(p []byte) (n int, err error)
-&#125;
-&#x2F;&#x2F;或者甚至使用一种混合的风格：
-
-type ReadWriter interface &#123;
-    Read(p []byte) (n int, err error)
-    Writer
-&#125;</code></pre>
-
-<h2 id="7-3-实现接口的条件"><a href="#7-3-实现接口的条件" class="headerlink" title="7.3 实现接口的条件"></a>7.3 实现接口的条件</h2><ul>
-<li><p>一个类型如果拥有一个接口需要的所有方法，那么这个类型就实现了这个接口.</p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">var w io.Writer
-&#x2F;&#x2F;只实现了Write 方法
-w &#x3D; os.Stdout           &#x2F;&#x2F; OK: *os.File has Write method
-&#x2F;&#x2F;只实现了Write方法
-w &#x3D; new(bytes.Buffer)   &#x2F;&#x2F; OK: *bytes.Buffer has Write method
-&#x2F;&#x2F; time.Duration没有Write方法
-w &#x3D; time.Second         &#x2F;&#x2F; compile error: time.Duration lacks Write method
-
-var rwc io.ReadWriteCloser
-rwc &#x3D; os.Stdout         &#x2F;&#x2F; OK: *os.File has Read, Write, Close methods
-rwc &#x3D; new(bytes.Buffer) &#x2F;&#x2F; compile error: *bytes.Buffer lacks Close method
-&#x2F;&#x2F; 这个规则甚至适用于等式右边本身也是一个接口类型
-&#x2F;&#x2F; rwc io.ReadWriteCloser
-w &#x3D; rwc                 &#x2F;&#x2F; OK: io.ReadWriteCloser has Write method
-&#x2F;&#x2F; w 只有Write方法
-rwc &#x3D; w                 &#x2F;&#x2F; compile error: io.Writer lacks Close method</code></pre>
+        <ul>
+<li><a href="#rand">rand</a><ul>
+<li><a href="#function-not-method-of-rand">function not method of rand</a><ul>
+<li><a href="#func-expfloat64-float64">func ExpFloat64() float64</a></li>
+<li><a href="#func-float32-float32">func Float32() float32</a></li>
+<li><a href="#func-float64-float64">func Float64() float64</a></li>
+<li><a href="#func-int-int">func Int() int</a></li>
+<li><a href="#func-int31-int32">func Int31() int32</a></li>
+<li><a href="#func-int31nn-int32-int32">func Int31n(n int32) int32</a></li>
+<li><a href="#func-int63-int64">func Int63() int64</a></li>
+<li><a href="#func-int63nn-int64-int64">func Int63n(n int64) int64</a></li>
+<li><a href="#func-intnn-int-int">func Intn(n int) int</a></li>
+<li><a href="#func-normfloat64-float64">func NormFloat64() float64</a></li>
+<li><a href="#func-permn-int-int">func Perm(n int) []int</a></li>
+<li><a href="#func-readp-byte-n-int-err-error">func Read(p []byte) (n int, err error)</a></li>
+<li><a href="#func-seedseed-int64">func Seed(seed int64)</a></li>
+<li><a href="#func-shufflen-int-swap-funci-j-int">func Shuffle(n int, swap func(i, j int))</a></li>
+<li><a href="#func-uint32-uint32">func Uint32() uint32</a></li>
+<li><a href="#func-uint64-uint64">func Uint64() uint64</a></li>
+</ul>
 </li>
-<li></li>
+<li><a href="#type-rand">type Rand</a><ul>
+<li><a href="#func-newsrc-source-rand">func New(src Source) *Rand</a></li>
+<li><a href="#func-r-rand-expfloat64-float64">func (r *Rand) ExpFloat64() float64</a></li>
+<li><a href="#func-r-rand-float32-float32">func (r *Rand) Float32() float32</a></li>
+<li><a href="#func-r-rand-float64-float64">func (r *Rand) Float64() float64</a></li>
+<li><a href="#func-r-rand-int-int">func (r *Rand) Int() int</a></li>
+<li><a href="#func-r-rand-int31-int32">func (r *Rand) Int31() int32</a></li>
+<li><a href="#func-r-rand-int31nn-int32-int32">func (r *Rand) Int31n(n int32) int32</a></li>
+<li><a href="#func-r-rand-int63-int64">func (r *Rand) Int63() int64</a></li>
+<li><a href="#func-r-rand-int63nn-int64-int64">func (r *Rand) Int63n(n int64) int64</a></li>
+<li><a href="#func-r-rand-intnn-int-int">func (r *Rand) Intn(n int) int</a></li>
+<li><a href="#func-r-rand-normfloat64-float64">func (r *Rand) NormFloat64() float64</a></li>
+<li><a href="#func-r-rand-permn-int-int">func (r *Rand) Perm(n int) []int</a></li>
+<li><a href="#func-r-rand-readp-byte-n-int-err-error">func (r *Rand) Read(p []byte) (n int, err error)</a></li>
+<li><a href="#func-r-rand-seedseed-int64">func (r *Rand) Seed(seed int64)</a></li>
+<li><a href="#func-r-rand-shufflen-int-swap-funci-j-int">func (r *Rand) Shuffle(n int, swap func(i, j int))</a></li>
+<li><a href="#func-r-rand-uint32-uint32">func (r *Rand) Uint32() uint32</a></li>
+<li><a href="#func-r-rand-uint64-uint64">func (r *Rand) Uint64() uint64</a></li>
 </ul>
-<h2 id="7-4-flag-Value接口"><a href="#7-4-flag-Value接口" class="headerlink" title="7.4 flag.Value接口"></a>7.4 flag.Value接口</h2><p>(翻译的太差劲，要去读原文)</p>
-<ul>
-<li><p>简单的<code>flag</code>包支持命令行的例子</p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">var period &#x3D; flag.Duration(&quot;period&quot;, 1*time.Second, &quot;sleep period&quot;)
-
-func main() &#123;
-    flag.Parse()
-    fmt.Printf(&quot;Sleeping for %v...&quot;, *period)
-    time.Sleep(*period)
-    fmt.Println()
-&#125;</code></pre>
 </li>
-<li><p>自定义新的标记符号</p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">package tempconv
-
-import (
-    &quot;flag&quot;
-    &quot;fmt&quot;
-)
-
-type Celsius float64
-type Fahrenheit float64
-
-func CToF(c Celsius) Fahrenheit &#123; return Fahrenheit(c*9.0&#x2F;5.0 + 32.0) &#125;
-func FToC(f Fahrenheit) Celsius &#123; return Celsius((f - 32.0) * 5.0 &#x2F; 9.0) &#125;
-
-func (c Celsius) String() string &#123; return fmt.Sprintf(&quot;%g°C&quot;, c) &#125;
-
-&#x2F;*
-&#x2F;&#x2F;!+flagvalue
-package flag
-
-&#x2F;&#x2F; Value is the interface to the value stored in a flag.
-type Value interface &#123;
-    String() string
-    Set(string) error
-&#125;
-&#x2F;&#x2F;!-flagvalue
-*&#x2F;
-
-&#x2F;&#x2F;!+celsiusFlag
-&#x2F;&#x2F; *celsiusFlag satisfies the flag.Value interface.
-type celsiusFlag struct&#123; Celsius &#125;
-
-func (f *celsiusFlag) Set(s string) error &#123;
-    var unit string
-    var value float64
-    fmt.Sscanf(s, &quot;%f%s&quot;, &amp;value, &amp;unit) &#x2F;&#x2F; no error check needed
-    switch unit &#123;
-    case &quot;C&quot;, &quot;°C&quot;:
-        f.Celsius &#x3D; Celsius(value)
-        return nil
-    case &quot;F&quot;, &quot;°F&quot;:
-        f.Celsius &#x3D; FToC(Fahrenheit(value))
-        return nil
-    &#125;
-    return fmt.Errorf(&quot;invalid temperature %q&quot;, s)
-&#125;
-
-&#x2F;&#x2F;!-celsiusFlag
-
-&#x2F;&#x2F;!+CelsiusFlag
-
-&#x2F;&#x2F; CelsiusFlag defines a Celsius flag with the specified name,
-&#x2F;&#x2F; default value, and usage, and returns the address of the flag variable.
-&#x2F;&#x2F; The flag argument must have a quantity and a unit, e.g., &quot;100C&quot;.
-func CelsiusFlag(name string, value Celsius, usage string) *Celsius &#123;
-    f :&#x3D; celsiusFlag&#123;value&#125;
-    flag.CommandLine.Var(&amp;f, name, usage)
-    return &amp;f.Celsius
-&#125;
-&#x2F;&#x2F; main函数
-var temp &#x3D; tempconv.CelsiusFlag(&quot;temp&quot;, 20.0, &quot;the temperature&quot;)
-
-func main() &#123;
-    flag.Parse()
-    fmt.Println(*temp)
-&#125;</code></pre></li>
+<li><a href="#type-source">type Source</a><ul>
+<li><a href="#func-newsourceseed-int64-source">func NewSource(seed int64) Source</a></li>
 </ul>
-<h2 id="7-5-接口值"><a href="#7-5-接口值" class="headerlink" title="7.5 接口值"></a>7.5 接口值</h2><p>下面语句中,<code>io.Writer</code>是接口类型值</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">var w io.Writer
-w &#x3D; os.Stdout
-w &#x3D; new(bytes.Buffer)
-w &#x3D; nil</code></pre>
-<ul>
-<li><p>对于接口的定义也不例外，<code>接口</code>的零值是它的类型和值的部分都是<code>nil</code></p>
 </li>
-<li><p>一个接口值基于它的动态类型被描述为空或非空，所以这是一个空的接口值。你可以通过使用w&#x3D;&#x3D;nil或者w!&#x3D;nil来判断接口值是否为空。调用一个空接口值上的任意方法都会产生<code>panic</code>: <code>w.Write([]byte(&quot;hello&quot;)) // panic: nil pointer dereference</code></p>
+<li><a href="#type-source64">type Source64</a></li>
+<li><a href="#type-zipf">type Zipf</a><ul>
+<li><a href="#func-newzipfr-rand-s-float64-v-float64-imax-uint64-zipf">func NewZipf(r *Rand, s float64, v float64, imax uint64) *Zipf</a></li>
+<li><a href="#func-z-zipf-uint64-uint64">func (z *Zipf) Uint64() uint64</a></li>
+</ul>
 </li>
-<li><p>第二句statement，这个赋值过程调用了一个<code>具体类型</code>到<code>接口类型</code>的隐式转换，这和显式的使用io.Writer(os.Stdout)是等价的。这类转换不管是显式的还是隐式的，它的动态值持有os.Stdout的拷贝；这是一个代表处理标准输出的<code>os.File</code>类型变量的指针.接口值可以使用<code>==</code>和<code>!＝</code>来进行比较。两个接口值相等仅当它们都是nil值。</p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">w.Write([]byte(&quot;hello&quot;)) &#x2F;&#x2F; &quot;hello&quot;
-os.Stdout.Write([]byte(&quot;hello&quot;)) &#x2F;&#x2F; &quot;hello&quot; 
-&#x2F;&#x2F;上下两句是等价的</code></pre></li>
-<li><p>一个接口值可以持有任意大的动态值</p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">var x interface&#123;&#125; &#x3D; time.Now()</code></pre>
-
-<p>  接口值可以使用&#x3D;&#x3D;和!＝来进行比较。两个接口值相等仅当它们都是nil值，或者它们的动态类型相同并且动态值也根据这个动态类型的&#x3D;&#x3D;操作相等。因为接口值是可比较的，所以它们可以用在map的键或者作为switch语句的操作数,然而，如果两个接口值的动态类型相同，但是这个动态类型是不可比较的（比如切片），将它们进行比较就会失败并且panic:</p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">var x interface&#123;&#125; &#x3D; []int&#123;1, 2, 3&#125;
-fmt.Println(x &#x3D;&#x3D; x) &#x2F;&#x2F; panic: comparing uncomparable type []int</code></pre></li>
 </ul>
-<p>考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型（如基本类型和指针）要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值.</p>
-<ul>
-<li><em>警告</em>: 一个包含nil指针的接口不是nil接口</li>
-</ul>
-<p>一个不包含任何值的nil接口值和一个刚好包含nil指针的接口值是不同的。这个细微区别产生了一个容易绊倒每个Go程序员的陷阱。</p>
-<p>思考下面的程序。当debug变量设置为true时，main函数会将f函数的输出收集到一个bytes.Buffer类型中。</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">const debug &#x3D; true
-
-func main() &#123;
-    var buf *bytes.Buffer
-    if debug &#123;
-        buf &#x3D; new(bytes.Buffer) &#x2F;&#x2F; enable collection of output
-    &#125;
-    f(buf) &#x2F;&#x2F; NOTE: subtly incorrect!
-    if debug &#123;
-        &#x2F;&#x2F; ...use buf...
-    &#125;
-&#125;
-
-&#x2F;&#x2F; If out is non-nil, output will be written to it.
-func f(out io.Writer) &#123;
-    &#x2F;&#x2F; ...do something...
-    if out !&#x3D; nil &#123;
-        out.Write([]byte(&quot;done!\n&quot;))
-    &#125;
-&#125;</code></pre>
-<p>我们可能会预计当把变量debug设置为false时可以禁止对输出的收集，但是实际上在out.Write方法调用时程序发生了panic：</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">if out !&#x3D; nil &#123;
-    out.Write([]byte(&quot;done!\n&quot;)) &#x2F;&#x2F; panic: nil pointer dereference
-&#125;</code></pre>
-<p>当main函数调用函数f时，它给f函数的out参数赋了一个<em>bytes.Buffer的空指针，所以out的动态值是nil。然而，它的动态类型是</em>bytes.Buffer，意思就是out变量是一个包含空指针值的非空接口（如图7.5），所以防御性检查out!&#x3D;nil的结果依然是true。</p>
-<p><img src="https://user-images.githubusercontent.com/46363359/182982938-08d67c3f-7aa6-457d-88a5-02646c5e2735.png"></p>
-<p>动态分配机制依然决定(<em>bytes.Buffer).Write的方法会被调用，但是这次的接收者的值是nil。对于一些如</em>os.File的类型，nil是一个有效的接收者（§6.2.1），但是*bytes.Buffer类型不在这些种类中。这个方法会被调用，但是当它尝试去获取缓冲区时会发生panic。</p>
-<p>问题在于尽管一个nil的*bytes.Buffer指针有实现这个接口的方法，它也不满足这个接口具体的行为上的要求。特别是这个调用违反了(*bytes.Buffer).Write方法的接收者非空的隐含先觉条件，所以将nil指针赋给这个接口是错误的。解决方案就是将main函数中的变量buf的类型改为io.Writer，因此可以避免一开始就将一个不完整的值赋值给这个接口：</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">var buf io.Writer
-if debug &#123;
-    buf &#x3D; new(bytes.Buffer) &#x2F;&#x2F; enable collection of output
-&#125;
-f(buf) &#x2F;&#x2F; OK</code></pre>
-<p>现在我们已经把接口值的技巧都讲完了，让我们来看更多的一些在Go标准库中的重要接口类型。在下面的三章中，我们会看到接口类型是怎样用在排序，web服务，错误处理中的。</p>
-<h2 id="7-6-sort-Interface接口"><a href="#7-6-sort-Interface接口" class="headerlink" title="7.6. sort.Interface接口"></a>7.6. sort.Interface接口</h2><p>golang提供了<code>sort</code>包帮助进行排序数据,实现排序需要自己实现对应的排序接口.</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">type byArtist []*Track
-func (x byArtist) Len() int           &#123; return len(x) &#125;
-func (x byArtist) Less(i, j int) bool &#123; return x[i].Artist &lt; x[j].Artist &#125;
-func (x byArtist) Swap(i, j int)      &#123; x[i], x[j] &#x3D; x[j], x[i] &#125;</code></pre>
-<p>对于自定义的排序，我们也需要实现排序函数.</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F;!+customcode
-type customSort struct &#123;
-	t    []*Track
-	less func(x, y *Track) bool
-&#125;
-
-func (x customSort) Len() int           &#123; return len(x.t) &#125;
-func (x customSort) Less(i, j int) bool &#123; return x.less(x.t[i], x.t[j]) &#125;
-func (x customSort) Swap(i, j int)      &#123; x.t[i], x.t[j] &#x3D; x.t[j], x.t[i] &#125;
-
-sort.Sort(customSort&#123;tracks, func(x, y *Track) bool &#123;
-		if x.Title !&#x3D; y.Title &#123;
-			return x.Title &lt; y.Title
-		&#125;
-		if x.Year !&#x3D; y.Year &#123;
-			return x.Year &lt; y.Year
-		&#125;
-		if x.Length !&#x3D; y.Length &#123;
-			return x.Length &lt; y.Length
-		&#125;
-		return false
-	&#125;&#125;)</code></pre>
-<p><code>IntsAreSorted(...interface&#123;&#125;)</code> reports whether the slice x is sorted in increasing order.</p>
-<h2 id="7-7-http-Handler接口"><a href="#7-7-http-Handler接口" class="headerlink" title="7.7. http.Handler接口"></a>7.7. http.Handler接口</h2><p>http.Handler的实例</p>
-<h2 id="7-8-error接口"><a href="#7-8-error接口" class="headerlink" title="7.8. error接口"></a>7.8. error接口</h2><pre class="language-golang" data-language="golang"><code class="language-golang">
-package errors_demo
-
-func New(text string) error &#123; return &amp;errorString&#123;text&#125; &#125;
-
-type errorString struct &#123; text string &#125;
-
-func (e *errorString) Error() string &#123; return e.text &#125;</code></pre>
-<p>调用<code>errors.New</code>函数是非常稀少的，因为有一个方便的封装函数<code>fmt.Errorf</code>它还会处理字符串格式化<br>另一个error demo实例</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">package syscall
-
-type Errno uintptr &#x2F;&#x2F; operating system error code
-
-var errors &#x3D; [...]string&#123;
-    1:   &quot;operation not permitted&quot;,   &#x2F;&#x2F; EPERM
-    2:   &quot;no such file or directory&quot;, &#x2F;&#x2F; ENOENT
-    3:   &quot;no such process&quot;,           &#x2F;&#x2F; ESRCH
-    &#x2F;&#x2F; ...
-&#125;
-
-func (e Errno) Error() string &#123;
-    if 0 &lt;&#x3D; int(e) &amp;&amp; int(e) &lt; len(errors) &#123;
-        return errors[e]
-    &#125;
-    return fmt.Sprintf(&quot;errno %d&quot;, e)
-&#125;
-
-var err error &#x3D; syscall.Errno(2)
-fmt.Println(err.Error()) &#x2F;&#x2F; &quot;no such file or directory&quot;
-fmt.Println(err)         &#x2F;&#x2F; &quot;no such file or directory&quot;</code></pre>
-<p>用有限几个进行描述，并且它满足标准错误接口</p>
-<h2 id="7-9-类型断言"><a href="#7-9-类型断言" class="headerlink" title="7.9. 类型断言"></a>7.9. 类型断言</h2><p>语法上它看起来像<code>x.(T)</code>被称为断言类型，这里<code>x</code>表示一个接口的类型和T表示一个类型,详细解释，一个类型断言检查它操作对象的动态类型是否和断言的类型是否匹配,分两种情况</p>
-<ul>
-<li><p>(T传入的是具体类型，X是动态类型),然后类型断言检查<code>X</code>的动态类型是否和<code>T</code>相同.如果检查成功了类型断言的结果就是<code>X</code>的动态值</p>
 </li>
-<li><p>(T传入的是接口类型，X是动态类型),然后类型断言检查是否<code>x</code>的动态类型满足T,如果这个检查成功了，动态值没有获取到；这个结果仍然是一个有相同动态类型和值部分的接口值</p>
-  <pre class="language-golang" data-language="golang"><code class="language-golang">
-var w io.Writer
-w &#x3D; os.Stdout   &#x2F;&#x2F;能赋值说明os.Stdout 实现了Write()方法
-rw :&#x3D; w.(io.ReadWriter) &#x2F;&#x2F; success: *os.File has both Read and Write,断言w是否实现了接口(io.ReadWriter)的Read和Write接口
-w &#x3D; new(ByteCounter)
-rw &#x3D; w.(io.ReadWriter) &#x2F;&#x2F; panic: *ByteCounter has no Read method
-&#x2F;&#x2F;如果对预期结果只是个判断就可以用第二个返回参数bool.
-var w io.Writer &#x3D; os.Stdout
-f, ok :&#x3D; w.(*os.File)      &#x2F;&#x2F; success:  ok, f &#x3D;&#x3D; os.Stdout
-b, ok :&#x3D; w.(*bytes.Buffer) &#x2F;&#x2F; failure: !ok, b &#x3D;&#x3D; nil
-&#x2F;&#x2F; if 后面的w变量不会覆盖外层的w
-if w, ok :&#x3D; w.(*os.File); ok &#123;
-&#x2F;&#x2F; ...use w...
-&#125;</code></pre></li>
 </ul>
-<h2 id="7-10-基于类型断言区别错误类型"><a href="#7-10-基于类型断言区别错误类型" class="headerlink" title="7.10. 基于类型断言区别错误类型"></a>7.10. 基于类型断言区别错误类型</h2><p>对这些判断的一个缺乏经验的实现可能会去检查错误消息是否包含了特定的子字符串，但是处理I&#x2F;O错误的逻辑可能一个和另一个平台非常的不同，所以这种方案并不健壮，并且对相同的失败可能会报出各种不同的错误消息。在测试的过程中，通过检查错误消息的子字符串来保证特定的函数以期望的方式失败是非常有用的，但对于线上的代码是不够的。</p>
-<p>一个更可靠的方式是使用一个专门的类型来描述结构化的错误。os包中定义了一个PathError类型来描述在文件路径操作中涉及到的失败，像Open或者Delete操作；并且定义了一个叫LinkError的变体来描述涉及到两个文件路径的操作，像Symlink和Rename。这下面是os.PathError：</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">
+<h1 id="rand"><a href="#rand" class="headerlink" title="rand"></a>rand</h1><h2 id="function-not-method-of-rand"><a href="#function-not-method-of-rand" class="headerlink" title="function not method of rand"></a>function not method of rand</h2><h3 id="func-ExpFloat64-float64"><a href="#func-ExpFloat64-float64" class="headerlink" title="func ExpFloat64() float64"></a>func ExpFloat64() float64</h3><h3 id="func-Float32-float32"><a href="#func-Float32-float32" class="headerlink" title="func Float32() float32"></a>func Float32() float32</h3><h3 id="func-Float64-float64"><a href="#func-Float64-float64" class="headerlink" title="func Float64() float64"></a>func Float64() float64</h3><h3 id="func-Int-int"><a href="#func-Int-int" class="headerlink" title="func Int() int"></a>func Int() int</h3><h3 id="func-Int31-int32"><a href="#func-Int31-int32" class="headerlink" title="func Int31() int32"></a>func Int31() int32</h3><h3 id="func-Int31n-n-int32-int32"><a href="#func-Int31n-n-int32-int32" class="headerlink" title="func Int31n(n int32) int32"></a>func Int31n(n int32) int32</h3><h3 id="func-Int63-int64"><a href="#func-Int63-int64" class="headerlink" title="func Int63() int64"></a>func Int63() int64</h3><h3 id="func-Int63n-n-int64-int64"><a href="#func-Int63n-n-int64-int64" class="headerlink" title="func Int63n(n int64) int64"></a>func Int63n(n int64) int64</h3><h3 id="func-Intn-n-int-int"><a href="#func-Intn-n-int-int" class="headerlink" title="func Intn(n int) int"></a>func Intn(n int) int</h3><h3 id="func-NormFloat64-float64"><a href="#func-NormFloat64-float64" class="headerlink" title="func NormFloat64() float64"></a>func NormFloat64() float64</h3><h3 id="func-Perm-n-int-int"><a href="#func-Perm-n-int-int" class="headerlink" title="func Perm(n int) []int"></a>func Perm(n int) []int</h3><h3 id="func-Read-p-byte-n-int-err-error"><a href="#func-Read-p-byte-n-int-err-error" class="headerlink" title="func Read(p []byte) (n int, err error)"></a>func Read(p []byte) (n int, err error)</h3><h3 id="func-Seed-seed-int64"><a href="#func-Seed-seed-int64" class="headerlink" title="func Seed(seed int64)"></a>func Seed(seed int64)</h3><h3 id="func-Shuffle-n-int-swap-func-i-j-int"><a href="#func-Shuffle-n-int-swap-func-i-j-int" class="headerlink" title="func Shuffle(n int, swap func(i, j int))"></a>func Shuffle(n int, swap func(i, j int))</h3><h3 id="func-Uint32-uint32"><a href="#func-Uint32-uint32" class="headerlink" title="func Uint32() uint32"></a>func Uint32() uint32</h3><h3 id="func-Uint64-uint64"><a href="#func-Uint64-uint64" class="headerlink" title="func Uint64() uint64"></a>func Uint64() uint64</h3><h2 id="type-Rand"><a href="#type-Rand" class="headerlink" title="type Rand"></a>type Rand</h2><h3 id="func-New-src-Source-Rand"><a href="#func-New-src-Source-Rand" class="headerlink" title="func New(src Source) *Rand"></a>func New(src Source) *Rand</h3><h3 id="func-r-Rand-ExpFloat64-float64"><a href="#func-r-Rand-ExpFloat64-float64" class="headerlink" title="func (r *Rand) ExpFloat64() float64"></a>func (r *Rand) ExpFloat64() float64</h3><h3 id="func-r-Rand-Float32-float32"><a href="#func-r-Rand-Float32-float32" class="headerlink" title="func (r *Rand) Float32() float32"></a>func (r *Rand) Float32() float32</h3><h3 id="func-r-Rand-Float64-float64"><a href="#func-r-Rand-Float64-float64" class="headerlink" title="func (r *Rand) Float64() float64"></a>func (r *Rand) Float64() float64</h3><h3 id="func-r-Rand-Int-int"><a href="#func-r-Rand-Int-int" class="headerlink" title="func (r *Rand) Int() int"></a>func (r *Rand) Int() int</h3><h3 id="func-r-Rand-Int31-int32"><a href="#func-r-Rand-Int31-int32" class="headerlink" title="func (r *Rand) Int31() int32"></a>func (r *Rand) Int31() int32</h3><h3 id="func-r-Rand-Int31n-n-int32-int32"><a href="#func-r-Rand-Int31n-n-int32-int32" class="headerlink" title="func (r *Rand) Int31n(n int32) int32"></a>func (r *Rand) Int31n(n int32) int32</h3><h3 id="func-r-Rand-Int63-int64"><a href="#func-r-Rand-Int63-int64" class="headerlink" title="func (r *Rand) Int63() int64"></a>func (r *Rand) Int63() int64</h3><h3 id="func-r-Rand-Int63n-n-int64-int64"><a href="#func-r-Rand-Int63n-n-int64-int64" class="headerlink" title="func (r *Rand) Int63n(n int64) int64"></a>func (r *Rand) Int63n(n int64) int64</h3><h3 id="func-r-Rand-Intn-n-int-int"><a href="#func-r-Rand-Intn-n-int-int" class="headerlink" title="func (r *Rand) Intn(n int) int"></a>func (r *Rand) Intn(n int) int</h3><h3 id="func-r-Rand-NormFloat64-float64"><a href="#func-r-Rand-NormFloat64-float64" class="headerlink" title="func (r *Rand) NormFloat64() float64"></a>func (r *Rand) NormFloat64() float64</h3><h3 id="func-r-Rand-Perm-n-int-int"><a href="#func-r-Rand-Perm-n-int-int" class="headerlink" title="func (r *Rand) Perm(n int) []int"></a>func (r *Rand) Perm(n int) []int</h3><h3 id="func-r-Rand-Read-p-byte-n-int-err-error"><a href="#func-r-Rand-Read-p-byte-n-int-err-error" class="headerlink" title="func (r *Rand) Read(p []byte) (n int, err error)"></a>func (r *Rand) Read(p []byte) (n int, err error)</h3><h3 id="func-r-Rand-Seed-seed-int64"><a href="#func-r-Rand-Seed-seed-int64" class="headerlink" title="func (r *Rand) Seed(seed int64)"></a>func (r *Rand) Seed(seed int64)</h3><h3 id="func-r-Rand-Shuffle-n-int-swap-func-i-j-int"><a href="#func-r-Rand-Shuffle-n-int-swap-func-i-j-int" class="headerlink" title="func (r *Rand) Shuffle(n int, swap func(i, j int))"></a>func (r *Rand) Shuffle(n int, swap func(i, j int))</h3><h3 id="func-r-Rand-Uint32-uint32"><a href="#func-r-Rand-Uint32-uint32" class="headerlink" title="func (r *Rand) Uint32() uint32"></a>func (r *Rand) Uint32() uint32</h3><h3 id="func-r-Rand-Uint64-uint64"><a href="#func-r-Rand-Uint64-uint64" class="headerlink" title="func (r *Rand) Uint64() uint64"></a>func (r *Rand) Uint64() uint64</h3><h2 id="type-Source"><a href="#type-Source" class="headerlink" title="type Source"></a>type Source</h2><h3 id="func-NewSource-seed-int64-Source"><a href="#func-NewSource-seed-int64-Source" class="headerlink" title="func NewSource(seed int64) Source"></a>func NewSource(seed int64) Source</h3><p>NewSource返回一个新的伪随机源，其种子为给定值。与顶级函数使用的默认Source不同，这个Source对于多个goroutine的并发使用是不安全的。</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">randomSource :&#x3D; NewSource(time.Now().Unix)
+randSeed :&#x3D; New(randomSource) &#x2F;&#x2F;这时候就可以使用rand的method
+</code></pre>
 
-package main
 
-import (
-	&quot;errors&quot;
-	&quot;fmt&quot;
-	&quot;os&quot;
-	&quot;syscall&quot;
-)
-
-type PathError struct &#123;
-	Op   string
-	Path string
-	Err  error
-&#125;
-
-func (e *PathError) Error() string &#123;
-	return e.Op + &quot; &quot; + e.Path + &quot;: &quot; + e.Err.Error()
-&#125;
-
-var ErrNotExist &#x3D; errors.New(&quot;file does not exist&quot;)
-
-&#x2F;&#x2F; IsNotExist returns a boolean indicating whether the error is known to
-&#x2F;&#x2F; report that a file or directory does not exist. It is satisfied by
-&#x2F;&#x2F; ErrNotExist as well as some syscall errors.
-func IsNotExist(err error) bool &#123;
-	if pe, ok :&#x3D; err.(*PathError); ok &#123;
-		err &#x3D; pe.Err
-	&#125;
-	return err &#x3D;&#x3D; syscall.ENOENT || err &#x3D;&#x3D; ErrNotExist
-&#125;
-
-func main() &#123;
-	_, err :&#x3D; os.Open(&quot;&#x2F;no&#x2F;such&#x2F;file&quot;)
-	fmt.Println(os.IsNotExist(err)) &#x2F;&#x2F; &quot;true&quot;
-&#125;</code></pre>
-
-<h2 id="7-11-any关键字与泛型"><a href="#7-11-any关键字与泛型" class="headerlink" title="7.11. any关键字与泛型"></a>7.11. any关键字与泛型</h2><p>类型定义时不限制<code>形参类型</code>，在函数调用的时候再指定<code>具体类型</code>.  <code>any</code>其实是<code>interface&#123;&#125;</code>的别名<br>泛型好处:  (1).在编译期间对类型进行检查以提高类型安全(2).通过指定类型消除强制类型转换(3).能够减少代码重复性，提供更通用的功能函数。</p>
-<ul>
-<li>类型泛型<pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-import &quot;fmt&quot;
-
-type ListType[T int | int32 | int64 | string] []T
-
-type MapType[K int | int32, V int64 | string] map[K]V
-
-func main() &#123;
-    var intList ListType[int]
-    intList &#x3D; []int&#123;1, 2, 3&#125;
-    fmt.Println(intList)
-    strList :&#x3D; ListType[string]&#123;&quot;1&quot;, &quot;2&quot;, &quot;3&quot;&#125;
-    fmt.Println(strList)
-
-    intMap :&#x3D; MapType[int, string]&#123;1: &quot;1&quot;, 2: &quot;2&quot;&#125;
-    int32Map :&#x3D; MapType[int32, int64]&#123;1: 2, 3: 4&#125;
-    fmt.Println(intMap)
-    fmt.Println(int32Map)
-&#125;</code></pre>
-这里面的T,K,V都是占位符号,<code>ListType</code>只能在那三种类型中选择,同理<code>MapType</code>也是</li>
-<li>接口泛型<pre class="language-golang" data-language="golang"><code class="language-golang">type GenericStackInterface[T any] interface &#123;
-  Push(element T)
-  Pop() T
-&#125;</code></pre></li>
-<li>泛型函数<pre class="language-golang" data-language="golang"><code class="language-golang">func minInt[T int | int8 | int16 | int32](a, b T) T &#123;
-if a &lt; b &#123;
-    return a
-&#125;
-    return b
-&#125;
-
-func maxInt[T int | int8 | int16 | int32](a, b T) T &#123;
-    if a &gt; b &#123;
-        return a
-    &#125;
-    return b
-&#125;
-func Mix(a any) any &#123;
-
-&#125;
-&#x2F;&#x2F;还可以简化一下
-type Numeric interface &#123;
-    int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64
-&#125;
-func min[T Numeric](a, b T) T &#123;
-if a &lt; b &#123;
-    return a
-&#125;
-    return b
-&#125;
-
-func max[T Numeric](a, b T) T &#123;
-    if a &gt; b &#123;
-        return a
-    &#125;
-    return b
-&#125;
-&#x2F;&#x2F; go.18内置了数字类型的集合，故可以
-import (
-&quot;golang.org&#x2F;x&#x2F;exp&#x2F;constraints&quot;
-)
-
-func minType[T constraints.Ordered](a, b T) T &#123;
-    if a &lt; b &#123;
-        return a
-    &#125;
-    return b
-&#125;
-
-func maxType[T constraints.Ordered](a, b T) T &#123;
-    if a &gt; b &#123;
-        return a
-    &#125;
-    return b
-&#125;</code></pre>
-如果进入<code>constraints</code>源代码查看其具体代码的话，会发现在 Ordered 类型中也是有各种数字类型组合起来的。但是有一点奇怪的地方就是这里的类型集合中，各种类型前加了一个波浪线~, 表示衍生类型，即使用 type 自定义的类型也可以被识别到，只要底层类型一致即可。比如 ~int 可以包含 int 和 type MyInt int 等多种类型</li>
-</ul>
-
+<h2 id="type-Source64"><a href="#type-Source64" class="headerlink" title="type Source64"></a>type Source64</h2><h2 id="type-Zipf"><a href="#type-Zipf" class="headerlink" title="type Zipf"></a>type Zipf</h2><h3 id="func-NewZipf-r-Rand-s-float64-v-float64-imax-uint64-Zipf"><a href="#func-NewZipf-r-Rand-s-float64-v-float64-imax-uint64-Zipf" class="headerlink" title="func NewZipf(r *Rand, s float64, v float64, imax uint64) *Zipf"></a>func NewZipf(r *Rand, s float64, v float64, imax uint64) *Zipf</h3><h3 id="func-z-Zipf-Uint64-uint64"><a href="#func-z-Zipf-Uint64-uint64" class="headerlink" title="func (z *Zipf) Uint64() uint64"></a>func (z *Zipf) Uint64() uint64</h3>
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>
