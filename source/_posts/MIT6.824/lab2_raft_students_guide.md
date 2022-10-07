@@ -1,25 +1,35 @@
 ---
-title: MIT6.824之lab2_raft_guide
+title: MIT6.824之lab2_raft_students_guide
 categories:
 - 分布式
 - MIT6.824
-
 ---
+
+- [二.Students' Guide to Raf文档](#二students-guide-to-raf文档)
+  - [背景](#背景)
+  - [实现raft](#实现raft)
+    - [重要的细节](#重要的细节)
+  - [Debugging Raft](#debugging-raft)
+    - [活锁](#活锁)
+    - [不正确的RPC](#不正确的rpc)
+    - [没有按照论文的理论实现raft](#没有按照论文的理论实现raft)
+    - [term混乱(term不稳定)](#term混乱term不稳定)
+    - [优化](#优化)
+  - [Applications on top of Raft](#applications-on-top-of-raft)
+  - [AppendIndex](#appendindex)
+
 
 # 二.Students' Guide to Raf文档
 
 > https://thesquareplanet.com/blog/students-guide-to-raft/ 原文链接
-
 
 在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是"理解门槛低"，并且我们也希望这项决定使同学们的生活更简单[在过去的几个月里，我一直是麻省理工学院6.824分布式系统课的教学助理。这门课传统上有一些建立在Paxos共识算法上的实验，但今年，我们决定改用Raft。Raft是 "设计成易于理解的"，我们希望这一改变能使学生的生活更轻松]
 
 这篇实验指南,对应着"教师教学指南"，印证着我们实验室与raft的journey，也希望对学生更好的理解raft内部运行机制，实现raft分布式协议起到帮助,如果你正在寻找Raft和Paxos的对比，或者raft的教学(pedagogical)分析,请前去阅读《教师教学指南》.文章底部包含一些学生提问的关于raft的共性问题的问题列表。如果你遇到的问题不在那些问题之内，请前去检查Q&A系统，这篇文章非常的长,但是它提出的所有点，都是现实中学生(助教)碰到过的问题，这是一篇值得阅读的文章。
 
 
-
 ## 背景
 
-    
 开始深入研究raft之前,一些前情提要或许是有用的，6.824过去有一些基于用golang实现的Paxos实验，之所以选择go是因为它易于理解和学习的，它非常适合实现高并发，分布式应用(goroutine是特别便利的)，通过这门课程的四门实验课程，学生构建一个容错的，共享key-value存储系统，第一个实验让你构建一个基于log的一致性算法库,第二门实验在一致性算法库上添加了key-value的存储，第三们实验课是实验构建共享的key-value容错集群,使用共享master节点解决集群成员变更，同时第四们实验,学生不得不实现失败和恢复机制，包括磁盘完整和磁盘不完整的情况这个实现曾作为学生默认的最后实验
 
 这些年我们决定使用raft重写所有mit6.824的实验，前三个实验跟以前是相同的,但是删除了第四个已经在raft中实现了关于失败与持久化的实验,这篇文章主要讨论了我们第一个实验的经验，一个直接跟raft相关的的实验，虽然我们也会接触到构建raft之上的应用层,(第二门实验)。
@@ -77,7 +87,8 @@ raft会把没有entry的appendEntry的RPC视为hearbeat,很多同学假设Append
 
 ### 没有按照论文的理论实现raft
 
-虽然Raft论文对如何实现每个RPC处理程序非常明确，但它也没有对一些规则和不变因素的实现进行说明。这些都列在图2右侧的 "服务器规则 "部分。虽然其中一些规则是不言自明的，但也有一些需要非常仔细地设计你的应用程序，使其不违反规则.  
+虽然Raft论文对如何实现每个RPC处理程序非常明确，但它也没有对一些规则和不变因素的实现进行说明。这些都列在图2右侧的 "服务器规则 "部分。虽然其中一些规则是不言自明的，但也有一些需要非常仔细地设计你的应用程序，使其不违反规则.
+
 - 在任何阶段`commitIndex>lastApplied`你都可以直接`apply`log到上层状态机,提交日志的时候不持有锁或者设置数据保护区，保证其他程序不apply日志
 - 将`commitIndex>lastApplied`解耦,每次sentout心跳的时候检查`commitIndex`你必须要等`appendlog`动作完成
 - `AppendEntries`RPC并不是因为log不一致被reject,应该立刻降级为follower,不要更新`nextIndex`，如果这个时候立刻选举你可能会面对数据竞争的问题
