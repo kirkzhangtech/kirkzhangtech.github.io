@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>内存高效golang | Eden</title>
+  <title>Eden</title>
   <meta name="keywords" content="">
-  <meta name="description" content="内存高效golang | Eden">
+  <meta name="description" content="Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="Raft Structure Advice A Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (election">
 <meta property="og:type" content="article">
@@ -843,29 +843,17 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-archive/内存高效golang" class="article article-type-post" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">内存高效golang</h1>
+        <article id="post-MIT6.824/lab2_raft_struct_guide" class="article article-type-post" itemscope itemprop="blogPost">
     
     <div class="article-meta">
         
         
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
-            
-            
-            <a  data-rel="archive">archive</a> > 
-            
-            <a  data-rel="archive&lt;---&gt;golang">golang</a>
-            
-        </span>
         
         
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-08-27 11:42:39'>2022-08-26 21:18</time>
+            Created At : <time class="date" title='Updated At: 2022-10-07 09:18:56'>2022-10-07 08:40</time>
         
     </div>
     <div class="article-meta">
@@ -898,7 +886,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Golang%E7%BC%96%E5%86%99%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88%E5%92%8CCPU%E4%BC%98%E5%8C%96%E7%9A%84Go%E7%BB%93%E6%9E%84"><span class="toc-text">Golang编写内存高效和CPU优化的Go结构</span></a></li></ol>
+        
     
 <style>
     .left-col .switch-btn,
@@ -914,155 +902,29 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <blockquote>
-<p>原文链接 : <a target="_blank" rel="noopener" href="https://dev.to/deadlock/golang-writing-memory-efficient-and-cpu-optimized-go-structs-2ick">https://dev.to/deadlock/golang-writing-memory-efficient-and-cpu-optimized-go-structs-2ick</a></p>
-</blockquote>
-<h1 id="Golang编写内存高效和CPU优化的Go结构"><a href="#Golang编写内存高效和CPU优化的Go结构" class="headerlink" title="Golang编写内存高效和CPU优化的Go结构"></a>Golang编写内存高效和CPU优化的Go结构</h1><p>结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个<code>strcut</code>有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义结构类型上的函数来实现行为。</p>
-<p>这篇博客我将尝试解释我们如何在内存使用和CPU周期方面有效地编写结构。</p>
-<p>让我们考虑下面这个结构，为我的一些奇怪的用例定义畸形资源类型。</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-&#125;
-</code></pre>
-<p>让我们用下面的代码看看TerraformResource结构需要多少内存分配。</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">
-package main
-
-import &quot;fmt&quot;
-import &quot;unsafe&quot;
-
-type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-&#125;
-
-func main() &#123;
-    var d TerraformResource
-    d.Cloud &#x3D; &quot;aws&quot;
-    d.Name &#x3D; &quot;ec2&quot;
-    d.HaveDSL &#x3D; true
-    d.PluginVersion &#x3D; &quot;3.64&quot;
-    d.TerraformVersion &#x3D; &quot;1.1&quot;
-    d.ModuleVersionMajor &#x3D; 1
-    d.IsVersionControlled &#x3D; true
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Total Memory Usage StructType:d %T &#x3D;&gt; [%d]\n&quot;, d, unsafe.Sizeof(d))
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Cloud Field StructType:d.Cloud %T &#x3D;&gt; [%d]\n&quot;, d.Cloud, unsafe.Sizeof(d.Cloud))
-    fmt.Printf(&quot;Name Field StructType:d.Name %T &#x3D;&gt; [%d]\n&quot;, d.Name, unsafe.Sizeof(d.Name))
-    fmt.Printf(&quot;HaveDSL Field StructType:d.HaveDSL %T &#x3D;&gt; [%d]\n&quot;, d.HaveDSL, unsafe.Sizeof(d.HaveDSL))
-    fmt.Printf(&quot;PluginVersion Field StructType:d.PluginVersion %T &#x3D;&gt; [%d]\n&quot;, d.PluginVersion, unsafe.Sizeof(d.PluginVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.IsVersionControlled %T &#x3D;&gt; [%d]\n&quot;, d.IsVersionControlled, unsafe.Sizeof(d.IsVersionControlled))
-    fmt.Printf(&quot;TerraformVersion Field StructType:d.TerraformVersion %T &#x3D;&gt; [%d]\n&quot;, d.TerraformVersion, unsafe.Sizeof(d.TerraformVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.ModuleVersionMajor %T &#x3D;&gt; [%d]\n&quot;, d.ModuleVersionMajor, unsafe.Sizeof(d.ModuleVersionMajor))  
-&#125;</code></pre>
-<p>output如下</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Total Memory Usage StructType:d main.TerraformResource &#x3D;&gt; [88]
-&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Cloud Field StructType:d.Cloud string &#x3D;&gt; [16]
-Name Field StructType:d.Name string &#x3D;&gt; [16]
-HaveDSL Field StructType:d.HaveDSL bool &#x3D;&gt; [1]
-PluginVersion Field StructType:d.PluginVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.IsVersionControlled bool &#x3D;&gt; [1]
-TerraformVersion Field StructType:d.TerraformVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]</code></pre>
-<p>所以TerraformResource结构需要的总内存分配是88字节。这就是TerraformResource类型的内存分配情况<br><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--HubwVUeX--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-memory-map.jpeg" alt="TerraformResource类型的内存分配情况"></p>
-<p>但为什么会有88个字节，16+16+1+16+1+16+4&#x3D;70个字节，这额外的18个字节从何而来？</p>
-<p>当涉及到结构体的内存分配时，它们总是被分配为连续的、字节对齐的内存块，并且字段是按照它们被定义的顺序分配和存储的。在这种情况下，<strong>字节对齐</strong>的概念意味着连续的内存块以与平台字大小相同的偏移量对齐。<br><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--S_4mkd0a--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/02-golang-struct-memory-map.jpeg"></p>
-<p>我们可以清楚地看到，TerraformResource.HaveDSL , TerraformResource.isVersionControlled和TerraformResource.ModuleVersionMajor分别只占用了1个字节、1个字节和4个字节。其余的空间都是用空的焊盘字节填充的。</p>
-<p>所以回到同样的数学问题上</p>
+        <p>Raft Structure Advice</p>
+<p>A Raft instance has to deal with the arrival of external events<br>(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),<br>and it has to execute periodic tasks (elections and heart-beats).<br>There are many ways to structure your Raft code to manage these<br>activities; this document outlines a few ideas.</p>
+<p>Each Raft instance has a bunch of state (the log, the current index,<br>&amp;c) which must be updated in response to events arising in concurrent<br>goroutines. The Go documentation points out that the goroutines can<br>perform the updates directly using shared data structures and locks,<br>or by passing messages on channels. Experience suggests that for Raft<br>it is most straightforward to use shared data and locks.</p>
+<p>A Raft instance has two time-driven activities: the leader must send<br>heart-beats, and others must start an election if too much time has<br>passed since hearing from the leader. <strong>It’s probably best to drive each<br>of these activities with a dedicated long-running goroutine</strong>, rather<br>than combining multiple activities into a single goroutine.</p>
 <blockquote>
-<p>分配字节&#x3D;16字节+16字节+1字节+16字节+1字节+16字节+4字节<br>空垫字节&#x3D;7字节+7字节+4字节&#x3D;18字节<br>总字节数&#x3D;分配字节数+空垫字节数&#x3D;70字节+18字节&#x3D;88字节</p>
+<p>It’s probably best to drive each of these activities<br>with a dedicated long-running goroutine</p>
 </blockquote>
-<p>那么，我们该如何解决这个问题呢？通过适当的数据结构调整，如果我们重新定义我们的结构，就像这样</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-&#125;
-</code></pre>
-<p>测试代码如下</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-import &quot;fmt&quot;
-import &quot;unsafe&quot;
-
-type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-&#125;
-
-func main() &#123;
-    var d TerraformResource
-    d.Cloud &#x3D; &quot;aws&quot;
-    d.Name &#x3D; &quot;ec2&quot;
-    d.HaveDSL &#x3D; true
-    d.PluginVersion &#x3D; &quot;3.64&quot;
-    d.TerraformVersion &#x3D; &quot;1.1&quot;
-    d.ModuleVersionMajor &#x3D; 1
-    d.IsVersionControlled &#x3D; true
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Total Memory Usage StructType:d %T &#x3D;&gt; [%d]\n&quot;, d, unsafe.Sizeof(d))
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Cloud Field StructType:d.Cloud %T &#x3D;&gt; [%d]\n&quot;, d.Cloud, unsafe.Sizeof(d.Cloud))
-    fmt.Printf(&quot;Name Field StructType:d.Name %T &#x3D;&gt; [%d]\n&quot;, d.Name, unsafe.Sizeof(d.Name))
-    fmt.Printf(&quot;HaveDSL Field StructType:d.HaveDSL %T &#x3D;&gt; [%d]\n&quot;, d.HaveDSL, unsafe.Sizeof(d.HaveDSL))
-    fmt.Printf(&quot;PluginVersion Field StructType:d.PluginVersion %T &#x3D;&gt; [%d]\n&quot;, d.PluginVersion, unsafe.Sizeof(d.PluginVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.IsVersionControlled %T &#x3D;&gt; [%d]\n&quot;, d.IsVersionControlled, unsafe.Sizeof(d.IsVersionControlled))
-    fmt.Printf(&quot;TerraformVersion Field StructType:d.TerraformVersion %T &#x3D;&gt; [%d]\n&quot;, d.TerraformVersion, unsafe.Sizeof(d.TerraformVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.ModuleVersionMajor %T &#x3D;&gt; [%d]\n&quot;, d.ModuleVersionMajor, unsafe.Sizeof(d.ModuleVersionMajor))
-&#125;
-
-</code></pre>
-<p>output如下</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">go run golang-struct-memory-allocation-optimized.go
-
-&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Total Memory Usage StructType:d main.TerraformResource &#x3D;&gt; [72]
-&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Cloud Field StructType:d.Cloud string &#x3D;&gt; [16]
-Name Field StructType:d.Name string &#x3D;&gt; [16]
-HaveDSL Field StructType:d.HaveDSL bool &#x3D;&gt; [1]
-PluginVersion Field StructType:d.PluginVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.IsVersionControlled bool &#x3D;&gt; [1]
-TerraformVersion Field StructType:d.TerraformVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
-</code></pre>
-<p>现在TerraformResource类型的总内存分配是72字节。让我们看看内存的排列方式是什么样子的</p>
-<p><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--V9hRLdR1--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/03-golang-struct-memory-map.jpeg"></p>
-<p>仅仅通过对结构元素进行适当的数据结构对齐，我们就能够将内存占用从88字节减少到72字节….，很好!</p>
-<p>让我们检查一下数学运算</p>
+<p>The management of the election timeout is a common source of<br>headaches. Perhaps the simplest plan is to maintain a variable in the<br>Raft struct containing the last time at which the peer heard from the<br>leader, and to have the election timeout goroutine periodically check<br>to see whether the time since then is greater than the timeout period.<br>It’s easiest to use time.Sleep() with a small constant argument to<br>drive the periodic checks. Don’t use time.Ticker and time.Timer;<br>they are tricky to use correctly.</p>
 <blockquote>
-<p>分配字节&#x3D;16字节+16字节+16字节+16字节+4字节+1字节+1字节&#x3D;70字节<br>空垫字节&#x3D;2字节<br>总字节数&#x3D;分配字节数+空垫字节数&#x3D;70字节+2字节&#x3D;72字节</p>
+<p>using hashicorp struct</p>
 </blockquote>
-<p>适当的数据结构排列不仅可以帮助我们有效地使用内存，还可以帮助CPU读取周期….，如何？</p>
-<p>CPU以字为单位读取内存，32位系统为4字节，64位系统为8字节。现在，我们的第一个结构类型TerraformResource的声明将需要11个字来让CPU读取所有内容。</p>
-<p><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--YxrCrSAs--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-word-length.jpeg"></p>
-<p>然而，优化后的结构只需要9个字，如下图所示<br><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--_N8r3Z9U--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/02-golang-struct-word-length.jpeg"></p>
-<p>通过正确定义结构体的数据结构，我们能够有效地使用内存分配，并使结构体在CPU读取方面也变得快速有效。</p>
-<p>这只是一个小例子，想想一个有20或30个不同类型字段的大型结构。对数据结构进行深思熟虑的调整真的很有价值……🤩</p>
-<p>希望这篇博客能够对结构的内部结构、其内存分配和所需的CPU读取周期有一些启发。希望这对你有帮助！!</p>
+<p>You’ll want to have a separate long-running goroutine that sends<br>committed log entries in order on the applyCh. It must be separate,<br>since sending on the applyCh can block; and it must be a single<br>goroutine, since otherwise it may be hard to ensure that you send log<br>entries in log order. The code that advances commitIndex will need to<br>kick the apply goroutine; it’s probably easiest to use a condition<br>variable (Go’s sync.Cond) for this.</p>
+<blockquote>
+<p>using a seperate applier channel</p>
+</blockquote>
+<p>Each RPC should probably be sent (and its reply processed) in its own<br>goroutine, for two reasons: so that unreachable peers don’t delay the<br>collection of a majority of replies, and so that the heartbeat and<br>election timers can continue to tick at all times. It’s easiest to do<br>the RPC reply processing in the same goroutine, rather than sending<br>reply information over a channel.</p>
+<blockquote>
+<p>easy to unstand , using two different channels to send and process<br>reply of RPC</p>
+</blockquote>
+<p>Keep in mind that the network can delay RPCs and RPC replies, and when<br>you send concurrent RPCs, the network can re-order requests and<br>replies. Figure 2 is pretty good about pointing out places where RPC<br>handlers have to be careful about this (e.g. an RPC handler should<br>ignore RPCs with old terms). Figure 2 is not always explicit about RPC<br>reply processing. The leader has to be careful when processing<br>replies; it must check that the term hasn’t changed since sending the<br>RPC, and must account for the possibility that replies from concurrent<br>RPCs to the same follower have changed the leader’s state (e.g.<br>nextIndex).</p>
+<blockquote>
+<p>this part we should put eyes on checking reply of concurrent RPC, like<br>election and heartbeat</p>
+</blockquote>
 
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
