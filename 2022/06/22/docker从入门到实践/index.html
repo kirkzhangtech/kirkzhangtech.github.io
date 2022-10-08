@@ -6,18 +6,20 @@
   <meta name="keywords" content=" Docker ">
   <meta name="description" content="docker从入门到实践 | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1. tarConstants  const (   &#x2F;&#x2F; Type &#39;0&#39; indicates a regular file.   TypeReg  &#x3D; &#39;0&#39;   TypeRegA &#x3D; &#39;\x00&#39; &#x2F;&#x2F; Deprecated: Use TypeReg instead.    &amp;#x2F">
+<meta name="description" content="1. 入门 2. 程序结构 2.1 命名 2.2 声明 2.3 变量 2.3.1 简短变量声明 2.3.2 指针 2.3.3 new函数 2.3.4. 变量的生命周期   2.4 赋值 2.4.1 元组赋值   2.5 类型 2.6 包和文件 2.7. 作用域   3.基础数据类型 3.1 整型 3.2 浮点数 3.3 复数 3.4 布尔类型 3.5 字符串   4. 复合数据类型 4.1 数组">
 <meta property="og:type" content="article">
-<meta property="og:title" content="go标准库解析">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/index.html">
+<meta property="og:title" content="go语言圣经">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="1. tarConstants  const (   &#x2F;&#x2F; Type &#39;0&#39; indicates a regular file.   TypeReg  &#x3D; &#39;0&#39;   TypeRegA &#x3D; &#39;\x00&#39; &#x2F;&#x2F; Deprecated: Use TypeReg instead.    &amp;#x2F">
+<meta property="og:description" content="1. 入门 2. 程序结构 2.1 命名 2.2 声明 2.3 变量 2.3.1 简短变量声明 2.3.2 指针 2.3.3 new函数 2.3.4. 变量的生命周期   2.4 赋值 2.4.1 元组赋值   2.5 类型 2.6 包和文件 2.7. 作用域   3.基础数据类型 3.1 整型 3.2 浮点数 3.3 复数 3.4 布尔类型 3.5 字符串   4. 复合数据类型 4.1 数组">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-07T23:48:06.892Z">
-<meta property="article:modified_time" content="2022-10-08T05:58:13.173Z">
+<meta property="og:image" content="https://user-images.githubusercontent.com/46363359/182982938-08d67c3f-7aa6-457d-88a5-02646c5e2735.png">
+<meta property="article:published_time" content="2022-10-08T06:02:11.553Z">
+<meta property="article:modified_time" content="2022-10-08T06:05:25.693Z">
 <meta property="article:author" content="kirkzhang">
 <meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/46363359/182982938-08d67c3f-7aa6-457d-88a5-02646c5e2735.png">
 
 
 <link rel="icon" href="/img/avatar.jpg">
@@ -113,7 +115,7 @@
     <li>
         <div class="all active" data-rel="All">All
             
-                <small>(56)</small>
+                <small>(46)</small>
             
         </div>
     </li>
@@ -272,7 +274,7 @@
                     <div data-rel="golang">
                         
                         golang
-                        <small>(12)</small>
+                        <small>(2)</small>
                         
                     </div>
                     
@@ -397,7 +399,7 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="56">
+<input type="hidden" id="yelog_site_posts_number" value="46">
 
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
@@ -475,99 +477,19 @@
     <nav id="title-list-nav">
         
         <a  class="All golang "
+           href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
+           data-tag="golang"
+           data-author="" >
+            <span class="post-title" title="go语言圣经">go语言圣经</span>
+            <span class="post-date" title="2022-10-08 14:02:11">2022/10/08</span>
+        </a>
+        
+        <a  class="All golang "
            href="/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/"
            data-tag="golang"
            data-author="" >
             <span class="post-title" title="go标准库解析">go标准库解析</span>
             <span class="post-date" title="2022-10-08 07:48:06">2022/10/08</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch11/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter11-测试">go语言圣经-chapter11-测试</span>
-            <span class="post-date" title="2022-10-07 23:29:16">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch10/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter10-包和工具">go语言圣经-chapter10-包和工具</span>
-            <span class="post-date" title="2022-10-07 23:28:46">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch09/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter09-基于共享变量的并发">go语言圣经-chapter09-基于共享变量的并发</span>
-            <span class="post-date" title="2022-10-07 23:27:54">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch08/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter08-Goroutines和Channels">go语言圣经-chapter08-Goroutines和Channels</span>
-            <span class="post-date" title="2022-10-07 23:26:46">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch07/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter07-接口">go语言圣经-chapter07-接口</span>
-            <span class="post-date" title="2022-10-07 23:25:44">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch06/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter06-方法">go语言圣经-chapter06-方法</span>
-            <span class="post-date" title="2022-10-07 23:24:37">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch05/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter05-函数">go语言圣经-chapter05-函数</span>
-            <span class="post-date" title="2022-10-07 23:23:33">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch04/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter04-复合数据类型">go语言圣经-chapter04-复合数据类型</span>
-            <span class="post-date" title="2022-10-07 23:22:50">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch03/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter03-基础数据类型">go语言圣经-chapter03-基础数据类型</span>
-            <span class="post-date" title="2022-10-07 23:21:54">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch02/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter02-程序结构">go语言圣经-chapter02-程序结构</span>
-            <span class="post-date" title="2022-10-07 23:20:08">2022/10/07</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/07/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E5%9C%A3%E7%BB%8F_ch01/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经-chapter01-入门">go语言圣经-chapter01-入门</span>
-            <span class="post-date" title="2022-10-07 23:19:38">2022/10/07</span>
         </a>
         
         <a  class="All archive "
@@ -731,18 +653,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="27.移除元素">27.移除元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="21.合并两个有序链表">21.合并两个有序链表</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="27.移除元素">27.移除元素</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
