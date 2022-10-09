@@ -270,10 +270,6 @@
     
         
             
-        
-    
-        
-            
                 <li>
                     <div data-rel="golang">
                         
@@ -283,6 +279,10 @@
                     </div>
                     
                 </li>
+            
+        
+    
+        
             
         
     
@@ -882,7 +882,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-09 16:18:38'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-10-09 18:42:17'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -2588,14 +2588,13 @@ $ <span class="token function">bash</span> ./test19.sh -a -b <span class="token 
 <span class="token comment"># testing STDERR messages </span>
 <span class="token builtin class-name">echo</span> <span class="token string">"This is an error"</span> <span class="token operator">></span><span class="token file-descriptor important">&amp;2</span> 
 <span class="token builtin class-name">echo</span> <span class="token string">"This is normal output"</span> </code></pre>
-
-<p>如果像平常一样运行这个脚本，你可能看不出什么区别,因为所有输出都到了STDOUT,但是默认情况下，linux会将STDERR导向STDOUT,但是，如果你在运行脚本时重定向了STDERR，脚本中所有导向STDERR的文本都会被重定向。</p>
+<p>临时重定向就是需要在脚本中一行一行的重定向log<br>如果像平常一样运行这个脚本，你可能看不出什么区别,因为所有输出都到了STDOUT,但是默认情况下,linux会将STDERR导向STDOUT,但是,如果你在运行脚本时重定向了STDERR,脚本中所有导向STDERR的文本都会被重定向。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">$ ./test8 <span class="token operator"><span class="token file-descriptor important">2</span>></span> test9
 This is normal output 
 $ <span class="token function">cat</span> test9 
 This is an error </code></pre>
 
-<h3 id="15-2-2-永久重定向"><a href="#15-2-2-永久重定向" class="headerlink" title="15.2.2 永久重定向"></a>15.2.2 永久重定向</h3><p>如果脚本中有大量数据需要重定向，那重定向每个echo语句就会很烦琐。取而代之，你可以用<code>exec</code>命令告诉shell在脚本执行期间重定向某个特定文件描述符。</p>
+<h3 id="15-2-2-永久重定向"><a href="#15-2-2-永久重定向" class="headerlink" title="15.2.2 永久重定向"></a>15.2.2 永久重定向</h3><p>脚本中有大量数据需要重定向，那重定向每个echo语句就会很烦琐。取而代之，你可以用<code>exec</code>命令告诉shell在脚本执行期间重定向某个特定文件描述符。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
 <span class="token comment"># redirecting all output to a file </span>
 <span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">1</span>></span>testout 
@@ -2621,9 +2620,14 @@ This is an error </code></pre>
 <span class="token builtin class-name">echo</span> <span class="token string">"This should display on the monitor"</span> 
 <span class="token builtin class-name">echo</span> <span class="token string">"and this should be stored in the file"</span> <span class="token operator">></span><span class="token file-descriptor important">&amp;3</span> 
 <span class="token builtin class-name">echo</span> <span class="token string">"Then this should be back on the monitor"</span> 
-$ ./test13 </code></pre>
+$ ./test13
+This should display on the monitor 
+Then this should be back on the monitor 
+$ <span class="token function">cat</span> test13out 
+and this should be stored <span class="token keyword">in</span> the <span class="token function">file</span> 
+</code></pre>
 
-<p>这个脚本用exec命令将文件描述符3重定向到另一个文件。当脚本执行echo语句时，输出内<br>容会像预想中那样显示在STDOUT上。但你重定向到文件描述符3的那行echo语句的输出却进入<br>了另一个文件。这样你就可以在显示器上保持正常的输出，而将特定信息重定向到文件中（比如<br>日志文件）。</p>
+<p>从表现上看,只有自己定义的重定向的输出会重定向到test13out文件。其他的还是会输出到STDOUT这个<br>脚本用exec命令将文件描述符3重定向到另一个文件。当脚本执行echo语句时，输出内容会像预想中那样<br>显示在STDOUT上。但你重定向到文件描述符3的那行echo语句的输出却进入了另一个文件。这样你就可以<br>在显示器上保持正常的输出，而将特定信息重定向到文件中（比如日志文件）。</p>
 <h3 id="15-4-2-重定向文件描述符"><a href="#15-4-2-重定向文件描述符" class="headerlink" title="15.4.2 重定向文件描述符"></a>15.4.2 重定向文件描述符</h3><p>现在介绍怎么恢复已重定向的文件描述符。你可以分配另外一个文件描述符给标准文件描述<br>符，反之亦然。这意味着你可以将STDOUT的原来位置重定向到另一个文件描述符，然后再利用<br>该文件描述符重定向回STDOUT。听起来可能有点复杂，但实际上相当直接。这个简单的例子能<br>帮你理清楚。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># ./test14 </span>
 <span class="token comment">#!/bin/bash</span>
@@ -2643,10 +2647,10 @@ along with this line.
 $ </code></pre>
 
 <p>这个方法可能有点叫人困惑，但这是一种在脚本中临时重定向输出，然后恢复默认输出设置<br>的常用方法。</p>
-<h3 id="15-4-3-创建输入文件描述符"><a href="#15-4-3-创建输入文件描述符" class="headerlink" title="15.4.3 创建输入文件描述符"></a>15.4.3 创建输入文件描述符</h3><p>(不是很懂)<br>可以用和重定向输出文件描述符同样的办法重定向输入文件描述符。在重定向到文件之前，<br>先将STDIN文件描述符保存到另外一个文件描述符，然后在读取完文件之后再将STDIN恢复到它<br>原来的位置</p>
+<h3 id="15-4-3-创建输入文件描述符"><a href="#15-4-3-创建输入文件描述符" class="headerlink" title="15.4.3 创建输入文件描述符"></a>15.4.3 创建输入文件描述符</h3><p>可以用和<strong>重定向输出文件描述符</strong>同样的办法重定向输入文件描述符。在重定向到文件之前，<br>先将STDIN文件描述符保存到另外一个文件描述符，然后在读取完文件之后再将STDIN恢复到它<br>原来的位置</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash </span>
 <span class="token comment"># redirecting input file descriptors </span>
-<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">6</span>&lt;</span><span class="token file-descriptor important">&amp;0</span> 
+<span class="token builtin class-name">exec</span> <span class="token number">6</span> <span class="token operator">&lt;</span> <span class="token file-descriptor important">&amp;0</span> 
 <span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">0</span>&lt;</span> testfile 
 <span class="token assign-left variable">count</span><span class="token operator">=</span><span class="token number">1</span> 
 <span class="token keyword">while</span> <span class="token builtin class-name">read</span> line 
@@ -2660,10 +2664,14 @@ $ </code></pre>
 Y<span class="token operator">|</span>y<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Goodbye"</span><span class="token punctuation">;</span><span class="token punctuation">;</span> 
 N<span class="token operator">|</span>n<span class="token punctuation">)</span> <span class="token builtin class-name">echo</span> <span class="token string">"Sorry, this is the end."</span><span class="token punctuation">;</span><span class="token punctuation">;</span> 
 <span class="token keyword">esac</span>
-</code></pre>
+$ ./test15
+Line <span class="token comment">#1: This is the first line.</span>
+Line <span class="token comment">#2: This is the second line. </span>
+Line <span class="token comment">#3: This is the third line. </span>
+Are you <span class="token keyword">done</span> now? y 
+Goodbye </code></pre>
 
-<h3 id="15-4-4-创建读写文件描述符"><a href="#15-4-4-创建读写文件描述符" class="headerlink" title="15.4.4 创建读写文件描述符"></a>15.4.4 创建读写文件描述符</h3><p>（不是太理解）</p>
-<p>尽管看起来可能会很奇怪，但是你也可以打开单个文件描述符来作为输入和输出。可以用同<br>一个文件描述符对同一个文件进行读写。<br>不过用这种方法时，你要特别小心。由于你是对同一个文件进行数据读写，shell会维护一个<br>内部指针，指明在文件中的当前位置。任何读或写都会从文件指针上次的位置开始。如果不够小<br>心，它会产生一些令人瞠目的结果。看看下面这个例子。</p>
+<h3 id="15-4-4-创建读写文件描述符"><a href="#15-4-4-创建读写文件描述符" class="headerlink" title="15.4.4 创建读写文件描述符"></a>15.4.4 创建读写文件描述符</h3><p>(不是太理解)<br>尽管看起来可能会很奇怪，但是你也可以打开单个文件描述符来作为输入和输出。可以用同<br>一个文件描述符对同一个文件进行读写。<br>不过用这种方法时，你要特别小心。由于你是对同一个文件进行数据读写，shell会维护一个<br>内部指针，指明在文件中的当前位置。任何读或写都会从文件指针上次的位置开始。如果不够小<br>心，它会产生一些令人瞠目的结果。看看下面这个例子。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">
 <span class="token comment">#!/bin/bash </span>
 <span class="token comment"># testing input/output file descriptor </span>
@@ -3203,10 +3211,29 @@ $ multem <span class="token number">2</span> <span class="token number">5</span>
 <blockquote>
 <p>sed  options  script  file</p>
 </blockquote>
-<p>echo ‘this is a test’ | sed  ‘s&#x2F;test&#x2F;big test&#x2F;‘  使用s命令将test替换为big test</p>
-<p>sed ‘s&#x2F;dog&#x2F;cat&#x2F;‘  data.txt    这是修改文件中dog为cat<br>sed  -e  ‘s&#x2F;brown&#x2F;red;  s&#x2F;blue&#x2F;yellow&#x2F;‘   data&#x2F;txt</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'this is a test'</span> <span class="token operator">|</span> <span class="token function">sed</span>  <span class="token string">'s/test/big test/'</span>  使用s命令将test替换为big <span class="token builtin class-name">test</span>
+<span class="token function">sed</span> <span class="token string">'s/dog/cat/'</span>  data.txt    这是修改文件中dog为cat
+<span class="token function">sed</span>  -e  <span class="token string">'s/brown/red;  s/blue/yellow/'</span>   data/txt</code></pre>
+
+<ol>
+<li>在命令行定义编辑器命令</li>
+</ol>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"This is a test"</span> <span class="token operator">|</span> <span class="token function">sed</span> <span class="token string">'s/test/big test/'</span></code></pre>
+
+<p>这里使用了<code>sed</code>的s命令，是指替换字符串，符合replace A B,用B替换A.重要的是，要记住，<br>sed编辑器并不会修改文本文件的数据。它只会将修改后的数据发送到STDOUT。如果你查看原来<br>的文本文件，它仍然保留着原始数据。<br>2. 在命令行使用多个编辑器命令</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sed</span> -e <span class="token string">'s/brown/green/; s/dog/cat/'</span> data1.txt </code></pre>
+
+<p>也可以使用</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">sed</span> -e <span class="token string">'
+> s/brown/green/ 
+> s/fox/elephant/ 
+> s/dog/cat/'</span> data1.txt 
+</code></pre>
+<p>必须记住，要在封尾单引号所在行结束命令。bash shell一旦发现了封尾的单引号，就会执行<br>命令。开始后，sed命令就会将你指定的每条命令应用到文本文件中的每一行上。</p>
 <p>从文件中读取编辑器命令</p>
-<p>sed -f script.sed  data.txt</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sed</span> -f script.sed  data.txt</code></pre>
+
+
 <p>gawk</p>
 <p>option</p>
 <p>-F fs  指定行中划分数据字段的字段分隔符<br>-f file  从指定的文件中读取程序<br>-v var&#x3D;value  定义gawk程序中的一个变量及其默认值<br>-mf N  指定要处理的数据文件中的最大字段数<br>-mr N  指定数据文件中的最大数据行数<br>-W keyword  指定gawk的兼容模式或警告等级</p>
