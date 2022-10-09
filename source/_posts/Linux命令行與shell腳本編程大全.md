@@ -137,11 +137,12 @@ categories:
     - [20.2.9 星号](#2029-星号)
 - [AppendIndex](#appendindex)
 
+
 # 1. linux入门
 
 linux是一款开源操作系统统称，其有很多发行版本，像ubuntu..，它的核心是其`内核`，早期由linus torvalds开发
 
-![linus本人](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da5122af2d44d499197cd6eafe8fc02~tplv-k3u1fbpfcp-watermark.image?)
+![linus本人](./../picture/linux_命令行与shell脚本/linus.png)
 
 内核主要负责以下四种功能:
 
@@ -222,6 +223,8 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   |/tmp |临时目录，可以在该目录中创建和删除临时工作文件|
   |/usr |用户二进制目录，大量用户级的GNU工具和数据文件都存储在这里|
   |/var |可变目录，用以存放经常变化的文件，比如日志文件|
+  
+  ![linux文件系统图](./../picture/linux_命令行与shell脚本/linux_folder_setup.jpg)
 
 - 遍历目录(cd命令)
   需要你知道文件树状结构,这样才能知道你将访问文件的具体位置，无论是`相对路径`还是`绝对路径`
@@ -1399,8 +1402,8 @@ Linux系统将每个对象(操作的文件，linux万物皆文件)当作文件�
 echo "This is an error" >&2 
 echo "This is normal output" 
 ```
-
-如果像平常一样运行这个脚本，你可能看不出什么区别,因为所有输出都到了STDOUT,但是默认情况下，linux会将STDERR导向STDOUT,但是，如果你在运行脚本时重定向了STDERR，脚本中所有导向STDERR的文本都会被重定向。
+临时重定向就是需要在脚本中一行一行的重定向log
+如果像平常一样运行这个脚本，你可能看不出什么区别,因为所有输出都到了STDOUT,但是默认情况下,linux会将STDERR导向STDOUT,但是,如果你在运行脚本时重定向了STDERR,脚本中所有导向STDERR的文本都会被重定向。
 
 ```bash
 $ ./test8 2> test9
@@ -1411,7 +1414,7 @@ This is an error
 
 ### 15.2.2 永久重定向
 
-如果脚本中有大量数据需要重定向，那重定向每个echo语句就会很烦琐。取而代之，你可以用`exec`命令告诉shell在脚本执行期间重定向某个特定文件描述符。
+脚本中有大量数据需要重定向，那重定向每个echo语句就会很烦琐。取而代之，你可以用`exec`命令告诉shell在脚本执行期间重定向某个特定文件描述符。
 
 ```bash
 #!/bin/bash
@@ -1453,13 +1456,18 @@ exec 3>test13out
 echo "This should display on the monitor" 
 echo "and this should be stored in the file" >&3 
 echo "Then this should be back on the monitor" 
-$ ./test13 
+$ ./test13
+This should display on the monitor 
+Then this should be back on the monitor 
+$ cat test13out 
+and this should be stored in the file 
+
 ```
 
-这个脚本用exec命令将文件描述符3重定向到另一个文件。当脚本执行echo语句时，输出内
-容会像预想中那样显示在STDOUT上。但你重定向到文件描述符3的那行echo语句的输出却进入
-了另一个文件。这样你就可以在显示器上保持正常的输出，而将特定信息重定向到文件中（比如
-日志文件）。
+从表现上看,只有自己定义的重定向的输出会重定向到test13out文件。其他的还是会输出到STDOUT这个
+脚本用exec命令将文件描述符3重定向到另一个文件。当脚本执行echo语句时，输出内容会像预想中那样
+显示在STDOUT上。但你重定向到文件描述符3的那行echo语句的输出却进入了另一个文件。这样你就可以
+在显示器上保持正常的输出，而将特定信息重定向到文件中（比如日志文件）。
 
 ### 15.4.2 重定向文件描述符
 
@@ -1492,15 +1500,14 @@ $
 
 ### 15.4.3 创建输入文件描述符
 
-(不是很懂)
-可以用和重定向输出文件描述符同样的办法重定向输入文件描述符。在重定向到文件之前，
+可以用和**重定向输出文件描述符**同样的办法重定向输入文件描述符。在重定向到文件之前，
 先将STDIN文件描述符保存到另外一个文件描述符，然后在读取完文件之后再将STDIN恢复到它
 原来的位置
 
 ```bash
 #!/bin/bash 
 # redirecting input file descriptors 
-exec 6<&0 
+exec 6 < &0 
 exec 0< testfile 
 count=1 
 while read line 
@@ -1514,13 +1521,17 @@ case $answer in
 Y|y) echo "Goodbye";; 
 N|n) echo "Sorry, this is the end.";; 
 esac
-
+$ ./test15
+Line #1: This is the first line.
+Line #2: This is the second line. 
+Line #3: This is the third line. 
+Are you done now? y 
+Goodbye 
 ```
 
 ### 15.4.4 创建读写文件描述符
 
-（不是太理解）
-
+(不是太理解)
 尽管看起来可能会很奇怪，但是你也可以打开单个文件描述符来作为输入和输出。可以用同
 一个文件描述符对同一个文件进行读写。
 不过用这种方法时，你要特别小心。由于你是对同一个文件进行数据读写，shell会维护一个
@@ -2374,11 +2385,14 @@ The result is
 暂时不需要
 
 # 19.初识sed和gawk
+
 你得熟悉Linux中的sed和gawk工具。这两个工具能够极大简化需要进行的数据处
 理任务。
+
 ## 19.1 文本处理
 
 ### 19.1.1 sed编辑器
+
 sed编辑器被称作流编辑器（stream editor），和普通的交互式文本编辑器恰好相反。在交互式
 文本编辑器中（比如vim），你可以用键盘命令来交互式地插入、删除或替换数据中的文本。流编
 辑器则会在编辑器处理数据之前基于预先提供的一组规则来编辑数据流。
@@ -2390,14 +2404,46 @@ sed编辑器被称作流编辑器（stream editor），和普通的交互式文�
 
 > sed  options  script  file
 
+```bash
 echo 'this is a test' | sed  's/test/big test/'  使用s命令将test替换为big test
-
 sed 's/dog/cat/'  data.txt    这是修改文件中dog为cat
 sed  -e  's/brown/red;  s/blue/yellow/'   data/txt
+```
 
-从文件中读取编辑器命令
+1. 在命令行定义编辑器命令
 
+```bash
+echo "This is a test" | sed 's/test/big test/'
+```
+
+这里使用了`sed`的s命令，是指替换字符串，符合replace A B,用B替换A.重要的是，要记住，
+sed编辑器并不会修改文本文件的数据。它只会将修改后的数据发送到STDOUT。如果你查看原来
+的文本文件，它仍然保留着原始数据。
+2. 在命令行使用多个编辑器命令
+
+```bash
+sed -e 's/brown/green/; s/dog/cat/' data1.txt 
+```
+
+也可以使用
+
+```bash
+$ sed -e '
+> s/brown/green/ 
+> s/fox/elephant/ 
+> s/dog/cat/' data1.txt 
+
+```
+
+必须记住，要在封尾**单引号**所在行结束命令。bash shell一旦发现了封尾的单引号，就会执行
+命令。开始后，sed命令就会将你指定的每条命令应用到文本文件中的每一行上。
+
+3. 从文件中读取编辑器命令
+
+```bash
 sed -f script.sed  data.txt
+```
+
 
 gawk
 
