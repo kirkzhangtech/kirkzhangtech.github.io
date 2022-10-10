@@ -882,7 +882,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-10 00:07:34'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-10-10 16:31:02'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -3219,23 +3219,23 @@ $ multem <span class="token number">2</span> <span class="token number">5</span>
 <ol>
 <li>在命令行定义编辑器命令</li>
 </ol>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"This is a test"</span> <span class="token operator">|</span> <span class="token function">sed</span> <span class="token string">'s/test/big test/'</span></code></pre>
+  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"This is a test"</span> <span class="token operator">|</span> <span class="token function">sed</span> <span class="token string">'s/test/big test/'</span></code></pre>
 
-<p>这里使用了<code>sed</code>的s命令，是指替换字符串，符合replace A B,用B替换A.重要的是，要记住，<br>sed编辑器并不会修改文本文件的数据。它只会将修改后的数据发送到STDOUT。如果你查看原来<br>的文本文件，它仍然保留着原始数据。<br>2. 在命令行使用多个编辑器命令</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sed</span> -e <span class="token string">'s/brown/green/; s/dog/cat/'</span> data1.txt </code></pre>
+<p>  这里使用了<code>sed</code>的s命令，是指替换字符串，符合replace A B,用B替换A.重要的是，要记住，<br>  sed编辑器并不会修改文本文件的数据。它只会将修改后的数据发送到STDOUT。如果你查看原来<br>  的文本文件，它仍然保留着原始数据。<br>2. 在命令行使用多个编辑器命令</p>
+  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sed</span> -e <span class="token string">'s/brown/green/; s/dog/cat/'</span> data1.txt </code></pre>
 
-<p>这种情况一定要加分号,也可以使用</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">sed</span> -e <span class="token string">'
+<p>  这种情况一定要加分号,也可以使用</p>
+  <pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">sed</span> -e <span class="token string">'
 > s/brown/green/ 
 > s/fox/elephant/ 
 > s/dog/cat/'</span> data1.txt 
 </code></pre>
 
-<p>必须记住，要在封尾<strong>单引号</strong>所在行结束命令。bash shell一旦发现了封尾的单引号，就会执行<br>命令。开始后，sed命令就会将你指定的每条命令应用到文本文件中的每一行上。</p>
+<p>  必须记住，要在封尾<strong>单引号</strong>所在行结束命令。bash shell一旦发现了封尾的单引号，就会执行<br>  命令。开始后，sed命令就会将你指定的每条命令应用到文本文件中的每一行上。</p>
 <ol start="3">
 <li>从文件中读取编辑器命令</li>
 </ol>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sed</span> -f script.sed  data.txt
+  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sed</span> -f script.sed  data.txt
 <span class="token comment"># 命令文件</span>
 $ <span class="token function">cat</span> script1.sed
 s/brown/green/
@@ -3253,34 +3253,26 @@ s/dog/cat/</code></pre>
 <li>基本格式</li>
 </ol>
   <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">gawk</span> options program <span class="token function">file</span></code></pre>
-
-<p>  可用选项</p>
-  <pre class="language-bash" data-language="bash"><code class="language-bash">-F fs  指定行中划分数据字段的字段分隔符
+<p>  可用选项<br>  <pre class="language-bash" data-language="bash"><code class="language-bash">-F fs  指定行中划分数据字段的字段分隔符
 -f <span class="token function">file</span>  从指定的文件中读取程序
 -v <span class="token assign-left variable">var</span><span class="token operator">=</span>value  定义gawk程序中的一个变量及其默认值
 -mf N  指定要处理的数据文件中的最大字段数
 -mr N  指定数据文件中的最大数据行数
--W keyword  指定gawk的兼容模式或警告等级</code></pre>
-
+-W keyword  指定gawk的兼容模式或警告等级</code></pre></p>
 <ol start="2">
 <li><p>从命令行读取程序脚本<br>  <code>gawk &#39;&#123;print &quot;Hello World!&quot;&#125;&#39;</code> ，可能让你失望了，什么都没有，gawk需要从STDIN读取数据，所以你输入任何字符都会返回hello world,<br>  Ctrl+D组合键会在bash中产生一个EOF字符。这个组合键能够终止该gawk</p>
 </li>
-<li><p>使用数据字段变量<br>  gawk会将如下变量分配给它在文本行中发现的数据字段：<br>  $0代表整个文本行；<br>  $1代表文本行中的第1个数据字段；<br>  $2代表文本行中的第2个数据字段；<br>  $n代表文本行中的第n个数据字段。</p>
+<li><p>使用数据字段变量<br>  gawk会将如下变量分配给它在文本行中发现的数据字段：<br>  $0代表整个文本行；<br>  $1代表文本行中的第1个数据字段；<br>  $2代表文本行中的第2个数据字段；<br>  $n代表文本行中的第n个数据字段。<br>  自动为文件每一行数据分配一个变量gawk ‘{print $1}’ data2.txt 数据文件中每一行的第一个字符<br>  <code>gawk -F: &#39;&#123;print $1&#125;&#39; /etc/passwd</code></p>
 </li>
-</ol>
-<p>  自动为文件每一行数据分配一个变量gawk ‘{print $1}’ data2.txt 数据文件中每一行的第一个字符<br>  <code>gawk -F: &#39;&#123;print $1&#125;&#39; /etc/passwd</code></p>
-<ol start="4">
-<li>在程序脚本中使用多个命令</li>
-</ol>
-<p>  <code>&quot;my name is rich&quot; | gawk &#39;&#123;$4=&quot;Christine&quot;; print $0&#125;&#39;</code> , 给第四个字段名赋值，并输出文本名 ，<br>  注意， gawk程序在输出中已经将原文本中的第四个数据字段替换成了新值。如果不指定文件名就会从标准输入等待输入<br>  也可以多行</p>
+<li><p>在程序脚本中使用多个命令<br>  <code>&quot;my name is rich&quot; | gawk &#39;&#123;$4=&quot;Christine&quot;; print $0&#125;&#39;</code> , 给第四个字段名赋值，并输出文本名 ，<br>  注意， gawk程序在输出中已经将原文本中的第四个数据字段替换成了新值。如果不指定文件名就会从标准输入等待输入<br>  也可以多行</p>
   <pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">gawk</span> <span class="token string">'&#123;
 > $4="Christine" 
 > print $0&#125;'</span> 
 <span class="token variable">$My</span> name is Rich 
 <span class="token variable">$My</span> name is Christine</code></pre>
-
-<ol start="5">
-<li>从文件中读取程序</li>
+</li>
+<li><p>从文件中读取程序</p>
+</li>
 </ol>
   <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">gawk</span> -F:  -f  script2.gawk  /etc/passwd
 <span class="token function">cat</span> script2.gawk
