@@ -882,7 +882,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-10 16:31:02'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-10-10 16:43:55'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -3250,16 +3250,16 @@ s/dog/cat/</code></pre>
 <li>通过提取数据文件中的数据元素，将其重新排列或格式化，生成格式化报告。</li>
 </ul>
 <ol>
-<li>基本格式</li>
-</ol>
+<li><p>基本格式</p>
   <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">gawk</span> options program <span class="token function">file</span></code></pre>
-<p>  可用选项<br>  <pre class="language-bash" data-language="bash"><code class="language-bash">-F fs  指定行中划分数据字段的字段分隔符
+<p>  可用选项</p>
+  <pre class="language-bash" data-language="bash"><code class="language-bash">-F fs  指定行中划分数据字段的字段分隔符
 -f <span class="token function">file</span>  从指定的文件中读取程序
 -v <span class="token assign-left variable">var</span><span class="token operator">=</span>value  定义gawk程序中的一个变量及其默认值
 -mf N  指定要处理的数据文件中的最大字段数
 -mr N  指定数据文件中的最大数据行数
--W keyword  指定gawk的兼容模式或警告等级</code></pre></p>
-<ol start="2">
+-W keyword  指定gawk的兼容模式或警告等级</code></pre>
+</li>
 <li><p>从命令行读取程序脚本<br>  <code>gawk &#39;&#123;print &quot;Hello World!&quot;&#125;&#39;</code> ，可能让你失望了，什么都没有，gawk需要从STDIN读取数据，所以你输入任何字符都会返回hello world,<br>  Ctrl+D组合键会在bash中产生一个EOF字符。这个组合键能够终止该gawk</p>
 </li>
 <li><p>使用数据字段变量<br>  gawk会将如下变量分配给它在文本行中发现的数据字段：<br>  $0代表整个文本行；<br>  $1代表文本行中的第1个数据字段；<br>  $2代表文本行中的第2个数据字段；<br>  $n代表文本行中的第n个数据字段。<br>  自动为文件每一行数据分配一个变量gawk ‘{print $1}’ data2.txt 数据文件中每一行的第一个字符<br>  <code>gawk -F: &#39;&#123;print $1&#125;&#39; /etc/passwd</code></p>
@@ -3272,12 +3272,10 @@ s/dog/cat/</code></pre>
 <span class="token variable">$My</span> name is Christine</code></pre>
 </li>
 <li><p>从文件中读取程序</p>
-</li>
-</ol>
   <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">gawk</span> -F:  -f  script2.gawk  /etc/passwd
 <span class="token function">cat</span> script2.gawk
-<span class="token punctuation">&#123;</span>print <span class="token variable">$1</span> <span class="token string">"'s home directory is "</span> <span class="token variable">$6</span><span class="token punctuation">&#125;</span></code></pre>
-
+<span class="token punctuation">&#123;</span>print <span class="token variable">$1</span> <span class="token string">"'s home directory is "</span> <span class="token variable">$6</span><span class="token punctuation">&#125;</span></code></pre></li>
+</ol>
 <p>  script2.gawk程序脚本会再次使用print命令打印&#x2F;etc&#x2F;passwd文件的主目录数据字段（字段变<br>  量$6），以及userid数据字段（字段变量$1）。</p>
   <pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">cat</span>   script3
 
@@ -3288,9 +3286,8 @@ print <span class="token variable">$1</span> text <span class="token variable">$
 
 <p>  script3.gawk程序脚本定义了一个变量(text)来保存print命令中用到的文本字符串。注意，gawk<br>  程序在引用变量值时并未像shell脚本一样使用美元</p>
 <ol start="6">
-<li>在处理数据前运行脚本</li>
+<li>在处理数据前运行脚本<br>  awk允许在执行脚本文件之前先执行某段特定程序<code>BEGIN</code>实现了这个功能</li>
 </ol>
-<p>  awk允许在执行脚本文件之前先执行某段特定程序<code>BEGIN</code>实现了这个功能</p>
   <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">gawk</span> <span class="token string">'BEGIN &#123;print "Hello World!"&#125;'</span></code></pre>
 <p>  但是执行这行命令就会立刻退出,如果想正常的程序脚本中处理数据，必须使用另一个脚本区域来定义程序</p>
   <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">gawk</span> <span class="token string">'BEGIN &#123;print "The data3 File Contents:"&#125;
