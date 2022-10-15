@@ -6,15 +6,15 @@
   <meta name="keywords" content="">
   <meta name="description" content="Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="chapter 5 Edtion_Baseed Redefinition升级数据库应用程序总是需要停机；根本不可能替换正在使用的PL&#x2F;SQL对象。 5.1 Planned Downtimeunplaned downtime是很难预料的，可以通过使用备机来减少downtime，但是完全消除downtime是不可能的硬件故障可以切换到物理或者逻辑备用数据库继续提供服务，一直以来，没有办法在运">
+<meta name="description" content="INTRODUCTION当应用程序的数据库组件在应用程序升级过程中被更新时，大型的关键的应用程序可能会经历几十个小时，甚至更长的停机时间。app的数据库组件在应用程序升级期间进行更新。Oracle数据库推出了基于版本的重新定义（EBR），这是一项革命性的功能，可以在不间断的情况下在线升级应用程序。革命性的功能，它允许在线应用升级，并保证应用的不间断可用性。 EBR的功能是同时维护两个版本的应用程序">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Real_World_SQL_and_PLSQL">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/11/oracle/Real_World_SQL_and_PLSQL/index.html">
+<meta property="og:title" content="Edition-Based Redefinition Technical Deep Dive">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/11/oracle/Oracle_EBR/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="chapter 5 Edtion_Baseed Redefinition升级数据库应用程序总是需要停机；根本不可能替换正在使用的PL&#x2F;SQL对象。 5.1 Planned Downtimeunplaned downtime是很难预料的，可以通过使用备机来减少downtime，但是完全消除downtime是不可能的硬件故障可以切换到物理或者逻辑备用数据库继续提供服务，一直以来，没有办法在运">
+<meta property="og:description" content="INTRODUCTION当应用程序的数据库组件在应用程序升级过程中被更新时，大型的关键的应用程序可能会经历几十个小时，甚至更长的停机时间。app的数据库组件在应用程序升级期间进行更新。Oracle数据库推出了基于版本的重新定义（EBR），这是一项革命性的功能，可以在不间断的情况下在线升级应用程序。革命性的功能，它允许在线应用升级，并保证应用的不间断可用性。 EBR的功能是同时维护两个版本的应用程序">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-11T06:57:52.994Z">
-<meta property="article:modified_time" content="2022-10-12T07:34:07.205Z">
+<meta property="article:published_time" content="2022-10-11T04:13:46.438Z">
+<meta property="article:modified_time" content="2022-10-11T04:48:44.628Z">
 <meta property="article:author" content="kirkzhang">
 <meta property="article:tag" content="Oracle">
 <meta name="twitter:card" content="summary">
@@ -134,6 +134,10 @@
     
         
             
+        
+    
+        
+            
                 <li>
                     <div data-rel="非技术类">
                         
@@ -143,10 +147,6 @@
                     </div>
                     
                 </li>
-            
-        
-    
-        
             
         
     
@@ -368,9 +368,9 @@
         
             
                 <li>
-                    <div data-rel="WEB API">
+                    <div data-rel="WEB-API">
                         
-                        WEB API
+                        WEB-API
                         <small>(1)</small>
                         
                     </div>
@@ -802,7 +802,7 @@
             <span class="post-date" title="2022-06-22 22:05:35">2022/06/22</span>
         </a>
         
-        <a  class="All WEB API "
+        <a  class="All WEB-API "
            href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
            data-tag=""
            data-author="" >
@@ -894,7 +894,7 @@
 </div>
             <h1 id="张士明-kirkzhang"><a href="#张士明-kirkzhang" class="headerlink" title="张士明(kirkzhang)"></a>张士明(kirkzhang)</h1><p>Knowledge isn’t free. You have to pay attention. 🧠</p>
 <ul>
-<li>email: <a href="mailto:&#122;&#120;&#x63;&#55;&#x34;&#49;&#x32;&#48;&#56;&#53;&#56;&#x34;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;">&#122;&#120;&#x63;&#55;&#x34;&#49;&#x32;&#48;&#56;&#53;&#56;&#x34;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;</a></li>
+<li>email: <a href="mailto:&#122;&#120;&#99;&#55;&#x34;&#x31;&#50;&#x30;&#x38;&#53;&#x38;&#52;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#109;">&#122;&#120;&#99;&#55;&#x34;&#x31;&#50;&#x30;&#x38;&#53;&#x38;&#52;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#109;</a></li>
 <li>homepag: <a href="https://simonteo58.github.io/">https://simonteo58.github.io/</a></li>
 <li>github: <a target="_blank" rel="noopener" href="https://github.com/SimonTeo58">https://github.com/SimonTeo58</a></li>
 </ul>
