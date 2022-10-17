@@ -6,16 +6,17 @@
   <meta name="keywords" content="">
   <meta name="description" content="Linux命令行与shell腳本編程大全 | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="我自己电脑都是使用apt命令   安装mysql  sudo apt update sudo apt upgrade sudo apt install mysql-server 启动mysql WSL2 sudo &#x2F;etc&#x2F;init.d&#x2F;mysql start,sudo &#x2F;etc&#x2F;init.d&#x2F;mysql stop ubuntu系统   配置mysql sudo vim &#x2F;etc&#x2F;mysql&#x2F;my">
+<meta name="description" content="创建用户CREATE DATABASE &#39;newdatabase&#39;; 设置密码CREATE USER &#39;newuser&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;newpassword&#39;; 授权GRANT ALL PRIVILEGES ON newdatabase.* TO &#39;newuser&#39;@&#39;localhost&#39;; FLUSH PRIVILEGES; 重新登陆mysql -u">
 <meta property="og:type" content="article">
-<meta property="og:title" content="install_mysql_on_ubuntu(Debian sys)">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/16/archive/install_mysql_on_ubuntu/index.html">
+<meta property="og:title" content="mysql manual">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/16/mysql/mysql_manual/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="我自己电脑都是使用apt命令   安装mysql  sudo apt update sudo apt upgrade sudo apt install mysql-server 启动mysql WSL2 sudo &#x2F;etc&#x2F;init.d&#x2F;mysql start,sudo &#x2F;etc&#x2F;init.d&#x2F;mysql stop ubuntu系统   配置mysql sudo vim &#x2F;etc&#x2F;mysql&#x2F;my">
+<meta property="og:description" content="创建用户CREATE DATABASE &#39;newdatabase&#39;; 设置密码CREATE USER &#39;newuser&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;newpassword&#39;; 授权GRANT ALL PRIVILEGES ON newdatabase.* TO &#39;newuser&#39;@&#39;localhost&#39;; FLUSH PRIVILEGES; 重新登陆mysql -u">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-16T08:23:49.935Z">
-<meta property="article:modified_time" content="2022-10-16T10:50:29.176Z">
+<meta property="article:published_time" content="2022-10-16T13:54:25.042Z">
+<meta property="article:modified_time" content="2022-10-16T13:59:17.302Z">
 <meta property="article:author" content="kirkzhang">
+<meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
 
 
@@ -724,18 +725,18 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -788,14 +789,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
            data-tag=""
            data-author="" >
@@ -808,6 +801,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -929,7 +930,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-10 19:24:50'>2022-06-22 21:53</time>
+            Created At : <time class="date" title='Updated At: 2022-10-17 22:54:58'>2022-06-22 21:53</time>
         
     </div>
     <div class="article-meta">
@@ -2729,7 +2730,7 @@ Line <span class="token comment">#3: This is the third line. </span>
 Are you <span class="token keyword">done</span> now? y 
 Goodbye </code></pre>
 
-<h3 id="15-4-4-创建读写文件描述符"><a href="#15-4-4-创建读写文件描述符" class="headerlink" title="15.4.4 创建读写文件描述符"></a>15.4.4 创建读写文件描述符</h3><p>(不是太理解)<br>尽管看起来可能会很奇怪，但是你也可以打开单个文件描述符来作为输入和输出。可以用同<br>一个文件描述符对同一个文件进行读写。<br>不过用这种方法时，你要特别小心。由于你是对同一个文件进行数据读写，shell会维护一个<br>内部指针，指明在文件中的当前位置。任何读或写都会从文件指针上次的位置开始。如果不够小<br>心，它会产生一些令人瞠目的结果。看看下面这个例子。</p>
+<h3 id="15-4-4-创建读写文件描述符"><a href="#15-4-4-创建读写文件描述符" class="headerlink" title="15.4.4 创建读写文件描述符"></a>15.4.4 创建读写文件描述符</h3><p>(第一遍不是很懂)<br>尽管看起来可能会很奇怪，但是你也可以打开单个文件描述符来作为输入和输出。可以用同<br>一个文件描述符对同一个文件进行读写。<br>不过用这种方法时，你要特别小心。由于你是对同一个文件进行数据读写，shell会维护一个<br>内部指针，指明在文件中的当前位置。任何读或写都会从文件指针上次的位置开始。如果不够小<br>心，它会产生一些令人瞠目的结果。看看下面这个例子。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">
 <span class="token comment">#!/bin/bash </span>
 <span class="token comment"># testing input/output file descriptor </span>
@@ -2747,7 +2748,35 @@ This is the third line.
 $ ./test16 
 Read: This is the first line. </code></pre>
 
-<h3 id="15-4-5-关闭文件描述符"><a href="#15-4-5-关闭文件描述符" class="headerlink" title="15.4.5 关闭文件描述符"></a>15.4.5 关闭文件描述符</h3><p>不懂</p>
+<p>这个例子用了exec命令将文件描述符3分配给文件testfile以进行文件读写。接下来，它<br>通过分配好的文件描述符，使用read命令读取文件中的第一行，然后将这一行显示在STDOUT上。<br>最后，它用echo语句将一行数据写入由同一个文件描述符打开的文件中。<br>在运行脚本时，一开始还算正常。输出内容表明脚本读取了testfile文件中的第一行。但如果<br>你在脚本运行完毕后，查看testfile文件内容的话，你会发现写入文件中的数据覆盖了已有的数据。<br>当脚本向文件中写入数据时，它会从文件指针所处的位置开始。read命令读取了第一行数<br>据，所以它使得文件指针指向了第二行数据的第一个字符。在echo语句将数据输出到文件时，<br>它会将数据放在文件指针的当前位置，覆盖了该位置的已有数据。</p>
+<h3 id="15-4-5-关闭文件描述符"><a href="#15-4-5-关闭文件描述符" class="headerlink" title="15.4.5 关闭文件描述符"></a>15.4.5 关闭文件描述符</h3><p>(第一遍不是很懂)<br>如果你创建了新的输入或输出文件描述符，shell会在脚本退出时自动关闭它们。然而在有些<br>情况下，你需要在脚本结束前手动关闭文件描述符。<br>要关闭文件描述符，将它重定向到特殊符号&amp;-。脚本中看起来如下：<br><code>exec 3&gt;&amp;- </code><br>该语句会关闭文件描述符3，不再在脚本中使用它。这里有个例子来说明当你尝试使用已关<br>闭的文件描述符时会怎样。</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">cat</span> badtest 
+<span class="token comment">#!/bin/bash </span>
+<span class="token comment"># testing closing file descriptors </span>
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">3</span>></span> test17file 
+<span class="token builtin class-name">echo</span> <span class="token string">"This is a test line of data"</span> <span class="token operator">></span><span class="token file-descriptor important">&amp;3</span> 
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">3</span>>&amp;</span>- 
+<span class="token builtin class-name">echo</span> <span class="token string">"This won't work"</span> <span class="token operator">></span><span class="token file-descriptor important">&amp;3</span> 
+$ ./badtest 
+./badtest: <span class="token number">3</span>: Bad <span class="token function">file</span> descriptor 
+$ </code></pre>
+<p>一旦关闭了文件描述符，就不能在脚本中向它写入任何数据，否则shell会生成错误消息。<br>在关闭文件描述符时还要注意另一件事。如果随后你在脚本中打开了同一个输出文件，shell<br>会用一个新文件来替换已有文件。这意味着如果你输出数据，它就会覆盖已有文件。考虑下面这<br>个问题的例子。</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">cat</span> test17 
+<span class="token comment">#!/bin/bash </span>
+<span class="token comment">#testing closing file descriptors </span>
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">3</span>></span> test17file 
+<span class="token builtin class-name">echo</span> <span class="token string">"This is a test line of data"</span> <span class="token operator">></span><span class="token file-descriptor important">&amp;3</span> 
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">3</span>>&amp;</span>- 
+<span class="token function">cat</span> test17file 
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">3</span>></span> test17file 
+<span class="token builtin class-name">echo</span> <span class="token string">"This'll be bad"</span> <span class="token operator">></span><span class="token file-descriptor important">&amp;3</span> 
+$ ./test17 
+This is a <span class="token builtin class-name">test</span> line of data 
+$ <span class="token function">cat</span> test17file 
+This'll be bad 
+$ </code></pre>
+
+
 <h2 id="15-5-列出未关闭的文件描述符"><a href="#15-5-列出未关闭的文件描述符" class="headerlink" title="15.5 列出未关闭的文件描述符"></a>15.5 列出未关闭的文件描述符</h2><p>你能用的文件描述符只有9个，你可能会觉得这没什么复杂的。但有时要记住哪个文件描述<br>符被重定向到了哪里很难。为了帮助你理清条理，bash shell提供了<code>lsof</code>命令。<code>$$</code>可以读取当前程序运行的的PID,<code>-a</code><br>对其他两个选项的输出做AND运算  </p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">/usr/sbin/lsof -a -p <span class="token variable">$$</span> -d <span class="token number">0,1</span>,2
 <span class="token comment"># lsof的默认输出</span>
@@ -2761,7 +2790,26 @@ SIZE        如果有的话，表示文件的大小
 NODE        本地文件的节点号
 NAME        文件名</code></pre>
 
-<p>(不是很懂)</p>
+<p>与STDIN、STDOUT和STDERR关联的文件类型是字符型。因为STDIN、STDOUT和STDERR文<br>件描述符都指向终端，所以输出文件的名称就是终端的设备名。所有3种标准文件都支持读和写<br>（尽管向STDIN写数据以及从STDOUT读数据看起来有点奇怪）。<br>现在看一下在打开了多个替代性文件描述符的脚本中使用lsof命令的结果。</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">cat</span> test18 
+<span class="token comment">#!/bin/bash </span>
+<span class="token comment"># testing lsof with file descriptors </span>
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">3</span>></span> test18file1 
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">6</span>></span> test18file2 
+<span class="token builtin class-name">exec</span> <span class="token operator"><span class="token file-descriptor important">7</span>&lt;</span> testfile 
+/usr/sbin/lsof -a -p <span class="token variable">$$</span> -d0,1,2,3,6,7 
+$ ./test18 
+COMMAND PID <span class="token environment constant">USER</span> FD TYPE DEVICE SIZE NODE NAME 
+test18 <span class="token number">3594</span> rich 0u CHR <span class="token number">136,0</span> <span class="token number">2</span> /dev/pts/0 
+test18 <span class="token number">3594</span> rich 1u CHR <span class="token number">136,0</span> <span class="token number">2</span> /dev/pts/0 
+test18 <span class="token number">3594</span> rich 2u CHR <span class="token number">136,0</span> <span class="token number">2</span> /dev/pts/0 
+<span class="token number">18</span> <span class="token number">3594</span> rich 3w REG <span class="token number">253,0</span> <span class="token number">0</span> <span class="token number">360712</span> /home/rich/test18file1 
+<span class="token number">18</span> <span class="token number">3594</span> rich 6w REG <span class="token number">253,0</span> <span class="token number">0</span> <span class="token number">360715</span> /home/rich/test18file2 
+<span class="token number">18</span> <span class="token number">3594</span> rich 7r REG <span class="token number">253,0</span> <span class="token number">73</span> <span class="token number">360717</span> /home/rich/testfile 
+$ </code></pre>
+
+<p>该脚本创建了3个替代性文件描述符，两个作为输出（3和6），一个作为输入（7）。在脚本<br>运行lsof命令时，可以在输出中看到新的文件描述符。我们去掉了输出中的第一部分，这样你<br>就能看到文件名的结果了。文件名显示了文件描述符所使用的文件的完整路径名。它将每个文件<br>都显示成REG类型的，这说明它们是文件系统中的常规文件。</p>
+<p>(第一遍不是很懂)</p>
 <h2 id="15-6-组织命令输出"><a href="#15-6-组织命令输出" class="headerlink" title="15.6 组织命令输出"></a>15.6 组织命令输出</h2><p>如果在运行在后台的脚本出现错误消息，shell会通过电子邮件将它们发给进程的属主。这<br>会很麻烦，尤其是当运行会生成很多烦琐的小错误的脚本时。<br>要解决这个问题，可以将STDERR重定向到一个叫作null文件的特殊文件。null文件跟它的名<br>字很像，文件里什么都没有。shell输出到null文件的任何数据都不会保存，全部都被丢掉了。<br>在Linux系统上null文件的标准位置是&#x2F;dev&#x2F;null。你重定向到该位置的任何数据都会被丢掉，<br>不会显示。</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">
 <span class="token function">cat</span> /dev/null/ <span class="token operator">></span> test18
