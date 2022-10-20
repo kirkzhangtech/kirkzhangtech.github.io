@@ -12,8 +12,22 @@ categories:
   - [3.4 文件系统](#34-文件系统)
 - [4. 其他shell命令](#4-其他shell命令)
   - [4.1 监控程序](#41-监控程序)
+    - [4.1.1 ps查看进程](#411-ps查看进程)
+    - [4.1.2 top实时监控](#412-top实时监控)
+    - [4.1.3 kill结束进程](#413-kill结束进程)
+    - [4.1.4 系统performance监控](#414-系统performance监控)
   - [4.2 磁盘空间监控](#42-磁盘空间监控)
+    - [4.2.1 mount挂在存储媒体](#421-mount挂在存储媒体)
+    - [4.2.2 unmount 卸载设备](#422-unmount-卸载设备)
+    - [4.2.3 df 查看磁盘使用情况](#423-df-查看磁盘使用情况)
+    - [4.2.4 du 磁盘空间](#424-du-磁盘空间)
   - [4.3 处理文件](#43-处理文件)
+    - [4.3.1 sort - 文件排序](#431-sort---文件排序)
+    - [4.3.2 grep - 搜索文件](#432-grep---搜索文件)
+    - [4.3.3 zip , gzip:gz, compress:Z, bzip2:bz2 压缩数据](#433-zip--gzipgz-compressz-bzip2bz2-压缩数据)
+    - [4.3.4 tar 归档数据](#434-tar-归档数据)
+    - [4.3.5 find 搜索命令](#435-find-搜索命令)
+    - [4.3.6 uname 显示系统内核信息](#436-uname-显示系统内核信息)
   - [4.4 date命令及其格式化](#44-date命令及其格式化)
 - [5. 理解shell](#5-理解shell)
   - [5.1 shell的类型](#51-shell的类型)
@@ -265,7 +279,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
 
 ## 4.1 监控程序
 
-- ps查看进程
+### 4.1.1 ps查看进程
 
   ```bash
   ps 选项
@@ -294,8 +308,9 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   |TIME|运行进程需要的累计CPU时间  |
   |CMD|启动的程序名称|
 
-- top实时监控
-  - 第一行：当前时间，系统运行时间，登录用户数，系统的平均负载(15分钟的参数越大且超过，说明有问题)  
+### 4.1.2 top实时监控
+
+  - 第一行：当前时间，系统运行时间，登录用户数，系统的平均负载(15分钟的参数越大且超过2，说明有问题)  
   - 第二行：进程状态  
   - 第三行：CPU相关数值，使用率  
 
@@ -313,7 +328,9 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   |%MEM：||进程使用的内存占可用内存的比例  |
   |TIME+：|自进程启动到目前为止的CPU时间总量|
   |COMMAND|：进程所对应的命令行名称，也就是启动的程序名  |
-- kill结束进程
+
+### 4.1.3 kill结束进程
+
   | 信号 | 名称 |描述|
   | --- | --- |---|
   | 1 | HUP | 挂起 |
@@ -325,19 +342,24 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   | 17 | STOP | 无条件终止 |
   | 18 | TSTP | 停止或暂停，但在后台运行 |
   | 19 | CONT | 在STOP或TSTP之后恢复执行 |
-- 系统performance监控
-  这个要下载`sysstat`程序。
-  - iostat - reports CPU statistics and input/output statistics for block devices and partitions.
-  - mpstat - Processors Statistics
-    - `mpstat -P ALl` 所有processor
-    - `mpstat -P ALL 2 5` 迭代五次间隔两秒
-  - pidstat - Process and Kernel Threads Statistics
-  - tapestat - reports statistics for tape drives connected to the system
-  - cifsiostat - reports CIFS statistics.
+
+### 4.1.4 系统performance监控
+
+  这个要下载`sysstat`程序
+    - iostat - reports CPU statistics and input/output statistics for block devices and partitions.
+    - mpstat - Processors Statistics
+      ```bash
+          `mpstat -P ALl`     #所有processor
+          `mpstat -P ALL 2 5` #迭代五次间隔两秒
+      ```
+    - pidstat - Process and Kernel Threads Statistics
+    - tapestat - reports statistics for tape drives connected to the system
+    - cifsiostat - reports CIFS statistics.
 
 ## 4.2 磁盘空间监控
 
-- mount挂在存储媒体
+### 4.2.1 mount挂在存储媒体
+
   `mount`提供如下信息`媒体设备名`,`挂载点`,`文件类型`,`访问方式`  
 
   ```bash
@@ -373,35 +395,67 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   check=none #挂载时进行完整性校验
   ```
 
-- unmount 卸载设备
+### 4.2.2 unmount 卸载设备
 
   ```bash
   unmount [directory | device] # //卸载文件应在外侧目录完成,命令行提示符仍然在挂载设备的文件系统目录中，`umount` 命令无法卸载该镜像
   ```
 
-- df 查看文件大小  
+### 4.2.3 df 查看磁盘使用情况
+
+  命令格式: df [OPTION]... [FILE]...
 
   ```bash
-  df -h #以M,G描述问价大小
+  -h  # 以M,G描述问价大小
+  -a, --all
+      # include pseudo, duplicate, inaccessible file systems
+  -B, --block-size=SIZE
+      # scale sizes by SIZE before  printing  them;  e.g.,  '-BM'  prints  sizes  in  units  of
+      # 1,048,576 bytes; see SIZE format below
+  -h, --human-readable
+      # print sizes in powers of 1024 (e.g., 1023M)
+  -H, --si
+      #print sizes in powers of 1000 (e.g., 1.1G)
+  -i, --inodes
+      #list inode information instead of block usage
+  -k  like --block-size=1K
+  -l, --local
+      #limit listing to local file systems
+  --no-sync
+      #do not invoke sync before getting usage info (default)
+  --output[=FIELD_LIST]
+      #use the output format defined by FIELD_LIST, or print all fields if FIELD_LIST is omit‐ted.
+  -P, --portability
+      #use the POSIX output format
+  --sync invoke sync before getting usage info
+  --total
+      #elide all entries insignificant to available space, and produce a grand total
+  -t, --type=TYPE
+      #limit listing to file systems of type TYPE
+  -T, --print-type
+      #print file system type
+  -x, --exclude-type=TYPE
+      #limit listing to file systems not of type TYPE
+  -v  (ignored)
+  --help display this help and exit
+  --version
+      #output version information and exit
+  
   ```
 
-- du 查看文件大小
+### 4.2.4 du 磁盘空间
 
   ```bash
   -c #显示所有已列出文件总的大小(还是不宜读)
   -h #按用户易读的格式输出大小，即用K替代千字节
   -s #显示每个输出参数的总计
+  -d # 限制查询深度
   ```
 
-- find
-
-  ```bash
-  find 目录 -
-  ```
   
 ## 4.3 处理文件  
 
-- sort - 文件排序  
+### 4.3.1 sort - 文件排序  
 
   ```bash
    -n  #sort命令会把数字当做字符来执行标准的字符排序,解决
@@ -411,18 +465,30 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
    -r  #反向排序 
    ```
 
-- grep - 搜索文件  
+### 4.3.2 grep - 搜索文件  
 
   ```bash
-  -v #输出不匹配的行
-  -n #输出行号
-  -c #计算匹配到的行数
-  -e #指定多个匹配模式
+  -i	              # 忽略大小写
+  -c	              # 只输出匹配行的数量
+  -l	              # 只列出符合匹配的文件名，不列出具体的匹配行
+  -n	              # 列出所有的匹配行，显示行号
+  -h	              # 查询多文件时不显示文件名
+  -s	              # 不显示不存在、没有匹配文本的错误信息
+  -v	              # 显示不包含匹配文本的所有行
+  -w	              # 匹配整词
+  -x	              # 匹配整行
+  -r	              # 递归搜索
+  -q	              # 禁止输出任何结果，已退出状态表示搜索是否成功
+  -b	              # 打印匹配行距文件头部的偏移量，以字节为单位
+  -o	              # 与-b结合使用，打印匹配的词据文件头部的偏移量，以字节为单位
+  -F	              # 匹配固定字符串的内容
+  -E	              # 支持扩展的正则表达式
   grep [tf] file1 #支持正则匹配
   ```
 
-- egrep, fgrep 功能更强大  
-- 压缩数据 - zip , gzip:gz, compress:Z, bzip2:bz2
+  egrep, fgrep 功能更强大
+
+### 4.3.3 zip , gzip:gz, compress:Z, bzip2:bz2 压缩数据
 
   ```bash
     gzip #压缩文件
@@ -430,7 +496,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
     gunzip #用来解压文件  
   ```
 
-- 归档数据 - tar
+### 4.3.4 tar 归档数据
 
   ```bash
   -c #~ create`创建一个新的tar文件
@@ -443,6 +509,62 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   -C #指定具体目录
   tar -xvf test.tar`令从tar文件test.tar中提取内容。如果tar文件是从一个目录结构创建的，那整个目录结构都会在当前目录下重新创建
   ```
+
+### 4.3.5 find 搜索命令
+
+  语法结构: find [路径] [参数]
+
+  ```bash
+  -name              # 匹配名称
+  -perm              # 匹配权限（mode为完全匹配，-mode为包含即可）
+  -user              # 匹配所有者
+  -group            # 匹配所有组
+  -mtime -n +n      # 匹配修改内容的时间（-n指n天以内，+n指n天以前）
+  -atime -n +n      # 匹配访问文件的时间（-n指n天以内，+n指n天以前）
+  -ctime -n +n      # 匹配修改文件权限的时间（-n指n天以内，+n指n天以前）
+  -nouser            # 匹配无所有者的文件
+  -nogroup          # 匹配无所有组的文件
+  -newer f1 !f2      # 匹配比文件f1新但比f2旧的文件
+  -type b/d/c/p/l/f  # 匹配文件类型（后面的字幕字母依次表示块设备、目录、字符设备、管道、链接文件、文本文件）
+  -size              # 匹配文件的大小(+50KB为查找超过50KB的文件，而-50KB为查找小于50KB的文件)
+  -prune            # 忽略某个目录
+  -exec …… {}\;     # 后面可跟用于进一步处理搜索结果的命令
+  ```
+
+  具体实例
+  
+  ```bash
+  # 搜索文件大于1M大小的文件
+  find /etc -size +1M
+  # 搜索所有属于指定用户的文件
+  find /home -user linuxprobe
+  # 在/var/log目录下搜索所有指定后缀的文件，后缀不需要大小写。
+  find /var/log -iname "*.log"
+  # 在/var/log目录下搜索所有后缀不是.log的文件：
+  find /var/log ! -name "*.log"
+  # 全盘搜索系统中所有类型为目录，且权限为1777的目录文件
+  find / -type d -perm 1777
+  #全盘搜索系统中所有后缀为.mp4的文件，并删除所有查找到的文件：
+  find / -name "*.mp4" -exec rm -rf {} \;
+  ```
+
+### 4.3.6 uname 显示系统内核信息
+
+  语法格式:uname [参数]  
+  常用参数
+
+  ```bash
+  -a	      # 显示系统所有相关信息
+  -m	      # 显示计算机硬件架构
+  -n	      # 显示主机名称
+  -r	      # 显示内核发行版本号
+  -s	      # 显示内核名称
+  -v	      # 显示内核版本
+  -p	      # 显示主机处理器类型
+  -o	      # 显示操作系统名称
+  -i	      # 显示硬件平台
+  ```
+  
 
 ## 4.4 date命令及其格式化
 
