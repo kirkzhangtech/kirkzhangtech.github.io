@@ -6,17 +6,20 @@
   <meta name="keywords" content="">
   <meta name="description" content="MIT6.824之lab2_raft_students_guide | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？ -- demo 1 begin   -- 中间写代码 end;  -- demo 2   declare  -- 定义变量  begin   -- 业务逻辑 end;  在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用 1.2 在pls">
+<meta name="description" content="https:&#x2F;&#x2F;garlicspace.com&#x2F;2022&#x2F;03&#x2F;19&#x2F;iso8583%E5%8D%8F%E8%AE%AE&#x2F;  ISO8583报文格式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle PLSQL Recipes">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/index.html">
+<meta property="og:title" content="iso8583简介">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？ -- demo 1 begin   -- 中间写代码 end;  -- demo 2   declare  -- 定义变量  begin   -- 业务逻辑 end;  在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用 1.2 在pls">
+<meta property="og:description" content="https:&#x2F;&#x2F;garlicspace.com&#x2F;2022&#x2F;03&#x2F;19&#x2F;iso8583%E5%8D%8F%E8%AE%AE&#x2F;  ISO8583报文格式">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-19T15:51:33.289Z">
-<meta property="article:modified_time" content="2022-10-19T16:55:59.819Z">
+<meta property="og:image" content="https://simonteo58.github.io/picture/ISO8583/MTI.png">
+<meta property="og:image" content="https://simonteo58.github.io/picture/ISO8583/bitmap.png">
+<meta property="article:published_time" content="2022-10-20T13:09:47.605Z">
+<meta property="article:modified_time" content="2022-10-20T13:22:09.355Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://simonteo58.github.io/picture/ISO8583/MTI.png">
 
 
 <link rel="icon" href="/img/avatar.jpg">
@@ -112,7 +115,7 @@
     <li>
         <div class="all active" data-rel="All">All
             
-                <small>(52)</small>
+                <small>(53)</small>
             
         </div>
     </li>
@@ -142,10 +145,6 @@
                     </div>
                     
                 </li>
-            
-        
-    
-        
             
         
     
@@ -214,7 +213,7 @@
                     <div data-rel="随笔">
                         
                         随笔
-                        <small>(1)</small>
+                        <small>(2)</small>
                         
                     </div>
                     
@@ -234,18 +233,6 @@
                     </div>
                     
                         <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="archive<--->非技术类">
-                                        
-                                        非技术类
-                                        
-                                            <small>(1
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
                             
                                 <li>
                                     <div data-rel="archive<--->golang">
@@ -438,7 +425,7 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="52">
+<input type="hidden" id="yelog_site_posts_number" value="53">
 
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
@@ -518,6 +505,14 @@
     </div>
     
     <nav id="title-list-nav">
+        
+        <a  class="All archive "
+           href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="iso8583简介">iso8583简介</span>
+            <span class="post-date" title="2022-10-20 21:09:47">2022/10/20</span>
+        </a>
         
         <a  class="All oracle "
            href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/"
@@ -615,8 +610,8 @@
             <span class="post-date" title="2022-10-05 20:21:56">2022/10/05</span>
         </a>
         
-        <a  class="All archive 非技术类 "
-           href="/2022/09/26/archive/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
+        <a  class="All 随笔 "
+           href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="费曼:任何伟大的科学成就，都源于思想自由">费曼:任何伟大的科学成就，都源于思想自由</span>
@@ -808,14 +803,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
            data-tag=""
            data-author="" >
@@ -828,6 +815,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="83.删除排序链表中的重复元素">83.删除排序链表中的重复元素</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         

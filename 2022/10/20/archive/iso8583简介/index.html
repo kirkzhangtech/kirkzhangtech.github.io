@@ -2,21 +2,24 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Eden</title>
+  <title>iso8583简介 | Eden</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Eden">
+  <meta name="description" content="iso8583简介 | Eden">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？ -- demo 1 begin   -- 中间写代码 end;  -- demo 2   declare  -- 定义变量  begin   -- 业务逻辑 end;  在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用 1.2 在pls">
+<meta name="description" content="https:&#x2F;&#x2F;garlicspace.com&#x2F;2022&#x2F;03&#x2F;19&#x2F;iso8583%E5%8D%8F%E8%AE%AE&#x2F;  ISO8583报文格式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle PLSQL Recipes">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/index.html">
+<meta property="og:title" content="iso8583简介">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？ -- demo 1 begin   -- 中间写代码 end;  -- demo 2   declare  -- 定义变量  begin   -- 业务逻辑 end;  在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用 1.2 在pls">
+<meta property="og:description" content="https:&#x2F;&#x2F;garlicspace.com&#x2F;2022&#x2F;03&#x2F;19&#x2F;iso8583%E5%8D%8F%E8%AE%AE&#x2F;  ISO8583报文格式">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-19T15:51:33.289Z">
-<meta property="article:modified_time" content="2022-10-19T16:55:59.819Z">
+<meta property="og:image" content="https://simonteo58.github.io/picture/ISO8583/MTI.png">
+<meta property="og:image" content="https://simonteo58.github.io/picture/ISO8583/bitmap.png">
+<meta property="article:published_time" content="2022-10-20T13:09:47.605Z">
+<meta property="article:modified_time" content="2022-10-20T13:22:09.355Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://simonteo58.github.io/picture/ISO8583/MTI.png">
 
 
 <link rel="icon" href="/img/avatar.jpg">
@@ -56,7 +59,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/"
    class="avatar_target">
@@ -112,7 +115,7 @@
     <li>
         <div class="all active" data-rel="All">All
             
-                <small>(52)</small>
+                <small>(53)</small>
             
         </div>
     </li>
@@ -142,10 +145,6 @@
                     </div>
                     
                 </li>
-            
-        
-    
-        
             
         
     
@@ -214,7 +213,7 @@
                     <div data-rel="随笔">
                         
                         随笔
-                        <small>(1)</small>
+                        <small>(2)</small>
                         
                     </div>
                     
@@ -234,18 +233,6 @@
                     </div>
                     
                         <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="archive<--->非技术类">
-                                        
-                                        非技术类
-                                        
-                                            <small>(1
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
                             
                                 <li>
                                     <div data-rel="archive<--->golang">
@@ -438,7 +425,7 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="52">
+<input type="hidden" id="yelog_site_posts_number" value="53">
 
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
@@ -518,6 +505,14 @@
     </div>
     
     <nav id="title-list-nav">
+        
+        <a  class="All archive "
+           href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="iso8583简介">iso8583简介</span>
+            <span class="post-date" title="2022-10-20 21:09:47">2022/10/20</span>
+        </a>
         
         <a  class="All oracle "
            href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/"
@@ -615,8 +610,8 @@
             <span class="post-date" title="2022-10-05 20:21:56">2022/10/05</span>
         </a>
         
-        <a  class="All archive 非技术类 "
-           href="/2022/09/26/archive/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
+        <a  class="All 随笔 "
+           href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="费曼:任何伟大的科学成就，都源于思想自由">费曼:任何伟大的科学成就，都源于思想自由</span>
@@ -808,14 +803,6 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
            data-tag=""
            data-author="" >
@@ -828,6 +815,14 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="83.删除排序链表中的重复元素">83.删除排序链表中的重复元素</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -951,12 +946,62 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-archive/iso8583简介" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%A0%E5%A3%AB%E6%98%8E-kirkzhang"><span class="toc-text">张士明(kirkzhang)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Education"><span class="toc-text">Education</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B9%96%E5%8D%97%E5%B7%A5%E5%AD%A6%E9%99%A2-2014-9-2018-09"><span class="toc-text">湖南工学院 2014.9 - 2018.09</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Experience"><span class="toc-text">Experience</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HSBC-Tech-China-contractor-2020-6-present"><span class="toc-text">HSBC Tech China(contractor) 2020.6 - present</span></a></li></ol></li></ol></li></ol>
+        <h1 class="article-title">iso8583简介</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="archive">archive</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            Created At : <time class="date" title='Updated At: 2022-10-20 21:22:09'>2022-10-20 21:09</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            Views 👀 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+        <span class="top-comment" title="跳转至评论区">
+            <a href="#comments">
+                Comment:<span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </a>
+        </span>
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        
     
 <style>
     .left-col .switch-btn,
@@ -969,26 +1014,25 @@
     }
 </style>
 </div>
-            <h1 id="张士明-kirkzhang"><a href="#张士明-kirkzhang" class="headerlink" title="张士明(kirkzhang)"></a>张士明(kirkzhang)</h1><p>Knowledge isn’t free. You have to pay attention. 🧠</p>
-<ul>
-<li>email: <a href="mailto:&#122;&#120;&#99;&#55;&#x34;&#49;&#x32;&#48;&#x38;&#53;&#x38;&#52;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#x6d;">&#122;&#120;&#99;&#55;&#x34;&#49;&#x32;&#48;&#x38;&#53;&#x38;&#52;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#x6d;</a></li>
-<li>homepag: <a href="https://simonteo58.github.io/">https://simonteo58.github.io/</a></li>
-<li>github: <a target="_blank" rel="noopener" href="https://github.com/SimonTeo58">https://github.com/SimonTeo58</a></li>
-</ul>
-<h2 id="Education"><a href="#Education" class="headerlink" title="Education"></a>Education</h2><h3 id="湖南工学院-2014-9-2018-09"><a href="#湖南工学院-2014-9-2018-09" class="headerlink" title="湖南工学院 2014.9 - 2018.09"></a><strong>湖南工学院</strong> <code>2014.9 - 2018.09</code></h3><pre><code>bachelor - 无机非金属材料学士学位
-</code></pre>
-<h2 id="Experience"><a href="#Experience" class="headerlink" title="Experience"></a>Experience</h2><h3 id="HSBC-Tech-China-contractor-2020-6-present"><a href="#HSBC-Tech-China-contractor-2020-6-present" class="headerlink" title="HSBC Tech China(contractor) 2020.6 - present"></a><strong>HSBC Tech China(contractor)</strong> <code>2020.6 - present</code></h3><p><em>Mid-software-engineer</em></br></p>
-<ol>
-<li>as a software-engineer solving xxxxxxx</li>
-<li>commonly using shell script figured out testing cases</li>
-<li>keep testing envirement stable ,and located root casuse of testing cases that tester put them in</li>
-<li>associated with software vendor to change system setup, more like source code and configuration</li>
-<li>familiar with debit card card system of ISO-8583</li>
-</ol>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p><a target="_blank" rel="noopener" href="https://garlicspace.com/2022/03/19/iso8583%E5%8D%8F%E8%AE%AE/">https://garlicspace.com/2022/03/19/iso8583%E5%8D%8F%E8%AE%AE/</a></p>
+</blockquote>
+<p>ISO8583报文格式</p>
+<p><img src="/./../../picture/ISO8583/MTI.png" alt="iso报文说明"></p>
+<p><img src="/./../../picture/ISO8583/bitmap.png" alt="bitmap"></p>
 
-        </article>
-        
-        
+      
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
+    </div>
+</article>
+
+
+
+
+
     <div id="comments"></div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
 
@@ -1010,6 +1054,13 @@
 </script>
 
 
+
+
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -1018,11 +1069,11 @@
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>
