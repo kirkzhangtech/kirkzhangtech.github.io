@@ -981,7 +981,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-20 21:48:04'>2022-10-20 21:42</time>
+            Created At : <time class="date" title='Updated At: 2022-10-20 22:43:17'>2022-10-20 21:42</time>
         
     </div>
     <div class="article-meta">
@@ -1034,13 +1034,10 @@
 <li><p>下载,并解压<br><a href="https://link.zhihu.com/?target=http://kafka.apache.org/">kafka官网</a></p>
 </li>
 <li><p>将<code>config/server.properties</code>复制三份</p>
+<p> server1.properties,server2.properties,server3.properties</p>
 </li>
-</ol>
-<p>server1.properties,server2.properties,server3.properties</p>
-<ol start="3">
-<li>修改server.properties</li>
-</ol>
-<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># server1.properties</span>
+<li><p>修改server.properties</p>
+ <pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># server1.properties</span>
 <span class="token key attr-name">broker.id</span><span class="token punctuation">=</span><span class="token value attr-value">1</span>
 <span class="token key attr-name">listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://:9092</span>
 <span class="token key attr-name">advertised.listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://10.1.14.159:9092(其中10.1.14.159是我本机的ip)</span>
@@ -1061,24 +1058,22 @@
 <span class="token key attr-name">log.dirs</span><span class="token punctuation">=</span><span class="token value attr-value">/ashura/kafka_2.11-2.2.1/logs/kafka3-logs</span>
 <span class="token key attr-name">zookeeper.connect</span><span class="token punctuation">=</span><span class="token value attr-value">localhost:2181,localhost:2182,localhost:2183</span>
 </code></pre>
-
-<ol start="4">
-<li>启动实例</li>
-</ol>
-<pre class="language-bash" data-language="bash"><code class="language-bash">
+</li>
+<li><p>启动实例</p>
+ <pre class="language-bash" data-language="bash"><code class="language-bash">
 <span class="token function">nohup</span> /ashura/kafka_2.11-2.2.1/bin/kafka-server-start.sh /ashura/kafka_2.11-2.2.1/config/server3.properties <span class="token operator">></span> /ashura/kafka_2.11-2.2.1/logs/kafka3-logs/startup.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token operator">&amp;</span>
 <span class="token function">nohup</span> /ashura/kafka_2.11-2.2.1/bin/kafka-server-start.sh /ashura/kafka_2.11-2.2.1/config/server2.properties <span class="token operator">></span> /ashura/kafka_2.11-2.2.1/logs/kafka2-logs/startup.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token operator">&amp;</span>
 <span class="token function">nohup</span> /ashura/kafka_2.11-2.2.1/bin/kafka-server-start.sh /ashura/kafka_2.11-2.2.1/config/server1.properties <span class="token operator">></span> /ashura/kafka_2.11-2.2.1/logs/kafka1-logs/startup.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token operator">&amp;</span></code></pre>
-
-<ol start="5">
-<li>health check</li>
-</ol>
-<p>通过startup.log,或者同级目录下的server.log查看是否有报错即可。<br>检测</p>
+</li>
+<li><p>health check</p>
+<p> 通过startup.log,或者同级目录下的server.log查看是否有报错即可。<br> 检测</p>
 <ul>
 <li>创建主题:.&#x2F;kafka-topics.sh –bootstrap-server 127.0.0.1:9092 –create –topic fxb_test1 –replication-factor 3 –partitions 3</li>
 <li>启动消费者: .&#x2F;kafka-console-producer.sh –broker-list 10.1.14.159:9092 –topic fxb_test1</li>
 <li>新开窗口个,启动生产者: kafka-console-producer.sh –bootstrap-server 127.0.0.1 –create –topic fxb_test1 在生产者窗口中输入消息，查看消费者的窗口，是否有消息产生。</li>
 </ul>
+</li>
+</ol>
 
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
