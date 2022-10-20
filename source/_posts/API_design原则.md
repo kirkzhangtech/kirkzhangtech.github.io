@@ -1,8 +1,7 @@
 ---
 title: API Design Patterns
 categories:
-- WEB API
-
+- WEB-API
 ---
 
 ## 1. API介绍

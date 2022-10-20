@@ -123,7 +123,15 @@ categories:
   - [19.1 文本处理](#191-文本处理)
     - [19.1.1 sed编辑器](#1911-sed编辑器)
     - [19.1.2 gawk程序](#1912-gawk程序)
-  - [19.2 sed and gawk进阶](#192-sed-and-gawk进阶)
+  - [19.2 sed 编辑器基础](#192-sed-编辑器基础)
+    - [19.2.1 更多的替换选项](#1921-更多的替换选项)
+    - [19.2.2 使用地址](#1922-使用地址)
+    - [19.2.3 删除行](#1923-删除行)
+    - [19.2.4 插入和附加文本](#1924-插入和附加文本)
+    - [19.2.5 修改行](#1925-修改行)
+    - [19.2.6 转换命令](#1926-转换命令)
+    - [19.2.7 回顾打印](#1927-回顾打印)
+    - [19.2.8 使 用 sed 处理文件](#1928-使-用-sed-处理文件)
 - [20.正则表达式](#20正则表达式)
   - [20.1 什么是正则表达式](#201-什么是正则表达式)
   - [20.2 定义BRE模式](#202-定义bre模式)
@@ -1532,7 +1540,7 @@ Goodbye
 
 ### 15.4.4 创建读写文件描述符
 
-(不是太理解)
+(第一遍不是很懂)
 尽管看起来可能会很奇怪，但是你也可以打开单个文件描述符来作为输入和输出。可以用同
 一个文件描述符对同一个文件进行读写。
 不过用这种方法时，你要特别小心。由于你是对同一个文件进行数据读写，shell会维护一个
@@ -1558,9 +1566,57 @@ $ ./test16
 Read: This is the first line. 
 ```
 
-### 15.4.5 关闭文件描述符
+这个例子用了exec命令将文件描述符3分配给文件testfile以进行文件读写。接下来，它
+通过分配好的文件描述符，使用read命令读取文件中的第一行，然后将这一行显示在STDOUT上。
+最后，它用echo语句将一行数据写入由同一个文件描述符打开的文件中。
+在运行脚本时，一开始还算正常。输出内容表明脚本读取了testfile文件中的第一行。但如果
+你在脚本运行完毕后，查看testfile文件内容的话，你会发现写入文件中的数据覆盖了已有的数据。
+当脚本向文件中写入数据时，它会从文件指针所处的位置开始。read命令读取了第一行数
+据，所以它使得文件指针指向了第二行数据的第一个字符。在echo语句将数据输出到文件时，
+它会将数据放在文件指针的当前位置，覆盖了该位置的已有数据。
 
-不懂
+### 15.4.5 关闭文件描述符
+(第一遍不是很懂)
+如果你创建了新的输入或输出文件描述符，shell会在脚本退出时自动关闭它们。然而在有些
+情况下，你需要在脚本结束前手动关闭文件描述符。
+要关闭文件描述符，将它重定向到特殊符号&-。脚本中看起来如下：
+`exec 3>&- `
+该语句会关闭文件描述符3，不再在脚本中使用它。这里有个例子来说明当你尝试使用已关
+闭的文件描述符时会怎样。
+```bash
+$ cat badtest 
+#!/bin/bash 
+# testing closing file descriptors 
+exec 3> test17file 
+echo "This is a test line of data" >&3 
+exec 3>&- 
+echo "This won't work" >&3 
+$ ./badtest 
+./badtest: 3: Bad file descriptor 
+$ 
+```
+一旦关闭了文件描述符，就不能在脚本中向它写入任何数据，否则shell会生成错误消息。
+在关闭文件描述符时还要注意另一件事。如果随后你在脚本中打开了同一个输出文件，shell
+会用一个新文件来替换已有文件。这意味着如果你输出数据，它就会覆盖已有文件。考虑下面这
+个问题的例子。
+
+```bash
+$ cat test17 
+#!/bin/bash 
+#testing closing file descriptors 
+exec 3> test17file 
+echo "This is a test line of data" >&3 
+exec 3>&- 
+cat test17file 
+exec 3> test17file 
+echo "This'll be bad" >&3 
+$ ./test17 
+This is a test line of data 
+$ cat test17file 
+This'll be bad 
+$ 
+```
+
 
 ## 15.5 列出未关闭的文件描述符
 
@@ -1582,7 +1638,35 @@ NODE        本地文件的节点号
 NAME        文件名
 ```
 
-(不是很懂)
+与STDIN、STDOUT和STDERR关联的文件类型是字符型。因为STDIN、STDOUT和STDERR文
+件描述符都指向终端，所以输出文件的名称就是终端的设备名。所有3种标准文件都支持读和写
+（尽管向STDIN写数据以及从STDOUT读数据看起来有点奇怪）。
+现在看一下在打开了多个替代性文件描述符的脚本中使用lsof命令的结果。
+```bash
+$ cat test18 
+#!/bin/bash 
+# testing lsof with file descriptors 
+exec 3> test18file1 
+exec 6> test18file2 
+exec 7< testfile 
+/usr/sbin/lsof -a -p $$ -d0,1,2,3,6,7 
+$ ./test18 
+COMMAND PID USER FD TYPE DEVICE SIZE NODE NAME 
+test18 3594 rich 0u CHR 136,0 2 /dev/pts/0 
+test18 3594 rich 1u CHR 136,0 2 /dev/pts/0 
+test18 3594 rich 2u CHR 136,0 2 /dev/pts/0 
+18 3594 rich 3w REG 253,0 0 360712 /home/rich/test18file1 
+18 3594 rich 6w REG 253,0 0 360715 /home/rich/test18file2 
+18 3594 rich 7r REG 253,0 73 360717 /home/rich/testfile 
+$ 
+```
+
+该脚本创建了3个替代性文件描述符，两个作为输出（3和6），一个作为输入（7）。在脚本
+运行lsof命令时，可以在输出中看到新的文件描述符。我们去掉了输出中的第一部分，这样你
+就能看到文件名的结果了。文件名显示了文件描述符所使用的文件的完整路径名。它将每个文件
+都显示成REG类型的，这说明它们是文件系统中的常规文件。
+
+(第一遍不是很懂)
 
 ## 15.6 组织命令输出
 
@@ -2413,42 +2497,42 @@ sed  -e  's/brown/red;  s/blue/yellow/'   data/txt
 
 1. 在命令行定义编辑器命令
 
-```bash
-echo "This is a test" | sed 's/test/big test/'
-```
+  ```bash
+  echo "This is a test" | sed 's/test/big test/'
+  ```
 
-这里使用了`sed`的s命令，是指替换字符串，符合replace A B,用B替换A.重要的是，要记住，
-sed编辑器并不会修改文本文件的数据。它只会将修改后的数据发送到STDOUT。如果你查看原来
-的文本文件，它仍然保留着原始数据。
+  这里使用了`sed`的s命令，是指替换字符串，符合replace A B,用B替换A.重要的是，要记住，
+  sed编辑器并不会修改文本文件的数据。它只会将修改后的数据发送到STDOUT。如果你查看原来
+  的文本文件，它仍然保留着原始数据。
 2. 在命令行使用多个编辑器命令
 
-```bash
-sed -e 's/brown/green/; s/dog/cat/' data1.txt 
-```
+  ```bash
+  sed -e 's/brown/green/; s/dog/cat/' data1.txt 
+  ```
 
-这种情况一定要加分号,也可以使用
+  这种情况一定要加分号,也可以使用
 
-```bash
-$ sed -e '
-> s/brown/green/ 
-> s/fox/elephant/ 
-> s/dog/cat/' data1.txt 
+  ```bash
+  $ sed -e '
+  > s/brown/green/ 
+  > s/fox/elephant/ 
+  > s/dog/cat/' data1.txt 
 
-```
+  ```
 
-必须记住，要在封尾**单引号**所在行结束命令。bash shell一旦发现了封尾的单引号，就会执行
-命令。开始后，sed命令就会将你指定的每条命令应用到文本文件中的每一行上。
+  必须记住，要在封尾**单引号**所在行结束命令。bash shell一旦发现了封尾的单引号，就会执行
+  命令。开始后，sed命令就会将你指定的每条命令应用到文本文件中的每一行上。
 
 3. 从文件中读取编辑器命令
 
-```bash
-sed -f script.sed  data.txt
-# 命令文件
-$ cat script1.sed
-s/brown/green/
-s/fox/elephant/ 
-s/dog/cat/
-```
+  ```bash
+  sed -f script.sed  data.txt
+  # 命令文件
+  $ cat script1.sed
+  s/brown/green/
+  s/fox/elephant/ 
+  s/dog/cat/
+  ```
 
 ### 19.1.2 gawk程序
 
@@ -2462,13 +2546,10 @@ s/dog/cat/
 - 通过提取数据文件中的数据元素，将其重新排列或格式化，生成格式化报告。
 
 1. 基本格式
-
   ```bash
   gawk options program file
   ```
-
   可用选项
-
   ```bash
   -F fs  指定行中划分数据字段的字段分隔符
   -f file  从指定的文件中读取程序
@@ -2488,16 +2569,13 @@ s/dog/cat/
   $1代表文本行中的第1个数据字段；
   $2代表文本行中的第2个数据字段；
   $n代表文本行中的第n个数据字段。
-
   自动为文件每一行数据分配一个变量gawk '{print $1}' data2.txt 数据文件中每一行的第一个字符
   `gawk -F: '{print $1}' /etc/passwd`
 
 4. 在程序脚本中使用多个命令
-
   `"my name is rich" | gawk '{$4="Christine"; print $0}'` , 给第四个字段名赋值，并输出文本名 ，
   注意， gawk程序在输出中已经将原文本中的第四个数据字段替换成了新值。如果不指定文件名就会从标准输入等待输入
   也可以多行
-
   ```bash
   $ gawk '{
   > $4="Christine" 
@@ -2507,7 +2585,6 @@ s/dog/cat/
   ```
 
 5. 从文件中读取程序
-
   ```bash
   gawk -F:  -f  script2.gawk  /etc/passwd
   cat script2.gawk
@@ -2530,7 +2607,6 @@ s/dog/cat/
   程序在引用变量值时并未像shell脚本一样使用美元
 
 6. 在处理数据前运行脚本
-
   awk允许在执行脚本文件之前先执行某段特定程序`BEGIN`实现了这个功能
 
   ```bash 
@@ -2547,7 +2623,6 @@ s/dog/cat/
   脚本仍然被认为是gawk命令行中的一个文本字符串。你需要相应地加上单引号
 
 7. 处理数据后运行脚本
-
   会在最后执行的一段程序代码
 
   ```bash
@@ -2566,30 +2641,218 @@ s/dog/cat/
   } 
   ```
 
-## 19.2 sed and gawk进阶
+## 19.2 sed 编辑器基础
 
-替换标记
-s/pattern/replacement/flags
+### 19.2.1 更多的替换选项
 
-- 数字， 说明新文本将替换第几处的地方
-- g，说明文本将替换所有
-- p, 原先行要打印
-- w file ， 将结果输出到新文件中
-- option 位置是 n 说明禁止输出
+1. 替换标记
+  > s/pattern/replacement/flags
+  一句话概括就是自定义替换范围，具体详情参考下面list
 
-替换字符
-在替换文件路径时候涉及到转义字符这样很影响阅读性
+  - 数字， 说明新文本将替换第几处的位置
+  - g，说明文本将替换所有
+  - p, 输出被替换命令修改过的行
+  - w file ， 将结果输出到新文件中`sed 's/test/trial/w test.txt' data5.txt ` 输出结果会打印到test.txt文件
+  - option 位置是 n 说明禁止输出
 
-替换指定行
-sed '2s/dog/cat/' data1.txt        这个命令的意思就是将data1.txt替换第二行中的dog，替换成cat
-sed '2,3s/dog/cat/' data1.txt    以此类推是第二行，第三行
-sed '2,$s/dog/cat/' data1.txt    从第二行开始到最后一行
-sed '/Samantha/s/bash/csh/' /etc/passwd   推过模式匹配
-sed '3,${
-  s/brown/green/
-  s/lazy/active/
-  }' data1.txt
+2. 替换字符
+  在替换文件路径时候涉及到`转义字符`这样很影响阅读性
+  ```bash
+  sed 's/\/bin\/bash/\/bin\/csh/' /etc/passwd
+  ```
+  上面命令太难看，可以选择下面的方式
+  ```bash
+  sed 's!/bin/bash!/bin/csh!' /etc/passwd 
+  ```
 
+### 19.2.2 使用地址
+  sed编辑器中使用的命令会作用于文本数据的所有行。如果只想将命令作用
+  于特定行或某些行，则必须用行寻址（line addressing).
+  在sed编辑器中有两种形式的行寻址：
+   - 以数字形式表示行区间
+   - 用文本模式来过滤出行
+
+1. 数字方式的行寻址
+   sed编辑器会将文本流中的第一行编号为1，然后继续按顺序为接下来的行分配行号。
+   ```bash
+    $ sed '2s/dog/cat/' data1.txt
+    The quick brown fox jumps over the lazy dog 
+    The quick brown fox jumps over the lazy cat 
+    The quick brown fox jumps over the lazy dog 
+    The quick brown fox jumps over the lazy dog 
+   ```
+   如果想修改2，3行可使用
+   ```bash
+   sed '2,3s/dog/cat/' data1.txt 
+   ```
+   如果想将命令作用到文本中从某行开始到结尾，可以用特殊地址——美元符
+   ```bash
+    sed '2,$s/dog/cat/' data1.txt
+    The quick brown fox jumps over the lazy dog 
+    The quick brown fox jumps over the lazy cat 
+    The quick brown fox jumps over the lazy cat 
+    The quick brown fox jumps over the lazy cat
+   ```
+2. 使用文本模式过滤器
+   sed编辑器允许指定文本模式来过滤出命令要作用的行。必须用正斜线将要指定的pattern封起来。
+   sed编辑器会将该命令作用到包含指定文本模式的行上。
+   说白了就是支持正则表达式来匹配字符串
+   ```bash
+  sed '/Samantha/s/bash/csh/' /etc/passwd 
+   ```
+3. 命令组合
+  如果需要在单行上执行多条命令，可以用花括号将多条命令组合在一起。sed编辑器会处理地址行处列出的每条命令。
+  ```bash
+  sed '3,${
+  > s/brown/green/ 
+  > s/lazy/active/ 
+  > }' data1.txt 
+  ```
+### 19.2.3 删除行
+  ```bash
+  sed 'd' data1.txt  # 删除整个data1文件内容
+  sed '3d' data6.txt  # 删除data6文件地三行
+  sed '3,$d' data6.txt  # 删除data6文件第三行及后面的行
+  sed '/number 1/d' data6.txt  # 删除第一行
+  sed '/1/,/3/d' data6.txt  #也可以使用两个文本模式来删除某个区间内的行，但这么做时要小心。你指定的第一个模式会“打开”行删除功能，第二个模式会“关闭”行删除功能。sed编辑器会删除两个指定行之间的所有行（包括指定的行）。
+  $ cat data7.txt 
+  This is line number 1. 
+  This is line number 2. 
+  This is line number 3. 
+  This is line number 4. 
+  This is line number 1 again. 
+  This is text you want to keep. 
+  This is the last line in the file. 
+  $ 
+  $ sed '/1/,/3/d' data7.txt  # 这个命令只会匹配数字的模式串
+  This is line number 4. 
+  ```
+  第二个出现数字“1”的行再次触发了删除命令，因为没有找到停止模式，所以就将数据流
+  中的剩余行全部删除了。当然，如果你指定了一个从未在文本中出现的停止模式，显然会出现另
+  外一个问题。
+
+### 19.2.4 插入和附加文本
+- 插入
+- 附加
+new line中的文本将会出现在sed编辑器输出中你指定的位置。记住，当使用插入命令时，
+文本会出现在数据流文本的前面.
+```bash
+$ echo "Test Line 2" | sed 'i\Test Line 1' 
+```
+当使用附加命令时，文本会出现在数据流文本的后面。
+```bash
+$ echo "Test Line 2" | sed 'a\Test Line 1' 
+$ sed '3i\ 
+> This is an inserted line.' data6.txt  # 指定插入的位置
+$ sed '3a\
+> This is an appended line.' data6.txt # 指定append的位置
+sed '$a\
+> This is a new line of text.' data6.txt  # append到最后一行
+$ sed '1i\
+> This is one line of new text.\ 
+> This is another line of new text.' data6.txt  # 要插入或附加多行文本，就必须对要插入或附加的新文本中的每一行使用反斜线，直到最后一行。
+```
+### 19.2.5 修改行
+  ```bash
+  $ sed '3c\
+  > This is a changed line of text.' data6.txt 
+  $ sed '/number 3/c\
+  > This is a changed line of text.' data6.txt 
+  ```
+  文本模式修改命令会修改它匹配的数据流中的任意文本行。
+  ```bash
+  $ sed '/number 1/c\ 
+  > This is a changed line of text.' data8.txt # 正则表达式
+  sed '2,3c\
+  > This is a new line of text.' data6.txt  # 用一行覆盖了2，3行
+  ```
+### 19.2.6 转换命令
+  ```bash
+  [address]y/inchars/outchars/ 
+  ```
+  如你在输出中看到的，inchars模式中指定字符的每个实例都会被替换成outchars模式中
+  相同位置的那个字符。
+  转换命令是一个全局命令，也就是说，它会文本行中找到的所有指定字符自动进行转换，而
+  不会考虑它们出现的位置。
+  ```bash
+  $ echo "This 1 is a test of 1 try." | sed 'y/123/456/'
+  ```
+### 19.2.7 回顾打印
+- p命令用来打印文本行；
+- 等号（=）命令用来打印行号；
+- l（小写的L）命令用来列出行。
+
+1. 打印行
+   ```bash
+    $ echo "this is a test" | sed 'p' # 打印原行
+    this is a test 
+    this is a test
+    $ sed -n '/number 3/p' data6.txt # 打印匹配行
+    This is line number 3. 
+    $ sed -n '2,3p' data6.txt  # 取范围
+    $ sed -n '/3/{  # 这个3是模式匹配
+    > p 
+    > s/line/test/p 
+    > }' data6.txt 
+   ```
+   在命令行上用-n选项，你可以禁止输出其他行，只打印匹配文本模式的行。
+2. 打印行号
+  ```bash
+  $ sed '=' data1.txt  
+  $ sed -n '/number 4/{
+  > = 
+  > p 
+  > }' data6.txt  # 模式匹配第四行，然后打印修改前数据
+  ```
+3. 列出行
+   ```bash
+    $ sed -n 'l' data9.txt  # 可以打印出特殊字符，甚至是制表符
+    $ cat data10.txt
+    This line contains an escape character. 
+    $ 
+    $ sed -n 'l' data10.txt 
+    This line contains an escape character. \a$ 
+    $ 
+   ```
+    data10.txt文本文件包含了一个转义控制码来产生铃声。当用cat命令来显示文本文件时，你
+    看不到转义控制码，只能听到声音（如果你的音箱打开的话）。但是，利用列出命令，你就能显
+    示出所使用的转义控制码
+### 19.2.8 使 用 sed 处理文件
+1. sed支持写文件
+  ```bash
+  [address]w filename
+  ```
+  filename可以使用相对路径或绝对路径，但不管是哪种，运行sed编辑器的用户都必须有文
+  件的写权限。地址可以是sed中支持的任意类型的寻址方式，例如单个行号、文本模式、行区间
+  或文本模式。
+  ```bash
+  $ sed -n '/Browncoat/w Browncoats.txt' data11.txt  #文本模式匹配
+  $ sed '1,2w test.txt' data6.txt  # 文件选址
+  ```
+2. 从文件读取数据
+  filename参数指定了数据文件的绝对路径或相对路径。你在读取命令中使用地址区间，只
+  能指定单独一个行号或文本模式地址。sed编辑器会将文件中的文本插入到指定地址后。
+  ```bash
+  $ cat data12.txt
+  This is an added line. 
+  This is the second added line. 
+  $ 
+  $ sed '3r data12.txt' data6.txt 
+  This is line number 1. 
+  This is line number 2. 
+  This is line number 3. 
+  This is an added line. 
+  This is the second added line. 
+  This is line number 4. 
+  ```
+  将data12.txt的文件插入到 data6.txt文件流中第三行后面
+  读取命令的另一个很酷的用法是和删除命令配合使用
+  ```bash
+  $ sed '/LIST/{
+  > r data11.txt 
+  > d 
+  > }' notice.std
+  ```
 # 20.正则表达式
 
 ## 20.1 什么是正则表达式

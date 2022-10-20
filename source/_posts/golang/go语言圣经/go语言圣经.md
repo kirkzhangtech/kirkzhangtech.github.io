@@ -88,7 +88,7 @@ tag: golang
 
 |功能性关键字|描述|
 |---|---|
-|break|推出循环|
+|break|退出循环|
 |case|switch case, select case|
 |chan||
 |const||
@@ -1498,10 +1498,9 @@ type ReadWriter interface {
 
 
 ## 7.4 flag.Value接口
-(翻译的太差劲，要去读原文)
-- 简单的`flag`包支持命令行的例子
-
-    ```golang
+在linux程序中，你会发现很多程序都支持选项，通过带上参数，程序会有很多丰富的功能
+比如下面demo就是简单的打印选项-period后面的值。
+```golang
     var period = flag.Duration("period", 1*time.Second, "sleep period")
 
     func main() {
@@ -1510,9 +1509,26 @@ type ReadWriter interface {
         time.Sleep(*period)
         fmt.Println()
     }
-    ```
+```
+这里golang的flag包提供了这种功能，我们可以通过实现flag的接口自定义新的标记符号
+```golang
+package flag
 
+// Value is the interface to the value stored in a flag.
+type Value interface {
+    String() string
+    Set(string) error
+}
+
+```
+`string() string`方法格式化标记的值  
+`Set(string) error` 解析它的字符串参数，并更新标记变量的值  
+让我们定义一个允许通过摄氏度或者华氏温度变换的形式指定温度的celsiusFlag类型。
+注意celsiusFlag内嵌了一个Celsius类型，因此不用实现本身就已经有String方法了。为了实现flag.Value，我们只需要定义Set方法：
+代码demo如下
 - 自定义新的标记符号
+
+    <details><summary>温度的转化</summary>
 
     ```golang
     package tempconv
@@ -1581,6 +1597,53 @@ type ReadWriter interface {
         fmt.Println(*temp)
     }
     ```
+
+    </details>
+
+    <details><summary>url解析</summary>
+    ```golang
+
+    package main
+
+    import (
+        "flag"
+        "fmt"
+        "net/url"
+    )
+
+    type URLValue struct {
+        URL *url.URL
+    }
+
+    func (v URLValue) String() string {
+        if v.URL != nil {
+            return v.URL.String()
+        }
+        return ""
+    }
+
+    func (v URLValue) Set(s string) error {
+        if u, err := url.Parse(s); err != nil {
+            return err
+        } else {
+            *v.URL = *u
+        }
+        return nil
+    }
+
+    var u = &url.URL{}
+
+    func main() {
+        fs := flag.NewFlagSet("ExampleValue", flag.ExitOnError)
+        fs.Var(&URLValue{u}, "url", "URL to parse")
+
+        fs.Parse([]string{"-url", "https://golang.org/pkg/flag/"})
+        fmt.Printf(\`{scheme: %q, host: %q, path: %q}\`, u.Scheme, u.Host, u.Path)
+
+    }
+    ```
+
+    </details>
 
 ## 7.5 接口值
 
