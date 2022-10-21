@@ -988,7 +988,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-22 00:46:52'>2022-10-08 14:02</time>
+            Created At : <time class="date" title='Updated At: 2022-10-22 00:53:04'>2022-10-08 14:02</time>
         
     </div>
     <div class="article-meta">
@@ -2726,7 +2726,7 @@ func main() &#123;
 
   </details></li>
 </ul>
-<h2 id="7-5-接口值"><a href="#7-5-接口值" class="headerlink" title="7.5 接口值"></a>7.5 接口值</h2><p>概念上讲接口的值,由两部分组成,是其<code>类型(值)</code>和<code>具体类型的值</code>,他们的组合被称为接口的<code>动态类型</code>和<code>动态值</code>.对于像Go语言这种静态类型的语言,类型是编译期的概念;因此一个类型不是一个值。在我们的概念模型中，一些提供每个类型信息的值被称为类型描述符，比如类型的名称和方法。在一个接口值中，类型部分代表与之相关类型的描述符。<br>下面4个语句中，变量w得到了3个不同的值,他们三个的值都是相同的</p>
+<h2 id="7-5-接口值"><a href="#7-5-接口值" class="headerlink" title="7.5 接口值"></a>7.5 接口值</h2><p>概念上讲接口的值,由两部分组成,是其<code>类型(值)</code>和<code>具体类型的值</code>,他们的组合被称为接口的<code>动态类型</code>和<code>动态值</code>.<br>对于像Go语言这种静态类型的语言,类型是编译期的概念;因此一个类型不是一个值。在我们的概念模型中，<br>一些提供每个类型信息的值被称为类型描述符，比如类型的名称和方法。在一个接口值中，类型部分代表与之相关类型的描述符。<br>下面语句中，变量w得到了3个不同的值,他们三个的值都是相同的</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">var w io.Writer &#x2F;&#x2F;接口type Write
 w &#x3D; os.Stdout &#x2F;&#x2F; 最后返回的是*file类型,func (f *File) Write(b []byte) (n int, err error)
 w &#x3D; new(bytes.Buffer) &#x2F;&#x2F; func (b *Buffer) Write(p []byte) (n int, err error)
@@ -2742,14 +2742,15 @@ fmt.Printf(&quot;%T\n&quot;, a) &#x2F;&#x2F; &quot;*bytes.Buffer&quot;</code></p
 <p>一个接口值基于它的动态类型被描述为<code>nil</code>或<code>!nil</code>，所以这是一个空的接口值。你可以通过使用<code>w==nil</code>或者<code>w!=nil</code>来判断接口值是否为空。调用一个空接口值上的任意方法都会产生<code>panic</code>:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w.Write([]byte(&quot;hello&quot;)) &#x2F;&#x2F; panic: nil pointer dereference</code></pre>
 
-<pre class="language-txt" data-language="txt"><code class="language-txt">如果是接口类型定义的变量那么它的动态类型和动态值都是nil，赋nil之后动态类型和动态值也全都是nil值，但是指针和基本类型和符合类型不会
-类似于java一样，不能没有对象就调用方法，会包空指针异常,上面代码在第三行动态值写为nil
-这里面有个细节要明白，定义语句var w io.Writer
-其实是动态类型和动态值都是nil，进行布尔判断的时候才是为nil</code></pre>
+<blockquote>
+<p>如果是接口类型定义的变量那么它的动态类型和动态值都是nil，赋nil之后动态类型和动态值也全都是nil值，但是指针和基本类型和符合类型不会<br>类似于java一样，不能没有对象就调用方法，会包空指针异常,上面代码在第三行动态值写为nil<br>这里面有个细节要明白，定义语句var w io.Writer<br>其实是动态类型和动态值都是nil，进行布尔判断的时候才是为nil</p>
+</blockquote>
 <p>第二个语句将一个<code>*os.File</code>类型的值赋给变量<code>w</code>:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w &#x3D; os.Stdout</code></pre>
 <p>这个赋值过程调用了一个具体类型到接口类型的隐式转换，这和显式的使用<code>io.Writer(os.Stdout)</code>是等价的。这类转换不管是显式的还是隐式的，都会刻画出操作到的类型和值。这个接口值的动态类型被设为<code>*os.File</code>指针的类型描述符，它的动态值持有<code>os.Stdout</code>的拷贝;这是一个代表处理标准输出的<code>os.File</code>类型变量的指针7.2<br><img src="/./../../../picture/golang%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/ch7-02.png" alt="7.2"></p>
-<pre class="language-txt" data-language="txt"><code class="language-txt">在第二行的赋值操作中,type已经变成`*os.file`类型,其实上面说的很罗嗦,直接就是os.Stdout是具体的*file类型实现了io.Writer接口</code></pre>
+<blockquote>
+<p>在第二行的赋值操作中,type已经变成<code>*os.file</code>类型,其实上面说的很罗嗦,直接就是os.Stdout是具<br>体的*file类型实现了io.Writer接口</p>
+</blockquote>
 <p>调用一个包含<code>*os.File</code>类型指针的接口值的<code>Write</code>方法，使得<code>(*os.File).Write</code>方法被调用。这个调用输出“hello”。</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w.Write([]byte(&quot;hello&quot;)) &#x2F;&#x2F; &quot;hello&quot;</code></pre>
 
@@ -2764,22 +2765,23 @@ fmt.Printf(&quot;%T\n&quot;, a) &#x2F;&#x2F; &quot;*bytes.Buffer&quot;</code></p
 <p>这次类型描述符是<code>*bytes.Buffer</code>，所以调用了<code>(*bytes.Buffer).Write</code>方法，并且接收者是该缓冲区的地址。这个调用把字符串“hello”添加到缓冲区中。<br>最后，第四个语句将nil赋给了接口值:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w &#x3D; nil</code></pre>
 
-<pre class="language-txt" data-language="txt"><code class="language-txt">w = nil 是将动态类型和动态值都设置成nil</code></pre>
-
+<blockquote>
+<p>w &#x3D; nil 是将动态类型和动态值都设置成nil</p>
+</blockquote>
 <p>这个重置将它所有的部分都设为<code>nil</code>值,把变量<code>w</code>恢复到和它之前定义时相同的状态，在图7.1中可以看到。</p>
 <p>一个接口值可以持有任意大的动态值。例如,表示时间实例的time.Time类型，这个类型有几个对外不公开的字段。我们从它上面创建一个接口值:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">var x interface&#123;&#125; &#x3D; time.Now()</code></pre>
 
-<pre class="language-txt" data-language="txt"><code class="language-txt">这里就是创建了一个接口类型的x值,然后可以引用任何类型值</code></pre>
-
+<blockquote>
+<p>这里就是创建了一个接口类型的x值,然后可以引用任何类型值</p>
+</blockquote>
 <p>结果可能和图7.4相似。从概念上讲，不论接口值多大，动态值总是可以容下它。（这只是一个概念上的模型;具体的实现可能会非常不同）</p>
 <p><img src="/./../../../picture/golang%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/ch7-04.png" alt="7.4"></p>
 <p>接口值可以使用<code>==</code>和<code>!＝</code>来进行比较。两个接口值相等仅当它们都是<code>nil</code>值，或者它们的动态类型相同并且动态值也根据这个动态类型的<code>==</code>操作相等。因为接口值是可比较的，所以它们可以用在map的键或者作为switch语句的操作数。</p>
 <p>然而，如果两个接口值的<code>动态类型</code>相同，但是这个动态类型是不可比较的（比如切片），将它们进行比较就会失败并且panic:</p>
-<pre class="language-txt" data-language="txt"><code class="language-txt">两个接口值都是nil的时候才相等,接口值是可比较的(基本的数据类型和指针),注意到原话'它们的动态类型相同并且动态值也根据这个动态类型的`==`操作相等',那么基本类型相同,复杂类型值相等,那么也是可以比较？(待解决)
-要回一下map类型，什么值可以作为key，什么样的不可以
-动态类型是不可比较的</code></pre>
-
+<blockquote>
+<p>两个接口值都是nil的时候才相等,接口值是可比较的(基本的数据类型和指针),<br>注意到原话’它们的动态类型相同并且动态值也根据这个动态类型的<code>==</code>操作相等’,<br>那么基本类型相同,复杂类型值相等,那么也是可以比较？(待解决)<br>要回一下map类型，什么值可以作为key，什么样的不可以<br>动态类型是不可比较的</p>
+</blockquote>
 <p>考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型（如基本类型和指针）要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值。  </p>
 <p>当我们处理错误或者调试的过程中，得知接口值的动态类型是非常有帮助的。所以我们使用fmt包的%T动作:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">
