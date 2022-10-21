@@ -55,6 +55,7 @@ tag: golang
   - [7.3 实现接口的条件](#73-实现接口的条件)
   - [7.4 flag.Value接口](#74-flagvalue接口)
   - [7.5 接口值](#75-接口值)
+    - [7.5.1. 警告:一个包含nil指针的接口不是nil接口](#751-警告一个包含nil指针的接口不是nil接口)
   - [7.6. sort.Interface接口](#76-sortinterface接口)
   - [7.7. http.Handler接口](#77-httphandler接口)
   - [7.8. error接口](#78-error接口)
@@ -1647,45 +1648,136 @@ type Value interface {
 
 ## 7.5 接口值
 
-下面语句中,`io.Writer`是接口类型值
+概念上讲接口的值,由两部分组成,是其`类型(值)`和`具体类型的值`,他们的组合被称为接口的`动态类型`和`动态值`.对于像Go语言这种静态类型的语言,类型是编译期的概念;因此一个类型不是一个值。在我们的概念模型中，一些提供每个类型信息的值被称为类型描述符，比如类型的名称和方法。在一个接口值中，类型部分代表与之相关类型的描述符。  
+下面4个语句中，变量w得到了3个不同的值,他们三个的值都是相同的
+
+```golang
+var w io.Writer //接口type Write
+w = os.Stdout // 最后返回的是*file类型,func (f *File) Write(b []byte) (n int, err error)
+w = new(bytes.Buffer) // func (b *Buffer) Write(p []byte) (n int, err error)
+w = nil // 动态类型和动态值都为空
+
+var a *bytes.Buffer //接口*bytes.Buffer
+a = nil               // 动态类型不为空和动态值都为空
+fmt.Printf("%T\n", a) // "*bytes.Buffer"
+```
 
 ```golang
 var w io.Writer
+```
+![7.1](./../../../picture/golang语言圣经/ch7-01.png)
+
+在Go语言中，变量总是被一个定义明确的值初始化，即使接口类型也不例外。对于一个接口的零值就是它的类型和值的部分都是nil（图7.1）。
+
+一个接口值基于它的动态类型被描述为`nil`或`!nil`，所以这是一个空的接口值。你可以通过使用`w==nil`或者`w!=nil`来判断接口值是否为空。调用一个空接口值上的任意方法都会产生`panic`:
+
+```golang
+w.Write([]byte("hello")) // panic: nil pointer dereference
+```
+
+```txt
+如果是接口类型定义的变量那么它的动态类型和动态值都是nil，赋nil之后动态类型和动态值也全都是nil值，但是指针和基本类型和符合类型不会
+类似于java一样，不能没有对象就调用方法，会包空指针异常,上面代码在第三行动态值写为nil
+这里面有个细节要明白，定义语句var w io.Writer
+其实是动态类型和动态值都是nil，进行布尔判断的时候才是为nil
+```
+第二个语句将一个`*os.File`类型的值赋给变量`w`:
+
+```golang
 w = os.Stdout
+```
+这个赋值过程调用了一个具体类型到接口类型的隐式转换，这和显式的使用`io.Writer(os.Stdout)`是等价的。这类转换不管是显式的还是隐式的，都会刻画出操作到的类型和值。这个接口值的动态类型被设为`*os.File`指针的类型描述符，它的动态值持有`os.Stdout`的拷贝;这是一个代表处理标准输出的`os.File`类型变量的指针7.2
+![7.2](./../../../picture/golang语言圣经/ch7-02.png)
+
+```txt
+在第二行的赋值操作中,type已经变成`*os.file`类型,其实上面说的很罗嗦,直接就是os.Stdout是具体的*file类型实现了io.Writer接口
+```
+调用一个包含`*os.File`类型指针的接口值的`Write`方法，使得`(*os.File).Write`方法被调用。这个调用输出“hello”。
+
+```golang
+w.Write([]byte("hello")) // "hello"
+```
+
+通常在编译期，我们不知道接口值的动态类型是什么，所以一个接口上的调用必须使用动态分配。因为不是直接进行调用，所以编译器必须把代码生成在类型描述符的方法`Write`上，然后间接调用那个地址。这个调用的接收者是一个接口动态值的拷贝，`os.Stdout`。效果和下面这个直接调用一样：
+
+```golang
+os.Stdout.Write([]byte("hello")) // "hello"
+```
+第三个语句给接口值赋了一个`*bytes.Buffer`类型的值
+
+```golang
 w = new(bytes.Buffer)
+```
+
+现在动态类型是`*bytes.Buffer`,并且动态值是一个指向新分配的缓冲区的指针
+![7.3](./../../../picture/golang语言圣经/ch7-03.png)
+`Write`方法的调用也使用了和之前一样的机制:
+
+```golang
+w.Write([]byte("hello")) // writes "hello" to the bytes.Buffers
+```
+
+这次类型描述符是`*bytes.Buffer`，所以调用了`(*bytes.Buffer).Write`方法，并且接收者是该缓冲区的地址。这个调用把字符串“hello”添加到缓冲区中。
+最后，第四个语句将nil赋给了接口值:
+
+```golang
 w = nil
 ```
-- 对于接口的定义也不例外，`接口`的零值是它的类型和值的部分都是`nil`
-- 一个接口值基于它的动态类型被描述为空或非空，所以这是一个空的接口值。你可以通过使用w==nil或者w!=nil来判断接口值是否为空。调用一个空接口值上的任意方法都会产生`panic`: `w.Write([]byte("hello")) // panic: nil pointer dereference`
-- 第二句statement，这个赋值过程调用了一个`具体类型`到`接口类型`的隐式转换，这和显式的使用io.Writer(os.Stdout)是等价的。这类转换不管是显式的还是隐式的，它的动态值持有os.Stdout的拷贝；这是一个代表处理标准输出的`os.File`类型变量的指针.接口值可以使用`==`和`!＝`来进行比较。两个接口值相等仅当它们都是nil值。
-    ```golang
-    w.Write([]byte("hello")) // "hello"
-    os.Stdout.Write([]byte("hello")) // "hello" 
-    //上下两句是等价的
-    ```
-- 一个接口值可以持有任意大的动态值
 
-    ```golang
-    var x interface{} = time.Now()
-    ```
+```txt
+w = nil 是将动态类型和动态值都设置成nil
+```
 
-    接口值可以使用==和!＝来进行比较。两个接口值相等仅当它们都是nil值，或者它们的动态类型相同并且动态值也根据这个动态类型的==操作相等。因为接口值是可比较的，所以它们可以用在map的键或者作为switch语句的操作数,然而，如果两个接口值的动态类型相同，但是这个动态类型是不可比较的（比如切片），将它们进行比较就会失败并且panic:
+这个重置将它所有的部分都设为`nil`值,把变量`w`恢复到和它之前定义时相同的状态，在图7.1中可以看到。
 
-    ```golang
-    var x interface{} = []int{1, 2, 3}
-    fmt.Println(x == x) // panic: comparing uncomparable type []int
-    ```
+一个接口值可以持有任意大的动态值。例如,表示时间实例的time.Time类型，这个类型有几个对外不公开的字段。我们从它上面创建一个接口值:
 
+```golang
+var x interface{} = time.Now()
+```
 
-考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型（如基本类型和指针）要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值.
+```txt
+这里就是创建了一个接口类型的x值,然后可以引用任何类型值
+```
 
+结果可能和图7.4相似。从概念上讲，不论接口值多大，动态值总是可以容下它。（这只是一个概念上的模型;具体的实现可能会非常不同）
 
+![7.4](./../../../picture/golang语言圣经/ch7-04.png)
 
-- *警告*: 一个包含nil指针的接口不是nil接口
+接口值可以使用`==`和`!＝`来进行比较。两个接口值相等仅当它们都是`nil`值，或者它们的动态类型相同并且动态值也根据这个动态类型的`==`操作相等。因为接口值是可比较的，所以它们可以用在map的键或者作为switch语句的操作数。
+
+然而，如果两个接口值的`动态类型`相同，但是这个动态类型是不可比较的（比如切片），将它们进行比较就会失败并且panic:
+
+```txt
+两个接口值都是nil的时候才相等,接口值是可比较的(基本的数据类型和指针),注意到原话'它们的动态类型相同并且动态值也根据这个动态类型的`==`操作相等',那么基本类型相同,复杂类型值相等,那么也是可以比较？(待解决)
+要回一下map类型，什么值可以作为key，什么样的不可以
+动态类型是不可比较的
+```
+
+考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型（如基本类型和指针）要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值。  
+
+当我们处理错误或者调试的过程中，得知接口值的动态类型是非常有帮助的。所以我们使用fmt包的%T动作:
+
+```golang
+
+var w io.Writer
+fmt.Printf("%T\n", w) // "<nil>"
+w = os.Stdout
+fmt.Printf("%T\n", w) // "*os.File"
+w = new(bytes.Buffer)
+fmt.Printf("%T\n", w) // "*bytes.Buffer"
+var buf *bytes.Buffer
+fmt.Printf("%T\n", buf) // "*bytes.Buffer"
+var x interface{}
+fmt.Printf("%T\n", x) // "<nil>"
+
+```
+
+### 7.5.1. 警告:一个包含nil指针的接口不是nil接口
 
 一个不包含任何值的nil接口值和一个刚好包含nil指针的接口值是不同的。这个细微区别产生了一个容易绊倒每个Go程序员的陷阱。
 
-思考下面的程序。当debug变量设置为true时，main函数会将f函数的输出收集到一个bytes.Buffer类型中。
+思考下面的程序。当debug变量设置为true时，main函数会将`f函数`的输出收集到一个bytes.Buffer类型中。
 
 ```golang
 const debug = true
@@ -1708,7 +1800,9 @@ func f(out io.Writer) {
         out.Write([]byte("done!\n"))
     }
 }
+
 ```
+
 我们可能会预计当把变量debug设置为false时可以禁止对输出的收集，但是实际上在out.Write方法调用时程序发生了panic：
 
 ```golang
@@ -1716,34 +1810,45 @@ if out != nil {
     out.Write([]byte("done!\n")) // panic: nil pointer dereference
 }
 ```
-当main函数调用函数f时，它给f函数的out参数赋了一个*bytes.Buffer的空指针，所以out的动态值是nil。然而，它的动态类型是*bytes.Buffer，意思就是out变量是一个包含空指针值的非空接口（如图7.5），所以防御性检查out!=nil的结果依然是true。
+当main函数调用函数f时，它给`f函数`的out参数赋了一个`*bytes.Buffer`的空指针，所以out的动态值是nil。然而，它的动态类型是`*bytes.Buffer`，意思就是out变量是一个包含空指针值的非空接口（如图7.5），所以防御性检查out!=nil的结果依然是true。
 
-![](https://user-images.githubusercontent.com/46363359/182982938-08d67c3f-7aa6-457d-88a5-02646c5e2735.png)
+![7.5](./../../../picture/golang语言圣经/ch7-05.png)
 
-动态分配机制依然决定(*bytes.Buffer).Write的方法会被调用，但是这次的接收者的值是nil。对于一些如*os.File的类型，nil是一个有效的接收者（§6.2.1），但是*bytes.Buffer类型不在这些种类中。这个方法会被调用，但是当它尝试去获取缓冲区时会发生panic。
+动态分配机制依然决定`(*bytes.Buffer).Write`的方法会被调用，但是这次的接收者的值是nil。对于一些如`*os.File`的类型，nil是一个有效的接收者（§6.2.1），但是`*bytes.Buffer`类型不在这些种类中。这个方法会被调用，但是当它尝试去获取缓冲区时会发生panic。
 
-问题在于尽管一个nil的*bytes.Buffer指针有实现这个接口的方法，它也不满足这个接口具体的行为上的要求。特别是这个调用违反了(*bytes.Buffer).Write方法的接收者非空的隐含先觉条件，所以将nil指针赋给这个接口是错误的。解决方案就是将main函数中的变量buf的类型改为io.Writer，因此可以避免一开始就将一个不完整的值赋值给这个接口：
+问题在于尽管一个nil的`*bytes.Buffer`指针有实现这个接口的方法，它也不满足这个接口具体的行为上的要求。特别是这个调用违反了`(*bytes.Buffer).Write`方法的接收者非空的隐含先觉条件，所以将nil指针赋给这个接口是错误的。解决方案就是将main函数中的变量buf的类型改为`io.Writer`，因此可以避免一开始就将一个不完整的值赋值给这个接口：
 
 ```golang
-var buf io.Writer
+var buf io.Writer // 这时候是空指针，没有具体值(对象)
 if debug {
     buf = new(bytes.Buffer) // enable collection of output
 }
 f(buf) // OK
-```
-现在我们已经把接口值的技巧都讲完了，让我们来看更多的一些在Go标准库中的重要接口类型。在下面的三章中，我们会看到接口类型是怎样用在排序，web服务，错误处理中的。
 
+
+// If out is non-nil, output will be written to it.
+func f(out io.Writer) {
+    // ...do something...
+    if out != nil { // 此处判断out为nil
+        out.Write([]byte("done!\n"))
+    }
+}
+```
 
 
 ## 7.6. sort.Interface接口
+
 golang提供了`sort`包帮助进行排序数据,实现排序需要自己实现对应的排序接口.
+
 ```golang
 type byArtist []*Track
 func (x byArtist) Len() int           { return len(x) }
 func (x byArtist) Less(i, j int) bool { return x[i].Artist < x[j].Artist }
 func (x byArtist) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 ```
+
 对于自定义的排序，我们也需要实现排序函数.
+
 ```golang
 //!+customcode
 type customSort struct {
@@ -1768,6 +1873,7 @@ sort.Sort(customSort{tracks, func(x, y *Track) bool {
 		return false
 	}})
 ```
+
 `IntsAreSorted(...interface{})` reports whether the slice x is sorted in increasing order.
 
 ## 7.7. http.Handler接口
