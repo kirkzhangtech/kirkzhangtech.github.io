@@ -12,3 +12,4 @@ categories:
 |markdown文章中使用html达到折叠代码块| ```     <details> <summary><font size="4" color="orange">Show Code</font></summary> <pre><code class="language-cpp">这里填充代码</code></pre> </details>```|
 |安装pyspark和spark|pyspark=3.2.2,spark=3.2.2,jdk=11,python3=3.8,scala=2.11.12.最重要的是版本保持一致|
 |英语中in which 用法|in which 是relative pronoun(关系代词)，用来引导定语从句,在which前加介词显得正式，省去which就不正式.[1] This is the car in which I travelled to Beijing. [2] This is the house in which I grew up. [3] This is the pitch on which I played football all those years ago. [4] ack at school, the name by which I was known was Charlie. [5] And these are the friends with whom I played every day. 这里的frinends是指代后面从句的宾语，故用whome|
+|vue installation|https://cbb104002.medium.com/vue-hello-world-ce15e547419c||

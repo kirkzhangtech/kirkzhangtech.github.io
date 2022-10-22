@@ -182,13 +182,67 @@ categories:
 
 ## 5.4 安全性
 
-目前来说已经说明raft是如何选举和复制日志的，但是这并不能保证不同的状态机执行不同的log，还是会因为follower进入不可用状态然后恢复活性并竞选为leader，这时候leader的日志就会不一致
+目前来说已经说明raft是如何选举和复制日志的，但是这并不能保证不同的状态机执行不同的log，
+还是会因为follower进入不可用状态然后恢复活性并竞选为leader，这时候leader的日志就会不一致
 
 ### 5.4.1 选举限制
 
-VSR算法一开始日志不全的情况下成为leader，然后当某台服务器成为leader之后会额外的同步这些未同步的日志，而raft则会检查candidate和follower的日志，因为如果集群保证半数node提交日志，那么就会有半数服务器是拥有最新的日志的，两份日志，任期号大的比较新，任期号相同，索引大的比较新
+VSR算法一开始日志不全的情况下成为leader，然后当某台服务器成为leader之后会额外的同步这些未同步的日志，
+而raft则会检查candidate和follower的日志，因为如果集群保证半数node提交日志，那么就会有半数服务器是拥有
+最新的日志的，两份日志，任期号大的比较新，任期号相同，索引大的比较新
 
 ### 5.4.2 提交之前任期内的日志条目
 
-熟读figure 8 的图，为了消除figure 8的情况，raft不会通过计算副本数量来提交日志，只有当前任期的日志会通过计算副本数量来进行提交日志，而raft使用了一种更加保守办法，为每个logEntry都保留任期号，想提交之前日志，leader必须使用当前任期号，与其他算法相比，raft只需要发送更少的日志条目
+As described in Section 5.3, a leader knows that an en-
+try from its current term is committed once that entry is
+stored on a majority of the servers. If a leader crashes be-
+fore committing an entry, future leaders will attempt to
+ﬁnish replicating the entry. However, a leader cannot im-
+mediately conclude that an entry from a previous term is
+committed once it is stored on a majority of servers.
+Fig-ure 8 illustrates a situation where an old log entry is stored
+on a majority of servers, yet can still be overwritten by a
+future leader.
 
+![figure9](./../../picture/mit6.824/raft_figure_9.png)
+
+To eliminate problems like the one in Figure 8, Raft
+never commits log entries from previous terms by count-
+ing replicas. Only log entries from the leader’s current
+term are committed by counting replicas; once an entry
+from the current term has been committed in this way,
+then all prior entries are committed indirectly because
+of the Log Matching Property. There are some situations
+where a leader could safely conclude that an older log en-
+try is committed (for example, if that entry is stored on ev-
+ery server), but Raft takes a more conservative approach
+for simplicity.
+
+Raft incurs(招致) this extra complexity in the commitment
+rules because log entries retain their original term num-
+bers when a leader replicates entries from previous
+terms. In other consensus algorithms, if a new leader re-
+replicates entries from prior “terms,” it must do so with
+its new “term number.” Raft’s approach makes it easier
+to reason about log entries, since they maintain the same
+term number over time and across logs. In addition, new
+leaders in Raft send fewer log entries from previous terms
+than in other algorithms (other algorithms must send re-
+dundant log entries to renumber them before they can be
+committed).
+
+<text style="font-family:'Courier new'; color:red ; font-size: 13px"  >
+
+Raft incurs(招致) this extra complexity in the commitment
+rules because log entries retain their original term num-
+bers when a leader replicates entries from previous
+terms. In other consensus algorithms, if a new leader re-
+replicates entries from prior “terms,” it must do so with
+its new “term number.” Raft’s approach makes it easier
+to reason about log entries, since they maintain the same
+term number over time and across logs. In addition, new
+leaders in Raft send fewer log entries from previous terms
+than in other algorithms (other algorithms must send re-
+dundant log entries to renumber them before they can be
+committed).
+</text>
