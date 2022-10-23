@@ -782,6 +782,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
            data-tag=""
            data-author="" >
@@ -802,14 +810,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -846,6 +846,14 @@
         </a>
         
         <a  class="All leetcode leetcode题解 "
+           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode leetcode题解 "
            href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
            data-tag=""
            data-author="" >
@@ -858,14 +866,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
             <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
         </a>
         
@@ -1013,7 +1013,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-23 14:40:48'>2022-10-07 08:40</time>
+            Created At : <time class="date" title='Updated At: 2022-10-23 15:17:51'>2022-10-07 08:40</time>
         
     </div>
     <div class="article-meta">
@@ -1065,13 +1065,23 @@
         <p>Raft Structure Advice</p>
 <p>A Raft instance has to deal with the arrival of external events<br>(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),<br>and it has to execute periodic tasks (elections and heart-beats).<br>There are many ways to structure your Raft code to manage these<br>activities; this document outlines a few ideas.</p>
 <p>Each Raft instance has a bunch of state (the log, the current index,<br>&amp;c) which must be updated in response to events arising in concurrent<br>goroutines. The Go documentation points out that the goroutines can<br>perform the updates directly using shared data structures and locks,<br>or by passing messages on channels. Experience suggests that for Raft<br>it is most straightforward to use shared data and locks.</p>
-<p>A Raft instance has two time-driven activities: the leader must send<br>heart-beats, and others must start an election if too much time has<br>passed since hearing from the leader. <strong>It’s probably best to drive each<br>of these activities with a dedicated long-running goroutine</strong>, rather<br>than combining multiple activities into a single goroutine.<br><text style="font-family:Courier New;color:red"><br>It’s probably best to drive each of these activities<br>with a dedicated long-running goroutine<br></text><br>The management of the election timeout is a common source of<br>headaches. Perhaps the simplest plan is to maintain a variable in the<br>Raft struct containing the last time at which the peer heard from the<br>leader, and to have the election timeout goroutine periodically check<br>to see whether the time since then is greater than the timeout period.<br>It’s easiest to use time.Sleep() with a small constant argument to<br>drive the periodic checks. Don’t use time.Ticker and time.Timer;<br>they are tricky to use correctly.</p>
+<p>A Raft instance has two time-driven activities: the leader must send<br>heart-beats, and others must start an election if too much time has<br>passed since hearing from the leader. <strong>It’s probably best to drive each<br>of these activities with a dedicated long-running goroutine</strong>, rather<br>than combining multiple activities into a single goroutine.</p>
+<text style="font-family:Courier New;color:red">
+It's probably best to drive each of these activities
+with a dedicated long-running goroutine
+</text>
+
+<p>The management of the election timeout is a common source of<br>headaches. Perhaps the simplest plan is to maintain a variable in the<br>Raft struct containing the last time at which the peer heard from the<br>leader, and to have the election timeout goroutine periodically check<br>to see whether the time since then is greater than the timeout period.<br>It’s easiest to use time.Sleep() with a small constant argument to<br>drive the periodic checks. Don’t use time.Ticker and time.Timer;<br>they are tricky to use correctly.</p>
 <text style="font-family:Courier New;color:red">
 using hashicorp struct
 </text>
 
-<p>You’ll want to have a separate long-running goroutine that sends<br>committed log entries in order on the applyCh. It must be separate,<br>since sending on the applyCh can block; and it must be a single<br>goroutine, since otherwise it may be hard to ensure that you send log<br>entries in log order. The code that advances commitIndex will need to<br>kick the apply goroutine; it’s probably easiest to use a condition<br>variable (Go’s sync.Cond) for this.<br><text style="font-family:Courier New;color:red"></p>
-<p>using a seperate applier channel<br></text><br>Each RPC should probably be sent (and its reply processed) in its own<br>goroutine, for two reasons: so that unreachable peers don’t delay the<br>collection of a majority of replies, and so that the heartbeat and<br>election timers can continue to tick at all times. It’s easiest to do<br>the RPC reply processing in the same goroutine, rather than sending<br>reply information over a channel.</p>
+<p>You’ll want to have a separate long-running goroutine that sends<br>committed log entries in order on the applyCh. It must be separate,<br>since sending on the applyCh can block; and it must be a single<br>goroutine, since otherwise it may be hard to ensure that you send log<br>entries in log order. The code that advances commitIndex will need to<br>kick the apply goroutine; it’s probably easiest to use a condition<br>variable (Go’s sync.Cond) for this.</p>
+<text style="font-family:Courier New;color:red">
+using a seperate applier channel
+</text>
+
+<p>Each RPC should probably be sent (and its reply processed) in its own<br>goroutine, for two reasons: so that unreachable peers don’t delay the<br>collection of a majority of replies, and so that the heartbeat and<br>election timers can continue to tick at all times. It’s easiest to do<br>the RPC reply processing in the same goroutine, rather than sending<br>reply information over a channel.</p>
 <text style="font-family:Courier New;color:red">
 easy to unstand , using two different channels to send and process
 reply of RPC
@@ -1095,7 +1105,7 @@ reply of RPC
     
     <p><span class="copy-title">Author:</span><a  title="kirkzhang">kirkzhang</a></p>
     <p><span class="copy-title">Created At:</span>2022-10-07, 08:40:25</p>
-    <p><span class="copy-title">Updated At:</span>2022-10-23, 14:40:48</p>
+    <p><span class="copy-title">Updated At:</span>2022-10-23, 15:17:51</p>
     <span class="copy-title">Url:</span><a class="post-url" href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/" title="MIT6.824之lab2_raft_structure_guide">https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/</a>
     <p>
         <span class="copy-title">Copyright:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">&#39;Attribution-non-commercial-shared in the same way 4.0&#39;</a> Reprint please keep the original link and author.
