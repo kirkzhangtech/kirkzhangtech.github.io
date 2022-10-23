@@ -2401,11 +2401,11 @@ func dirents(dir string) []os.FileInfo {
 
 1. 使用场景: `sync.Cond` 经常用在多个goroutine等待，一个goroutine通知,如果是一读一等待使用`sync.Mutx`和`chan`就可以
 2. `sync.Cond`的[方法](https://pkg.go.dev/sync@go1.19#Cond)
+
     ```golang
     // Each Cond has an associated Locker L (often a *Mutex or *RWMutex),
     // which must be held when changing the condition and
     // when calling the Wait method.
-    //
     // A Cond must not be copied after first use.
     type Cond struct {
             noCopy noCopy
@@ -2417,37 +2417,21 @@ func dirents(dir string) []os.FileInfo {
 
     ```
 
-    Cond 实例都会关联一个锁 L（互斥锁 *Mutex，或读写锁 *RWMutex），当修改条件或者调用 Wait 方法时，必须加锁
+    Cond 实例都会关联一个锁`L`(互斥锁 *Mutex，或读写锁 *RWMutex)，当修改条件或者调用`Wait()`方法时,必须加锁
 
     ```golang
     // Signal wakes one goroutine waiting on c, if there is any.
-    //
     // It is allowed but not required for the caller to hold c.L
     // during the call.
-    //Signal 只唤醒任意 1 个等待条件变量 c 的 goroutine，无需锁保护
+    // Signal 只唤醒任意 1 个等待条件变量 c 的 goroutine，无需锁保护
     func (c *Cond) Signal()
     // Broadcast wakes all goroutines waiting on c.
-    //
     // It is allowed but not required for the caller to hold c.L
     // during the call.
     func (c *Cond) Broadcast()
 
-    // Wait atomically unlocks c.L and suspends execution
-    // of the calling goroutine. After later resuming execution,
-    // Wait locks c.L before returning. Unlike in other systems,
-    // Wait cannot return unless awoken by Broadcast or Signal.
-    //
-    // Because c.L is not locked when Wait first resumes, the caller
-    // typically cannot assume that the condition is true when
-    // Wait returns. Instead, the caller should Wait in a loop:
-    //
-    //    c.L.Lock()
-    //    for !condition() {
-    //        c.Wait()
-    //    }
-    //    ... make use of condition ...
-    //    c.L.Unlock()
-    //挂起调用者所在的 goroutine,等待Broadcast或者Signal方法
+    // c.L.Unlock()
+    // 挂起调用者所在的 goroutine,等待Broadcast或者Signal方法
     func (c *Cond) Wait()
         //代码片段
         c.L.Lock()
@@ -2456,10 +2440,6 @@ func dirents(dir string) []os.FileInfo {
         }
         ... make use of condition ...
         c.L.Unlock()
-    
-
-
-
     ```
 
 3. Cond代码示例
