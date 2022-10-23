@@ -2434,9 +2434,9 @@ func dirents(dir string) []os.FileInfo {
         ... make use of condition ...
         c.L.Unlock()
     ```
-    调用 Wait 会自动释放锁 c.L，并挂起调用者所在的 goroutine，因此当前协程会阻塞在 Wait 方法调用的地方。
-    如果其他协程调用了 Signal 或 Broadcast 唤醒了该协程，那么 Wait 方法在结束阻塞时，会重新给 c.L 加锁，
-    并且继续执行 Wait 后面的代码
+    调用`Wait`会自动释放锁 `c.L`,并挂起调用者所在的`goroutine`，因此当前协程会阻塞在`Wait`方法调用的地方。
+    如果其他协程调用了`Signal`或`Broadcast`唤醒了该协程,那么`Wait`方法在结束阻塞时,会重新给`c.L`加锁，
+    并且继续执行`Wait`后面的代码
 
 3. Cond代码示例
     ```golang
