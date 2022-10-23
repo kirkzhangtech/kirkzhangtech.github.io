@@ -27,7 +27,7 @@ categories:
 
 1. 共识通常出现在状态机背景下，冗余状态机通常被用来解决分布式系统中的容错问题，例如，诸如GFS [8], HDFS [38],和RAM云[33]通常使用一个状态机管理leader选举，存储相关重要的配置信息复制状态机的例子包括Chubby[2] 和 ZooKeeper [11]
 
-    ![raft_figure_1](./../../picture/mit6.824/raft_figure_1.png)
+    ![raft_figure_1](./../../../picture/mit6.824/raft_figure_1.png)
 
 2. 因为两台状态机按顺序执行相同的`日志`x=1.y=3等等,那么这两个状态机计算的状态和输出的结果也是一样的，所以共识算法要保证日志的一致性是非常重要的工作。即使一些状态机因为机械故障导致宕机(少于raft规定的数量)，但是这些服务器看起来还是像一个整体一样对外提供服务。
     - 它们确保在所有非拜占庭条件下的安全性（永远不会返回错误的结果），包括网络延迟、分区、以及数据包丢失、重复和重新排序
@@ -61,14 +61,14 @@ categories:
 
 1. leader接受来自客户端的日志条目，将其复制到其他服务器上，并告诉服务器何时可以将日志条目应用到他们的状态机上。有一个领导者可以简化对复制日志的管理。例如只允许数据从领导者流向其他服务器。一个领导者可能失败或与其他服务器断开连接，在这种情况下 选举一个新的领导者
 
-![raft_figure_2](./../../picture/mit6.824/raft_figure_2.png)
+![raft_figure_2](./../../../picture/mit6.824/raft_figure_2.png)
 考虑到领导者的方法，Raft将共识问题分解为三个相对独立的子问题，这将在后面的小节中讨论.
 
 - leader选举 : 现任领导人失败,必须选择新的领导人
 - Log replication : 领导者必须接受日志条目从client,并在整个集群中复制它们。迫使其他日志与自己的日志一致（第5.3节）。
 - Safety : Raft的关键安全属性是图中的状态机安全属性。图3中的状态机安全属性：如果任何服务器 在其状态机上应用了一个特定的日志条目。 那么其他服务器就不能对相同的日志索引应用不同命令 对相同的日志索引应用不同的命令。第5.4节描述了如何Raft如何确保这一特性；该解决方案涉及到一个 第5.2节中描述的选举机制的额外限制。
 
-![raft_figure_3](./../../picture/mit6.824/raft_figure_3.png)
+![raft_figure_3](./../../../picture/mit6.824/raft_figure_3.png)
 
 - Election Safety: 一届任期内最多可以选出一位领导人
 - Leader Append-Only : 领导者从不覆盖或删除其日志中的的条目；它只添加新的条目
@@ -77,7 +77,7 @@ categories:
 - State Machine Safety : 如果一个服务器在它的状态机上应用了一个日志条目 在它的状态机中应用了一个给定的索引，那么其他服务器将永远不会在同一索引应用不同的日志条目.
 - Raft保证这些属性中的每一个都是真的,在任何时候都是真实的。节号表示每个属性的讨论位置。
 
-![raft_figure_3](./../../picture/mit6.824/raft_figure_4_5.png)
+![raft_figure_3](./../../../picture/mit6.824/raft_figure_4_5.png)
 
 总结
 
@@ -136,7 +136,7 @@ categories:
 2. raft主要将时间定义为任意长度的term,是连续且单调递增的,在某些情况下,会出现多个candidate同时竞选leader的情况，这时候或会出现`瓜分投票`的情况，这是整个raft系统就无法继续前进通过引入随机选举超时解决这个问题，如果一个follower没有在选举超时实践之内接收到leader的heartbeat就会开始选举
 3. 不同的服务器可能在不同的时间观察到term之间的转换。而在某些情况下，一个服务器
 可能观察不到一次选举，甚至是整个任期(candidate在一个term时间内无法完成选举)，term在Raft中充当逻辑时钟[14]，它们允许服务器检测过时的信息，如过时的leader。每个服务器存储一个当前的currentTerm，该currentTerm随着时间的推移单调地随时间增加。每当服务器进行通信时，就会交换currentTerm。如果一个服务器的currentTerm小于另一个服务器的currentTerm，那么它就会更新自己的currentTerm，那么它就将其currentTerm更新为较大的值。如果一个candidate或leader发现它的currenTerm已经过时，它就会变成follower。如果follower收到一个过时的term的请求，它将拒绝该请求。
-![feature 6](./../../picture/mit6.824/raft_figure_6.png)
+![feature 6](./../../../picture/mit6.824/raft_figure_6.png)
 
 ## 5.2  Leader election
 
@@ -204,7 +204,7 @@ Fig-ure 8 illustrates a situation where an old log entry is stored
 on a majority of servers, yet can still be overwritten by a
 future leader.
 
-![figure9](./../../picture/mit6.824/raft_figure_9.png)
+![figure9](./../../../picture/mit6.824/raft_figure_9.png)
 
 To eliminate problems like the one in Figure 8, Raft
 never commits log entries from previous terms by count-
@@ -231,18 +231,3 @@ than in other algorithms (other algorithms must send re-
 dundant log entries to renumber them before they can be
 committed).
 
-<text style="font-family:'Courier new'; color:red>
-
-Raft incurs(招致) this extra complexity in the commitment
-rules because log entries retain their original term num-
-bers when a leader replicates entries from previous
-terms. In other consensus algorithms, if a new leader re-
-replicates entries from prior “terms,” it must do so with
-its new “term number.” Raft’s approach makes it easier
-to reason about log entries, since they maintain the same
-term number over time and across logs. In addition, new
-leaders in Raft send fewer log entries from previous terms
-than in other algorithms (other algorithms must send re-
-dundant log entries to renumber them before they can be
-committed).
-</text>
