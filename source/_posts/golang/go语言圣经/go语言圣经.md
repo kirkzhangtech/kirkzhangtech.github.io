@@ -510,7 +510,7 @@ Go语言主要有四种类型的声明语句:
     |---|---|
     |%b	| 整型以二进制方式显示|
     |%o	| 整型以八进制方式显示|
-    |%d	| 整型以十进制方式显示,以锁为例子`rf.mu=&{{1 0} 0 0 -1073741824 0}`|
+    |%d	| 整型以十进制方式显示,以锁为例子mutex=&((1 0) 0 0 -1073741824 0)|
     |%x	| 整型以十六进制方式显示|
     |%X	| 整型以十六进制、字母大写方式显示|
     |%c	| 相应Unicode码点所表示的字符|
@@ -540,27 +540,22 @@ Go语言主要有四种类型的声明语句:
 - 通用的占位符
     |格 式|	描 述|
     |---|---|
-    |%v	|   值的默认格式。只输出字段的值，没有字段名字,eg: requestVote RPC={1,1,0,0}|
-    |%+v|   类似%v，但输出结构体时会添加字段名,以RWMutex为例子,&{w:{state:1 sema:0} writerSem:0 readerSem:0 readerCount:-1073741824 readerWait:0}|
-    |%#v|   相应值的Go语法表示,以RWMutex为例子,&sync.RWMutex{w:sync.Mutex{state:1, sema:0x0}, writerSem:0x0, readerSem:0x0, readerCount:-1073741824, readerWait:0}|
-    |%T	|   相应值的类型的Go语法表示,比如以RWMutex为例子,rf.mu=*sync.RWMutex|
-    |%%	|   百分号,字面上的%,非占位符含义|
+    |%v	|值的默认格式。只输出字段的值，没有字段名字,eg: requestVote RPC={1,1,0,0}|
+    |%+v|类似%v，但输出结构体时会添加字段名,以RWMutex为例子, &{w:{state:1 sema:0} writerSem:0 readerSem:0 readerCount:-1073741824 readerWait:0}|
+    |%#v|相应值的Go语法表示,比如地址用十六进制表示,以RWMutex为例子, &sync.RWMutex{w:sync.Mutex{state:1, sema:0x0}, writerSem:0x0, readerSem:0x0, readerCount:-1073741824, readerWait:0}|
+    |%T	|相应值的类型的Go语法表示,比如以RWMutex为例子,rf.mu=*sync.RWMutex|
+    |%%	|百分号,字面上的%,非占位符含义|
 
 - 控制宽度
     宽度设置格式: 占位符中间加一个数字, 数字分正负, +: 右对齐, -: 左对齐
     - 字符串控制
-
         ```golang
         fmt.Printf("|%s|", "aa") // 不设置宽度
         fmt.Printf("|%5s|", "aa") // 5个宽度,  默认+， 右对齐
         fmt.Printf("|%-5s|", "aa") // 5个宽度, 左对齐
-
         fmt.Printf("|%05s|", "aa") // |000aa|
-
         ```
-
     - 浮点控制
-
         ```golang
         a := 54.123456
         fmt.Printf("|%f|", a)  // |54.123456|
@@ -568,9 +563,6 @@ Go语言主要有四种类型的声明语句:
         fmt.Printf("|%-5.1f|", a) // |54.1 |
         fmt.Printf("|%05.1f|", a) // |054.1|
         ```
-
-
-
 ## 3.1 整型
 
 1. 因为不同的编译器即使在相同的硬件平台上可能产生不同的大小字节
@@ -2378,6 +2370,7 @@ func dirents(dir string) []os.FileInfo {
     (多看看本章代码)
 
 ## 9.1 sync.Mutex与sync.RMutex互斥锁
+
 比如银行存款查询余额的场景，因为所有的余额查询请求是顺序执行的，这样会互斥地获得锁，并且会暂时阻止其它的goroutine运行。由于Balance函数只需要读取变量的状态，所以我们同时让多个Balance调用并发运行事实上是安全的，只要在运行的时候没有存款或者取款(这句话很关键要没有)操作就行。在这种场景下我们需要一种特殊类型的锁，其允许多个只读操作并行执行，但写操作会完全互斥。这种锁叫作“多读单写”锁
 - 总结
     - 避免临界区中的变量在中途被其他的goroutine修改
@@ -2399,7 +2392,7 @@ func dirents(dir string) []os.FileInfo {
 ## 9.3 sync.Cond的使用
 
 
-1. 使用场景: `sync.Cond` 经常用在多个goroutine等待，一个goroutine通知,如果是一读一等待使用`sync.Mutx`和`chan`就可以
+1. 使用场景: `sync.Cond` 经常用在多个goroutine等待,一个goroutine通知,如果是一读一等待使用`sync.Mutx`和`chan`就可以
 2. `sync.Cond`的[方法](https://pkg.go.dev/sync@go1.19#Cond)
 
     ```golang
@@ -2417,7 +2410,7 @@ func dirents(dir string) []os.FileInfo {
 
     ```
 
-    Cond 实例都会关联一个锁`L`(互斥锁 *Mutex，或读写锁 *RWMutex)，当修改条件或者调用`Wait()`方法时,必须加锁
+    Cond 实例都会关联一个锁`L`(互斥锁 *Mutex，或读写锁 *RWMutex);当修改条件或者调用`Wait()`方法时,必须加锁
 
     ```golang
     // Signal wakes one goroutine waiting on c, if there is any.
@@ -2441,6 +2434,9 @@ func dirents(dir string) []os.FileInfo {
         ... make use of condition ...
         c.L.Unlock()
     ```
+    调用 Wait 会自动释放锁 c.L，并挂起调用者所在的 goroutine，因此当前协程会阻塞在 Wait 方法调用的地方。
+    如果其他协程调用了 Signal 或 Broadcast 唤醒了该协程，那么 Wait 方法在结束阻塞时，会重新给 c.L 加锁，
+    并且继续执行 Wait 后面的代码
 
 3. Cond代码示例
     ```golang
