@@ -510,7 +510,7 @@ Go语言主要有四种类型的声明语句:
     |---|---|
     |%b	| 整型以二进制方式显示|
     |%o	| 整型以八进制方式显示|
-    |%d	| 整型以十进制方式显示|
+    |%d	| 整型以十进制方式显示,以锁为例子`rf.mu=&{{1 0} 0 0 -1073741824 0}`|
     |%x	| 整型以十六进制方式显示|
     |%X	| 整型以十六进制、字母大写方式显示|
     |%c	| 相应Unicode码点所表示的字符|
@@ -541,9 +541,9 @@ Go语言主要有四种类型的声明语句:
     |格 式|	描 述|
     |---|---|
     |%v	|   值的默认格式。只输出字段的值，没有字段名字,eg: requestVote RPC={1,1,0,0}|
-    |%+v|   类似%v，但输出结构体时会添加字段名|
-    |%#v|   相应值的Go语法表示|
-    |%T	|   相应值的类型的Go语法表示|
+    |%+v|   类似%v，但输出结构体时会添加字段名,以RWMutex为例子,&{w:{state:1 sema:0} writerSem:0 readerSem:0 readerCount:-1073741824 readerWait:0}|
+    |%#v|   相应值的Go语法表示,以RWMutex为例子,&sync.RWMutex{w:sync.Mutex{state:1, sema:0x0}, writerSem:0x0, readerSem:0x0, readerCount:-1073741824, readerWait:0}|
+    |%T	|   相应值的类型的Go语法表示,比如以RWMutex为例子,rf.mu=*sync.RWMutex|
     |%%	|   百分号,字面上的%,非占位符含义|
 
 - 控制宽度
