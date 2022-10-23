@@ -1018,7 +1018,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-22 00:53:04'>2022-10-08 14:02</time>
+            Created At : <time class="date" title='Updated At: 2022-10-23 14:56:57'>2022-10-08 14:02</time>
         
     </div>
     <div class="article-meta">
@@ -3388,7 +3388,6 @@ func dirents(dir string) []os.FileInfo &#123;
  <pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F; Each Cond has an associated Locker L (often a *Mutex or *RWMutex),
 &#x2F;&#x2F; which must be held when changing the condition and
 &#x2F;&#x2F; when calling the Wait method.
-&#x2F;&#x2F;
 &#x2F;&#x2F; A Cond must not be copied after first use.
 type Cond struct &#123;
         noCopy noCopy
@@ -3399,35 +3398,19 @@ type Cond struct &#123;
 &#125;
 </code></pre>
 
-<p> Cond 实例都会关联一个锁 L（互斥锁 *Mutex，或读写锁 *RWMutex），当修改条件或者调用 Wait 方法时，必须加锁</p>
+<p> Cond 实例都会关联一个锁<code>L</code>(互斥锁 *Mutex，或读写锁 *RWMutex)，当修改条件或者调用<code>Wait()</code>方法时,必须加锁</p>
  <pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F; Signal wakes one goroutine waiting on c, if there is any.
-&#x2F;&#x2F;
 &#x2F;&#x2F; It is allowed but not required for the caller to hold c.L
 &#x2F;&#x2F; during the call.
-&#x2F;&#x2F;Signal 只唤醒任意 1 个等待条件变量 c 的 goroutine，无需锁保护
+&#x2F;&#x2F; Signal 只唤醒任意 1 个等待条件变量 c 的 goroutine，无需锁保护
 func (c *Cond) Signal()
 &#x2F;&#x2F; Broadcast wakes all goroutines waiting on c.
-&#x2F;&#x2F;
 &#x2F;&#x2F; It is allowed but not required for the caller to hold c.L
 &#x2F;&#x2F; during the call.
 func (c *Cond) Broadcast()
 
-&#x2F;&#x2F; Wait atomically unlocks c.L and suspends execution
-&#x2F;&#x2F; of the calling goroutine. After later resuming execution,
-&#x2F;&#x2F; Wait locks c.L before returning. Unlike in other systems,
-&#x2F;&#x2F; Wait cannot return unless awoken by Broadcast or Signal.
-&#x2F;&#x2F;
-&#x2F;&#x2F; Because c.L is not locked when Wait first resumes, the caller
-&#x2F;&#x2F; typically cannot assume that the condition is true when
-&#x2F;&#x2F; Wait returns. Instead, the caller should Wait in a loop:
-&#x2F;&#x2F;
-&#x2F;&#x2F;    c.L.Lock()
-&#x2F;&#x2F;    for !condition() &#123;
-&#x2F;&#x2F;        c.Wait()
-&#x2F;&#x2F;    &#125;
-&#x2F;&#x2F;    ... make use of condition ...
-&#x2F;&#x2F;    c.L.Unlock()
-&#x2F;&#x2F;挂起调用者所在的 goroutine,等待Broadcast或者Signal方法
+&#x2F;&#x2F; c.L.Unlock()
+&#x2F;&#x2F; 挂起调用者所在的 goroutine,等待Broadcast或者Signal方法
 func (c *Cond) Wait()
     &#x2F;&#x2F;代码片段
     c.L.Lock()
@@ -3435,11 +3418,7 @@ func (c *Cond) Wait()
         c.Wait()
     &#125;
     ... make use of condition ...
-    c.L.Unlock()
-
-
-
-</code></pre>
+    c.L.Unlock()</code></pre>
 </li>
 <li><p>Cond代码示例</p>
  <pre class="language-golang" data-language="golang"><code class="language-golang">var done &#x3D; false
@@ -3732,7 +3711,7 @@ import &quot;math&#x2F;rand&quot;
     
     <p><span class="copy-title">Author:</span><a  title="kirkzhang">kirkzhang</a></p>
     <p><span class="copy-title">Created At:</span>2022-10-08, 14:02:11</p>
-    <p><span class="copy-title">Updated At:</span>2022-10-22, 00:53:04</p>
+    <p><span class="copy-title">Updated At:</span>2022-10-23, 14:56:57</p>
     <span class="copy-title">Url:</span><a class="post-url" href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/" title="go语言圣经">https://simonteo58.github.io/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/</a>
     <p>
         <span class="copy-title">Copyright:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">&#39;Attribution-non-commercial-shared in the same way 4.0&#39;</a> Reprint please keep the original link and author.
