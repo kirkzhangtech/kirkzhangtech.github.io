@@ -90,6 +90,44 @@ tag: golang
     - [3.6.1. func NewTicker(d Duration) *Ticker](#361-func-newtickerd-duration-ticker)
     - [3.6.2. func (t *Ticker) Reset(d Duration)](#362-func-t-ticker-resetd-duration)
     - [3.6.3. func (t *Ticker) Stop()](#363-func-t-ticker-stop)
+- [sort](#sort)
+    - [func Find(n int, cmp func(int) int) (i int, found bool)](#func-findn-int-cmp-funcint-int-i-int-found-bool)
+    - [func Float64s(x []float64)](#func-float64sx-float64)
+    - [func Float64sAreSorted(x []float64) bool](#func-float64saresortedx-float64-bool)
+    - [func Ints(x []int)](#func-intsx-int)
+    - [func IntsAreSorted(x []int) bool](#func-intsaresortedx-int-bool)
+    - [func IsSorted(data Interface) bool](#func-issorteddata-interface-bool)
+    - [func Search(n int, f func(int) bool) int](#func-searchn-int-f-funcint-bool-int)
+    - [func SearchFloat64s(a []float64, x float64) int](#func-searchfloat64sa-float64-x-float64-int)
+    - [func SearchInts(a []int, x int) int](#func-searchintsa-int-x-int-int)
+    - [func SearchStrings(a []string, x string) int](#func-searchstringsa-string-x-string-int)
+    - [func Slice(x any, less func(i, j int) bool)](#func-slicex-any-less-funci-j-int-bool)
+    - [func SliceIsSorted(x any, less func(i, j int) bool) bool](#func-sliceissortedx-any-less-funci-j-int-bool-bool)
+    - [func SliceStable(x any, less func(i, j int) bool)](#func-slicestablex-any-less-funci-j-int-bool)
+    - [func Sort(data Interface)](#func-sortdata-interface)
+    - [func Stable(data Interface)](#func-stabledata-interface)
+    - [func Strings(x []string)](#func-stringsx-string)
+    - [func StringsAreSorted(x []string) bool](#func-stringsaresortedx-string-bool)
+  - [type Float64Slice](#type-float64slice)
+    - [func (x Float64Slice) Len() int](#func-x-float64slice-len-int)
+    - [func (x Float64Slice) Less(i, j int) bool](#func-x-float64slice-lessi-j-int-bool)
+    - [func (p Float64Slice) Search(x float64) int](#func-p-float64slice-searchx-float64-int)
+    - [func (x Float64Slice) Sort()](#func-x-float64slice-sort)
+    - [func (x Float64Slice) Swap(i, j int)](#func-x-float64slice-swapi-j-int)
+  - [type IntSlice](#type-intslice)
+    - [func (x IntSlice) Len() int](#func-x-intslice-len-int)
+    - [func (x IntSlice) Less(i, j int) bool](#func-x-intslice-lessi-j-int-bool)
+    - [func (p IntSlice) Search(x int) int](#func-p-intslice-searchx-int-int)
+    - [func (x IntSlice) Sort()](#func-x-intslice-sort)
+    - [func (x IntSlice) Swap(i, j int)](#func-x-intslice-swapi-j-int)
+  - [type Interface](#type-interface)
+    - [func Reverse(data Interface) Interface](#func-reversedata-interface-interface)
+  - [type StringSlice](#type-stringslice)
+    - [func (x StringSlice) Len() int](#func-x-stringslice-len-int)
+    - [func (x StringSlice) Less(i, j int) bool](#func-x-stringslice-lessi-j-int-bool)
+    - [func (p StringSlice) Search(x string) int](#func-p-stringslice-searchx-string-int)
+    - [func (x StringSlice) Sort()](#func-x-stringslice-sort)
+    - [func (x StringSlice) Swap(i, j int)](#func-x-stringslice-swapi-j-int)
   - [3.7. type Time](#37-type-time)
     - [3.7.1. func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time](#371-func-dateyear-int-month-month-day-hour-min-sec-nsec-int-loc-location-time)
     - [3.7.2. func Now() Time](#372-func-now-time)
@@ -613,7 +651,56 @@ tag: golang
 ### 3.6.3. func (t *Ticker) Stop()
 
   Stop turns off a ticker. After Stop, no more ticks will be sent. Stop does not close the channel, to prevent a concurrent goroutine reading from the channel from seeing an erroneous "tick".
-  
+
+# sort
+
+### func Find(n int, cmp func(int) int) (i int, found bool)
+
+### func Float64s(x []float64)
+
+### func Float64sAreSorted(x []float64) bool
+
+### func Ints(x []int)
+
+就是排序基础数据类型int的
+
+### func IntsAreSorted(x []int) bool
+
+### func IsSorted(data Interface) bool
+
+### func Search(n int, f func(int) bool) int
+
+### func SearchFloat64s(a []float64, x float64) int
+### func SearchInts(a []int, x int) int
+### func SearchStrings(a []string, x string) int
+### func Slice(x any, less func(i, j int) bool)
+### func SliceIsSorted(x any, less func(i, j int) bool) bool
+### func SliceStable(x any, less func(i, j int) bool)
+### func Sort(data Interface)
+### func Stable(data Interface)
+### func Strings(x []string)
+### func StringsAreSorted(x []string) bool
+## type Float64Slice
+### func (x Float64Slice) Len() int
+### func (x Float64Slice) Less(i, j int) bool
+### func (p Float64Slice) Search(x float64) int
+### func (x Float64Slice) Sort()
+### func (x Float64Slice) Swap(i, j int)
+## type IntSlice
+### func (x IntSlice) Len() int
+### func (x IntSlice) Less(i, j int) bool
+### func (p IntSlice) Search(x int) int
+### func (x IntSlice) Sort()
+### func (x IntSlice) Swap(i, j int)
+## type Interface
+### func Reverse(data Interface) Interface
+## type StringSlice
+### func (x StringSlice) Len() int
+### func (x StringSlice) Less(i, j int) bool
+### func (p StringSlice) Search(x string) int
+### func (x StringSlice) Sort()
+### func (x StringSlice) Swap(i, j int)
+
 ## 3.7. type Time
 
 ### 3.7.1. func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time

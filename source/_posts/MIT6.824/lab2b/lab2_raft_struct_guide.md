@@ -25,10 +25,12 @@ heart-beats, and others must start an election if too much time has
 passed since hearing from the leader. **It's probably best to drive each
 of these activities with a dedicated long-running goroutine**, rather
 than combining multiple activities into a single goroutine.
+
 <text style="font-family:Courier New;color:red">
 It's probably best to drive each of these activities
 with a dedicated long-running goroutine
 </text>
+
 The management of the election timeout is a common source of
 headaches. Perhaps the simplest plan is to maintain a variable in the
 Raft struct containing the last time at which the peer heard from the
@@ -49,10 +51,11 @@ goroutine, since otherwise it may be hard to ensure that you send log
 entries in log order. The code that advances commitIndex will need to
 kick the apply goroutine; it's probably easiest to use a condition
 variable (Go's sync.Cond) for this.
-<text style="font-family:Courier New;color:red">
 
+<text style="font-family:Courier New;color:red">
 using a seperate applier channel
 </text>
+
 Each RPC should probably be sent (and its reply processed) in its own
 goroutine, for two reasons: so that unreachable peers don't delay the
 collection of a majority of replies, and so that the heartbeat and
