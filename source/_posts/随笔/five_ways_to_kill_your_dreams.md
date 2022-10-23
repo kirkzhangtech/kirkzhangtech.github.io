@@ -1,5 +1,5 @@
 ---
-title: five ways to kill your_dreams
+title: five ways to kill your dreams
 categories: 
 - 随笔
 ---
@@ -28,4 +28,4 @@ We all have dreams and aspirations, at least most of us. Just like in school, mo
 
 If you want to kill your dreams, endeavour to do all this and you would do a fabulous job. Just kidding… Rid yourself of all these attitudes and thoughts and you will be on your way to living a wonderful life.
 
-Watch the Ted Talk below.
+Watch the Ted Talk below

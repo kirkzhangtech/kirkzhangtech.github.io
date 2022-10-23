@@ -231,7 +231,7 @@ than in other algorithms (other algorithms must send re-
 dundant log entries to renumber them before they can be
 committed).
 
-<text style="font-family:'Courier new'; color:red ; font-size: 13px"  >
+<text style="font-family:'Courier new'; color:red>
 
 Raft incurs(招致) this extra complexity in the commitment
 rules because log entries retain their original term num-

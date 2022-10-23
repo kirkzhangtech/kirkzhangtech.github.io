@@ -25,7 +25,7 @@ heart-beats, and others must start an election if too much time has
 passed since hearing from the leader. **It's probably best to drive each
 of these activities with a dedicated long-running goroutine**, rather
 than combining multiple activities into a single goroutine.
-> It's probably best to drive each of these activities 
+> It's probably best to drive each of these activities
 > with a dedicated long-running goroutine
 
 The management of the election timeout is a common source of
@@ -66,5 +66,10 @@ replies; it must check that the term hasn't changed since sending the
 RPC, and must account for the possibility that replies from concurrent
 RPCs to the same follower have changed the leader's state (e.g.
 nextIndex).
-> this part we should put eyes on checking reply of concurrent RPC, like 
-> election and heartbeat
+
+<text style="font-family:'Courier new'; color:red ">
+
+this part we should put eyes on checking reply of concurrent RPC, like
+election and heartbeat
+
+</text>
