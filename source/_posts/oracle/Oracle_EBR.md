@@ -1,8 +1,7 @@
 ---
 title: Edition-Based Redefinition Technical Deep Dive
 categories:
-- Oracle
-tag: Oracle
+- oracle
 ---
 
 # INTRODUCTION

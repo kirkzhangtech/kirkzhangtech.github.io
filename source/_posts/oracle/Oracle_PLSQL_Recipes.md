@@ -1,7 +1,7 @@
 ---
 title: Oracle PLSQL Recipes
 categories: 
-- Oracle
+- oracle
 ---
 
 # 1 PL/SQL Fundamentals

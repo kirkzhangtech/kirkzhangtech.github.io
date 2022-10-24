@@ -1669,10 +1669,15 @@ var w io.Writer
 w.Write([]byte("hello")) // panic: nil pointer dereference
 ```
 
-> 如果是接口类型定义的变量那么它的动态类型和动态值都是nil，赋nil之后动态类型和动态值也全都是nil值，但是指针和基本类型和符合类型不会
-> 类似于java一样，不能没有对象就调用方法，会包空指针异常,上面代码在第三行动态值写为nil
-> 这里面有个细节要明白，定义语句var w io.Writer
-> 其实是动态类型和动态值都是nil，进行布尔判断的时候才是为nil
+<text style="font-family:Courier New;color:red">
+如果是接口类型定义的变量那么它的动态类型和动态值都是nil，赋nil之后动态类型和动态值也全都是nil值，
+但是指针,基本类型和复合类型不会.
+
+类似于java一样，不能没有对象就调用方法，会报空指针异常,上面代码在第三行动态值写为nil
+这里面有个细节要明白，定义语句var w io.Writer(接口类型),其实是动态类型和动态值都是nil,
+进行布尔判断的时候才是为nil,w = nil 是将动态类型和动态值都设置成nil
+
+</text>
 
 第二个语句将一个`*os.File`类型的值赋给变量`w`:
 
@@ -1682,8 +1687,10 @@ w = os.Stdout
 这个赋值过程调用了一个具体类型到接口类型的隐式转换，这和显式的使用`io.Writer(os.Stdout)`是等价的。这类转换不管是显式的还是隐式的，都会刻画出操作到的类型和值。这个接口值的动态类型被设为`*os.File`指针的类型描述符，它的动态值持有`os.Stdout`的拷贝;这是一个代表处理标准输出的`os.File`类型变量的指针7.2
 ![7.2](./../../../picture/golang语言圣经/ch7-02.png)
 
-> 在第二行的赋值操作中,type已经变成`*os.file`类型,其实上面说的很罗嗦,直接就是os.Stdout是具
-> 体的*file类型实现了io.Writer接口
+<text style="font-family:Courier New;color:red">
+在第二行的赋值操作中,type已经变成`*os.file`类型,其实上面说的很啰嗦,直接就是os.Stdout是具
+体的*file类型实现了io.Writer接口
+</text>
 
 调用一个包含`*os.File`类型指针的接口值的`Write`方法，使得`(*os.File).Write`方法被调用。这个调用输出“hello”。
 
@@ -1717,7 +1724,7 @@ w.Write([]byte("hello")) // writes "hello" to the bytes.Buffers
 w = nil
 ```
 
-> w = nil 是将动态类型和动态值都设置成nil
+
 
 这个重置将它所有的部分都设为`nil`值,把变量`w`恢复到和它之前定义时相同的状态，在图7.1中可以看到。
 
@@ -1727,7 +1734,9 @@ w = nil
 var x interface{} = time.Now()
 ```
 
-> 这里就是创建了一个接口类型的x值,然后可以引用任何类型值
+<text style="font-family:Courier New;color:red">
+这里就是创建了一个接口类型的x值,然后可以引用任何类型值
+</text>
 
 结果可能和图7.4相似。从概念上讲，不论接口值多大，动态值总是可以容下它。（这只是一个概念上的模型;具体的实现可能会非常不同）
 
@@ -1737,14 +1746,15 @@ var x interface{} = time.Now()
 
 然而，如果两个接口值的`动态类型`相同，但是这个动态类型是不可比较的（比如切片），将它们进行比较就会失败并且panic:
 
-> 两个接口值都是nil的时候才相等,接口值是可比较的(基本的数据类型和指针),
-> 注意到原话'它们的动态类型相同并且动态值也根据这个动态类型的`==`操作相等',
-> 那么基本类型相同,复杂类型值相等,那么也是可以比较？(待解决)
-> 要回一下map类型，什么值可以作为key，什么样的不可以
-> 动态类型是不可比较的
+<text style="font-family:Courier New;color:red">
+
+注意到原话'它们的动态类型相同并且动态值,就可以进行`==`操作',要保证动态类型相等,动态值相等,则A==A
+那么基本类型相同,复杂类型地址相等
+
+</text>
 
 
-考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型（如基本类型和指针）要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值。  
+考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型(如基本类型和指针)要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值。  
 
 当我们处理错误或者调试的过程中，得知接口值的动态类型是非常有帮助的。所以我们使用fmt包的%T动作:
 
@@ -1760,6 +1770,14 @@ var buf *bytes.Buffer
 fmt.Printf("%T\n", buf) // "*bytes.Buffer"
 var x interface{}
 fmt.Printf("%T\n", x) // "<nil>"
+// 另一个接口值相等的case
+w := new(bytes.Buffer)
+fmt.Printf("%T\n", w) // "*bytes.Buffer"
+var buf *bytes.Buffer
+fmt.Printf("%T\n", buf) // "*bytes.Buffer"
+w = &bytes.Buffer{}
+buf = &bytes.Buffer{}
+w!=buf
 
 ```
 
@@ -1824,7 +1842,9 @@ func f(out io.Writer) {
     }
 }
 ```
-
+<text style="font-family:Courier New;color:red">
+总结一句话就是动态类型不为nil,动态值为nil,这个变量也是不要nil
+</text>
 
 ## 7.6. sort.Interface接口
 

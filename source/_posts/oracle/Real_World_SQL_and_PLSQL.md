@@ -1,8 +1,7 @@
 ---
 title: Real_World_SQL_and_PLSQL
 categories:
-- Oracle
-tag: Oracle
+- oracle
 ---
 
 

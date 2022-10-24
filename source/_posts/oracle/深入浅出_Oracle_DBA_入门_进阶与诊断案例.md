@@ -1,8 +1,7 @@
 ---
 title: 深入浅出_Oracle_DBA_入门_进阶与诊断案例
 categories:
-- Oracle
-tag: Oracle
+- oracle
 ---
 
 
