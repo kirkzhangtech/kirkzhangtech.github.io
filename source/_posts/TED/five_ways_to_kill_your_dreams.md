@@ -1,8 +1,9 @@
 ---
 title: five ways to kill your dreams
 categories: 
-- 随笔
+- TED
 ---
+> 《five ways to kill your dreams》--TED
 
 If you have dreams, it is your responsibility to make them happen.
 – Bel Pesce
