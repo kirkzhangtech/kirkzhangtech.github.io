@@ -275,3 +275,80 @@ EXCEPTION
  DBMS_OUTPUT.PUT_LINE('No department for the given ID'); 
 END;
 ```
+
+# 2.基础sql
+
+## 2.1 Retrieving a Single Row from the Database
+
+**problem**
+
+You are interested in returning one row from a database table via a query that searches for an exact
+match.
+
+**solution 1**  
+你可以使用`select ... into ...`语法
+```sql
+DECLARE
+    first VARCHAR2(20);  -- varchar2(20)一定是要兼容的数据库表字段的
+    last VARCHAR2(25); 
+    email VARCHAR2(25); 
+BEGIN 
+    SELECT first_name, last_name, email 
+    INTO first, last, email 
+    FROM employees 
+    WHERE employee_id = 100; 
+    DBMS_OUTPUT.PUT_LINE( 
+    'Employee Information for ID: ' || first || ' ' || last || ' - ' || email); 
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE('No employee matches the given ID'); 
+WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('More than one employee matches the given ID'); 
+END; 
+ ```
+
+**solution 2**
+
+```sql
+DECLARE
+ CURSOR emp_cursor IS 
+ SELECT first_name, last_name, email 
+ FROM employees 
+ WHERE employee_id = &emp_id; 
+ first VARCHAR2(20); 
+ last VARCHAR2(25); 
+ email VARCHAR2(25); 
+BEGIN 
+ OPEN emp_cursor; 
+ FETCH emp_cursor INTO first, last, email; 
+ IF emp_cursor%NOTFOUND THEN 
+      RAISE NO_DATA_FOUND; 
+ ELSE 
+ -- Perform second fetch to see if more than one row is returned 
+    FETCH emp_cursor INTO first, last, email; 
+    IF emp_cursor%FOUND THEN 
+      RAISE TOO_MANY_ROWS; 
+    ELSE 
+      DBMS_OUTPUT.PUT_LINE( 
+      'Employee Information for ID: ' || first || ' ' || last || ' - ' || email); 
+      END IF;
+ END IF; 
+CLOSE emp_cursor; 
+
+```
+
+**how it works**
+
+solution 1: One is to issue a SELECT…INTO statement,which is a statement designed to return just one row.
+The other approach is to open a cursor, fetch the  one row, and close the cursor  
+solution 2: We keep an open mind on that point. Consider that if youare expecting exactly one row to be 
+returned, getting multiple rows back represents an exception case that you must somehow deal with. 
+The cursor-based solution makes it easy to simply ignore that exception case, but ignoring a condition 
+that you do not expect to occur does not change the fact that it has occurred. Although a cursor is used, 
+the cases where no data is returned or where too many rows are returnedgiven the user-supplied EMPLOYEE_ID
+still remain a reality. However, since cursors are specifically designed to deal with zero rows or more
+than one row coming back from a query, no exceptions will be raised if these situations occur. For this reason,
+Solution #2 contains some conditional logic that is used to manually raise the desired exceptions.In the event that the user supplies the block with an invalid EMPLOYEE_ID, the cursor will not fetch any data. The %NOTFOUND attribute of the cursor will be checked to see whether the cursor successfully fetched data. If not, then the NO_DATA_FOUND exception is raised. If the cursor is successful in retrieving data, then a second FETCH statement is issued to see whether more than 
+one row will be returned. If more than one row is returned, then the TOO_MANY_ROWS exception is raised; 
+otherwise, the expected output is displayed. In any event, the output that is displayed using either of the 
+solutions will be the same whether successful or not.
