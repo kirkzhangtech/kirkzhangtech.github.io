@@ -15,3 +15,4 @@ categories:
 |vue installation|https://cbb104002.medium.com/vue-hello-world-ce15e547419c||
 |html 标签，作为总结部分||\<text style="font-family:Courier New;color:red"\>\<\/text\>|
 ||https://michaelnielsen.org/blog/principles-of-effective-research/|高校研究个人准则|
+|fetch DB resources||SELECT * FROM USER_PROCEDURES ;SELECT * FROM USER_PROCEDURES WHERE OBJECT_TYPE='PACKAGE';SELECT * FROM ALL_PROCEDURES WHERE OBJECT_TYPE='PACKAGE';SELECT * FROM DBA_PROCEDURES WHERE OBJECT_TYPE='PACKAGE'; SELECT * FROM USER_OBJECTS WHERE OBJECT_TYPE='PACKAGE';|
