@@ -351,9 +351,9 @@
         
             
                 <li>
-                    <div data-rel="Oracle">
+                    <div data-rel="oracle">
                         
-                        Oracle
+                        oracle
                         <small>(4)</small>
                         
                     </div>
@@ -488,10 +488,6 @@
                 <i class="iconfont icon-tag"></i><a>mysql</a>
             </li>
         
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>Oracle</a>
-            </li>
-        
     </div>
 
 </div>
@@ -559,7 +555,7 @@
             <span class="post-date" title="2022-10-20 21:09:47">2022/10/20</span>
         </a>
         
-        <a  class="All Oracle "
+        <a  class="All oracle "
            href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/"
            data-tag=""
            data-author="" >
@@ -591,17 +587,17 @@
             <span class="post-date" title="2022-10-16 16:23:49">2022/10/16</span>
         </a>
         
-        <a  class="All Oracle "
+        <a  class="All oracle "
            href="/2022/10/11/oracle/Real_World_SQL_and_PLSQL/"
-           data-tag="Oracle"
+           data-tag=""
            data-author="" >
             <span class="post-title" title="Real_World_SQL_and_PLSQL">Real_World_SQL_and_PLSQL</span>
             <span class="post-date" title="2022-10-11 14:57:52">2022/10/11</span>
         </a>
         
-        <a  class="All Oracle "
+        <a  class="All oracle "
            href="/2022/10/11/oracle/Oracle_EBR/"
-           data-tag="Oracle"
+           data-tag=""
            data-author="" >
             <span class="post-title" title="Edition-Based Redefinition Technical Deep Dive">Edition-Based Redefinition Technical Deep Dive</span>
             <span class="post-date" title="2022-10-11 12:13:46">2022/10/11</span>
@@ -679,9 +675,9 @@
             <span class="post-date" title="2022-09-09 12:21:02">2022/09/09</span>
         </a>
         
-        <a  class="All Oracle "
+        <a  class="All oracle "
            href="/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/"
-           data-tag="Oracle"
+           data-tag=""
            data-author="" >
             <span class="post-title" title="深入浅出_Oracle_DBA_入门_进阶与诊断案例">深入浅出_Oracle_DBA_入门_进阶与诊断案例</span>
             <span class="post-date" title="2022-08-31 17:35:04">2022/08/31</span>
@@ -744,7 +740,7 @@
         </a>
         
         <a  class="All 数据结构 "
-           href="/2022/07/12/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%B2%E4%B9%89/"
+           href="/2022/07/12/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%B2%E4%B9%89/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="数据结构讲义">数据结构讲义</span>
@@ -904,7 +900,7 @@
         </a>
         
         <a  class="All 算法 "
-           href="/2022/06/22/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/"
+           href="/2022/06/22/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="算法导论">算法导论</span>
@@ -1012,7 +1008,7 @@
     </div>
     <div class="article-meta">
         
-            Created At : <time class="date" title='Updated At: 2022-10-23 21:12:06'>2022-10-08 14:02</time>
+            Created At : <time class="date" title='Updated At: 2022-10-24 22:59:52'>2022-10-08 14:02</time>
         
     </div>
     <div class="article-meta">
@@ -2761,15 +2757,21 @@ fmt.Printf(&quot;%T\n&quot;, a) &#x2F;&#x2F; &quot;*bytes.Buffer&quot;</code></p
 <p>一个接口值基于它的动态类型被描述为<code>nil</code>或<code>!nil</code>，所以这是一个空的接口值。你可以通过使用<code>w==nil</code>或者<code>w!=nil</code>来判断接口值是否为空。调用一个空接口值上的任意方法都会产生<code>panic</code>:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w.Write([]byte(&quot;hello&quot;)) &#x2F;&#x2F; panic: nil pointer dereference</code></pre>
 
-<blockquote>
-<p>如果是接口类型定义的变量那么它的动态类型和动态值都是nil，赋nil之后动态类型和动态值也全都是nil值，但是指针和基本类型和符合类型不会<br>类似于java一样，不能没有对象就调用方法，会包空指针异常,上面代码在第三行动态值写为nil<br>这里面有个细节要明白，定义语句var w io.Writer<br>其实是动态类型和动态值都是nil，进行布尔判断的时候才是为nil</p>
-</blockquote>
+<text style="font-family:Courier New;color:red">
+如果是接口类型定义的变量那么它的动态类型和动态值都是nil，赋nil之后动态类型和动态值也全都是nil值，
+但是指针,基本类型和复合类型不会.
+
+<p>类似于java一样，不能没有对象就调用方法，会报空指针异常,上面代码在第三行动态值写为nil<br>这里面有个细节要明白，定义语句var w io.Writer(接口类型),其实是动态类型和动态值都是nil,<br>进行布尔判断的时候才是为nil,w &#x3D; nil 是将动态类型和动态值都设置成nil</p>
+</text>
+
 <p>第二个语句将一个<code>*os.File</code>类型的值赋给变量<code>w</code>:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w &#x3D; os.Stdout</code></pre>
 <p>这个赋值过程调用了一个具体类型到接口类型的隐式转换，这和显式的使用<code>io.Writer(os.Stdout)</code>是等价的。这类转换不管是显式的还是隐式的，都会刻画出操作到的类型和值。这个接口值的动态类型被设为<code>*os.File</code>指针的类型描述符，它的动态值持有<code>os.Stdout</code>的拷贝;这是一个代表处理标准输出的<code>os.File</code>类型变量的指针7.2<br><img src="/./../../../picture/golang%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/ch7-02.png" alt="7.2"></p>
-<blockquote>
-<p>在第二行的赋值操作中,type已经变成<code>*os.file</code>类型,其实上面说的很罗嗦,直接就是os.Stdout是具<br>体的*file类型实现了io.Writer接口</p>
-</blockquote>
+<text style="font-family:Courier New;color:red">
+在第二行的赋值操作中,type已经变成`*os.file`类型,其实上面说的很啰嗦,直接就是os.Stdout是具
+体的*file类型实现了io.Writer接口
+</text>
+
 <p>调用一个包含<code>*os.File</code>类型指针的接口值的<code>Write</code>方法，使得<code>(*os.File).Write</code>方法被调用。这个调用输出“hello”。</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w.Write([]byte(&quot;hello&quot;)) &#x2F;&#x2F; &quot;hello&quot;</code></pre>
 
@@ -2784,24 +2786,27 @@ fmt.Printf(&quot;%T\n&quot;, a) &#x2F;&#x2F; &quot;*bytes.Buffer&quot;</code></p
 <p>这次类型描述符是<code>*bytes.Buffer</code>，所以调用了<code>(*bytes.Buffer).Write</code>方法，并且接收者是该缓冲区的地址。这个调用把字符串“hello”添加到缓冲区中。<br>最后，第四个语句将nil赋给了接口值:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">w &#x3D; nil</code></pre>
 
-<blockquote>
-<p>w &#x3D; nil 是将动态类型和动态值都设置成nil</p>
-</blockquote>
+
+
 <p>这个重置将它所有的部分都设为<code>nil</code>值,把变量<code>w</code>恢复到和它之前定义时相同的状态，在图7.1中可以看到。</p>
 <p>一个接口值可以持有任意大的动态值。例如,表示时间实例的time.Time类型，这个类型有几个对外不公开的字段。我们从它上面创建一个接口值:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">var x interface&#123;&#125; &#x3D; time.Now()</code></pre>
 
-<blockquote>
-<p>这里就是创建了一个接口类型的x值,然后可以引用任何类型值</p>
-</blockquote>
+<text style="font-family:Courier New;color:red">
+这里就是创建了一个接口类型的x值,然后可以引用任何类型值
+</text>
+
 <p>结果可能和图7.4相似。从概念上讲，不论接口值多大，动态值总是可以容下它。（这只是一个概念上的模型;具体的实现可能会非常不同）</p>
 <p><img src="/./../../../picture/golang%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/ch7-04.png" alt="7.4"></p>
 <p>接口值可以使用<code>==</code>和<code>!＝</code>来进行比较。两个接口值相等仅当它们都是<code>nil</code>值，或者它们的动态类型相同并且动态值也根据这个动态类型的<code>==</code>操作相等。因为接口值是可比较的，所以它们可以用在map的键或者作为switch语句的操作数。</p>
 <p>然而，如果两个接口值的<code>动态类型</code>相同，但是这个动态类型是不可比较的（比如切片），将它们进行比较就会失败并且panic:</p>
-<blockquote>
-<p>两个接口值都是nil的时候才相等,接口值是可比较的(基本的数据类型和指针),<br>注意到原话’它们的动态类型相同并且动态值也根据这个动态类型的<code>==</code>操作相等’,<br>那么基本类型相同,复杂类型值相等,那么也是可以比较？(待解决)<br>要回一下map类型，什么值可以作为key，什么样的不可以<br>动态类型是不可比较的</p>
-</blockquote>
-<p>考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型（如基本类型和指针）要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值。  </p>
+<text style="font-family:Courier New;color:red">
+
+<p>注意到原话’它们的动态类型相同并且动态值,就可以进行<code>==</code>操作’,要保证动态类型相等,动态值相等,则A&#x3D;&#x3D;A<br>那么基本类型相同,复杂类型地址相等</p>
+</text>
+
+
+<p>考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型(如基本类型和指针)要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值。  </p>
 <p>当我们处理错误或者调试的过程中，得知接口值的动态类型是非常有帮助的。所以我们使用fmt包的%T动作:</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">
 var w io.Writer
@@ -2814,6 +2819,14 @@ var buf *bytes.Buffer
 fmt.Printf(&quot;%T\n&quot;, buf) &#x2F;&#x2F; &quot;*bytes.Buffer&quot;
 var x interface&#123;&#125;
 fmt.Printf(&quot;%T\n&quot;, x) &#x2F;&#x2F; &quot;&lt;nil&gt;&quot;
+&#x2F;&#x2F; 另一个接口值相等的case
+w :&#x3D; new(bytes.Buffer)
+fmt.Printf(&quot;%T\n&quot;, w) &#x2F;&#x2F; &quot;*bytes.Buffer&quot;
+var buf *bytes.Buffer
+fmt.Printf(&quot;%T\n&quot;, buf) &#x2F;&#x2F; &quot;*bytes.Buffer&quot;
+w &#x3D; &amp;bytes.Buffer&#123;&#125;
+buf &#x3D; &amp;bytes.Buffer&#123;&#125;
+w!&#x3D;buf
 </code></pre>
 
 <h3 id="7-5-1-警告-一个包含nil指针的接口不是nil接口"><a href="#7-5-1-警告-一个包含nil指针的接口不是nil接口" class="headerlink" title="7.5.1. 警告:一个包含nil指针的接口不是nil接口"></a>7.5.1. 警告:一个包含nil指针的接口不是nil接口</h3><p>一个不包含任何值的nil接口值和一个刚好包含nil指针的接口值是不同的。这个细微区别产生了一个容易绊倒每个Go程序员的陷阱。</p>
@@ -2862,7 +2875,9 @@ func f(out io.Writer) &#123;
         out.Write([]byte(&quot;done!\n&quot;))
     &#125;
 &#125;</code></pre>
-
+<text style="font-family:Courier New;color:red">
+总结一句话就是动态类型不为nil,动态值为nil,这个变量也是不要nil
+</text>
 
 <h2 id="7-6-sort-Interface接口"><a href="#7-6-sort-Interface接口" class="headerlink" title="7.6. sort.Interface接口"></a>7.6. sort.Interface接口</h2><p>golang提供了<code>sort</code>包帮助进行排序数据,实现排序需要自己实现对应的排序接口.</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">type byArtist []*Track
@@ -3701,7 +3716,7 @@ import &quot;math&#x2F;rand&quot;
     
     <p><span class="copy-title">Author:</span><a  title="kirkzhang">kirkzhang</a></p>
     <p><span class="copy-title">Created At:</span>2022-10-08, 14:02:11</p>
-    <p><span class="copy-title">Updated At:</span>2022-10-23, 21:12:06</p>
+    <p><span class="copy-title">Updated At:</span>2022-10-24, 22:59:52</p>
     <span class="copy-title">Url:</span><a class="post-url" href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/" title="go语言圣经">https://simonteo58.github.io/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/</a>
     <p>
         <span class="copy-title">Copyright:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">&#39;Attribution-non-commercial-shared in the same way 4.0&#39;</a> Reprint please keep the original link and author.
