@@ -1,1079 +1,373 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+    
 <head>
-  <meta charset="utf-8">
-  <title>go标准库阅读与解析 | Eden</title>
-  <meta name="keywords" content=" golang ">
-  <meta name="description" content="go标准库阅读与解析 | Eden">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="作者：Eugene Vinitsky  Personal Rules of Productive ResearchCaveats and intent: Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid m">
-<meta property="og:type" content="article">
-<meta property="og:title" content="高效研究的个人规则">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/index.html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Eden">
+    <title>go标准库阅读与解析 - Eden</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"\n1. package tar\n1.1. Constants\n1.2. Variables\n1.3. type Format\n1.3.1. func (f Format) String() string\n\n\n1.4. type Header\n1.4.1. func FileInfoHeader(fi fs.FileInfo, link string) (*Header, error)\n1.4.2. func (h*Header) FileInfo() fs.FileInfo\n\n\n1.5. type Reader\n1.5.1. func NewReader(r io.Reader) *Reader\n1.5.2. func (tr*Reader) Next() (*Header, error)\n1.5.3. func (tr*Reader) Read(b []byte) (int, error)\n\n\n1.6. type Writer\n1.6.1. func NewWriter(w io.Writer) *Writer\n1.6.2. func (tw*Writer) Close() error\n1.6.3. func (tw *Writer) Flush() error\n1.6.4. func (tw*Writer) Write(b []byte) (int, error)\n1.6.5. func (tw Writer) WriteHeader(hdrHeader) error\n\n\n\n\n2. zip package\n2.1. Constants\n2.2. Variables\n2.2.1. func RegisterCompressor(method uint16, comp Compressor)\n2.2.2. func RegisterDecompressor(method uint16, dcomp Decompressor)\n\n\n2.3. type Compressor\n2.4. type Decompressor\n2.5. type File\n2.5.1. func (f *File) DataOffset() (offset int64, err error)\n2.5.2. func (f*File) Open() (io.ReadCloser, error)\n2.5.3. func (f *File) OpenRaw() (io.Reader, error)\n\n\n2.6. type FileHeader\n2.6.1. func FileInfoHeader(fi fs.FileInfo) (*FileHeader, error)\n2.6.2. func (h *FileHeader) FileInfo() fs.FileInfo\n2.6.3. func (h*FileHeader) ModTime() time.TimeDEPRECATED\n2.6.4. func (h *FileHeader) Mode() (mode fs.FileMode)\n2.6.5. func (h*FileHeader) SetModTime(t time.Time)DEPRECATED\n2.6.6. func (h *FileHeader) SetMode(mode fs.FileMode)\n\n\n2.7. type ReadCloser\n2.7.1. func OpenReader(name string) (*ReadCloser, error)\n2.7.2. func (rc *ReadCloser) Close() error\n\n\n2.8. type Reader\n2.8.1. func NewReader(r io.ReaderAt, size int64) (*Reader, error)\n2.8.2. func (r *Reader) Open(name string) (fs.File, error)\n2.8.3. func (z*Reader) RegisterDecompressor(method uint16, dcomp Decompressor)\n\n\n2.9. type Writer\n2.9.1. func NewWriter(w io.Writer) *Writer\n2.9.2. func (w*Writer) Close() error\n2.9.3. func (w *Writer) Copy(f*File) error\n2.9.4. func (w *Writer) Create(name string) (io.Writer, error)\n2.9.5. func (w*Writer) CreateHeader(fh*FileHeader) (io.Writer, error)\n2.9.6. func (w*Writer) CreateRaw(fh*FileHeader) (io.Writer, error)\n2.9.7. func (w*Writer) Flush() error\n2.9.8. func (w *Writer) RegisterCompressor(method uint16, comp Compressor)\n2.9.9. func (w*Writer) SetComment(comment string) error\n2.9.10. func (w *Writer) SetOffset(n int64)\n\n\n\n\n3. time package\n3.1. Constants\n3.1.1. func After(d Duration) &lt;-chan Time\n3.1.2. func Sleep(d Duration)\n3.1.3. func Tick(d Duration) &lt;-chan Time\n\n\n3.2. type Duration\n3.2.1. func ParseDuration(s string) (Duration, error)\n3.2.2. func Since(t Time) Duration\n3.2.3. func Until(t Time) Duration\n3.2.4. func (d Duration) Abs() Duration\n3.2.5. func (d Duration) Hours() float64\n3.2.6. func (d Duration) Microseconds() int64\n3.2.7. func (d Duration) Milliseconds() int64\n3.2.8. func (d Duration) Minutes() float64\n3.2.9. func (d Duration) Nanoseconds() int64\n3.2.10. func (d Duration) Round(m Duration) Duration\n3.2.11. func (d Duration) Seconds() float64\n3.2.12. func (d Duration) String() string\n3.2.13. func (d Duration) Truncate(m Duration) Duration\n\n\n3.3. type Location\n3.3.1. func FixedZone(name string, offset int) *Location\n3.3.2. func LoadLocation(name string) (*Location, error)\n3.3.3. func LoadLocationFromTZData(name string, data []byte) (*Location, error)\n3.3.4. func (l*Location) String() string\n\n\n3.4. type Month\n3.4.1. func (m Month) String() string\n\n\n3.5. type ParseError\n3.5.1. func (e *ParseError) Error() string\n\n\n3.6. type Ticker\n3.6.1. func NewTicker(d Duration) *Ticker\n3.6.2. func (t *Ticker) Reset(d Duration)\n3.6.3. func (t *Ticker) Stop()\n\n\n\n\nsort\nfunc Find(n int, cmp func(int) int) (i int, found bool)\nfunc Float64s(x []float64)\nfunc Float64sAreSorted(x []float64) bool\nfunc Ints(x []int)\nfunc IntsAreSorted(x []int) bool\nfunc IsSorted(data Interface) bool\nfunc Search(n int, f func(int) bool) int\nfunc SearchFloat64s(a []float64, x float64) int\nfunc SearchInts(a []int, x int) int\nfunc SearchStrings(a []string, x string) int\nfunc Slice(x any, less func(i, j int) bool)\nfunc SliceIsSorted(x any, less func(i, j int) bool) bool\nfunc SliceStable(x any, less func(i, j int) bool)\nfunc Sort(data Interface)\nfunc Stable(data Interface)\nfunc Strings(x []string)\nfunc StringsAreSorted(x []string) bool\ntype Float64Slice\nfunc (x Float64Slice) Len() int\nfunc (x Float64Slice) Less(i, j int) bool\nfunc (p Float64Slice) Search(x float64) int\nfunc (x Float64Slice) Sort()\nfunc (x Float64Slice) Swap(i, j int)\n\n\ntype IntSlice\nfunc (x IntSlice) Len() int\nfunc (x IntSlice) Less(i, j int) bool\nfunc (p IntSlice) Search(x int) int\nfunc (x IntSlice) Sort()\nfunc (x IntSlice) Swap(i, j int)\n\n\ntype Interface\nfunc Reverse(data Interface) Interface\n\n\ntype StringSlice\nfunc (x StringSlice) Len() int\nfunc (x StringSlice) Less(i, j int) bool\nfunc (p StringSlice) Search(x string) int\nfunc (x StringSlice) Sort()\nfunc (x StringSlice) Swap(i, j int)\n\n\n3.7. type Time\n3.7.1. func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time\n3.7.2. func Now() Time\n3.7.3. func Parse(layout, value string) (Time, error)\n3.7.4. func ParseInLocation(layout, value string, loc *Location) (Time, error)\n3.7.5. func Unix(sec int64, nsec int64) Time\n3.7.6. func UnixMicro(usec int64) Time\n3.7.7. func UnixMilli(msec int64) Time\n3.7.8. func (t Time) Add(d Duration) Time\n3.7.9. func (t Time) AddDate(years int, months int, days int) Time\n3.7.10. func (t Time) After(u Time) bool\n3.7.11. func (t Time) AppendFormat(b []byte, layout string) []byte\n3.7.12. func (t Time) Before(u Time) bool\n3.7.13. func (t Time) Clock() (hour, min, sec int)\n3.7.14. func (t Time) Date() (year int, month Month, day int)\n3.7.15. func (t Time) Day() int\n3.7.16. func (t Time) Equal(u Time) bool\n3.7.17. func (t Time) Format(layout string) string\n3.7.18. func (t Time) GoString() string\n3.7.19. func (t *Time) GobDecode(data []byte) error\n3.7.20. func (t Time) GobEncode() ([]byte, error)\n3.7.21. func (t Time) Hour() int\n3.7.22. func (t Time) ISOWeek() (year, week int)\n3.7.23. func (t Time) In(loc*Location) Time\n3.7.24. func (t Time) IsDST() bool\n3.7.25. func (t Time) IsZero() bool\n3.7.26. func (t Time) Local() Time\n3.7.27. func (t Time) Location() *Location\n3.7.28. func (t Time) MarshalBinary() ([]byte, error)\n3.7.29. func (t Time) MarshalJSON() ([]byte, error)\n3.7.30. func (t Time) MarshalText() ([]byte, error)\n3.7.31. func (t Time) Minute() int\n3.7.32. func (t Time) Month() Month\n3.7.33. func (t Time) Nanosecond() int\n3.7.34. func (t Time) Round(d Duration) Time\n3.7.35. func (t Time) Second() int\n3.7.36. func (t Time) String() string\n3.7.37. func (t Time) Sub(u Time) Duration\n3.7.38. func (t Time) Truncate(d Duration) Time\n3.7.39. func (t Time) UTC() Time\n3.7.40. func (t Time) Unix() int64\n3.7.41. func (t Time) UnixMicro() int64\n3.7.42. func (t Time) UnixMilli() int64\n3.7.43. func (t Time) UnixNano() int64\n3.7.44. func (t*Time) UnmarshalBinary(data []byte) error\n3.7.45. func (t *Time) UnmarshalJSON(data []byte) error\n3.7.46. func (t*Time) UnmarshalText(data []byte) error\n3.7.47. func (t Time) Weekday() Weekday\n3.7.48. func (t Time) Year() int\n3.7.49. func (t Time) YearDay() int\n3.7.50. func (t Time) Zone() (name string, offset int)\n3.7.51. func (t Time) ZoneBounds() (start, end Time)\n3.7.52. type Timer\n3.7.53. func AfterFunc(d Duration, f func()) *Timer\n3.7.54. func NewTimer(d Duration)*Timer\n3.7.55. func (t *Timer) Reset(d Duration) bool\n3.7.56. func (t*Timer) Stop() bool\n\n\n3.8. type Weekday\n3.8.1. func (d Weekday) String() string\n\n\n\n\n4. rand\n4.1. function not method of rand\n4.1.1. func ExpFloat64() float64\n4.1.2. func Float32() float32\n4.1.3. func Float64() float64\n4.1.4. func Int() int\n4.1.5. func Int31() int32\n4.1.6. func Int31n(n int32) int32\n4.1.7. func Int63() int64\n4.1.8. func Int63n(n int64) int64\n4.1.9. func Intn(n int) int\n4.1.10. func NormFloat64() float64\n4.1.11. func Perm(n int) []int\n4.1.12. func Read(p []byte) (n int, err error)\n4.1.13. func Seed(seed int64)\n4.1.14. func Shuffle(n int, swap func(i, j int))\n4.1.15. func Uint32() uint32\n4.1.16. func Uint64() uint64\n\n\n4.2. type Rand\n4.2.1. func New(src Source) *Rand\n4.2.2. func (r*Rand) ExpFloat64() float64\n4.2.3. func (r *Rand) Float32() float32\n4.2.4. func (r*Rand) Float64() float64\n4.2.5. func (r *Rand) Int() int\n4.2.6. func (r*Rand) Int31() int32\n4.2.7. func (r *Rand) Int31n(n int32) int32\n4.2.8. func (r*Rand) Int63() int64\n4.2.9. func (r *Rand) Int63n(n int64) int64\n4.2.10. func (r*Rand) Intn(n int) int\n4.2.11. func (r *Rand) NormFloat64() float64\n4.2.12. func (r*Rand) Perm(n int) []int\n4.2.13. func (r *Rand) Read(p []byte) (n int, err error)\n4.2.14. func (r*Rand) Seed(seed int64)\n4.2.15. func (r *Rand) Shuffle(n int, swap func(i, j int))\n4.2.16. func (r*Rand) Uint32() uint32\n4.2.17. func (r *Rand) Uint64() uint64\n\n\n4.3. type Source\n4.3.1. func NewSource(seed int64) Source\n\n\n4.4. type Source64\n4.5. type Zipf\n4.5.1. func NewZipf(r *Rand, s float64, v float64, imax uint64)*Zipf\n4.5.2. func (z *Zipf) Uint64() uint64\n\n\n\n\n\n1. package tar  Package tar implements access to tar archives.\n  Tape(封装) archives (tar) are a file format for storing a sequence of files that can be read and written in a streaming manner. This package aims to cover most variations of the format, including those produced by GNU and BSD tar tools.\n1.1. Constants  const (\n  &#x2F;&#x2F; Type &#39;0&#39; indicates a regular file.\n  TypeReg  &#x3D; &#39;0&#39;\n  TypeRegA &#x3D; &#39;\\x00&#39; &#x2F;&#x2F; Deprecated: Use TypeReg instead.\n\n  &#x2F;&#x2F; Type &#39;1&#39; to &#39;6&#39; are header-only flags and may not have a data body.\n  TypeLink    &#x3D; &#39;1&#39; &#x2F;&#x2F; Hard link\n  TypeSymlink &#x3D; &#39;2&#39; &#x2F;&#x2F; Symbolic link\n  TypeChar    &#x3D; &#39;3&#39; &#x2F;&#x2F; Character device node\n  TypeBlock   &#x3D; &#39;4&#39; &#x2F;&#x2F; Block device node\n  TypeDir     &#x3D; &#39;5&#39; &#x2F;&#x2F; Directory\n  TypeFifo    &#x3D; &#39;6&#39; &#x2F;&#x2F; FIFO node\n\n  &#x2F;&#x2F; Type &#39;7&#39; is reserved.\n  TypeCont &#x3D; &#39;7&#39;\n\n  &#x2F;&#x2F; Type &#39;x&#39; is used by the PAX format to store key-value records that\n  &#x2F;&#x2F; are only relevant to the next file.\n  &#x2F;&#x2F; This package transparently handles these types.\n  TypeXHeader &#x3D; &#39;x&#39;\n\n  &#x2F;&#x2F; Type &#39;g&#39; is used by the PAX format to store key-value records that\n  &#x2F;&#x2F; are relevant to all subsequent files.\n  &#x2F;&#x2F; This package only supports parsing and composing such headers,\n  &#x2F;&#x2F; but does not currently support persisting the global state across files.\n  TypeXGlobalHeader &#x3D; &#39;g&#39;\n\n  &#x2F;&#x2F; Type &#39;S&#39; indicates a sparse file in the GNU format.\n  TypeGNUSparse &#x3D; &#39;S&#39;\n\n  &#x2F;&#x2F; Types &#39;L&#39; and &#39;K&#39; are used by the GNU format for a meta file\n  &#x2F;&#x2F; used to store the path or link name for the next file.\n  &#x2F;&#x2F; This package transparently handles these types.\n  TypeGNULongName &#x3D; &#39;L&#39;\n  TypeGNULongLink &#x3D; &#39;K&#39;\n)\n\n1.2. Variables  var (\n  ErrHeader          &#x3D; errors.New(&quot;archive&#x2F;tar: invalid tar header&quot;)\n  ErrWriteTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: write too long&quot;)\n  ErrFieldTooLong    &#x3D; errors.New(&quot;archive&#x2F;tar: header field too long&quot;)\n  ErrWriteAfterClose &#x3D; errors.New(&quot;archive&#x2F;tar: write after close&quot;)\n)\n\n1.3. type Format  type Format int\n\n  Format represents the tar archive format.The original tar format was introduced in Unix V7. Since then, there have been multiple competing(相互竞争) formats attempting to standardize or extend the V7 format to overcome its limitations. The most common formats are the USTAR, PAX, and GNU formats, each with their own advantages and limitations.\n  The following table captures the capabilities of each format:\n                    |  USTAR |       PAX |       GNU\n------------------+--------+-----------+----------\nName              |   256B | unlimited | unlimited\nLinkname          |   100B | unlimited | unlimited\nSize              | uint33 | unlimited |    uint89\nMode              | uint21 |    uint21 |    uint57\nUid&#x2F;Gid           | uint21 | unlimited |    uint57\nUname&#x2F;Gname       |    32B | unlimited |       32B\nModTime           | uint33 | unlimited |     int89\nAccessTime        |    n&#x2F;a | unlimited |     int89\nChangeTime        |    n&#x2F;a | unlimited |     int89\nDevmajor&#x2F;Devminor | uint21 |    uint21 |    uint57\n------------------+--------+-----------+----------\nstring encoding   |  ASCII |     UTF-8 |    binary\nsub-second times  |     no |       yes |        no\nsparse files      |     no |       yes |       yes\n\n  The table’s upper portion shows the Header fields, where each format reports the maximum number of bytes allowed for each string field and the integer type used to store each numeric field (where timestamps are stored as the number of seconds since the Unix epoch).\n  The table’s lower portion shows specialized features of each format, such as supported string encodings, support for sub-second timestamps, or support for sparse files.\n  The Writer currently provides no support for sparse files.\n  const (\n\n&#x2F;&#x2F; FormatUnknown indicates that the format is unknown.\nFormatUnknown Format\n&#x2F;&#x2F; FormatUSTAR represents the USTAR header format defined in POSIX.1-1988.\n&#x2F;&#x2F;\n&#x2F;&#x2F; While this format is compatible with most tar readers,\n&#x2F;&#x2F; the format has several limitations making it unsuitable for some usages.\n&#x2F;&#x2F; Most notably, it cannot support sparse files, files larger than 8GiB,\n&#x2F;&#x2F; filenames larger than 256 characters, and non-ASCII filenames.\n&#x2F;&#x2F;\n&#x2F;&#x2F; Reference:\n&#x2F;&#x2F; http:&#x2F;&#x2F;pubs.opengroup.org&#x2F;onlinepubs&#x2F;9699919799&#x2F;utilities&#x2F;pax.html#tag_20_92_13_06\nFormatUSTAR\n&#x2F;&#x2F; FormatPAX represents the PAX header format defined in POSIX.1-2001.\n&#x2F;&#x2F;\n&#x2F;&#x2F; PAX extends USTAR by writing a special file with Typeflag TypeXHeader\n&#x2F;&#x2F; preceding the original header. This file contains a set of key-value\n&#x2F;&#x2F; records, which are used to overcome USTAR\\&#39;s shortcomings, in addition to\n&#x2F;&#x2F; providing the ability to have sub-second resolution for timestamps.\n&#x2F;&#x2F;\n&#x2F;&#x2F; Some newer formats add their own extensions to PAX by defining their\n&#x2F;&#x2F; own keys and assigning certain semantic meaning to the associated values.\n&#x2F;&#x2F; For example, sparse file support in PAX is implemented using keys\n&#x2F;&#x2F; defined by the GNU manual (e.g., &quot;GNU.sparse.map&quot;).\n&#x2F;&#x2F;\n&#x2F;&#x2F; Reference:\n&#x2F;&#x2F; http:&#x2F;&#x2F;pubs.opengroup.org&#x2F;onlinepubs&#x2F;009695399&#x2F;utilities&#x2F;pax.html\nFormatPAX\n&#x2F;&#x2F; FormatGNU represents the GNU header format.\n&#x2F;&#x2F;\n&#x2F;&#x2F; The GNU header format is older than the USTAR and PAX standards and\n&#x2F;&#x2F; is not compatible with them. The GNU format supports\n&#x2F;&#x2F; arbitrary file sizes, filenames of arbitrary encoding and length,\n&#x2F;&#x2F; sparse files, and other features.\n&#x2F;&#x2F;\n&#x2F;&#x2F; It is recommended that PAX be chosen over GNU unless the target\n&#x2F;&#x2F; application can only parse GNU formatted archives.\n&#x2F;&#x2F;\n&#x2F;&#x2F; Reference:\n&#x2F;&#x2F; https:&#x2F;&#x2F;www.gnu.org&#x2F;software&#x2F;tar&#x2F;manual&#x2F;html_node&#x2F;Standard.html\nFormatGNU\n)\n\n\n1.3.1. func (f Format) String() string  打印tar的格式\n1.4. type Header    type Header struct &#123;\n  &#x2F;&#x2F; Typeflag is the type of header entry.\n  &#x2F;&#x2F; The zero value is automatically promoted to either TypeReg or TypeDir\n  &#x2F;&#x2F; depending on the presence of a trailing slash in Name.\n  Typeflag byte\n\n  Name     string &#x2F;&#x2F; Name of file entry\n  Linkname string &#x2F;&#x2F; Target name of link (valid for TypeLink or TypeSymlink)\n\n  Size  int64  &#x2F;&#x2F; Logical file size in bytes\n  Mode  int64  &#x2F;&#x2F; Permission and mode bits\n  Uid   int    &#x2F;&#x2F; User ID of owner\n  Gid   int    &#x2F;&#x2F; Group ID of owner\n  Uname string &#x2F;&#x2F; User name of owner\n  Gname string &#x2F;&#x2F; Group name of owner\n\n  &#x2F;&#x2F; If the Format is unspecified, then Writer.WriteHeader rounds ModTime\n  &#x2F;&#x2F; to the nearest second and ignores the AccessTime and ChangeTime fields.\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; To use AccessTime or ChangeTime, specify the Format as PAX or GNU.\n  &#x2F;&#x2F; To use sub-second resolution, specify the Format as PAX.\n  ModTime    time.Time &#x2F;&#x2F; Modification time\n  AccessTime time.Time &#x2F;&#x2F; Access time (requires either PAX or GNU support)\n  ChangeTime time.Time &#x2F;&#x2F; Change time (requires either PAX or GNU support)\n\n  Devmajor int64 &#x2F;&#x2F; Major device number (valid for TypeChar or TypeBlock)\n  Devminor int64 &#x2F;&#x2F; Minor device number (valid for TypeChar or TypeBlock)\n\n  &#x2F;&#x2F; Xattrs stores extended attributes as PAX records under the\n  &#x2F;&#x2F; &quot;SCHILY.xattr.&quot; namespace.\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; The following are semantically equivalent:\n  &#x2F;&#x2F;  h.Xattrs[key] &#x3D; value\n  &#x2F;&#x2F;  h.PAXRecords[&quot;SCHILY.xattr.&quot;+key] &#x3D; value\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; When Writer.WriteHeader is called, the contents of Xattrs will take\n  &#x2F;&#x2F; precedence over those in PAXRecords.\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; Deprecated: Use PAXRecords instead.\n  Xattrs map[string]string\n\n  &#x2F;&#x2F; PAXRecords is a map of PAX extended header records.\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; User-defined records should have keys of the following form:\n  &#x2F;&#x2F;\tVENDOR.keyword\n  &#x2F;&#x2F; Where VENDOR is some namespace in all uppercase, and keyword may\n  &#x2F;&#x2F; not contain the &#39;&#x3D;&#39; character (e.g., &quot;GOLANG.pkg.version&quot;).\n  &#x2F;&#x2F; The key and value should be non-empty UTF-8 strings.\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; When Writer.WriteHeader is called, PAX records derived from the\n  &#x2F;&#x2F; other fields in Header take precedence over PAXRecords.\n  PAXRecords map[string]string\n\n  &#x2F;&#x2F; Format specifies the format of the tar header.\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; This is set by Reader.Next as a best-effort guess at the format.\n  &#x2F;&#x2F; Since the Reader liberally reads some non-compliant files,\n  &#x2F;&#x2F; it is possible for this to be FormatUnknown.\n  &#x2F;&#x2F;\n  &#x2F;&#x2F; If the format is unspecified when Writer.WriteHeader is called,\n  &#x2F;&#x2F; then it uses the first format (in the order of USTAR, PAX, GNU)\n  &#x2F;&#x2F; capable of encoding this Header (see Format).\n  Format Format\n&#125;\n\n\n1.4.1. func FileInfoHeader(fi fs.FileInfo, link string) (*Header, error)1.4.2. func (h*Header) FileInfo() fs.FileInfo1.5. type Reader1.5.1. func NewReader(r io.Reader) *Reader1.5.2. func (tr*Reader) Next() (*Header, error)1.5.3. func (tr*Reader) Read(b []byte) (int, error)1.6. type Writer1.6.1. func NewWriter(w io.Writer) *Writer1.6.2. func (tw*Writer) Close() error1.6.3. func (tw *Writer) Flush() error1.6.4. func (tw*Writer) Write(b []byte) (int, error)1.6.5. func (tw Writer) WriteHeader(hdrHeader) error2. zip package2.1. Constants  const (\n  Store   uint16 &#x3D; 0 &#x2F;&#x2F; no compression\n  Deflate uint16 &#x3D; 8 &#x2F;&#x2F; DEFLATE compressed\n)\n\n2.2. Variables  var (\n  ErrFormat    &#x3D; errors.New(&quot;zip: not a valid zip file&quot;)\n  ErrAlgorithm &#x3D; errors.New(&quot;zip: unsupported compression algorithm&quot;)\n  ErrChecksum  &#x3D; errors.New(&quot;zip: checksum error&quot;)\n)\n\n\n2.2.1. func RegisterCompressor(method uint16, comp Compressor)2.2.2. func RegisterDecompressor(method uint16, dcomp Decompressor)2.3. type Compressor2.4. type Decompressor2.5. type File2.5.1. func (f *File) DataOffset() (offset int64, err error)2.5.2. func (f*File) Open() (io.ReadCloser, error)2.5.3. func (f *File) OpenRaw() (io.Reader, error)2.6. type FileHeader2.6.1. func FileInfoHeader(fi fs.FileInfo) (*FileHeader, error)2.6.2. func (h *FileHeader) FileInfo() fs.FileInfo2.6.3. func (h*FileHeader) ModTime() time.TimeDEPRECATED2.6.4. func (h *FileHeader) Mode() (mode fs.FileMode)2.6.5. func (h*FileHeader) SetModTime(t time.Time)DEPRECATED2.6.6. func (h *FileHeader) SetMode(mode fs.FileMode)2.7. type ReadCloser2.7.1. func OpenReader(name string) (*ReadCloser, error)2.7.2. func (rc *ReadCloser) Close() error2.8. type Reader2.8.1. func NewReader(r io.ReaderAt, size int64) (*Reader, error)2.8.2. func (r *Reader) Open(name string) (fs.File, error)2.8.3. func (z*Reader) RegisterDecompressor(method uint16, dcomp Decompressor)2.9. type Writer2.9.1. func NewWriter(w io.Writer) *Writer2.9.2. func (w*Writer) Close() error2.9.3. func (w *Writer) Copy(f*File) error2.9.4. func (w *Writer) Create(name string) (io.Writer, error)2.9.5. func (w*Writer) CreateHeader(fh*FileHeader) (io.Writer, error)2.9.6. func (w*Writer) CreateRaw(fh*FileHeader) (io.Writer, error)2.9.7. func (w*Writer) Flush() error2.9.8. func (w *Writer) RegisterCompressor(method uint16, comp Compressor)2.9.9. func (w*Writer) SetComment(comment string) error2.9.10. func (w *Writer) SetOffset(n int64)3. time package3.1. Constants  const (\n  Layout      &#x3D; &quot;01&#x2F;02 03:04:05PM &#39;06 -0700&quot; &#x2F;&#x2F; The reference time, in numerical order.\n  ANSIC       &#x3D; &quot;Mon Jan _2 15:04:05 2006&quot;\n  UnixDate    &#x3D; &quot;Mon Jan _2 15:04:05 MST 2006&quot;\n  RubyDate    &#x3D; &quot;Mon Jan 02 15:04:05 -0700 2006&quot;\n  RFC822      &#x3D; &quot;02 Jan 06 15:04 MST&quot;\n  RFC822Z     &#x3D; &quot;02 Jan 06 15:04 -0700&quot; &#x2F;&#x2F; RFC822 with numeric zone\n  RFC850      &#x3D; &quot;Monday, 02-Jan-06 15:04:05 MST&quot;\n  RFC1123     &#x3D; &quot;Mon, 02 Jan 2006 15:04:05 MST&quot;\n  RFC1123Z    &#x3D; &quot;Mon, 02 Jan 2006 15:04:05 -0700&quot; &#x2F;&#x2F; RFC1123 with numeric zone\n  RFC3339     &#x3D; &quot;2006-01-02T15:04:05Z07:00&quot;\n  RFC3339Nano &#x3D; &quot;2006-01-02T15:04:05.999999999Z07:00&quot;\n  Kitchen     &#x3D; &quot;3:04PM&quot;\n  &#x2F;&#x2F; Handy time stamps.\n  Stamp      &#x3D; &quot;Jan _2 15:04:05&quot;\n  StampMilli &#x3D; &quot;Jan _2 15:04:05.000&quot;\n  StampMicro &#x3D; &quot;Jan _2 15:04:05.000000&quot;\n  StampNano  &#x3D; &quot;Jan _2 15:04:05.000000000&quot;\n)\n\n3.1.1. func After(d Duration) &lt;-chan Time  After waits for the duration to elapse and then sends the current time on the returned channel. It is equivalent to NewTimer(d).C. The underlying Timer is not recovered by the garbage collector until the timer fires. If efficiency is a concern, use NewTimer instead and call Timer.Stop if the timer is no longer needed.这里需要注意，这个After(d Duration)是指返回一次的时间戳，想要使用还要再次初始化\n3.1.2. func Sleep(d Duration)3.1.3. func Tick(d Duration) &lt;-chan Time3.2. type Duration3.2.1. func ParseDuration(s string) (Duration, error)3.2.2. func Since(t Time) Duration3.2.3. func Until(t Time) Duration3.2.4. func (d Duration) Abs() Duration3.2.5. func (d Duration) Hours() float643.2.6. func (d Duration) Microseconds() int643.2.7. func (d Duration) Milliseconds() int643.2.8. func (d Duration) Minutes() float643.2.9. func (d Duration) Nanoseconds() int643.2.10. func (d Duration) Round(m Duration) Duration3.2.11. func (d Duration) Seconds() float643.2.12. func (d Duration) String() string3.2.13. func (d Duration) Truncate(m Duration) Duration3.3. type Location3.3.1. func FixedZone(name string, offset int) *Location3.3.2. func LoadLocation(name string) (*Location, error)3.3.3. func LoadLocationFromTZData(name string, data []byte) (*Location, error)3.3.4. func (l*Location) String() string3.4. type Month3.4.1. func (m Month) String() string3.5. type ParseError3.5.1. func (e *ParseError) Error() string3.6. type Ticker  A Ticker holds a channel that delivers “ticks” of a clock at intervals.\n3.6.1. func NewTicker(d Duration) *Ticker  NewTicker returns a new Ticker containing a channel that will send the current time on the channel after each tick. The period of the ticks is specified by the duration argument. The ticker will adjust the time interval or drop ticks to make up for slow receivers. The duration d must be greater than zero; if not, NewTicker will panic. Stop the ticker to release associated resources.\n3.6.2. func (t *Ticker) Reset(d Duration)  Reset stops a ticker and resets its period to the specified duration. The next tick will arrive after the new period elapses. The duration d must be greater than zero; if not, Reset will panic.\n3.6.3. func (t *Ticker) Stop()  Stop turns off a ticker. After Stop, no more ticks will be sent. Stop does not close the channel, to prevent a concurrent goroutine reading from the channel from seeing an erroneous “tick”.\nsortfunc Find(n int, cmp func(int) int) (i int, found bool)func Float64s(x []float64)func Float64sAreSorted(x []float64) boolfunc Ints(x []int)就是排序基础数据类型int的\nfunc IntsAreSorted(x []int) boolfunc IsSorted(data Interface) boolfunc Search(n int, f func(int) bool) intfunc SearchFloat64s(a []float64, x float64) intfunc SearchInts(a []int, x int) intfunc SearchStrings(a []string, x string) intfunc Slice(x any, less func(i, j int) bool)func SliceIsSorted(x any, less func(i, j int) bool) boolfunc SliceStable(x any, less func(i, j int) bool)func Sort(data Interface)func Stable(data Interface)func Strings(x []string)func StringsAreSorted(x []string) booltype Float64Slicefunc (x Float64Slice) Len() intfunc (x Float64Slice) Less(i, j int) boolfunc (p Float64Slice) Search(x float64) intfunc (x Float64Slice) Sort()func (x Float64Slice) Swap(i, j int)type IntSlicefunc (x IntSlice) Len() intfunc (x IntSlice) Less(i, j int) boolfunc (p IntSlice) Search(x int) intfunc (x IntSlice) Sort()func (x IntSlice) Swap(i, j int)type Interfacefunc Reverse(data Interface) Interfacetype StringSlicefunc (x StringSlice) Len() intfunc (x StringSlice) Less(i, j int) boolfunc (p StringSlice) Search(x string) intfunc (x StringSlice) Sort()func (x StringSlice) Swap(i, j int)3.7. type Time3.7.1. func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time3.7.2. func Now() Time3.7.3. func Parse(layout, value string) (Time, error)3.7.4. func ParseInLocation(layout, value string, loc *Location) (Time, error)3.7.5. func Unix(sec int64, nsec int64) Time3.7.6. func UnixMicro(usec int64) Time3.7.7. func UnixMilli(msec int64) Time3.7.8. func (t Time) Add(d Duration) Time3.7.9. func (t Time) AddDate(years int, months int, days int) Time3.7.10. func (t Time) After(u Time) bool3.7.11. func (t Time) AppendFormat(b []byte, layout string) []byte3.7.12. func (t Time) Before(u Time) bool3.7.13. func (t Time) Clock() (hour, min, sec int)3.7.14. func (t Time) Date() (year int, month Month, day int)3.7.15. func (t Time) Day() int3.7.16. func (t Time) Equal(u Time) bool3.7.17. func (t Time) Format(layout string) string3.7.18. func (t Time) GoString() string3.7.19. func (t *Time) GobDecode(data []byte) error3.7.20. func (t Time) GobEncode() ([]byte, error)3.7.21. func (t Time) Hour() int3.7.22. func (t Time) ISOWeek() (year, week int)3.7.23. func (t Time) In(loc*Location) Time3.7.24. func (t Time) IsDST() bool3.7.25. func (t Time) IsZero() bool3.7.26. func (t Time) Local() Time3.7.27. func (t Time) Location() *Location3.7.28. func (t Time) MarshalBinary() ([]byte, error)3.7.29. func (t Time) MarshalJSON() ([]byte, error)3.7.30. func (t Time) MarshalText() ([]byte, error)3.7.31. func (t Time) Minute() int3.7.32. func (t Time) Month() Month3.7.33. func (t Time) Nanosecond() int3.7.34. func (t Time) Round(d Duration) Time3.7.35. func (t Time) Second() int3.7.36. func (t Time) String() string3.7.37. func (t Time) Sub(u Time) Duration3.7.38. func (t Time) Truncate(d Duration) Time3.7.39. func (t Time) UTC() Time3.7.40. func (t Time) Unix() int643.7.41. func (t Time) UnixMicro() int643.7.42. func (t Time) UnixMilli() int643.7.43. func (t Time) UnixNano() int643.7.44. func (t*Time) UnmarshalBinary(data []byte) error3.7.45. func (t *Time) UnmarshalJSON(data []byte) error3.7.46. func (t*Time) UnmarshalText(data []byte) error3.7.47. func (t Time) Weekday() Weekday3.7.48. func (t Time) Year() int3.7.49. func (t Time) YearDay() int3.7.50. func (t Time) Zone() (name string, offset int)3.7.51. func (t Time) ZoneBounds() (start, end Time)3.7.52. type Timer  type Timer struct &#123;\n  C &lt;-chan Time\n  &#x2F;&#x2F; contains filtered or unexported fields\n&#125;\n\n  这里的C用于接收\n3.7.53. func AfterFunc(d Duration, f func()) *Timer3.7.54. func NewTimer(d Duration)*Timer3.7.55. func (t *Timer) Reset(d Duration) bool3.7.56. func (t*Timer) Stop() bool3.8. type Weekday3.8.1. func (d Weekday) String() string4. rand4.1. function not method of rand4.1.1. func ExpFloat64() float644.1.2. func Float32() float324.1.3. func Float64() float644.1.4. func Int() int4.1.5. func Int31() int324.1.6. func Int31n(n int32) int324.1.7. func Int63() int644.1.8. func Int63n(n int64) int644.1.9. func Intn(n int) int4.1.10. func NormFloat64() float644.1.11. func Perm(n int) []int4.1.12. func Read(p []byte) (n int, err error)4.1.13. func Seed(seed int64)4.1.14. func Shuffle(n int, swap func(i, j int))4.1.15. func Uint32() uint324.1.16. func Uint64() uint644.2. type Rand4.2.1. func New(src Source) *Rand4.2.2. func (r*Rand) ExpFloat64() float644.2.3. func (r *Rand) Float32() float324.2.4. func (r*Rand) Float64() float644.2.5. func (r *Rand) Int() int4.2.6. func (r*Rand) Int31() int324.2.7. func (r *Rand) Int31n(n int32) int324.2.8. func (r*Rand) Int63() int644.2.9. func (r *Rand) Int63n(n int64) int644.2.10. func (r*Rand) Intn(n int) int4.2.11. func (r *Rand) NormFloat64() float644.2.12. func (r*Rand) Perm(n int) []int4.2.13. func (r *Rand) Read(p []byte) (n int, err error)4.2.14. func (r*Rand) Seed(seed int64)  Seed使用提供的种子值将生成器初始化为一个确定的状态。Seed不应该与其他Rand方法并发调用。\n4.2.15. func (r *Rand) Shuffle(n int, swap func(i, j int))4.2.16. func (r*Rand) Uint32() uint324.2.17. func (r *Rand) Uint64() uint644.3. type Source4.3.1. func NewSource(seed int64) Source  NewSource返回一个新的伪随机源，其种子为给定值。与顶级函数使用的默认Source不同，这个Source对于多个goroutine的并发使用是不安全的。\n  randomSource :&#x3D; NewSource(time.Now().UnixNano())\nrandSeed :&#x3D; New(randomSource) &#x2F;&#x2F;这时候就可以使用rand的method\nrandomInt :&#x3D; randSeed.Intn(300)&#x2F;&#x2F;[0,300)的整数\n\n\n4.4. type Source64  Source64是一个也可以直接生成[0, 1&lt;&lt;64]范围内的均匀分布的伪随机uint64值的Source。如果一个Rand r的底层Source s实现了Source64，那么r.Uint64返回对s.Uint64的一次调用结果，而不是对s.Int63的两次调用。  Source64的结构\n  type Source64 interface &#123;\n    Source\n    Uint64() uint64\n&#125;\n\n4.5. type Zipf4.5.1. func NewZipf(r *Rand, s float64, v float64, imax uint64)*Zipf4.5.2. func (z *Zipf) Uint64() uint64","dateCreated":"2022-10-08T07:48:06+08:00","dateModified":"2022-10-23T16:24:42+08:00","datePublished":"2022-10-08T07:48:06+08:00","description":"","headline":"go标准库阅读与解析","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/","keywords":"golang"}</script>
+    <meta name="description" content="1. package tar 1.1. Constants 1.2. Variables 1.3. type Format 1.3.1. func (f Format) String() string   1.4. type Header 1.4.1. func FileInfoHeader(fi fs.FileInfo, link string) (*Header, error) 1.4.2.">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="go标准库阅读与解析">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="作者：Eugene Vinitsky  Personal Rules of Productive ResearchCaveats and intent: Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid m">
+<meta property="og:description" content="1. package tar 1.1. Constants 1.2. Variables 1.3. type Format 1.3.1. func (f Format) String() string   1.4. type Header 1.4.1. func FileInfoHeader(fi fs.FileInfo, link string) (*Header, error) 1.4.2.">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-24T15:33:29.906Z">
-<meta property="article:modified_time" content="2022-10-25T08:46:00.940Z">
+<meta property="article:published_time" content="2022-10-07T23:48:06.892Z">
+<meta property="article:modified_time" content="2022-10-23T08:24:42.164Z">
 <meta property="article:author" content="kirkzhang">
+<meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@nil">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/nil"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
 
 
-<link rel="icon" href="/img/avatar.jpg">
+    
+        
+            
+        
+    
 
-<link href="/css/style.css?v=1.1.0" rel="stylesheet">
-
-<link href="/css/hl_theme/sublime.css?v=1.1.0" rel="stylesheet">
-
-<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
-
-<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-<script src="/js/titleTip.js?v=1.1.0" ></script>
-
-<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
-<script>
-    hljs.initHighlightingOnLoad();
-</script>
-
-<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
-
-
-
-<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
-
-<script src="/js/iconfont.js?v=1.1.0" ></script>
-
-<meta name="generator" content="Hexo 6.2.0"></head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_preload_comment" value="">
-  <input class="theme_blog_path" value="">
-  <input id="theme_shortcut" value="true" />
-  <input id="theme_highlight_on" value="true" />
-  <input id="theme_code_copy" value="true" />
-</div>
-
-
-
-<body>
-<aside class="nav">
-    <div class="nav-left">
-        <a href="/"
-   class="avatar_target">
-    <img class="avatar"
-         src="/img/avatar.jpg"/>
-</a>
-<div class="author">
-    <span>kirkzhang</span>
-</div>
-
-<div class="icon">
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-</div>
-
-
-
-
-<ul>
-    <li>
-        <div class="all active" data-rel="All">All
-            
-                <small>(60)</small>
-            
-        </div>
-    </li>
-    
-        
-            
-                <li>
-                    <div data-rel="CPP">
-                        
-                        CPP
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="非技术类">
-                        
-                        非技术类
-                        <small>(3)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="分布式">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        分布式
-                        <small>(5)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="分布式<--->MIT6.824">
-                                        
-                                        MIT6.824
-                                        
-                                            <small>(4
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="数据结构">
-                        
-                        数据结构
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="算法">
-                        
-                        算法
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="随笔">
-                        
-                        随笔
-                        <small>(5)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="archive">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        archive
-                        <small>(10)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="archive<--->golang">
-                                        
-                                        golang
-                                        
-                                            <small>(2
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="CICD">
-                        
-                        CICD
-                        <small>(2)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="golang">
-                        
-                        golang
-                        <small>(2)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="leetcode">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        leetcode
-                        <small>(17)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="leetcode<--->leetcode题解">
-                                        
-                                        leetcode题解
-                                        
-                                            <small>(17
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="linux">
-                        
-                        linux
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="mysql">
-                        
-                        mysql
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="oracle">
-                        
-                        oracle
-                        <small>(4)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="TED">
-                        
-                        TED
-                        <small>(4)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="vue">
-                        
-                        vue
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="WEB-API">
-                        
-                        WEB-API
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-</ul>
-<div class="left-bottom">
-    <div class="menus">
-        
-            
-            
-            
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Eden
+        </a>
     </div>
-    <div>
+    
         
-            <a class="about  "
-               target="_blank"
-                    
-               href="/about">About</a>
+            <a
+                class="header-right-picture "
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
         
         
-    </div>
-</div>
-<input type="hidden" id="yelog_site_posts_number" value="60">
+            <img class="header-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
 
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
+            <!-- Define author's picture -->
 
-    </div>
-    <div class="nav-right">
-        <div class="friends-area">
-    <div class="friends-title">
-        Links
-        <i class="iconfont icon-left"></i>
-    </div>
-    <div class="friends-content">
-        <ul>
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
             
-            <li><a target="_blank" href="/null">叶落阁</a></li>
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
             
         </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Google +"
+                        >
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/mailto"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
     </div>
-</div>
-        <div class="title-list">
-    <div class="right-top">
-        <div id="default-panel">
-            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
-            <div class="right-title">All</div>
-            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
-        </div>
-        <div id="search-panel">
-            <i class="iconfont icon-left" data-title="返回"></i>
-            <input id="local-search-input" autocomplete="off"/>
-            <label class="border-line" for="input"></label>
-            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
-            <i class="iconfont icon-tag" data-title="标签"></i>
-        </div>
-        <div id="outline-panel" style="display: none">
-            <div class="right-title">大纲</div>
-            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
-        </div>
-    </div>
+</nav>
 
-    <div class="tags-list">
-    <input id="tag-search" />
-    <div class="tag-wrapper">
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            go标准库阅读与解析
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-10-08T07:48:06+08:00">
+	
+		    Oct 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
         
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>非技术类</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>ansible</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>Docker</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>golang</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>mysql</a>
-            </li>
-        
-    </div>
+    <a class="category-link" href="/categories/golang/">golang</a>
 
-</div>
 
     
-    <div id="local-search-result">
-
-    </div>
-    
-    <nav id="title-list-nav">
-        
-        <a id="top" class="All 随笔 "
-           href="/2022/06/22/%E9%9A%8F%E7%AC%94/%E5%A6%82%E4%BD%95%E5%9C%A8%E8%AF%BB%E7%A0%94%E7%9A%84%E9%81%93%E8%B7%AF%E4%B8%8A%E5%BF%AB%E9%80%9F%E5%A4%B1%E8%B4%A5/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何在读研的道路上快速失败">如何在读研的道路上快速失败</span>
-            <span class="post-date" title="2022-06-22 21:14:38">2022/06/22</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="高效研究的个人规则">高效研究的个人规则</span>
-            <span class="post-date" title="2022-10-24 23:33:29">2022/10/24</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/24/%E9%9A%8F%E7%AC%94/%E9%AB%98%E6%95%88%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Expectation setting">Expectation setting</span>
-            <span class="post-date" title="2022-10-24 23:28:34">2022/10/24</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/23/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E9%9C%80%E8%A6%811368%E4%B8%AA%E5%8D%95%E8%AF%8D/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="为什么只需要1368个单词">为什么只需要1368个单词</span>
-            <span class="post-date" title="2022-10-23 17:07:23">2022/10/23</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/10/22/TED/five_ways_to_kill_your_dreams/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="five ways to kill your dreams">five ways to kill your dreams</span>
-            <span class="post-date" title="2022-10-22 20:49:43">2022/10/22</span>
-        </a>
-        
-        <a  class="All vue "
-           href="/2022/10/22/vue/vuejs_up_and_running/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="vue.js up and running">vue.js up and running</span>
-            <span class="post-date" title="2022-10-22 13:44:29">2022/10/22</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/ubuntu%E5%AE%89%E8%A3%85zookeeper/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="ubuntu安装zookeeper">ubuntu安装zookeeper</span>
-            <span class="post-date" title="2022-10-20 21:48:20">2022/10/20</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="单机安装三个kafka节点">单机安装三个kafka节点</span>
-            <span class="post-date" title="2022-10-20 21:42:43">2022/10/20</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="iso8583简介">iso8583简介</span>
-            <span class="post-date" title="2022-10-20 21:09:47">2022/10/20</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Oracle PLSQL Recipes">Oracle PLSQL Recipes</span>
-            <span class="post-date" title="2022-10-19 23:51:33">2022/10/19</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/10/19/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E5%8E%9F%E7%94%9F%E5%AE%B6%E5%BA%AD%E5%A6%82%E4%BD%95%E4%BF%AE%E8%A1%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E6%80%A7%E6%A0%BC%E7%BC%BA%E9%99%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="原生家庭如何修补自己的性格缺陷">原生家庭如何修补自己的性格缺陷</span>
-            <span class="post-date" title="2022-10-19 22:29:54">2022/10/19</span>
-        </a>
-        
-        <a  class="All mysql "
-           href="/2022/10/16/mysql/mysql_manual/"
-           data-tag="mysql"
-           data-author="" >
-            <span class="post-title" title="mysql manual">mysql manual</span>
-            <span class="post-date" title="2022-10-16 21:54:25">2022/10/16</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/16/archive/install_mysql_on_ubuntu/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="install_mysql_on_ubuntu(Debian sys)">install_mysql_on_ubuntu(Debian sys)</span>
-            <span class="post-date" title="2022-10-16 16:23:49">2022/10/16</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/11/oracle/Real_World_SQL_and_PLSQL/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Real_World_SQL_and_PLSQL">Real_World_SQL_and_PLSQL</span>
-            <span class="post-date" title="2022-10-11 14:57:52">2022/10/11</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/11/oracle/Oracle_EBR/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Edition-Based Redefinition Technical Deep Dive">Edition-Based Redefinition Technical Deep Dive</span>
-            <span class="post-date" title="2022-10-11 12:13:46">2022/10/11</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经">go语言圣经</span>
-            <span class="post-date" title="2022-10-08 14:02:11">2022/10/08</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go标准库阅读与解析">go标准库阅读与解析</span>
-            <span class="post-date" title="2022-10-08 07:48:06">2022/10/08</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/07/archive/compact_wsl2/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="压缩wsl2的磁盘">压缩wsl2的磁盘</span>
-            <span class="post-date" title="2022-10-07 15:33:59">2022/10/07</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_structure_guide">MIT6.824之lab2_raft_structure_guide</span>
-            <span class="post-date" title="2022-10-07 08:40:25">2022/10/07</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_lock_advice">MIT6.824之lab2_raft_lock_advice</span>
-            <span class="post-date" title="2022-10-05 22:32:54">2022/10/05</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2b/lab2_raft_students_guide/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_students_guide">MIT6.824之lab2_raft_students_guide</span>
-            <span class="post-date" title="2022-10-05 20:21:56">2022/10/05</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="费曼:任何伟大的科学成就，都源于思想自由">费曼:任何伟大的科学成就，都源于思想自由</span>
-            <span class="post-date" title="2022-09-26 00:05:55">2022/09/26</span>
-        </a>
-        
-        <a  class="All archive golang "
-           href="/2022/09/09/archive/golang_concurrency_map/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="concurreny-map代码阅读">concurreny-map代码阅读</span>
-            <span class="post-date" title="2022-09-09 16:43:34">2022/09/09</span>
-        </a>
-        
-        <a  class="All "
-           href="/2022/09/09/pro_git/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="pro_git">pro_git</span>
-            <span class="post-date" title="2022-09-09 12:21:02">2022/09/09</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="深入浅出_Oracle_DBA_入门_进阶与诊断案例">深入浅出_Oracle_DBA_入门_进阶与诊断案例</span>
-            <span class="post-date" title="2022-08-31 17:35:04">2022/08/31</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="API数据自动入库">API数据自动入库</span>
-            <span class="post-date" title="2022-08-27 13:35:51">2022/08/27</span>
-        </a>
-        
-        <a  class="All archive golang "
-           href="/2022/08/26/archive/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="内存高效golang">内存高效golang</span>
-            <span class="post-date" title="2022-08-26 21:18:06">2022/08/26</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/08/26/archive/remote_github/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="更新origin 和upstream url链接">更新origin 和upstream url链接</span>
-            <span class="post-date" title="2022-08-26 21:14:30">2022/08/26</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/08/12/MIT6.824/lab2b/lab2_raft_paper/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_paper">MIT6.824之lab2_raft_paper</span>
-            <span class="post-date" title="2022-08-12 21:57:38">2022/08/12</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/08/04/TED/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="多巴胺戒断">多巴胺戒断</span>
-            <span class="post-date" title="2022-08-04 23:08:38">2022/08/04</span>
-        </a>
-        
-        <a  class="All 分布式 "
-           href="/2022/07/26/SAF_mechanism/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="SAF mechanism replication">SAF mechanism replication</span>
-            <span class="post-date" title="2022-07-26 17:00:17">2022/07/26</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/07/14/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E7%A6%85%E4%B8%8E%E6%91%A9%E6%89%98%E8%BD%A6%E7%BB%B4%E4%BF%AE%E8%89%BA%E6%9C%AF/"
-           data-tag="非技术类"
-           data-author="" >
-            <span class="post-title" title="禅与摩托车维修艺术">禅与摩托车维修艺术</span>
-            <span class="post-date" title="2022-07-14 08:37:05">2022/07/14</span>
-        </a>
-        
-        <a  class="All 数据结构 "
-           href="/2022/07/12/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%B2%E4%B9%89/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="数据结构讲义">数据结构讲义</span>
-            <span class="post-date" title="2022-07-12 23:27:09">2022/07/12</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/06/24/archive/archive/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="手册阅读归档">手册阅读归档</span>
-            <span class="post-date" title="2022-06-24 06:54:11">2022/06/24</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="21.合并两个有序链表">21.合并两个有序链表</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="27.移除元素">27.移除元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="66.加一">66.加一</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="83.删除排序链表中的重复元素">83.删除排序链表中的重复元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="9.回文数">9.回文数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E4%B8%93%E6%B3%A8%E5%8A%9B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何提高专注力-How to Get Your Brain to Focus-TED">如何提高专注力-How to Get Your Brain to Focus-TED</span>
-            <span class="post-date" title="2022-06-22 23:10:43">2022/06/22</span>
-        </a>
-        
-        <a  class="All 算法 "
-           href="/2022/06/22/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="算法导论">算法导论</span>
-            <span class="post-date" title="2022-06-22 22:07:23">2022/06/22</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何阅读-TED">如何阅读-TED</span>
-            <span class="post-date" title="2022-06-22 22:05:35">2022/06/22</span>
-        </a>
-        
-        <a  class="All WEB-API "
-           href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="API Design Patterns">API Design Patterns</span>
-            <span class="post-date" title="2022-06-22 21:55:02">2022/06/22</span>
-        </a>
-        
-        <a  class="All linux "
-           href="/2022/06/22/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%88%87shell%E8%85%B3%E6%9C%AC%E7%B7%A8%E7%A8%8B%E5%A4%A7%E5%85%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Linux命令行与shell腳本編程大全">Linux命令行与shell腳本編程大全</span>
-            <span class="post-date" title="2022-06-22 21:53:01">2022/06/22</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/06/22/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%BB%8E0%E5%88%B01_%E5%BC%80%E5%90%AF%E5%95%86%E4%B8%9A%E4%B8%8E%E6%9C%AA%E6%9D%A5%E7%9A%84%E7%A7%98%E5%AF%86/"
-           data-tag="非技术类"
-           data-author="" >
-            <span class="post-title" title="从0到1:开启商业与未来的秘密">从0到1:开启商业与未来的秘密</span>
-            <span class="post-date" title="2022-06-22 20:51:26">2022/06/22</span>
-        </a>
-        
-        <a  class="All CICD "
-           href="/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
-           data-tag="Docker"
-           data-author="" >
-            <span class="post-title" title="docker从入门到实践">docker从入门到实践</span>
-            <span class="post-date" title="2022-06-22 20:47:28">2022/06/22</span>
-        </a>
-        
-        <a  class="All CICD "
-           href="/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/"
-           data-tag="ansible"
-           data-author="" >
-            <span class="post-title" title="奔跑吧ansible">奔跑吧ansible</span>
-            <span class="post-date" title="2022-06-22 20:45:28">2022/06/22</span>
-        </a>
-        
-        <a  class="All CPP "
-           href="/2022/06/22/C++_Primer/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="C++ Primer Plus">C++ Primer Plus</span>
-            <span class="post-date" title="2022-06-22 01:01:03">2022/06/22</span>
-        </a>
-        
-        <div id="no-item-tips">
-
-        </div>
-    </nav>
-    <div id="outline-list">
-    </div>
 </div>
 
-    </div>
-    <div class="hide-list">
-        <div class="semicircle" data-title="切换全屏 快捷键 s">
-            <div class="brackets first"><</div>
-            <div class="brackets">&gt;</div>
-        </div>
-    </div>
-</aside>
-<div id="post">
-    <div class="pjax">
-        <article id="post-golang/go标准文档" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">go标准库阅读与解析</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
-            
-            
-            <a  data-rel="golang">golang</a>
-            
-        </span>
-        
-        
-        <span class="tag">
-            <i class="iconfont icon-tag"></i>
-            
-            <a class="color2">golang</a>
-            
-        </span>
-        
-    </div>
-    <div class="article-meta">
-        
-            Created At : <time class="date" title='Updated At: 2022-10-23 16:24:42'>2022-10-08 07:48</time>
-        
-    </div>
-    <div class="article-meta">
-        
-        
-        <span id="busuanzi_container_page_pv">
-            Views 👀 :<span id="busuanzi_value_page_pv">
-                <span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </span>
-        </span>
-        
-        
-        <span class="top-comment" title="跳转至评论区">
-            <a href="#comments">
-                Comment:<span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </a>
-        </span>
-        
-    </div>
-    
-    <div class="toc-ref">
-    
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-package-tar"><span class="toc-text">1. package tar</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-Constants"><span class="toc-text">1.1. Constants</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-Variables"><span class="toc-text">1.2. Variables</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-type-Format"><span class="toc-text">1.3. type Format</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1-func-f-Format-String-string"><span class="toc-text">1.3.1. func (f Format) String() string</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-type-Header"><span class="toc-text">1.4. type Header</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-1-func-FileInfoHeader-fi-fs-FileInfo-link-string-Header-error"><span class="toc-text">1.4.1. func FileInfoHeader(fi fs.FileInfo, link string) (*Header, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-2-func-h-Header-FileInfo-fs-FileInfo"><span class="toc-text">1.4.2. func (h*Header) FileInfo() fs.FileInfo</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-type-Reader"><span class="toc-text">1.5. type Reader</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-1-func-NewReader-r-io-Reader-Reader"><span class="toc-text">1.5.1. func NewReader(r io.Reader) *Reader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-2-func-tr-Reader-Next-Header-error"><span class="toc-text">1.5.2. func (tr*Reader) Next() (*Header, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-3-func-tr-Reader-Read-b-byte-int-error"><span class="toc-text">1.5.3. func (tr*Reader) Read(b []byte) (int, error)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-6-type-Writer"><span class="toc-text">1.6. type Writer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-1-func-NewWriter-w-io-Writer-Writer"><span class="toc-text">1.6.1. func NewWriter(w io.Writer) *Writer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-2-func-tw-Writer-Close-error"><span class="toc-text">1.6.2. func (tw*Writer) Close() error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-3-func-tw-Writer-Flush-error"><span class="toc-text">1.6.3. func (tw *Writer) Flush() error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-4-func-tw-Writer-Write-b-byte-int-error"><span class="toc-text">1.6.4. func (tw*Writer) Write(b []byte) (int, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-5-func-tw-Writer-WriteHeader-hdrHeader-error"><span class="toc-text">1.6.5. func (tw Writer) WriteHeader(hdrHeader) error</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-zip-package"><span class="toc-text">2. zip package</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-Constants"><span class="toc-text">2.1. Constants</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Variables"><span class="toc-text">2.2. Variables</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-func-RegisterCompressor-method-uint16-comp-Compressor"><span class="toc-text">2.2.1. func RegisterCompressor(method uint16, comp Compressor)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-func-RegisterDecompressor-method-uint16-dcomp-Decompressor"><span class="toc-text">2.2.2. func RegisterDecompressor(method uint16, dcomp Decompressor)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-type-Compressor"><span class="toc-text">2.3. type Compressor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-type-Decompressor"><span class="toc-text">2.4. type Decompressor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-type-File"><span class="toc-text">2.5. type File</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-1-func-f-File-DataOffset-offset-int64-err-error"><span class="toc-text">2.5.1. func (f *File) DataOffset() (offset int64, err error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-2-func-f-File-Open-io-ReadCloser-error"><span class="toc-text">2.5.2. func (f*File) Open() (io.ReadCloser, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-3-func-f-File-OpenRaw-io-Reader-error"><span class="toc-text">2.5.3. func (f *File) OpenRaw() (io.Reader, error)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-type-FileHeader"><span class="toc-text">2.6. type FileHeader</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-1-func-FileInfoHeader-fi-fs-FileInfo-FileHeader-error"><span class="toc-text">2.6.1. func FileInfoHeader(fi fs.FileInfo) (*FileHeader, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-2-func-h-FileHeader-FileInfo-fs-FileInfo"><span class="toc-text">2.6.2. func (h *FileHeader) FileInfo() fs.FileInfo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-3-func-h-FileHeader-ModTime-time-TimeDEPRECATED"><span class="toc-text">2.6.3. func (h*FileHeader) ModTime() time.TimeDEPRECATED</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-4-func-h-FileHeader-Mode-mode-fs-FileMode"><span class="toc-text">2.6.4. func (h *FileHeader) Mode() (mode fs.FileMode)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-5-func-h-FileHeader-SetModTime-t-time-Time-DEPRECATED"><span class="toc-text">2.6.5. func (h*FileHeader) SetModTime(t time.Time)DEPRECATED</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-6-func-h-FileHeader-SetMode-mode-fs-FileMode"><span class="toc-text">2.6.6. func (h *FileHeader) SetMode(mode fs.FileMode)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-type-ReadCloser"><span class="toc-text">2.7. type ReadCloser</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-1-func-OpenReader-name-string-ReadCloser-error"><span class="toc-text">2.7.1. func OpenReader(name string) (*ReadCloser, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-2-func-rc-ReadCloser-Close-error"><span class="toc-text">2.7.2. func (rc *ReadCloser) Close() error</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-8-type-Reader"><span class="toc-text">2.8. type Reader</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-1-func-NewReader-r-io-ReaderAt-size-int64-Reader-error"><span class="toc-text">2.8.1. func NewReader(r io.ReaderAt, size int64) (*Reader, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-2-func-r-Reader-Open-name-string-fs-File-error"><span class="toc-text">2.8.2. func (r *Reader) Open(name string) (fs.File, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-3-func-z-Reader-RegisterDecompressor-method-uint16-dcomp-Decompressor"><span class="toc-text">2.8.3. func (z*Reader) RegisterDecompressor(method uint16, dcomp Decompressor)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-9-type-Writer"><span class="toc-text">2.9. type Writer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-1-func-NewWriter-w-io-Writer-Writer"><span class="toc-text">2.9.1. func NewWriter(w io.Writer) *Writer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-2-func-w-Writer-Close-error"><span class="toc-text">2.9.2. func (w*Writer) Close() error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-3-func-w-Writer-Copy-f-File-error"><span class="toc-text">2.9.3. func (w *Writer) Copy(f*File) error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-4-func-w-Writer-Create-name-string-io-Writer-error"><span class="toc-text">2.9.4. func (w *Writer) Create(name string) (io.Writer, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-5-func-w-Writer-CreateHeader-fh-FileHeader-io-Writer-error"><span class="toc-text">2.9.5. func (w*Writer) CreateHeader(fh*FileHeader) (io.Writer, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-6-func-w-Writer-CreateRaw-fh-FileHeader-io-Writer-error"><span class="toc-text">2.9.6. func (w*Writer) CreateRaw(fh*FileHeader) (io.Writer, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-7-func-w-Writer-Flush-error"><span class="toc-text">2.9.7. func (w*Writer) Flush() error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-8-func-w-Writer-RegisterCompressor-method-uint16-comp-Compressor"><span class="toc-text">2.9.8. func (w *Writer) RegisterCompressor(method uint16, comp Compressor)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-9-func-w-Writer-SetComment-comment-string-error"><span class="toc-text">2.9.9. func (w*Writer) SetComment(comment string) error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-10-func-w-Writer-SetOffset-n-int64"><span class="toc-text">2.9.10. func (w *Writer) SetOffset(n int64)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-time-package"><span class="toc-text">3. time package</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-Constants"><span class="toc-text">3.1. Constants</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-func-After-d-Duration-lt-chan-Time"><span class="toc-text">3.1.1. func After(d Duration) &lt;-chan Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-func-Sleep-d-Duration"><span class="toc-text">3.1.2. func Sleep(d Duration)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-func-Tick-d-Duration-lt-chan-Time"><span class="toc-text">3.1.3. func Tick(d Duration) &lt;-chan Time</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-type-Duration"><span class="toc-text">3.2. type Duration</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-func-ParseDuration-s-string-Duration-error"><span class="toc-text">3.2.1. func ParseDuration(s string) (Duration, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-func-Since-t-Time-Duration"><span class="toc-text">3.2.2. func Since(t Time) Duration</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-3-func-Until-t-Time-Duration"><span class="toc-text">3.2.3. func Until(t Time) Duration</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-4-func-d-Duration-Abs-Duration"><span class="toc-text">3.2.4. func (d Duration) Abs() Duration</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-5-func-d-Duration-Hours-float64"><span class="toc-text">3.2.5. func (d Duration) Hours() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-6-func-d-Duration-Microseconds-int64"><span class="toc-text">3.2.6. func (d Duration) Microseconds() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-7-func-d-Duration-Milliseconds-int64"><span class="toc-text">3.2.7. func (d Duration) Milliseconds() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-8-func-d-Duration-Minutes-float64"><span class="toc-text">3.2.8. func (d Duration) Minutes() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-9-func-d-Duration-Nanoseconds-int64"><span class="toc-text">3.2.9. func (d Duration) Nanoseconds() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-10-func-d-Duration-Round-m-Duration-Duration"><span class="toc-text">3.2.10. func (d Duration) Round(m Duration) Duration</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-11-func-d-Duration-Seconds-float64"><span class="toc-text">3.2.11. func (d Duration) Seconds() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-12-func-d-Duration-String-string"><span class="toc-text">3.2.12. func (d Duration) String() string</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-13-func-d-Duration-Truncate-m-Duration-Duration"><span class="toc-text">3.2.13. func (d Duration) Truncate(m Duration) Duration</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-type-Location"><span class="toc-text">3.3. type Location</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-1-func-FixedZone-name-string-offset-int-Location"><span class="toc-text">3.3.1. func FixedZone(name string, offset int) *Location</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-2-func-LoadLocation-name-string-Location-error"><span class="toc-text">3.3.2. func LoadLocation(name string) (*Location, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-3-func-LoadLocationFromTZData-name-string-data-byte-Location-error"><span class="toc-text">3.3.3. func LoadLocationFromTZData(name string, data []byte) (*Location, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-4-func-l-Location-String-string"><span class="toc-text">3.3.4. func (l*Location) String() string</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-type-Month"><span class="toc-text">3.4. type Month</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-1-func-m-Month-String-string"><span class="toc-text">3.4.1. func (m Month) String() string</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-type-ParseError"><span class="toc-text">3.5. type ParseError</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-1-func-e-ParseError-Error-string"><span class="toc-text">3.5.1. func (e *ParseError) Error() string</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-6-type-Ticker"><span class="toc-text">3.6. type Ticker</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-1-func-NewTicker-d-Duration-Ticker"><span class="toc-text">3.6.1. func NewTicker(d Duration) *Ticker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-2-func-t-Ticker-Reset-d-Duration"><span class="toc-text">3.6.2. func (t *Ticker) Reset(d Duration)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-3-func-t-Ticker-Stop"><span class="toc-text">3.6.3. func (t *Ticker) Stop()</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#sort"><span class="toc-text">sort</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Find-n-int-cmp-func-int-int-i-int-found-bool"><span class="toc-text">func Find(n int, cmp func(int) int) (i int, found bool)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Float64s-x-float64"><span class="toc-text">func Float64s(x []float64)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Float64sAreSorted-x-float64-bool"><span class="toc-text">func Float64sAreSorted(x []float64) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Ints-x-int"><span class="toc-text">func Ints(x []int)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-IntsAreSorted-x-int-bool"><span class="toc-text">func IntsAreSorted(x []int) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-IsSorted-data-Interface-bool"><span class="toc-text">func IsSorted(data Interface) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Search-n-int-f-func-int-bool-int"><span class="toc-text">func Search(n int, f func(int) bool) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-SearchFloat64s-a-float64-x-float64-int"><span class="toc-text">func SearchFloat64s(a []float64, x float64) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-SearchInts-a-int-x-int-int"><span class="toc-text">func SearchInts(a []int, x int) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-SearchStrings-a-string-x-string-int"><span class="toc-text">func SearchStrings(a []string, x string) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Slice-x-any-less-func-i-j-int-bool"><span class="toc-text">func Slice(x any, less func(i, j int) bool)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-SliceIsSorted-x-any-less-func-i-j-int-bool-bool"><span class="toc-text">func SliceIsSorted(x any, less func(i, j int) bool) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-SliceStable-x-any-less-func-i-j-int-bool"><span class="toc-text">func SliceStable(x any, less func(i, j int) bool)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Sort-data-Interface"><span class="toc-text">func Sort(data Interface)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Stable-data-Interface"><span class="toc-text">func Stable(data Interface)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Strings-x-string"><span class="toc-text">func Strings(x []string)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-StringsAreSorted-x-string-bool"><span class="toc-text">func StringsAreSorted(x []string) bool</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-Float64Slice"><span class="toc-text">type Float64Slice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-Float64Slice-Len-int"><span class="toc-text">func (x Float64Slice) Len() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-Float64Slice-Less-i-j-int-bool"><span class="toc-text">func (x Float64Slice) Less(i, j int) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-p-Float64Slice-Search-x-float64-int"><span class="toc-text">func (p Float64Slice) Search(x float64) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-Float64Slice-Sort"><span class="toc-text">func (x Float64Slice) Sort()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-Float64Slice-Swap-i-j-int"><span class="toc-text">func (x Float64Slice) Swap(i, j int)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-IntSlice"><span class="toc-text">type IntSlice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-IntSlice-Len-int"><span class="toc-text">func (x IntSlice) Len() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-IntSlice-Less-i-j-int-bool"><span class="toc-text">func (x IntSlice) Less(i, j int) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-p-IntSlice-Search-x-int-int"><span class="toc-text">func (p IntSlice) Search(x int) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-IntSlice-Sort"><span class="toc-text">func (x IntSlice) Sort()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-IntSlice-Swap-i-j-int"><span class="toc-text">func (x IntSlice) Swap(i, j int)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-Interface"><span class="toc-text">type Interface</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-Reverse-data-Interface-Interface"><span class="toc-text">func Reverse(data Interface) Interface</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type-StringSlice"><span class="toc-text">type StringSlice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-StringSlice-Len-int"><span class="toc-text">func (x StringSlice) Len() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-StringSlice-Less-i-j-int-bool"><span class="toc-text">func (x StringSlice) Less(i, j int) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-p-StringSlice-Search-x-string-int"><span class="toc-text">func (p StringSlice) Search(x string) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-StringSlice-Sort"><span class="toc-text">func (x StringSlice) Sort()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#func-x-StringSlice-Swap-i-j-int"><span class="toc-text">func (x StringSlice) Swap(i, j int)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-7-type-Time"><span class="toc-text">3.7. type Time</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-1-func-Date-year-int-month-Month-day-hour-min-sec-nsec-int-loc-Location-Time"><span class="toc-text">3.7.1. func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-2-func-Now-Time"><span class="toc-text">3.7.2. func Now() Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-3-func-Parse-layout-value-string-Time-error"><span class="toc-text">3.7.3. func Parse(layout, value string) (Time, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-4-func-ParseInLocation-layout-value-string-loc-Location-Time-error"><span class="toc-text">3.7.4. func ParseInLocation(layout, value string, loc *Location) (Time, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-5-func-Unix-sec-int64-nsec-int64-Time"><span class="toc-text">3.7.5. func Unix(sec int64, nsec int64) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-6-func-UnixMicro-usec-int64-Time"><span class="toc-text">3.7.6. func UnixMicro(usec int64) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-7-func-UnixMilli-msec-int64-Time"><span class="toc-text">3.7.7. func UnixMilli(msec int64) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-8-func-t-Time-Add-d-Duration-Time"><span class="toc-text">3.7.8. func (t Time) Add(d Duration) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-9-func-t-Time-AddDate-years-int-months-int-days-int-Time"><span class="toc-text">3.7.9. func (t Time) AddDate(years int, months int, days int) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-10-func-t-Time-After-u-Time-bool"><span class="toc-text">3.7.10. func (t Time) After(u Time) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-11-func-t-Time-AppendFormat-b-byte-layout-string-byte"><span class="toc-text">3.7.11. func (t Time) AppendFormat(b []byte, layout string) []byte</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-12-func-t-Time-Before-u-Time-bool"><span class="toc-text">3.7.12. func (t Time) Before(u Time) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-13-func-t-Time-Clock-hour-min-sec-int"><span class="toc-text">3.7.13. func (t Time) Clock() (hour, min, sec int)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-14-func-t-Time-Date-year-int-month-Month-day-int"><span class="toc-text">3.7.14. func (t Time) Date() (year int, month Month, day int)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-15-func-t-Time-Day-int"><span class="toc-text">3.7.15. func (t Time) Day() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-16-func-t-Time-Equal-u-Time-bool"><span class="toc-text">3.7.16. func (t Time) Equal(u Time) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-17-func-t-Time-Format-layout-string-string"><span class="toc-text">3.7.17. func (t Time) Format(layout string) string</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-18-func-t-Time-GoString-string"><span class="toc-text">3.7.18. func (t Time) GoString() string</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-19-func-t-Time-GobDecode-data-byte-error"><span class="toc-text">3.7.19. func (t *Time) GobDecode(data []byte) error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-20-func-t-Time-GobEncode-byte-error"><span class="toc-text">3.7.20. func (t Time) GobEncode() ([]byte, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-21-func-t-Time-Hour-int"><span class="toc-text">3.7.21. func (t Time) Hour() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-22-func-t-Time-ISOWeek-year-week-int"><span class="toc-text">3.7.22. func (t Time) ISOWeek() (year, week int)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-23-func-t-Time-In-loc-Location-Time"><span class="toc-text">3.7.23. func (t Time) In(loc*Location) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-24-func-t-Time-IsDST-bool"><span class="toc-text">3.7.24. func (t Time) IsDST() bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-25-func-t-Time-IsZero-bool"><span class="toc-text">3.7.25. func (t Time) IsZero() bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-26-func-t-Time-Local-Time"><span class="toc-text">3.7.26. func (t Time) Local() Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-27-func-t-Time-Location-Location"><span class="toc-text">3.7.27. func (t Time) Location() *Location</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-28-func-t-Time-MarshalBinary-byte-error"><span class="toc-text">3.7.28. func (t Time) MarshalBinary() ([]byte, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-29-func-t-Time-MarshalJSON-byte-error"><span class="toc-text">3.7.29. func (t Time) MarshalJSON() ([]byte, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-30-func-t-Time-MarshalText-byte-error"><span class="toc-text">3.7.30. func (t Time) MarshalText() ([]byte, error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-31-func-t-Time-Minute-int"><span class="toc-text">3.7.31. func (t Time) Minute() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-32-func-t-Time-Month-Month"><span class="toc-text">3.7.32. func (t Time) Month() Month</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-33-func-t-Time-Nanosecond-int"><span class="toc-text">3.7.33. func (t Time) Nanosecond() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-34-func-t-Time-Round-d-Duration-Time"><span class="toc-text">3.7.34. func (t Time) Round(d Duration) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-35-func-t-Time-Second-int"><span class="toc-text">3.7.35. func (t Time) Second() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-36-func-t-Time-String-string"><span class="toc-text">3.7.36. func (t Time) String() string</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-37-func-t-Time-Sub-u-Time-Duration"><span class="toc-text">3.7.37. func (t Time) Sub(u Time) Duration</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-38-func-t-Time-Truncate-d-Duration-Time"><span class="toc-text">3.7.38. func (t Time) Truncate(d Duration) Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-39-func-t-Time-UTC-Time"><span class="toc-text">3.7.39. func (t Time) UTC() Time</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-40-func-t-Time-Unix-int64"><span class="toc-text">3.7.40. func (t Time) Unix() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-41-func-t-Time-UnixMicro-int64"><span class="toc-text">3.7.41. func (t Time) UnixMicro() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-42-func-t-Time-UnixMilli-int64"><span class="toc-text">3.7.42. func (t Time) UnixMilli() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-43-func-t-Time-UnixNano-int64"><span class="toc-text">3.7.43. func (t Time) UnixNano() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-44-func-t-Time-UnmarshalBinary-data-byte-error"><span class="toc-text">3.7.44. func (t*Time) UnmarshalBinary(data []byte) error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-45-func-t-Time-UnmarshalJSON-data-byte-error"><span class="toc-text">3.7.45. func (t *Time) UnmarshalJSON(data []byte) error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-46-func-t-Time-UnmarshalText-data-byte-error"><span class="toc-text">3.7.46. func (t*Time) UnmarshalText(data []byte) error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-47-func-t-Time-Weekday-Weekday"><span class="toc-text">3.7.47. func (t Time) Weekday() Weekday</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-48-func-t-Time-Year-int"><span class="toc-text">3.7.48. func (t Time) Year() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-49-func-t-Time-YearDay-int"><span class="toc-text">3.7.49. func (t Time) YearDay() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-50-func-t-Time-Zone-name-string-offset-int"><span class="toc-text">3.7.50. func (t Time) Zone() (name string, offset int)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-51-func-t-Time-ZoneBounds-start-end-Time"><span class="toc-text">3.7.51. func (t Time) ZoneBounds() (start, end Time)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-52-type-Timer"><span class="toc-text">3.7.52. type Timer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-53-func-AfterFunc-d-Duration-f-func-Timer"><span class="toc-text">3.7.53. func AfterFunc(d Duration, f func()) *Timer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-54-func-NewTimer-d-Duration-Timer"><span class="toc-text">3.7.54. func NewTimer(d Duration)*Timer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-55-func-t-Timer-Reset-d-Duration-bool"><span class="toc-text">3.7.55. func (t *Timer) Reset(d Duration) bool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-56-func-t-Timer-Stop-bool"><span class="toc-text">3.7.56. func (t*Timer) Stop() bool</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-8-type-Weekday"><span class="toc-text">3.8. type Weekday</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-8-1-func-d-Weekday-String-string"><span class="toc-text">3.8.1. func (d Weekday) String() string</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-rand"><span class="toc-text">4. rand</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-function-not-method-of-rand"><span class="toc-text">4.1. function not method of rand</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-1-func-ExpFloat64-float64"><span class="toc-text">4.1.1. func ExpFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-2-func-Float32-float32"><span class="toc-text">4.1.2. func Float32() float32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-3-func-Float64-float64"><span class="toc-text">4.1.3. func Float64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-4-func-Int-int"><span class="toc-text">4.1.4. func Int() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-5-func-Int31-int32"><span class="toc-text">4.1.5. func Int31() int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-6-func-Int31n-n-int32-int32"><span class="toc-text">4.1.6. func Int31n(n int32) int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-7-func-Int63-int64"><span class="toc-text">4.1.7. func Int63() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-8-func-Int63n-n-int64-int64"><span class="toc-text">4.1.8. func Int63n(n int64) int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-9-func-Intn-n-int-int"><span class="toc-text">4.1.9. func Intn(n int) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-10-func-NormFloat64-float64"><span class="toc-text">4.1.10. func NormFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-11-func-Perm-n-int-int"><span class="toc-text">4.1.11. func Perm(n int) []int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-12-func-Read-p-byte-n-int-err-error"><span class="toc-text">4.1.12. func Read(p []byte) (n int, err error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-13-func-Seed-seed-int64"><span class="toc-text">4.1.13. func Seed(seed int64)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-14-func-Shuffle-n-int-swap-func-i-j-int"><span class="toc-text">4.1.14. func Shuffle(n int, swap func(i, j int))</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-15-func-Uint32-uint32"><span class="toc-text">4.1.15. func Uint32() uint32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-16-func-Uint64-uint64"><span class="toc-text">4.1.16. func Uint64() uint64</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-type-Rand"><span class="toc-text">4.2. type Rand</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-func-New-src-Source-Rand"><span class="toc-text">4.2.1. func New(src Source) *Rand</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2-func-r-Rand-ExpFloat64-float64"><span class="toc-text">4.2.2. func (r*Rand) ExpFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-3-func-r-Rand-Float32-float32"><span class="toc-text">4.2.3. func (r *Rand) Float32() float32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-4-func-r-Rand-Float64-float64"><span class="toc-text">4.2.4. func (r*Rand) Float64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-5-func-r-Rand-Int-int"><span class="toc-text">4.2.5. func (r *Rand) Int() int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-6-func-r-Rand-Int31-int32"><span class="toc-text">4.2.6. func (r*Rand) Int31() int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-7-func-r-Rand-Int31n-n-int32-int32"><span class="toc-text">4.2.7. func (r *Rand) Int31n(n int32) int32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-8-func-r-Rand-Int63-int64"><span class="toc-text">4.2.8. func (r*Rand) Int63() int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-9-func-r-Rand-Int63n-n-int64-int64"><span class="toc-text">4.2.9. func (r *Rand) Int63n(n int64) int64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-10-func-r-Rand-Intn-n-int-int"><span class="toc-text">4.2.10. func (r*Rand) Intn(n int) int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-11-func-r-Rand-NormFloat64-float64"><span class="toc-text">4.2.11. func (r *Rand) NormFloat64() float64</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-12-func-r-Rand-Perm-n-int-int"><span class="toc-text">4.2.12. func (r*Rand) Perm(n int) []int</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-13-func-r-Rand-Read-p-byte-n-int-err-error"><span class="toc-text">4.2.13. func (r *Rand) Read(p []byte) (n int, err error)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-14-func-r-Rand-Seed-seed-int64"><span class="toc-text">4.2.14. func (r*Rand) Seed(seed int64)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-15-func-r-Rand-Shuffle-n-int-swap-func-i-j-int"><span class="toc-text">4.2.15. func (r *Rand) Shuffle(n int, swap func(i, j int))</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-16-func-r-Rand-Uint32-uint32"><span class="toc-text">4.2.16. func (r*Rand) Uint32() uint32</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-17-func-r-Rand-Uint64-uint64"><span class="toc-text">4.2.17. func (r *Rand) Uint64() uint64</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-type-Source"><span class="toc-text">4.3. type Source</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-1-func-NewSource-seed-int64-Source"><span class="toc-text">4.3.1. func NewSource(seed int64) Source</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-type-Source64"><span class="toc-text">4.4. type Source64</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-type-Zipf"><span class="toc-text">4.5. type Zipf</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-1-func-NewZipf-r-Rand-s-float64-v-float64-imax-uint64-Zipf"><span class="toc-text">4.5.1. func NewZipf(r *Rand, s float64, v float64, imax uint64)*Zipf</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-2-func-z-Zipf-Uint64-uint64"><span class="toc-text">4.5.2. func (z *Zipf) Uint64() uint64</span></a></li></ol></li></ol></li></ol>
-    
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
-    }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
 </div>
+
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <ul>
 <li><a href="#1-package-tar">1. package tar</a><ul>
 <li><a href="#11-constants">1.1. Constants</a></li>
 <li><a href="#12-variables">1.2. Variables</a></li>
@@ -1412,22 +706,22 @@
 
 <p>  Format represents the tar archive format.The original tar format was introduced in Unix V7. Since then, there have been multiple competing(相互竞争) formats attempting to standardize or extend the V7 format to overcome its limitations. The most common formats are the <strong>USTAR</strong>, <strong>PAX</strong>, and <strong>GNU</strong> formats, each with their own advantages and limitations.</p>
 <p>  The following table captures the capabilities of each format:</p>
-  <pre class="language-bash" data-language="bash"><code class="language-bash">                  <span class="token operator">|</span>  USTAR <span class="token operator">|</span>       PAX <span class="token operator">|</span>       GNU
+  <pre class="language-bash" data-language="bash"><code class="language-bash">                  |  USTAR |       PAX |       GNU
 ------------------+--------+-----------+----------
-Name              <span class="token operator">|</span>   256B <span class="token operator">|</span> unlimited <span class="token operator">|</span> unlimited
-Linkname          <span class="token operator">|</span>   100B <span class="token operator">|</span> unlimited <span class="token operator">|</span> unlimited
-Size              <span class="token operator">|</span> uint33 <span class="token operator">|</span> unlimited <span class="token operator">|</span>    uint89
-Mode              <span class="token operator">|</span> uint21 <span class="token operator">|</span>    uint21 <span class="token operator">|</span>    uint57
-Uid/Gid           <span class="token operator">|</span> uint21 <span class="token operator">|</span> unlimited <span class="token operator">|</span>    uint57
-Uname/Gname       <span class="token operator">|</span>    32B <span class="token operator">|</span> unlimited <span class="token operator">|</span>       32B
-ModTime           <span class="token operator">|</span> uint33 <span class="token operator">|</span> unlimited <span class="token operator">|</span>     int89
-AccessTime        <span class="token operator">|</span>    n/a <span class="token operator">|</span> unlimited <span class="token operator">|</span>     int89
-ChangeTime        <span class="token operator">|</span>    n/a <span class="token operator">|</span> unlimited <span class="token operator">|</span>     int89
-Devmajor/Devminor <span class="token operator">|</span> uint21 <span class="token operator">|</span>    uint21 <span class="token operator">|</span>    uint57
+Name              |   256B | unlimited | unlimited
+Linkname          |   100B | unlimited | unlimited
+Size              | uint33 | unlimited |    uint89
+Mode              | uint21 |    uint21 |    uint57
+Uid&#x2F;Gid           | uint21 | unlimited |    uint57
+Uname&#x2F;Gname       |    32B | unlimited |       32B
+ModTime           | uint33 | unlimited |     int89
+AccessTime        |    n&#x2F;a | unlimited |     int89
+ChangeTime        |    n&#x2F;a | unlimited |     int89
+Devmajor&#x2F;Devminor | uint21 |    uint21 |    uint57
 ------------------+--------+-----------+----------
-string encoding   <span class="token operator">|</span>  ASCII <span class="token operator">|</span>     UTF-8 <span class="token operator">|</span>    binary
-sub-second <span class="token builtin class-name">times</span>  <span class="token operator">|</span>     no <span class="token operator">|</span>       <span class="token function">yes</span> <span class="token operator">|</span>        no
-sparse files      <span class="token operator">|</span>     no <span class="token operator">|</span>       <span class="token function">yes</span> <span class="token operator">|</span>       <span class="token function">yes</span></code></pre>
+string encoding   |  ASCII |     UTF-8 |    binary
+sub-second times  |     no |       yes |        no
+sparse files      |     no |       yes |       yes</code></pre>
 
 <p>  The table’s upper portion shows the Header fields, where each format reports the maximum number of bytes allowed for each string field and the integer type used to store each numeric field (where timestamps are stored as the number of seconds since the Unix epoch).</p>
 <p>  The table’s lower portion shows specialized features of each format, such as supported string encodings, support for sub-second timestamps, or support for sparse files.</p>
@@ -1602,210 +896,376 @@ randomInt :&#x3D; randSeed.Intn(300)&#x2F;&#x2F;[0,300)的整数
 &#125;</code></pre>
 
 <h2 id="4-5-type-Zipf"><a href="#4-5-type-Zipf" class="headerlink" title="4.5. type Zipf"></a>4.5. type Zipf</h2><h3 id="4-5-1-func-NewZipf-r-Rand-s-float64-v-float64-imax-uint64-Zipf"><a href="#4-5-1-func-NewZipf-r-Rand-s-float64-v-float64-imax-uint64-Zipf" class="headerlink" title="4.5.1. func NewZipf(r *Rand, s float64, v float64, imax uint64)*Zipf"></a>4.5.1. func NewZipf(r *Rand, s float64, v float64, imax uint64)*Zipf</h3><h3 id="4-5-2-func-z-Zipf-Uint64-uint64"><a href="#4-5-2-func-z-Zipf-Uint64-uint64" class="headerlink" title="4.5.2. func (z *Zipf) Uint64() uint64"></a>4.5.2. func (z *Zipf) Uint64() uint64</h3>
-      
-       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/golang/" rel="tag">golang</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
+                    data-tooltip="go语言圣经"
+                    aria-label="PREVIOUS: go语言圣经"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/07/archive/compact_wsl2/"
+                    data-tooltip="压缩wsl2的磁盘"
+                    aria-label="NEXT: 压缩wsl2的磁盘"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
     </div>
 </article>
 
 
 
-<div class="article_copyright">
-    <p><span class="copy-title">Title:</span>go标准库阅读与解析</p>
-    
-    <p><span class="copy-title">Author:</span><a  title="kirkzhang">kirkzhang</a></p>
-    <p><span class="copy-title">Created At:</span>2022-10-08, 07:48:06</p>
-    <p><span class="copy-title">Updated At:</span>2022-10-23, 16:24:42</p>
-    <span class="copy-title">Url:</span><a class="post-url" href="/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/" title="go标准库阅读与解析">https://simonteo58.github.io/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/</a>
-    <p>
-        <span class="copy-title">Copyright:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">&#39;Attribution-non-commercial-shared in the same way 4.0&#39;</a> Reprint please keep the original link and author.
-    </p>
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
+                    data-tooltip="go语言圣经"
+                    aria-label="PREVIOUS: go语言圣经"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/07/archive/compact_wsl2/"
+                    data-tooltip="压缩wsl2的磁盘"
+                    aria-label="NEXT: 压缩wsl2的磁盘"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
 </div>
 
 
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
 
-    <div id="comments"></div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
 
-<script type="text/javascript">
-    $.getScript('/js/gitalk.js', function () {
-        var gitalk = new Gitalk({
-            clientID: 'ca29b9a1203b5920918d',
-            clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
-            repo: 'SimonTeo58.github.io',
-            owner: 'SimonTeo58',
-            admin: ['SimonTeo58'],
-            id: decodeURI(location.pathname),
-            distractionFreeMode: 'true',
-            language: 'zh-CN',
-            perPage: parseInt('10',10)
-        })
-        gitalk.render('comments')
-    })
-</script>
-
-
+            
+        </div>
+        
 
 
     
+        
+    
 
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
 
-
-
-    </div>
-    <div class="copyright">
-        <p class="footer-entry">
-    i hear i forget, i see i remember , i do i understand
-</p>
-<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
-
-    </div>
-    <div class="full-toc">
-        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
-<a class="" id="rocket" ></a>
-
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                nil
+            </div>
+        
     </div>
 </div>
 
-</body>
-<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
-
-<script src="/js/script.js?v=1.1.0" ></script>
-<script>
-    var img_resize = 'default';
-    function initArticle() {
-        /*渲染对应的表格样式*/
-        
-            $("#post .pjax table").addClass("green");
-        
-
-        /*渲染打赏样式*/
-        
-
-        /*高亮代码块行号*/
-        
-
-        /*访问数量*/
-        
-        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-
-        /*代码高亮，行号对齐*/
-        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
-
         
         
-    }
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
 
-    /*打赏页面隐藏与展示*/
-    
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
-</script>
-
-<!--加入行号的高亮代码块样式-->
-
-<!--自定义样式设置-->
-<style>
-    
-    
-    .nav {
-        width: 572px;
-    }
-    .nav.fullscreen {
-        margin-left: -572px;
-    }
-    .nav-left {
-        width: 150px;
-    }
-    
-    
-    @media screen and (max-width: 1468px) {
-        .nav {
-            width: 492px;
-        }
-        .nav.fullscreen {
-            margin-left: -492px;
-        }
-        .nav-left {
-            width: 100px;
-        }
-    }
-    
-    
-    @media screen and (max-width: 1024px) {
-        .nav {
-            width: 492px;
-            margin-left: -492px
-        }
-        .nav.fullscreen {
-            margin-left: 0;
-        }
-    }
-    
-    @media screen and (max-width: 426px) {
-        .nav {
-            width: 100%;
-        }
-        .nav-left {
-            width: 100%;
-        }
-    }
-    
-    
-    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
-        color: #383636;
-    }
-    
-    
-    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
-        color: #5e5e5f;
-    }
-    
-    
-    .nav-right nav a.hover, #local-search-result a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-    /*列表样式*/
-    
-    #post .pjax article .article-entry>ol, #post .pjax article .article-entry>ul, #post .pjax article>ol, #post .pjax article>ul{
-        border: #e2dede solid 1px;
-        border-radius: 10px;
-        padding: 10px 32px 10px 56px;
-    }
-    #post .pjax article .article-entry li>ol, #post .pjax article .article-entry li>ul,#post .pjax article li>ol, #post .pjax article li>ul{
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-    #post .pjax article .article-entry>ol>li, #post .pjax article .article-entry>ul>li,#post .pjax article>ol>li, #post .pjax article>ul>li{
-        margin-bottom: auto;
-        margin-left: auto;
-    }
-    #post .pjax article .article-entry li>ol>li, #post .pjax article .article-entry li>ul>li,#post .pjax article li>ol>li, #post .pjax article li>ul>li{
-        margin-bottom: auto;
-        margin-left: auto;
-    }
-    
-
-    /* 背景图样式 */
-    
-    
+<!--SCRIPTS END-->
 
 
-    /*引用块样式*/
     
+        
+<script src="/assets/js/gitalk.js"></script>
 
-    /*文章列表背景图*/
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/10/08/golang/go标准文档/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
     
-
-    
-</style>
 
 
 
 
-
-
-
+    </body>
 </html>
