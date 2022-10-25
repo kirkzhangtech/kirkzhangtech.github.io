@@ -34,16 +34,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -591,8 +582,8 @@ CMD curl -fs http:&#x2F;&#x2F;localhost&#x2F; || exit 1
 &#x2F;&#x2F;作为健康检查命令。</code></pre>
 
 <h3 id="2-3-12-ONBUILD-为他人作嫁衣裳"><a href="#2-3-12-ONBUILD-为他人作嫁衣裳" class="headerlink" title="2.3.12 ONBUILD 为他人作嫁衣裳"></a>2.3.12 ONBUILD 为他人作嫁衣裳</h3><h3 id="2-3-13-LABEL-为镜像添加元数据"><a href="#2-3-13-LABEL-为镜像添加元数据" class="headerlink" title="2.3.13 LABEL 为镜像添加元数据"></a>2.3.13 LABEL 为镜像添加元数据</h3><p>我们还可以用一些标签来申明镜像的作者、文档地址等：</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">LABEL org.opencontainers.image.authors<span class="token operator">=</span><span class="token string">"yeasy"</span>
-LABEL org.opencontainers.image.documentation<span class="token operator">=</span><span class="token string">"https://yeasy.gitbooks.io"</span></code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">LABEL org.opencontainers.image.authors&#x3D;&quot;yeasy&quot;
+LABEL org.opencontainers.image.documentation&#x3D;&quot;https:&#x2F;&#x2F;yeasy.gitbooks.io&quot;</code></pre>
 
 <h3 id="2-3-14-shell指令"><a href="#2-3-14-shell指令" class="headerlink" title="2.3.14 shell指令"></a>2.3.14 shell指令</h3><p><code>SHELL</code> 指令可以指定 <code>RUN</code> <code>ENTRYPOINT</code> <code>CMD</code> 指令的 shell程序，Linux 中默认为 <code>[&quot;/bin/sh&quot;, &quot;-c&quot;]</code></p>
 <h3 id="2-3-15-参考文档"><a href="#2-3-15-参考文档" class="headerlink" title="2.3.15 参考文档"></a>2.3.15 参考文档</h3><ul>
@@ -682,12 +673,12 @@ ENTRYPOINT [&quot;dotnet&quot;, &quot;aspnetapp.dll&quot;]</code></pre>
 <li>从 rootfs 压缩包导入</li>
 </ul>
 <pre class="language-docker" data-language="docker"><code class="language-docker">$ docker import \
-    http://download.openvz.org/template/precreated/ubuntu-16.04-x86_64.tar.gz \
-    openvz/ubuntu:16.04
+    http:&#x2F;&#x2F;download.openvz.org&#x2F;template&#x2F;precreated&#x2F;ubuntu-16.04-x86_64.tar.gz \
+    openvz&#x2F;ubuntu:16.04
 
-Downloading from http://download.openvz.org/template/precreated/ubuntu-16.04-x86_64.tar.gz
+Downloading from http:&#x2F;&#x2F;download.openvz.org&#x2F;template&#x2F;precreated&#x2F;ubuntu-16.04-x86_64.tar.gz
 sha256:412b8fc3e3f786dca0197834a698932b9c51b69bd8cf49e100c35d38c9879213
-// 从web远程下载ubuntu然后制作镜像</code></pre>
+&#x2F;&#x2F; 从web远程下载ubuntu然后制作镜像</code></pre>
 
 <ul>
 <li>Docker 镜像的导入和导出 <code>docker save</code> 和 <code>docker load</code> ，目前已经不推荐</li>
@@ -725,21 +716,21 @@ docker volume inspect my_vol 查看某一个数据卷  </code></pre>
 </ol>
 <pre class="language-docker" data-language="docker"><code class="language-docker">docker run -d -P \
     --name web \
-    <span class="token comment"># -v my-vol:/usr/share/nginx/html \</span>
-    --mount source=my-vol,target=/usr/share/nginx/html \
+    # -v my-vol:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \
+    --mount source&#x3D;my-vol,target&#x3D;&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \
     nginx:alpine
-//使用my_vol数据卷，映射到/usr/share/nginx/html</code></pre>
+&#x2F;&#x2F;使用my_vol数据卷，映射到&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html</code></pre>
 
 <ol start="3">
 <li>查看数据卷具体信息</li>
 </ol>
-<pre class="language-docker" data-language="docker"><code class="language-docker">docker inspect web //数据卷信息在Mounts key下
+<pre class="language-docker" data-language="docker"><code class="language-docker">docker inspect web &#x2F;&#x2F;数据卷信息在Mounts key下
 ....
-"Mountpoint": "/var/lib/docker/volumes/my-vol/_data" //默认位置</code></pre>
+&quot;Mountpoint&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes&#x2F;my-vol&#x2F;_data&quot; &#x2F;&#x2F;默认位置</code></pre>
 
 <p>4.删除一个数据卷</p>
 <pre class="language-docker" data-language="docker"><code class="language-docker">docker volume rm my-vol
-docker volume prune //删除无主的数据卷</code></pre>
+docker volume prune &#x2F;&#x2F;删除无主的数据卷</code></pre>
 
 <ul>
 <li>数据卷可以在容器间共用</li>
@@ -752,8 +743,8 @@ docker volume prune //删除无主的数据卷</code></pre>
 </ol>
 <pre class="language-docker" data-language="docker"><code class="language-docker">$ docker run -d -P \
     --name web \
-    <span class="token comment"># -v /src/webapp:/usr/share/nginx/html \</span>
-    --mount type=bind,source=/src/webapp,target=/usr/share/nginx/html, readonly \
+    # -v &#x2F;src&#x2F;webapp:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \
+    --mount type&#x3D;bind,source&#x3D;&#x2F;src&#x2F;webapp,target&#x3D;&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html, readonly \
     nginx:alpine</code></pre>
 
 <p><code>挂载主机目录</code> 的配置信息在 “Mounts” Key 下面</p>
@@ -877,16 +868,7 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 

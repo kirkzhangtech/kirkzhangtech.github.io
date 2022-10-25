@@ -34,16 +34,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -409,21 +400,21 @@
 <li><p>自底向上的动态规划</p>
 </li>
 </ol>
-<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">// Cut-Rod with bottom-up method</span>
-<span class="token keyword">int</span> <span class="token function">BottomUpCutRod</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token double-colon punctuation">::</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token operator">&amp;</span>p<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">int</span> <span class="token operator">&amp;</span>n<span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
-    std<span class="token double-colon punctuation">::</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> r<span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">auto</span> j <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> j <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> <span class="token operator">++</span>j<span class="token punctuation">)</span>
-    <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> q <span class="token operator">=</span> INT8_MIN<span class="token punctuation">;</span>
-        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">auto</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> j<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-            q <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token function">max</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> p<span class="token punctuation">.</span><span class="token function">at</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">+</span> r<span class="token punctuation">.</span><span class="token function">at</span><span class="token punctuation">(</span>j <span class="token operator">-</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        r<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>q<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token keyword">return</span> r<span class="token punctuation">.</span><span class="token function">at</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span></code></pre>
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp">&#x2F;&#x2F; Cut-Rod with bottom-up method
+int BottomUpCutRod(const std::vector&lt;int&gt; &amp;p, const int &amp;n)
+&#123;
+    std::vector&lt;int&gt; r&#123;0&#125;;
+    for (auto j &#x3D; 1; j &lt;&#x3D; n; ++j)
+    &#123;
+        int q &#x3D; INT8_MIN;
+        for (auto i &#x3D; 1; i &lt;&#x3D; j; ++i)
+        &#123;
+            q &#x3D; std::max(q, p.at(i) + r.at(j - i));
+        &#125;
+        r.push_back(q);
+    &#125;
+    return r.at(n);
+&#125;</code></pre>
 
 <h3 id="15-2-最大子序和"><a href="#15-2-最大子序和" class="headerlink" title="15.2 最大子序和"></a>15.2 最大子序和</h3><p>这道题是来自leetcode.给你一个整数数组 nums,请你找出一个具有最大和的连续子数组（子数组最少包含一个元素）,返回其最大和.子数组 是数组中的一个连续部分.<br><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3ecb52e9f8c446efbe01435060ce41c4~tplv-k3u1fbpfcp-watermark.image" alt="image.png"></p>
 <pre class="language-golang" data-language="golang"><code class="language-golang"> &#x2F;&#x2F; &#123;-2, 1, -3, 4, -1, 2, 1, -5, 4&#125;
@@ -539,16 +530,7 @@ func Max(a int, b int) int &#123;
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 

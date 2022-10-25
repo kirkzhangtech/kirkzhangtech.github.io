@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"/*\n * @lc app=leetcode.cn id=94 lang=cpp\n *\n * [94] 二叉树的中序遍历\n *\n * https://leetcode.cn/problems/binary-tree-inorder-traversal/description/\n *\n * algorithms\n * Easy (75.91%)\n * Likes:    1465\n * Dislikes: 0\n * Total Accepted:    855.6K\n * Total Submissions: 1.1M\n * Testcase Example:  '[1,null,2,3]'\n *\n * 给定一个二叉树的根节点 root ，返回 它的 中序 遍历 。\n * \n * \n * \n * 示例 1：\n * \n * \n * 输入：root = [1,null,2,3]\n * 输出：[1,3,2]\n * \n * \n * 示例 2：\n * \n * \n * 输入：root = []\n * 输出：[]\n * \n * \n * 示例 3：\n * \n * \n * 输入：root = [1]\n * 输出：[1]\n * \n * \n * \n * \n * 提示：\n * \n * \n * 树中节点数目在范围 [0, 100] 内\n * -100 &lt;= Node.val &lt;= 100\n * \n * \n * \n * \n * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？\n * \n */\n// @lc code=start\n/**\n * Definition for a binary tree node.\n * struct TreeNode &#123;\n *     int val;\n *     TreeNode *left;\n *     TreeNode *right;\n *     TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n * &#125;;\n */\n\n\n#include&lt;stack>\n#include&lt;vector>\n\n struct TreeNode &#123;\n    int val;\n      TreeNode *left; \n      TreeNode *right;\n      TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n &#125;;\n\nclass Solution &#123;\npublic:\n    vector&lt;int> inorderTraversal(TreeNode* root) &#123;\n        std::stack&lt;TreeNode*>  treeStack ;\n        std::vector&lt;int> nodes;\n\n        while (root || !treeStack.empty())&#123;\n            if (root)&#123;\n                treeStack.push(root);\n                root = root->left;\n\n            &#125;else &#123;\n                root = treeStack.top();\n                treeStack.pop();\n                nodes.push_back(root -> val);\n                root = root -> right;\n\n            &#125;\n        &#125;\n        return nodes;\n\n    &#125;\n&#125;;\n\n// @lc code=end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-06-24T07:40:09+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"94.二叉树的中序排序","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"/*\n * @lc app=leetcode.cn id=94 lang=cpp\n *\n * [94] 二叉树的中序遍历\n *\n * https://leetcode.cn/problems/binary-tree-inorder-traversal/description/\n *\n * algorithms\n * Easy (75.91%)\n * Likes:    1465\n * Dislikes: 0\n * Total Accepted:    855.6K\n * Total Submissions: 1.1M\n * Testcase Example:  '[1,null,2,3]'\n *\n * 给定一个二叉树的根节点 root ，返回 它的 中序 遍历 。\n * \n * \n * \n * 示例 1：\n * \n * \n * 输入：root = [1,null,2,3]\n * 输出：[1,3,2]\n * \n * \n * 示例 2：\n * \n * \n * 输入：root = []\n * 输出：[]\n * \n * \n * 示例 3：\n * \n * \n * 输入：root = [1]\n * 输出：[1]\n * \n * \n * \n * \n * 提示：\n * \n * \n * 树中节点数目在范围 [0, 100] 内\n * -100 &lt;= Node.val &lt;= 100\n * \n * \n * \n * \n * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？\n * \n */\n// @lc code=start\n/**\n * Definition for a binary tree node.\n * struct TreeNode &#123;\n *     int val;\n *     TreeNode *left;\n *     TreeNode *right;\n *     TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n * &#125;;\n */\n\n\n#include&lt;stack&gt;\n#include&lt;vector&gt;\n\n struct TreeNode &#123;\n    int val;\n      TreeNode *left; \n      TreeNode *right;\n      TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n &#125;;\n\nclass Solution &#123;\npublic:\n    vector&lt;int&gt; inorderTraversal(TreeNode* root) &#123;\n        std::stack&lt;TreeNode*&gt;  treeStack ;\n        std::vector&lt;int&gt; nodes;\n\n        while (root || !treeStack.empty())&#123;\n            if (root)&#123;\n                treeStack.push(root);\n                root &#x3D; root-&gt;left;\n\n            &#125;else &#123;\n                root &#x3D; treeStack.top();\n                treeStack.pop();\n                nodes.push_back(root -&gt; val);\n                root &#x3D; root -&gt; right;\n\n            &#125;\n        &#125;\n        return nodes;\n\n    &#125;\n&#125;;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-06-24T07:40:09+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"94.二叉树的中序排序","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"}</script>
     <meta name="description" content="&#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;94 lang&#x3D;cpp  *  * [94] 二叉树的中序遍历  *  * https:&#x2F;&#x2F;leetcode.cn&#x2F;problems&#x2F;binary-tree-inorder-traversal&#x2F;description&#x2F;  *  * algorithms  * Easy (75.91%)  * Likes:    1465  * Dislik">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="94.二叉树的中序排序">
@@ -38,16 +38,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -443,43 +434,43 @@
  */
 </code></pre>
 
-<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span><span class="token string">&lt;stack></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span><span class="token string">&lt;vector></span></span>
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp">#include&lt;stack&gt;
+#include&lt;vector&gt;
 
- <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">int</span> val<span class="token punctuation">;</span>
-      TreeNode <span class="token operator">*</span>left<span class="token punctuation">;</span> 
-      TreeNode <span class="token operator">*</span>right<span class="token punctuation">;</span>
-      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
-      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
-      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">,</span> TreeNode <span class="token operator">*</span>left<span class="token punctuation">,</span> TreeNode <span class="token operator">*</span>right<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span>left<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span>right<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
- <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+ struct TreeNode &#123;
+    int val;
+      TreeNode *left; 
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;
+ &#125;;
 
-<span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">inorderTraversal</span><span class="token punctuation">(</span>TreeNode<span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        std<span class="token double-colon punctuation">::</span>stack<span class="token operator">&lt;</span>TreeNode<span class="token operator">*</span><span class="token operator">></span>  treeStack <span class="token punctuation">;</span>
-        std<span class="token double-colon punctuation">::</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> nodes<span class="token punctuation">;</span>
+class Solution &#123;
+public:
+    vector&lt;int&gt; inorderTraversal(TreeNode* root) &#123;
+        std::stack&lt;TreeNode*&gt;  treeStack ;
+        std::vector&lt;int&gt; nodes;
 
-        <span class="token keyword">while</span> <span class="token punctuation">(</span>root <span class="token operator">||</span> <span class="token operator">!</span>treeStack<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-                treeStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                root <span class="token operator">=</span> root<span class="token operator">-></span>left<span class="token punctuation">;</span>
+        while (root || !treeStack.empty())&#123;
+            if (root)&#123;
+                treeStack.push(root);
+                root &#x3D; root-&gt;left;
 
-            <span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-                root <span class="token operator">=</span> treeStack<span class="token punctuation">.</span><span class="token function">top</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                treeStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                nodes<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>root <span class="token operator">-></span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                root <span class="token operator">=</span> root <span class="token operator">-></span> right<span class="token punctuation">;</span>
+            &#125;else &#123;
+                root &#x3D; treeStack.top();
+                treeStack.pop();
+                nodes.push_back(root -&gt; val);
+                root &#x3D; root -&gt; right;
 
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> nodes<span class="token punctuation">;</span>
+            &#125;
+        &#125;
+        return nodes;
 
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    &#125;
+&#125;;
 
-<span class="token comment">// @lc code=end</span></code></pre>
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
             
 
 
@@ -817,16 +808,7 @@
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 

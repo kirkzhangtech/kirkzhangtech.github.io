@@ -34,16 +34,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -833,21 +824,21 @@ public:
 <li></li>
 <li></li>
 <li>进阶：你可以设计实现一个时间复杂度为 O(m + n) 的算法解决此问题吗？</li>
-<li> *&#x2F;<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">// @lc code=start</span>
-<span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    <span class="token comment">// nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3</span>
-    <span class="token keyword">void</span> <span class="token function">merge</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums1<span class="token punctuation">,</span> <span class="token keyword">int</span> m<span class="token punctuation">,</span> vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums2<span class="token punctuation">,</span> <span class="token keyword">int</span> n<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> i <span class="token operator">=</span> m <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> j <span class="token operator">=</span> n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> tar <span class="token operator">=</span> m <span class="token operator">+</span> n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
-        <span class="token keyword">while</span> <span class="token punctuation">(</span>j <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-            nums1<span class="token punctuation">[</span>tar<span class="token operator">--</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>i <span class="token operator">>=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> nums1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> nums2<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">?</span> nums1<span class="token punctuation">[</span>i<span class="token operator">--</span><span class="token punctuation">]</span> <span class="token operator">:</span> nums2<span class="token punctuation">[</span>j<span class="token operator">--</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
+<li> *&#x2F;<pre class="language-cpp" data-language="cpp"><code class="language-cpp">&#x2F;&#x2F; @lc code&#x3D;start
+class Solution &#123;
+public:
+    &#x2F;&#x2F; nums1 &#x3D; [1,2,3,0,0,0], m &#x3D; 3, nums2 &#x3D; [2,5,6], n &#x3D; 3
+    void merge(vector&lt;int&gt;&amp; nums1, int m, vector&lt;int&gt;&amp; nums2, int n) &#123;
+        int i &#x3D; m - 1, j &#x3D; n - 1, tar &#x3D; m + n - 1;
+        while (j &gt;&#x3D; 0) &#123;
+            nums1[tar--] &#x3D; (i &gt;&#x3D; 0 &amp;&amp; nums1[i] &gt; nums2[j] ? nums1[i--] : nums2[j--]);
+        &#125;
 
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    &#125;
+&#125;;
 
 
-<span class="token comment">// @lc code=end</span>
+&#x2F;&#x2F; @lc code&#x3D;end
 </code></pre></li>
 </ul>
 
@@ -1059,43 +1050,43 @@ func isPalindrome(x int) bool &#123;
  */
 </code></pre>
 
-<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span><span class="token string">&lt;stack></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span><span class="token string">&lt;vector></span></span>
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp">#include&lt;stack&gt;
+#include&lt;vector&gt;
 
- <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">int</span> val<span class="token punctuation">;</span>
-      TreeNode <span class="token operator">*</span>left<span class="token punctuation">;</span> 
-      TreeNode <span class="token operator">*</span>right<span class="token punctuation">;</span>
-      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
-      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
-      <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">,</span> TreeNode <span class="token operator">*</span>left<span class="token punctuation">,</span> TreeNode <span class="token operator">*</span>right<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">val</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">left</span><span class="token punctuation">(</span>left<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">right</span><span class="token punctuation">(</span>right<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
- <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+ struct TreeNode &#123;
+    int val;
+      TreeNode *left; 
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;
+ &#125;;
 
-<span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">inorderTraversal</span><span class="token punctuation">(</span>TreeNode<span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        std<span class="token double-colon punctuation">::</span>stack<span class="token operator">&lt;</span>TreeNode<span class="token operator">*</span><span class="token operator">></span>  treeStack <span class="token punctuation">;</span>
-        std<span class="token double-colon punctuation">::</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> nodes<span class="token punctuation">;</span>
+class Solution &#123;
+public:
+    vector&lt;int&gt; inorderTraversal(TreeNode* root) &#123;
+        std::stack&lt;TreeNode*&gt;  treeStack ;
+        std::vector&lt;int&gt; nodes;
 
-        <span class="token keyword">while</span> <span class="token punctuation">(</span>root <span class="token operator">||</span> <span class="token operator">!</span>treeStack<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-                treeStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                root <span class="token operator">=</span> root<span class="token operator">-></span>left<span class="token punctuation">;</span>
+        while (root || !treeStack.empty())&#123;
+            if (root)&#123;
+                treeStack.push(root);
+                root &#x3D; root-&gt;left;
 
-            <span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-                root <span class="token operator">=</span> treeStack<span class="token punctuation">.</span><span class="token function">top</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                treeStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                nodes<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>root <span class="token operator">-></span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                root <span class="token operator">=</span> root <span class="token operator">-></span> right<span class="token punctuation">;</span>
+            &#125;else &#123;
+                root &#x3D; treeStack.top();
+                treeStack.pop();
+                nodes.push_back(root -&gt; val);
+                root &#x3D; root -&gt; right;
 
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> nodes<span class="token punctuation">;</span>
+            &#125;
+        &#125;
+        return nodes;
 
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    &#125;
+&#125;;
 
-<span class="token comment">// @lc code=end</span></code></pre>
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
                         
 
@@ -1193,16 +1184,7 @@ func isPalindrome(x int) bool &#123;
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 

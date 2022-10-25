@@ -34,16 +34,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -375,23 +366,23 @@
 </blockquote>
 <ol>
 <li><p>创建数据库</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">DATABASE</span> <span class="token string">'newdatabase'</span><span class="token punctuation">;</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE DATABASE &#39;newdatabase&#39;;</code></pre>
 </li>
 <li><p>设置创建用户并设置密码</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- # Host: %表示支持任意连接，localhost表示只允许本地连接</span>
- <span class="token keyword">CREATE</span> <span class="token keyword">USER</span> <span class="token string">'newuser'</span><span class="token variable">@'localhost'</span> IDENTIFIED <span class="token keyword">BY</span> <span class="token string">'newpassword'</span><span class="token punctuation">;</span>
- <span class="token keyword">CREATE</span> <span class="token keyword">USER</span> <span class="token string">'newuser'</span>@ <span class="token string">'%'</span> IDENTIFIED <span class="token keyword">BY</span> <span class="token string">'newpassword'</span><span class="token punctuation">;</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- # Host: %表示支持任意连接，localhost表示只允许本地连接
+ CREATE USER &#39;newuser&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;newpassword&#39;;
+ CREATE USER &#39;newuser&#39;@ &#39;%&#39; IDENTIFIED BY &#39;newpassword&#39;;
 </code></pre>
 </li>
 <li><p>授权</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- 如果需要给用户创建数据库的权限，则可以这样设置</span>
-<span class="token keyword">GRANT</span> <span class="token keyword">ALL</span> <span class="token keyword">PRIVILEGES</span> <span class="token keyword">ON</span> <span class="token operator">*</span><span class="token punctuation">.</span><span class="token operator">*</span> <span class="token keyword">to</span> my_user<span class="token variable">@'%'</span><span class="token punctuation">;</span> <span class="token comment">-- 这里的my_user 跟第五步是相同的</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- 如果需要给用户创建数据库的权限，则可以这样设置
+GRANT ALL PRIVILEGES ON *.* to my_user@&#39;%&#39;; -- 这里的my_user 跟第五步是相同的
 
-<span class="token keyword">GRANT</span> <span class="token keyword">ALL</span> <span class="token keyword">PRIVILEGES</span> <span class="token keyword">ON</span> newdatabase<span class="token punctuation">.</span><span class="token operator">*</span> <span class="token keyword">TO</span> <span class="token string">'newuser'</span><span class="token variable">@'localhost'</span><span class="token punctuation">;</span>
-FLUSH <span class="token keyword">PRIVILEGES</span><span class="token punctuation">;</span></code></pre>
+GRANT ALL PRIVILEGES ON newdatabase.* TO &#39;newuser&#39;@&#39;localhost&#39;;
+FLUSH PRIVILEGES;</code></pre>
 </li>
 <li><p>重新登陆</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">mysql <span class="token operator">-</span>u kirkzhang <span class="token operator">-</span>p</code></pre></li>
+<pre class="language-sql" data-language="sql"><code class="language-sql">mysql -u kirkzhang -p</code></pre></li>
 </ol>
 
                     
@@ -558,88 +549,88 @@ when an edition is dropped from the database. Also, changes to the data
 are not reversed and should be removed as well to return to the pre-upgraded version.</code></pre>
 
 <h2 id="5-4-Preparation-Enable-Editions"><a href="#5-4-Preparation-Enable-Editions" class="headerlink" title="5.4 Preparation: Enable Editions"></a>5.4 Preparation: Enable Editions</h2><ol>
-<li>启动EBR<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">user</span> scott <span class="token keyword">enable</span> editions</code></pre></li>
+<li>启动EBR<pre class="language-sql" data-language="sql"><code class="language-sql">alter user scott enable editions</code></pre></li>
 <li>不能disable这个操作<br>12.1之前是enable整个schema的object为editionable,12.1之后可以指定aditionable为non-editionable.</li>
 </ol>
 <h2 id="5-4-1-NE-non-editionable-on-E-editionable-Prohibition"><a href="#5-4-1-NE-non-editionable-on-E-editionable-Prohibition" class="headerlink" title="5.4.1 NE(non-editionable) on E(editionable) Prohibition"></a>5.4.1 NE(non-editionable) on E(editionable) Prohibition</h2><p>这句话怎么翻译比较贴切？— It is not possible for noneditionable objects to depend on editionable objects. This is called the NE on E prohibition.<br>user-defined type : 可能就是复合数据类型，由基础数据类型组成</p>
 <p>在Oracle数据库12.1之前，当你想对一个schema启用编辑时，你必须解决NE on E的问题。例如，当你有一个user-defined type被用于表的定义时，你就违反了NE on E prohibition。一个用户定义的类型是可编辑的，而一个表永远不能被编辑。当你需要遵守12.1版本之前的zero downtime要求时，不可避免地需要改变你的模式设计。</p>
 <p>从Oracle数据库12.1开始，可以通过明确地将某些对象设置为不可编辑来定义对象。这只能在edition-enable之前实现。一旦一个object被设置为不可编辑，并且edition enabled，其状态就会被固定，不能被改变。试图这样做将导致以下异常。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">ORA<span class="token operator">-</span><span class="token number">38825</span>: The EDITIONABLB property <span class="token keyword">of</span> an editioned object cannot be altered<span class="token punctuation">.</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">ORA-38825: The EDITIONABLB property of an editioned object cannot be altered.</code></pre>
 
 <p>演示对某一个用户(账号)启动EBR,分析NE on E prohibition具体例子，<br>创建一个新用户</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">user</span> neone identified <span class="token keyword">by</span> neone
-<span class="token operator">/</span>
-<span class="token keyword">grant</span> <span class="token keyword">connect</span><span class="token punctuation">,</span><span class="token keyword">create</span> <span class="token keyword">table</span><span class="token punctuation">,</span><span class="token keyword">create</span> <span class="token keyword">type</span> <span class="token keyword">to</span> neone
-<span class="token operator">/</span>
-<span class="token keyword">alter</span> <span class="token keyword">user</span> neone quota unlimited <span class="token keyword">on</span> users
-<span class="token operator">/</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">create user neone identified by neone
+&#x2F;
+grant connect,create table,create type to neone
+&#x2F;
+alter user neone quota unlimited on users
+&#x2F;</code></pre>
 
 <p>接着用该账号创建user-defined type</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">type</span> phone_number_ot <span class="token keyword">as</span> object<span class="token punctuation">(</span>
-   type_name varchar2 <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
-<span class="token punctuation">,</span>  phone_number varchar2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span>
-<span class="token punctuation">)</span>
-<span class="token operator">/</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">create type phone_number_ot as object(
+   type_name varchar2 (10)
+,  phone_number varchar2(20)
+)
+&#x2F;
 </code></pre>
 
 <p>基于上面的type object创建数据库的表</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">type</span> phone_numbers_tt <span class="token keyword">as</span> <span class="token keyword">table</span> <span class="token keyword">of</span> phone_number_ot
-<span class="token operator">/</span>
-<span class="token keyword">create</span> <span class="token keyword">table</span> emps<span class="token punctuation">(</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">create type phone_numbers_tt as table of phone_number_ot
+&#x2F;
+create table emps( 
    empno number
-<span class="token punctuation">,</span>  phone_numbers phone_numbers_tt
-<span class="token punctuation">)</span>
-nested <span class="token keyword">table</span> phone_numbers store <span class="token keyword">as</span> phone_numbers_nt
+,  phone_numbers phone_numbers_tt
+)
+nested table phone_numbers store as phone_numbers_nt
 </code></pre>
 
 <p>这时候尝试启动EBR,就会碰到如下问题</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">user</span> neone <span class="token keyword">enable</span> editions
-<span class="token operator">/</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">alter user neone enable editions
+&#x2F;
 ERRORat line l:
-ORA<span class="token operator">-</span><span class="token number">38819</span>: <span class="token keyword">user</span> NEONE owns one <span class="token operator">or</span> more objects whose <span class="token keyword">type</span> <span class="token operator">is</span> editionableand that have noneditioned dependent objects
+ORA-38819: user NEONE owns one or more objects whose type is editionableand that have noneditioned dependent objects
 </code></pre>
 <p>这是因为你的type类型是editionable的，table类型是non-aditionable的，EBR不允许有这样的依赖关系，这样是12.1版本之前必须要该schema的table和source code的设计，12.1之后我们可以实现将NE编程E从而解决这个问题。通过如下可以解决NE on E问题</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-<span class="token keyword">alter</span> <span class="token keyword">type</span> phone_numbers_tt noneditionable
-<span class="token operator">/</span>
-<span class="token keyword">alter</span> <span class="token keyword">type</span> phone_number_ot noneditionable
-<span class="token operator">/</span>
+alter type phone_numbers_tt noneditionable
+&#x2F;
+alter type phone_number_ot noneditionable
+&#x2F;
 </code></pre>
 
 <p>另外，上面相同的例子，还有有第二种情况，如果是已经启动EBR，然后基于user-defined type创建表就会报错</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-<span class="token keyword">create</span> <span class="token keyword">table</span> emps<span class="token operator">*</span>
-ERROR at line <span class="token number">1</span>:
-ORA<span class="token operator">-</span><span class="token number">38818</span>: illegal reference <span class="token keyword">to</span> editioned object neone<span class="token punctuation">.</span>PHONE_NUMBBR_OT
+create table emps*
+ERROR at line 1:
+ORA-38818: illegal reference to editioned object neone.PHONE_NUMBBR_OT
 </code></pre>
 <p>因为第二种情况下neone已经启动了EBR,这时候你也无法把将edtionable的type类型改变为non-aditionable</p>
 <p>如果测试，生产环境中真碰到了这个问题，我们该如何的解决这个问题呢?<br>需要我们重新创建type类型，这样才能保证我们成功创建基于type类型的table</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">type</span> phone_numbers_tt
-<span class="token operator">/</span>
-<span class="token keyword">Type</span> dropped<span class="token punctuation">.</span>
-<span class="token keyword">drop</span> <span class="token keyword">type</span> phone_number_ot
-<span class="token operator">/</span>
-<span class="token keyword">Type</span> dropped<span class="token punctuation">.</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">drop type phone_numbers_tt
+&#x2F;
+Type dropped.
+drop type phone_number_ot
+&#x2F;
+Type dropped.
 
-<span class="token keyword">create</span> <span class="token operator">or</span> <span class="token keyword">replace</span> noneditionable <span class="token keyword">type</span> phone_number_ot <span class="token keyword">as</span> object
-<span class="token punctuation">(</span> type_name varchar2 <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
-<span class="token punctuation">,</span> phone_number varchar2 <span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span>
-<span class="token punctuation">)</span>
-<span class="token operator">/</span>
-<span class="token keyword">Type</span> created
+create or replace noneditionable type phone_number_ot as object
+( type_name varchar2 (10)
+, phone_number varchar2 (20)
+)
+&#x2F;
+Type created
 
-<span class="token keyword">create</span> <span class="token operator">or</span> <span class="token keyword">replace</span> noneditionable <span class="token keyword">type</span> phone_numbers_tt <span class="token keyword">as</span> <span class="token keyword">table</span> <span class="token keyword">of</span> phone_number_ot
-<span class="token operator">/</span>
-<span class="token keyword">Type</span> created<span class="token punctuation">.</span>
+create or replace noneditionable type phone_numbers_tt as table of phone_number_ot
+&#x2F;
+Type created.
 
-<span class="token keyword">create</span> <span class="token keyword">table</span> emps<span class="token punctuation">(</span>
+create table emps(
    empno number
-<span class="token punctuation">,</span>  phone_numbers phone_numbers_tt
-<span class="token punctuation">)</span>
-nested <span class="token keyword">table</span> phone_numbers store <span class="token keyword">as</span> phone_numbers_nt
-<span class="token operator">/</span>
+,  phone_numbers phone_numbers_tt
+)
+nested table phone_numbers store as phone_numbers_nt
+&#x2F;
 
-<span class="token keyword">Table</span> created
+Table created
 </code></pre>
 
 <p>现在总结如下:</p>
@@ -653,26 +644,26 @@ nested <span class="token keyword">table</span> phone_numbers store <span class=
 <li>如果你的架构中使用ogg，data guard，RAC等等oracle系的组件，<br>要如何保证他们不停机维护，也要把他们考虑进去</li>
 </ol>
 <h2 id="5-4-2-Create-a-new-edition"><a href="#5-4-2-Create-a-new-edition" class="headerlink" title="5.4.2 Create a new edition"></a>5.4.2 Create a new edition</h2><p>因为用户SCOTT启用了edition，所以我们可以创建一个额外的edition。版本之间有一个层次关系，其中一个edition总是有一个父edition这里唯一的例外是ORA$BASE，或者当这个edition最终被删除时，是层次结构中的下一个版本——根edition。<br>为了创建一个新版本，需要系统权限<code>create ANY edition</code>:</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">grant</span> <span class="token keyword">create</span> <span class="token keyword">any</span> edition <span class="token keyword">on</span> scott</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">grant create any edition on scott</code></pre>
 
 <p>在创建版本之前，还需要将用作父版本的版本上的USE特权。一个版本总是作为另一个版本的子版本创建。创建版本时，会自动授予USE对象特权。USE权限也可以单独授予，如下面的代码示例所示:</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">grant</span> <span class="token keyword">use</span> <span class="token keyword">on</span> edition <span class="token operator">&lt;</span>edition_name<span class="token operator">></span> <span class="token keyword">to</span> <span class="token operator">&lt;</span><span class="token keyword">user</span><span class="token operator">></span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">grant use on edition &lt;edition_name&gt; to &lt;user&gt;</code></pre>
 
 <p>这里，<code>&lt;edition_name&gt;</code>和<code>&lt;user&gt;</code>需要用edition的名称和你想授予权限的用户来代替。<br>为了删除根edition或leaf edition，需要有<code>DROP ANY EDITION</code>系统权限。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">grant</span> <span class="token keyword">drop</span> <span class="token keyword">any</span> edition <span class="token keyword">to</span> scott</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">grant drop any edition to scott</code></pre>
 
 <p>当你连接到一个数据库时，可以通过使用ALTER语句来改变版本，比如在下一个例子中，其中<code>&lt;edition_name&gt;</code>是指应该改成你想改成的版本。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">session</span> <span class="token keyword">set</span> edition <span class="token operator">=</span><span class="token operator">&lt;</span>edition_name<span class="token operator">></span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">alter session set edition &#x3D;&lt;edition_name&gt;</code></pre>
 <p>请记住，如果application有未完成的事务，这时候是不用change你的edition,否则你将会碰到如下error。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">session</span> <span class="token keyword">set</span> edition <span class="token operator">=</span>r2
+<pre class="language-sql" data-language="sql"><code class="language-sql">alter session set edition &#x3D;r2
 error:
-ora<span class="token operator">-</span><span class="token number">38814</span>:<span class="token keyword">alter</span> <span class="token keyword">session</span> <span class="token keyword">set</span> edition must be <span class="token keyword">first</span> statement <span class="token keyword">of</span> <span class="token keyword">transaction</span>
+ora-38814:alter session set edition must be first statement of transaction
 </code></pre>
 
 <h2 id="5-5-Complexity-levels"><a href="#5-5-Complexity-levels" class="headerlink" title="5.5 Complexity levels"></a>5.5 Complexity levels</h2><p>使用EBR包括了多层复杂因素<br>first level : PLSQL object结构change,有哪些在edition之间<br>second level : table struct change among edition<br>在同一时间不需要维护多个版本的edition因为在将来所有的user都会使用post-upgrade edition<br>third level : complex level is where you do have table structure changes and the users need to access multiple editions at the same time ,thus keeping data in sync between multiple editions.</p>
 <h3 id="5-5-1-replace-PLSQL-code"><a href="#5-5-1-replace-PLSQL-code" class="headerlink" title="5.5.1 replace PLSQL code"></a>5.5.1 replace PLSQL code</h3><p>接下来阐述了在不同edition之间，不同的functionality可以有相同的名字<br>下面sql可以查看当前edition名字</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> sys_context<span class="token punctuation">(</span><span class="token string">'userenv'</span><span class="token punctuation">,</span>
-                   <span class="token string">'current_edition_name'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token string">"current_edition"</span><span class="token keyword">from</span> dual<span class="token punctuation">;</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">select sys_context(&#39;userenv&#39;,
+                   &#39;current_edition_name&#39;) as &quot;current_edition&quot;from dual;</code></pre>
 <p>也可以通过<code>show edition</code>来查询当前edition.</p>
 
                     
@@ -3276,12 +3267,12 @@ go list -f &#39;&#123;&#123;.ImportPath&#125;&#125; -&gt; &#123;&#123;join .Impo
 </ul>
 <h1 id="11-测试"><a href="#11-测试" class="headerlink" title="11. 测试"></a>11. 测试</h1><p>go test选项含义</p>
 <pre class="language-bash" data-language="bash"><code class="language-bash">
--args 传递参数到test binary<span class="token punctuation">(</span>到时候补一个demo<span class="token punctuation">)</span>
+-args 传递参数到test binary(到时候补一个demo)
 -c 编译test binary,但是不执行
 -exec xprog  运行test binary ,原理如同 go run
 -i 安装test binary的相关依赖
 -json 将测试输出转化为json为了自动化处理
--c <span class="token function">file</span>   定义编译后的binary的文件名
+-c file   定义编译后的binary的文件名
 </code></pre>
 
 
@@ -3852,22 +3843,22 @@ import &quot;math&#x2F;rand&quot;
 
 <p>  Format represents the tar archive format.The original tar format was introduced in Unix V7. Since then, there have been multiple competing(相互竞争) formats attempting to standardize or extend the V7 format to overcome its limitations. The most common formats are the <strong>USTAR</strong>, <strong>PAX</strong>, and <strong>GNU</strong> formats, each with their own advantages and limitations.</p>
 <p>  The following table captures the capabilities of each format:</p>
-  <pre class="language-bash" data-language="bash"><code class="language-bash">                  <span class="token operator">|</span>  USTAR <span class="token operator">|</span>       PAX <span class="token operator">|</span>       GNU
+  <pre class="language-bash" data-language="bash"><code class="language-bash">                  |  USTAR |       PAX |       GNU
 ------------------+--------+-----------+----------
-Name              <span class="token operator">|</span>   256B <span class="token operator">|</span> unlimited <span class="token operator">|</span> unlimited
-Linkname          <span class="token operator">|</span>   100B <span class="token operator">|</span> unlimited <span class="token operator">|</span> unlimited
-Size              <span class="token operator">|</span> uint33 <span class="token operator">|</span> unlimited <span class="token operator">|</span>    uint89
-Mode              <span class="token operator">|</span> uint21 <span class="token operator">|</span>    uint21 <span class="token operator">|</span>    uint57
-Uid/Gid           <span class="token operator">|</span> uint21 <span class="token operator">|</span> unlimited <span class="token operator">|</span>    uint57
-Uname/Gname       <span class="token operator">|</span>    32B <span class="token operator">|</span> unlimited <span class="token operator">|</span>       32B
-ModTime           <span class="token operator">|</span> uint33 <span class="token operator">|</span> unlimited <span class="token operator">|</span>     int89
-AccessTime        <span class="token operator">|</span>    n/a <span class="token operator">|</span> unlimited <span class="token operator">|</span>     int89
-ChangeTime        <span class="token operator">|</span>    n/a <span class="token operator">|</span> unlimited <span class="token operator">|</span>     int89
-Devmajor/Devminor <span class="token operator">|</span> uint21 <span class="token operator">|</span>    uint21 <span class="token operator">|</span>    uint57
+Name              |   256B | unlimited | unlimited
+Linkname          |   100B | unlimited | unlimited
+Size              | uint33 | unlimited |    uint89
+Mode              | uint21 |    uint21 |    uint57
+Uid&#x2F;Gid           | uint21 | unlimited |    uint57
+Uname&#x2F;Gname       |    32B | unlimited |       32B
+ModTime           | uint33 | unlimited |     int89
+AccessTime        |    n&#x2F;a | unlimited |     int89
+ChangeTime        |    n&#x2F;a | unlimited |     int89
+Devmajor&#x2F;Devminor | uint21 |    uint21 |    uint57
 ------------------+--------+-----------+----------
-string encoding   <span class="token operator">|</span>  ASCII <span class="token operator">|</span>     UTF-8 <span class="token operator">|</span>    binary
-sub-second <span class="token builtin class-name">times</span>  <span class="token operator">|</span>     no <span class="token operator">|</span>       <span class="token function">yes</span> <span class="token operator">|</span>        no
-sparse files      <span class="token operator">|</span>     no <span class="token operator">|</span>       <span class="token function">yes</span> <span class="token operator">|</span>       <span class="token function">yes</span></code></pre>
+string encoding   |  ASCII |     UTF-8 |    binary
+sub-second times  |     no |       yes |        no
+sparse files      |     no |       yes |       yes</code></pre>
 
 <p>  The table’s upper portion shows the Header fields, where each format reports the maximum number of bytes allowed for each string field and the integer type used to store each numeric field (where timestamps are stored as the number of seconds since the Unix epoch).</p>
 <p>  The table’s lower portion shows specialized features of each format, such as supported string encodings, support for sub-second timestamps, or support for sparse files.</p>
@@ -4110,7 +4101,7 @@ randomInt :&#x3D; randSeed.Intn(300)&#x2F;&#x2F;[0,300)的整数
 <p>name可以通过<code>wsl -l</code>命令进行查看</p>
 </li>
 <li><p>运行diskpart</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token keyword">select</span> vdisk <span class="token assign-left variable">file</span><span class="token operator">=</span><span class="token string">"your location"</span>
+<pre class="language-bash" data-language="bash"><code class="language-bash">select vdisk file&#x3D;&quot;your location&quot;
 compact vdisk
 </code></pre></li>
 </ol>
@@ -4584,16 +4575,7 @@ Raft Locking Advice
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 

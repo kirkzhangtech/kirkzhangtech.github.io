@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"3. 第三章 inventory:描述你的服务器ansible管理的多台主机文件叫inventory\n3.1 inventory基本参数含义inventory文件通常是.ini格式的，常用inventory参数如下\nansible_ssh_host     #用于指定被管理的主机的真实IP和将要连接的远程主机名.与你想要设定的主机的别名不同的话,可通过此变量设置.\nansible_ssh_port     #用于指定连接到被管理主机的ssh端口号，默认是22，如果不是默认的端口号,通过此变量设置.\nansible_ssh_user     #ssh连接时默认使用的用户名\nansible_ssh_pass     #ssh连接时的密码，(这种方式并不安全,我们强烈建议使用 --ask-pass（交互密码）或 SSH 密钥)\nansible_sudo_pass     #使用sudo连接用户时的密码，(这种方式并不安全,我们强烈建议使用 --ask-sudo-pass)\nansible_sudo_exec     #如果sudo命令不在默认路径，需要指定sudo命令路径(适用于1.8及以上版本)\nansible_ssh_private_key_file     #秘钥文件路径，秘钥文件如果不想使用ssh-agent管理时可以使用此选项\nansible_shell_type     #目标系统的shell的类型，默认sh，可设置为 'csh' 或 'fish'.\nansible_connection     #SSH 连接的类型： local , ssh , paramiko，在 ansible 1.2 之前默认是 paramiko ，后来智能选择，优先使用基于 ControlPersist 的 ssh （支持的前提）\nansible_python_interpreter     #用来指定python解释器的路径，默认为/usr/bin/python 同样可以指定ruby 、perl 的路径\nansible_*_interpreter     #其他解释器路径，用法与ansible_python_interpreter类似，这里\"*\"可以是ruby或才perl等其他语言\n以上是2.0版本之前的参数，2.0之后有更换，但是向下兼容\n\n3.1.1 主机别名和群组inventory支持群组,类似于下面\n[webservers]\ntestserver ansible_port=2202\n\n//群组变量\n[webservers:vars] \nansible_user = vagrant\nansible_host = 127.0.0.1\nansible_private_key_file = .vagrant/machines/default/virtualbox/private_key\n\n[web]\nweb[1:20].example.com\n\n\n3.1.2 主机和群组变量，在inventory各自文件中在inventory目录下我们根据环境，将不同阶段的变量放进文件，group_vars文件夹下文件名要与hosts文件中的群组保持一致\ngroup_vars\n|----production\n|      |- db_primary_host: rhodeisland.example.com\n|      |- db_replica_host: virginia.example.com\n|      |- db_name: widget_production\n|      |- db_user: widgetuser\n|      |- db_password: pFmMxcyD;Fc6)6\n|      |- rabbitmq_host: pennsylvania.example.com\n|----preprod\n|      |- db_primary_host: chicago.example.com\n|      |- db_replica_host: amsterdam.example.com\n|      |- db_name: widget_staging\n|      |- db_user: widgetuser\n|      |- db_password: L@4Ryz8cRUXedj\n|      |- rabbitmq_host: chicago.example.com\n\n3.1.3 动态inventory脚本接口对于用何种语言实现脚本，没有要求，但必须支持传--list和--host=&lt;hostname&gt;参数,同时--list输出的json字符串也有要求。有群组和主机键值对，_meta要保存主机变量\n./dynamic.py  --list\n\noutput\n\n&#123;\n    \"group1\": &#123;\n        \"hosts\": [\n            \"192.168.28.71\",\n            \"192.168.28.72\"\n        ],\n        \"vars\": &#123;\n            \"ansible_ssh_user\": \"johndoe\",\n            \"ansible_ssh_private_key_file\": \"~/.ssh/mykey\",\n            \"example_variable\": \"value\"\n        &#125;,\n        \"children\":['group2']\n    &#125;,\n    \"_meta\": &#123;\n        \"hostvars\": &#123;\n            \"192.168.28.71\": &#123;\n                \"host_specific_var\": \"bar\"\n            &#125;,\n            \"192.168.28.72\": &#123;\n                \"host_specific_var\": \"foo\"\n            &#125;\n        &#125;\n    &#125;\n&#125;\n\n./dynamic.py  --host=192.168.28.71\n\noutput\n&#123;\n    \"host_specific_var\": \"foo\"\n&#125;\n\nansible支持将动态inventory和动态的inventory放在同一文件夹下(名为inventory的文件夹)通过ansible.cfg的hostfile进行控制，也可以使用-i参数进行控制\n3.1.4 add_host模块和group_by模块add_hostplaybook运行时，主机被创建是无法追加新主机的。使用add_host模块就可以添加新主机并在此次playbook中生效group_by书上使用group_by 实现了按照OS系统类型进行分组执行(像if语句)，yml中具体参数不知道什么意思.\n","dateCreated":"2022-06-22T20:45:28+08:00","dateModified":"2022-10-22T16:19:25+08:00","datePublished":"2022-06-22T20:45:28+08:00","description":"","headline":"奔跑吧ansible","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/","keywords":"ansible"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"3. 第三章 inventory:描述你的服务器ansible管理的多台主机文件叫inventory\n3.1 inventory基本参数含义inventory文件通常是.ini格式的，常用inventory参数如下\nansible_ssh_host     #用于指定被管理的主机的真实IP和将要连接的远程主机名.与你想要设定的主机的别名不同的话,可通过此变量设置.\nansible_ssh_port     #用于指定连接到被管理主机的ssh端口号，默认是22，如果不是默认的端口号,通过此变量设置.\nansible_ssh_user     #ssh连接时默认使用的用户名\nansible_ssh_pass     #ssh连接时的密码，(这种方式并不安全,我们强烈建议使用 --ask-pass（交互密码）或 SSH 密钥)\nansible_sudo_pass     #使用sudo连接用户时的密码，(这种方式并不安全,我们强烈建议使用 --ask-sudo-pass)\nansible_sudo_exec     #如果sudo命令不在默认路径，需要指定sudo命令路径(适用于1.8及以上版本)\nansible_ssh_private_key_file     #秘钥文件路径，秘钥文件如果不想使用ssh-agent管理时可以使用此选项\nansible_shell_type     #目标系统的shell的类型，默认sh，可设置为 'csh' 或 'fish'.\nansible_connection     #SSH 连接的类型： local , ssh , paramiko，在 ansible 1.2 之前默认是 paramiko ，后来智能选择，优先使用基于 ControlPersist 的 ssh （支持的前提）\nansible_python_interpreter     #用来指定python解释器的路径，默认为/usr/bin/python 同样可以指定ruby 、perl 的路径\nansible_*_interpreter     #其他解释器路径，用法与ansible_python_interpreter类似，这里\"*\"可以是ruby或才perl等其他语言\n以上是2.0版本之前的参数，2.0之后有更换，但是向下兼容\n\n3.1.1 主机别名和群组inventory支持群组,类似于下面\n[webservers]\ntestserver ansible_port&#x3D;2202\n\n&#x2F;&#x2F;群组变量\n[webservers:vars] \nansible_user &#x3D; vagrant\nansible_host &#x3D; 127.0.0.1\nansible_private_key_file &#x3D; .vagrant&#x2F;machines&#x2F;default&#x2F;virtualbox&#x2F;private_key\n\n[web]\nweb[1:20].example.com\n\n\n3.1.2 主机和群组变量，在inventory各自文件中在inventory目录下我们根据环境，将不同阶段的变量放进文件，group_vars文件夹下文件名要与hosts文件中的群组保持一致\ngroup_vars\n|----production\n|      |- db_primary_host: rhodeisland.example.com\n|      |- db_replica_host: virginia.example.com\n|      |- db_name: widget_production\n|      |- db_user: widgetuser\n|      |- db_password: pFmMxcyD;Fc6)6\n|      |- rabbitmq_host: pennsylvania.example.com\n|----preprod\n|      |- db_primary_host: chicago.example.com\n|      |- db_replica_host: amsterdam.example.com\n|      |- db_name: widget_staging\n|      |- db_user: widgetuser\n|      |- db_password: L@4Ryz8cRUXedj\n|      |- rabbitmq_host: chicago.example.com\n\n3.1.3 动态inventory脚本接口对于用何种语言实现脚本，没有要求，但必须支持传--list和--host=&lt;hostname&gt;参数,同时--list输出的json字符串也有要求。有群组和主机键值对，_meta要保存主机变量\n.&#x2F;dynamic.py  --list\n\noutput\n\n&#123;\n    &quot;group1&quot;: &#123;\n        &quot;hosts&quot;: [\n            &quot;192.168.28.71&quot;,\n            &quot;192.168.28.72&quot;\n        ],\n        &quot;vars&quot;: &#123;\n            &quot;ansible_ssh_user&quot;: &quot;johndoe&quot;,\n            &quot;ansible_ssh_private_key_file&quot;: &quot;~&#x2F;.ssh&#x2F;mykey&quot;,\n            &quot;example_variable&quot;: &quot;value&quot;\n        &#125;,\n        &quot;children&quot;:[&#39;group2&#39;]\n    &#125;,\n    &quot;_meta&quot;: &#123;\n        &quot;hostvars&quot;: &#123;\n            &quot;192.168.28.71&quot;: &#123;\n                &quot;host_specific_var&quot;: &quot;bar&quot;\n            &#125;,\n            &quot;192.168.28.72&quot;: &#123;\n                &quot;host_specific_var&quot;: &quot;foo&quot;\n            &#125;\n        &#125;\n    &#125;\n&#125;\n\n.&#x2F;dynamic.py  --host&#x3D;192.168.28.71\n\noutput\n&#123;\n    &quot;host_specific_var&quot;: &quot;foo&quot;\n&#125;\n\nansible支持将动态inventory和动态的inventory放在同一文件夹下(名为inventory的文件夹)通过ansible.cfg的hostfile进行控制，也可以使用-i参数进行控制\n3.1.4 add_host模块和group_by模块add_hostplaybook运行时，主机被创建是无法追加新主机的。使用add_host模块就可以添加新主机并在此次playbook中生效group_by书上使用group_by 实现了按照OS系统类型进行分组执行(像if语句)，yml中具体参数不知道什么意思.\n","dateCreated":"2022-06-22T20:45:28+08:00","dateModified":"2022-10-22T16:19:25+08:00","datePublished":"2022-06-22T20:45:28+08:00","description":"","headline":"奔跑吧ansible","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/","keywords":"ansible"}</script>
     <meta name="description" content="3. 第三章 inventory:描述你的服务器ansible管理的多台主机文件叫inventory 3.1 inventory基本参数含义inventory文件通常是.ini格式的，常用inventory参数如下 ansible_ssh_host     #用于指定被管理的主机的真实IP和将要连接的远程主机名.与你想要设定的主机的别名不同的话,可通过此变量设置. ansible_ssh_port">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="奔跑吧ansible">
@@ -39,16 +39,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -392,17 +383,17 @@ ansible_*_interpreter     #其他解释器路径，用法与ansible_python_inter
 以上是2.0版本之前的参数，2.0之后有更换，但是向下兼容</code></pre>
 
 <h3 id="3-1-1-主机别名和群组"><a href="#3-1-1-主机别名和群组" class="headerlink" title="3.1.1 主机别名和群组"></a>3.1.1 主机别名和群组</h3><p>inventory支持群组,类似于下面</p>
-<pre class="language-yaml" data-language="yaml"><code class="language-yaml"><span class="token punctuation">[</span>webservers<span class="token punctuation">]</span>
-testserver ansible_port=2202
+<pre class="language-yaml" data-language="yaml"><code class="language-yaml">[webservers]
+testserver ansible_port&#x3D;2202
 
-//群组变量
-<span class="token punctuation">[</span>webservers<span class="token punctuation">:</span>vars<span class="token punctuation">]</span> 
-ansible_user = vagrant
-ansible_host = 127.0.0.1
-ansible_private_key_file = .vagrant/machines/default/virtualbox/private_key
+&#x2F;&#x2F;群组变量
+[webservers:vars] 
+ansible_user &#x3D; vagrant
+ansible_host &#x3D; 127.0.0.1
+ansible_private_key_file &#x3D; .vagrant&#x2F;machines&#x2F;default&#x2F;virtualbox&#x2F;private_key
 
-<span class="token punctuation">[</span>web<span class="token punctuation">]</span>
-web<span class="token punctuation">[</span><span class="token datetime number">1:20</span><span class="token punctuation">]</span>.example.com
+[web]
+web[1:20].example.com
 </code></pre>
 
 <h3 id="3-1-2-主机和群组变量，在inventory各自文件中"><a href="#3-1-2-主机和群组变量，在inventory各自文件中" class="headerlink" title="3.1.2 主机和群组变量，在inventory各自文件中"></a>3.1.2 主机和群组变量，在inventory各自文件中</h3><p>在inventory目录下我们根据环境，将不同阶段的变量放进文件，<code>group_vars</code>文件夹下文件名要与<code>hosts</code>文件中的群组保持一致</p>
@@ -423,41 +414,41 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
 |      |- rabbitmq_host: chicago.example.com</code></pre>
 
 <h3 id="3-1-3-动态inventory脚本接口"><a href="#3-1-3-动态inventory脚本接口" class="headerlink" title="3.1.3 动态inventory脚本接口"></a>3.1.3 动态inventory脚本接口</h3><p>对于用何种语言实现脚本，没有要求，但必须支持传<code>--list</code>和<code>--host=&lt;hostname&gt;</code>参数,同时<code>--list</code>输出的json字符串也有要求。有群组和主机键值对，<code>_meta</code>要保存主机变量</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">./dynamic.py  --list</code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">.&#x2F;dynamic.py  --list</code></pre>
 
 <p>output</p>
 <pre class="language-json" data-language="json"><code class="language-json">
-<span class="token punctuation">&#123;</span>
-    <span class="token property">"group1"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token property">"hosts"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-            <span class="token string">"192.168.28.71"</span><span class="token punctuation">,</span>
-            <span class="token string">"192.168.28.72"</span>
-        <span class="token punctuation">]</span><span class="token punctuation">,</span>
-        <span class="token property">"vars"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-            <span class="token property">"ansible_ssh_user"</span><span class="token operator">:</span> <span class="token string">"johndoe"</span><span class="token punctuation">,</span>
-            <span class="token property">"ansible_ssh_private_key_file"</span><span class="token operator">:</span> <span class="token string">"~/.ssh/mykey"</span><span class="token punctuation">,</span>
-            <span class="token property">"example_variable"</span><span class="token operator">:</span> <span class="token string">"value"</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-        <span class="token property">"children"</span><span class="token operator">:</span><span class="token punctuation">[</span>'group2'<span class="token punctuation">]</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token property">"hostvars"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-            <span class="token property">"192.168.28.71"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-                <span class="token property">"host_specific_var"</span><span class="token operator">:</span> <span class="token string">"bar"</span>
-            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-            <span class="token property">"192.168.28.72"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-                <span class="token property">"host_specific_var"</span><span class="token operator">:</span> <span class="token string">"foo"</span>
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span></code></pre>
+&#123;
+    &quot;group1&quot;: &#123;
+        &quot;hosts&quot;: [
+            &quot;192.168.28.71&quot;,
+            &quot;192.168.28.72&quot;
+        ],
+        &quot;vars&quot;: &#123;
+            &quot;ansible_ssh_user&quot;: &quot;johndoe&quot;,
+            &quot;ansible_ssh_private_key_file&quot;: &quot;~&#x2F;.ssh&#x2F;mykey&quot;,
+            &quot;example_variable&quot;: &quot;value&quot;
+        &#125;,
+        &quot;children&quot;:[&#39;group2&#39;]
+    &#125;,
+    &quot;_meta&quot;: &#123;
+        &quot;hostvars&quot;: &#123;
+            &quot;192.168.28.71&quot;: &#123;
+                &quot;host_specific_var&quot;: &quot;bar&quot;
+            &#125;,
+            &quot;192.168.28.72&quot;: &#123;
+                &quot;host_specific_var&quot;: &quot;foo&quot;
+            &#125;
+        &#125;
+    &#125;
+&#125;</code></pre>
 
-<pre class="language-bash" data-language="bash"><code class="language-bash">./dynamic.py  --host<span class="token operator">=</span><span class="token number">192.168</span>.28.71</code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">.&#x2F;dynamic.py  --host&#x3D;192.168.28.71</code></pre>
 
 <p>output</p>
-<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
-    <span class="token property">"host_specific_var"</span><span class="token operator">:</span> <span class="token string">"foo"</span>
-<span class="token punctuation">&#125;</span></code></pre>
+<pre class="language-json" data-language="json"><code class="language-json">&#123;
+    &quot;host_specific_var&quot;: &quot;foo&quot;
+&#125;</code></pre>
 
 <p>ansible支持将动态inventory和动态的inventory放在同一文件夹下(名为inventory的文件夹)通过ansible.cfg的hostfile进行控制，也可以使用<code>-i</code>参数进行控制</p>
 <h3 id="3-1-4-add-host模块和group-by模块"><a href="#3-1-4-add-host模块和group-by模块" class="headerlink" title="3.1.4 add_host模块和group_by模块"></a>3.1.4 add_host模块和group_by模块</h3><p><code>add_host</code><br>playbook运行时，主机被创建是无法追加新主机的。使用<code>add_host</code>模块就可以添加新主机并在此次playbook中生效<br><code>group_by</code><br>书上使用group_by 实现了按照OS系统类型进行分组执行(像if语句)，yml中具体参数不知道什么意思.</p>
@@ -806,16 +797,7 @@ web<span class="token punctuation">[</span><span class="token datetime number">1
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 

@@ -34,16 +34,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -383,57 +374,57 @@
 </ul>
 <p>完成的配置文件如下:</p>
 <pre class="language-properties" data-language="properties"><code class="language-properties">
-<span class="token comment"># The number of milliseconds of each tick</span>
-<span class="token key attr-name">tickTime</span><span class="token punctuation">=</span><span class="token value attr-value">2000</span>
-<span class="token comment"># The number of ticks that the initial</span>
-<span class="token comment"># synchronization phase can take</span>
-<span class="token key attr-name">initLimit</span><span class="token punctuation">=</span><span class="token value attr-value">10</span>
-<span class="token comment"># The number of ticks that can pass between</span>
-<span class="token comment"># sending a request and getting an acknowledgement</span>
-<span class="token key attr-name">syncLimit</span><span class="token punctuation">=</span><span class="token value attr-value">5</span>
-<span class="token comment"># the directory where the snapshot is stored.</span>
-<span class="token comment"># do not use /tmp for storage, /tmp here is just</span>
-<span class="token comment"># example sakes.</span>
-<span class="token key attr-name">dataDir</span><span class="token punctuation">=</span><span class="token value attr-value">/ashura/zookeeper-1/datalog</span>
-<span class="token comment"># the port at which the clients will connect</span>
-<span class="token key attr-name">clientPort</span><span class="token punctuation">=</span><span class="token value attr-value">2181</span>
-<span class="token comment"># the maximum number of client connections.</span>
-<span class="token comment"># increase this if you need to handle more clients</span>
-<span class="token comment">#maxClientCnxns=60</span>
-<span class="token comment">#</span>
-<span class="token comment"># Be sure to read the maintenance section of the</span>
-<span class="token comment"># administrator guide before turning on autopurge.</span>
-<span class="token comment">#</span>
-<span class="token comment"># http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance</span>
-<span class="token comment">#</span>
-<span class="token comment"># The number of snapshots to retain in dataDir</span>
-<span class="token comment">#autopurge.snapRetainCount=3</span>
-<span class="token comment"># Purge task interval in hours</span>
-<span class="token comment"># Set to "0" to disable auto purge feature</span>
-<span class="token comment">#autopurge.purgeInterval=1</span>
-<span class="token key attr-name">server.1</span><span class="token punctuation">=</span><span class="token value attr-value">localhost.:2887:3887</span>
-<span class="token key attr-name">server.2</span><span class="token punctuation">=</span><span class="token value attr-value">localhost.:2888:3888</span>
-<span class="token key attr-name">server.3</span><span class="token punctuation">=</span><span class="token value attr-value">localhost.:2889:3889</span></code></pre>
+# The number of milliseconds of each tick
+tickTime&#x3D;2000
+# The number of ticks that the initial
+# synchronization phase can take
+initLimit&#x3D;10
+# The number of ticks that can pass between
+# sending a request and getting an acknowledgement
+syncLimit&#x3D;5
+# the directory where the snapshot is stored.
+# do not use &#x2F;tmp for storage, &#x2F;tmp here is just
+# example sakes.
+dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog
+# the port at which the clients will connect
+clientPort&#x3D;2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns&#x3D;60
+#
+# Be sure to read the maintenance section of the
+# administrator guide before turning on autopurge.
+#
+# http:&#x2F;&#x2F;zookeeper.apache.org&#x2F;doc&#x2F;current&#x2F;zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount&#x3D;3
+# Purge task interval in hours
+# Set to &quot;0&quot; to disable auto purge feature
+#autopurge.purgeInterval&#x3D;1
+server.1&#x3D;localhost.:2887:3887
+server.2&#x3D;localhost.:2888:3888
+server.3&#x3D;localhost.:2889:3889</code></pre>
 <p>将这份zoo.cfg分别复制到zookeeper-2,zookeeper-3的config目录下.<br>修改zookeeper2的zoo.cfg中clientPort&#x3D;2183,dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog<br>修改zookeeper3的zoo.cfg中clientPort&#x3D;2184,dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog</p>
 <p>创建刚才在配置文件中写的目录</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> /ashura/zookeeper-1/datalog
-<span class="token function">mkdir</span> /ashura/zookeeper-2/datalog
-<span class="token function">mkdir</span> /ashura/zookeeper-3/datalog</code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mkdir &#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog
+mkdir &#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog
+mkdir &#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog</code></pre>
 
 <p>分别{– 在datalog目录下 –}执行以下命令,写入myid。</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"1"</span> <span class="token operator">></span> /ashura/zookeeper-1/datalog/myid
-<span class="token builtin class-name">echo</span> <span class="token string">"2"</span> <span class="token operator">></span> /ashura/zookeeper-2/datalog/myid
-<span class="token builtin class-name">echo</span> <span class="token string">"3"</span> <span class="token operator">></span> /ashura/zookeeper-3/datalog/myid</code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">echo &quot;1&quot; &gt; &#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog&#x2F;myid
+echo &quot;2&quot; &gt; &#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog&#x2F;myid
+echo &quot;3&quot; &gt; &#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog&#x2F;myid</code></pre>
 
 <p>最后分别启动zookeeper集群</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">/ashura/zookeeper-1/bin/zkServer.sh start
-/ashura/zookeeper-2/bin/zkServer.sh start
-/ashura/zookeeper-3/bin/zkServer.sh start</code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">&#x2F;ashura&#x2F;zookeeper-1&#x2F;bin&#x2F;zkServer.sh start
+&#x2F;ashura&#x2F;zookeeper-2&#x2F;bin&#x2F;zkServer.sh start
+&#x2F;ashura&#x2F;zookeeper-3&#x2F;bin&#x2F;zkServer.sh start</code></pre>
 
 <p>使用如下命令判断是否启动成功</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">/ashura/zookeeper-1/bin/zkServer.sh status
-/ashura/zookeeper-2/bin/zkServer.sh status
-/ashura/zookeeper-3/bin/zkServer.sh status</code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">&#x2F;ashura&#x2F;zookeeper-1&#x2F;bin&#x2F;zkServer.sh status
+&#x2F;ashura&#x2F;zookeeper-2&#x2F;bin&#x2F;zkServer.sh status
+&#x2F;ashura&#x2F;zookeeper-3&#x2F;bin&#x2F;zkServer.sh status</code></pre>
                     
                         
 
@@ -497,33 +488,33 @@
 <p> server1.properties,server2.properties,server3.properties</p>
 </li>
 <li><p>修改server.properties</p>
- <pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># server1.properties</span>
-<span class="token key attr-name">broker.id</span><span class="token punctuation">=</span><span class="token value attr-value">1</span>
-<span class="token key attr-name">listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://:9092</span>
-<span class="token key attr-name">advertised.listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://10.1.14.159:9092(其中10.1.14.159是我本机的ip)</span>
-<span class="token key attr-name">log.dirs</span><span class="token punctuation">=</span><span class="token value attr-value">/ashura/kafka_2.11-2.2.1/logs/kafka1-logs</span>
-<span class="token key attr-name">zookeeper.connect</span><span class="token punctuation">=</span><span class="token value attr-value">localhost:2181,localhost:2182,localhost:2183</span>
+ <pre class="language-properties" data-language="properties"><code class="language-properties"># server1.properties
+broker.id&#x3D;1
+listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9092
+advertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9092(其中10.1.14.159是我本机的ip)
+log.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka1-logs
+zookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183
 
-<span class="token comment"># server2.properties</span>
-<span class="token key attr-name">broker.id</span><span class="token punctuation">=</span><span class="token value attr-value">2</span>
-<span class="token key attr-name">listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://:9093</span>
-<span class="token key attr-name">advertised.listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://10.1.14.159:9093(其中10.1.14.159是我本机的ip)</span>
-<span class="token key attr-name">log.dirs</span><span class="token punctuation">=</span><span class="token value attr-value">/ashura/kafka_2.11-2.2.1/logs/kafka2-logs</span>
-<span class="token key attr-name">zookeeper.connect</span><span class="token punctuation">=</span><span class="token value attr-value">localhost:2181,localhost:2182,localhost:2183</span>
+# server2.properties
+broker.id&#x3D;2
+listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9093
+advertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9093(其中10.1.14.159是我本机的ip)
+log.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka2-logs
+zookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183
 
-<span class="token comment"># server3.properties</span>
-<span class="token key attr-name">broker.id</span><span class="token punctuation">=</span><span class="token value attr-value">3</span>
-<span class="token key attr-name">listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://:9094</span>
-<span class="token key attr-name">advertised.listeners</span><span class="token punctuation">=</span><span class="token value attr-value">PLAINTEXT://10.1.14.159:9094(其中10.1.14.159是我本机的ip)</span>
-<span class="token key attr-name">log.dirs</span><span class="token punctuation">=</span><span class="token value attr-value">/ashura/kafka_2.11-2.2.1/logs/kafka3-logs</span>
-<span class="token key attr-name">zookeeper.connect</span><span class="token punctuation">=</span><span class="token value attr-value">localhost:2181,localhost:2182,localhost:2183</span>
+# server3.properties
+broker.id&#x3D;3
+listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9094
+advertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9094(其中10.1.14.159是我本机的ip)
+log.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka3-logs
+zookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183
 </code></pre>
 </li>
 <li><p>启动实例</p>
  <pre class="language-bash" data-language="bash"><code class="language-bash">
-<span class="token function">nohup</span> /ashura/kafka_2.11-2.2.1/bin/kafka-server-start.sh /ashura/kafka_2.11-2.2.1/config/server3.properties <span class="token operator">></span> /ashura/kafka_2.11-2.2.1/logs/kafka3-logs/startup.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token operator">&amp;</span>
-<span class="token function">nohup</span> /ashura/kafka_2.11-2.2.1/bin/kafka-server-start.sh /ashura/kafka_2.11-2.2.1/config/server2.properties <span class="token operator">></span> /ashura/kafka_2.11-2.2.1/logs/kafka2-logs/startup.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token operator">&amp;</span>
-<span class="token function">nohup</span> /ashura/kafka_2.11-2.2.1/bin/kafka-server-start.sh /ashura/kafka_2.11-2.2.1/config/server1.properties <span class="token operator">></span> /ashura/kafka_2.11-2.2.1/logs/kafka1-logs/startup.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token operator">&amp;</span></code></pre>
+nohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server3.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka3-logs&#x2F;startup.log 2&gt;&amp;1 &amp;
+nohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server2.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka2-logs&#x2F;startup.log 2&gt;&amp;1 &amp;
+nohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server1.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka1-logs&#x2F;startup.log 2&gt;&amp;1 &amp;</code></pre>
 </li>
 <li><p>health check</p>
 <p> 通过startup.log,或者同级目录下的server.log查看是否有报错即可。<br> 检测</p>
@@ -751,7 +742,7 @@
 <p>name可以通过<code>wsl -l</code>命令进行查看</p>
 </li>
 <li><p>运行diskpart</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token keyword">select</span> vdisk <span class="token assign-left variable">file</span><span class="token operator">=</span><span class="token string">"your location"</span>
+<pre class="language-bash" data-language="bash"><code class="language-bash">select vdisk file&#x3D;&quot;your location&quot;
 compact vdisk
 </code></pre></li>
 </ol>
@@ -1526,8 +1517,8 @@ ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
                 <div class="postShorten-content">
                     <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>本地想更改项目代码的绑定的github链接，但是repo的url变了。<br><code>remote: This repository moved. Please use the new location [new location]</code> 的警示。因為你的git連結位置有變動因此要修改本機端的git remote位置。另外一种场景下载别人的代码库，并做修改最后推到自己的github，这个github repo</p>
 <h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><ul>
-<li>绑定本地origin仓库  <pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> remote set-url origin https://XXX.git</code></pre></li>
-<li>绑定upstream仓库  <pre class="language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">git</span> remote <span class="token function">add</span> upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git</code></pre></li>
+<li>绑定本地origin仓库  <pre class="language-bash" data-language="bash"><code class="language-bash">git remote set-url origin https:&#x2F;&#x2F;XXX.git</code></pre></li>
+<li>绑定upstream仓库  <pre class="language-bash" data-language="bash"><code class="language-bash">$ git remote add upstream https:&#x2F;&#x2F;github.com&#x2F;ORIGINAL_OWNER&#x2F;ORIGINAL_REPOSITORY.git</code></pre></li>
 </ul>
 
                     
@@ -1727,16 +1718,7 @@ ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 

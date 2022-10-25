@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？\n-- demo 1\nbegin\n  -- 中间写代码\nend;\n\n-- demo 2\n\n\ndeclare\n\n-- 定义变量\n\nbegin \n -- 业务逻辑\nend;\n\n在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用\n1.2 在plsql种执行plsql代码块如何在sqlplus中执行plsql代码?\n登录sqlplus就可以直接输入自己的代码，然后end;结束代码块，并且接着输入/,这时候sqlplus解释器就可以执行代码了。但是有一点需要明确，如果你的代码块是以declare开头的，那么就会直接输出到屏幕\nsql> begin\nDBMS_OUTPUT.put_line(\"hello world\")\nend;\n/\n\n但是如果你想创建package,function,procedure,可以使用如下语句，方便后面的调用\nSQL> CREATE OR REPLACE PROCEDURE hello_world AS \n BEGIN \n DBMS_OUTPUT.PUT_LINE('Hello World'); \n END; \n / \n\n1.3 store code in script如果你想通过sql脚本执行代码，该如何运行？\nSET SERVEROUTPUT ON;\nDECLARE \n counter NUMBER;\nBEGIN \n  FOR counter IN REVERSE 0..10 LOOP \n  DBMS_OUTPUT.PUT_LINE (counter); \n  END LOOP; \nEND;\n/\n你可以保存你的plsql代码在脚本里,重要一步是要保证你的文件扩展名是.sqlSQL Developer supports a number of additionalextensions for more specific types of PL&#x2F;SQL. \n1.4 执行你的脚本登录sqlplus，然后跳(Traverse)到你的脚本目录\n@绝对路径\n@相对路径\nsqlplus username/password@database my_stored_script.sql \n\n1.5 接受用户的输入从键盘中sqlplus使用&amp;符号来接受来自键盘的输入\nDECLARE\n emp_count NUMBER; \nBEGIN \n SELECT count(*) \n INTO emp_count \n FROM employees \n WHERE department_id = &amp;department_id; \nEND; \n\n但是如果你想从键盘接受一个输入，但是后面又想继续使用，则可以使用如下方法\nDECLARE\n emp_count NUMBER; \nBEGIN \n  SELECT count(*) \n  INTO emp_count \n  FROM employees \n  WHERE department_id = &amp;&amp;department_id; \n  DBMS_OUTPUT.PUT_LINE('The employee count is: ' || emp_count || \n  ' for the department with an ID of: ' || &amp;department_id); \nEND;\n\n\n另外还有一种方法就是定义变量来承接从键盘来的输入,但是要注意这个变量定义的类型,如果是numeric类型的，如果是varchar2类型则需要用单引号,见如下代码\nDECLARE \n    first varchar2(20); \n    last varchar2(25); \n    emp_last VARCHAR2(25) := '&amp;last_name'; \n    emp_count NUMBER; \nBEGIN \n    SELECT count(*) \n    INTO emp_count \n    FROM employees \n    WHERE last_name = emp_last; \n IF emp_count > 1 THEN \n    DBMS_OUTPUT.PUT_LINE('More than 1 employee exists with that name.'); \n ELSE \n    SELECT first_name, last_name \n    INTO first, last \n    FROM employees \n    WHERE last_name = emp_last; \n    DBMS_OUTPUT.PUT_LINE('The matching employee is: ' || \n    first || ' ' || last); \n END IF; \nEXCEPTION \n    WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE('Please enter a different last name.'); \nEND; \n\n1.6 Displaying Results in SQL*PlusSET SERVEROUTPUT ON is issued, then the default buffer size is 20,000 bytes.Any content that surpasses that size will be cut off. To increase the buffer, simply set the size of bufferyou’d like to use when turning the SERVEROUTPUT on: \n1.7 Commenting Your Code1.8 Referencing a Block of Code如何引用一个代码块?\n给一个代码块添加label标签,比如下面的代码\n\n&lt;&lt;dept_block>>\nDECLARE \n  dept_name varchar2(30); \nBEGIN \n  SELECT department_name \n  INTO dept_name \n  FROM departments \n  WHERE department_id = 230;\n  DBMS_OUTPUT.PUT_LINE(dept_name);\nEND dept_block;\n\n\n1.9. Referring to Variables from Nested Blocks如果code block是嵌套关系那么该如何使用具有相同名字的变量,可以使用label来区分不同的变量名字\n&lt;&lt;outer_block>>\nDECLARE\n  mgr_id NUMBER(6) := '&amp;current_manager_id';\n  dept_count number := 0;\nBEGIN\n\nSELECT count(*)\n    INTO dept_count \n    FROM departments \n    WHERE manager_id = outer_block.mgr_id;\n\n IF dept_count > 0 THEN \n    &lt;&lt;inner_block>> \n    DECLARE \n      dept_name VARCHAR2(30); \n      mgr_id NUMBER(6):= '&amp;new_manager_id'; \n    BEGIN \n    SELECT department_name \n    INTO dept_name \n    FROM departments \n    WHERE manager_id = outer_block.mgr_id; \n\n    UPDATE departments \n    SET manager_id = inner_block.mgr_id \n    WHERE manager_id = outer_block.mgr_id; \n    DBMS_OUTPUT.PUT_LINE \n    ('Department manager ID has been changed for ' || dept_name); \n    END inner_block; \n ELSE \n    DBMS_OUTPUT.PUT_LINE('There are no departments listed for the manager'); \n END IF; \nEXCEPTION \n WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE('There are no departments listed for the manager'); \nEND outer_block; \n\n但是inner block创建的变量，outside block是不会读取到的,外部块变量在内部块中是可见的，而不需要完全限定名称，并且不需要块标签\n1.10. Ignoring Substitution Variables转义那些sqlplus使用的特殊字符\nSQL> SET ESCAPE '\\' \nSQL> INSERT INTO DEPARTMENTS VALUES( \n  departments_seq.nextval, \n  'Shipping \\&amp; Receiving', \n  null, \n null);\n\n还有另外一种\nSQL> SET DEFINE OFF\nINSERT INTO DEPARTMENTS VALUES( \ndepartments_seq.nextval, \n'Importing &amp; Exporting', \nnull, \nnull); \n\n\n1.11. Changing the Substitution Variable Character如果你对改变替换变量符号(&amp;)为其他的符号\n可以使用set define ^, 你也可以使用任意其他的符号来替换\nSQL> SET DEFINE ^\nSQL> SELECT department_name \n     FROM departments \n     WHERE department_id = ^dept_id;\n\n1.12. Creating a Variable to Match a Database Column Type如果向查数据库中某一个表的数据，该如何将查询结果赋值给变量呢？可以使用%type关键字,会将一列的数据赋值给变量,而%rowtype则是返回一列的数据给变量\n\nDECLARE\n dept_name departments.department_name%TYPE; \n dept_id NUMBER(6) := &amp;department_id; \nBEGIN \n SELECT department_name \n INTO dept_name \n FROM departments \n WHERE department_id = dept_id; \n DBMS_OUTPUT.PUT_LINE('The department with the given ID is: ' || dept_name); \nEXCEPTION \n WHEN NO_DATA_FOUND THEN \n DBMS_OUTPUT.PUT_LINE('No department for the given ID'); \nEND;\n\n2.基础sql2.1 Retrieving a Single Row from the Databaseproblem\nYou are interested in returning one row from a database table via a query that searches for an exactmatch.\nsolution 1你可以使用select ... into ...语法\nDECLARE\n    first VARCHAR2(20);  -- varchar2(20)一定是要兼容的数据库表字段的\n    last VARCHAR2(25); \n    email VARCHAR2(25); \nBEGIN \n    SELECT first_name, last_name, email \n    INTO first, last, email \n    FROM employees \n    WHERE employee_id = 100; \n    DBMS_OUTPUT.PUT_LINE( \n    'Employee Information for ID: ' || first || ' ' || last || ' - ' || email); \nEXCEPTION \nWHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE('No employee matches the given ID'); \nWHEN TOO_MANY_ROWS THEN\n    DBMS_OUTPUT.PUT_LINE('More than one employee matches the given ID'); \nEND; \n\nsolution 2\nDECLARE\n CURSOR emp_cursor IS \n SELECT first_name, last_name, email \n FROM employees \n WHERE employee_id = &amp;emp_id; \n first VARCHAR2(20); \n last VARCHAR2(25); \n email VARCHAR2(25); \nBEGIN \n OPEN emp_cursor; \n FETCH emp_cursor INTO first, last, email; \n IF emp_cursor%NOTFOUND THEN \n      RAISE NO_DATA_FOUND; \n ELSE \n -- Perform second fetch to see if more than one row is returned \n    FETCH emp_cursor INTO first, last, email; \n    IF emp_cursor%FOUND THEN \n      RAISE TOO_MANY_ROWS; \n    ELSE \n      DBMS_OUTPUT.PUT_LINE( \n      'Employee Information for ID: ' || first || ' ' || last || ' - ' || email); \n      END IF;\n END IF; \nCLOSE emp_cursor; \n\n\nhow it works\nsolution 1: One is to issue a SELECT…INTO statement,which is a statement designed to return just one row.The other approach is to open a cursor, fetch the  one row, and close the cursorsolution 2: We keep an open mind on that point. Consider that if youare expecting exactly one row to bereturned, getting multiple rows back represents an exception case that you must somehow deal with.The cursor-based solution makes it easy to simply ignore that exception case, but ignoring a conditionthat you do not expect to occur does not change the fact that it has occurred. Although a cursor is used,the cases where no data is returned or where too many rows are returnedgiven the user-supplied EMPLOYEE_IDstill remain a reality. However, since cursors are specifically designed to deal with zero rows or morethan one row coming back from a query, no exceptions will be raised if these situations occur. For this reason,Solution #2 contains some conditional logic that is used to manually raise the desired exceptions.In the event that the user supplies the block with an invalid EMPLOYEE_ID, the cursor will not fetch any data. The %NOTFOUND attribute of the cursor will be checked to see whether the cursor successfully fetched data. If not, then the NO_DATA_FOUND exception is raised. If the cursor is successful in retrieving data, then a second FETCH statement is issued to see whether more thanone row will be returned. If more than one row is returned, then the TOO_MANY_ROWS exception is raised;otherwise, the expected output is displayed. In any event, the output that is displayed using either of thesolutions will be the same whether successful or not.\n","dateCreated":"2022-10-19T23:51:33+08:00","dateModified":"2022-10-24T21:39:23+08:00","datePublished":"2022-10-19T23:51:33+08:00","description":"","headline":"Oracle PLSQL Recipes","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？\n-- demo 1\nbegin\n  -- 中间写代码\nend;\n\n-- demo 2\n\n\ndeclare\n\n-- 定义变量\n\nbegin \n -- 业务逻辑\nend;\n\n在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用\n1.2 在plsql种执行plsql代码块如何在sqlplus中执行plsql代码?\n登录sqlplus就可以直接输入自己的代码，然后end;结束代码块，并且接着输入/,这时候sqlplus解释器就可以执行代码了。但是有一点需要明确，如果你的代码块是以declare开头的，那么就会直接输出到屏幕\nsql&gt; begin\nDBMS_OUTPUT.put_line(&quot;hello world&quot;)\nend;\n&#x2F;\n\n但是如果你想创建package,function,procedure,可以使用如下语句，方便后面的调用\nSQL&gt; CREATE OR REPLACE PROCEDURE hello_world AS \n BEGIN \n DBMS_OUTPUT.PUT_LINE(&#39;Hello World&#39;); \n END; \n &#x2F; \n\n1.3 store code in script如果你想通过sql脚本执行代码，该如何运行？\nSET SERVEROUTPUT ON;\nDECLARE \n counter NUMBER;\nBEGIN \n  FOR counter IN REVERSE 0..10 LOOP \n  DBMS_OUTPUT.PUT_LINE (counter); \n  END LOOP; \nEND;\n&#x2F;\n你可以保存你的plsql代码在脚本里,重要一步是要保证你的文件扩展名是.sqlSQL Developer supports a number of additionalextensions for more specific types of PL&#x2F;SQL. \n1.4 执行你的脚本登录sqlplus，然后跳(Traverse)到你的脚本目录\n@绝对路径\n@相对路径\nsqlplus username&#x2F;password@database my_stored_script.sql \n\n1.5 接受用户的输入从键盘中sqlplus使用&amp;符号来接受来自键盘的输入\nDECLARE\n emp_count NUMBER; \nBEGIN \n SELECT count(*) \n INTO emp_count \n FROM employees \n WHERE department_id &#x3D; &amp;department_id; \nEND; \n\n但是如果你想从键盘接受一个输入，但是后面又想继续使用，则可以使用如下方法\nDECLARE\n emp_count NUMBER; \nBEGIN \n  SELECT count(*) \n  INTO emp_count \n  FROM employees \n  WHERE department_id &#x3D; &amp;&amp;department_id; \n  DBMS_OUTPUT.PUT_LINE(&#39;The employee count is: &#39; || emp_count || \n  &#39; for the department with an ID of: &#39; || &amp;department_id); \nEND;\n\n\n另外还有一种方法就是定义变量来承接从键盘来的输入,但是要注意这个变量定义的类型,如果是numeric类型的，如果是varchar2类型则需要用单引号,见如下代码\nDECLARE \n    first varchar2(20); \n    last varchar2(25); \n    emp_last VARCHAR2(25) :&#x3D; &#39;&amp;last_name&#39;; \n    emp_count NUMBER; \nBEGIN \n    SELECT count(*) \n    INTO emp_count \n    FROM employees \n    WHERE last_name &#x3D; emp_last; \n IF emp_count &gt; 1 THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;More than 1 employee exists with that name.&#39;); \n ELSE \n    SELECT first_name, last_name \n    INTO first, last \n    FROM employees \n    WHERE last_name &#x3D; emp_last; \n    DBMS_OUTPUT.PUT_LINE(&#39;The matching employee is: &#39; || \n    first || &#39; &#39; || last); \n END IF; \nEXCEPTION \n    WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;Please enter a different last name.&#39;); \nEND; \n\n1.6 Displaying Results in SQL*PlusSET SERVEROUTPUT ON is issued, then the default buffer size is 20,000 bytes.Any content that surpasses that size will be cut off. To increase the buffer, simply set the size of bufferyou’d like to use when turning the SERVEROUTPUT on: \n1.7 Commenting Your Code1.8 Referencing a Block of Code如何引用一个代码块?\n给一个代码块添加label标签,比如下面的代码\n\n&lt;&lt;dept_block&gt;&gt;\nDECLARE \n  dept_name varchar2(30); \nBEGIN \n  SELECT department_name \n  INTO dept_name \n  FROM departments \n  WHERE department_id &#x3D; 230;\n  DBMS_OUTPUT.PUT_LINE(dept_name);\nEND dept_block;\n\n\n1.9. Referring to Variables from Nested Blocks如果code block是嵌套关系那么该如何使用具有相同名字的变量,可以使用label来区分不同的变量名字\n&lt;&lt;outer_block&gt;&gt;\nDECLARE\n  mgr_id NUMBER(6) :&#x3D; &#39;&amp;current_manager_id&#39;;\n  dept_count number :&#x3D; 0;\nBEGIN\n\nSELECT count(*)\n    INTO dept_count \n    FROM departments \n    WHERE manager_id &#x3D; outer_block.mgr_id;\n\n IF dept_count &gt; 0 THEN \n    &lt;&lt;inner_block&gt;&gt; \n    DECLARE \n      dept_name VARCHAR2(30); \n      mgr_id NUMBER(6):&#x3D; &#39;&amp;new_manager_id&#39;; \n    BEGIN \n    SELECT department_name \n    INTO dept_name \n    FROM departments \n    WHERE manager_id &#x3D; outer_block.mgr_id; \n\n    UPDATE departments \n    SET manager_id &#x3D; inner_block.mgr_id \n    WHERE manager_id &#x3D; outer_block.mgr_id; \n    DBMS_OUTPUT.PUT_LINE \n    (&#39;Department manager ID has been changed for &#39; || dept_name); \n    END inner_block; \n ELSE \n    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); \n END IF; \nEXCEPTION \n WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); \nEND outer_block; \n\n但是inner block创建的变量，outside block是不会读取到的,外部块变量在内部块中是可见的，而不需要完全限定名称，并且不需要块标签\n1.10. Ignoring Substitution Variables转义那些sqlplus使用的特殊字符\nSQL&gt; SET ESCAPE &#39;\\&#39; \nSQL&gt; INSERT INTO DEPARTMENTS VALUES( \n  departments_seq.nextval, \n  &#39;Shipping \\&amp; Receiving&#39;, \n  null, \n null);\n\n还有另外一种\nSQL&gt; SET DEFINE OFF\nINSERT INTO DEPARTMENTS VALUES( \ndepartments_seq.nextval, \n&#39;Importing &amp; Exporting&#39;, \nnull, \nnull); \n\n\n1.11. Changing the Substitution Variable Character如果你对改变替换变量符号(&amp;)为其他的符号\n可以使用set define ^, 你也可以使用任意其他的符号来替换\nSQL&gt; SET DEFINE ^\nSQL&gt; SELECT department_name \n     FROM departments \n     WHERE department_id &#x3D; ^dept_id;\n\n1.12. Creating a Variable to Match a Database Column Type如果向查数据库中某一个表的数据，该如何将查询结果赋值给变量呢？可以使用%type关键字,会将一列的数据赋值给变量,而%rowtype则是返回一列的数据给变量\n\nDECLARE\n dept_name departments.department_name%TYPE; \n dept_id NUMBER(6) :&#x3D; &amp;department_id; \nBEGIN \n SELECT department_name \n INTO dept_name \n FROM departments \n WHERE department_id &#x3D; dept_id; \n DBMS_OUTPUT.PUT_LINE(&#39;The department with the given ID is: &#39; || dept_name); \nEXCEPTION \n WHEN NO_DATA_FOUND THEN \n DBMS_OUTPUT.PUT_LINE(&#39;No department for the given ID&#39;); \nEND;\n\n2.基础sql2.1 Retrieving a Single Row from the Databaseproblem\nYou are interested in returning one row from a database table via a query that searches for an exactmatch.\nsolution 1你可以使用select ... into ...语法\nDECLARE\n    first VARCHAR2(20);  -- varchar2(20)一定是要兼容的数据库表字段的\n    last VARCHAR2(25); \n    email VARCHAR2(25); \nBEGIN \n    SELECT first_name, last_name, email \n    INTO first, last, email \n    FROM employees \n    WHERE employee_id &#x3D; 100; \n    DBMS_OUTPUT.PUT_LINE( \n    &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); \nEXCEPTION \nWHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;No employee matches the given ID&#39;); \nWHEN TOO_MANY_ROWS THEN\n    DBMS_OUTPUT.PUT_LINE(&#39;More than one employee matches the given ID&#39;); \nEND; \n\nsolution 2\nDECLARE\n CURSOR emp_cursor IS \n SELECT first_name, last_name, email \n FROM employees \n WHERE employee_id &#x3D; &amp;emp_id; \n first VARCHAR2(20); \n last VARCHAR2(25); \n email VARCHAR2(25); \nBEGIN \n OPEN emp_cursor; \n FETCH emp_cursor INTO first, last, email; \n IF emp_cursor%NOTFOUND THEN \n      RAISE NO_DATA_FOUND; \n ELSE \n -- Perform second fetch to see if more than one row is returned \n    FETCH emp_cursor INTO first, last, email; \n    IF emp_cursor%FOUND THEN \n      RAISE TOO_MANY_ROWS; \n    ELSE \n      DBMS_OUTPUT.PUT_LINE( \n      &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); \n      END IF;\n END IF; \nCLOSE emp_cursor; \n\n\nhow it works\nsolution 1: One is to issue a SELECT…INTO statement,which is a statement designed to return just one row.The other approach is to open a cursor, fetch the  one row, and close the cursorsolution 2: We keep an open mind on that point. Consider that if youare expecting exactly one row to bereturned, getting multiple rows back represents an exception case that you must somehow deal with.The cursor-based solution makes it easy to simply ignore that exception case, but ignoring a conditionthat you do not expect to occur does not change the fact that it has occurred. Although a cursor is used,the cases where no data is returned or where too many rows are returnedgiven the user-supplied EMPLOYEE_IDstill remain a reality. However, since cursors are specifically designed to deal with zero rows or morethan one row coming back from a query, no exceptions will be raised if these situations occur. For this reason,Solution #2 contains some conditional logic that is used to manually raise the desired exceptions.In the event that the user supplies the block with an invalid EMPLOYEE_ID, the cursor will not fetch any data. The %NOTFOUND attribute of the cursor will be checked to see whether the cursor successfully fetched data. If not, then the NO_DATA_FOUND exception is raised. If the cursor is successful in retrieving data, then a second FETCH statement is issued to see whether more thanone row will be returned. If more than one row is returned, then the TOO_MANY_ROWS exception is raised;otherwise, the expected output is displayed. In any event, the output that is displayed using either of thesolutions will be the same whether successful or not.\n","dateCreated":"2022-10-19T23:51:33+08:00","dateModified":"2022-10-24T21:39:23+08:00","datePublished":"2022-10-19T23:51:33+08:00","description":"","headline":"Oracle PLSQL Recipes","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/"}</script>
     <meta name="description" content="1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？ -- demo 1 begin   -- 中间写代码 end;  -- demo 2   declare  -- 定义变量  begin   -- 业务逻辑 end;  在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用 1.2 在pls">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Oracle PLSQL Recipes">
@@ -38,16 +38,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
 
     <!--STYLES END-->
     
@@ -376,242 +367,242 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <h1 id="1-PL-x2F-SQL-Fundamentals"><a href="#1-PL-x2F-SQL-Fundamentals" class="headerlink" title="1 PL&#x2F;SQL Fundamentals"></a>1 PL&#x2F;SQL Fundamentals</h1><h2 id="1-1-创建plsql代码块"><a href="#1-1-创建plsql代码块" class="headerlink" title="1.1 创建plsql代码块"></a>1.1 创建plsql代码块</h2><p>如和创建一个可以执行的plsql代码块？</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- demo 1</span>
-<span class="token keyword">begin</span>
-  <span class="token comment">-- 中间写代码</span>
-<span class="token keyword">end</span><span class="token punctuation">;</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- demo 1
+begin
+  -- 中间写代码
+end;
 
-<span class="token comment">-- demo 2</span>
+-- demo 2
 
 
-<span class="token keyword">declare</span>
+declare
 
-<span class="token comment">-- 定义变量</span>
+-- 定义变量
 
-<span class="token keyword">begin</span> 
- <span class="token comment">-- 业务逻辑</span>
-<span class="token keyword">end</span><span class="token punctuation">;</span></code></pre>
+begin 
+ -- 业务逻辑
+end;</code></pre>
 
 <p>在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用</p>
 <h2 id="1-2-在plsql种执行plsql代码块"><a href="#1-2-在plsql种执行plsql代码块" class="headerlink" title="1.2 在plsql种执行plsql代码块"></a>1.2 在plsql种执行plsql代码块</h2><p>如何在sqlplus中执行plsql代码?</p>
 <p>登录sqlplus就可以直接输入自己的代码，然后<code>end;</code>结束代码块，并且接着输入<code>/</code>,这时候sqlplus解释器就可以执行代码了。<br>但是有一点需要明确，如果你的代码块是以<code>declare</code>开头的，那么就会直接输出到屏幕</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">sql</span><span class="token operator">></span> <span class="token keyword">begin</span>
-DBMS_OUTPUT<span class="token punctuation">.</span>put_line<span class="token punctuation">(</span><span class="token string">"hello world"</span><span class="token punctuation">)</span>
-<span class="token keyword">end</span><span class="token punctuation">;</span>
-<span class="token operator">/</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">sql&gt; begin
+DBMS_OUTPUT.put_line(&quot;hello world&quot;)
+end;
+&#x2F;</code></pre>
 
 <p>但是如果你想创建package,function,procedure,可以使用如下语句，方便后面的调用</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">CREATE</span> <span class="token operator">OR</span> <span class="token keyword">REPLACE</span> <span class="token keyword">PROCEDURE</span> hello_world <span class="token keyword">AS</span> 
- <span class="token keyword">BEGIN</span> 
- DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'Hello World'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">END</span><span class="token punctuation">;</span> 
- <span class="token operator">/</span> </code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; CREATE OR REPLACE PROCEDURE hello_world AS 
+ BEGIN 
+ DBMS_OUTPUT.PUT_LINE(&#39;Hello World&#39;); 
+ END; 
+ &#x2F; </code></pre>
 
 <h2 id="1-3-store-code-in-script"><a href="#1-3-store-code-in-script" class="headerlink" title="1.3 store code in script"></a>1.3 store code in script</h2><p>如果你想通过sql脚本执行代码，该如何运行？</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SET</span> SERVEROUTPUT <span class="token keyword">ON</span><span class="token punctuation">;</span>
-<span class="token keyword">DECLARE</span> 
- counter NUMBER<span class="token punctuation">;</span>
-<span class="token keyword">BEGIN</span> 
-  <span class="token keyword">FOR</span> counter <span class="token operator">IN</span> REVERSE <span class="token number">0.</span><span class="token number">.10</span> <span class="token keyword">LOOP</span> 
-  DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE <span class="token punctuation">(</span>counter<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-  <span class="token keyword">END</span> <span class="token keyword">LOOP</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span>
-<span class="token operator">/</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SET SERVEROUTPUT ON;
+DECLARE 
+ counter NUMBER;
+BEGIN 
+  FOR counter IN REVERSE 0..10 LOOP 
+  DBMS_OUTPUT.PUT_LINE (counter); 
+  END LOOP; 
+END;
+&#x2F;</code></pre>
 <p>你可以保存你的plsql代码在脚本里,重要一步是要保证你的文件扩展名是<code>.sql</code><br>SQL Developer supports a number of additionalextensions for more specific types of PL&#x2F;SQL. </p>
 <h2 id="1-4-执行你的脚本"><a href="#1-4-执行你的脚本" class="headerlink" title="1.4 执行你的脚本"></a>1.4 执行你的脚本</h2><p>登录sqlplus，然后跳(Traverse)到你的脚本目录</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">@绝对路径
 @相对路径
-sqlplus username<span class="token operator">/</span>password<span class="token variable">@database</span> my_stored_script<span class="token punctuation">.</span><span class="token keyword">sql</span> </code></pre>
+sqlplus username&#x2F;password@database my_stored_script.sql </code></pre>
 
 <h2 id="1-5-接受用户的输入从键盘中"><a href="#1-5-接受用户的输入从键盘中" class="headerlink" title="1.5 接受用户的输入从键盘中"></a>1.5 接受用户的输入从键盘中</h2><p>sqlplus使用&amp;符号来接受来自键盘的输入</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
- emp_count NUMBER<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
- <span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> 
- <span class="token keyword">INTO</span> emp_count 
- <span class="token keyword">FROM</span> employees 
- <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token operator">&amp;</span>department_id<span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span> </code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ emp_count NUMBER; 
+BEGIN 
+ SELECT count(*) 
+ INTO emp_count 
+ FROM employees 
+ WHERE department_id &#x3D; &amp;department_id; 
+END; </code></pre>
 
 <p>但是如果你想从键盘接受一个输入，但是后面又想继续使用，则可以使用如下方法</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
- emp_count NUMBER<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-  <span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> 
-  <span class="token keyword">INTO</span> emp_count 
-  <span class="token keyword">FROM</span> employees 
-  <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token operator">&amp;&amp;</span>department_id<span class="token punctuation">;</span> 
-  DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'The employee count is: '</span> <span class="token operator">||</span> emp_count <span class="token operator">||</span> 
-  <span class="token string">' for the department with an ID of: '</span> <span class="token operator">||</span> <span class="token operator">&amp;</span>department_id<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ emp_count NUMBER; 
+BEGIN 
+  SELECT count(*) 
+  INTO emp_count 
+  FROM employees 
+  WHERE department_id &#x3D; &amp;&amp;department_id; 
+  DBMS_OUTPUT.PUT_LINE(&#39;The employee count is: &#39; || emp_count || 
+  &#39; for the department with an ID of: &#39; || &amp;department_id); 
+END;
 </code></pre>
 
 <p>另外还有一种方法就是定义变量来承接从键盘来的输入,但是要注意这个变量定义的类型,如果是numeric类型的，如果是varchar2类型则需要用<code>单引号</code>,见如下代码</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span> 
-    <span class="token keyword">first</span> varchar2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    <span class="token keyword">last</span> varchar2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    emp_last VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span> :<span class="token operator">=</span> <span class="token string">'&amp;last_name'</span><span class="token punctuation">;</span> 
-    emp_count NUMBER<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-    <span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> 
-    <span class="token keyword">INTO</span> emp_count 
-    <span class="token keyword">FROM</span> employees 
-    <span class="token keyword">WHERE</span> last_name <span class="token operator">=</span> emp_last<span class="token punctuation">;</span> 
- <span class="token keyword">IF</span> emp_count <span class="token operator">></span> <span class="token number">1</span> <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'More than 1 employee exists with that name.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">ELSE</span> 
-    <span class="token keyword">SELECT</span> first_name<span class="token punctuation">,</span> last_name 
-    <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span> 
-    <span class="token keyword">FROM</span> employees 
-    <span class="token keyword">WHERE</span> last_name <span class="token operator">=</span> emp_last<span class="token punctuation">;</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'The matching employee is: '</span> <span class="token operator">||</span> 
-    <span class="token keyword">first</span> <span class="token operator">||</span> <span class="token string">' '</span> <span class="token operator">||</span> <span class="token keyword">last</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+    first varchar2(20); 
+    last varchar2(25); 
+    emp_last VARCHAR2(25) :&#x3D; &#39;&amp;last_name&#39;; 
+    emp_count NUMBER; 
+BEGIN 
+    SELECT count(*) 
+    INTO emp_count 
+    FROM employees 
+    WHERE last_name &#x3D; emp_last; 
+ IF emp_count &gt; 1 THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;More than 1 employee exists with that name.&#39;); 
+ ELSE 
+    SELECT first_name, last_name 
+    INTO first, last 
+    FROM employees 
+    WHERE last_name &#x3D; emp_last; 
+    DBMS_OUTPUT.PUT_LINE(&#39;The matching employee is: &#39; || 
+    first || &#39; &#39; || last); 
+ END IF; 
 EXCEPTION 
-    <span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'Please enter a different last name.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span> </code></pre>
+    WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;Please enter a different last name.&#39;); 
+END; </code></pre>
 
 <h2 id="1-6-Displaying-Results-in-SQL-Plus"><a href="#1-6-Displaying-Results-in-SQL-Plus" class="headerlink" title="1.6 Displaying Results in SQL*Plus"></a>1.6 Displaying Results in SQL*Plus</h2><p><code>SET SERVEROUTPUT ON</code> is issued, then the default buffer size is 20,000 bytes.<br>Any content that surpasses that size will be cut off. To increase the buffer, simply set the size of buffer<br>you’d like to use when turning the SERVEROUTPUT on: </p>
 <h2 id="1-7-Commenting-Your-Code"><a href="#1-7-Commenting-Your-Code" class="headerlink" title="1.7 Commenting Your Code"></a>1.7 Commenting Your Code</h2><h2 id="1-8-Referencing-a-Block-of-Code"><a href="#1-8-Referencing-a-Block-of-Code" class="headerlink" title="1.8 Referencing a Block of Code"></a>1.8 Referencing a Block of Code</h2><p>如何引用一个代码块?</p>
 <p>给一个代码块添加label标签,比如下面的代码</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-<span class="token operator">&lt;&lt;</span>dept_block<span class="token operator">>></span>
-<span class="token keyword">DECLARE</span> 
-  dept_name varchar2<span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-  <span class="token keyword">SELECT</span> department_name 
-  <span class="token keyword">INTO</span> dept_name 
-  <span class="token keyword">FROM</span> departments 
-  <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token number">230</span><span class="token punctuation">;</span>
-  DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span>dept_name<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">END</span> dept_block<span class="token punctuation">;</span>
+&lt;&lt;dept_block&gt;&gt;
+DECLARE 
+  dept_name varchar2(30); 
+BEGIN 
+  SELECT department_name 
+  INTO dept_name 
+  FROM departments 
+  WHERE department_id &#x3D; 230;
+  DBMS_OUTPUT.PUT_LINE(dept_name);
+END dept_block;
 </code></pre>
 
 <h2 id="1-9-Referring-to-Variables-from-Nested-Blocks"><a href="#1-9-Referring-to-Variables-from-Nested-Blocks" class="headerlink" title="1.9. Referring to Variables from Nested Blocks"></a>1.9. Referring to Variables from Nested Blocks</h2><p>如果code block是嵌套关系那么该如何使用具有相同名字的变量,可以使用label来区分不同的变量名字</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token operator">&lt;&lt;</span>outer_block<span class="token operator">>></span>
-<span class="token keyword">DECLARE</span>
-  mgr_id NUMBER<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span> :<span class="token operator">=</span> <span class="token string">'&amp;current_manager_id'</span><span class="token punctuation">;</span>
-  dept_count number :<span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token keyword">BEGIN</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">&lt;&lt;outer_block&gt;&gt;
+DECLARE
+  mgr_id NUMBER(6) :&#x3D; &#39;&amp;current_manager_id&#39;;
+  dept_count number :&#x3D; 0;
+BEGIN
 
-<span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span>
-    <span class="token keyword">INTO</span> dept_count 
-    <span class="token keyword">FROM</span> departments 
-    <span class="token keyword">WHERE</span> manager_id <span class="token operator">=</span> outer_block<span class="token punctuation">.</span>mgr_id<span class="token punctuation">;</span>
+SELECT count(*)
+    INTO dept_count 
+    FROM departments 
+    WHERE manager_id &#x3D; outer_block.mgr_id;
 
- <span class="token keyword">IF</span> dept_count <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">THEN</span> 
-    <span class="token operator">&lt;&lt;</span>inner_block<span class="token operator">>></span> 
-    <span class="token keyword">DECLARE</span> 
-      dept_name VARCHAR2<span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-      mgr_id NUMBER<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span>:<span class="token operator">=</span> <span class="token string">'&amp;new_manager_id'</span><span class="token punctuation">;</span> 
-    <span class="token keyword">BEGIN</span> 
-    <span class="token keyword">SELECT</span> department_name 
-    <span class="token keyword">INTO</span> dept_name 
-    <span class="token keyword">FROM</span> departments 
-    <span class="token keyword">WHERE</span> manager_id <span class="token operator">=</span> outer_block<span class="token punctuation">.</span>mgr_id<span class="token punctuation">;</span> 
+ IF dept_count &gt; 0 THEN 
+    &lt;&lt;inner_block&gt;&gt; 
+    DECLARE 
+      dept_name VARCHAR2(30); 
+      mgr_id NUMBER(6):&#x3D; &#39;&amp;new_manager_id&#39;; 
+    BEGIN 
+    SELECT department_name 
+    INTO dept_name 
+    FROM departments 
+    WHERE manager_id &#x3D; outer_block.mgr_id; 
 
-    <span class="token keyword">UPDATE</span> departments 
-    <span class="token keyword">SET</span> manager_id <span class="token operator">=</span> inner_block<span class="token punctuation">.</span>mgr_id 
-    <span class="token keyword">WHERE</span> manager_id <span class="token operator">=</span> outer_block<span class="token punctuation">.</span>mgr_id<span class="token punctuation">;</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE 
-    <span class="token punctuation">(</span><span class="token string">'Department manager ID has been changed for '</span> <span class="token operator">||</span> dept_name<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    <span class="token keyword">END</span> inner_block<span class="token punctuation">;</span> 
- <span class="token keyword">ELSE</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'There are no departments listed for the manager'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span> 
+    UPDATE departments 
+    SET manager_id &#x3D; inner_block.mgr_id 
+    WHERE manager_id &#x3D; outer_block.mgr_id; 
+    DBMS_OUTPUT.PUT_LINE 
+    (&#39;Department manager ID has been changed for &#39; || dept_name); 
+    END inner_block; 
+ ELSE 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); 
+ END IF; 
 EXCEPTION 
- <span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'There are no departments listed for the manager'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span> outer_block<span class="token punctuation">;</span> </code></pre>
+ WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); 
+END outer_block; </code></pre>
 
 <p>但是inner block创建的变量，outside block是不会读取到的,外部块变量在内部块中是可见的，而不需要完全限定名称，并且不需要块标签</p>
 <h2 id="1-10-Ignoring-Substitution-Variables"><a href="#1-10-Ignoring-Substitution-Variables" class="headerlink" title="1.10. Ignoring Substitution Variables"></a>1.10. Ignoring Substitution Variables</h2><p>转义那些sqlplus使用的特殊字符</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SET</span> <span class="token keyword">ESCAPE</span> <span class="token string">'\' 
-SQL> INSERT INTO DEPARTMENTS VALUES( 
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; SET ESCAPE &#39;\&#39; 
+SQL&gt; INSERT INTO DEPARTMENTS VALUES( 
   departments_seq.nextval, 
-  '</span>Shipping \<span class="token operator">&amp;</span> Receiving'<span class="token punctuation">,</span> 
-  <span class="token boolean">null</span><span class="token punctuation">,</span> 
- <span class="token boolean">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+  &#39;Shipping \&amp; Receiving&#39;, 
+  null, 
+ null);</code></pre>
 
 <p>还有另外一种</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SET</span> DEFINE <span class="token keyword">OFF</span>
-<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> DEPARTMENTS <span class="token keyword">VALUES</span><span class="token punctuation">(</span> 
-departments_seq<span class="token punctuation">.</span>nextval<span class="token punctuation">,</span> 
-<span class="token string">'Importing &amp; Exporting'</span><span class="token punctuation">,</span> 
-<span class="token boolean">null</span><span class="token punctuation">,</span> 
-<span class="token boolean">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; SET DEFINE OFF
+INSERT INTO DEPARTMENTS VALUES( 
+departments_seq.nextval, 
+&#39;Importing &amp; Exporting&#39;, 
+null, 
+null); 
 </code></pre>
 
 <h2 id="1-11-Changing-the-Substitution-Variable-Character"><a href="#1-11-Changing-the-Substitution-Variable-Character" class="headerlink" title="1.11. Changing the Substitution Variable Character"></a>1.11. Changing the Substitution Variable Character</h2><p>如果你对改变替换变量符号(&amp;)为其他的符号</p>
 <p>可以使用<code>set define ^</code>, 你也可以使用任意其他的符号来替换</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SET</span> DEFINE <span class="token operator">^</span>
-<span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SELECT</span> department_name 
-     <span class="token keyword">FROM</span> departments 
-     <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token operator">^</span>dept_id<span class="token punctuation">;</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; SET DEFINE ^
+SQL&gt; SELECT department_name 
+     FROM departments 
+     WHERE department_id &#x3D; ^dept_id;</code></pre>
 
 <h2 id="1-12-Creating-a-Variable-to-Match-a-Database-Column-Type"><a href="#1-12-Creating-a-Variable-to-Match-a-Database-Column-Type" class="headerlink" title="1.12. Creating a Variable to Match a Database Column Type"></a>1.12. Creating a Variable to Match a Database Column Type</h2><p>如果向查数据库中某一个表的数据，该如何将查询结果赋值给变量呢？<br>可以使用<code>%type</code>关键字,会将一列的数据赋值给变量,而<code>%rowtype</code>则是返回一列的数据给变量</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-<span class="token keyword">DECLARE</span>
- dept_name departments<span class="token punctuation">.</span>department_name<span class="token operator">%</span><span class="token keyword">TYPE</span><span class="token punctuation">;</span> 
- dept_id NUMBER<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span> :<span class="token operator">=</span> <span class="token operator">&amp;</span>department_id<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
- <span class="token keyword">SELECT</span> department_name 
- <span class="token keyword">INTO</span> dept_name 
- <span class="token keyword">FROM</span> departments 
- <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> dept_id<span class="token punctuation">;</span> 
- DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'The department with the given ID is: '</span> <span class="token operator">||</span> dept_name<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+DECLARE
+ dept_name departments.department_name%TYPE; 
+ dept_id NUMBER(6) :&#x3D; &amp;department_id; 
+BEGIN 
+ SELECT department_name 
+ INTO dept_name 
+ FROM departments 
+ WHERE department_id &#x3D; dept_id; 
+ DBMS_OUTPUT.PUT_LINE(&#39;The department with the given ID is: &#39; || dept_name); 
 EXCEPTION 
- <span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
- DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'No department for the given ID'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span></code></pre>
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE(&#39;No department for the given ID&#39;); 
+END;</code></pre>
 
 <h1 id="2-基础sql"><a href="#2-基础sql" class="headerlink" title="2.基础sql"></a>2.基础sql</h1><h2 id="2-1-Retrieving-a-Single-Row-from-the-Database"><a href="#2-1-Retrieving-a-Single-Row-from-the-Database" class="headerlink" title="2.1 Retrieving a Single Row from the Database"></a>2.1 Retrieving a Single Row from the Database</h2><p><strong>problem</strong></p>
 <p>You are interested in returning one row from a database table via a query that searches for an exact<br>match.</p>
 <p><strong>solution 1</strong><br>你可以使用<code>select ... into ...</code>语法</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
-    <span class="token keyword">first</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">-- varchar2(20)一定是要兼容的数据库表字段的</span>
-    <span class="token keyword">last</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    email VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-    <span class="token keyword">SELECT</span> first_name<span class="token punctuation">,</span> last_name<span class="token punctuation">,</span> email 
-    <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span><span class="token punctuation">,</span> email 
-    <span class="token keyword">FROM</span> employees 
-    <span class="token keyword">WHERE</span> employee_id <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">;</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span> 
-    <span class="token string">'Employee Information for ID: '</span> <span class="token operator">||</span> <span class="token keyword">first</span> <span class="token operator">||</span> <span class="token string">' '</span> <span class="token operator">||</span> <span class="token keyword">last</span> <span class="token operator">||</span> <span class="token string">' - '</span> <span class="token operator">||</span> email<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+    first VARCHAR2(20);  -- varchar2(20)一定是要兼容的数据库表字段的
+    last VARCHAR2(25); 
+    email VARCHAR2(25); 
+BEGIN 
+    SELECT first_name, last_name, email 
+    INTO first, last, email 
+    FROM employees 
+    WHERE employee_id &#x3D; 100; 
+    DBMS_OUTPUT.PUT_LINE( 
+    &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); 
 EXCEPTION 
-<span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'No employee matches the given ID'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">WHEN</span> TOO_MANY_ROWS <span class="token keyword">THEN</span>
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'More than one employee matches the given ID'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span> </code></pre>
+WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;No employee matches the given ID&#39;); 
+WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE(&#39;More than one employee matches the given ID&#39;); 
+END; </code></pre>
 
 <p><strong>solution 2</strong></p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
- <span class="token keyword">CURSOR</span> emp_cursor <span class="token operator">IS</span> 
- <span class="token keyword">SELECT</span> first_name<span class="token punctuation">,</span> last_name<span class="token punctuation">,</span> email 
- <span class="token keyword">FROM</span> employees 
- <span class="token keyword">WHERE</span> employee_id <span class="token operator">=</span> <span class="token operator">&amp;</span>emp_id<span class="token punctuation">;</span> 
- <span class="token keyword">first</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">last</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- email VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
- <span class="token keyword">OPEN</span> emp_cursor<span class="token punctuation">;</span> 
- <span class="token keyword">FETCH</span> emp_cursor <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span><span class="token punctuation">,</span> email<span class="token punctuation">;</span> 
- <span class="token keyword">IF</span> emp_cursor<span class="token operator">%</span>NOTFOUND <span class="token keyword">THEN</span> 
-      RAISE NO_DATA_FOUND<span class="token punctuation">;</span> 
- <span class="token keyword">ELSE</span> 
- <span class="token comment">-- Perform second fetch to see if more than one row is returned </span>
-    <span class="token keyword">FETCH</span> emp_cursor <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span><span class="token punctuation">,</span> email<span class="token punctuation">;</span> 
-    <span class="token keyword">IF</span> emp_cursor<span class="token operator">%</span>FOUND <span class="token keyword">THEN</span> 
-      RAISE TOO_MANY_ROWS<span class="token punctuation">;</span> 
-    <span class="token keyword">ELSE</span> 
-      DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span> 
-      <span class="token string">'Employee Information for ID: '</span> <span class="token operator">||</span> <span class="token keyword">first</span> <span class="token operator">||</span> <span class="token string">' '</span> <span class="token operator">||</span> <span class="token keyword">last</span> <span class="token operator">||</span> <span class="token string">' - '</span> <span class="token operator">||</span> email<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-      <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span>
- <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span> 
-<span class="token keyword">CLOSE</span> emp_cursor<span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ CURSOR emp_cursor IS 
+ SELECT first_name, last_name, email 
+ FROM employees 
+ WHERE employee_id &#x3D; &amp;emp_id; 
+ first VARCHAR2(20); 
+ last VARCHAR2(25); 
+ email VARCHAR2(25); 
+BEGIN 
+ OPEN emp_cursor; 
+ FETCH emp_cursor INTO first, last, email; 
+ IF emp_cursor%NOTFOUND THEN 
+      RAISE NO_DATA_FOUND; 
+ ELSE 
+ -- Perform second fetch to see if more than one row is returned 
+    FETCH emp_cursor INTO first, last, email; 
+    IF emp_cursor%FOUND THEN 
+      RAISE TOO_MANY_ROWS; 
+    ELSE 
+      DBMS_OUTPUT.PUT_LINE( 
+      &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); 
+      END IF;
+ END IF; 
+CLOSE emp_cursor; 
 </code></pre>
 
 <p><strong>how it works</strong></p>
@@ -954,16 +945,7 @@ EXCEPTION
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
 <!--SCRIPTS END-->
 
