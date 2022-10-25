@@ -1,0 +1,1098 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Eden">
+    <title>concurreny-map代码阅读 - Eden</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"摘要学习下别人如何写的golang的concurrent map实现并于官方版本的进行对比。接下来的内容来自于作者的readme—-在Go 1.9之前，go语言标准库中并没有实现并发map。在Go 1.9中，引入了sync.Map。新的sync.Map与此concurrent-map有几个关键区别。标准库中的sync.Map是专为append-only场景设计的。因此，如果您想将Map用于一个类似内存数据库，那么使用我们的版本可能会受益。你可以在golang repo上读到更多，这里 and 这里译注:sync.Map在读多写少性能比较好，否则并发性能很差\n第三方conrrency map理解\n源代码地址 : https://github.com/orcaman/concurrent-map\n\n\ngolang-concurrency-map\n\npackage cmap\n\nimport (\n\t&quot;encoding&#x2F;json&quot;\n\t&quot;sync&quot;\n)\n\nvar SHARD_COUNT &#x3D; 32\n\n\n&#x2F;&#x2F; A &quot;thread&quot; safe string to anything map.\ntype ConcurrentMapShared[V any] struct &#123;\n\titems        map[string]V\n\tsync.RWMutex &#x2F;&#x2F; Read Write mutex, guards access to internal \n\n&#125;\n\n&#x2F;&#x2F; A &quot;thread&quot; safe map of type string:Anything.\n&#x2F;&#x2F; To avoid lock bottlenecks this map is dived to several (SHARD_COUNT) map shards.\ntype ConcurrentMap[V any] []*ConcurrentMapShared[V]\n\n\n&#x2F;&#x2F; 创建了一个长度32的切片\n&#x2F;&#x2F; Creates a new concurrent map.\nfunc New[V any]() ConcurrentMap[V] &#123;\n\tm :&#x3D; make(ConcurrentMap[V], SHARD_COUNT)\n\tfor i :&#x3D; 0; i &lt; SHARD_COUNT; i++ &#123;\n\t\tm[i] &#x3D; &amp;ConcurrentMapShared[V]&#123;items: make(map[string]V)&#125;\n\t&#125;\n\treturn m\n&#125;\n\n&#x2F;&#x2F; GetShard returns shard under given key\nfunc (m ConcurrentMap[V]) GetShard(key string) *ConcurrentMapShared[V] &#123;\n\treturn m[uint(fnv32(key))%uint(SHARD_COUNT)]\n&#125;\n&#x2F;&#x2F; batch赋值数据\nfunc (m ConcurrentMap[V]) MSet(data map[string]V) &#123;\n\tfor key, value :&#x3D; range data &#123;\n\t\tshard :&#x3D; m.GetShard(key)\n\t\tshard.Lock()\n\t\tshard.items[key] &#x3D; value\n\t\tshard.Unlock()\n\t&#125;\n&#125;\n\n&#x2F;&#x2F; Sets the given value under the specified key.\nfunc (m ConcurrentMap[V]) Set(key string, value V) &#123;\n\t&#x2F;&#x2F; Get map shard.\n\tshard :&#x3D; m.GetShard(key)\n\tshard.Lock()\n\tshard.items[key] &#x3D; value\n\tshard.Unlock()\n&#125;\n\n&#x2F;&#x2F; Callback to return new element to be inserted into the map\n&#x2F;&#x2F; It is called while lock is held, therefore it MUST NOT\n&#x2F;&#x2F; try to access other keys in same map, as it can lead to deadlock since\n&#x2F;&#x2F; Go sync.RWLock is not reentrant\ntype UpsertCb[V any] func(exist bool, valueInMap V, newValue V) V\n\n&#x2F;&#x2F; Insert or Update - updates existing element or inserts a new one using UpsertCb\n&#x2F;&#x2F; 有就更新，没有就插入\nfunc (m ConcurrentMap[V]) Upsert(key string, value V, cb UpsertCb[V]) (res V) &#123;\n\tshard :&#x3D; m.GetShard(key)\n\tshard.Lock()\n\tv, ok :&#x3D; shard.items[key]\n\tres &#x3D; cb(ok, v, value)\n\tshard.items[key] &#x3D; res\n\tshard.Unlock()\n\treturn res\n&#125;\n\n&#x2F;&#x2F; Sets the given value under the specified key if no value was associated with it.\nfunc (m ConcurrentMap[V]) SetIfAbsent(key string, value V) bool &#123;\n\t&#x2F;&#x2F; Get map shard.\n\tshard :&#x3D; m.GetShard(key)\n\tshard.Lock()\n\t_, ok :&#x3D; shard.items[key]\n\tif !ok &#123;\n\t\tshard.items[key] &#x3D; value\n\t&#125;\n\tshard.Unlock()\n\treturn !ok\n&#125;\n\n&#x2F;&#x2F; Get retrieves an element from map under given key.\nfunc (m ConcurrentMap[V]) Get(key string) (V, bool) &#123;\n\t&#x2F;&#x2F; Get shard\n\tshard :&#x3D; m.GetShard(key)\n\tshard.RLock()\n\t&#x2F;&#x2F; Get item from shard.\n\tval, ok :&#x3D; shard.items[key]\n\tshard.RUnlock()\n\treturn val, ok\n&#125;\n\n&#x2F;&#x2F; Count returns the number of elements within the map.\nfunc (m ConcurrentMap[V]) Count() int &#123;\n\tcount :&#x3D; 0\n\tfor i :&#x3D; 0; i &lt; SHARD_COUNT; i++ &#123;\n\t\tshard :&#x3D; m[i]\n\t\tshard.RLock()\n\t\tcount +&#x3D; len(shard.items)\n\t\tshard.RUnlock()\n\t&#125;\n\treturn count\n&#125;\n\n&#x2F;&#x2F; Looks up an item under specified key\nfunc (m ConcurrentMap[V]) Has(key string) bool &#123;\n\t&#x2F;&#x2F; Get shard\n\tshard :&#x3D; m.GetShard(key)\n\tshard.RLock()\n\t&#x2F;&#x2F; See if element is within shard.\n\t_, ok :&#x3D; shard.items[key]\n\tshard.RUnlock()\n\treturn ok\n&#125;\n\n&#x2F;&#x2F; Remove removes an element from the map.\nfunc (m ConcurrentMap[V]) Remove(key string) &#123;\n\t&#x2F;&#x2F; Try to get shard.\n\tshard :&#x3D; m.GetShard(key)\n\tshard.Lock()\n\tdelete(shard.items, key)\n\tshard.Unlock()\n&#125;\n\n&#x2F;&#x2F; RemoveCb is a callback executed in a map.RemoveCb() call, while Lock is held\n&#x2F;&#x2F; If returns true, the element will be removed from the map\ntype RemoveCb[V any] func(key string, v V, exists bool) bool\n\n&#x2F;&#x2F; RemoveCb locks the shard containing the key, retrieves its current value and calls the callback with those params\n&#x2F;&#x2F; If callback returns true and element exists, it will remove it from the map\n&#x2F;&#x2F; Returns the value returned by the callback (even if element was not present in the map)\nfunc (m ConcurrentMap[V]) RemoveCb(key string, cb RemoveCb[V]) bool &#123;\n\t&#x2F;&#x2F; Try to get shard.\n\tshard :&#x3D; m.GetShard(key)\n\tshard.Lock()\n\tv, ok :&#x3D; shard.items[key]\n\tremove :&#x3D; cb(key, v, ok)\n\tif remove &amp;&amp; ok &#123;\n\t\tdelete(shard.items, key)\n\t&#125;\n\tshard.Unlock()\n\treturn remove\n&#125;\n\n&#x2F;&#x2F; Pop removes an element from the map and returns it\nfunc (m ConcurrentMap[V]) Pop(key string) (v V, exists bool) &#123;\n\t&#x2F;&#x2F; Try to get shard.\n\tshard :&#x3D; m.GetShard(key)\n\tshard.Lock()\n\tv, exists &#x3D; shard.items[key]\n\tdelete(shard.items, key)\n\tshard.Unlock()\n\treturn v, exists\n&#125;\n\n&#x2F;&#x2F; IsEmpty checks if map is empty.\nfunc (m ConcurrentMap[V]) IsEmpty() bool &#123;\n\treturn m.Count() &#x3D;&#x3D; 0\n&#125;\n\n&#x2F;&#x2F; Used by the Iter &amp; IterBuffered functions to wrap two variables together over a channel,\ntype Tuple[V any] struct &#123;\n\tKey string\n\tVal V\n&#125;\n\n&#x2F;&#x2F; Iter returns an iterator which could be used in a for range loop.\n&#x2F;&#x2F;\n&#x2F;&#x2F; Deprecated: using IterBuffered() will get a better performence\nfunc (m ConcurrentMap[V]) Iter() &lt;-chan Tuple[V] &#123;\n\tchans :&#x3D; snapshot(m)\n\tch :&#x3D; make(chan Tuple[V])\n\tgo fanIn(chans, ch)\n\treturn ch\n&#125;\n\n&#x2F;&#x2F; IterBuffered returns a buffered iterator which could be used in a for range loop.\nfunc (m ConcurrentMap[V]) IterBuffered() &lt;-chan Tuple[V] &#123;\n\tchans :&#x3D; snapshot(m)\n\ttotal :&#x3D; 0\n\tfor _, c :&#x3D; range chans &#123;\n\t\ttotal +&#x3D; cap(c)\n\t&#125;\n\tch :&#x3D; make(chan Tuple[V], total)\n\tgo fanIn(chans, ch)\n\treturn ch\n&#125;\n\n&#x2F;&#x2F; Clear removes all items from map.\nfunc (m ConcurrentMap[V]) Clear() &#123;\n\tfor item :&#x3D; range m.IterBuffered() &#123;\n\t\tm.Remove(item.Key)\n\t&#125;\n&#125;\n\n&#x2F;&#x2F; Returns a array of channels that contains elements in each shard,\n&#x2F;&#x2F; which likely takes a snapshot of &#96;m&#96;.\n&#x2F;&#x2F; It returns once the size of each buffered channel is determined,\n&#x2F;&#x2F; before all the channels are populated using goroutines.\nfunc snapshot[V any](m ConcurrentMap[V]) (chans []chan Tuple[V]) &#123;\n\t&#x2F;&#x2F;When you access map items before initializing.\n\tif len(m) &#x3D;&#x3D; 0 &#123;\n\t\tpanic(&#96;cmap.ConcurrentMap is not initialized. Should run New() before usage.&#96;)\n\t&#125;\n\tchans &#x3D; make([]chan Tuple[V], SHARD_COUNT)\n\twg :&#x3D; sync.WaitGroup&#123;&#125;\n\twg.Add(SHARD_COUNT)\n\t&#x2F;&#x2F; Foreach shard.\n\tfor index, shard :&#x3D; range m &#123;\n\t\tgo func(index int, shard *ConcurrentMapShared[V]) &#123;\n\t\t\t&#x2F;&#x2F; Foreach key, value pair.\n\t\t\tshard.RLock()\n\t\t\tchans[index] &#x3D; make(chan Tuple[V], len(shard.items))\n\t\t\twg.Done()\n\t\t\tfor key, val :&#x3D; range shard.items &#123;\n\t\t\t\tchans[index] &lt;- Tuple[V]&#123;key, val&#125;\n\t\t\t&#125;\n\t\t\tshard.RUnlock()\n\t\t\tclose(chans[index])\n\t\t&#125;(index, shard)\n\t&#125;\n\twg.Wait()\n\treturn chans\n&#125;\n\n&#x2F;&#x2F; fanIn reads elements from channels &#96;chans&#96; into channel &#96;out&#96;\nfunc fanIn[V any](chans []chan Tuple[V], out chan Tuple[V]) &#123;\n\twg :&#x3D; sync.WaitGroup&#123;&#125;\n\twg.Add(len(chans))\n\tfor _, ch :&#x3D; range chans &#123;\n\t\tgo func(ch chan Tuple[V]) &#123;\n\t\t\tfor t :&#x3D; range ch &#123;\n\t\t\t\tout &lt;- t\n\t\t\t&#125;\n\t\t\twg.Done()\n\t\t&#125;(ch)\n\t&#125;\n\twg.Wait()\n\tclose(out)\n&#125;\n\n&#x2F;&#x2F; Items returns all items as map[string]V\nfunc (m ConcurrentMap[V]) Items() map[string]V &#123;\n\ttmp :&#x3D; make(map[string]V)\n\n\t&#x2F;&#x2F; Insert items to temporary map.\n\tfor item :&#x3D; range m.IterBuffered() &#123;\n\t\ttmp[item.Key] &#x3D; item.Val\n\t&#125;\n\n\treturn tmp\n&#125;\n\n&#x2F;&#x2F; Iterator callbacalled for every key,value found in\n&#x2F;&#x2F; maps. RLock is held for all calls for a given shard\n&#x2F;&#x2F; therefore callback sess consistent view of a shard,\n&#x2F;&#x2F; but not across the shards\ntype IterCb[V any] func(key string, v V)\n\n&#x2F;&#x2F; Callback based iterator, cheapest way to read\n&#x2F;&#x2F; all elements in a map.\nfunc (m ConcurrentMap[V]) IterCb(fn IterCb[V]) &#123;\n\tfor idx :&#x3D; range m &#123;\n\t\tshard :&#x3D; (m)[idx]\n\t\tshard.RLock()\n\t\tfor key, value :&#x3D; range shard.items &#123;\n\t\t\tfn(key, value)\n\t\t&#125;\n\t\tshard.RUnlock()\n\t&#125;\n&#125;\n\n&#x2F;&#x2F; Keys returns all keys as []string\nfunc (m ConcurrentMap[V]) Keys() []string &#123;\n\tcount :&#x3D; m.Count()\n\tch :&#x3D; make(chan string, count)\n\tgo func() &#123;\n\t\t&#x2F;&#x2F; Foreach shard.\n\t\twg :&#x3D; sync.WaitGroup&#123;&#125;\n\t\twg.Add(SHARD_COUNT)\n\t\tfor _, shard :&#x3D; range m &#123;\n\t\t\tgo func(shard *ConcurrentMapShared[V]) &#123;\n\t\t\t\t&#x2F;&#x2F; Foreach key, value pair.\n\t\t\t\tshard.RLock()\n\t\t\t\tfor key :&#x3D; range shard.items &#123;\n\t\t\t\t\tch &lt;- key\n\t\t\t\t&#125;\n\t\t\t\tshard.RUnlock()\n\t\t\t\twg.Done()\n\t\t\t&#125;(shard)\n\t\t&#125;\n\t\twg.Wait()\n\t\tclose(ch)\n\t&#125;()\n\n\t&#x2F;&#x2F; Generate keys\n\tkeys :&#x3D; make([]string, 0, count)\n\tfor k :&#x3D; range ch &#123;\n\t\tkeys &#x3D; append(keys, k)\n\t&#125;\n\treturn keys\n&#125;\n\n&#x2F;&#x2F;Reviles ConcurrentMap &quot;private&quot; variables to json marshal.\nfunc (m ConcurrentMap[V]) MarshalJSON() ([]byte, error) &#123;\n\t&#x2F;&#x2F; Create a temporary map, which will hold all item spread across shards.\n\ttmp :&#x3D; make(map[string]V)\n\n\t&#x2F;&#x2F; Insert items to temporary map.\n\tfor item :&#x3D; range m.IterBuffered() &#123;\n\t\ttmp[item.Key] &#x3D; item.Val\n\t&#125;\n\treturn json.Marshal(tmp)\n&#125;\n\nfunc fnv32(key string) uint32 &#123;\n\thash :&#x3D; uint32(2166136261)\n\tconst prime32 &#x3D; uint32(16777619)\n\tkeyLength :&#x3D; len(key)\n\tfor i :&#x3D; 0; i &lt; keyLength; i++ &#123;\n\t\thash *&#x3D; prime32\n\t\thash ^&#x3D; uint32(key[i])\n\t&#125;\n\treturn hash\n&#125;\n\n&#x2F;&#x2F; Reverse process of Marshal.\nfunc (m *ConcurrentMap[V]) UnmarshalJSON(b []byte) (err error) &#123;\n \ttmp :&#x3D; make(map[string]V)\n\n \t&#x2F;&#x2F; Unmarshal into a single map.\n \tif err :&#x3D; json.Unmarshal(b, &amp;tmp); err !&#x3D; nil &#123;\n \t\treturn err\n \t&#125;\n\n \t&#x2F;&#x2F; foreach key,value pair in temporary map insert into our concurrent map.\n \tfor key, val :&#x3D; range tmp &#123;\n \t\tm.Set(key, val)\n \t&#125;\n\treturn nil\n&#125;\n\n\n\n总结\n\n通过这个concurrency-map学习了golang的泛型，golang具体泛型内容可以阅读对应的笔记\n说实话作者这种数据结构还是没太理解，不理解why，但是能看懂代码。应该先尝试试着了解数据结构\n\n","dateCreated":"2022-09-09T16:43:34+08:00","dateModified":"2022-09-10T14:18:57+08:00","datePublished":"2022-09-09T16:43:34+08:00","description":"","headline":"concurreny-map代码阅读","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/09/09/archive/golang_concurrency_map/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/09/09/archive/golang_concurrency_map/"}</script>
+    <meta name="description" content="摘要学习下别人如何写的golang的concurrent map实现并于官方版本的进行对比。接下来的内容来自于作者的readme—-在Go 1.9之前，go语言标准库中并没有实现并发map。在Go 1.9中，引入了sync.Map。新的sync.Map与此concurrent-map有几个关键区别。标准库中的sync.Map是专为append-only场景设计的。因此，如果您想将Map用于一个类似">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="concurreny-map代码阅读">
+<meta property="og:url" content="https://simonteo58.github.io/2022/09/09/archive/golang_concurrency_map/index.html">
+<meta property="og:site_name" content="Eden">
+<meta property="og:description" content="摘要学习下别人如何写的golang的concurrent map实现并于官方版本的进行对比。接下来的内容来自于作者的readme—-在Go 1.9之前，go语言标准库中并没有实现并发map。在Go 1.9中，引入了sync.Map。新的sync.Map与此concurrent-map有几个关键区别。标准库中的sync.Map是专为append-only场景设计的。因此，如果您想将Map用于一个类似">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-09-09T08:43:34.983Z">
+<meta property="article:modified_time" content="2022-09-10T06:18:57.744Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@nil">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/nil"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Eden
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture "
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Google +"
+                        >
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/mailto"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            concurreny-map代码阅读
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-09-09T16:43:34+08:00">
+	
+		    Sep 09, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/archive/">archive</a>, <a class="category-link" href="/categories/archive/golang/">golang</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>学习下别人如何写的golang的concurrent map实现并于官方版本的进行对比。接下来的内容来自于作者的readme—-在Go 1.9之前，go语言标准库中并没有实现并发<code>map</code>。在Go 1.9中，引入了<code>sync.Map</code>。新的<code>sync.Map</code>与此<code>concurrent-map</code>有几个关键区别。标准库中的<code>sync.Map</code>是专为<code>append-only</code>场景设计的。因此，如果您想将<code>Map</code>用于一个类似内存数据库，那么使用我们的版本可能会受益。你可以在golang repo上读到更多，<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/21035">这里</a> and <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/11063473/map-with-concurrent-access">这里</a><br><em><strong>译注:<code>sync.Map</code>在读多写少性能比较好，否则并发性能很差</strong></em></p>
+<h2 id="第三方conrrency-map理解"><a href="#第三方conrrency-map理解" class="headerlink" title="第三方conrrency map理解"></a>第三方conrrency map理解</h2><blockquote>
+<p>源代码地址 : <a target="_blank" rel="noopener" href="https://github.com/orcaman/concurrent-map">https://github.com/orcaman/concurrent-map</a></p>
+</blockquote>
+<details>
+<summary>golang-concurrency-map</summary>
+
+<pre class="language-golang" data-language="golang"><code class="language-golang">package cmap
+
+import (
+	&quot;encoding&#x2F;json&quot;
+	&quot;sync&quot;
+)
+
+var SHARD_COUNT &#x3D; 32
+
+
+&#x2F;&#x2F; A &quot;thread&quot; safe string to anything map.
+type ConcurrentMapShared[V any] struct &#123;
+	items        map[string]V
+	sync.RWMutex &#x2F;&#x2F; Read Write mutex, guards access to internal 
+
+&#125;
+
+&#x2F;&#x2F; A &quot;thread&quot; safe map of type string:Anything.
+&#x2F;&#x2F; To avoid lock bottlenecks this map is dived to several (SHARD_COUNT) map shards.
+type ConcurrentMap[V any] []*ConcurrentMapShared[V]
+
+
+&#x2F;&#x2F; 创建了一个长度32的切片
+&#x2F;&#x2F; Creates a new concurrent map.
+func New[V any]() ConcurrentMap[V] &#123;
+	m :&#x3D; make(ConcurrentMap[V], SHARD_COUNT)
+	for i :&#x3D; 0; i &lt; SHARD_COUNT; i++ &#123;
+		m[i] &#x3D; &amp;ConcurrentMapShared[V]&#123;items: make(map[string]V)&#125;
+	&#125;
+	return m
+&#125;
+
+&#x2F;&#x2F; GetShard returns shard under given key
+func (m ConcurrentMap[V]) GetShard(key string) *ConcurrentMapShared[V] &#123;
+	return m[uint(fnv32(key))%uint(SHARD_COUNT)]
+&#125;
+&#x2F;&#x2F; batch赋值数据
+func (m ConcurrentMap[V]) MSet(data map[string]V) &#123;
+	for key, value :&#x3D; range data &#123;
+		shard :&#x3D; m.GetShard(key)
+		shard.Lock()
+		shard.items[key] &#x3D; value
+		shard.Unlock()
+	&#125;
+&#125;
+
+&#x2F;&#x2F; Sets the given value under the specified key.
+func (m ConcurrentMap[V]) Set(key string, value V) &#123;
+	&#x2F;&#x2F; Get map shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	shard.items[key] &#x3D; value
+	shard.Unlock()
+&#125;
+
+&#x2F;&#x2F; Callback to return new element to be inserted into the map
+&#x2F;&#x2F; It is called while lock is held, therefore it MUST NOT
+&#x2F;&#x2F; try to access other keys in same map, as it can lead to deadlock since
+&#x2F;&#x2F; Go sync.RWLock is not reentrant
+type UpsertCb[V any] func(exist bool, valueInMap V, newValue V) V
+
+&#x2F;&#x2F; Insert or Update - updates existing element or inserts a new one using UpsertCb
+&#x2F;&#x2F; 有就更新，没有就插入
+func (m ConcurrentMap[V]) Upsert(key string, value V, cb UpsertCb[V]) (res V) &#123;
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	v, ok :&#x3D; shard.items[key]
+	res &#x3D; cb(ok, v, value)
+	shard.items[key] &#x3D; res
+	shard.Unlock()
+	return res
+&#125;
+
+&#x2F;&#x2F; Sets the given value under the specified key if no value was associated with it.
+func (m ConcurrentMap[V]) SetIfAbsent(key string, value V) bool &#123;
+	&#x2F;&#x2F; Get map shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	_, ok :&#x3D; shard.items[key]
+	if !ok &#123;
+		shard.items[key] &#x3D; value
+	&#125;
+	shard.Unlock()
+	return !ok
+&#125;
+
+&#x2F;&#x2F; Get retrieves an element from map under given key.
+func (m ConcurrentMap[V]) Get(key string) (V, bool) &#123;
+	&#x2F;&#x2F; Get shard
+	shard :&#x3D; m.GetShard(key)
+	shard.RLock()
+	&#x2F;&#x2F; Get item from shard.
+	val, ok :&#x3D; shard.items[key]
+	shard.RUnlock()
+	return val, ok
+&#125;
+
+&#x2F;&#x2F; Count returns the number of elements within the map.
+func (m ConcurrentMap[V]) Count() int &#123;
+	count :&#x3D; 0
+	for i :&#x3D; 0; i &lt; SHARD_COUNT; i++ &#123;
+		shard :&#x3D; m[i]
+		shard.RLock()
+		count +&#x3D; len(shard.items)
+		shard.RUnlock()
+	&#125;
+	return count
+&#125;
+
+&#x2F;&#x2F; Looks up an item under specified key
+func (m ConcurrentMap[V]) Has(key string) bool &#123;
+	&#x2F;&#x2F; Get shard
+	shard :&#x3D; m.GetShard(key)
+	shard.RLock()
+	&#x2F;&#x2F; See if element is within shard.
+	_, ok :&#x3D; shard.items[key]
+	shard.RUnlock()
+	return ok
+&#125;
+
+&#x2F;&#x2F; Remove removes an element from the map.
+func (m ConcurrentMap[V]) Remove(key string) &#123;
+	&#x2F;&#x2F; Try to get shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	delete(shard.items, key)
+	shard.Unlock()
+&#125;
+
+&#x2F;&#x2F; RemoveCb is a callback executed in a map.RemoveCb() call, while Lock is held
+&#x2F;&#x2F; If returns true, the element will be removed from the map
+type RemoveCb[V any] func(key string, v V, exists bool) bool
+
+&#x2F;&#x2F; RemoveCb locks the shard containing the key, retrieves its current value and calls the callback with those params
+&#x2F;&#x2F; If callback returns true and element exists, it will remove it from the map
+&#x2F;&#x2F; Returns the value returned by the callback (even if element was not present in the map)
+func (m ConcurrentMap[V]) RemoveCb(key string, cb RemoveCb[V]) bool &#123;
+	&#x2F;&#x2F; Try to get shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	v, ok :&#x3D; shard.items[key]
+	remove :&#x3D; cb(key, v, ok)
+	if remove &amp;&amp; ok &#123;
+		delete(shard.items, key)
+	&#125;
+	shard.Unlock()
+	return remove
+&#125;
+
+&#x2F;&#x2F; Pop removes an element from the map and returns it
+func (m ConcurrentMap[V]) Pop(key string) (v V, exists bool) &#123;
+	&#x2F;&#x2F; Try to get shard.
+	shard :&#x3D; m.GetShard(key)
+	shard.Lock()
+	v, exists &#x3D; shard.items[key]
+	delete(shard.items, key)
+	shard.Unlock()
+	return v, exists
+&#125;
+
+&#x2F;&#x2F; IsEmpty checks if map is empty.
+func (m ConcurrentMap[V]) IsEmpty() bool &#123;
+	return m.Count() &#x3D;&#x3D; 0
+&#125;
+
+&#x2F;&#x2F; Used by the Iter &amp; IterBuffered functions to wrap two variables together over a channel,
+type Tuple[V any] struct &#123;
+	Key string
+	Val V
+&#125;
+
+&#x2F;&#x2F; Iter returns an iterator which could be used in a for range loop.
+&#x2F;&#x2F;
+&#x2F;&#x2F; Deprecated: using IterBuffered() will get a better performence
+func (m ConcurrentMap[V]) Iter() &lt;-chan Tuple[V] &#123;
+	chans :&#x3D; snapshot(m)
+	ch :&#x3D; make(chan Tuple[V])
+	go fanIn(chans, ch)
+	return ch
+&#125;
+
+&#x2F;&#x2F; IterBuffered returns a buffered iterator which could be used in a for range loop.
+func (m ConcurrentMap[V]) IterBuffered() &lt;-chan Tuple[V] &#123;
+	chans :&#x3D; snapshot(m)
+	total :&#x3D; 0
+	for _, c :&#x3D; range chans &#123;
+		total +&#x3D; cap(c)
+	&#125;
+	ch :&#x3D; make(chan Tuple[V], total)
+	go fanIn(chans, ch)
+	return ch
+&#125;
+
+&#x2F;&#x2F; Clear removes all items from map.
+func (m ConcurrentMap[V]) Clear() &#123;
+	for item :&#x3D; range m.IterBuffered() &#123;
+		m.Remove(item.Key)
+	&#125;
+&#125;
+
+&#x2F;&#x2F; Returns a array of channels that contains elements in each shard,
+&#x2F;&#x2F; which likely takes a snapshot of &#96;m&#96;.
+&#x2F;&#x2F; It returns once the size of each buffered channel is determined,
+&#x2F;&#x2F; before all the channels are populated using goroutines.
+func snapshot[V any](m ConcurrentMap[V]) (chans []chan Tuple[V]) &#123;
+	&#x2F;&#x2F;When you access map items before initializing.
+	if len(m) &#x3D;&#x3D; 0 &#123;
+		panic(&#96;cmap.ConcurrentMap is not initialized. Should run New() before usage.&#96;)
+	&#125;
+	chans &#x3D; make([]chan Tuple[V], SHARD_COUNT)
+	wg :&#x3D; sync.WaitGroup&#123;&#125;
+	wg.Add(SHARD_COUNT)
+	&#x2F;&#x2F; Foreach shard.
+	for index, shard :&#x3D; range m &#123;
+		go func(index int, shard *ConcurrentMapShared[V]) &#123;
+			&#x2F;&#x2F; Foreach key, value pair.
+			shard.RLock()
+			chans[index] &#x3D; make(chan Tuple[V], len(shard.items))
+			wg.Done()
+			for key, val :&#x3D; range shard.items &#123;
+				chans[index] &lt;- Tuple[V]&#123;key, val&#125;
+			&#125;
+			shard.RUnlock()
+			close(chans[index])
+		&#125;(index, shard)
+	&#125;
+	wg.Wait()
+	return chans
+&#125;
+
+&#x2F;&#x2F; fanIn reads elements from channels &#96;chans&#96; into channel &#96;out&#96;
+func fanIn[V any](chans []chan Tuple[V], out chan Tuple[V]) &#123;
+	wg :&#x3D; sync.WaitGroup&#123;&#125;
+	wg.Add(len(chans))
+	for _, ch :&#x3D; range chans &#123;
+		go func(ch chan Tuple[V]) &#123;
+			for t :&#x3D; range ch &#123;
+				out &lt;- t
+			&#125;
+			wg.Done()
+		&#125;(ch)
+	&#125;
+	wg.Wait()
+	close(out)
+&#125;
+
+&#x2F;&#x2F; Items returns all items as map[string]V
+func (m ConcurrentMap[V]) Items() map[string]V &#123;
+	tmp :&#x3D; make(map[string]V)
+
+	&#x2F;&#x2F; Insert items to temporary map.
+	for item :&#x3D; range m.IterBuffered() &#123;
+		tmp[item.Key] &#x3D; item.Val
+	&#125;
+
+	return tmp
+&#125;
+
+&#x2F;&#x2F; Iterator callbacalled for every key,value found in
+&#x2F;&#x2F; maps. RLock is held for all calls for a given shard
+&#x2F;&#x2F; therefore callback sess consistent view of a shard,
+&#x2F;&#x2F; but not across the shards
+type IterCb[V any] func(key string, v V)
+
+&#x2F;&#x2F; Callback based iterator, cheapest way to read
+&#x2F;&#x2F; all elements in a map.
+func (m ConcurrentMap[V]) IterCb(fn IterCb[V]) &#123;
+	for idx :&#x3D; range m &#123;
+		shard :&#x3D; (m)[idx]
+		shard.RLock()
+		for key, value :&#x3D; range shard.items &#123;
+			fn(key, value)
+		&#125;
+		shard.RUnlock()
+	&#125;
+&#125;
+
+&#x2F;&#x2F; Keys returns all keys as []string
+func (m ConcurrentMap[V]) Keys() []string &#123;
+	count :&#x3D; m.Count()
+	ch :&#x3D; make(chan string, count)
+	go func() &#123;
+		&#x2F;&#x2F; Foreach shard.
+		wg :&#x3D; sync.WaitGroup&#123;&#125;
+		wg.Add(SHARD_COUNT)
+		for _, shard :&#x3D; range m &#123;
+			go func(shard *ConcurrentMapShared[V]) &#123;
+				&#x2F;&#x2F; Foreach key, value pair.
+				shard.RLock()
+				for key :&#x3D; range shard.items &#123;
+					ch &lt;- key
+				&#125;
+				shard.RUnlock()
+				wg.Done()
+			&#125;(shard)
+		&#125;
+		wg.Wait()
+		close(ch)
+	&#125;()
+
+	&#x2F;&#x2F; Generate keys
+	keys :&#x3D; make([]string, 0, count)
+	for k :&#x3D; range ch &#123;
+		keys &#x3D; append(keys, k)
+	&#125;
+	return keys
+&#125;
+
+&#x2F;&#x2F;Reviles ConcurrentMap &quot;private&quot; variables to json marshal.
+func (m ConcurrentMap[V]) MarshalJSON() ([]byte, error) &#123;
+	&#x2F;&#x2F; Create a temporary map, which will hold all item spread across shards.
+	tmp :&#x3D; make(map[string]V)
+
+	&#x2F;&#x2F; Insert items to temporary map.
+	for item :&#x3D; range m.IterBuffered() &#123;
+		tmp[item.Key] &#x3D; item.Val
+	&#125;
+	return json.Marshal(tmp)
+&#125;
+
+func fnv32(key string) uint32 &#123;
+	hash :&#x3D; uint32(2166136261)
+	const prime32 &#x3D; uint32(16777619)
+	keyLength :&#x3D; len(key)
+	for i :&#x3D; 0; i &lt; keyLength; i++ &#123;
+		hash *&#x3D; prime32
+		hash ^&#x3D; uint32(key[i])
+	&#125;
+	return hash
+&#125;
+
+&#x2F;&#x2F; Reverse process of Marshal.
+func (m *ConcurrentMap[V]) UnmarshalJSON(b []byte) (err error) &#123;
+ 	tmp :&#x3D; make(map[string]V)
+
+ 	&#x2F;&#x2F; Unmarshal into a single map.
+ 	if err :&#x3D; json.Unmarshal(b, &amp;tmp); err !&#x3D; nil &#123;
+ 		return err
+ 	&#125;
+
+ 	&#x2F;&#x2F; foreach key,value pair in temporary map insert into our concurrent map.
+ 	for key, val :&#x3D; range tmp &#123;
+ 		m.Set(key, val)
+ 	&#125;
+	return nil
+&#125;</code></pre>
+
+</details>
+
+<p>总结</p>
+<ul>
+<li>通过这个concurrency-map学习了golang的泛型，golang具体泛型内容可以阅读对应的笔记</li>
+<li>说实话作者这种数据结构还是没太理解，不理解why，但是能看懂代码。应该先尝试试着了解数据结构</li>
+</ul>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
+                    data-tooltip="费曼:任何伟大的科学成就，都源于思想自由"
+                    aria-label="PREVIOUS: 费曼:任何伟大的科学成就，都源于思想自由"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/09/09/pro_git/"
+                    data-tooltip="pro_git"
+                    aria-label="NEXT: pro_git"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
+                    data-tooltip="费曼:任何伟大的科学成就，都源于思想自由"
+                    aria-label="PREVIOUS: 费曼:任何伟大的科学成就，都源于思想自由"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/09/09/pro_git/"
+                    data-tooltip="pro_git"
+                    aria-label="NEXT: pro_git"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                nil
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/09/09/archive/golang_concurrency_map/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

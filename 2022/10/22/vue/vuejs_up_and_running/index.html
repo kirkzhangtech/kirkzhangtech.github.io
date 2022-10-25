@@ -1,0 +1,813 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Eden">
+    <title>vue.js up and running - Eden</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"1. Vue.js: The BasicsAs explained in the preface, Vue.js is the library at the heart of an ecosystem thatallows us to create powerful client-side applications. We don’t have to use thewhole ecosystem just to build a website, though, so we’ll start by looking at Vueby itself.\n1.1 Why Vue.js?Without a framework,we’d end up with a mess of unmaintainable code, the vastmajority of which would be dealing with stuff that the framework abstracts awayfrom us. Take the following two code examples, both of which download a listof items from an Ajax resource and display them on the page. The first one ispowered by jQuery, while the second one is using Vue.\nUsing jQuery, we download the items, select the ul element, and then if there areitems,we iterate through them, manually creating a list element, adding the is-blue class if wanted,and setting the text to be the item. Finally, we append it tothe ul element:\n&lt;ul class=\"js-items\">&lt;/ul>\n&lt;script>\n$(function () &#123;\n    $.get('https://example.com/items.json')\n        .then(function (data) &#123;\n            var $itemsUl = $('.js-items');\n            if (!data.items.length) &#123;\n                var $noItems = $('li');\n                $noItems.text('Sorry, there are no items.');\n                $itemsUl.append($noItems);\n            &#125; else &#123;\n                data.items.forEach(function (item) &#123;\n                    var $newItem = $('li');\n                    $newItem.text(item);\n                    if (item.includes('blue')) &#123;\n                        $newItem.addClass('is-blue');\n                    &#125;\n                    $itemsUl.append($newItem);\n                &#125;);\n            &#125;\n        &#125;);\n&#125;);\n&lt;/script>\n\nThis is what the code does:\n\nIt makes an Ajax request using $.get().\nIt selects the element matching .js-items and stores it in the $itemsUl object.\nIf there are no items in the list downloaded, it creates an li element,sets the text of the li element to indicate that there were no items,andadds it to the document.If there are items in the list,it iterates through them in a loop.\nFor every item in the list, it creates an li element and sets the text to bethe item. Then,if the item contains the string blue, it sets the class ofthe element to is-blue. Finally, it adds the element to the document\n\nEvery step had to be done manually—every element created and appended to thedocument individually. We have to read all the way through the code to work outexactly what is going on, and it isn’t obvious at all at first glance.With Vue,the code providing the same functionality is much simpler to read andunderstand—even if you’re not yet familiar with Vue:\n&lt;ul class=\"js-items\">\n&lt;li v-if=\"!items.length\">Sorry, there are no items.&lt;/li>\n&lt;li v-for=\"item in items\" :class=\"&#123; 'is-blue': item.includes('blue') &#125;\">\n&#123;&#123; item &#125;&#125;\n&lt;/li>\n&lt;/ul>\n&lt;script>\nnew Vue(&#123;\n    el: '.js-items', \n    data: &#123;\n        items: []\n    &#125;,\n    created() &#123;\n        fetch('https://example.com/items.json')\n            .\n            then((res) => res.json())\n            .\n            then((data) => &#123;\n                this.items = data.items;\n            &#125;);\n    &#125;\n&#125;);\n&lt;/script>\n\n\nThis code does the following:\n\nIt makes an Ajax request using fetch().\nIt parses the response from JSON into a JavaScript object.\nIt stores the downloaded items in the items data property.\n\n\nel is abbrivate of element\n\nThat’s all the actual logic in the code. Now that the items have been downloadedand stored,we can use Vue’s templating functionality to write the elements tothe Document Object Model (DOM), which is how elements are represented onan HTML page. We tell Vue that we want one li element for every item and thatthe value should be item. Vue handles the creation of the elements and thesetting of the class for us.\nDon’t worry about fully understanding the code example if you don’t yet. I’llslow down and introduce the various concepts one at a time throughout the book.\nNot only is the second example significantly shorter, but it’s also a lot easier toread,as the actual logic of the app is completely separated from the view logic.Instead of having to wade through some jQuery to work out what is being added when,we can look at the template: if there are no items, a warning is displayed;otherwise,the items are displayed as list elements. The difference becomes evenmore noticeable with larger examples. Imagine we wanted to add a reload buttonto the page that would send a request to the server, get the new items, and updatethe page when the user clicks a button. With the Vue example, that’s only acouple of additional lines of code, but with the jQuery example, things start toget complicated.\nIn addition to the core Vue framework,several libraries work great with Vue andare maintained by the same people who maintain Vue itself. For routing—displaying different content depending on the URL of the application—there’svue-router. For managing state—sharing data between components in one globalstore—there’s vuex,and for unit testing Vue components, there’s vue-test-utils. Icover all three of those libraries and give them a proper introduction later in thebook: vue-router in Chapter 5, vuex in Chapter 6, and vue-test-utils in Chapter 7.\n\nall of above text just only illustrated one thing ,Vue is better than jquery, a good framework.including vue-router, which depending on the URL of the application to display different content.vuex managing state—sharing data between components in one global store.vue-test-utils, unit testing utility.\n\n1.2 Installation and Setup","dateCreated":"2022-10-22T13:44:29+08:00","dateModified":"2022-10-22T14:24:00+08:00","datePublished":"2022-10-22T13:44:29+08:00","description":"","headline":"vue.js up and running","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/22/vue/vuejs_up_and_running/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/10/22/vue/vuejs_up_and_running/"}</script>
+    <meta name="description" content="1. Vue.js: The BasicsAs explained in the preface, Vue.js is the library at the heart of an ecosystem thatallows us to create powerful client-side applications. We don’t have to use thewhole ecosystem">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="vue.js up and running">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/22/vue/vuejs_up_and_running/index.html">
+<meta property="og:site_name" content="Eden">
+<meta property="og:description" content="1. Vue.js: The BasicsAs explained in the preface, Vue.js is the library at the heart of an ecosystem thatallows us to create powerful client-side applications. We don’t have to use thewhole ecosystem">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-10-22T05:44:29.883Z">
+<meta property="article:modified_time" content="2022-10-22T06:24:00.243Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@nil">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/nil"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Eden
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture "
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Google +"
+                        >
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/mailto"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            vue.js up and running
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-10-22T13:44:29+08:00">
+	
+		    Oct 22, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/vue/">vue</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="1-Vue-js-The-Basics"><a href="#1-Vue-js-The-Basics" class="headerlink" title="1. Vue.js: The Basics"></a>1. Vue.js: The Basics</h1><p>As explained in the preface, Vue.js is the library at the heart of an ecosystem that<br>allows us to create powerful client-side applications. We don’t have to use the<br>whole ecosystem just to build a website, though, so we’ll start by looking at Vue<br>by itself.</p>
+<h2 id="1-1-Why-Vue-js"><a href="#1-1-Why-Vue-js" class="headerlink" title="1.1 Why Vue.js?"></a>1.1 Why Vue.js?</h2><p>Without a framework,we’d end up with a mess of unmaintainable code, the vast<br>majority of which would be dealing with stuff that the framework abstracts away<br>from us. Take the following two code examples, both of which download a list<br>of items from an Ajax resource and display them on the page. The first one is<br>powered by jQuery, while the second one is using Vue.</p>
+<p>Using jQuery, we download the items, select the ul element, and then if there are<br>items,we iterate through them, manually creating a list element, adding the is-<br>blue class if wanted,and setting the text to be the item. Finally, we append it to<br>the ul element:</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>ul <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"js-items"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>ul<span class="token operator">></span>
+<span class="token operator">&lt;</span>script<span class="token operator">></span>
+<span class="token function">$</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    $<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'https://example.com/items.json'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">data</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">var</span> $itemsUl <span class="token operator">=</span> <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">'.js-items'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>data<span class="token punctuation">.</span>items<span class="token punctuation">.</span>length<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                <span class="token keyword">var</span> $noItems <span class="token operator">=</span> <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">'li'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                $noItems<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token string">'Sorry, there are no items.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                $itemsUl<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>$noItems<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+                data<span class="token punctuation">.</span>items<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">item</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                    <span class="token keyword">var</span> $newItem <span class="token operator">=</span> <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">'li'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    $newItem<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>item<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span><span class="token string">'blue'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                        $newItem<span class="token punctuation">.</span><span class="token function">addClass</span><span class="token punctuation">(</span><span class="token string">'is-blue'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">&#125;</span>
+                    $itemsUl<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>$newItem<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span></code></pre>
+
+<p>This is what the code does:</p>
+<ol>
+<li>It makes an Ajax request using $.get().</li>
+<li>It selects the element matching <code>.js-items</code> and stores it in the <code>$itemsUl</code> object.</li>
+<li>If there are no items in the list downloaded, it creates an <code>li</code> element,<br>sets the text of the <code>li</code> element to indicate that there were no items,and<br>adds it to the document.If there are items in the list,it iterates through them in a loop.</li>
+<li>For every item in the list, it creates an <code>li</code> element and sets the text to be<br>the item. Then,if the item contains the string blue, it sets the class of<br>the element to is-blue. Finally, it adds the element to the document</li>
+</ol>
+<p>Every step had to be done manually—every element created and appended to the<br>document individually. We have to read all the way through the code to work out<br>exactly what is going on, and it isn’t obvious at all at first glance.<br>With Vue,the code providing the same functionality is much simpler to read and<br>understand—even if you’re not yet familiar with Vue:</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>ul <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"js-items"</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>li v<span class="token operator">-</span><span class="token keyword">if</span><span class="token operator">=</span><span class="token string">"!items.length"</span><span class="token operator">></span>Sorry<span class="token punctuation">,</span> there are no items<span class="token punctuation">.</span><span class="token operator">&lt;</span><span class="token operator">/</span>li<span class="token operator">></span>
+<span class="token operator">&lt;</span>li v<span class="token operator">-</span><span class="token keyword">for</span><span class="token operator">=</span><span class="token string">"item in items"</span> <span class="token operator">:</span><span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"&#123; 'is-blue': item.includes('blue') &#125;"</span><span class="token operator">></span>
+<span class="token punctuation">&#123;</span><span class="token punctuation">&#123;</span> item <span class="token punctuation">&#125;</span><span class="token punctuation">&#125;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>li<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>ul<span class="token operator">></span>
+<span class="token operator">&lt;</span>script<span class="token operator">></span>
+<span class="token keyword">new</span> <span class="token class-name">Vue</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">el</span><span class="token operator">:</span> <span class="token string">'.js-items'</span><span class="token punctuation">,</span> 
+    <span class="token literal-property property">data</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">items</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token function">created</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'https://example.com/items.json'</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span>
+            <span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">res</span><span class="token punctuation">)</span> <span class="token operator">=></span> res<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span>
+            <span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">data</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span>items <span class="token operator">=</span> data<span class="token punctuation">.</span>items<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+</code></pre>
+
+<p>This code does the following:</p>
+<ol>
+<li>It makes an Ajax request using fetch().</li>
+<li>It parses the response from JSON into a JavaScript object.</li>
+<li>It stores the downloaded items in the items data property.</li>
+</ol>
+<blockquote>
+<p>el is abbrivate of element</p>
+</blockquote>
+<p>That’s all the actual logic in the code. Now that the items have been downloaded<br>and stored,we can use Vue’s templating functionality to write the elements to<br>the Document Object Model (DOM), which is how elements are represented on<br>an HTML page. We tell Vue that we want one li element for every item and that<br>the value should be item. Vue handles the creation of the elements and the<br>setting of the class for us.</p>
+<p>Don’t worry about fully understanding the code example if you don’t yet. I’ll<br>slow down and introduce the various concepts one at a time throughout the book.</p>
+<p>Not only is the second example significantly shorter, but it’s also a lot easier to<br>read,as the actual logic of the app is completely separated from the view logic.<br>Instead of having to wade through some jQuery to work out what is being added when,<br>we can look at the template: if there are no items, a warning is displayed;<br>otherwise,the items are displayed as list elements. The difference becomes even<br>more noticeable with larger examples. Imagine we wanted to add a reload button<br>to the page that would send a request to the server, get the new items, and update<br>the page when the user clicks a button. With the Vue example, that’s only a<br>couple of additional lines of code, but with the jQuery example, things start to<br>get complicated.</p>
+<p>In addition to the core Vue framework,several libraries work great with Vue and<br>are maintained by the same people who maintain Vue itself. For routing—<br>displaying different content depending on the URL of the application—there’s<br>vue-router. For managing state—sharing data between components in one global<br>store—there’s vuex,and for unit testing Vue components, there’s vue-test-utils. I<br>cover all three of those libraries and give them a proper introduction later in the<br>book: vue-router in Chapter 5, vuex in Chapter 6, and vue-test-utils in Chapter 7.</p>
+<blockquote>
+<p>all of above text just only illustrated one thing ,Vue is better than jquery, a good framework.<br>including vue-router, which depending on the URL of the application to display different content.<br>vuex managing state—sharing data between components in one global store.<br>vue-test-utils, unit testing utility.</p>
+</blockquote>
+<h2 id="1-2-Installation-and-Setup"><a href="#1-2-Installation-and-Setup" class="headerlink" title="1.2 Installation and Setup"></a>1.2 Installation and Setup</h2>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/22/TED/five_ways_to_kill_your_dreams/"
+                    data-tooltip="five ways to kill your dreams"
+                    aria-label="PREVIOUS: five ways to kill your dreams"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/20/archive/ubuntu%E5%AE%89%E8%A3%85zookeeper/"
+                    data-tooltip="ubuntu安装zookeeper"
+                    aria-label="NEXT: ubuntu安装zookeeper"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/22/TED/five_ways_to_kill_your_dreams/"
+                    data-tooltip="five ways to kill your dreams"
+                    aria-label="PREVIOUS: five ways to kill your dreams"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/20/archive/ubuntu%E5%AE%89%E8%A3%85zookeeper/"
+                    data-tooltip="ubuntu安装zookeeper"
+                    aria-label="NEXT: ubuntu安装zookeeper"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                nil
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/10/22/vue/vuejs_up_and_running/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>
