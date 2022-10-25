@@ -160,6 +160,7 @@ categories:
     - [20.2.9 星号](#2029-星号)
 - [AppendIndex](#appendindex)
 
+<!-- more -->
 
 # 1. linux入门
 
