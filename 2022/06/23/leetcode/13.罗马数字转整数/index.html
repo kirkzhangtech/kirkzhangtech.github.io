@@ -11,16 +11,16 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang\n *\n * [13] 罗马数字转整数\n\n 2. I X C 也是写成从大到小\n 3. 左高位，右低位\n 4. 输入: s &#x3D; &quot;MC MX CI V&quot;\n             1100 1010 101 5\n\t输出: 1994\n\t解释: M &#x3D; 1000, CM &#x3D; 900, XC &#x3D; 90, IV &#x3D; 4.\n\n\tMMMCCCXXXIII\n\t1000+1000+1000 -100-100-100-10-10-10+1+1+1\n\tCXCIX\n\t100 -10 +100-1+10\n*&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc romanToInt(s string) int &#123;\n\n\tvar intSum int\n\tfor i :&#x3D; 0; i &lt; len(s)-1; i++ &#123;\n\t\tif char2Int(string(s[i])) &gt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125; else if char2Int(string(s[i])) &lt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum - char2Int(string(s[i]))\n\t\t&#125; else &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125;\n\t&#125;\n\tintSum &#x3D; intSum + char2Int(string(s[len(s)-1]))\n\n\treturn intSum\n\n&#125;\nfunc char2Int(c string) int &#123;\n\tswitch c &#123;\n\tcase &quot;I&quot;:\n\t\treturn 1\n\tcase &quot;V&quot;:\n\t\treturn 5\n\tcase &quot;X&quot;:\n\t\treturn 10\n\tcase &quot;L&quot;:\n\t\treturn 50\n\tcase &quot;C&quot;:\n\t\treturn 100\n\tcase &quot;D&quot;:\n\t\treturn 500\n\tcase &quot;M&quot;:\n\t\treturn 1000\n\t&#125;\n\tpanic(&quot;excep I V X L C D M&quot;)\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-06-24T07:42:27+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"13.罗马数字转整数","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"}</script>
-    <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang  *  * [13] 罗马数字转整数   2. I X C 也是写成从大到小  3. 左高位，右低位  4. 输入: s &#x3D; &quot;MC MX CI V&quot;              1100 1010 101 5 	输">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang\n *\n * [13] 罗马数字转整数\n\n 1. I X C 也是写成从大到小\n 2. 左高位，右低位\n 3. 输入: s &#x3D; &quot;MC MX CI V&quot;\n             1100 1010 101 5\n\t输出: 1994\n\t解释: M &#x3D; 1000, CM &#x3D; 900, XC &#x3D; 90, IV &#x3D; 4.\n\n\tMMMCCCXXXIII\n\t1000+1000+1000 -100-100-100-10-10-10+1+1+1\n\tCXCIX\n\t100 -10 +100-1+10\n*&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc romanToInt(s string) int &#123;\n\n\tvar intSum int\n\tfor i :&#x3D; 0; i &lt; len(s)-1; i++ &#123;\n\t\tif char2Int(string(s[i])) &gt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125; else if char2Int(string(s[i])) &lt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum - char2Int(string(s[i]))\n\t\t&#125; else &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125;\n\t&#125;\n\tintSum &#x3D; intSum + char2Int(string(s[len(s)-1]))\n\n\treturn intSum\n\n&#125;\nfunc char2Int(c string) int &#123;\n\tswitch c &#123;\n\tcase &quot;I&quot;:\n\t\treturn 1\n\tcase &quot;V&quot;:\n\t\treturn 5\n\tcase &quot;X&quot;:\n\t\treturn 10\n\tcase &quot;L&quot;:\n\t\treturn 50\n\tcase &quot;C&quot;:\n\t\treturn 100\n\tcase &quot;D&quot;:\n\t\treturn 500\n\tcase &quot;M&quot;:\n\t\treturn 1000\n\t&#125;\n\tpanic(&quot;excep I V X L C D M&quot;)\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:57+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"13.罗马数字转整数","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"}</script>
+    <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang  *  * [13] 罗马数字转整数   1. I X C 也是写成从大到小  2. 左高位，右低位  3. 输入: s &#x3D; &quot;MC MX CI V&quot;              1100 1010 101 5 	输">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="13.罗马数字转整数">
 <meta property="og:url" content="https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang  *  * [13] 罗马数字转整数   2. I X C 也是写成从大到小  3. 左高位，右低位  4. 输入: s &#x3D; &quot;MC MX CI V&quot;              1100 1010 101 5 	输">
+<meta property="og:description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang  *  * [13] 罗马数字转整数   1. I X C 也是写成从大到小  2. 左高位，右低位  3. 输入: s &#x3D; &quot;MC MX CI V&quot;              1100 1010 101 5 	输">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-06-22T16:10:00.241Z">
-<meta property="article:modified_time" content="2022-06-23T23:42:27.365Z">
+<meta property="article:modified_time" content="2022-10-25T14:45:57.183Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@nil">
@@ -354,7 +354,7 @@
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>, <a class="category-link" href="/categories/leetcode/leetcode%E9%A2%98%E8%A7%A3/">leetcode题解</a>
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
 
 
     
@@ -373,9 +373,9 @@
  *
  * [13] 罗马数字转整数
 
- 2. I X C 也是写成从大到小
- 3. 左高位，右低位
- 4. 输入: s &#x3D; &quot;MC MX CI V&quot;
+ 1. I X C 也是写成从大到小
+ 2. 左高位，右低位
+ 3. 输入: s &#x3D; &quot;MC MX CI V&quot;
              1100 1010 101 5
 	输出: 1994
 	解释: M &#x3D; 1000, CM &#x3D; 900, XC &#x3D; 90, IV &#x3D; 4.
@@ -759,7 +759,7 @@ func char2Int(c string) int &#123;
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20220806212204.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>

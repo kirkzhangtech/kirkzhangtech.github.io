@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"\npackage main\n\nimport &quot;fmt&quot;\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;66 lang&#x3D;golang\n *\n * [66] 加一\n *&#x2F;\n&#x2F;&#x2F;  9 9 9 9 9\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc plusOne(digits []int) []int &#123;\n\n\tl :&#x3D; len(digits)\n\t&#x2F;&#x2F;遍历数组\n\tfor i :&#x3D; l - 1; i &gt;&#x3D; 0; i-- &#123;\n\t\tdigits[i] &#x3D; (digits[i] + 1) % 10\n\t\tfmt.Println(digits[i])\n\t\t&#x2F;&#x2F;判断取模10是否等于零\n\t\tif digits[i] !&#x3D; 0 &#123;\n\t\t\treturn digits\n\t\t&#125;\n\t&#125;\n\t&#x2F;&#x2F;new一个新数组\n\tnewArr :&#x3D; make([]int, l+1)\n\t&#x2F;&#x2F; digits&#x3D; new int[l + 1];\n\t&#x2F;&#x2F;设定第一位为1\n\tnewArr[0] &#x3D; 1\n\treturn newArr\n\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end\n","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-06-24T07:40:42+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"66.加一","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"\npackage main\n\nimport &quot;fmt&quot;\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;66 lang&#x3D;golang\n *\n * [66] 加一\n *&#x2F;\n&#x2F;&#x2F;  9 9 9 9 9\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc plusOne(digits []int) []int &#123;\n\n\tl :&#x3D; len(digits)\n\t&#x2F;&#x2F;遍历数组\n\tfor i :&#x3D; l - 1; i &gt;&#x3D; 0; i-- &#123;\n\t\tdigits[i] &#x3D; (digits[i] + 1) % 10\n\t\tfmt.Println(digits[i])\n\t\t&#x2F;&#x2F;判断取模10是否等于零\n\t\tif digits[i] !&#x3D; 0 &#123;\n\t\t\treturn digits\n\t\t&#125;\n\t&#125;\n\t&#x2F;&#x2F;new一个新数组\n\tnewArr :&#x3D; make([]int, l+1)\n\t&#x2F;&#x2F; digits&#x3D; new int[l + 1];\n\t&#x2F;&#x2F;设定第一位为1\n\tnewArr[0] &#x3D; 1\n\treturn newArr\n\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end\n","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:26+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"66.加一","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"}</script>
     <meta name="description" content="package main  import &quot;fmt&quot;  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;66 lang&#x3D;golang  *  * [66] 加一  *&#x2F; &#x2F;&#x2F;  9 9 9 9 9 &#x2F;&#x2F; @lc code&#x3D;start func plusOne(digi">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="66.加一">
@@ -20,7 +20,7 @@
 <meta property="og:description" content="package main  import &quot;fmt&quot;  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;66 lang&#x3D;golang  *  * [66] 加一  *&#x2F; &#x2F;&#x2F;  9 9 9 9 9 &#x2F;&#x2F; @lc code&#x3D;start func plusOne(digi">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-06-22T16:10:00.241Z">
-<meta property="article:modified_time" content="2022-06-23T23:40:42.935Z">
+<meta property="article:modified_time" content="2022-10-25T14:46:26.483Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@nil">
@@ -354,7 +354,7 @@
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>, <a class="category-link" href="/categories/leetcode/leetcode%E9%A2%98%E8%A7%A3/">leetcode题解</a>
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
 
 
     
@@ -735,7 +735,7 @@ func plusOne(digits []int) []int &#123;
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20220806212204.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>

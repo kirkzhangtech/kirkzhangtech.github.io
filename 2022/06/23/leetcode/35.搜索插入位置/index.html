@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang\n *\n * [35] 搜索插入位置\n *&#x2F;\n&#x2F;&#x2F;  [1,3,5,6]\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc searchInsert(nums []int, target int) int &#123;\n\tlow :&#x3D; 0\n\thigh :&#x3D; len(nums) - 1\n\tfor low &lt;&#x3D; high &#123;\n\t\t&#x2F;&#x2F; midIndex :&#x3D; low + ((high - low) &#x2F; 2)\n\t\tmidIndex :&#x3D; (high - low) &#x2F; 2\n\n\t\tmidValue :&#x3D; nums[midIndex]\n\t\tif target &#x3D;&#x3D; midValue &#123;\n\t\t\treturn midIndex\n\t\t&#125; else if target &lt; midValue &#123;\n\t\t\thigh &#x3D; midIndex - 1\n\t\t&#125; else &#123;\n\t\t\tlow &#x3D; midIndex + 1\n\t\t&#125;\n\t&#125;\n\treturn high + 1\n\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-06-24T07:42:27+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"35.搜索插入位置","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang\n *\n * [35] 搜索插入位置\n *&#x2F;\n&#x2F;&#x2F;  [1,3,5,6]\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc searchInsert(nums []int, target int) int &#123;\n\tlow :&#x3D; 0\n\thigh :&#x3D; len(nums) - 1\n\tfor low &lt;&#x3D; high &#123;\n\t\t&#x2F;&#x2F; midIndex :&#x3D; low + ((high - low) &#x2F; 2)\n\t\tmidIndex :&#x3D; (high - low) &#x2F; 2\n\n\t\tmidValue :&#x3D; nums[midIndex]\n\t\tif target &#x3D;&#x3D; midValue &#123;\n\t\t\treturn midIndex\n\t\t&#125; else if target &lt; midValue &#123;\n\t\t\thigh &#x3D; midIndex - 1\n\t\t&#125; else &#123;\n\t\t\tlow &#x3D; midIndex + 1\n\t\t&#125;\n\t&#125;\n\treturn high + 1\n\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:26+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"35.搜索插入位置","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"}</script>
     <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang  *  * [35] 搜索插入位置  *&#x2F; &#x2F;&#x2F;  [1,3,5,6] &#x2F;&#x2F; @lc code&#x3D;start func searchInsert(nums []int, target i">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="35.搜索插入位置">
@@ -20,7 +20,7 @@
 <meta property="og:description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang  *  * [35] 搜索插入位置  *&#x2F; &#x2F;&#x2F;  [1,3,5,6] &#x2F;&#x2F; @lc code&#x3D;start func searchInsert(nums []int, target i">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-06-22T16:10:00.241Z">
-<meta property="article:modified_time" content="2022-06-23T23:42:27.365Z">
+<meta property="article:modified_time" content="2022-10-25T14:46:26.483Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@nil">
@@ -354,7 +354,7 @@
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>, <a class="category-link" href="/categories/leetcode/leetcode%E9%A2%98%E8%A7%A3/">leetcode题解</a>
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
 
 
     
@@ -730,7 +730,7 @@ func searchInsert(nums []int, target int) int &#123;
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20220806212204.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
