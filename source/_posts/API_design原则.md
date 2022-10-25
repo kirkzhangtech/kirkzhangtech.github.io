@@ -3,7 +3,9 @@ title: API Design Patterns
 categories:
 - WEB-API
 ---
-
+<!-- more -->
+API Design Patterns
+<!-- more -->
 ## 1. API介绍
 
 ### 1.1 什么是API

@@ -47,6 +47,10 @@ categories:
   - [5.4. 多态](#54-多态)
   - [5.5. CPP接口](#55-cpp接口)
 
+<!-- more -->
+golang圣经
+<!-- more -->
+
 # 1. 变量及基本类型
 
  1. `g++ -o hello_world  -std=c++11  hello_world.cpp`  
