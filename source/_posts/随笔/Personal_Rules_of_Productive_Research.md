@@ -1,5 +1,5 @@
 ---
-title: 高校研究的个人规则
+title: 高效研究的个人规则
 categories:
 - 随笔
 ---
