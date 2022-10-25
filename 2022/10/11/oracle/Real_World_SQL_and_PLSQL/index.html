@@ -1,374 +1,1057 @@
-
 <!DOCTYPE html>
-<html lang="en">
-    
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Eden">
-    <title>Real_World_SQL_and_PLSQL - Eden</title>
-    <meta name="author" content="kirkzhang">
-    
-    
-        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
-    
-    
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"chapter 5 Edtion_Baseed Redefinition升级数据库应用程序总是需要停机；根本不可能替换正在使用的PL&#x2F;SQL对象。\n5.1 Planned Downtimeunplaned downtime是很难预料的，可以通过使用备机来减少downtime，但是完全消除downtime是不可能的硬件故障可以切换到物理或者逻辑备用数据库继续提供服务，一直以来，没有办法在运行时替换PL&#x2F;SQL而不影响服务的运行。某一PL&#x2F;SQL object只能有一个版本。当你替换object时候，整个object是被锁住的。planed downtime : 贵公司计划的downtime时间\nWith edition-based redefinition, you can create PL&#x2F;SQL changes in the privacy of an edition. Then, when the custom application is updated, it can be released to the users. Newly connecting users will use the new application objects, while the users who were using the application during the upgrade can continue to work as if nothing happened. When the last of the users has disconnected from the pre-upgraded application, that application can be retired and only the post-upgraded application will be available for use.\n5.2 Terminology Used（专业术语）patch : 当程序没有实现需求所规定的内容时，需要应用补丁来纠正，实现程序和需求一致。补丁应该使程序符合需求所规定的。upgrade : 当需求在程序创建后发生变化。（跟patch的区分不是太清晰，当文本中提到 “升级 “时，也可理解为一个补丁，反之亦然）。\n5.3 The ConceptEBR解决的三个挑战\n\n首先，当有人在使用一个应用程序时，你怎么能对其进行修改？对一个应用程序进行修改通常涉及许多对象的修改，但你不能一个接一个地修改它们。这将使应用程序处于invalid的状态 ,有可能用升级前的数据库应用程序对数据库进行完整的复制，并进行必要的修改以达到升级后的状态，这就解决了第一个问题。另一个选择是复制数据库schema，并在这个schema中进行修改。\n随之而来的第二个问题，如何在两个应用程序（升级前的应用程序和升级后的应用程序）之间保持数据的同步？你可以想象，这不是一件容易做到的事情。原来的数据库对象仍然在使用，数据继续导入和改变。必须有一种机制，允许数据变化在升级前和升级后的应用程序之间传播。\n表结构的升级。\n\nEBR三个优点Changes are made in the privacy of a new edition.相同表的不同版本（pre,post）是通过使用编辑视图实现的.在热更新期间，跨版本的触发器将使不同版本之间的数据变化保持同步.\nhigh risk\nImplementing edition-based redefinition is not as trivial as flipping a switch. \nThe preparation phase of edition-based redefinition is very important and might \nrequire changing the existing database design and database source code\n\nIf, for whatever reason, the edition-based redefinition exercise fails \nand the edition must be removed, the edition can be dropped by a single \nstatement.Keep in mind, though, that changes to the table are not reversed \nwhen an edition is dropped from the database. Also, changes to the data \nare not reversed and should be removed as well to return to the pre-upgraded version.\n\n5.4 Preparation: Enable Editions\n启动EBRalter user scott enable editions\n不能disable这个操作12.1之前是enable整个schema的object为editionable,12.1之后可以指定aditionable为non-editionable.\n\n5.4.1 NE(non-editionable) on E(editionable) Prohibition这句话怎么翻译比较贴切？— It is not possible for noneditionable objects to depend on editionable objects. This is called the NE on E prohibition.user-defined type : 可能就是复合数据类型，由基础数据类型组成\n在Oracle数据库12.1之前，当你想对一个schema启用编辑时，你必须解决NE on E的问题。例如，当你有一个user-defined type被用于表的定义时，你就违反了NE on E prohibition。一个用户定义的类型是可编辑的，而一个表永远不能被编辑。当你需要遵守12.1版本之前的zero downtime要求时，不可避免地需要改变你的模式设计。\n从Oracle数据库12.1开始，可以通过明确地将某些对象设置为不可编辑来定义对象。这只能在edition-enable之前实现。一旦一个object被设置为不可编辑，并且edition enabled，其状态就会被固定，不能被改变。试图这样做将导致以下异常。\nORA-38825: The EDITIONABLB property of an editioned object cannot be altered.\n\n演示对某一个用户(账号)启动EBR,分析NE on E prohibition具体例子，创建一个新用户\ncreate user neone identified by neone\n&#x2F;\ngrant connect,create table,create type to neone\n&#x2F;\nalter user neone quota unlimited on users\n&#x2F;\n\n接着用该账号创建user-defined type\ncreate type phone_number_ot as object(\n   type_name varchar2 (10)\n,  phone_number varchar2(20)\n)\n&#x2F;\n\n\n基于上面的type object创建数据库的表\ncreate type phone_numbers_tt as table of phone_number_ot\n&#x2F;\ncreate table emps( \n   empno number\n,  phone_numbers phone_numbers_tt\n)\nnested table phone_numbers store as phone_numbers_nt\n\n\n这时候尝试启动EBR,就会碰到如下问题\nalter user neone enable editions\n&#x2F;\nERRORat line l:\nORA-38819: user NEONE owns one or more objects whose type is editionableand that have noneditioned dependent objects\n\n这是因为你的type类型是editionable的，table类型是non-aditionable的，EBR不允许有这样的依赖关系，这样是12.1版本之前必须要该schema的table和source code的设计，12.1之后我们可以实现将NE编程E从而解决这个问题。通过如下可以解决NE on E问题\n\nalter type phone_numbers_tt noneditionable\n&#x2F;\nalter type phone_number_ot noneditionable\n&#x2F;\n\n\n另外，上面相同的例子，还有有第二种情况，如果是已经启动EBR，然后基于user-defined type创建表就会报错\n\ncreate table emps*\nERROR at line 1:\nORA-38818: illegal reference to editioned object neone.PHONE_NUMBBR_OT\n\n因为第二种情况下neone已经启动了EBR,这时候你也无法把将edtionable的type类型改变为non-aditionable\n如果测试，生产环境中真碰到了这个问题，我们该如何的解决这个问题呢?需要我们重新创建type类型，这样才能保证我们成功创建基于type类型的table\ndrop type phone_numbers_tt\n&#x2F;\nType dropped.\ndrop type phone_number_ot\n&#x2F;\nType dropped.\n\ncreate or replace noneditionable type phone_number_ot as object\n( type_name varchar2 (10)\n, phone_number varchar2 (20)\n)\n&#x2F;\nType created\n\ncreate or replace noneditionable type phone_numbers_tt as table of phone_number_ot\n&#x2F;\nType created.\n\ncreate table emps(\n   empno number\n,  phone_numbers phone_numbers_tt\n)\nnested table phone_numbers store as phone_numbers_nt\n&#x2F;\n\nTable created\n\n\n现在总结如下:\n\n如果数据库中存在NE on E的情况，在12.1之前是启动不了EBR，需要改设计\n在12.1之前版本启动了EBR,那么在之后的表设计当中就要避开NE on E的问题\n如果真出了NE on E的问题，可以通过重新创建type,然后重新创建表来解决\n\n遗留问题尚待解决:\n\n如果你的架构中使用ogg，data guard，RAC等等oracle系的组件，要如何保证他们不停机维护，也要把他们考虑进去\n\n5.4.2 Create a new edition因为用户SCOTT启用了edition，所以我们可以创建一个额外的edition。版本之间有一个层次关系，其中一个edition总是有一个父edition这里唯一的例外是ORA$BASE，或者当这个edition最终被删除时，是层次结构中的下一个版本——根edition。为了创建一个新版本，需要系统权限create ANY edition:\ngrant create any edition on scott\n\n在创建版本之前，还需要将用作父版本的版本上的USE特权。一个版本总是作为另一个版本的子版本创建。创建版本时，会自动授予USE对象特权。USE权限也可以单独授予，如下面的代码示例所示:\ngrant use on edition &lt;edition_name&gt; to &lt;user&gt;\n\n这里，&lt;edition_name&gt;和&lt;user&gt;需要用edition的名称和你想授予权限的用户来代替。为了删除根edition或leaf edition，需要有DROP ANY EDITION系统权限。\ngrant drop any edition to scott\n\n当你连接到一个数据库时，可以通过使用ALTER语句来改变版本，比如在下一个例子中，其中&lt;edition_name&gt;是指应该改成你想改成的版本。\nalter session set edition &#x3D;&lt;edition_name&gt;\n请记住，如果application有未完成的事务，这时候是不用change你的edition,否则你将会碰到如下error。\nalter session set edition &#x3D;r2\nerror:\nora-38814:alter session set edition must be first statement of transaction\n\n\n5.5 Complexity levels使用EBR包括了多层复杂因素first level : PLSQL object结构change,有哪些在edition之间second level : table struct change among edition在同一时间不需要维护多个版本的edition因为在将来所有的user都会使用post-upgrade editionthird level : complex level is where you do have table structure changes and the users need to access multiple editions at the same time ,thus keeping data in sync between multiple editions.\n5.5.1 replace PLSQL code接下来阐述了在不同edition之间，不同的functionality可以有相同的名字下面sql可以查看当前edition名字\nselect sys_context(&#39;userenv&#39;,\n                   &#39;current_edition_name&#39;) as &quot;current_edition&quot;from dual;\n也可以通过show edition来查询当前edition.\n","dateCreated":"2022-10-11T14:57:52+08:00","dateModified":"2022-10-24T21:42:53+08:00","datePublished":"2022-10-11T14:57:52+08:00","description":"","headline":"Real_World_SQL_and_PLSQL","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/11/oracle/Real_World_SQL_and_PLSQL/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/11/oracle/Real_World_SQL_and_PLSQL/"}</script>
-    <meta name="description" content="chapter 5 Edtion_Baseed Redefinition升级数据库应用程序总是需要停机；根本不可能替换正在使用的PL&#x2F;SQL对象。 5.1 Planned Downtimeunplaned downtime是很难预料的，可以通过使用备机来减少downtime，但是完全消除downtime是不可能的硬件故障可以切换到物理或者逻辑备用数据库继续提供服务，一直以来，没有办法在运">
-<meta property="og:type" content="blog">
-<meta property="og:title" content="Real_World_SQL_and_PLSQL">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/11/oracle/Real_World_SQL_and_PLSQL/index.html">
+  <meta charset="utf-8">
+  <title>Real_World_SQL_and_PLSQL | Eden</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="Real_World_SQL_and_PLSQL | Eden">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Page not found">
+<meta property="og:url" content="https://simonteo58.github.io/404.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="chapter 5 Edtion_Baseed Redefinition升级数据库应用程序总是需要停机；根本不可能替换正在使用的PL&#x2F;SQL对象。 5.1 Planned Downtimeunplaned downtime是很难预料的，可以通过使用备机来减少downtime，但是完全消除downtime是不可能的硬件故障可以切换到物理或者逻辑备用数据库继续提供服务，一直以来，没有办法在运">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-11T06:57:52.994Z">
-<meta property="article:modified_time" content="2022-10-24T13:42:53.086Z">
+<meta property="article:published_time" content="2022-10-25T14:21:35.473Z">
+<meta property="article:modified_time" content="2022-10-25T14:21:35.473Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@nil">
-    
-        <link rel="publisher" href="https://plus.google.com/nil"/>
-    
-    
-        
-    
-    
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
-    
-    
-    
-    
-    <!--STYLES-->
-    
-<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
-
-    <!--STYLES END-->
-    
-
-    
-
-    
-        
-            
-<link rel="stylesheet" href="/assets/css/gitalk.css">
-
-        
-    
-</head>
-
-    <body>
-        <div id="blog">
-            <!-- Define author's picture -->
 
 
-    
-        
-            
-        
-    
+<link rel="icon" href="/img/avatar.jpg">
 
-<header id="header" data-behavior="4">
-    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-    <div class="header-title">
-        <a
-            class="header-title-link"
-            href="/"
-            aria-label=""
-        >
-            Eden
-        </a>
-    </div>
-    
-        
-            <a
-                class="header-right-picture "
-                href="#about"
-                aria-label="Open the link: /#about"
-            >
-        
-        
-            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
-        
-        </a>
-    
-</header>
+<link href="/css/style.css?v=1.1.0" rel="stylesheet">
 
-            <!-- Define author's picture -->
+<link href="/css/hl_theme/sublime.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
 
 
 
-        
-    
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
 
-<nav id="sidebar" data-behavior="4">
-    <div class="sidebar-container">
-        
-            <div class="sidebar-profile">
-                <a
-                    href="/#about"
-                    aria-label="Read more about the author"
-                >
-                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
-                </a>
-                <h4 class="sidebar-profile-name">kirkzhang</h4>
-                
-                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
-</h5>
-                
-            </div>
-        
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/"
-                            
-                            rel="noopener"
-                            title="Home"
-                        >
-                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Home</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/all-categories"
-                            
-                            rel="noopener"
-                            title="Categories"
-                        >
-                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Categories</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/all-tags"
-                            
-                            rel="noopener"
-                            title="Tags"
-                        >
-                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Tags</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/all-archives"
-                            
-                            rel="noopener"
-                            title="Archives"
-                        >
-                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Archives</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link open-algolia-search"
-                            href="#search"
-                            
-                            rel="noopener"
-                            title="Search"
-                        >
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="#about"
-                            
-                            rel="noopener"
-                            title="About"
-                        >
-                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">About</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="https://github.com/"
-                            
-                                target="_blank"
-                            
-                            rel="noopener"
-                            title="GitHub"
-                        >
-                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Stack Overflow"
-                        >
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Twitter"
-                        >
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Facebook"
-                        >
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Google +"
-                        >
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="LinkedIn"
-                        >
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/mailto"
-                            
-                            rel="noopener"
-                            title="Mail"
-                        >
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/atom.xml"
-                            
-                            rel="noopener"
-                            title="RSS"
-                        >
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-    </div>
-</nav>
+<script src="/js/iconfont.js?v=1.1.0" ></script>
 
-            
-            <div id="main" data-behavior="4"
-                 class="
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post">
-    
-    
-        <div class="post-header main-content-wrap text-left">
-    
-        <h1 class="post-title">
-            Real_World_SQL_and_PLSQL
-        </h1>
-    
-    
-        <div class="post-meta">
-    <time datetime="2022-10-11T14:57:52+08:00">
-	
-		    Oct 11, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/oracle/">oracle</a>
+<meta name="generator" content="Hexo 6.2.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
 
 
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/img/avatar.jpg"/>
+</a>
+<div class="author">
+    <span>kirkzhang</span>
+</div>
+
+<div class="icon">
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
     
 </div>
 
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="All">All
+            
+                <small>(61)</small>
+            
+        </div>
+    </li>
     
+        
+            
+                <li>
+                    <div data-rel="CPP">
+                        
+                        CPP
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="非技术类">
+                        
+                        非技术类
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="分布式">
+                        <i class="fold iconfont icon-right"></i>
+                        
+                        分布式
+                        <small>(5)</small>
+                        
+                    </div>
+                    
+                        <ul class="sub hide">
+                            
+                                <li>
+                                    <div data-rel="分布式<--->MIT6.824">
+                                        
+                                        MIT6.824
+                                        
+                                            <small>(4
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                        </ul>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构">
+                        
+                        数据结构
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="算法">
+                        
+                        算法
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="随笔">
+                        
+                        随笔
+                        <small>(5)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="archive">
+                        <i class="fold iconfont icon-right"></i>
+                        
+                        archive
+                        <small>(10)</small>
+                        
+                    </div>
+                    
+                        <ul class="sub hide">
+                            
+                                <li>
+                                    <div data-rel="archive<--->golang">
+                                        
+                                        golang
+                                        
+                                            <small>(2
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                        </ul>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="CICD">
+                        
+                        CICD
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="golang">
+                        
+                        golang
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="leetcode">
+                        
+                        leetcode
+                        <small>(17)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="linux">
+                        
+                        linux
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="mysql">
+                        
+                        mysql
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="oracle">
+                        
+                        oracle
+                        <small>(4)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="TED">
+                        
+                        TED
+                        <small>(4)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="vue">
+                        
+                        vue
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="WEB-API">
+                        
+                        WEB-API
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+            <a class="about  "
+               target="_blank"
+                    
+               href="/about">About</a>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="61">
+
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        Links
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="/null">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">All</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>非技术类</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>ansible</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>Docker</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>golang</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>mysql</a>
+            </li>
+        
+    </div>
+
 </div>
 
     
-    <div class="post-content markdown">
-        <div class="main-content-wrap">
-            <h1 id="chapter-5-Edtion-Baseed-Redefinition"><a href="#chapter-5-Edtion-Baseed-Redefinition" class="headerlink" title="chapter 5 Edtion_Baseed Redefinition"></a>chapter 5 Edtion_Baseed Redefinition</h1><p>升级数据库应用程序总是需要停机；根本不可能替换正在使用的PL&#x2F;SQL对象。</p>
+    <div id="local-search-result">
+
+    </div>
+    
+    <nav id="title-list-nav">
+        
+        <a id="top" class="All 随笔 "
+           href="/2022/06/22/%E9%9A%8F%E7%AC%94/%E5%A6%82%E4%BD%95%E5%9C%A8%E8%AF%BB%E7%A0%94%E7%9A%84%E9%81%93%E8%B7%AF%E4%B8%8A%E5%BF%AB%E9%80%9F%E5%A4%B1%E8%B4%A5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="如何在读研的道路上快速失败">如何在读研的道路上快速失败</span>
+            <span class="post-date" title="2022-06-22 21:14:38">2022/06/22</span>
+        </a>
+        
+        <a  class="All "
+           href="/2022/10/25/index/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="welcome to kirk&#39;s blog">welcome to kirk&#39;s blog</span>
+            <span class="post-date" title="2022-10-25 21:57:45">2022/10/25</span>
+        </a>
+        
+        <a  class="All 随笔 "
+           href="/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="高效研究的个人规则">高效研究的个人规则</span>
+            <span class="post-date" title="2022-10-24 23:33:29">2022/10/24</span>
+        </a>
+        
+        <a  class="All 随笔 "
+           href="/2022/10/24/%E9%9A%8F%E7%AC%94/%E9%AB%98%E6%95%88%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Expectation setting">Expectation setting</span>
+            <span class="post-date" title="2022-10-24 23:28:34">2022/10/24</span>
+        </a>
+        
+        <a  class="All 随笔 "
+           href="/2022/10/23/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E9%9C%80%E8%A6%811368%E4%B8%AA%E5%8D%95%E8%AF%8D/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="为什么只需要1368个单词">为什么只需要1368个单词</span>
+            <span class="post-date" title="2022-10-23 17:07:23">2022/10/23</span>
+        </a>
+        
+        <a  class="All TED "
+           href="/2022/10/22/TED/five_ways_to_kill_your_dreams/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="five ways to kill your dreams">five ways to kill your dreams</span>
+            <span class="post-date" title="2022-10-22 20:49:43">2022/10/22</span>
+        </a>
+        
+        <a  class="All vue "
+           href="/2022/10/22/vue/vuejs_up_and_running/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="vue.js up and running">vue.js up and running</span>
+            <span class="post-date" title="2022-10-22 13:44:29">2022/10/22</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/10/20/archive/ubuntu%E5%AE%89%E8%A3%85zookeeper/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="ubuntu安装zookeeper">ubuntu安装zookeeper</span>
+            <span class="post-date" title="2022-10-20 21:48:20">2022/10/20</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="单机安装三个kafka节点">单机安装三个kafka节点</span>
+            <span class="post-date" title="2022-10-20 21:42:43">2022/10/20</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="iso8583简介">iso8583简介</span>
+            <span class="post-date" title="2022-10-20 21:09:47">2022/10/20</span>
+        </a>
+        
+        <a  class="All oracle "
+           href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Oracle PLSQL Recipes">Oracle PLSQL Recipes</span>
+            <span class="post-date" title="2022-10-19 23:51:33">2022/10/19</span>
+        </a>
+        
+        <a  class="All 非技术类 "
+           href="/2022/10/19/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E5%8E%9F%E7%94%9F%E5%AE%B6%E5%BA%AD%E5%A6%82%E4%BD%95%E4%BF%AE%E8%A1%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E6%80%A7%E6%A0%BC%E7%BC%BA%E9%99%B7/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="原生家庭如何修补自己的性格缺陷">原生家庭如何修补自己的性格缺陷</span>
+            <span class="post-date" title="2022-10-19 22:29:54">2022/10/19</span>
+        </a>
+        
+        <a  class="All mysql "
+           href="/2022/10/16/mysql/mysql_manual/"
+           data-tag="mysql"
+           data-author="" >
+            <span class="post-title" title="mysql manual">mysql manual</span>
+            <span class="post-date" title="2022-10-16 21:54:25">2022/10/16</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/10/16/archive/install_mysql_on_ubuntu/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="install_mysql_on_ubuntu(Debian sys)">install_mysql_on_ubuntu(Debian sys)</span>
+            <span class="post-date" title="2022-10-16 16:23:49">2022/10/16</span>
+        </a>
+        
+        <a  class="All oracle "
+           href="/2022/10/11/oracle/Real_World_SQL_and_PLSQL/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Real_World_SQL_and_PLSQL">Real_World_SQL_and_PLSQL</span>
+            <span class="post-date" title="2022-10-11 14:57:52">2022/10/11</span>
+        </a>
+        
+        <a  class="All oracle "
+           href="/2022/10/11/oracle/Oracle_EBR/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Edition-Based Redefinition Technical Deep Dive">Edition-Based Redefinition Technical Deep Dive</span>
+            <span class="post-date" title="2022-10-11 12:13:46">2022/10/11</span>
+        </a>
+        
+        <a  class="All golang "
+           href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
+           data-tag="golang"
+           data-author="" >
+            <span class="post-title" title="go语言圣经">go语言圣经</span>
+            <span class="post-date" title="2022-10-08 14:02:11">2022/10/08</span>
+        </a>
+        
+        <a  class="All golang "
+           href="/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/"
+           data-tag="golang"
+           data-author="" >
+            <span class="post-title" title="go标准库阅读与解析">go标准库阅读与解析</span>
+            <span class="post-date" title="2022-10-08 07:48:06">2022/10/08</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/10/07/archive/compact_wsl2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="压缩wsl2的磁盘">压缩wsl2的磁盘</span>
+            <span class="post-date" title="2022-10-07 15:33:59">2022/10/07</span>
+        </a>
+        
+        <a  class="All 分布式 MIT6.824 "
+           href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MIT6.824之lab2_raft_structure_guide">MIT6.824之lab2_raft_structure_guide</span>
+            <span class="post-date" title="2022-10-07 08:40:25">2022/10/07</span>
+        </a>
+        
+        <a  class="All 分布式 MIT6.824 "
+           href="/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MIT6.824之lab2_raft_lock_advice">MIT6.824之lab2_raft_lock_advice</span>
+            <span class="post-date" title="2022-10-05 22:32:54">2022/10/05</span>
+        </a>
+        
+        <a  class="All 分布式 MIT6.824 "
+           href="/2022/10/05/MIT6.824/lab2b/lab2_raft_students_guide/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MIT6.824之lab2_raft_students_guide">MIT6.824之lab2_raft_students_guide</span>
+            <span class="post-date" title="2022-10-05 20:21:56">2022/10/05</span>
+        </a>
+        
+        <a  class="All 随笔 "
+           href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="费曼:任何伟大的科学成就，都源于思想自由">费曼:任何伟大的科学成就，都源于思想自由</span>
+            <span class="post-date" title="2022-09-26 00:05:55">2022/09/26</span>
+        </a>
+        
+        <a  class="All archive golang "
+           href="/2022/09/09/archive/golang_concurrency_map/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="concurreny-map代码阅读">concurreny-map代码阅读</span>
+            <span class="post-date" title="2022-09-09 16:43:34">2022/09/09</span>
+        </a>
+        
+        <a  class="All "
+           href="/2022/09/09/pro_git/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="pro_git">pro_git</span>
+            <span class="post-date" title="2022-09-09 12:21:02">2022/09/09</span>
+        </a>
+        
+        <a  class="All oracle "
+           href="/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="深入浅出_Oracle_DBA_入门_进阶与诊断案例">深入浅出_Oracle_DBA_入门_进阶与诊断案例</span>
+            <span class="post-date" title="2022-08-31 17:35:04">2022/08/31</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="API数据自动入库">API数据自动入库</span>
+            <span class="post-date" title="2022-08-27 13:35:51">2022/08/27</span>
+        </a>
+        
+        <a  class="All archive golang "
+           href="/2022/08/26/archive/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存高效golang">内存高效golang</span>
+            <span class="post-date" title="2022-08-26 21:18:06">2022/08/26</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/08/26/archive/remote_github/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="更新origin 和upstream url链接">更新origin 和upstream url链接</span>
+            <span class="post-date" title="2022-08-26 21:14:30">2022/08/26</span>
+        </a>
+        
+        <a  class="All 分布式 MIT6.824 "
+           href="/2022/08/12/MIT6.824/lab2b/lab2_raft_paper/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MIT6.824之lab2_raft_paper">MIT6.824之lab2_raft_paper</span>
+            <span class="post-date" title="2022-08-12 21:57:38">2022/08/12</span>
+        </a>
+        
+        <a  class="All TED "
+           href="/2022/08/04/TED/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="多巴胺戒断">多巴胺戒断</span>
+            <span class="post-date" title="2022-08-04 23:08:38">2022/08/04</span>
+        </a>
+        
+        <a  class="All 分布式 "
+           href="/2022/07/26/SAF_mechanism/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="SAF mechanism replication">SAF mechanism replication</span>
+            <span class="post-date" title="2022-07-26 17:00:17">2022/07/26</span>
+        </a>
+        
+        <a  class="All 非技术类 "
+           href="/2022/07/14/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E7%A6%85%E4%B8%8E%E6%91%A9%E6%89%98%E8%BD%A6%E7%BB%B4%E4%BF%AE%E8%89%BA%E6%9C%AF/"
+           data-tag="非技术类"
+           data-author="" >
+            <span class="post-title" title="禅与摩托车维修艺术">禅与摩托车维修艺术</span>
+            <span class="post-date" title="2022-07-14 08:37:05">2022/07/14</span>
+        </a>
+        
+        <a  class="All 数据结构 "
+           href="/2022/07/12/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%B2%E4%B9%89/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="数据结构讲义">数据结构讲义</span>
+            <span class="post-date" title="2022-07-12 23:27:09">2022/07/12</span>
+        </a>
+        
+        <a  class="All archive "
+           href="/2022/06/24/archive/archive/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="手册阅读归档">手册阅读归档</span>
+            <span class="post-date" title="2022-06-24 06:54:11">2022/06/24</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="21.合并两个有序链表">21.合并两个有序链表</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="27.移除元素">27.移除元素</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="66.加一">66.加一</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="83.删除排序链表中的重复元素">83.删除排序链表中的重复元素</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="9.回文数">9.回文数</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All leetcode "
+           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
+            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
+        </a>
+        
+        <a  class="All TED "
+           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E4%B8%93%E6%B3%A8%E5%8A%9B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="如何提高专注力-How to Get Your Brain to Focus-TED">如何提高专注力-How to Get Your Brain to Focus-TED</span>
+            <span class="post-date" title="2022-06-22 23:10:43">2022/06/22</span>
+        </a>
+        
+        <a  class="All 算法 "
+           href="/2022/06/22/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="算法导论">算法导论</span>
+            <span class="post-date" title="2022-06-22 22:07:23">2022/06/22</span>
+        </a>
+        
+        <a  class="All TED "
+           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="如何阅读-TED">如何阅读-TED</span>
+            <span class="post-date" title="2022-06-22 22:05:35">2022/06/22</span>
+        </a>
+        
+        <a  class="All WEB-API "
+           href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="API Design Patterns">API Design Patterns</span>
+            <span class="post-date" title="2022-06-22 21:55:02">2022/06/22</span>
+        </a>
+        
+        <a  class="All linux "
+           href="/2022/06/22/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%88%87shell%E8%85%B3%E6%9C%AC%E7%B7%A8%E7%A8%8B%E5%A4%A7%E5%85%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Linux命令行与shell腳本編程大全">Linux命令行与shell腳本編程大全</span>
+            <span class="post-date" title="2022-06-22 21:53:01">2022/06/22</span>
+        </a>
+        
+        <a  class="All 非技术类 "
+           href="/2022/06/22/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%BB%8E0%E5%88%B01_%E5%BC%80%E5%90%AF%E5%95%86%E4%B8%9A%E4%B8%8E%E6%9C%AA%E6%9D%A5%E7%9A%84%E7%A7%98%E5%AF%86/"
+           data-tag="非技术类"
+           data-author="" >
+            <span class="post-title" title="从0到1:开启商业与未来的秘密">从0到1:开启商业与未来的秘密</span>
+            <span class="post-date" title="2022-06-22 20:51:26">2022/06/22</span>
+        </a>
+        
+        <a  class="All CICD "
+           href="/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
+           data-tag="Docker"
+           data-author="" >
+            <span class="post-title" title="docker从入门到实践">docker从入门到实践</span>
+            <span class="post-date" title="2022-06-22 20:47:28">2022/06/22</span>
+        </a>
+        
+        <a  class="All CICD "
+           href="/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/"
+           data-tag="ansible"
+           data-author="" >
+            <span class="post-title" title="奔跑吧ansible">奔跑吧ansible</span>
+            <span class="post-date" title="2022-06-22 20:45:28">2022/06/22</span>
+        </a>
+        
+        <a  class="All CPP "
+           href="/2022/06/22/C++_Primer/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="C++ Primer Plus">C++ Primer Plus</span>
+            <span class="post-date" title="2022-06-22 01:01:03">2022/06/22</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-oracle/Real_World_SQL_and_PLSQL" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">Real_World_SQL_and_PLSQL</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="oracle">oracle</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            Created At : <time class="date" title='Updated At: 2022-10-24 21:42:53'>2022-10-11 14:57</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            Views 👀 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+        <span class="top-comment" title="跳转至评论区">
+            <a href="#comments">
+                Comment:<span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </a>
+        </span>
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#chapter-5-Edtion-Baseed-Redefinition"><span class="toc-text">chapter 5 Edtion_Baseed Redefinition</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-Planned-Downtime"><span class="toc-text">5.1 Planned Downtime</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-Terminology-Used%EF%BC%88%E4%B8%93%E4%B8%9A%E6%9C%AF%E8%AF%AD%EF%BC%89"><span class="toc-text">5.2 Terminology Used（专业术语）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-The-Concept"><span class="toc-text">5.3 The Concept</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-Preparation-Enable-Editions"><span class="toc-text">5.4 Preparation: Enable Editions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-1-NE-non-editionable-on-E-editionable-Prohibition"><span class="toc-text">5.4.1 NE(non-editionable) on E(editionable) Prohibition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-2-Create-a-new-edition"><span class="toc-text">5.4.2 Create a new edition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5-Complexity-levels"><span class="toc-text">5.5 Complexity levels</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-1-replace-PLSQL-code"><span class="toc-text">5.5.1 replace PLSQL code</span></a></li></ol></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="chapter-5-Edtion-Baseed-Redefinition"><a href="#chapter-5-Edtion-Baseed-Redefinition" class="headerlink" title="chapter 5 Edtion_Baseed Redefinition"></a>chapter 5 Edtion_Baseed Redefinition</h1><p>升级数据库应用程序总是需要停机；根本不可能替换正在使用的PL&#x2F;SQL对象。</p>
 <h2 id="5-1-Planned-Downtime"><a href="#5-1-Planned-Downtime" class="headerlink" title="5.1 Planned Downtime"></a>5.1 Planned Downtime</h2><p>unplaned downtime是很难预料的，可以通过使用备机来减少downtime，但是完全消除downtime是不可能的<br>硬件故障可以切换到物理或者逻辑备用数据库继续提供服务，一直以来，没有办法在运行时替换PL&#x2F;SQL而不影响服务的运行。<br>某一PL&#x2F;SQL object只能有一个版本。当你替换object时候，整个object是被锁住的。<br>planed downtime : 贵公司计划的downtime时间</p>
 <p>With edition-based redefinition, you can create PL&#x2F;SQL changes in the privacy of an edition. Then, when the custom application is updated, it can be released to the users. Newly connecting users will use the new application objects, while the users who were using the application during the upgrade can continue to work as if nothing happened. When the last of the users has disconnected from the pre-upgraded application, that application can be retired and only the post-upgraded application will be available for use.</p>
 <h2 id="5-2-Terminology-Used（专业术语）"><a href="#5-2-Terminology-Used（专业术语）" class="headerlink" title="5.2 Terminology Used（专业术语）"></a>5.2 Terminology Used（专业术语）</h2><p>patch : 当程序没有实现需求所规定的内容时，需要应用补丁来纠正，实现程序和需求一致。补丁应该使程序符合需求所规定的。<br>upgrade : 当需求在程序创建后发生变化。（跟patch的区分不是太清晰，当文本中提到 “升级 “时，也可理解为一个补丁，反之亦然）。</p>
@@ -391,88 +1074,88 @@ when an edition is dropped from the database. Also, changes to the data
 are not reversed and should be removed as well to return to the pre-upgraded version.</code></pre>
 
 <h2 id="5-4-Preparation-Enable-Editions"><a href="#5-4-Preparation-Enable-Editions" class="headerlink" title="5.4 Preparation: Enable Editions"></a>5.4 Preparation: Enable Editions</h2><ol>
-<li>启动EBR<pre class="language-sql" data-language="sql"><code class="language-sql">alter user scott enable editions</code></pre></li>
+<li>启动EBR<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">user</span> scott <span class="token keyword">enable</span> editions</code></pre></li>
 <li>不能disable这个操作<br>12.1之前是enable整个schema的object为editionable,12.1之后可以指定aditionable为non-editionable.</li>
 </ol>
 <h2 id="5-4-1-NE-non-editionable-on-E-editionable-Prohibition"><a href="#5-4-1-NE-non-editionable-on-E-editionable-Prohibition" class="headerlink" title="5.4.1 NE(non-editionable) on E(editionable) Prohibition"></a>5.4.1 NE(non-editionable) on E(editionable) Prohibition</h2><p>这句话怎么翻译比较贴切？— It is not possible for noneditionable objects to depend on editionable objects. This is called the NE on E prohibition.<br>user-defined type : 可能就是复合数据类型，由基础数据类型组成</p>
 <p>在Oracle数据库12.1之前，当你想对一个schema启用编辑时，你必须解决NE on E的问题。例如，当你有一个user-defined type被用于表的定义时，你就违反了NE on E prohibition。一个用户定义的类型是可编辑的，而一个表永远不能被编辑。当你需要遵守12.1版本之前的zero downtime要求时，不可避免地需要改变你的模式设计。</p>
 <p>从Oracle数据库12.1开始，可以通过明确地将某些对象设置为不可编辑来定义对象。这只能在edition-enable之前实现。一旦一个object被设置为不可编辑，并且edition enabled，其状态就会被固定，不能被改变。试图这样做将导致以下异常。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">ORA-38825: The EDITIONABLB property of an editioned object cannot be altered.</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">ORA<span class="token operator">-</span><span class="token number">38825</span>: The EDITIONABLB property <span class="token keyword">of</span> an editioned object cannot be altered<span class="token punctuation">.</span></code></pre>
 
 <p>演示对某一个用户(账号)启动EBR,分析NE on E prohibition具体例子，<br>创建一个新用户</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">create user neone identified by neone
-&#x2F;
-grant connect,create table,create type to neone
-&#x2F;
-alter user neone quota unlimited on users
-&#x2F;</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">user</span> neone identified <span class="token keyword">by</span> neone
+<span class="token operator">/</span>
+<span class="token keyword">grant</span> <span class="token keyword">connect</span><span class="token punctuation">,</span><span class="token keyword">create</span> <span class="token keyword">table</span><span class="token punctuation">,</span><span class="token keyword">create</span> <span class="token keyword">type</span> <span class="token keyword">to</span> neone
+<span class="token operator">/</span>
+<span class="token keyword">alter</span> <span class="token keyword">user</span> neone quota unlimited <span class="token keyword">on</span> users
+<span class="token operator">/</span></code></pre>
 
 <p>接着用该账号创建user-defined type</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">create type phone_number_ot as object(
-   type_name varchar2 (10)
-,  phone_number varchar2(20)
-)
-&#x2F;
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">type</span> phone_number_ot <span class="token keyword">as</span> object<span class="token punctuation">(</span>
+   type_name varchar2 <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+<span class="token punctuation">,</span>  phone_number varchar2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+<span class="token operator">/</span>
 </code></pre>
 
 <p>基于上面的type object创建数据库的表</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">create type phone_numbers_tt as table of phone_number_ot
-&#x2F;
-create table emps( 
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">type</span> phone_numbers_tt <span class="token keyword">as</span> <span class="token keyword">table</span> <span class="token keyword">of</span> phone_number_ot
+<span class="token operator">/</span>
+<span class="token keyword">create</span> <span class="token keyword">table</span> emps<span class="token punctuation">(</span> 
    empno number
-,  phone_numbers phone_numbers_tt
-)
-nested table phone_numbers store as phone_numbers_nt
+<span class="token punctuation">,</span>  phone_numbers phone_numbers_tt
+<span class="token punctuation">)</span>
+nested <span class="token keyword">table</span> phone_numbers store <span class="token keyword">as</span> phone_numbers_nt
 </code></pre>
 
 <p>这时候尝试启动EBR,就会碰到如下问题</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">alter user neone enable editions
-&#x2F;
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">user</span> neone <span class="token keyword">enable</span> editions
+<span class="token operator">/</span>
 ERRORat line l:
-ORA-38819: user NEONE owns one or more objects whose type is editionableand that have noneditioned dependent objects
+ORA<span class="token operator">-</span><span class="token number">38819</span>: <span class="token keyword">user</span> NEONE owns one <span class="token operator">or</span> more objects whose <span class="token keyword">type</span> <span class="token operator">is</span> editionableand that have noneditioned dependent objects
 </code></pre>
 <p>这是因为你的type类型是editionable的，table类型是non-aditionable的，EBR不允许有这样的依赖关系，这样是12.1版本之前必须要该schema的table和source code的设计，12.1之后我们可以实现将NE编程E从而解决这个问题。通过如下可以解决NE on E问题</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-alter type phone_numbers_tt noneditionable
-&#x2F;
-alter type phone_number_ot noneditionable
-&#x2F;
+<span class="token keyword">alter</span> <span class="token keyword">type</span> phone_numbers_tt noneditionable
+<span class="token operator">/</span>
+<span class="token keyword">alter</span> <span class="token keyword">type</span> phone_number_ot noneditionable
+<span class="token operator">/</span>
 </code></pre>
 
 <p>另外，上面相同的例子，还有有第二种情况，如果是已经启动EBR，然后基于user-defined type创建表就会报错</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-create table emps*
-ERROR at line 1:
-ORA-38818: illegal reference to editioned object neone.PHONE_NUMBBR_OT
+<span class="token keyword">create</span> <span class="token keyword">table</span> emps<span class="token operator">*</span>
+ERROR at line <span class="token number">1</span>:
+ORA<span class="token operator">-</span><span class="token number">38818</span>: illegal reference <span class="token keyword">to</span> editioned object neone<span class="token punctuation">.</span>PHONE_NUMBBR_OT
 </code></pre>
 <p>因为第二种情况下neone已经启动了EBR,这时候你也无法把将edtionable的type类型改变为non-aditionable</p>
 <p>如果测试，生产环境中真碰到了这个问题，我们该如何的解决这个问题呢?<br>需要我们重新创建type类型，这样才能保证我们成功创建基于type类型的table</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">drop type phone_numbers_tt
-&#x2F;
-Type dropped.
-drop type phone_number_ot
-&#x2F;
-Type dropped.
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">type</span> phone_numbers_tt
+<span class="token operator">/</span>
+<span class="token keyword">Type</span> dropped<span class="token punctuation">.</span>
+<span class="token keyword">drop</span> <span class="token keyword">type</span> phone_number_ot
+<span class="token operator">/</span>
+<span class="token keyword">Type</span> dropped<span class="token punctuation">.</span>
 
-create or replace noneditionable type phone_number_ot as object
-( type_name varchar2 (10)
-, phone_number varchar2 (20)
-)
-&#x2F;
-Type created
+<span class="token keyword">create</span> <span class="token operator">or</span> <span class="token keyword">replace</span> noneditionable <span class="token keyword">type</span> phone_number_ot <span class="token keyword">as</span> object
+<span class="token punctuation">(</span> type_name varchar2 <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+<span class="token punctuation">,</span> phone_number varchar2 <span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+<span class="token operator">/</span>
+<span class="token keyword">Type</span> created
 
-create or replace noneditionable type phone_numbers_tt as table of phone_number_ot
-&#x2F;
-Type created.
+<span class="token keyword">create</span> <span class="token operator">or</span> <span class="token keyword">replace</span> noneditionable <span class="token keyword">type</span> phone_numbers_tt <span class="token keyword">as</span> <span class="token keyword">table</span> <span class="token keyword">of</span> phone_number_ot
+<span class="token operator">/</span>
+<span class="token keyword">Type</span> created<span class="token punctuation">.</span>
 
-create table emps(
+<span class="token keyword">create</span> <span class="token keyword">table</span> emps<span class="token punctuation">(</span>
    empno number
-,  phone_numbers phone_numbers_tt
-)
-nested table phone_numbers store as phone_numbers_nt
-&#x2F;
+<span class="token punctuation">,</span>  phone_numbers phone_numbers_tt
+<span class="token punctuation">)</span>
+nested <span class="token keyword">table</span> phone_numbers store <span class="token keyword">as</span> phone_numbers_nt
+<span class="token operator">/</span>
 
-Table created
+<span class="token keyword">Table</span> created
 </code></pre>
 
 <p>现在总结如下:</p>
@@ -486,391 +1169,232 @@ Table created
 <li>如果你的架构中使用ogg，data guard，RAC等等oracle系的组件，<br>要如何保证他们不停机维护，也要把他们考虑进去</li>
 </ol>
 <h2 id="5-4-2-Create-a-new-edition"><a href="#5-4-2-Create-a-new-edition" class="headerlink" title="5.4.2 Create a new edition"></a>5.4.2 Create a new edition</h2><p>因为用户SCOTT启用了edition，所以我们可以创建一个额外的edition。版本之间有一个层次关系，其中一个edition总是有一个父edition这里唯一的例外是ORA$BASE，或者当这个edition最终被删除时，是层次结构中的下一个版本——根edition。<br>为了创建一个新版本，需要系统权限<code>create ANY edition</code>:</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">grant create any edition on scott</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">grant</span> <span class="token keyword">create</span> <span class="token keyword">any</span> edition <span class="token keyword">on</span> scott</code></pre>
 
 <p>在创建版本之前，还需要将用作父版本的版本上的USE特权。一个版本总是作为另一个版本的子版本创建。创建版本时，会自动授予USE对象特权。USE权限也可以单独授予，如下面的代码示例所示:</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">grant use on edition &lt;edition_name&gt; to &lt;user&gt;</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">grant</span> <span class="token keyword">use</span> <span class="token keyword">on</span> edition <span class="token operator">&lt;</span>edition_name<span class="token operator">></span> <span class="token keyword">to</span> <span class="token operator">&lt;</span><span class="token keyword">user</span><span class="token operator">></span></code></pre>
 
 <p>这里，<code>&lt;edition_name&gt;</code>和<code>&lt;user&gt;</code>需要用edition的名称和你想授予权限的用户来代替。<br>为了删除根edition或leaf edition，需要有<code>DROP ANY EDITION</code>系统权限。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">grant drop any edition to scott</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">grant</span> <span class="token keyword">drop</span> <span class="token keyword">any</span> edition <span class="token keyword">to</span> scott</code></pre>
 
 <p>当你连接到一个数据库时，可以通过使用ALTER语句来改变版本，比如在下一个例子中，其中<code>&lt;edition_name&gt;</code>是指应该改成你想改成的版本。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">alter session set edition &#x3D;&lt;edition_name&gt;</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">session</span> <span class="token keyword">set</span> edition <span class="token operator">=</span><span class="token operator">&lt;</span>edition_name<span class="token operator">></span></code></pre>
 <p>请记住，如果application有未完成的事务，这时候是不用change你的edition,否则你将会碰到如下error。</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">alter session set edition &#x3D;r2
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">alter</span> <span class="token keyword">session</span> <span class="token keyword">set</span> edition <span class="token operator">=</span>r2
 error:
-ora-38814:alter session set edition must be first statement of transaction
+ora<span class="token operator">-</span><span class="token number">38814</span>:<span class="token keyword">alter</span> <span class="token keyword">session</span> <span class="token keyword">set</span> edition must be <span class="token keyword">first</span> statement <span class="token keyword">of</span> <span class="token keyword">transaction</span>
 </code></pre>
 
 <h2 id="5-5-Complexity-levels"><a href="#5-5-Complexity-levels" class="headerlink" title="5.5 Complexity levels"></a>5.5 Complexity levels</h2><p>使用EBR包括了多层复杂因素<br>first level : PLSQL object结构change,有哪些在edition之间<br>second level : table struct change among edition<br>在同一时间不需要维护多个版本的edition因为在将来所有的user都会使用post-upgrade edition<br>third level : complex level is where you do have table structure changes and the users need to access multiple editions at the same time ,thus keeping data in sync between multiple editions.</p>
 <h3 id="5-5-1-replace-PLSQL-code"><a href="#5-5-1-replace-PLSQL-code" class="headerlink" title="5.5.1 replace PLSQL code"></a>5.5.1 replace PLSQL code</h3><p>接下来阐述了在不同edition之间，不同的functionality可以有相同的名字<br>下面sql可以查看当前edition名字</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql">select sys_context(&#39;userenv&#39;,
-                   &#39;current_edition_name&#39;) as &quot;current_edition&quot;from dual;</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> sys_context<span class="token punctuation">(</span><span class="token string">'userenv'</span><span class="token punctuation">,</span>
+                   <span class="token string">'current_edition_name'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token string">"current_edition"</span><span class="token keyword">from</span> dual<span class="token punctuation">;</span></code></pre>
 <p>也可以通过<code>show edition</code>来查询当前edition.</p>
 
-            
-
-
-        </div>
-    </div>
-    <div id="post-footer" class="post-footer main-content-wrap">
-        
-        
-            <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/10/16/archive/install_mysql_on_ubuntu/"
-                    data-tooltip="install_mysql_on_ubuntu(Debian sys)"
-                    aria-label="PREVIOUS: install_mysql_on_ubuntu(Debian sys)"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/10/11/oracle/Oracle_EBR/"
-                    data-tooltip="Edition-Based Redefinition Technical Deep Dive"
-                    aria-label="NEXT: Edition-Based Redefinition Technical Deep Dive"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Share this post"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Facebook"
-                    aria-label="Share on Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Twitter"
-                    aria-label="Share on Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Google+"
-                    aria-label="Share on Google+"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-                <li class="post-action">
-                    <a
-                        class="post-action-btn btn btn--default"
-                        href="#gitalk"
-                        aria-label="Leave a comment"
-                    >
-                        <i class="fa fa-comment"></i>
-                    </a>
-                </li>
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
-    </ul>
-</div>
-
-
-        
-        
-            
-                <div id="gitalk"></div>
-
-            
-        
+      
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
     </div>
 </article>
 
 
 
-                <footer id="footer" class="main-content-wrap">
-    <span class="copyrights">
-        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
-    </span>
-</footer>
-
-            </div>
-            
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-                    <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/10/16/archive/install_mysql_on_ubuntu/"
-                    data-tooltip="install_mysql_on_ubuntu(Debian sys)"
-                    aria-label="PREVIOUS: install_mysql_on_ubuntu(Debian sys)"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/10/11/oracle/Oracle_EBR/"
-                    data-tooltip="Edition-Based Redefinition Technical Deep Dive"
-                    aria-label="NEXT: Edition-Based Redefinition Technical Deep Dive"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Share this post"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Facebook"
-                    aria-label="Share on Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Twitter"
-                    aria-label="Share on Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Google+"
-                    aria-label="Share on Google+"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-                <li class="post-action">
-                    <a
-                        class="post-action-btn btn btn--default"
-                        href="#gitalk"
-                        aria-label="Leave a comment"
-                    >
-                        <i class="fa fa-comment"></i>
-                    </a>
-                </li>
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
-    </ul>
+<div class="article_copyright">
+    <p><span class="copy-title">Title:</span>Real_World_SQL_and_PLSQL</p>
+    
+    <p><span class="copy-title">Author:</span><a  title="kirkzhang">kirkzhang</a></p>
+    <p><span class="copy-title">Created At:</span>2022-10-11, 14:57:52</p>
+    <p><span class="copy-title">Updated At:</span>2022-10-24, 21:42:53</p>
+    <span class="copy-title">Url:</span><a class="post-url" href="/2022/10/11/oracle/Real_World_SQL_and_PLSQL/" title="Real_World_SQL_and_PLSQL">https://simonteo58.github.io/2022/10/11/oracle/Real_World_SQL_and_PLSQL/</a>
+    <p>
+        <span class="copy-title">Copyright:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">&#39;Attribution-non-commercial-shared in the same way 4.0&#39;</a> Reprint please keep the original link and author.
+    </p>
 </div>
 
 
-                </div>
-                
-    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-        <i id="btn-close-shareoptions" class="fa fa-times"></i>
-        <ul class="share-options">
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href=""
-                        aria-label="Share on Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href=""
-                        aria-label="Share on Twitter"
-                    >
-                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href=""
-                        aria-label="Share on Google+"
-                    >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
-                    </a>
-                </li>
-            
-        </ul>
+
+    <div id="comments"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+<script type="text/javascript">
+    $.getScript('/js/gitalk.js', function () {
+        var gitalk = new Gitalk({
+            clientID: 'ca29b9a1203b5920918d',
+            clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+            repo: 'SimonTeo58.github.io',
+            owner: 'SimonTeo58',
+            admin: ['SimonTeo58'],
+            id: decodeURI(location.pathname),
+            distractionFreeMode: 'true',
+            language: 'zh-CN',
+            perPage: parseInt('10',10)
+        })
+        gitalk.render('comments')
+    })
+</script>
+
+
+
+
+    
+
+
+
+
     </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    i hear i forget, i see i remember , i do i understand
+</p>
+<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
 
-            
-        </div>
-        
-
-
-    
-        
-    
-
-<div id="about">
-    <div id="about-card">
-        <div id="about-btn-close">
-            <i class="fa fa-times"></i>
-        </div>
-        
-            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
-        
-            <h4 id="about-card-name">kirkzhang</h4>
-        
-            <div id="about-card-bio"><p>author.bio</p>
-</div>
-        
-        
-            <div id="about-card-job">
-                <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>author.job</p>
-
-            </div>
-        
-        
-            <div id="about-card-location">
-                <i class="fa fa-map-marker-alt"></i>
-                <br/>
-                nil
-            </div>
-        
     </div>
 </div>
 
+</body>
+<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
-        <!--SCRIPTS-->
+    }
 
-<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
+    /*打赏页面隐藏与展示*/
+    
 
-<!--SCRIPTS END-->
+</script>
 
+<!--加入行号的高亮代码块样式-->
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 572px;
+    }
+    .nav.fullscreen {
+        margin-left: -572px;
+    }
+    .nav-left {
+        width: 150px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+    #post .pjax article .article-entry>ol, #post .pjax article .article-entry>ul, #post .pjax article>ol, #post .pjax article>ul{
+        border: #e2dede solid 1px;
+        border-radius: 10px;
+        padding: 10px 32px 10px 56px;
+    }
+    #post .pjax article .article-entry li>ol, #post .pjax article .article-entry li>ul,#post .pjax article li>ol, #post .pjax article li>ul{
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    #post .pjax article .article-entry>ol>li, #post .pjax article .article-entry>ul>li,#post .pjax article>ol>li, #post .pjax article>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
+    #post .pjax article .article-entry li>ol>li, #post .pjax article .article-entry li>ul>li,#post .pjax article li>ol>li, #post .pjax article li>ul>li{
+        margin-bottom: auto;
+        margin-left: auto;
+    }
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
 
     
-        
-<script src="/assets/js/gitalk.js"></script>
-
-        <script type="text/javascript">
-          (function() {
-            new Gitalk({
-              clientID: 'ca29b9a1203b5920918d',
-              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
-              repo: 'SimonTeo58.github.io',
-              owner: 'SimonTeo58',
-              admin: ['SimonTeo58'],
-              id: '2022/10/11/oracle/Real_World_SQL_and_PLSQL/',
-              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
-            }).render('gitalk')
-          })()
-        </script>
-    
+</style>
 
 
 
 
-    </body>
+
+
+
 </html>
