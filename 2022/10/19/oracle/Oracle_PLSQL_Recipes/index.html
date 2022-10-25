@@ -1,1502 +1,978 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+    
 <head>
-  <meta charset="utf-8">
-  <title>Oracle PLSQL Recipes | Eden</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="Oracle PLSQL Recipes | Eden">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Page not found">
-<meta property="og:url" content="https://simonteo58.github.io/404.html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Eden">
+    <title>Oracle PLSQL Recipes - Eden</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？\n-- demo 1\nbegin\n  -- 中间写代码\nend;\n\n-- demo 2\n\n\ndeclare\n\n-- 定义变量\n\nbegin \n -- 业务逻辑\nend;\n\n在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用\n1.2 在plsql种执行plsql代码块如何在sqlplus中执行plsql代码?\n登录sqlplus就可以直接输入自己的代码，然后end;结束代码块，并且接着输入/,这时候sqlplus解释器就可以执行代码了。但是有一点需要明确，如果你的代码块是以declare开头的，那么就会直接输出到屏幕\nsql&gt; begin\nDBMS_OUTPUT.put_line(&quot;hello world&quot;)\nend;\n&#x2F;\n\n但是如果你想创建package,function,procedure,可以使用如下语句，方便后面的调用\nSQL&gt; CREATE OR REPLACE PROCEDURE hello_world AS \n BEGIN \n DBMS_OUTPUT.PUT_LINE(&#39;Hello World&#39;); \n END; \n &#x2F; \n\n1.3 store code in script如果你想通过sql脚本执行代码，该如何运行？\nSET SERVEROUTPUT ON;\nDECLARE \n counter NUMBER;\nBEGIN \n  FOR counter IN REVERSE 0..10 LOOP \n  DBMS_OUTPUT.PUT_LINE (counter); \n  END LOOP; \nEND;\n&#x2F;\n你可以保存你的plsql代码在脚本里,重要一步是要保证你的文件扩展名是.sqlSQL Developer supports a number of additionalextensions for more specific types of PL&#x2F;SQL. \n1.4 执行你的脚本登录sqlplus，然后跳(Traverse)到你的脚本目录\n@绝对路径\n@相对路径\nsqlplus username&#x2F;password@database my_stored_script.sql \n\n1.5 接受用户的输入从键盘中sqlplus使用&amp;符号来接受来自键盘的输入\nDECLARE\n emp_count NUMBER; \nBEGIN \n SELECT count(*) \n INTO emp_count \n FROM employees \n WHERE department_id &#x3D; &amp;department_id; \nEND; \n\n但是如果你想从键盘接受一个输入，但是后面又想继续使用，则可以使用如下方法\nDECLARE\n emp_count NUMBER; \nBEGIN \n  SELECT count(*) \n  INTO emp_count \n  FROM employees \n  WHERE department_id &#x3D; &amp;&amp;department_id; \n  DBMS_OUTPUT.PUT_LINE(&#39;The employee count is: &#39; || emp_count || \n  &#39; for the department with an ID of: &#39; || &amp;department_id); \nEND;\n\n\n另外还有一种方法就是定义变量来承接从键盘来的输入,但是要注意这个变量定义的类型,如果是numeric类型的，如果是varchar2类型则需要用单引号,见如下代码\nDECLARE \n    first varchar2(20); \n    last varchar2(25); \n    emp_last VARCHAR2(25) :&#x3D; &#39;&amp;last_name&#39;; \n    emp_count NUMBER; \nBEGIN \n    SELECT count(*) \n    INTO emp_count \n    FROM employees \n    WHERE last_name &#x3D; emp_last; \n IF emp_count &gt; 1 THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;More than 1 employee exists with that name.&#39;); \n ELSE \n    SELECT first_name, last_name \n    INTO first, last \n    FROM employees \n    WHERE last_name &#x3D; emp_last; \n    DBMS_OUTPUT.PUT_LINE(&#39;The matching employee is: &#39; || \n    first || &#39; &#39; || last); \n END IF; \nEXCEPTION \n    WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;Please enter a different last name.&#39;); \nEND; \n\n1.6 Displaying Results in SQL*PlusSET SERVEROUTPUT ON is issued, then the default buffer size is 20,000 bytes.Any content that surpasses that size will be cut off. To increase the buffer, simply set the size of bufferyou’d like to use when turning the SERVEROUTPUT on: \n1.7 Commenting Your Code1.8 Referencing a Block of Code如何引用一个代码块?\n给一个代码块添加label标签,比如下面的代码\n\n&lt;&lt;dept_block&gt;&gt;\nDECLARE \n  dept_name varchar2(30); \nBEGIN \n  SELECT department_name \n  INTO dept_name \n  FROM departments \n  WHERE department_id &#x3D; 230;\n  DBMS_OUTPUT.PUT_LINE(dept_name);\nEND dept_block;\n\n\n1.9. Referring to Variables from Nested Blocks如果code block是嵌套关系那么该如何使用具有相同名字的变量,可以使用label来区分不同的变量名字\n&lt;&lt;outer_block&gt;&gt;\nDECLARE\n  mgr_id NUMBER(6) :&#x3D; &#39;&amp;current_manager_id&#39;;\n  dept_count number :&#x3D; 0;\nBEGIN\n\nSELECT count(*)\n    INTO dept_count \n    FROM departments \n    WHERE manager_id &#x3D; outer_block.mgr_id;\n\n IF dept_count &gt; 0 THEN \n    &lt;&lt;inner_block&gt;&gt; \n    DECLARE \n      dept_name VARCHAR2(30); \n      mgr_id NUMBER(6):&#x3D; &#39;&amp;new_manager_id&#39;; \n    BEGIN \n    SELECT department_name \n    INTO dept_name \n    FROM departments \n    WHERE manager_id &#x3D; outer_block.mgr_id; \n\n    UPDATE departments \n    SET manager_id &#x3D; inner_block.mgr_id \n    WHERE manager_id &#x3D; outer_block.mgr_id; \n    DBMS_OUTPUT.PUT_LINE \n    (&#39;Department manager ID has been changed for &#39; || dept_name); \n    END inner_block; \n ELSE \n    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); \n END IF; \nEXCEPTION \n WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); \nEND outer_block; \n\n但是inner block创建的变量，outside block是不会读取到的,外部块变量在内部块中是可见的，而不需要完全限定名称，并且不需要块标签\n1.10. Ignoring Substitution Variables转义那些sqlplus使用的特殊字符\nSQL&gt; SET ESCAPE &#39;\\&#39; \nSQL&gt; INSERT INTO DEPARTMENTS VALUES( \n  departments_seq.nextval, \n  &#39;Shipping \\&amp; Receiving&#39;, \n  null, \n null);\n\n还有另外一种\nSQL&gt; SET DEFINE OFF\nINSERT INTO DEPARTMENTS VALUES( \ndepartments_seq.nextval, \n&#39;Importing &amp; Exporting&#39;, \nnull, \nnull); \n\n\n1.11. Changing the Substitution Variable Character如果你对改变替换变量符号(&amp;)为其他的符号\n可以使用set define ^, 你也可以使用任意其他的符号来替换\nSQL&gt; SET DEFINE ^\nSQL&gt; SELECT department_name \n     FROM departments \n     WHERE department_id &#x3D; ^dept_id;\n\n1.12. Creating a Variable to Match a Database Column Type如果向查数据库中某一个表的数据，该如何将查询结果赋值给变量呢？可以使用%type关键字,会将一列的数据赋值给变量,而%rowtype则是返回一列的数据给变量\n\nDECLARE\n dept_name departments.department_name%TYPE; \n dept_id NUMBER(6) :&#x3D; &amp;department_id; \nBEGIN \n SELECT department_name \n INTO dept_name \n FROM departments \n WHERE department_id &#x3D; dept_id; \n DBMS_OUTPUT.PUT_LINE(&#39;The department with the given ID is: &#39; || dept_name); \nEXCEPTION \n WHEN NO_DATA_FOUND THEN \n DBMS_OUTPUT.PUT_LINE(&#39;No department for the given ID&#39;); \nEND;\n\n2.基础sql2.1 Retrieving a Single Row from the Databaseproblem\nYou are interested in returning one row from a database table via a query that searches for an exactmatch.\nsolution 1你可以使用select ... into ...语法\nDECLARE\n    first VARCHAR2(20);  -- varchar2(20)一定是要兼容的数据库表字段的\n    last VARCHAR2(25); \n    email VARCHAR2(25); \nBEGIN \n    SELECT first_name, last_name, email \n    INTO first, last, email \n    FROM employees \n    WHERE employee_id &#x3D; 100; \n    DBMS_OUTPUT.PUT_LINE( \n    &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); \nEXCEPTION \nWHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;No employee matches the given ID&#39;); \nWHEN TOO_MANY_ROWS THEN\n    DBMS_OUTPUT.PUT_LINE(&#39;More than one employee matches the given ID&#39;); \nEND; \n\nsolution 2\nDECLARE\n CURSOR emp_cursor IS \n SELECT first_name, last_name, email \n FROM employees \n WHERE employee_id &#x3D; &amp;emp_id; \n first VARCHAR2(20); \n last VARCHAR2(25); \n email VARCHAR2(25); \nBEGIN \n OPEN emp_cursor; \n FETCH emp_cursor INTO first, last, email; \n IF emp_cursor%NOTFOUND THEN \n      RAISE NO_DATA_FOUND; \n ELSE \n -- Perform second fetch to see if more than one row is returned \n    FETCH emp_cursor INTO first, last, email; \n    IF emp_cursor%FOUND THEN \n      RAISE TOO_MANY_ROWS; \n    ELSE \n      DBMS_OUTPUT.PUT_LINE( \n      &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); \n      END IF;\n END IF; \nCLOSE emp_cursor; \n\n\nhow it works\nsolution 1: One is to issue a SELECT…INTO statement,which is a statement designed to return just one row.The other approach is to open a cursor, fetch the  one row, and close the cursorsolution 2: We keep an open mind on that point. Consider that if youare expecting exactly one row to bereturned, getting multiple rows back represents an exception case that you must somehow deal with.The cursor-based solution makes it easy to simply ignore that exception case, but ignoring a conditionthat you do not expect to occur does not change the fact that it has occurred. Although a cursor is used,the cases where no data is returned or where too many rows are returnedgiven the user-supplied EMPLOYEE_IDstill remain a reality. However, since cursors are specifically designed to deal with zero rows or morethan one row coming back from a query, no exceptions will be raised if these situations occur. For this reason,Solution #2 contains some conditional logic that is used to manually raise the desired exceptions.In the event that the user supplies the block with an invalid EMPLOYEE_ID, the cursor will not fetch any data. The %NOTFOUND attribute of the cursor will be checked to see whether the cursor successfully fetched data. If not, then the NO_DATA_FOUND exception is raised. If the cursor is successful in retrieving data, then a second FETCH statement is issued to see whether more thanone row will be returned. If more than one row is returned, then the TOO_MANY_ROWS exception is raised;otherwise, the expected output is displayed. In any event, the output that is displayed using either of thesolutions will be the same whether successful or not.\n","dateCreated":"2022-10-19T23:51:33+08:00","dateModified":"2022-10-24T21:39:23+08:00","datePublished":"2022-10-19T23:51:33+08:00","description":"","headline":"Oracle PLSQL Recipes","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/"}</script>
+    <meta name="description" content="1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？ -- demo 1 begin   -- 中间写代码 end;  -- demo 2   declare  -- 定义变量  begin   -- 业务逻辑 end;  在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用 1.2 在pls">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/index.html">
 <meta property="og:site_name" content="Eden">
+<meta property="og:description" content="1 PL&#x2F;SQL Fundamentals1.1 创建plsql代码块如和创建一个可以执行的plsql代码块？ -- demo 1 begin   -- 中间写代码 end;  -- demo 2   declare  -- 定义变量  begin   -- 业务逻辑 end;  在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用 1.2 在pls">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-25T14:21:35.473Z">
-<meta property="article:modified_time" content="2022-10-25T14:21:35.473Z">
+<meta property="article:published_time" content="2022-10-19T15:51:33.289Z">
+<meta property="article:modified_time" content="2022-10-24T13:39:23.206Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@nil">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-jtle2hiadqi6creqze7vuhnn9ct7bmrwzzyznr4cpumzvckdy7pw9sbtrdse.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
 
 
-<link rel="icon" href="/img/avatar.jpg">
+    
+        
+            
+        
+    
 
-<link href="/css/style.css?v=1.1.0" rel="stylesheet">
-
-<link href="/css/hl_theme/sublime.css?v=1.1.0" rel="stylesheet">
-
-<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
-
-<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-<script src="/js/titleTip.js?v=1.1.0" ></script>
-
-<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
-<script>
-    hljs.initHighlightingOnLoad();
-</script>
-
-<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
-
-
-
-<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
-
-<script src="/js/iconfont.js?v=1.1.0" ></script>
-
-<meta name="generator" content="Hexo 6.2.0"></head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_preload_comment" value="">
-  <input class="theme_blog_path" value="">
-  <input id="theme_shortcut" value="true" />
-  <input id="theme_highlight_on" value="true" />
-  <input id="theme_code_copy" value="true" />
-</div>
-
-
-
-<body>
-<aside class="nav">
-    <div class="nav-left">
-        <a href="/"
-   class="avatar_target">
-    <img class="avatar"
-         src="/img/avatar.jpg"/>
-</a>
-<div class="author">
-    <span>kirkzhang</span>
-</div>
-
-<div class="icon">
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-</div>
-
-
-
-
-<ul>
-    <li>
-        <div class="all active" data-rel="All">All
-            
-                <small>(61)</small>
-            
-        </div>
-    </li>
-    
-        
-            
-                <li>
-                    <div data-rel="CPP">
-                        
-                        CPP
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="非技术类">
-                        
-                        非技术类
-                        <small>(3)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="分布式">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        分布式
-                        <small>(5)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="分布式<--->MIT6.824">
-                                        
-                                        MIT6.824
-                                        
-                                            <small>(4
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="数据结构">
-                        
-                        数据结构
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="算法">
-                        
-                        算法
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="随笔">
-                        
-                        随笔
-                        <small>(5)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="archive">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        archive
-                        <small>(10)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="archive<--->golang">
-                                        
-                                        golang
-                                        
-                                            <small>(2
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="CICD">
-                        
-                        CICD
-                        <small>(2)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="golang">
-                        
-                        golang
-                        <small>(2)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="leetcode">
-                        
-                        leetcode
-                        <small>(17)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="linux">
-                        
-                        linux
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="mysql">
-                        
-                        mysql
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="oracle">
-                        
-                        oracle
-                        <small>(4)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="TED">
-                        
-                        TED
-                        <small>(4)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="vue">
-                        
-                        vue
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="WEB-API">
-                        
-                        WEB-API
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-</ul>
-<div class="left-bottom">
-    <div class="menus">
-        
-            
-            
-            
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Eden
+        </a>
     </div>
-    <div>
+    
         
-            <a class="about  "
-               target="_blank"
-                    
-               href="/about">About</a>
+            <a
+                class="header-right-picture "
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
         
         
-    </div>
-</div>
-<input type="hidden" id="yelog_site_posts_number" value="61">
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
 
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
+            <!-- Define author's picture -->
 
-    </div>
-    <div class="nav-right">
-        <div class="friends-area">
-    <div class="friends-title">
-        Links
-        <i class="iconfont icon-left"></i>
-    </div>
-    <div class="friends-content">
-        <ul>
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
             
-            <li><a target="_blank" href="/null">叶落阁</a></li>
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
             
         </ul>
-    </div>
-</div>
-        <div class="title-list">
-    <div class="right-top">
-        <div id="default-panel">
-            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
-            <div class="right-title">All</div>
-            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
-        </div>
-        <div id="search-panel">
-            <i class="iconfont icon-left" data-title="返回"></i>
-            <input id="local-search-input" autocomplete="off"/>
-            <label class="border-line" for="input"></label>
-            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
-            <i class="iconfont icon-tag" data-title="标签"></i>
-        </div>
-        <div id="outline-panel" style="display: none">
-            <div class="right-title">大纲</div>
-            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
-        </div>
-    </div>
-
-    <div class="tags-list">
-    <input id="tag-search" />
-    <div class="tag-wrapper">
         
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>非技术类</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>ansible</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>Docker</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>golang</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>mysql</a>
-            </li>
-        
-    </div>
-
-</div>
-
-    
-    <div id="local-search-result">
-
-    </div>
-    
-    <nav id="title-list-nav">
-        
-        <a id="top" class="All 随笔 "
-           href="/2022/06/22/%E9%9A%8F%E7%AC%94/%E5%A6%82%E4%BD%95%E5%9C%A8%E8%AF%BB%E7%A0%94%E7%9A%84%E9%81%93%E8%B7%AF%E4%B8%8A%E5%BF%AB%E9%80%9F%E5%A4%B1%E8%B4%A5/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何在读研的道路上快速失败">如何在读研的道路上快速失败</span>
-            <span class="post-date" title="2022-06-22 21:14:38">2022/06/22</span>
-        </a>
-        
-        <a  class="All "
-           href="/2022/10/25/index/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="welcome to kirk&#39;s blog">welcome to kirk&#39;s blog</span>
-            <span class="post-date" title="2022-10-25 21:57:45">2022/10/25</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="高效研究的个人规则">高效研究的个人规则</span>
-            <span class="post-date" title="2022-10-24 23:33:29">2022/10/24</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/24/%E9%9A%8F%E7%AC%94/%E9%AB%98%E6%95%88%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Expectation setting">Expectation setting</span>
-            <span class="post-date" title="2022-10-24 23:28:34">2022/10/24</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/23/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E9%9C%80%E8%A6%811368%E4%B8%AA%E5%8D%95%E8%AF%8D/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="为什么只需要1368个单词">为什么只需要1368个单词</span>
-            <span class="post-date" title="2022-10-23 17:07:23">2022/10/23</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/10/22/TED/five_ways_to_kill_your_dreams/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="five ways to kill your dreams">five ways to kill your dreams</span>
-            <span class="post-date" title="2022-10-22 20:49:43">2022/10/22</span>
-        </a>
-        
-        <a  class="All vue "
-           href="/2022/10/22/vue/vuejs_up_and_running/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="vue.js up and running">vue.js up and running</span>
-            <span class="post-date" title="2022-10-22 13:44:29">2022/10/22</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/ubuntu%E5%AE%89%E8%A3%85zookeeper/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="ubuntu安装zookeeper">ubuntu安装zookeeper</span>
-            <span class="post-date" title="2022-10-20 21:48:20">2022/10/20</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="单机安装三个kafka节点">单机安装三个kafka节点</span>
-            <span class="post-date" title="2022-10-20 21:42:43">2022/10/20</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="iso8583简介">iso8583简介</span>
-            <span class="post-date" title="2022-10-20 21:09:47">2022/10/20</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Oracle PLSQL Recipes">Oracle PLSQL Recipes</span>
-            <span class="post-date" title="2022-10-19 23:51:33">2022/10/19</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/10/19/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E5%8E%9F%E7%94%9F%E5%AE%B6%E5%BA%AD%E5%A6%82%E4%BD%95%E4%BF%AE%E8%A1%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E6%80%A7%E6%A0%BC%E7%BC%BA%E9%99%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="原生家庭如何修补自己的性格缺陷">原生家庭如何修补自己的性格缺陷</span>
-            <span class="post-date" title="2022-10-19 22:29:54">2022/10/19</span>
-        </a>
-        
-        <a  class="All mysql "
-           href="/2022/10/16/mysql/mysql_manual/"
-           data-tag="mysql"
-           data-author="" >
-            <span class="post-title" title="mysql manual">mysql manual</span>
-            <span class="post-date" title="2022-10-16 21:54:25">2022/10/16</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/16/archive/install_mysql_on_ubuntu/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="install_mysql_on_ubuntu(Debian sys)">install_mysql_on_ubuntu(Debian sys)</span>
-            <span class="post-date" title="2022-10-16 16:23:49">2022/10/16</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/11/oracle/Real_World_SQL_and_PLSQL/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Real_World_SQL_and_PLSQL">Real_World_SQL_and_PLSQL</span>
-            <span class="post-date" title="2022-10-11 14:57:52">2022/10/11</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/11/oracle/Oracle_EBR/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Edition-Based Redefinition Technical Deep Dive">Edition-Based Redefinition Technical Deep Dive</span>
-            <span class="post-date" title="2022-10-11 12:13:46">2022/10/11</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经">go语言圣经</span>
-            <span class="post-date" title="2022-10-08 14:02:11">2022/10/08</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go标准库阅读与解析">go标准库阅读与解析</span>
-            <span class="post-date" title="2022-10-08 07:48:06">2022/10/08</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/07/archive/compact_wsl2/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="压缩wsl2的磁盘">压缩wsl2的磁盘</span>
-            <span class="post-date" title="2022-10-07 15:33:59">2022/10/07</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_structure_guide">MIT6.824之lab2_raft_structure_guide</span>
-            <span class="post-date" title="2022-10-07 08:40:25">2022/10/07</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_lock_advice">MIT6.824之lab2_raft_lock_advice</span>
-            <span class="post-date" title="2022-10-05 22:32:54">2022/10/05</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2b/lab2_raft_students_guide/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_students_guide">MIT6.824之lab2_raft_students_guide</span>
-            <span class="post-date" title="2022-10-05 20:21:56">2022/10/05</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="费曼:任何伟大的科学成就，都源于思想自由">费曼:任何伟大的科学成就，都源于思想自由</span>
-            <span class="post-date" title="2022-09-26 00:05:55">2022/09/26</span>
-        </a>
-        
-        <a  class="All archive golang "
-           href="/2022/09/09/archive/golang_concurrency_map/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="concurreny-map代码阅读">concurreny-map代码阅读</span>
-            <span class="post-date" title="2022-09-09 16:43:34">2022/09/09</span>
-        </a>
-        
-        <a  class="All "
-           href="/2022/09/09/pro_git/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="pro_git">pro_git</span>
-            <span class="post-date" title="2022-09-09 12:21:02">2022/09/09</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="深入浅出_Oracle_DBA_入门_进阶与诊断案例">深入浅出_Oracle_DBA_入门_进阶与诊断案例</span>
-            <span class="post-date" title="2022-08-31 17:35:04">2022/08/31</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="API数据自动入库">API数据自动入库</span>
-            <span class="post-date" title="2022-08-27 13:35:51">2022/08/27</span>
-        </a>
-        
-        <a  class="All archive golang "
-           href="/2022/08/26/archive/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="内存高效golang">内存高效golang</span>
-            <span class="post-date" title="2022-08-26 21:18:06">2022/08/26</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/08/26/archive/remote_github/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="更新origin 和upstream url链接">更新origin 和upstream url链接</span>
-            <span class="post-date" title="2022-08-26 21:14:30">2022/08/26</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/08/12/MIT6.824/lab2b/lab2_raft_paper/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_paper">MIT6.824之lab2_raft_paper</span>
-            <span class="post-date" title="2022-08-12 21:57:38">2022/08/12</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/08/04/TED/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="多巴胺戒断">多巴胺戒断</span>
-            <span class="post-date" title="2022-08-04 23:08:38">2022/08/04</span>
-        </a>
-        
-        <a  class="All 分布式 "
-           href="/2022/07/26/SAF_mechanism/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="SAF mechanism replication">SAF mechanism replication</span>
-            <span class="post-date" title="2022-07-26 17:00:17">2022/07/26</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/07/14/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E7%A6%85%E4%B8%8E%E6%91%A9%E6%89%98%E8%BD%A6%E7%BB%B4%E4%BF%AE%E8%89%BA%E6%9C%AF/"
-           data-tag="非技术类"
-           data-author="" >
-            <span class="post-title" title="禅与摩托车维修艺术">禅与摩托车维修艺术</span>
-            <span class="post-date" title="2022-07-14 08:37:05">2022/07/14</span>
-        </a>
-        
-        <a  class="All 数据结构 "
-           href="/2022/07/12/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%B2%E4%B9%89/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="数据结构讲义">数据结构讲义</span>
-            <span class="post-date" title="2022-07-12 23:27:09">2022/07/12</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/06/24/archive/archive/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="手册阅读归档">手册阅读归档</span>
-            <span class="post-date" title="2022-06-24 06:54:11">2022/06/24</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="21.合并两个有序链表">21.合并两个有序链表</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="27.移除元素">27.移除元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="66.加一">66.加一</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="83.删除排序链表中的重复元素">83.删除排序链表中的重复元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="9.回文数">9.回文数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode "
-           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E4%B8%93%E6%B3%A8%E5%8A%9B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何提高专注力-How to Get Your Brain to Focus-TED">如何提高专注力-How to Get Your Brain to Focus-TED</span>
-            <span class="post-date" title="2022-06-22 23:10:43">2022/06/22</span>
-        </a>
-        
-        <a  class="All 算法 "
-           href="/2022/06/22/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="算法导论">算法导论</span>
-            <span class="post-date" title="2022-06-22 22:07:23">2022/06/22</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何阅读-TED">如何阅读-TED</span>
-            <span class="post-date" title="2022-06-22 22:05:35">2022/06/22</span>
-        </a>
-        
-        <a  class="All WEB-API "
-           href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="API Design Patterns">API Design Patterns</span>
-            <span class="post-date" title="2022-06-22 21:55:02">2022/06/22</span>
-        </a>
-        
-        <a  class="All linux "
-           href="/2022/06/22/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%88%87shell%E8%85%B3%E6%9C%AC%E7%B7%A8%E7%A8%8B%E5%A4%A7%E5%85%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Linux命令行与shell腳本編程大全">Linux命令行与shell腳本編程大全</span>
-            <span class="post-date" title="2022-06-22 21:53:01">2022/06/22</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/06/22/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%BB%8E0%E5%88%B01_%E5%BC%80%E5%90%AF%E5%95%86%E4%B8%9A%E4%B8%8E%E6%9C%AA%E6%9D%A5%E7%9A%84%E7%A7%98%E5%AF%86/"
-           data-tag="非技术类"
-           data-author="" >
-            <span class="post-title" title="从0到1:开启商业与未来的秘密">从0到1:开启商业与未来的秘密</span>
-            <span class="post-date" title="2022-06-22 20:51:26">2022/06/22</span>
-        </a>
-        
-        <a  class="All CICD "
-           href="/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
-           data-tag="Docker"
-           data-author="" >
-            <span class="post-title" title="docker从入门到实践">docker从入门到实践</span>
-            <span class="post-date" title="2022-06-22 20:47:28">2022/06/22</span>
-        </a>
-        
-        <a  class="All CICD "
-           href="/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/"
-           data-tag="ansible"
-           data-author="" >
-            <span class="post-title" title="奔跑吧ansible">奔跑吧ansible</span>
-            <span class="post-date" title="2022-06-22 20:45:28">2022/06/22</span>
-        </a>
-        
-        <a  class="All CPP "
-           href="/2022/06/22/C++_Primer/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="C++ Primer Plus">C++ Primer Plus</span>
-            <span class="post-date" title="2022-06-22 01:01:03">2022/06/22</span>
-        </a>
-        
-        <div id="no-item-tips">
-
-        </div>
-    </nav>
-    <div id="outline-list">
-    </div>
-</div>
-
-    </div>
-    <div class="hide-list">
-        <div class="semicircle" data-title="切换全屏 快捷键 s">
-            <div class="brackets first"><</div>
-            <div class="brackets">&gt;</div>
-        </div>
-    </div>
-</aside>
-<div id="post">
-    <div class="pjax">
-        <article id="post-oracle/Oracle_PLSQL_Recipes" class="article article-type-post" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">Oracle PLSQL Recipes</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
+            <ul class="sidebar-buttons">
             
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
             
-            <a  data-rel="oracle">oracle</a>
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
             
-        </span>
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Google +"
+                        >
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/mailto"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
         
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
         
     </div>
-    <div class="article-meta">
-        
-            Created At : <time class="date" title='Updated At: 2022-10-24 21:39:23'>2022-10-19 23:51</time>
-        
-    </div>
-    <div class="article-meta">
-        
-        
-        <span id="busuanzi_container_page_pv">
-            Views 👀 :<span id="busuanzi_value_page_pv">
-                <span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </span>
-        </span>
-        
-        
-        <span class="top-comment" title="跳转至评论区">
-            <a href="#comments">
-                Comment:<span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </a>
-        </span>
-        
-    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
     
-    <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-PL-x2F-SQL-Fundamentals"><span class="toc-text">1 PL&#x2F;SQL Fundamentals</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E5%88%9B%E5%BB%BAplsql%E4%BB%A3%E7%A0%81%E5%9D%97"><span class="toc-text">1.1 创建plsql代码块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E5%9C%A8plsql%E7%A7%8D%E6%89%A7%E8%A1%8Cplsql%E4%BB%A3%E7%A0%81%E5%9D%97"><span class="toc-text">1.2 在plsql种执行plsql代码块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-store-code-in-script"><span class="toc-text">1.3 store code in script</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-%E6%89%A7%E8%A1%8C%E4%BD%A0%E7%9A%84%E8%84%9A%E6%9C%AC"><span class="toc-text">1.4 执行你的脚本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-%E6%8E%A5%E5%8F%97%E7%94%A8%E6%88%B7%E7%9A%84%E8%BE%93%E5%85%A5%E4%BB%8E%E9%94%AE%E7%9B%98%E4%B8%AD"><span class="toc-text">1.5 接受用户的输入从键盘中</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-6-Displaying-Results-in-SQL-Plus"><span class="toc-text">1.6 Displaying Results in SQL*Plus</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-7-Commenting-Your-Code"><span class="toc-text">1.7 Commenting Your Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-8-Referencing-a-Block-of-Code"><span class="toc-text">1.8 Referencing a Block of Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-9-Referring-to-Variables-from-Nested-Blocks"><span class="toc-text">1.9. Referring to Variables from Nested Blocks</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-10-Ignoring-Substitution-Variables"><span class="toc-text">1.10. Ignoring Substitution Variables</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-11-Changing-the-Substitution-Variable-Character"><span class="toc-text">1.11. Changing the Substitution Variable Character</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-12-Creating-a-Variable-to-Match-a-Database-Column-Type"><span class="toc-text">1.12. Creating a Variable to Match a Database Column Type</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%9F%BA%E7%A1%80sql"><span class="toc-text">2.基础sql</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-Retrieving-a-Single-Row-from-the-Database"><span class="toc-text">2.1 Retrieving a Single Row from the Database</span></a></li></ol></li></ol>
+        <div class="post-header main-content-wrap text-left">
     
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
-    }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
+        <h1 class="post-title">
+            Oracle PLSQL Recipes
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-10-19T23:51:33+08:00">
+	
+		    Oct 19, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
 </div>
+
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-PL-x2F-SQL-Fundamentals"><a href="#1-PL-x2F-SQL-Fundamentals" class="headerlink" title="1 PL&#x2F;SQL Fundamentals"></a>1 PL&#x2F;SQL Fundamentals</h1><h2 id="1-1-创建plsql代码块"><a href="#1-1-创建plsql代码块" class="headerlink" title="1.1 创建plsql代码块"></a>1.1 创建plsql代码块</h2><p>如和创建一个可以执行的plsql代码块？</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- demo 1</span>
-<span class="token keyword">begin</span>
-  <span class="token comment">-- 中间写代码</span>
-<span class="token keyword">end</span><span class="token punctuation">;</span>
+</div>
 
-<span class="token comment">-- demo 2</span>
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="1-PL-x2F-SQL-Fundamentals"><a href="#1-PL-x2F-SQL-Fundamentals" class="headerlink" title="1 PL&#x2F;SQL Fundamentals"></a>1 PL&#x2F;SQL Fundamentals</h1><h2 id="1-1-创建plsql代码块"><a href="#1-1-创建plsql代码块" class="headerlink" title="1.1 创建plsql代码块"></a>1.1 创建plsql代码块</h2><p>如和创建一个可以执行的plsql代码块？</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- demo 1
+begin
+  -- 中间写代码
+end;
+
+-- demo 2
 
 
-<span class="token keyword">declare</span>
+declare
 
-<span class="token comment">-- 定义变量</span>
+-- 定义变量
 
-<span class="token keyword">begin</span> 
- <span class="token comment">-- 业务逻辑</span>
-<span class="token keyword">end</span><span class="token punctuation">;</span></code></pre>
+begin 
+ -- 业务逻辑
+end;</code></pre>
 
 <p>在实际的开发当中，这些代码块会进行嵌套，第一层代码块定义的变量，内层的代码块也可以直接使用</p>
 <h2 id="1-2-在plsql种执行plsql代码块"><a href="#1-2-在plsql种执行plsql代码块" class="headerlink" title="1.2 在plsql种执行plsql代码块"></a>1.2 在plsql种执行plsql代码块</h2><p>如何在sqlplus中执行plsql代码?</p>
 <p>登录sqlplus就可以直接输入自己的代码，然后<code>end;</code>结束代码块，并且接着输入<code>/</code>,这时候sqlplus解释器就可以执行代码了。<br>但是有一点需要明确，如果你的代码块是以<code>declare</code>开头的，那么就会直接输出到屏幕</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">sql</span><span class="token operator">></span> <span class="token keyword">begin</span>
-DBMS_OUTPUT<span class="token punctuation">.</span>put_line<span class="token punctuation">(</span><span class="token string">"hello world"</span><span class="token punctuation">)</span>
-<span class="token keyword">end</span><span class="token punctuation">;</span>
-<span class="token operator">/</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">sql&gt; begin
+DBMS_OUTPUT.put_line(&quot;hello world&quot;)
+end;
+&#x2F;</code></pre>
 
 <p>但是如果你想创建package,function,procedure,可以使用如下语句，方便后面的调用</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">CREATE</span> <span class="token operator">OR</span> <span class="token keyword">REPLACE</span> <span class="token keyword">PROCEDURE</span> hello_world <span class="token keyword">AS</span> 
- <span class="token keyword">BEGIN</span> 
- DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'Hello World'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">END</span><span class="token punctuation">;</span> 
- <span class="token operator">/</span> </code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; CREATE OR REPLACE PROCEDURE hello_world AS 
+ BEGIN 
+ DBMS_OUTPUT.PUT_LINE(&#39;Hello World&#39;); 
+ END; 
+ &#x2F; </code></pre>
 
 <h2 id="1-3-store-code-in-script"><a href="#1-3-store-code-in-script" class="headerlink" title="1.3 store code in script"></a>1.3 store code in script</h2><p>如果你想通过sql脚本执行代码，该如何运行？</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SET</span> SERVEROUTPUT <span class="token keyword">ON</span><span class="token punctuation">;</span>
-<span class="token keyword">DECLARE</span> 
- counter NUMBER<span class="token punctuation">;</span>
-<span class="token keyword">BEGIN</span> 
-  <span class="token keyword">FOR</span> counter <span class="token operator">IN</span> REVERSE <span class="token number">0.</span><span class="token number">.10</span> <span class="token keyword">LOOP</span> 
-  DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE <span class="token punctuation">(</span>counter<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-  <span class="token keyword">END</span> <span class="token keyword">LOOP</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span>
-<span class="token operator">/</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SET SERVEROUTPUT ON;
+DECLARE 
+ counter NUMBER;
+BEGIN 
+  FOR counter IN REVERSE 0..10 LOOP 
+  DBMS_OUTPUT.PUT_LINE (counter); 
+  END LOOP; 
+END;
+&#x2F;</code></pre>
 <p>你可以保存你的plsql代码在脚本里,重要一步是要保证你的文件扩展名是<code>.sql</code><br>SQL Developer supports a number of additionalextensions for more specific types of PL&#x2F;SQL. </p>
 <h2 id="1-4-执行你的脚本"><a href="#1-4-执行你的脚本" class="headerlink" title="1.4 执行你的脚本"></a>1.4 执行你的脚本</h2><p>登录sqlplus，然后跳(Traverse)到你的脚本目录</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">@绝对路径
 @相对路径
-sqlplus username<span class="token operator">/</span>password<span class="token variable">@database</span> my_stored_script<span class="token punctuation">.</span><span class="token keyword">sql</span> </code></pre>
+sqlplus username&#x2F;password@database my_stored_script.sql </code></pre>
 
 <h2 id="1-5-接受用户的输入从键盘中"><a href="#1-5-接受用户的输入从键盘中" class="headerlink" title="1.5 接受用户的输入从键盘中"></a>1.5 接受用户的输入从键盘中</h2><p>sqlplus使用&amp;符号来接受来自键盘的输入</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
- emp_count NUMBER<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
- <span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> 
- <span class="token keyword">INTO</span> emp_count 
- <span class="token keyword">FROM</span> employees 
- <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token operator">&amp;</span>department_id<span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span> </code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ emp_count NUMBER; 
+BEGIN 
+ SELECT count(*) 
+ INTO emp_count 
+ FROM employees 
+ WHERE department_id &#x3D; &amp;department_id; 
+END; </code></pre>
 
 <p>但是如果你想从键盘接受一个输入，但是后面又想继续使用，则可以使用如下方法</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
- emp_count NUMBER<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-  <span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> 
-  <span class="token keyword">INTO</span> emp_count 
-  <span class="token keyword">FROM</span> employees 
-  <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token operator">&amp;&amp;</span>department_id<span class="token punctuation">;</span> 
-  DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'The employee count is: '</span> <span class="token operator">||</span> emp_count <span class="token operator">||</span> 
-  <span class="token string">' for the department with an ID of: '</span> <span class="token operator">||</span> <span class="token operator">&amp;</span>department_id<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ emp_count NUMBER; 
+BEGIN 
+  SELECT count(*) 
+  INTO emp_count 
+  FROM employees 
+  WHERE department_id &#x3D; &amp;&amp;department_id; 
+  DBMS_OUTPUT.PUT_LINE(&#39;The employee count is: &#39; || emp_count || 
+  &#39; for the department with an ID of: &#39; || &amp;department_id); 
+END;
 </code></pre>
 
 <p>另外还有一种方法就是定义变量来承接从键盘来的输入,但是要注意这个变量定义的类型,如果是numeric类型的，如果是varchar2类型则需要用<code>单引号</code>,见如下代码</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span> 
-    <span class="token keyword">first</span> varchar2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    <span class="token keyword">last</span> varchar2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    emp_last VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span> :<span class="token operator">=</span> <span class="token string">'&amp;last_name'</span><span class="token punctuation">;</span> 
-    emp_count NUMBER<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-    <span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> 
-    <span class="token keyword">INTO</span> emp_count 
-    <span class="token keyword">FROM</span> employees 
-    <span class="token keyword">WHERE</span> last_name <span class="token operator">=</span> emp_last<span class="token punctuation">;</span> 
- <span class="token keyword">IF</span> emp_count <span class="token operator">></span> <span class="token number">1</span> <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'More than 1 employee exists with that name.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">ELSE</span> 
-    <span class="token keyword">SELECT</span> first_name<span class="token punctuation">,</span> last_name 
-    <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span> 
-    <span class="token keyword">FROM</span> employees 
-    <span class="token keyword">WHERE</span> last_name <span class="token operator">=</span> emp_last<span class="token punctuation">;</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'The matching employee is: '</span> <span class="token operator">||</span> 
-    <span class="token keyword">first</span> <span class="token operator">||</span> <span class="token string">' '</span> <span class="token operator">||</span> <span class="token keyword">last</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+    first varchar2(20); 
+    last varchar2(25); 
+    emp_last VARCHAR2(25) :&#x3D; &#39;&amp;last_name&#39;; 
+    emp_count NUMBER; 
+BEGIN 
+    SELECT count(*) 
+    INTO emp_count 
+    FROM employees 
+    WHERE last_name &#x3D; emp_last; 
+ IF emp_count &gt; 1 THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;More than 1 employee exists with that name.&#39;); 
+ ELSE 
+    SELECT first_name, last_name 
+    INTO first, last 
+    FROM employees 
+    WHERE last_name &#x3D; emp_last; 
+    DBMS_OUTPUT.PUT_LINE(&#39;The matching employee is: &#39; || 
+    first || &#39; &#39; || last); 
+ END IF; 
 EXCEPTION 
-    <span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'Please enter a different last name.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span> </code></pre>
+    WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;Please enter a different last name.&#39;); 
+END; </code></pre>
 
 <h2 id="1-6-Displaying-Results-in-SQL-Plus"><a href="#1-6-Displaying-Results-in-SQL-Plus" class="headerlink" title="1.6 Displaying Results in SQL*Plus"></a>1.6 Displaying Results in SQL*Plus</h2><p><code>SET SERVEROUTPUT ON</code> is issued, then the default buffer size is 20,000 bytes.<br>Any content that surpasses that size will be cut off. To increase the buffer, simply set the size of buffer<br>you’d like to use when turning the SERVEROUTPUT on: </p>
 <h2 id="1-7-Commenting-Your-Code"><a href="#1-7-Commenting-Your-Code" class="headerlink" title="1.7 Commenting Your Code"></a>1.7 Commenting Your Code</h2><h2 id="1-8-Referencing-a-Block-of-Code"><a href="#1-8-Referencing-a-Block-of-Code" class="headerlink" title="1.8 Referencing a Block of Code"></a>1.8 Referencing a Block of Code</h2><p>如何引用一个代码块?</p>
 <p>给一个代码块添加label标签,比如下面的代码</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-<span class="token operator">&lt;&lt;</span>dept_block<span class="token operator">>></span>
-<span class="token keyword">DECLARE</span> 
-  dept_name varchar2<span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-  <span class="token keyword">SELECT</span> department_name 
-  <span class="token keyword">INTO</span> dept_name 
-  <span class="token keyword">FROM</span> departments 
-  <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token number">230</span><span class="token punctuation">;</span>
-  DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span>dept_name<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">END</span> dept_block<span class="token punctuation">;</span>
+&lt;&lt;dept_block&gt;&gt;
+DECLARE 
+  dept_name varchar2(30); 
+BEGIN 
+  SELECT department_name 
+  INTO dept_name 
+  FROM departments 
+  WHERE department_id &#x3D; 230;
+  DBMS_OUTPUT.PUT_LINE(dept_name);
+END dept_block;
 </code></pre>
 
 <h2 id="1-9-Referring-to-Variables-from-Nested-Blocks"><a href="#1-9-Referring-to-Variables-from-Nested-Blocks" class="headerlink" title="1.9. Referring to Variables from Nested Blocks"></a>1.9. Referring to Variables from Nested Blocks</h2><p>如果code block是嵌套关系那么该如何使用具有相同名字的变量,可以使用label来区分不同的变量名字</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token operator">&lt;&lt;</span>outer_block<span class="token operator">>></span>
-<span class="token keyword">DECLARE</span>
-  mgr_id NUMBER<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span> :<span class="token operator">=</span> <span class="token string">'&amp;current_manager_id'</span><span class="token punctuation">;</span>
-  dept_count number :<span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token keyword">BEGIN</span>
+<pre class="language-sql" data-language="sql"><code class="language-sql">&lt;&lt;outer_block&gt;&gt;
+DECLARE
+  mgr_id NUMBER(6) :&#x3D; &#39;&amp;current_manager_id&#39;;
+  dept_count number :&#x3D; 0;
+BEGIN
 
-<span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span>
-    <span class="token keyword">INTO</span> dept_count 
-    <span class="token keyword">FROM</span> departments 
-    <span class="token keyword">WHERE</span> manager_id <span class="token operator">=</span> outer_block<span class="token punctuation">.</span>mgr_id<span class="token punctuation">;</span>
+SELECT count(*)
+    INTO dept_count 
+    FROM departments 
+    WHERE manager_id &#x3D; outer_block.mgr_id;
 
- <span class="token keyword">IF</span> dept_count <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">THEN</span> 
-    <span class="token operator">&lt;&lt;</span>inner_block<span class="token operator">>></span> 
-    <span class="token keyword">DECLARE</span> 
-      dept_name VARCHAR2<span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-      mgr_id NUMBER<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span>:<span class="token operator">=</span> <span class="token string">'&amp;new_manager_id'</span><span class="token punctuation">;</span> 
-    <span class="token keyword">BEGIN</span> 
-    <span class="token keyword">SELECT</span> department_name 
-    <span class="token keyword">INTO</span> dept_name 
-    <span class="token keyword">FROM</span> departments 
-    <span class="token keyword">WHERE</span> manager_id <span class="token operator">=</span> outer_block<span class="token punctuation">.</span>mgr_id<span class="token punctuation">;</span> 
+ IF dept_count &gt; 0 THEN 
+    &lt;&lt;inner_block&gt;&gt; 
+    DECLARE 
+      dept_name VARCHAR2(30); 
+      mgr_id NUMBER(6):&#x3D; &#39;&amp;new_manager_id&#39;; 
+    BEGIN 
+    SELECT department_name 
+    INTO dept_name 
+    FROM departments 
+    WHERE manager_id &#x3D; outer_block.mgr_id; 
 
-    <span class="token keyword">UPDATE</span> departments 
-    <span class="token keyword">SET</span> manager_id <span class="token operator">=</span> inner_block<span class="token punctuation">.</span>mgr_id 
-    <span class="token keyword">WHERE</span> manager_id <span class="token operator">=</span> outer_block<span class="token punctuation">.</span>mgr_id<span class="token punctuation">;</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE 
-    <span class="token punctuation">(</span><span class="token string">'Department manager ID has been changed for '</span> <span class="token operator">||</span> dept_name<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    <span class="token keyword">END</span> inner_block<span class="token punctuation">;</span> 
- <span class="token keyword">ELSE</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'There are no departments listed for the manager'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span> 
+    UPDATE departments 
+    SET manager_id &#x3D; inner_block.mgr_id 
+    WHERE manager_id &#x3D; outer_block.mgr_id; 
+    DBMS_OUTPUT.PUT_LINE 
+    (&#39;Department manager ID has been changed for &#39; || dept_name); 
+    END inner_block; 
+ ELSE 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); 
+ END IF; 
 EXCEPTION 
- <span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'There are no departments listed for the manager'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span> outer_block<span class="token punctuation">;</span> </code></pre>
+ WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are no departments listed for the manager&#39;); 
+END outer_block; </code></pre>
 
 <p>但是inner block创建的变量，outside block是不会读取到的,外部块变量在内部块中是可见的，而不需要完全限定名称，并且不需要块标签</p>
 <h2 id="1-10-Ignoring-Substitution-Variables"><a href="#1-10-Ignoring-Substitution-Variables" class="headerlink" title="1.10. Ignoring Substitution Variables"></a>1.10. Ignoring Substitution Variables</h2><p>转义那些sqlplus使用的特殊字符</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SET</span> <span class="token keyword">ESCAPE</span> <span class="token string">'\' 
-SQL> INSERT INTO DEPARTMENTS VALUES( 
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; SET ESCAPE &#39;\&#39; 
+SQL&gt; INSERT INTO DEPARTMENTS VALUES( 
   departments_seq.nextval, 
-  '</span>Shipping \<span class="token operator">&amp;</span> Receiving'<span class="token punctuation">,</span> 
-  <span class="token boolean">null</span><span class="token punctuation">,</span> 
- <span class="token boolean">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+  &#39;Shipping \&amp; Receiving&#39;, 
+  null, 
+ null);</code></pre>
 
 <p>还有另外一种</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SET</span> DEFINE <span class="token keyword">OFF</span>
-<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> DEPARTMENTS <span class="token keyword">VALUES</span><span class="token punctuation">(</span> 
-departments_seq<span class="token punctuation">.</span>nextval<span class="token punctuation">,</span> 
-<span class="token string">'Importing &amp; Exporting'</span><span class="token punctuation">,</span> 
-<span class="token boolean">null</span><span class="token punctuation">,</span> 
-<span class="token boolean">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; SET DEFINE OFF
+INSERT INTO DEPARTMENTS VALUES( 
+departments_seq.nextval, 
+&#39;Importing &amp; Exporting&#39;, 
+null, 
+null); 
 </code></pre>
 
 <h2 id="1-11-Changing-the-Substitution-Variable-Character"><a href="#1-11-Changing-the-Substitution-Variable-Character" class="headerlink" title="1.11. Changing the Substitution Variable Character"></a>1.11. Changing the Substitution Variable Character</h2><p>如果你对改变替换变量符号(&amp;)为其他的符号</p>
 <p>可以使用<code>set define ^</code>, 你也可以使用任意其他的符号来替换</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SET</span> DEFINE <span class="token operator">^</span>
-<span class="token keyword">SQL</span><span class="token operator">></span> <span class="token keyword">SELECT</span> department_name 
-     <span class="token keyword">FROM</span> departments 
-     <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> <span class="token operator">^</span>dept_id<span class="token punctuation">;</span></code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; SET DEFINE ^
+SQL&gt; SELECT department_name 
+     FROM departments 
+     WHERE department_id &#x3D; ^dept_id;</code></pre>
 
 <h2 id="1-12-Creating-a-Variable-to-Match-a-Database-Column-Type"><a href="#1-12-Creating-a-Variable-to-Match-a-Database-Column-Type" class="headerlink" title="1.12. Creating a Variable to Match a Database Column Type"></a>1.12. Creating a Variable to Match a Database Column Type</h2><p>如果向查数据库中某一个表的数据，该如何将查询结果赋值给变量呢？<br>可以使用<code>%type</code>关键字,会将一列的数据赋值给变量,而<code>%rowtype</code>则是返回一列的数据给变量</p>
 <pre class="language-sql" data-language="sql"><code class="language-sql">
-<span class="token keyword">DECLARE</span>
- dept_name departments<span class="token punctuation">.</span>department_name<span class="token operator">%</span><span class="token keyword">TYPE</span><span class="token punctuation">;</span> 
- dept_id NUMBER<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span> :<span class="token operator">=</span> <span class="token operator">&amp;</span>department_id<span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
- <span class="token keyword">SELECT</span> department_name 
- <span class="token keyword">INTO</span> dept_name 
- <span class="token keyword">FROM</span> departments 
- <span class="token keyword">WHERE</span> department_id <span class="token operator">=</span> dept_id<span class="token punctuation">;</span> 
- DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'The department with the given ID is: '</span> <span class="token operator">||</span> dept_name<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+DECLARE
+ dept_name departments.department_name%TYPE; 
+ dept_id NUMBER(6) :&#x3D; &amp;department_id; 
+BEGIN 
+ SELECT department_name 
+ INTO dept_name 
+ FROM departments 
+ WHERE department_id &#x3D; dept_id; 
+ DBMS_OUTPUT.PUT_LINE(&#39;The department with the given ID is: &#39; || dept_name); 
 EXCEPTION 
- <span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
- DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'No department for the given ID'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span></code></pre>
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE(&#39;No department for the given ID&#39;); 
+END;</code></pre>
 
 <h1 id="2-基础sql"><a href="#2-基础sql" class="headerlink" title="2.基础sql"></a>2.基础sql</h1><h2 id="2-1-Retrieving-a-Single-Row-from-the-Database"><a href="#2-1-Retrieving-a-Single-Row-from-the-Database" class="headerlink" title="2.1 Retrieving a Single Row from the Database"></a>2.1 Retrieving a Single Row from the Database</h2><p><strong>problem</strong></p>
 <p>You are interested in returning one row from a database table via a query that searches for an exact<br>match.</p>
 <p><strong>solution 1</strong><br>你可以使用<code>select ... into ...</code>语法</p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
-    <span class="token keyword">first</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">-- varchar2(20)一定是要兼容的数据库表字段的</span>
-    <span class="token keyword">last</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    email VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
-    <span class="token keyword">SELECT</span> first_name<span class="token punctuation">,</span> last_name<span class="token punctuation">,</span> email 
-    <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span><span class="token punctuation">,</span> email 
-    <span class="token keyword">FROM</span> employees 
-    <span class="token keyword">WHERE</span> employee_id <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">;</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span> 
-    <span class="token string">'Employee Information for ID: '</span> <span class="token operator">||</span> <span class="token keyword">first</span> <span class="token operator">||</span> <span class="token string">' '</span> <span class="token operator">||</span> <span class="token keyword">last</span> <span class="token operator">||</span> <span class="token string">' - '</span> <span class="token operator">||</span> email<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+    first VARCHAR2(20);  -- varchar2(20)一定是要兼容的数据库表字段的
+    last VARCHAR2(25); 
+    email VARCHAR2(25); 
+BEGIN 
+    SELECT first_name, last_name, email 
+    INTO first, last, email 
+    FROM employees 
+    WHERE employee_id &#x3D; 100; 
+    DBMS_OUTPUT.PUT_LINE( 
+    &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); 
 EXCEPTION 
-<span class="token keyword">WHEN</span> NO_DATA_FOUND <span class="token keyword">THEN</span> 
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'No employee matches the given ID'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">WHEN</span> TOO_MANY_ROWS <span class="token keyword">THEN</span>
-    DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span><span class="token string">'More than one employee matches the given ID'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">END</span><span class="token punctuation">;</span> </code></pre>
+WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;No employee matches the given ID&#39;); 
+WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE(&#39;More than one employee matches the given ID&#39;); 
+END; </code></pre>
 
 <p><strong>solution 2</strong></p>
-<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">DECLARE</span>
- <span class="token keyword">CURSOR</span> emp_cursor <span class="token operator">IS</span> 
- <span class="token keyword">SELECT</span> first_name<span class="token punctuation">,</span> last_name<span class="token punctuation">,</span> email 
- <span class="token keyword">FROM</span> employees 
- <span class="token keyword">WHERE</span> employee_id <span class="token operator">=</span> <span class="token operator">&amp;</span>emp_id<span class="token punctuation">;</span> 
- <span class="token keyword">first</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- <span class="token keyword">last</span> VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
- email VARCHAR2<span class="token punctuation">(</span><span class="token number">25</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">BEGIN</span> 
- <span class="token keyword">OPEN</span> emp_cursor<span class="token punctuation">;</span> 
- <span class="token keyword">FETCH</span> emp_cursor <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span><span class="token punctuation">,</span> email<span class="token punctuation">;</span> 
- <span class="token keyword">IF</span> emp_cursor<span class="token operator">%</span>NOTFOUND <span class="token keyword">THEN</span> 
-      RAISE NO_DATA_FOUND<span class="token punctuation">;</span> 
- <span class="token keyword">ELSE</span> 
- <span class="token comment">-- Perform second fetch to see if more than one row is returned </span>
-    <span class="token keyword">FETCH</span> emp_cursor <span class="token keyword">INTO</span> <span class="token keyword">first</span><span class="token punctuation">,</span> <span class="token keyword">last</span><span class="token punctuation">,</span> email<span class="token punctuation">;</span> 
-    <span class="token keyword">IF</span> emp_cursor<span class="token operator">%</span>FOUND <span class="token keyword">THEN</span> 
-      RAISE TOO_MANY_ROWS<span class="token punctuation">;</span> 
-    <span class="token keyword">ELSE</span> 
-      DBMS_OUTPUT<span class="token punctuation">.</span>PUT_LINE<span class="token punctuation">(</span> 
-      <span class="token string">'Employee Information for ID: '</span> <span class="token operator">||</span> <span class="token keyword">first</span> <span class="token operator">||</span> <span class="token string">' '</span> <span class="token operator">||</span> <span class="token keyword">last</span> <span class="token operator">||</span> <span class="token string">' - '</span> <span class="token operator">||</span> email<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-      <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span>
- <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span> 
-<span class="token keyword">CLOSE</span> emp_cursor<span class="token punctuation">;</span> 
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ CURSOR emp_cursor IS 
+ SELECT first_name, last_name, email 
+ FROM employees 
+ WHERE employee_id &#x3D; &amp;emp_id; 
+ first VARCHAR2(20); 
+ last VARCHAR2(25); 
+ email VARCHAR2(25); 
+BEGIN 
+ OPEN emp_cursor; 
+ FETCH emp_cursor INTO first, last, email; 
+ IF emp_cursor%NOTFOUND THEN 
+      RAISE NO_DATA_FOUND; 
+ ELSE 
+ -- Perform second fetch to see if more than one row is returned 
+    FETCH emp_cursor INTO first, last, email; 
+    IF emp_cursor%FOUND THEN 
+      RAISE TOO_MANY_ROWS; 
+    ELSE 
+      DBMS_OUTPUT.PUT_LINE( 
+      &#39;Employee Information for ID: &#39; || first || &#39; &#39; || last || &#39; - &#39; || email); 
+      END IF;
+ END IF; 
+CLOSE emp_cursor; 
 </code></pre>
 
 <p><strong>how it works</strong></p>
 <p>solution 1: One is to issue a SELECT…INTO statement,which is a statement designed to return just one row.<br>The other approach is to open a cursor, fetch the  one row, and close the cursor<br>solution 2: We keep an open mind on that point. Consider that if youare expecting exactly one row to be<br>returned, getting multiple rows back represents an exception case that you must somehow deal with.<br>The cursor-based solution makes it easy to simply ignore that exception case, but ignoring a condition<br>that you do not expect to occur does not change the fact that it has occurred. Although a cursor is used,<br>the cases where no data is returned or where too many rows are returnedgiven the user-supplied EMPLOYEE_ID<br>still remain a reality. However, since cursors are specifically designed to deal with zero rows or more<br>than one row coming back from a query, no exceptions will be raised if these situations occur. For this reason,<br>Solution #2 contains some conditional logic that is used to manually raise the desired exceptions.In the event that the user supplies the block with an invalid EMPLOYEE_ID, the cursor will not fetch any data. The %NOTFOUND attribute of the cursor will be checked to see whether the cursor successfully fetched data. If not, then the NO_DATA_FOUND exception is raised. If the cursor is successful in retrieving data, then a second FETCH statement is issued to see whether more than<br>one row will be returned. If more than one row is returned, then the TOO_MANY_ROWS exception is raised;<br>otherwise, the expected output is displayed. In any event, the output that is displayed using either of the<br>solutions will be the same whether successful or not.</p>
 
-      
-       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
+                    data-tooltip="iso8583简介"
+                    aria-label="PREVIOUS: iso8583简介"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/19/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E5%8E%9F%E7%94%9F%E5%AE%B6%E5%BA%AD%E5%A6%82%E4%BD%95%E4%BF%AE%E8%A1%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E6%80%A7%E6%A0%BC%E7%BC%BA%E9%99%B7/"
+                    data-tooltip="原生家庭如何修补自己的性格缺陷"
+                    aria-label="NEXT: 原生家庭如何修补自己的性格缺陷"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
     </div>
 </article>
 
 
 
-<div class="article_copyright">
-    <p><span class="copy-title">Title:</span>Oracle PLSQL Recipes</p>
-    
-    <p><span class="copy-title">Author:</span><a  title="kirkzhang">kirkzhang</a></p>
-    <p><span class="copy-title">Created At:</span>2022-10-19, 23:51:33</p>
-    <p><span class="copy-title">Updated At:</span>2022-10-24, 21:39:23</p>
-    <span class="copy-title">Url:</span><a class="post-url" href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/" title="Oracle PLSQL Recipes">https://simonteo58.github.io/2022/10/19/oracle/Oracle_PLSQL_Recipes/</a>
-    <p>
-        <span class="copy-title">Copyright:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">&#39;Attribution-non-commercial-shared in the same way 4.0&#39;</a> Reprint please keep the original link and author.
-    </p>
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
+                    data-tooltip="iso8583简介"
+                    aria-label="PREVIOUS: iso8583简介"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/19/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E5%8E%9F%E7%94%9F%E5%AE%B6%E5%BA%AD%E5%A6%82%E4%BD%95%E4%BF%AE%E8%A1%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E6%80%A7%E6%A0%BC%E7%BC%BA%E9%99%B7/"
+                    data-tooltip="原生家庭如何修补自己的性格缺陷"
+                    aria-label="NEXT: 原生家庭如何修补自己的性格缺陷"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
 </div>
 
 
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
 
-    <div id="comments"></div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
 
-<script type="text/javascript">
-    $.getScript('/js/gitalk.js', function () {
-        var gitalk = new Gitalk({
-            clientID: 'ca29b9a1203b5920918d',
-            clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
-            repo: 'SimonTeo58.github.io',
-            owner: 'SimonTeo58',
-            admin: ['SimonTeo58'],
-            id: decodeURI(location.pathname),
-            distractionFreeMode: 'true',
-            language: 'zh-CN',
-            perPage: parseInt('10',10)
-        })
-        gitalk.render('comments')
-    })
-</script>
-
-
+            
+        </div>
+        
 
 
     
+        
+    
 
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
 
-
-
-    </div>
-    <div class="copyright">
-        <p class="footer-entry">
-    i hear i forget, i see i remember , i do i understand
-</p>
-<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
-
-    </div>
-    <div class="full-toc">
-        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
-<a class="" id="rocket" ></a>
-
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                nil
+            </div>
+        
     </div>
 </div>
 
-</body>
-<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
-
-<script src="/js/script.js?v=1.1.0" ></script>
-<script>
-    var img_resize = 'default';
-    function initArticle() {
-        /*渲染对应的表格样式*/
-        
-            $("#post .pjax table").addClass("green");
-        
-
-        /*渲染打赏样式*/
-        
-
-        /*高亮代码块行号*/
-        
-
-        /*访问数量*/
-        
-        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-
-        /*代码高亮，行号对齐*/
-        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
-
         
         
-    }
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
 
-    /*打赏页面隐藏与展示*/
-    
+<script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
 
-</script>
-
-<!--加入行号的高亮代码块样式-->
-
-<!--自定义样式设置-->
-<style>
-    
-    
-    .nav {
-        width: 572px;
-    }
-    .nav.fullscreen {
-        margin-left: -572px;
-    }
-    .nav-left {
-        width: 150px;
-    }
-    
-    
-    @media screen and (max-width: 1468px) {
-        .nav {
-            width: 492px;
-        }
-        .nav.fullscreen {
-            margin-left: -492px;
-        }
-        .nav-left {
-            width: 100px;
-        }
-    }
-    
-    
-    @media screen and (max-width: 1024px) {
-        .nav {
-            width: 492px;
-            margin-left: -492px
-        }
-        .nav.fullscreen {
-            margin-left: 0;
-        }
-    }
-    
-    @media screen and (max-width: 426px) {
-        .nav {
-            width: 100%;
-        }
-        .nav-left {
-            width: 100%;
-        }
-    }
-    
-    
-    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
-        color: #383636;
-    }
-    
-    
-    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
-        color: #5e5e5f;
-    }
-    
-    
-    .nav-right nav a.hover, #local-search-result a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-    /*列表样式*/
-    
-    #post .pjax article .article-entry>ol, #post .pjax article .article-entry>ul, #post .pjax article>ol, #post .pjax article>ul{
-        border: #e2dede solid 1px;
-        border-radius: 10px;
-        padding: 10px 32px 10px 56px;
-    }
-    #post .pjax article .article-entry li>ol, #post .pjax article .article-entry li>ul,#post .pjax article li>ol, #post .pjax article li>ul{
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-    #post .pjax article .article-entry>ol>li, #post .pjax article .article-entry>ul>li,#post .pjax article>ol>li, #post .pjax article>ul>li{
-        margin-bottom: auto;
-        margin-left: auto;
-    }
-    #post .pjax article .article-entry li>ol>li, #post .pjax article .article-entry li>ul>li,#post .pjax article li>ol>li, #post .pjax article li>ul>li{
-        margin-bottom: auto;
-        margin-left: auto;
-    }
-    
-
-    /* 背景图样式 */
-    
-    
+<!--SCRIPTS END-->
 
 
-    /*引用块样式*/
     
+        
+<script src="/assets/js/gitalk.js"></script>
 
-    /*文章列表背景图*/
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/10/19/oracle/Oracle_PLSQL_Recipes/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
     
-
-    
-</style>
 
 
 
 
-
-
-
+    </body>
 </html>
