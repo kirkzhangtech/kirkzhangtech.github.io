@@ -4,6 +4,7 @@ categories:
 - linux
 ---
 
+<!-- toc -->
 - [1. linux入门](#1-linux入门)
 - [2. 走进shell](#2-走进shell)
 - [3. 基本shell命令](#3-基本shell命令)
@@ -159,6 +160,7 @@ categories:
     - [20.2.8 特殊的字符数组](#2028-特殊的字符数组)
     - [20.2.9 星号](#2029-星号)
 - [AppendIndex](#appendindex)
+<!-- toc -->
 
 <!-- more -->
 
@@ -185,6 +187,7 @@ linux是一款开源操作系统统称，其有很多发行版本，像ubuntu..�
 
 - 文件系统管理
     linux自有的诸多文件系统外，Linux还支持从其他操作系统（比如Microsoft Windows）采用的文件系统中读写数据。内核必须在编译时就加入对所有可能用到的文件系统的支持
+<!-- more -->
 
 # 2. 走进shell
 

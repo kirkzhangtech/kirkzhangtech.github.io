@@ -153,7 +153,7 @@ author:
 sidebar_behavior: 4
 # Hide sidebar on all article page to let article take full width to improve reading, and
 # enjoy wide images and cover images. (true: enable, false: disable)
-clear_reading: true
+clear_reading: false
 # Display thumbnail image of each post on index pages (false: disabled, true: enabled)
 thumbnail_image: true
 # Display thumbnail image at the right of title in index pages (`right`, `left` or `bottom`)
