@@ -101,7 +101,8 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: 3-hexo
+# theme: 3-hexo
+theme: tranquilpeak
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
