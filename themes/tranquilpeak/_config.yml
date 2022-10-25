@@ -123,9 +123,9 @@ author:
     # or in `source/assets/images/` (production)
     # or you can use an external url
     # Overwritten by your gravatar image if `gravatar_email` is filled
-    picture: avatar.jpg
+    picture: nil
     # Your Twitter username without the @. E.g : `tranquilpeak`
-    twitter: @shiming_kirk
+    twitter: nil
     # Your personal google plus profile id, not your blog or business page id.
     # E.g : `+JohnDoe` or `123812884128439`
     google_plus: nil
