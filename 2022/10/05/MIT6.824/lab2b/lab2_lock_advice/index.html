@@ -1,1074 +1,381 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+    
 <head>
-  <meta charset="utf-8">
-  <title>MIT6.824之lab2_raft_lock_advice | Eden</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="MIT6.824之lab2_raft_lock_advice | Eden">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="作者：Eugene Vinitsky  Personal Rules of Productive ResearchCaveats and intent: Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid m">
-<meta property="og:type" content="article">
-<meta property="og:title" content="高效研究的个人规则">
-<meta property="og:url" content="https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/index.html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Eden">
+    <title>MIT6.824之lab2_raft_lock_advice - Eden</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"rule 1whenever you have one more goroutine gonna modify data , you should use lock to prevent data andavoid multip-goroutine change data ,go race is a good tool , that is enable to detect data race ,but without any helpful on below rules\nrule 2whenever your code make a sequence of modification on shared code.if they looked at thedata midway through the sequence,other goroutines might malfunction, you should use lockto pretect code block which gonna be change and other routine read data midway, for example\nrf.mu.Lock()\nrf.currentTerm +&#x3D; 1\nrf.state &#x3D; Candidate\nrf.mu.Unlock()\n\n\none more goroutine could not read any of above temp updates, so A goroutine should hold locking over the critical section.on the other hand , if B goroutine using r.currenTerm or r.state, ,who must hold locking when access r.currenTerm at somewhere\nrule 3Whenever code does a sequence of reads of shared data (orreads and writes), and would malfunction if another goroutine modifiedthe data midway through the sequence, you should use a lock around thewhole sequence.\nplease must take care and review the multi-goroutine change data at the same time.and must aware if another goroutine modifiedthe data midway through the sequence, you should use a lock around the whole sequence.\n\nrf.mu.Lock()\n  if args.Term &gt; rf.currentTerm &#123;\n   rf.currentTerm &#x3D; args.Term\n  &#125;\n  rf.mu.Unlock()\n\n\nrule 4this rule just only apply to lab2, it announces that It’s usually a bad idea to hold a lock while doing anything that might wait: reading a Go channel, sending on a channel, waiting for a timer, calling time.Sleep(), or sending an RPC (and waiting for thereply).\nrule 5this rule is also apply for lab2 specifical case.Be careful about assumptions across a drop and re-acquire of alock. One place this can arise is when avoiding waiting with locksheld.\nBe careful about assumptions across a drop and re-acquire of alock. One place this can arise is when avoiding waiting with locksheld. For example, this code to send vote RPCs is incorrect:\nrf.mu.Lock()\nrf.currentTerm +&#x3D; 1\nrf.state &#x3D; Candidate\nfor &lt;each peer&gt; &#123;\n  go func() &#123;\n    rf.mu.Lock()\n    args.Term &#x3D; rf.currentTerm\n    rf.mu.Unlock()\n    Call(&quot;Raft.RequestVote&quot;, &amp;args, ...)\n    &#x2F;&#x2F; handle the reply...\n  &#125; ()\n&#125;\nrf.mu.Unlock()\n\nThe code sends each RPC in a separate goroutine. It’s incorrectbecause args.Term may not be the same as the rf.currentTerm at whichthe surrounding code decided to become a Candidate. Lots of time maypass between when the surrounding code creates the goroutine and whenthe goroutine reads rf.currentTerm; for example, multiple terms maycome and go, and the peer may no longer be a candidate. One way to fixthis is for the created goroutine to use a copy of rf.currentTerm madewhile the outer code holds the lock. Similarly, reply-handling codeafter the Call() must re-check all relevant assumptions afterre-acquiring the lock; for example, it should check thatrf.currentTerm hasn’t changed since the decision to become acandidate.\nIt can be difficult to interpret and apply these rules. Perhaps mostpuzzling is the notion in Rules 2 and 3 of code sequences thatshouldn’t be interleaved with other goroutines’ reads or writes. Howcan one recognize such sequences? How should one decide where asequence ought to start and end?\nOne approach is to start with code that has no locks, and thinkcarefully about where one needs to add locks to attain correctness.This approach can be difficult since it requires reasoning about thecorrectness of concurrent code.\n一个更务实的方法是从观察开始的，如果没有没有并发性（没有同时执行的goroutine），你就根本不需要锁。就根本不需要锁了。但是，当RPC系统创建goroutines来执行RPC时，你的并发性被强加于你当RPC系统创建goroutines来执行RPC处理程序时，你的并发性是被迫的，并且因为你需要在不同的goroutine中发送RPC以避免等待。你可以有效地消除这种并发，方法是确定所有的地方（RPC处理程序、你在Make()中创建的后台goroutine中创建的后台goroutines，等等），在每个goroutine的开始时获取锁，并且只释放锁。锁，并且只有在该程序完全结束并返回时才释放锁。完全结束并返回时才释放锁。这个锁协议确保没有任何重要的东西是并行执行的；锁保证了每个goroutine在任何其他goroutine被允许启动之前执行完毕。允许启动。由于没有并行执行，所以很难违反规则1、2、3或5。如果每个goroutine的代码在孤立情况下是正确的(当单独执行时，没有并发的goroutine)，那么当你使用锁时，它很可能当你使用锁来抑制并发性时，它仍然是正确的。所以你可以避免对正确性进行明确的推理，或者明确的识别关键部分。\n\n通过www.DeepL.com/Translator（免费版）翻译\n\nHowever, Rule 4 is likely to be a problem. So the next step is to findplaces where the code waits, and to add lock releases and re-acquires(and&#x2F;or goroutine creation) as needed, being careful to re-establishassumptions after each re-acquire. You may find this process easier toget right than directly identifying sequences that must be locked forcorrectness.\n(As an aside, what this approach sacrifices is any opportunity forbetter performance via parallel execution on multiple cores: your codeis likely to hold locks when it doesn’t need to, and may thusunnecessarily prohibit parallel execution of goroutines. On the otherhand, there is not much opportunity for CPU parallelism within asingle Raft peer.)\n原文\n原文\n\nRaft Locking Advice\n\nIf you are wondering how to use locks in the 6.824 Raft labs, here aresome rules and ways of thinking that might be helpful.\nRule 1: Whenever you have data that more than one goroutine uses, andat least one goroutine might modify the data, the goroutines shoulduse locks to prevent simultaneous use of the data. The Go racedetector is pretty good at detecting violations of this rule (thoughit won’t help with any of the rules below).\nRule 2: Whenever code makes a sequence of modifications to shareddata, and other goroutines might malfunction if they looked at thedata midway through the sequence, you should use a lock around thewhole sequence.\nAn example:\n  rf.mu.Lock()  rf.currentTerm +&#x3D; 1  rf.state &#x3D; Candidate  rf.mu.Unlock()\nIt would be a mistake for another goroutine to see either of theseupdates alone (i.e. the old state with the new term, or the new termwith the old state). So we need to hold the lock continuously over thewhole sequence of updates. All other code that uses rf.currentTerm orrf.state must also hold the lock, in order to ensure exclusive accessfor all uses.\nThe code between Lock() and Unlock() is often called a “criticalsection.” The locking rules a programmer chooses (e.g. “a goroutinemust hold rf.mu when using rf.currentTerm or rf.state”) are oftencalled a “locking protocol”.\nRule 3: Whenever code does a sequence of reads of shared data (orreads and writes), and would malfunction if another goroutine modifiedthe data midway through the sequence, you should use a lock around thewhole sequence.\nAn example that could occur in a Raft RPC handler:\n  rf.mu.Lock()  if args.Term &gt; rf.currentTerm {   rf.currentTerm &#x3D; args.Term  }  rf.mu.Unlock()\nThis code needs to hold the lock continuously for the whole sequence.Raft requires that currentTerm only increases, and never decreases.Another RPC handler could be executing in a separate goroutine; if itwere allowed to modify rf.currentTerm between the if statement and theupdate to rf.currentTerm, this code might end up decreasingrf.currentTerm. Hence the lock must be held continuously over thewhole sequence. In addition, every other use of currentTerm must holdthe lock, to ensure that no other goroutine modifies currentTermduring our critical section.\nReal Raft code would need to use longer critical sections than theseexamples; for example, a Raft RPC handler should probably hold thelock for the entire handler.\nRule 4: It’s usually a bad idea to hold a lock while doing anythingthat might wait: reading a Go channel, sending on a channel, waitingfor a timer, calling time.Sleep(), or sending an RPC (and waiting for thereply). One reason is that you probably want other goroutines to makeprogress during the wait. Another reason is deadlock avoidance. Imaginetwo peers sending each other RPCs while holding locks; both RPChandlers need the receiving peer’s lock; neither RPC handler can evercomplete because it needs the lock held by the waiting RPC call.\nCode that waits should first release locks. If that’s not convenient,sometimes it’s useful to create a separate goroutine to do the wait.\nRule 5: Be careful about assumptions across a drop and re-acquire of alock. One place this can arise is when avoiding waiting with locksheld. For example, this code to send vote RPCs is incorrect:\n  rf.mu.Lock()  rf.currentTerm +&#x3D; 1  rf.state &#x3D; Candidate  for  {    go func() {      rf.mu.Lock()      args.Term &#x3D; rf.currentTerm      rf.mu.Unlock()      Call(“Raft.RequestVote”, &amp;args, …)      &#x2F;&#x2F; handle the reply…    } ()  }  rf.mu.Unlock()\nThe code sends each RPC in a separate goroutine. It’s incorrectbecause args.Term may not be the same as the rf.currentTerm at whichthe surrounding code decided to become a Candidate. Lots of time maypass between when the surrounding code creates the goroutine and whenthe goroutine reads rf.currentTerm; for example, multiple terms maycome and go, and the peer may no longer be a candidate. One way to fixthis is for the created goroutine to use a copy of rf.currentTerm madewhile the outer code holds the lock. Similarly, reply-handling codeafter the Call() must re-check all relevant assumptions afterre-acquiring the lock; for example, it should check thatrf.currentTerm hasn’t changed since the decision to become acandidate.\nIt can be difficult to interpret and apply these rules. Perhaps mostpuzzling is the notion in Rules 2 and 3 of code sequences thatshouldn’t be interleaved with other goroutines’ reads or writes. Howcan one recognize such sequences? How should one decide where asequence ought to start and end?\nOne approach is to start with code that has no locks, and thinkcarefully about where one needs to add locks to attain correctness.This approach can be difficult since it requires reasoning about thecorrectness of concurrent code.\nA more pragmatic approach starts with the observation that if therewere no concurrency (no simultaneously executing goroutines), youwould not need locks at all. But you have concurrency forced on youwhen the RPC system creates goroutines to execute RPC handlers, andbecause you need to send RPCs in separate goroutines to avoid waiting.You can effectively eliminate this concurrency by identifying allplaces where goroutines start (RPC handlers, background goroutines youcreate in Make(), &amp;c), acquiring the lock at the very start of eachgoroutine, and only releasing the lock when that goroutine hascompletely finished and returns. This locking protocol ensures thatnothing significant ever executes in parallel; the locks ensure thateach goroutine executes to completion before any other goroutine isallowed to start. With no parallel execution, it’s hard to violateRules 1, 2, 3, or 5. If each goroutine’s code is correct in isolation(when executed alone, with no concurrent goroutines), it’s likely tostill be correct when you use locks to suppress concurrency. So youcan avoid explicit reasoning about correctness, or explicitlyidentifying critical sections.\nHowever, Rule 4 is likely to be a problem. So the next step is to findplaces where the code waits, and to add lock releases and re-acquires(and&#x2F;or goroutine creation) as needed, being careful to re-establishassumptions after each re-acquire. You may find this process easier toget right than directly identifying sequences that must be locked forcorrectness.\n(As an aside, what this approach sacrifices is any opportunity forbetter performance via parallel execution on multiple cores: your codeis likely to hold locks when it doesn’t need to, and may thusunnecessarily prohibit parallel execution of goroutines. On the otherhand, there is not much opportunity for CPU parallelism within asingle Raft peer.)\n","dateCreated":"2022-10-05T22:32:54+08:00","dateModified":"2022-10-07T08:39:20+08:00","datePublished":"2022-10-05T22:32:54+08:00","description":"","headline":"MIT6.824之lab2_raft_lock_advice","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/"}</script>
+    <meta name="description" content="rule 1whenever you have one more goroutine gonna modify data , you should use lock to prevent data andavoid multip-goroutine change data ,go race is a good tool , that is enable to detect data race ,b">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="MIT6.824之lab2_raft_lock_advice">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="作者：Eugene Vinitsky  Personal Rules of Productive ResearchCaveats and intent: Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid m">
+<meta property="og:description" content="rule 1whenever you have one more goroutine gonna modify data , you should use lock to prevent data andavoid multip-goroutine change data ,go race is a good tool , that is enable to detect data race ,b">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-10-24T15:33:29.906Z">
-<meta property="article:modified_time" content="2022-10-25T08:46:00.940Z">
+<meta property="article:published_time" content="2022-10-05T14:32:54.640Z">
+<meta property="article:modified_time" content="2022-10-07T00:39:20.001Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@nil">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/nil"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/all.css">
+
+    
+<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="/assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
 
 
-<link rel="icon" href="/img/avatar.jpg">
+    
+        
+            
+        
+    
 
-<link href="/css/style.css?v=1.1.0" rel="stylesheet">
-
-<link href="/css/hl_theme/sublime.css?v=1.1.0" rel="stylesheet">
-
-<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
-
-<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-<script src="/js/titleTip.js?v=1.1.0" ></script>
-
-<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
-<script>
-    hljs.initHighlightingOnLoad();
-</script>
-
-<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
-
-
-
-<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
-
-<script src="/js/iconfont.js?v=1.1.0" ></script>
-
-<meta name="generator" content="Hexo 6.2.0"></head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_preload_comment" value="">
-  <input class="theme_blog_path" value="">
-  <input id="theme_shortcut" value="true" />
-  <input id="theme_highlight_on" value="true" />
-  <input id="theme_code_copy" value="true" />
-</div>
-
-
-
-<body>
-<aside class="nav">
-    <div class="nav-left">
-        <a href="/"
-   class="avatar_target">
-    <img class="avatar"
-         src="/img/avatar.jpg"/>
-</a>
-<div class="author">
-    <span>kirkzhang</span>
-</div>
-
-<div class="icon">
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-</div>
-
-
-
-
-<ul>
-    <li>
-        <div class="all active" data-rel="All">All
-            
-                <small>(60)</small>
-            
-        </div>
-    </li>
-    
-        
-            
-                <li>
-                    <div data-rel="CPP">
-                        
-                        CPP
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="非技术类">
-                        
-                        非技术类
-                        <small>(3)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="分布式">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        分布式
-                        <small>(5)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="分布式<--->MIT6.824">
-                                        
-                                        MIT6.824
-                                        
-                                            <small>(4
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="数据结构">
-                        
-                        数据结构
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="算法">
-                        
-                        算法
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="随笔">
-                        
-                        随笔
-                        <small>(5)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="archive">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        archive
-                        <small>(10)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="archive<--->golang">
-                                        
-                                        golang
-                                        
-                                            <small>(2
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="CICD">
-                        
-                        CICD
-                        <small>(2)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="golang">
-                        
-                        golang
-                        <small>(2)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="leetcode">
-                        <i class="fold iconfont icon-right"></i>
-                        
-                        leetcode
-                        <small>(17)</small>
-                        
-                    </div>
-                    
-                        <ul class="sub hide">
-                            
-                                <li>
-                                    <div data-rel="leetcode<--->leetcode题解">
-                                        
-                                        leetcode题解
-                                        
-                                            <small>(17
-                                                )</small>
-                                        
-                                    </div>
-                                    
-                                </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="linux">
-                        
-                        linux
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="mysql">
-                        
-                        mysql
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="oracle">
-                        
-                        oracle
-                        <small>(4)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="TED">
-                        
-                        TED
-                        <small>(4)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="vue">
-                        
-                        vue
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="WEB-API">
-                        
-                        WEB-API
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-</ul>
-<div class="left-bottom">
-    <div class="menus">
-        
-            
-            
-            
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Eden
+        </a>
     </div>
-    <div>
+    
         
-            <a class="about  "
-               target="_blank"
-                    
-               href="/about">About</a>
+            <a
+                class="header-right-picture "
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
         
         
-    </div>
-</div>
-<input type="hidden" id="yelog_site_posts_number" value="60">
+            <img class="header-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
 
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
+            <!-- Define author's picture -->
 
-    </div>
-    <div class="nav-right">
-        <div class="friends-area">
-    <div class="friends-title">
-        Links
-        <i class="iconfont icon-left"></i>
-    </div>
-    <div class="friends-content">
-        <ul>
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
             
-            <li><a target="_blank" href="/null">叶落阁</a></li>
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
             
         </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="Google +"
+                        >
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/nil"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/mailto"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
     </div>
-</div>
-        <div class="title-list">
-    <div class="right-top">
-        <div id="default-panel">
-            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
-            <div class="right-title">All</div>
-            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
-        </div>
-        <div id="search-panel">
-            <i class="iconfont icon-left" data-title="返回"></i>
-            <input id="local-search-input" autocomplete="off"/>
-            <label class="border-line" for="input"></label>
-            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
-            <i class="iconfont icon-tag" data-title="标签"></i>
-        </div>
-        <div id="outline-panel" style="display: none">
-            <div class="right-title">大纲</div>
-            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
-        </div>
-    </div>
+</nav>
 
-    <div class="tags-list">
-    <input id="tag-search" />
-    <div class="tag-wrapper">
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            MIT6.824之lab2_raft_lock_advice
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-10-05T22:32:54+08:00">
+	
+		    Oct 05, 2022
+    	
+    </time>
+    
+        <span>in </span>
         
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>非技术类</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>ansible</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>Docker</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>golang</a>
-            </li>
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>mysql</a>
-            </li>
-        
-    </div>
+    <a class="category-link" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>, <a class="category-link" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/MIT6-824/">MIT6.824</a>
 
-</div>
 
     
-    <div id="local-search-result">
-
-    </div>
-    
-    <nav id="title-list-nav">
-        
-        <a id="top" class="All 随笔 "
-           href="/2022/06/22/%E9%9A%8F%E7%AC%94/%E5%A6%82%E4%BD%95%E5%9C%A8%E8%AF%BB%E7%A0%94%E7%9A%84%E9%81%93%E8%B7%AF%E4%B8%8A%E5%BF%AB%E9%80%9F%E5%A4%B1%E8%B4%A5/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何在读研的道路上快速失败">如何在读研的道路上快速失败</span>
-            <span class="post-date" title="2022-06-22 21:14:38">2022/06/22</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="高效研究的个人规则">高效研究的个人规则</span>
-            <span class="post-date" title="2022-10-24 23:33:29">2022/10/24</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/24/%E9%9A%8F%E7%AC%94/%E9%AB%98%E6%95%88%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Expectation setting">Expectation setting</span>
-            <span class="post-date" title="2022-10-24 23:28:34">2022/10/24</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/10/23/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E9%9C%80%E8%A6%811368%E4%B8%AA%E5%8D%95%E8%AF%8D/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="为什么只需要1368个单词">为什么只需要1368个单词</span>
-            <span class="post-date" title="2022-10-23 17:07:23">2022/10/23</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/10/22/TED/five_ways_to_kill_your_dreams/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="five ways to kill your dreams">five ways to kill your dreams</span>
-            <span class="post-date" title="2022-10-22 20:49:43">2022/10/22</span>
-        </a>
-        
-        <a  class="All vue "
-           href="/2022/10/22/vue/vuejs_up_and_running/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="vue.js up and running">vue.js up and running</span>
-            <span class="post-date" title="2022-10-22 13:44:29">2022/10/22</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/ubuntu%E5%AE%89%E8%A3%85zookeeper/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="ubuntu安装zookeeper">ubuntu安装zookeeper</span>
-            <span class="post-date" title="2022-10-20 21:48:20">2022/10/20</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="单机安装三个kafka节点">单机安装三个kafka节点</span>
-            <span class="post-date" title="2022-10-20 21:42:43">2022/10/20</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/20/archive/iso8583%E7%AE%80%E4%BB%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="iso8583简介">iso8583简介</span>
-            <span class="post-date" title="2022-10-20 21:09:47">2022/10/20</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/19/oracle/Oracle_PLSQL_Recipes/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Oracle PLSQL Recipes">Oracle PLSQL Recipes</span>
-            <span class="post-date" title="2022-10-19 23:51:33">2022/10/19</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/10/19/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E5%8E%9F%E7%94%9F%E5%AE%B6%E5%BA%AD%E5%A6%82%E4%BD%95%E4%BF%AE%E8%A1%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E6%80%A7%E6%A0%BC%E7%BC%BA%E9%99%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="原生家庭如何修补自己的性格缺陷">原生家庭如何修补自己的性格缺陷</span>
-            <span class="post-date" title="2022-10-19 22:29:54">2022/10/19</span>
-        </a>
-        
-        <a  class="All mysql "
-           href="/2022/10/16/mysql/mysql_manual/"
-           data-tag="mysql"
-           data-author="" >
-            <span class="post-title" title="mysql manual">mysql manual</span>
-            <span class="post-date" title="2022-10-16 21:54:25">2022/10/16</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/16/archive/install_mysql_on_ubuntu/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="install_mysql_on_ubuntu(Debian sys)">install_mysql_on_ubuntu(Debian sys)</span>
-            <span class="post-date" title="2022-10-16 16:23:49">2022/10/16</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/11/oracle/Real_World_SQL_and_PLSQL/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Real_World_SQL_and_PLSQL">Real_World_SQL_and_PLSQL</span>
-            <span class="post-date" title="2022-10-11 14:57:52">2022/10/11</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/10/11/oracle/Oracle_EBR/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Edition-Based Redefinition Technical Deep Dive">Edition-Based Redefinition Technical Deep Dive</span>
-            <span class="post-date" title="2022-10-11 12:13:46">2022/10/11</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/08/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go语言圣经">go语言圣经</span>
-            <span class="post-date" title="2022-10-08 14:02:11">2022/10/08</span>
-        </a>
-        
-        <a  class="All golang "
-           href="/2022/10/08/golang/go%E6%A0%87%E5%87%86%E6%96%87%E6%A1%A3/"
-           data-tag="golang"
-           data-author="" >
-            <span class="post-title" title="go标准库阅读与解析">go标准库阅读与解析</span>
-            <span class="post-date" title="2022-10-08 07:48:06">2022/10/08</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/10/07/archive/compact_wsl2/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="压缩wsl2的磁盘">压缩wsl2的磁盘</span>
-            <span class="post-date" title="2022-10-07 15:33:59">2022/10/07</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_structure_guide">MIT6.824之lab2_raft_structure_guide</span>
-            <span class="post-date" title="2022-10-07 08:40:25">2022/10/07</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_lock_advice">MIT6.824之lab2_raft_lock_advice</span>
-            <span class="post-date" title="2022-10-05 22:32:54">2022/10/05</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/10/05/MIT6.824/lab2b/lab2_raft_students_guide/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_students_guide">MIT6.824之lab2_raft_students_guide</span>
-            <span class="post-date" title="2022-10-05 20:21:56">2022/10/05</span>
-        </a>
-        
-        <a  class="All 随笔 "
-           href="/2022/09/26/%E9%9A%8F%E7%AC%94/%E8%B4%B9%E6%9B%BC:%E4%BB%BB%E4%BD%95%E4%BC%9F%E5%A4%A7%E7%9A%84%E7%A7%91%E5%AD%A6%E6%88%90%E5%B0%B1%E9%83%BD%E6%BA%90%E4%BA%8E%E6%80%9D%E6%83%B3%E8%87%AA%E7%94%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="费曼:任何伟大的科学成就，都源于思想自由">费曼:任何伟大的科学成就，都源于思想自由</span>
-            <span class="post-date" title="2022-09-26 00:05:55">2022/09/26</span>
-        </a>
-        
-        <a  class="All archive golang "
-           href="/2022/09/09/archive/golang_concurrency_map/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="concurreny-map代码阅读">concurreny-map代码阅读</span>
-            <span class="post-date" title="2022-09-09 16:43:34">2022/09/09</span>
-        </a>
-        
-        <a  class="All "
-           href="/2022/09/09/pro_git/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="pro_git">pro_git</span>
-            <span class="post-date" title="2022-09-09 12:21:02">2022/09/09</span>
-        </a>
-        
-        <a  class="All oracle "
-           href="/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="深入浅出_Oracle_DBA_入门_进阶与诊断案例">深入浅出_Oracle_DBA_入门_进阶与诊断案例</span>
-            <span class="post-date" title="2022-08-31 17:35:04">2022/08/31</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="API数据自动入库">API数据自动入库</span>
-            <span class="post-date" title="2022-08-27 13:35:51">2022/08/27</span>
-        </a>
-        
-        <a  class="All archive golang "
-           href="/2022/08/26/archive/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="内存高效golang">内存高效golang</span>
-            <span class="post-date" title="2022-08-26 21:18:06">2022/08/26</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/08/26/archive/remote_github/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="更新origin 和upstream url链接">更新origin 和upstream url链接</span>
-            <span class="post-date" title="2022-08-26 21:14:30">2022/08/26</span>
-        </a>
-        
-        <a  class="All 分布式 MIT6.824 "
-           href="/2022/08/12/MIT6.824/lab2b/lab2_raft_paper/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MIT6.824之lab2_raft_paper">MIT6.824之lab2_raft_paper</span>
-            <span class="post-date" title="2022-08-12 21:57:38">2022/08/12</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/08/04/TED/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="多巴胺戒断">多巴胺戒断</span>
-            <span class="post-date" title="2022-08-04 23:08:38">2022/08/04</span>
-        </a>
-        
-        <a  class="All 分布式 "
-           href="/2022/07/26/SAF_mechanism/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="SAF mechanism replication">SAF mechanism replication</span>
-            <span class="post-date" title="2022-07-26 17:00:17">2022/07/26</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/07/14/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E7%A6%85%E4%B8%8E%E6%91%A9%E6%89%98%E8%BD%A6%E7%BB%B4%E4%BF%AE%E8%89%BA%E6%9C%AF/"
-           data-tag="非技术类"
-           data-author="" >
-            <span class="post-title" title="禅与摩托车维修艺术">禅与摩托车维修艺术</span>
-            <span class="post-date" title="2022-07-14 08:37:05">2022/07/14</span>
-        </a>
-        
-        <a  class="All 数据结构 "
-           href="/2022/07/12/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%B2%E4%B9%89/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="数据结构讲义">数据结构讲义</span>
-            <span class="post-date" title="2022-07-12 23:27:09">2022/07/12</span>
-        </a>
-        
-        <a  class="All archive "
-           href="/2022/06/24/archive/archive/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="手册阅读归档">手册阅读归档</span>
-            <span class="post-date" title="2022-06-24 06:54:11">2022/06/24</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="13.罗马数字转整数">13.罗马数字转整数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="14.最长公共前缀">14.最长公共前缀</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="20.有效的括号">20.有效的括号</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="21.合并两个有序链表">21.合并两个有序链表</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="27.移除元素">27.移除元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="53.最大子数组和">53.最大子数组和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="28.实现 strStr()">28.实现 strStr()</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="58.最后一个单词的长度">58.最后一个单词的长度</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="35.搜索插入位置">35.搜索插入位置</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="66.加一">66.加一</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="67.二进制的求和">67.二进制的求和</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="69.x-的平方根">69.x-的平方根</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="70.爬楼梯">70.爬楼梯</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="83.删除排序链表中的重复元素">83.删除排序链表中的重复元素</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="88.合并两个有序数组">88.合并两个有序数组</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="94.二叉树的中序排序">94.二叉树的中序排序</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All leetcode leetcode题解 "
-           href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="9.回文数">9.回文数</span>
-            <span class="post-date" title="2022-06-23 00:10:00">2022/06/23</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E4%B8%93%E6%B3%A8%E5%8A%9B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何提高专注力-How to Get Your Brain to Focus-TED">如何提高专注力-How to Get Your Brain to Focus-TED</span>
-            <span class="post-date" title="2022-06-22 23:10:43">2022/06/22</span>
-        </a>
-        
-        <a  class="All 算法 "
-           href="/2022/06/22/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="算法导论">算法导论</span>
-            <span class="post-date" title="2022-06-22 22:07:23">2022/06/22</span>
-        </a>
-        
-        <a  class="All TED "
-           href="/2022/06/22/TED/%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="如何阅读-TED">如何阅读-TED</span>
-            <span class="post-date" title="2022-06-22 22:05:35">2022/06/22</span>
-        </a>
-        
-        <a  class="All WEB-API "
-           href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="API Design Patterns">API Design Patterns</span>
-            <span class="post-date" title="2022-06-22 21:55:02">2022/06/22</span>
-        </a>
-        
-        <a  class="All linux "
-           href="/2022/06/22/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%88%87shell%E8%85%B3%E6%9C%AC%E7%B7%A8%E7%A8%8B%E5%A4%A7%E5%85%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Linux命令行与shell腳本編程大全">Linux命令行与shell腳本編程大全</span>
-            <span class="post-date" title="2022-06-22 21:53:01">2022/06/22</span>
-        </a>
-        
-        <a  class="All 非技术类 "
-           href="/2022/06/22/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%BB%8E0%E5%88%B01_%E5%BC%80%E5%90%AF%E5%95%86%E4%B8%9A%E4%B8%8E%E6%9C%AA%E6%9D%A5%E7%9A%84%E7%A7%98%E5%AF%86/"
-           data-tag="非技术类"
-           data-author="" >
-            <span class="post-title" title="从0到1:开启商业与未来的秘密">从0到1:开启商业与未来的秘密</span>
-            <span class="post-date" title="2022-06-22 20:51:26">2022/06/22</span>
-        </a>
-        
-        <a  class="All CICD "
-           href="/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
-           data-tag="Docker"
-           data-author="" >
-            <span class="post-title" title="docker从入门到实践">docker从入门到实践</span>
-            <span class="post-date" title="2022-06-22 20:47:28">2022/06/22</span>
-        </a>
-        
-        <a  class="All CICD "
-           href="/2022/06/22/%E5%A5%94%E8%B7%91%E5%90%A7ansible/"
-           data-tag="ansible"
-           data-author="" >
-            <span class="post-title" title="奔跑吧ansible">奔跑吧ansible</span>
-            <span class="post-date" title="2022-06-22 20:45:28">2022/06/22</span>
-        </a>
-        
-        <a  class="All CPP "
-           href="/2022/06/22/C++_Primer/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="C++ Primer Plus">C++ Primer Plus</span>
-            <span class="post-date" title="2022-06-22 01:01:03">2022/06/22</span>
-        </a>
-        
-        <div id="no-item-tips">
-
-        </div>
-    </nav>
-    <div id="outline-list">
-    </div>
 </div>
 
-    </div>
-    <div class="hide-list">
-        <div class="semicircle" data-title="切换全屏 快捷键 s">
-            <div class="brackets first"><</div>
-            <div class="brackets">&gt;</div>
-        </div>
-    </div>
-</aside>
-<div id="post">
-    <div class="pjax">
-        <article id="post-MIT6.824/lab2b/lab2_lock_advice" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">MIT6.824之lab2_raft_lock_advice</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
-            
-            
-            <a  data-rel="分布式">分布式</a> > 
-            
-            <a  data-rel="分布式&lt;---&gt;MIT6.824">MIT6.824</a>
-            
-        </span>
-        
-        
-    </div>
-    <div class="article-meta">
-        
-            Created At : <time class="date" title='Updated At: 2022-10-07 08:39:20'>2022-10-05 22:32</time>
-        
-    </div>
-    <div class="article-meta">
-        
-        
-        <span id="busuanzi_container_page_pv">
-            Views 👀 :<span id="busuanzi_value_page_pv">
-                <span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </span>
-        </span>
-        
-        
-        <span class="top-comment" title="跳转至评论区">
-            <a href="#comments">
-                Comment:<span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </a>
-        </span>
-        
-    </div>
-    
-    <div class="toc-ref">
-    
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-1"><span class="toc-text">rule 1</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-2"><span class="toc-text">rule 2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-3"><span class="toc-text">rule 3</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-4"><span class="toc-text">rule 4</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-5"><span class="toc-text">rule 5</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8E%9F%E6%96%87"><span class="toc-text">原文</span></a></li></ol>
-    
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
-    }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
 </div>
+
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="rule-1"><a href="#rule-1" class="headerlink" title="rule 1"></a>rule 1</h1><p>whenever you have one more goroutine gonna modify data , you should use lock to prevent data and<br>avoid multip-goroutine change data ,go race is a good tool , that is enable to detect data race ,<br>but without any helpful on below rules</p>
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="rule-1"><a href="#rule-1" class="headerlink" title="rule 1"></a>rule 1</h1><p>whenever you have one more goroutine gonna modify data , you should use lock to prevent data and<br>avoid multip-goroutine change data ,go race is a good tool , that is enable to detect data race ,<br>but without any helpful on below rules</p>
 <h1 id="rule-2"><a href="#rule-2" class="headerlink" title="rule 2"></a>rule 2</h1><p>whenever your code make a sequence of modification on shared code.if they looked at the<br>data midway through the sequence,other goroutines might malfunction, you should use lock<br>to pretect code block which gonna be change and other routine read data midway, for example</p>
 <pre class="language-golang" data-language="golang"><code class="language-golang">rf.mu.Lock()
 rf.currentTerm +&#x3D; 1
@@ -1141,210 +448,378 @@ Raft Locking Advice
 <p>However, Rule 4 is likely to be a problem. So the next step is to find<br>places where the code waits, and to add lock releases and re-acquires<br>(and&#x2F;or goroutine creation) as needed, being careful to re-establish<br>assumptions after each re-acquire. You may find this process easier to<br>get right than directly identifying sequences that must be locked for<br>correctness.</p>
 <p>(As an aside, what this approach sacrifices is any opportunity for<br>better performance via parallel execution on multiple cores: your code<br>is likely to hold locks when it doesn’t need to, and may thus<br>unnecessarily prohibit parallel execution of goroutines. On the other<br>hand, there is not much opportunity for CPU parallelism within a<br>single Raft peer.)<br></pre></p>
 </details>
-      
-       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源,欢迎对文章中的引用来源进行考证,欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论,也可以邮件至zxc741208584@gmail.com </span>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
+                    data-tooltip="MIT6.824之lab2_raft_structure_guide"
+                    aria-label="PREVIOUS: MIT6.824之lab2_raft_structure_guide"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/05/MIT6.824/lab2b/lab2_raft_students_guide/"
+                    data-tooltip="MIT6.824之lab2_raft_students_guide"
+                    aria-label="NEXT: MIT6.824之lab2_raft_students_guide"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
     </div>
 </article>
 
 
 
-<div class="article_copyright">
-    <p><span class="copy-title">Title:</span>MIT6.824之lab2_raft_lock_advice</p>
-    
-    <p><span class="copy-title">Author:</span><a  title="kirkzhang">kirkzhang</a></p>
-    <p><span class="copy-title">Created At:</span>2022-10-05, 22:32:54</p>
-    <p><span class="copy-title">Updated At:</span>2022-10-07, 08:39:20</p>
-    <span class="copy-title">Url:</span><a class="post-url" href="/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/" title="MIT6.824之lab2_raft_lock_advice">https://simonteo58.github.io/2022/10/05/MIT6.824/lab2b/lab2_lock_advice/</a>
-    <p>
-        <span class="copy-title">Copyright:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">&#39;Attribution-non-commercial-shared in the same way 4.0&#39;</a> Reprint please keep the original link and author.
-    </p>
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
+                    data-tooltip="MIT6.824之lab2_raft_structure_guide"
+                    aria-label="PREVIOUS: MIT6.824之lab2_raft_structure_guide"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/05/MIT6.824/lab2b/lab2_raft_students_guide/"
+                    data-tooltip="MIT6.824之lab2_raft_students_guide"
+                    aria-label="NEXT: MIT6.824之lab2_raft_students_guide"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
 </div>
 
 
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
 
-    <div id="comments"></div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
 
-<script type="text/javascript">
-    $.getScript('/js/gitalk.js', function () {
-        var gitalk = new Gitalk({
-            clientID: 'ca29b9a1203b5920918d',
-            clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
-            repo: 'SimonTeo58.github.io',
-            owner: 'SimonTeo58',
-            admin: ['SimonTeo58'],
-            id: decodeURI(location.pathname),
-            distractionFreeMode: 'true',
-            language: 'zh-CN',
-            perPage: parseInt('10',10)
-        })
-        gitalk.render('comments')
-    })
-</script>
-
-
+            
+        </div>
+        
 
 
     
+        
+    
 
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
 
-
-
-    </div>
-    <div class="copyright">
-        <p class="footer-entry">
-    i hear i forget, i see i remember , i do i understand
-</p>
-<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
-
-    </div>
-    <div class="full-toc">
-        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
-<a class="" id="rocket" ></a>
-
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                nil
+            </div>
+        
     </div>
 </div>
 
-</body>
-<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
-
-<script src="/js/script.js?v=1.1.0" ></script>
-<script>
-    var img_resize = 'default';
-    function initArticle() {
-        /*渲染对应的表格样式*/
-        
-            $("#post .pjax table").addClass("green");
-        
-
-        /*渲染打赏样式*/
-        
-
-        /*高亮代码块行号*/
-        
-
-        /*访问数量*/
-        
-        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-
-        /*代码高亮，行号对齐*/
-        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
-
         
         
-    }
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
 
-    /*打赏页面隐藏与展示*/
-    
-
-</script>
-
-<!--加入行号的高亮代码块样式-->
-
-<!--自定义样式设置-->
-<style>
-    
-    
-    .nav {
-        width: 572px;
-    }
-    .nav.fullscreen {
-        margin-left: -572px;
-    }
-    .nav-left {
-        width: 150px;
-    }
-    
-    
-    @media screen and (max-width: 1468px) {
-        .nav {
-            width: 492px;
-        }
-        .nav.fullscreen {
-            margin-left: -492px;
-        }
-        .nav-left {
-            width: 100px;
-        }
-    }
-    
-    
-    @media screen and (max-width: 1024px) {
-        .nav {
-            width: 492px;
-            margin-left: -492px
-        }
-        .nav.fullscreen {
-            margin-left: 0;
-        }
-    }
-    
-    @media screen and (max-width: 426px) {
-        .nav {
-            width: 100%;
-        }
-        .nav-left {
-            width: 100%;
-        }
-    }
-    
-    
-    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
-        color: #383636;
-    }
-    
-    
-    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
-        color: #5e5e5f;
-    }
-    
-    
-    .nav-right nav a.hover, #local-search-result a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-    /*列表样式*/
-    
-    #post .pjax article .article-entry>ol, #post .pjax article .article-entry>ul, #post .pjax article>ol, #post .pjax article>ul{
-        border: #e2dede solid 1px;
-        border-radius: 10px;
-        padding: 10px 32px 10px 56px;
-    }
-    #post .pjax article .article-entry li>ol, #post .pjax article .article-entry li>ul,#post .pjax article li>ol, #post .pjax article li>ul{
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-    #post .pjax article .article-entry>ol>li, #post .pjax article .article-entry>ul>li,#post .pjax article>ol>li, #post .pjax article>ul>li{
-        margin-bottom: auto;
-        margin-left: auto;
-    }
-    #post .pjax article .article-entry li>ol>li, #post .pjax article .article-entry li>ul>li,#post .pjax article li>ol>li, #post .pjax article li>ul>li{
-        margin-bottom: auto;
-        margin-left: auto;
-    }
-    
-
-    /* 背景图样式 */
-    
-    
+<script src="/assets/js/jquery.js"></script>
 
 
-    /*引用块样式*/
-    
+<script src="/assets/js/jquery.fancybox.js"></script>
 
-    /*文章列表背景图*/
-    
+
+<script src="/assets/js/thumbs.js"></script>
+
+
+<script src="/assets/js/tranquilpeak.js"></script>
+
+<!--SCRIPTS END-->
+
 
     
-</style>
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/10/05/MIT6.824/lab2b/lab2_lock_advice/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
 
 
 
 
-
-
-
+    </body>
 </html>
