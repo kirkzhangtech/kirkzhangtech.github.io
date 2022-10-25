@@ -3,9 +3,10 @@ title: API Design Patterns
 categories:
 - WEB-API
 ---
-<!-- more -->
-API Design Patterns
-<!-- more -->
+<!-- ## 1. API介绍
+定义一组与系统交互的界面,是的用户有相对较小的权限操作系统
+
+ -->
 ## 1. API介绍
 
 ### 1.1 什么是API

@@ -4,9 +4,11 @@ categories:
 - CICD
 tag: ansible
 ---
-<!-- more -->
-奔跑吧ansible
-<!-- more -->
+<!-- # 3. 第三章 inventory:描述你的服务器
+ansible管理的多台主机文件叫inventory
+
+ -->
+
 # 3. 第三章 inventory:描述你的服务器
 
 ansible管理的多台主机文件叫inventory
