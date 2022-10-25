@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil"},"articleBody":"INTRODUCTION当应用程序的数据库组件在应用程序升级过程中被更新时，大型的关键的应用程序可能会经历几十个小时，甚至更长的停机时间。app的数据库组件在应用程序升级期间进行更新。Oracle数据库推出了基于版本的重新定义（EBR），这是一项革命性的功能，可以在不间断的情况下在线升级应用程序。革命性的功能，它允许在线应用升级，并保证应用的不间断可用性。\nEBR的功能是同时维护两个版本的应用程序。当升级的安装完成后。升级前(pre-upgrade application)的应用程序和升级后(post-upgrade application)的应用程序可以同时使用。因此，一个现有的会话可以 继续使用升级前的应用程序，直到其用户决定结束它；而所有新的会话可以使用升级后的应用程序。在所有会话与它断开连接后，升级前的应用程序就可以退役了。换句话说，该 应用程序作为一个整体享有从升级前版本到升级后版本的热迁移。\n为了利用这种能力，应用程序的数据库后端必须通过一些一次性的schema改变来启用EBR。另外，执行应用程序升级的脚本必须以使用EBR功能的方式来编写。因此，EBR的采用和后续使用是开发车的事情。\n为了实现在线应用升级2，必须满足以下条件。\n\n改变后的数据库对象的安装不能影响到升级前应用程序的实时用户。\n\n升级前应用程序的用户所做的交易必须反映在升级后的应用程序中。\n\n升级后应用程序的用户进行的交易必须反映在升级前的应用程序中。\n\n\nOracle数据库通过一种称为基于版本的重新定义（EBR）的革命性功能实现了这一点。\nUsing EBR:\n\n代码修改是在新版本的隐私中安装的。\n\n数据的改变是通过只写入新的列或新的表来实现的，而旧版本是看不到的。这是这是通过一个编辑视图来实现的，该视图将一个表的不同投影暴露在每个版本中，因此每个版本只看到自己的列。看到自己的列。\n\n跨版本触发器将旧版本的数据变化传播到新版本的公共列中，或者（在hot-rollover）反之亦然。\n\n\n","dateCreated":"2022-10-11T12:13:46+08:00","dateModified":"2022-10-24T21:39:05+08:00","datePublished":"2022-10-11T12:13:46+08:00","description":"","headline":"Edition-Based Redefinition Technical Deep Dive","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/11/oracle/Oracle_EBR/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"nil","logo":{"@type":"ImageObject","url":"nil"}},"url":"https://simonteo58.github.io/2022/10/11/oracle/Oracle_EBR/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"INTRODUCTION当应用程序的数据库组件在应用程序升级过程中被更新时，大型的关键的应用程序可能会经历几十个小时，甚至更长的停机时间。app的数据库组件在应用程序升级期间进行更新。Oracle数据库推出了基于版本的重新定义（EBR），这是一项革命性的功能，可以在不间断的情况下在线升级应用程序。革命性的功能，它允许在线应用升级，并保证应用的不间断可用性。\nEBR的功能是同时维护两个版本的应用程序。当升级的安装完成后。升级前(pre-upgrade application)的应用程序和升级后(post-upgrade application)的应用程序可以同时使用。因此，一个现有的会话可以 继续使用升级前的应用程序，直到其用户决定结束它；而所有新的会话可以使用升级后的应用程序。在所有会话与它断开连接后，升级前的应用程序就可以退役了。换句话说，该 应用程序作为一个整体享有从升级前版本到升级后版本的热迁移。\n为了利用这种能力，应用程序的数据库后端必须通过一些一次性的schema改变来启用EBR。另外，执行应用程序升级的脚本必须以使用EBR功能的方式来编写。因此，EBR的采用和后续使用是开发车的事情。\n为了实现在线应用升级2，必须满足以下条件。\n\n改变后的数据库对象的安装不能影响到升级前应用程序的实时用户。\n\n升级前应用程序的用户所做的交易必须反映在升级后的应用程序中。\n\n升级后应用程序的用户进行的交易必须反映在升级前的应用程序中。\n\n\nOracle数据库通过一种称为基于版本的重新定义（EBR）的革命性功能实现了这一点。\nUsing EBR:\n\n代码修改是在新版本的隐私中安装的。\n\n数据的改变是通过只写入新的列或新的表来实现的，而旧版本是看不到的。这是这是通过一个编辑视图来实现的，该视图将一个表的不同投影暴露在每个版本中，因此每个版本只看到自己的列。看到自己的列。\n\n跨版本触发器将旧版本的数据变化传播到新版本的公共列中，或者（在hot-rollover）反之亦然。\n\n\n","dateCreated":"2022-10-11T12:13:46+08:00","dateModified":"2022-10-24T21:39:05+08:00","datePublished":"2022-10-11T12:13:46+08:00","description":"","headline":"Edition-Based Redefinition Technical Deep Dive","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/11/oracle/Oracle_EBR/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/11/oracle/Oracle_EBR/"}</script>
     <meta name="description" content="INTRODUCTION当应用程序的数据库组件在应用程序升级过程中被更新时，大型的关键的应用程序可能会经历几十个小时，甚至更长的停机时间。app的数据库组件在应用程序升级期间进行更新。Oracle数据库推出了基于版本的重新定义（EBR），这是一项革命性的功能，可以在不间断的情况下在线升级应用程序。革命性的功能，它允许在线应用升级，并保证应用的不间断可用性。 EBR的功能是同时维护两个版本的应用程序">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Edition-Based Redefinition Technical Deep Dive">
@@ -33,7 +33,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/nil"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
     
     
     
@@ -87,7 +87,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -108,7 +108,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -698,7 +698,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/nil" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
