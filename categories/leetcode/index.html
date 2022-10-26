@@ -9,17 +9,22 @@
     <title>Category: leetcode - Eden</title>
     <meta name="author" content="kirkzhang">
     
+        <meta name="keywords" content="ssss,">
+    
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
     <script type="application/ld+json">{}</script>
-    <meta property="og:type" content="blog">
+    <meta name="description" content="随遇而安吧">
+<meta property="og:type" content="blog">
 <meta property="og:title" content="Eden">
 <meta property="og:url" content="https://simonteo58.github.io/categories/leetcode/index.html">
 <meta property="og:site_name" content="Eden">
+<meta property="og:description" content="随遇而安吧">
 <meta property="og:locale" content="en_US">
 <meta property="article:author" content="kirkzhang">
+<meta property="article:tag" content="ssss">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@shiming_kirk">
     
@@ -29,7 +34,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
     
     
     
@@ -77,7 +82,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -98,7 +103,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -888,99 +893,6 @@ func removeElement(nums []int, val int) int &#123;
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-                            aria-label=": 28.实现 strStr()"
-                        >
-                            28.实现 strStr()
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;28 lang&#x3D;golang
- *
- * [28] 实现 strStr()
- *&#x2F;
-
-&#x2F;&#x2F; hellabcelp
-&#x2F;&#x2F;  elp
-
-&#x2F;&#x2F; @lc code&#x3D;start
-func strStr(haystack string, needle string) int &#123;
-	if len(needle) &#x3D;&#x3D; 0 &#123;
-		return 0
-	&#125;
-	i, j :&#x3D; 0, 0
-	for j &lt; len(haystack) &#123;
-
-		c :&#x3D; needle[i]
-		ch :&#x3D; haystack[j]
-		if c &#x3D;&#x3D; ch &#123;
-			i++
-			j++
-		&#125; else &#123;
-			j &#x3D; j - i + 1
-			i &#x3D; 0
-		&#125;
-		if i &#x3D;&#x3D; len(needle) &#123;
-			return j - i
-		&#125;
-
-	&#125;
-	return -1
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                        
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
                             href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
                             aria-label=": 35.搜索插入位置"
                         >
@@ -1231,6 +1143,99 @@ func lengthOfLastWord(s string) int &#123;
                     
                         <a
                             class="link-unstyled"
+                            href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
+                            aria-label=": 28.实现 strStr()"
+                        >
+                            28.实现 strStr()
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;28 lang&#x3D;golang
+ *
+ * [28] 实现 strStr()
+ *&#x2F;
+
+&#x2F;&#x2F; hellabcelp
+&#x2F;&#x2F;  elp
+
+&#x2F;&#x2F; @lc code&#x3D;start
+func strStr(haystack string, needle string) int &#123;
+	if len(needle) &#x3D;&#x3D; 0 &#123;
+		return 0
+	&#125;
+	i, j :&#x3D; 0, 0
+	for j &lt; len(haystack) &#123;
+
+		c :&#x3D; needle[i]
+		ch :&#x3D; haystack[j]
+		if c &#x3D;&#x3D; ch &#123;
+			i++
+			j++
+		&#125; else &#123;
+			j &#x3D; j - i + 1
+			i &#x3D; 0
+		&#125;
+		if i &#x3D;&#x3D; len(needle) &#123;
+			return j - i
+		&#125;
+
+	&#125;
+	return -1
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
                             href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
                             aria-label=": 66.加一"
                         >
@@ -1358,7 +1363,7 @@ func plusOne(digits []int) []int &#123;
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -1377,7 +1382,7 @@ func plusOne(digits []int) []int &#123;
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
                 <br/>
-                nil
+                Canton
             </div>
         
     </div>

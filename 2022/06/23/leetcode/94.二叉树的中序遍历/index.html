@@ -9,11 +9,13 @@
     <title>94.二叉树的中序排序 - Eden</title>
     <meta name="author" content="kirkzhang">
     
+        <meta name="keywords" content="ssss,">
+    
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg"},"articleBody":"/*\n * @lc app=leetcode.cn id=94 lang=cpp\n *\n * [94] 二叉树的中序遍历\n *\n * https://leetcode.cn/problems/binary-tree-inorder-traversal/description/\n *\n * algorithms\n * Easy (75.91%)\n * Likes:    1465\n * Dislikes: 0\n * Total Accepted:    855.6K\n * Total Submissions: 1.1M\n * Testcase Example:  '[1,null,2,3]'\n *\n * 给定一个二叉树的根节点 root ，返回 它的 中序 遍历 。\n * \n * \n * \n * 示例 1：\n * \n * \n * 输入：root = [1,null,2,3]\n * 输出：[1,3,2]\n * \n * \n * 示例 2：\n * \n * \n * 输入：root = []\n * 输出：[]\n * \n * \n * 示例 3：\n * \n * \n * 输入：root = [1]\n * 输出：[1]\n * \n * \n * \n * \n * 提示：\n * \n * \n * 树中节点数目在范围 [0, 100] 内\n * -100 &lt;= Node.val &lt;= 100\n * \n * \n * \n * \n * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？\n * \n */\n// @lc code=start\n/**\n * Definition for a binary tree node.\n * struct TreeNode &#123;\n *     int val;\n *     TreeNode *left;\n *     TreeNode *right;\n *     TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n * &#125;;\n */\n\n\n#include&lt;stack&gt;\n#include&lt;vector&gt;\n\n struct TreeNode &#123;\n    int val;\n      TreeNode *left; \n      TreeNode *right;\n      TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n &#125;;\n\nclass Solution &#123;\npublic:\n    vector&lt;int&gt; inorderTraversal(TreeNode* root) &#123;\n        std::stack&lt;TreeNode*&gt;  treeStack ;\n        std::vector&lt;int&gt; nodes;\n\n        while (root || !treeStack.empty())&#123;\n            if (root)&#123;\n                treeStack.push(root);\n                root &#x3D; root-&gt;left;\n\n            &#125;else &#123;\n                root &#x3D; treeStack.top();\n                treeStack.pop();\n                nodes.push_back(root -&gt; val);\n                root &#x3D; root -&gt; right;\n\n            &#125;\n        &#125;\n        return nodes;\n\n    &#125;\n&#125;;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:24+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"94.二叉树的中序排序","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg","logo":{"@type":"ImageObject","url":"cover.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"/*\n * @lc app=leetcode.cn id=94 lang=cpp\n *\n * [94] 二叉树的中序遍历\n *\n * https://leetcode.cn/problems/binary-tree-inorder-traversal/description/\n *\n * algorithms\n * Easy (75.91%)\n * Likes:    1465\n * Dislikes: 0\n * Total Accepted:    855.6K\n * Total Submissions: 1.1M\n * Testcase Example:  '[1,null,2,3]'\n *\n * 给定一个二叉树的根节点 root ，返回 它的 中序 遍历 。\n * \n * \n * \n * 示例 1：\n * \n * \n * 输入：root = [1,null,2,3]\n * 输出：[1,3,2]\n * \n * \n * 示例 2：\n * \n * \n * 输入：root = []\n * 输出：[]\n * \n * \n * 示例 3：\n * \n * \n * 输入：root = [1]\n * 输出：[1]\n * \n * \n * \n * \n * 提示：\n * \n * \n * 树中节点数目在范围 [0, 100] 内\n * -100 &lt;= Node.val &lt;= 100\n * \n * \n * \n * \n * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？\n * \n */\n// @lc code=start\n/**\n * Definition for a binary tree node.\n * struct TreeNode &#123;\n *     int val;\n *     TreeNode *left;\n *     TreeNode *right;\n *     TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n * &#125;;\n */\n\n\n#include&lt;stack&gt;\n#include&lt;vector&gt;\n\n struct TreeNode &#123;\n    int val;\n      TreeNode *left; \n      TreeNode *right;\n      TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;\n      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) &#123;&#125;\n &#125;;\n\nclass Solution &#123;\npublic:\n    vector&lt;int&gt; inorderTraversal(TreeNode* root) &#123;\n        std::stack&lt;TreeNode*&gt;  treeStack ;\n        std::vector&lt;int&gt; nodes;\n\n        while (root || !treeStack.empty())&#123;\n            if (root)&#123;\n                treeStack.push(root);\n                root &#x3D; root-&gt;left;\n\n            &#125;else &#123;\n                root &#x3D; treeStack.top();\n                treeStack.pop();\n                nodes.push_back(root -&gt; val);\n                root &#x3D; root -&gt; right;\n\n            &#125;\n        &#125;\n        return nodes;\n\n    &#125;\n&#125;;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:24+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"94.二叉树的中序排序","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"}</script>
     <meta name="description" content="&#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;94 lang&#x3D;cpp  *  * [94] 二叉树的中序遍历  *  * https:&#x2F;&#x2F;leetcode.cn&#x2F;problems&#x2F;binary-tree-inorder-traversal&#x2F;description&#x2F;  *  * algorithms  * Easy (75.91%)  * Likes:    1465  * Dislik">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="94.二叉树的中序排序">
@@ -24,6 +26,7 @@
 <meta property="article:published_time" content="2022-06-22T16:10:00.241Z">
 <meta property="article:modified_time" content="2022-10-25T14:46:24.433Z">
 <meta property="article:author" content="kirkzhang">
+<meta property="article:tag" content="ssss">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@shiming_kirk">
     
@@ -33,7 +36,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
     
     
     
@@ -87,7 +90,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -108,7 +111,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -780,7 +783,7 @@ public:
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -799,7 +802,7 @@ public:
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
                 <br/>
-                nil
+                Canton
             </div>
         
     </div>

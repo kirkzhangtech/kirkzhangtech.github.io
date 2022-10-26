@@ -9,11 +9,13 @@
     <title>21.合并两个有序链表 - Eden</title>
     <meta name="author" content="kirkzhang">
     
+        <meta name="keywords" content="ssss,">
+    
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;21 lang&#x3D;golang\n *\n * [21] 合并两个有序链表\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\n\nfunc mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode &#123;\n\n\tif list1 &#x3D;&#x3D; nil &#123;\n\n\t\treturn list2\n\t&#125;\n\tif list2 &#x3D;&#x3D; nil &#123;\n\t\treturn list1\n\t&#125;\n\thead :&#x3D; &amp;ListNode&#123;0, nil&#125;\n\tpre :&#x3D; head\n\tc1 :&#x3D; list1\n\tc2 :&#x3D; list2\n\n\tfor &#123;\n\t\tif c1.Val &gt; c2.Val &#123;\n\t\t\tpre.Next &#x3D; c2\n\t\t\tc2 &#x3D; c2.Next\n\t\t\tpre &#x3D; pre.Next\n\t\t\t&#x2F;&#x2F; pre.Next &#x3D; c1\n\t\t\t&#x2F;&#x2F; c1 &#x3D; c1.Next\n\t\t\t&#x2F;&#x2F; pre &#x3D; pre.Next\n\t\t&#125; else if c1.Val &lt;&#x3D; c2.Val &#123;\n\t\t\tpre.Next &#x3D; c1\n\t\t\tc1 &#x3D; c1.Next\n\t\t\tpre &#x3D; pre.Next\n\t\t\t&#x2F;&#x2F; pre.Next &#x3D; c2\n\t\t\t&#x2F;&#x2F; c2 &#x3D; c2.Next\n\t\t\t&#x2F;&#x2F; pre &#x3D; pre.Next\n\t\t&#125;\n\t\tif c1 &#x3D;&#x3D; nil &#123;\n\t\t\tpre.Next &#x3D; c2\n\t\t\tbreak\n\t\t&#125;\n\t\tif c2 &#x3D;&#x3D; nil &#123;\n\t\t\tpre.Next &#x3D; c1\n\n\t\t\tbreak\n\t\t&#125;\n\n\t&#125;\n\thead &#x3D; head.Next\n\treturn head\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:54+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"21.合并两个有序链表","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg","logo":{"@type":"ImageObject","url":"cover.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;21 lang&#x3D;golang\n *\n * [21] 合并两个有序链表\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\n\nfunc mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode &#123;\n\n\tif list1 &#x3D;&#x3D; nil &#123;\n\n\t\treturn list2\n\t&#125;\n\tif list2 &#x3D;&#x3D; nil &#123;\n\t\treturn list1\n\t&#125;\n\thead :&#x3D; &amp;ListNode&#123;0, nil&#125;\n\tpre :&#x3D; head\n\tc1 :&#x3D; list1\n\tc2 :&#x3D; list2\n\n\tfor &#123;\n\t\tif c1.Val &gt; c2.Val &#123;\n\t\t\tpre.Next &#x3D; c2\n\t\t\tc2 &#x3D; c2.Next\n\t\t\tpre &#x3D; pre.Next\n\t\t\t&#x2F;&#x2F; pre.Next &#x3D; c1\n\t\t\t&#x2F;&#x2F; c1 &#x3D; c1.Next\n\t\t\t&#x2F;&#x2F; pre &#x3D; pre.Next\n\t\t&#125; else if c1.Val &lt;&#x3D; c2.Val &#123;\n\t\t\tpre.Next &#x3D; c1\n\t\t\tc1 &#x3D; c1.Next\n\t\t\tpre &#x3D; pre.Next\n\t\t\t&#x2F;&#x2F; pre.Next &#x3D; c2\n\t\t\t&#x2F;&#x2F; c2 &#x3D; c2.Next\n\t\t\t&#x2F;&#x2F; pre &#x3D; pre.Next\n\t\t&#125;\n\t\tif c1 &#x3D;&#x3D; nil &#123;\n\t\t\tpre.Next &#x3D; c2\n\t\t\tbreak\n\t\t&#125;\n\t\tif c2 &#x3D;&#x3D; nil &#123;\n\t\t\tpre.Next &#x3D; c1\n\n\t\t\tbreak\n\t\t&#125;\n\n\t&#125;\n\thead &#x3D; head.Next\n\treturn head\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:54+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"21.合并两个有序链表","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"}</script>
     <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;21 lang&#x3D;golang  *  * [21] 合并两个有序链表  *&#x2F;  &#x2F;&#x2F; @lc code&#x3D;start  func mergeTwoLists(list1 *ListNode, list2 *ListNode) *List">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="21.合并两个有序链表">
@@ -24,6 +26,7 @@
 <meta property="article:published_time" content="2022-06-22T16:10:00.241Z">
 <meta property="article:modified_time" content="2022-10-25T14:45:54.583Z">
 <meta property="article:author" content="kirkzhang">
+<meta property="article:tag" content="ssss">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@shiming_kirk">
     
@@ -33,7 +36,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
     
     
     
@@ -87,7 +90,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -108,7 +111,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -731,7 +734,7 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode &#123;
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -750,7 +753,7 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode &#123;
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
                 <br/>
-                nil
+                Canton
             </div>
         
     </div>

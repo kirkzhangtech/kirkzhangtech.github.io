@@ -9,11 +9,13 @@
     <title>27.移除元素 - Eden</title>
     <meta name="author" content="kirkzhang">
     
+        <meta name="keywords" content="ssss,">
+    
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;27 lang&#x3D;golang\n *\n * [27] 移除元素\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc removeElement(nums []int, val int) int &#123;\n\tslow, fast :&#x3D; 0, 0\n\tfor fast &lt; len(nums) &#123;\n\t\tif val !&#x3D; nums[fast] &#123;\n\t\t\tnums[slow] &#x3D; nums[fast]\n\t\t\tslow++\n\t\t&#125;\n\t\tfast++\n\n\t&#125;\n\treturn len(nums[:slow])\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:26+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"27.移除元素","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg","logo":{"@type":"ImageObject","url":"cover.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;27 lang&#x3D;golang\n *\n * [27] 移除元素\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc removeElement(nums []int, val int) int &#123;\n\tslow, fast :&#x3D; 0, 0\n\tfor fast &lt; len(nums) &#123;\n\t\tif val !&#x3D; nums[fast] &#123;\n\t\t\tnums[slow] &#x3D; nums[fast]\n\t\t\tslow++\n\t\t&#125;\n\t\tfast++\n\n\t&#125;\n\treturn len(nums[:slow])\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:26+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"27.移除元素","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"}</script>
     <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;27 lang&#x3D;golang  *  * [27] 移除元素  *&#x2F;  &#x2F;&#x2F; @lc code&#x3D;start func removeElement(nums []int, val int) int &amp;#123; 	slow, fast">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="27.移除元素">
@@ -24,6 +26,7 @@
 <meta property="article:published_time" content="2022-06-22T16:10:00.241Z">
 <meta property="article:modified_time" content="2022-10-25T14:46:26.483Z">
 <meta property="article:author" content="kirkzhang">
+<meta property="article:tag" content="ssss">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@shiming_kirk">
     
@@ -33,7 +36,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
     
     
     
@@ -87,7 +90,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -108,7 +111,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -421,9 +424,9 @@ func removeElement(nums []int, val int) int &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-                    data-tooltip="28.实现 strStr()"
-                    aria-label="NEXT: 28.实现 strStr()"
+                    href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+                    data-tooltip="35.搜索插入位置"
+                    aria-label="NEXT: 35.搜索插入位置"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -549,9 +552,9 @@ func removeElement(nums []int, val int) int &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-                    data-tooltip="28.实现 strStr()"
-                    aria-label="NEXT: 28.实现 strStr()"
+                    href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+                    data-tooltip="35.搜索插入位置"
+                    aria-label="NEXT: 35.搜索插入位置"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -698,7 +701,7 @@ func removeElement(nums []int, val int) int &#123;
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -717,7 +720,7 @@ func removeElement(nums []int, val int) int &#123;
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
                 <br/>
-                nil
+                Canton
             </div>
         
     </div>
