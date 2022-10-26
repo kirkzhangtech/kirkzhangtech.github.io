@@ -4,6 +4,10 @@ categories:
 - oracle
 ---
 
+摘要:
+<!-- more -->
+
+<!-- toc -->
 
 # chapter 5 Edtion_Baseed Redefinition
 

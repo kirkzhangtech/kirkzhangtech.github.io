@@ -4,7 +4,7 @@ categories:
 - archive
 ---
 
-
+<!-- more -->
 1. shuwdown wsl
 ```bash
 wsl --shutdown

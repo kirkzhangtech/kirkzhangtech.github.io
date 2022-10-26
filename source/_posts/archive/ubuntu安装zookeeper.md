@@ -6,6 +6,8 @@ categories:
 
 # 搭建zookeeper集群
 
+<!-- more -->
+
 首先下载(zookeeper)[https://zookeeper.apache.org/]
 
 - 将`zookeeper`复制三份,分别命名为`zookeeper-1,zookeeper-2,zookeeper-3`

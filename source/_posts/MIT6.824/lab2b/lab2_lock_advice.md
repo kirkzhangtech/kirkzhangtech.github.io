@@ -4,6 +4,10 @@ categories:
 - 分布式
 - MIT6.824
 ---
+摘要:
+<!-- more -->
+
+<!-- toc -->
 
 # rule 1
 

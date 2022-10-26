@@ -4,6 +4,10 @@ categories:
 - oracle
 ---
 
+摘要:
+<!-- more -->
+
+<!-- toc -->
 
 # 1. 数据库额启动与关闭
 

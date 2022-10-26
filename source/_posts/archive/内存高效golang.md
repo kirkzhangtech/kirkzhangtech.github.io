@@ -1,12 +1,13 @@
 ---
 title: 内存高效golang
 categories: 
-- archive
 - golang
 
 ---
 
 > 原文链接 : https://dev.to/deadlock/golang-writing-memory-efficient-and-cpu-optimized-go-structs-2ick
+
+<!-- more -->
 
 # Golang编写内存高效和CPU优化的Go结构
 

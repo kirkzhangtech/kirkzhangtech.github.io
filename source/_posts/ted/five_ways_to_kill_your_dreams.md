@@ -5,6 +5,11 @@ categories:
 ---
 > 《five ways to kill your dreams》--TED
 
+
+摘要:玄学
+
+<!-- more -->
+
 If you have dreams, it is your responsibility to make them happen.
 – Bel Pesce
 

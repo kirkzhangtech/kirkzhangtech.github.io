@@ -3,10 +3,18 @@ title: API Design Patterns
 categories:
 - WEB-API
 ---
-<!-- ## 1. API介绍
-定义一组与系统交互的界面,是的用户有相对较小的权限操作系统
 
- -->
+
+摘要:
+<!-- more -->
+
+<!-- toc -->- [1. API介绍](#1-api介绍)
+  - [1.1 什么是API](#11-什么是api)
+  - [1.2 为什么API重要](#12-为什么api重要)
+  - [1.3 什么是面向资源API](#13-什么是面向资源api)
+  - [1.4 什么是"good"API](#14-什么是goodapi)
+  - [summary](#summary)
+
 ## 1. API介绍
 
 ### 1.1 什么是API

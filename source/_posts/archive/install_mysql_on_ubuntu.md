@@ -3,7 +3,9 @@ title: install_mysql_on_ubuntu(Debian sys)
 categories: 
 - archive
 ---
+
 我自己电脑都是使用`apt`命令  
+<!-- more -->
 
 安装mysql
 1. sudo apt update

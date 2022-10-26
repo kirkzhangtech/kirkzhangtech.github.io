@@ -5,6 +5,9 @@ categories:
 - MIT6.824
 ---
 
+<!-- more -->
+
+<!-- toc -->
 - [二.Students' Guide to Raf文档](#二students-guide-to-raf文档)
   - [背景](#背景)
   - [实现raft](#实现raft)

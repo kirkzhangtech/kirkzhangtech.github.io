@@ -4,6 +4,12 @@ categories:
 - golang
 tag: golang
 ---
+
+摘要:
+<!-- more -->
+
+<!-- toc -->
+
 - [1. package tar](#1-package-tar)
   - [1.1. Constants](#11-constants)
   - [1.2. Variables](#12-variables)

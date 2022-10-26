@@ -4,7 +4,6 @@ categories:
 - 分布式
 - MIT6.824
 ---
-
 Raft Structure Advice
 
 A Raft instance has to deal with the arrival of external events
@@ -12,6 +11,10 @@ A Raft instance has to deal with the arrival of external events
 and it has to execute periodic tasks (elections and heart-beats).
 There are many ways to structure your Raft code to manage these
 activities; this document outlines a few ideas.
+<!-- more -->
+
+<!-- toc -->
+
 
 Each Raft instance has a bunch of state (the log, the current index,
 &c) which must be updated in response to events arising in concurrent

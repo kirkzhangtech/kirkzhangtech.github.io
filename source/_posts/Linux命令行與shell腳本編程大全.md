@@ -4,7 +4,12 @@ categories:
 - linux
 ---
 
+
+摘要: linux number one
+<!-- more -->
+
 <!-- toc -->
+
 - [1. linux入门](#1-linux入门)
 - [2. 走进shell](#2-走进shell)
 - [3. 基本shell命令](#3-基本shell命令)

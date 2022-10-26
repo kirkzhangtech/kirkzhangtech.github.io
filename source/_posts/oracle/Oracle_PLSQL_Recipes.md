@@ -3,7 +3,11 @@ title: Oracle PLSQL Recipes
 categories: 
 - oracle
 ---
+摘要: 其实这个讲PLSQL有点基础
 
+<!-- more -->
+
+<!-- toc -->
 # 1 PL/SQL Fundamentals
 
 ## 1.1 创建plsql代码块

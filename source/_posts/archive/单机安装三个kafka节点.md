@@ -3,7 +3,10 @@ title: 单机安装三个kafka节点
 categories: 
 - archive
 ---
-# 单机安装三个kafka节点
+
+摘要: 装完还没用过:)
+
+<!-- more -->
 
 1. 下载,并解压
 [kafka官网](https://link.zhihu.com/?target=http%3A//kafka.apache.org/)

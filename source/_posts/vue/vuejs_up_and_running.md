@@ -4,7 +4,25 @@ categories:
 - vue
 ---
 
+A framework is a JavaScript tool that makes it easier for developers to create
+rich,interactive websites. Frameworks contain functionality that enable us to
+make a fully functional web application: manipulating complicated data and
+displaying it on the page, handling routing client-side instead of having to rely
+on a server,and sometimes even allowing us to create a full website that needs to
+hit the server only once for the initial download. Vue.js is the latest popular
+JavaScript framework and is rapidly increasing in popularity. Evan You, then
+working at Google, wrote and released the first version of Vue.js in early 2014.
+At the time of writing, it has over 75,000 stars on GitHub, making it the eighth
+most starred repository on GitHub, and that number is growing rapidly. Vue has
+hundreds of collaborators and is downloaded from npm about 40,000 times
+every day. It contains features that are useful when developing websites and
+applications: a powerful templating syntax to write to the DOM and listen to
+events,reactivity so that you don’t need to update the template after your data
+changes, and functionality that makes it easier for you to manipulate your data.
 
+<!-- more -->
+
+<!-- toc -->
 
 # 1. Vue.js: The Basics
 

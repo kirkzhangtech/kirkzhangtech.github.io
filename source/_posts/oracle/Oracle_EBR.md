@@ -3,6 +3,11 @@ title: Edition-Based Redefinition Technical Deep Dive
 categories:
 - oracle
 ---
+摘要:
+
+<!-- more -->
+
+<!-- toc -->
 
 # INTRODUCTION
 
