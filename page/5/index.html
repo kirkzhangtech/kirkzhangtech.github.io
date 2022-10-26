@@ -678,10 +678,10 @@ func plusOne(digits []int) []int &#123;
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
-                            aria-label=": 67.二进制的求和"
+                            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+                            aria-label=": 69.x-的平方根"
                         >
-                            67.二进制的求和
+                            69.x-的平方根
                         </a>
                     
                 </h1>
@@ -703,53 +703,22 @@ func plusOne(digits []int) []int &#123;
             </div>
             
                 <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">
-package main
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+import &quot;math&quot;
 
 &#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;67 lang&#x3D;golang
+ * @lc app&#x3D;leetcode.cn id&#x3D;69 lang&#x3D;golang
  *
- * [67] 二进制求和
+ * [69] x 的平方根
  *&#x2F;
 
 &#x2F;&#x2F; @lc code&#x3D;start
-func addBinary(a string, b string) string &#123;
-	var carry, sum int
-	i, j :&#x3D; len(a), len(b)
-	if i &lt; j &#123;
-		i, j &#x3D; j, i
-		a, b &#x3D; b, a
-	&#125;
 
-	res :&#x3D; make([]byte, i+1)
+func mySqrt(x int) int &#123;
 
-	for j &gt; 0 &#123;
-		j--
-		i--
-		sum &#x3D; int(a[i]-&#39;0&#39;) + int(b[j]-&#39;0&#39;) + carry
-		carry &#x3D; sum &#x2F; 2
-		sum &#x3D; sum % 2
-		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
-	&#125;
+	return int(math.Sqrt(float64(x)))
 
-	for i &gt; 0 &#123;
-		i--
-		sum &#x3D; int(a[i]-&#39;0&#39;) + carry
-		carry &#x3D; sum &#x2F; 2
-		sum &#x3D; sum % 2
-		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
-	&#125;
-
-	res[0] &#x3D; byte(carry + &#39;0&#39;)
-
-	for i &lt; len(res)-1 &#123;
-		if res[i] &#x3D;&#x3D; &#39;0&#39; &#123;
-			i++
-		&#125; else &#123;
-			break
-		&#125;
-	&#125;
-	return string(res[i:])
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
@@ -761,7 +730,7 @@ func addBinary(a string, b string) string &#123;
                     
                         <p>
                             <a
-                                href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/#post-footer"
+                                href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -997,10 +966,10 @@ public:
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-                            aria-label=": 69.x-的平方根"
+                            href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
+                            aria-label=": 67.二进制的求和"
                         >
-                            69.x-的平方根
+                            67.二进制的求和
                         </a>
                     
                 </h1>
@@ -1022,22 +991,53 @@ public:
             </div>
             
                 <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-import &quot;math&quot;
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">
+package main
 
 &#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;69 lang&#x3D;golang
+ * @lc app&#x3D;leetcode.cn id&#x3D;67 lang&#x3D;golang
  *
- * [69] x 的平方根
+ * [67] 二进制求和
  *&#x2F;
 
 &#x2F;&#x2F; @lc code&#x3D;start
+func addBinary(a string, b string) string &#123;
+	var carry, sum int
+	i, j :&#x3D; len(a), len(b)
+	if i &lt; j &#123;
+		i, j &#x3D; j, i
+		a, b &#x3D; b, a
+	&#125;
 
-func mySqrt(x int) int &#123;
+	res :&#x3D; make([]byte, i+1)
 
-	return int(math.Sqrt(float64(x)))
+	for j &gt; 0 &#123;
+		j--
+		i--
+		sum &#x3D; int(a[i]-&#39;0&#39;) + int(b[j]-&#39;0&#39;) + carry
+		carry &#x3D; sum &#x2F; 2
+		sum &#x3D; sum % 2
+		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
+	&#125;
 
+	for i &gt; 0 &#123;
+		i--
+		sum &#x3D; int(a[i]-&#39;0&#39;) + carry
+		carry &#x3D; sum &#x2F; 2
+		sum &#x3D; sum % 2
+		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
+	&#125;
+
+	res[0] &#x3D; byte(carry + &#39;0&#39;)
+
+	for i &lt; len(res)-1 &#123;
+		if res[i] &#x3D;&#x3D; &#39;0&#39; &#123;
+			i++
+		&#125; else &#123;
+			break
+		&#125;
+	&#125;
+	return string(res[i:])
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
@@ -1049,7 +1049,7 @@ func mySqrt(x int) int &#123;
                     
                         <p>
                             <a
-                                href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/#post-footer"
+                                href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -1372,7 +1372,7 @@ func isPalindrome(x int) bool &#123;
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/avatar.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
