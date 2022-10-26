@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;20 lang&#x3D;golang\n *\n * [20] 有效的括号\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\ntype (\n\tStack struct &#123;\n\t\ttop    *node\n\t\tlength int\n\t&#125;\n\tnode struct &#123;\n\t\tvalue int\n\t\tprev  *node\n\t&#125;\n)\n\n&#x2F;&#x2F; Create a new stack\nfunc New() *Stack &#123;\n\treturn &amp;Stack&#123;nil, 0&#125;\n&#125;\n\n&#x2F;&#x2F; Return the number of items in the stack\nfunc (this *Stack) Len() int &#123;\n\treturn this.length\n&#125;\n\n&#x2F;&#x2F; View the top item on the stack\nfunc (this *Stack) Peek() int &#123;\n\tif this.length &#x3D;&#x3D; 0 &#123;\n\t\treturn 0\n\t&#125;\n\treturn this.top.value\n&#125;\n\n&#x2F;&#x2F; Pop the top item of the stack and return it\nfunc (this *Stack) Pop() int &#123;\n\tif this.length &#x3D;&#x3D; 0 &#123;\n\t\treturn 0\n\t&#125;\n\n\tn :&#x3D; this.top\n\tthis.top &#x3D; n.prev\n\tthis.length--\n\treturn n.value\n&#125;\n\n&#x2F;&#x2F; Push a value onto the top of the stack\nfunc (this *Stack) Push(value int) &#123;\n\tn :&#x3D; &amp;node&#123;value, this.top&#125;\n\tthis.top &#x3D; n\n\tthis.length++\n&#125;\n\n&#x2F;&#x2F; 123 &#123;\n&#x2F;&#x2F; 91  [\n&#x2F;&#x2F; 40  (\n&#x2F;&#x2F; 41\t)\n&#x2F;&#x2F; 93\t]\n&#x2F;&#x2F; 125\t&#125;\n&#x2F;&#x2F;主函数\nfunc isValid(s string) bool &#123;\n\tbracket :&#x3D; New()\n\n\tfor _, v :&#x3D; range s &#123;\n\t\tswitch v &#123;\n\t\tcase 123:\n\t\t\tbracket.Push(int(v))\n\t\tcase 91:\n\t\t\tbracket.Push(int(v))\n\t\tcase 40:\n\t\t\tbracket.Push(int(v))\n\t\tcase 41:\n\t\t\ttopValue :&#x3D; bracket.Pop()\n\t\t\tif (int(v) - topValue) !&#x3D; 1 &#123;\n\t\t\t\treturn false\n\t\t\t&#125;\n\t\tcase 93:\n\t\t\ttopValue :&#x3D; bracket.Pop()\n\t\t\tif (int(v) - topValue) !&#x3D; 2 &#123;\n\t\t\t\treturn false\n\t\t\t&#125;\n\t\tcase 125:\n\t\t\ttopValue :&#x3D; bracket.Pop()\n\t\t\tif (int(v) - topValue) !&#x3D; 2 &#123;\n\t\t\t\treturn false\n\t\t\t&#125;\n\n\t\t&#125;\n\t&#125;\n\tif bracket.Len() !&#x3D; 0 &#123;\n\t\treturn false\n\t&#125;\n\n\treturn true\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:57+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"20.有效的括号","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;20 lang&#x3D;golang\n *\n * [20] 有效的括号\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\ntype (\n\tStack struct &#123;\n\t\ttop    *node\n\t\tlength int\n\t&#125;\n\tnode struct &#123;\n\t\tvalue int\n\t\tprev  *node\n\t&#125;\n)\n\n&#x2F;&#x2F; Create a new stack\nfunc New() *Stack &#123;\n\treturn &amp;Stack&#123;nil, 0&#125;\n&#125;\n\n&#x2F;&#x2F; Return the number of items in the stack\nfunc (this *Stack) Len() int &#123;\n\treturn this.length\n&#125;\n\n&#x2F;&#x2F; View the top item on the stack\nfunc (this *Stack) Peek() int &#123;\n\tif this.length &#x3D;&#x3D; 0 &#123;\n\t\treturn 0\n\t&#125;\n\treturn this.top.value\n&#125;\n\n&#x2F;&#x2F; Pop the top item of the stack and return it\nfunc (this *Stack) Pop() int &#123;\n\tif this.length &#x3D;&#x3D; 0 &#123;\n\t\treturn 0\n\t&#125;\n\n\tn :&#x3D; this.top\n\tthis.top &#x3D; n.prev\n\tthis.length--\n\treturn n.value\n&#125;\n\n&#x2F;&#x2F; Push a value onto the top of the stack\nfunc (this *Stack) Push(value int) &#123;\n\tn :&#x3D; &amp;node&#123;value, this.top&#125;\n\tthis.top &#x3D; n\n\tthis.length++\n&#125;\n\n&#x2F;&#x2F; 123 &#123;\n&#x2F;&#x2F; 91  [\n&#x2F;&#x2F; 40  (\n&#x2F;&#x2F; 41\t)\n&#x2F;&#x2F; 93\t]\n&#x2F;&#x2F; 125\t&#125;\n&#x2F;&#x2F;主函数\nfunc isValid(s string) bool &#123;\n\tbracket :&#x3D; New()\n\n\tfor _, v :&#x3D; range s &#123;\n\t\tswitch v &#123;\n\t\tcase 123:\n\t\t\tbracket.Push(int(v))\n\t\tcase 91:\n\t\t\tbracket.Push(int(v))\n\t\tcase 40:\n\t\t\tbracket.Push(int(v))\n\t\tcase 41:\n\t\t\ttopValue :&#x3D; bracket.Pop()\n\t\t\tif (int(v) - topValue) !&#x3D; 1 &#123;\n\t\t\t\treturn false\n\t\t\t&#125;\n\t\tcase 93:\n\t\t\ttopValue :&#x3D; bracket.Pop()\n\t\t\tif (int(v) - topValue) !&#x3D; 2 &#123;\n\t\t\t\treturn false\n\t\t\t&#125;\n\t\tcase 125:\n\t\t\ttopValue :&#x3D; bracket.Pop()\n\t\t\tif (int(v) - topValue) !&#x3D; 2 &#123;\n\t\t\t\treturn false\n\t\t\t&#125;\n\n\t\t&#125;\n\t&#125;\n\tif bracket.Len() !&#x3D; 0 &#123;\n\t\treturn false\n\t&#125;\n\n\treturn true\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:57+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"20.有效的括号","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg","logo":{"@type":"ImageObject","url":"cover.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"}</script>
     <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;20 lang&#x3D;golang  *  * [20] 有效的括号  *&#x2F;  &#x2F;&#x2F; @lc code&#x3D;start type ( 	Stack struct &amp;#123; 		top    *node 		length int 	&amp;#125">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="20.有效的括号">
@@ -25,7 +25,7 @@
 <meta property="article:modified_time" content="2022-10-25T14:45:57.183Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@nil">
+<meta name="twitter:creator" content="@shiming_kirk">
     
         <link rel="publisher" href="https://plus.google.com/nil"/>
     
@@ -33,7 +33,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
     
     
     
@@ -87,7 +87,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -108,7 +108,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -485,9 +485,9 @@ func isValid(s string) bool &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-                    data-tooltip="27.移除元素"
-                    aria-label="PREVIOUS: 27.移除元素"
+                    href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+                    data-tooltip="14.最长公共前缀"
+                    aria-label="PREVIOUS: 14.最长公共前缀"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -499,9 +499,9 @@ func isValid(s string) bool &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-                    data-tooltip="28.实现 strStr()"
-                    aria-label="NEXT: 28.实现 strStr()"
+                    href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
+                    data-tooltip="21.合并两个有序链表"
+                    aria-label="NEXT: 21.合并两个有序链表"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -613,9 +613,9 @@ func isValid(s string) bool &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-                    data-tooltip="27.移除元素"
-                    aria-label="PREVIOUS: 27.移除元素"
+                    href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+                    data-tooltip="14.最长公共前缀"
+                    aria-label="PREVIOUS: 14.最长公共前缀"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -627,9 +627,9 @@ func isValid(s string) bool &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-                    data-tooltip="28.实现 strStr()"
-                    aria-label="NEXT: 28.实现 strStr()"
+                    href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
+                    data-tooltip="21.合并两个有序链表"
+                    aria-label="NEXT: 21.合并两个有序链表"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -776,7 +776,7 @@ func isValid(s string) bool &#123;
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -803,7 +803,7 @@ func isValid(s string) bool &#123;
 
         
         
-<div id="cover" style="background-image:url('/assets/images/avatar.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>

@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"\n install mysql on ubuntu https://hevodata.com/learn/installing-mysql-on-ubuntu-20-04/\n\n\n创建数据库\nCREATE DATABASE &#39;newdatabase&#39;;\n\n设置创建用户并设置密码\n-- # Host: %表示支持任意连接，localhost表示只允许本地连接\n CREATE USER &#39;newuser&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;newpassword&#39;;\n CREATE USER &#39;newuser&#39;@ &#39;%&#39; IDENTIFIED BY &#39;newpassword&#39;;\n\n\n授权\n-- 如果需要给用户创建数据库的权限，则可以这样设置\nGRANT ALL PRIVILEGES ON *.* to my_user@&#39;%&#39;; -- 这里的my_user 跟第五步是相同的\n\nGRANT ALL PRIVILEGES ON newdatabase.* TO &#39;newuser&#39;@&#39;localhost&#39;;\nFLUSH PRIVILEGES;\n\n重新登陆\nmysql -u kirkzhang -p\n\n","dateCreated":"2022-10-16T21:54:25+08:00","dateModified":"2022-10-22T20:50:56+08:00","datePublished":"2022-10-16T21:54:25+08:00","description":"","headline":"mysql manual","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/16/mysql/mysql_manual/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/16/mysql/mysql_manual/","keywords":"mysql"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg"},"articleBody":"\n install mysql on ubuntu https://hevodata.com/learn/installing-mysql-on-ubuntu-20-04/\n\n\n创建数据库\nCREATE DATABASE &#39;newdatabase&#39;;\n\n设置创建用户并设置密码\n-- # Host: %表示支持任意连接，localhost表示只允许本地连接\n CREATE USER &#39;newuser&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;newpassword&#39;;\n CREATE USER &#39;newuser&#39;@ &#39;%&#39; IDENTIFIED BY &#39;newpassword&#39;;\n\n\n授权\n-- 如果需要给用户创建数据库的权限，则可以这样设置\nGRANT ALL PRIVILEGES ON *.* to my_user@&#39;%&#39;; -- 这里的my_user 跟第五步是相同的\n\nGRANT ALL PRIVILEGES ON newdatabase.* TO &#39;newuser&#39;@&#39;localhost&#39;;\nFLUSH PRIVILEGES;\n\n重新登陆\nmysql -u kirkzhang -p\n\n","dateCreated":"2022-10-16T21:54:25+08:00","dateModified":"2022-10-22T20:50:56+08:00","datePublished":"2022-10-16T21:54:25+08:00","description":"","headline":"mysql manual","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/16/mysql/mysql_manual/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg","logo":{"@type":"ImageObject","url":"cover.jpg"}},"url":"https://simonteo58.github.io/2022/10/16/mysql/mysql_manual/","keywords":"mysql"}</script>
     <meta name="description" content="install mysql on ubuntu https:&#x2F;&#x2F;hevodata.com&#x2F;learn&#x2F;installing-mysql-on-ubuntu-20-04&#x2F;   创建数据库 CREATE DATABASE &#39;newdatabase&#39;;  设置创建用户并设置密码 -- # Host: %表示支持任意连接，localhost表示只允许本地连接  CREATE USER">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="mysql manual">
@@ -26,7 +26,7 @@
 <meta property="article:author" content="kirkzhang">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@nil">
+<meta name="twitter:creator" content="@shiming_kirk">
     
         <link rel="publisher" href="https://plus.google.com/nil"/>
     
@@ -34,7 +34,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
     
     
     
@@ -88,7 +88,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -109,7 +109,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -707,7 +707,7 @@ FLUSH PRIVILEGES;</code></pre>
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -734,7 +734,7 @@ FLUSH PRIVILEGES;</code></pre>
 
         
         
-<div id="cover" style="background-image:url('/assets/images/avatar.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>

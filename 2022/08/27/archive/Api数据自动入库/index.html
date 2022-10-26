@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"\n原文链接 : https://blog.csdn.net/weixin_44723724/article/details/125600165\n\n场景将不同渠道的api日志入库，方便日后分析和检查系统行为\n挑战\napi返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构.\njson格式的嵌套问题.通过额外定义表进行关联.\n单表形式\njson字段就是表字段\n\n\n多表详细存储\n关联字段通过外层表名拼接内层表名\n解析 json 的时候，需要把关联键和关联键的值传递进去，关联键的值传递的就是外层表当前行数据的 md5 值，这样就生成了多表之间行数据关联的依据\n\n\n\n\n本地多种数据源(不同种数据库).\n通过md5值解决幂等问题，如果导入同一批数据就只是更新导入时间\n\n代码设计\n工厂模式 : 适配不同种数据源\n抽象sql构建模型 : 将构建sql时公共的代码进行抽象,定义抽象类.\n固定表名\n列信息\n关联键\n数据集合\n\n\n\n","dateCreated":"2022-08-27T13:35:51+08:00","dateModified":"2022-08-27T16:39:39+08:00","datePublished":"2022-08-27T13:35:51+08:00","description":"","headline":"API数据自动入库","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg"},"articleBody":"\n原文链接 : https://blog.csdn.net/weixin_44723724/article/details/125600165\n\n场景将不同渠道的api日志入库，方便日后分析和检查系统行为\n挑战\napi返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构.\njson格式的嵌套问题.通过额外定义表进行关联.\n单表形式\njson字段就是表字段\n\n\n多表详细存储\n关联字段通过外层表名拼接内层表名\n解析 json 的时候，需要把关联键和关联键的值传递进去，关联键的值传递的就是外层表当前行数据的 md5 值，这样就生成了多表之间行数据关联的依据\n\n\n\n\n本地多种数据源(不同种数据库).\n通过md5值解决幂等问题，如果导入同一批数据就只是更新导入时间\n\n代码设计\n工厂模式 : 适配不同种数据源\n抽象sql构建模型 : 将构建sql时公共的代码进行抽象,定义抽象类.\n固定表名\n列信息\n关联键\n数据集合\n\n\n\n","dateCreated":"2022-08-27T13:35:51+08:00","dateModified":"2022-08-27T16:39:39+08:00","datePublished":"2022-08-27T13:35:51+08:00","description":"","headline":"API数据自动入库","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg","logo":{"@type":"ImageObject","url":"cover.jpg"}},"url":"https://simonteo58.github.io/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"}</script>
     <meta name="description" content="原文链接 : https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_44723724&#x2F;article&#x2F;details&#x2F;125600165  场景将不同渠道的api日志入库，方便日后分析和检查系统行为 挑战 api返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构. json格式的嵌套问题.通过额外定义表进行关联. 单表形式 json字段就是表字段   多表详细存储 关联字段通过外层">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="API数据自动入库">
@@ -25,7 +25,7 @@
 <meta property="article:modified_time" content="2022-08-27T08:39:39.759Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@nil">
+<meta name="twitter:creator" content="@shiming_kirk">
     
         <link rel="publisher" href="https://plus.google.com/nil"/>
     
@@ -33,7 +33,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
     
     
     
@@ -87,7 +87,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -108,7 +108,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -707,7 +707,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -734,7 +734,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/avatar.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>

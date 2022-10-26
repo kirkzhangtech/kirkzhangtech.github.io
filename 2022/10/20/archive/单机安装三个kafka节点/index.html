@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"单机安装三个kafka节点\n下载,并解压kafka官网\n\n将config/server.properties复制三份\n server1.properties,server2.properties,server3.properties\n\n修改server.properties\n # server1.properties\nbroker.id&#x3D;1\nlisteners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9092\nadvertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9092(其中10.1.14.159是我本机的ip)\nlog.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka1-logs\nzookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183\n\n# server2.properties\nbroker.id&#x3D;2\nlisteners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9093\nadvertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9093(其中10.1.14.159是我本机的ip)\nlog.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka2-logs\nzookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183\n\n# server3.properties\nbroker.id&#x3D;3\nlisteners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9094\nadvertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9094(其中10.1.14.159是我本机的ip)\nlog.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka3-logs\nzookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183\n\n\n启动实例\n \nnohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server3.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka3-logs&#x2F;startup.log 2&gt;&amp;1 &amp;\nnohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server2.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka2-logs&#x2F;startup.log 2&gt;&amp;1 &amp;\nnohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server1.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka1-logs&#x2F;startup.log 2&gt;&amp;1 &amp;\n\nhealth check\n 通过startup.log,或者同级目录下的server.log查看是否有报错即可。 检测\n\n创建主题:.&#x2F;kafka-topics.sh –bootstrap-server 127.0.0.1:9092 –create –topic fxb_test1 –replication-factor 3 –partitions 3\n启动消费者: .&#x2F;kafka-console-producer.sh –broker-list 10.1.14.159:9092 –topic fxb_test1\n新开窗口个,启动生产者: kafka-console-producer.sh –bootstrap-server 127.0.0.1 –create –topic fxb_test1 在生产者窗口中输入消息，查看消费者的窗口，是否有消息产生。\n\n\n\n","dateCreated":"2022-10-20T21:42:43+08:00","dateModified":"2022-10-20T22:43:17+08:00","datePublished":"2022-10-20T21:42:43+08:00","description":"","headline":"单机安装三个kafka节点","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg"},"articleBody":"单机安装三个kafka节点\n下载,并解压kafka官网\n\n将config/server.properties复制三份\n server1.properties,server2.properties,server3.properties\n\n修改server.properties\n # server1.properties\nbroker.id&#x3D;1\nlisteners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9092\nadvertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9092(其中10.1.14.159是我本机的ip)\nlog.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka1-logs\nzookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183\n\n# server2.properties\nbroker.id&#x3D;2\nlisteners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9093\nadvertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9093(其中10.1.14.159是我本机的ip)\nlog.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka2-logs\nzookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183\n\n# server3.properties\nbroker.id&#x3D;3\nlisteners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9094\nadvertised.listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;10.1.14.159:9094(其中10.1.14.159是我本机的ip)\nlog.dirs&#x3D;&#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka3-logs\nzookeeper.connect&#x3D;localhost:2181,localhost:2182,localhost:2183\n\n\n启动实例\n \nnohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server3.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka3-logs&#x2F;startup.log 2&gt;&amp;1 &amp;\nnohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server2.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka2-logs&#x2F;startup.log 2&gt;&amp;1 &amp;\nnohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;config&#x2F;server1.properties &gt; &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;logs&#x2F;kafka1-logs&#x2F;startup.log 2&gt;&amp;1 &amp;\n\nhealth check\n 通过startup.log,或者同级目录下的server.log查看是否有报错即可。 检测\n\n创建主题:.&#x2F;kafka-topics.sh –bootstrap-server 127.0.0.1:9092 –create –topic fxb_test1 –replication-factor 3 –partitions 3\n启动消费者: .&#x2F;kafka-console-producer.sh –broker-list 10.1.14.159:9092 –topic fxb_test1\n新开窗口个,启动生产者: kafka-console-producer.sh –bootstrap-server 127.0.0.1 –create –topic fxb_test1 在生产者窗口中输入消息，查看消费者的窗口，是否有消息产生。\n\n\n\n","dateCreated":"2022-10-20T21:42:43+08:00","dateModified":"2022-10-20T22:43:17+08:00","datePublished":"2022-10-20T21:42:43+08:00","description":"","headline":"单机安装三个kafka节点","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"cover.jpg","logo":{"@type":"ImageObject","url":"cover.jpg"}},"url":"https://simonteo58.github.io/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"}</script>
     <meta name="description" content="单机安装三个kafka节点 下载,并解压kafka官网  将config&#x2F;server.properties复制三份  server1.properties,server2.properties,server3.properties  修改server.properties  # server1.properties broker.id&#x3D;1 listeners&#x3D;PLAINTEX">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="单机安装三个kafka节点">
@@ -25,7 +25,7 @@
 <meta property="article:modified_time" content="2022-10-20T14:43:17.845Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@nil">
+<meta name="twitter:creator" content="@shiming_kirk">
     
         <link rel="publisher" href="https://plus.google.com/nil"/>
     
@@ -33,7 +33,7 @@
         
     
     
-        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/cover.jpg"/>
     
     
     
@@ -87,7 +87,7 @@
             >
         
         
-            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -108,7 +108,7 @@
                     href="/#about"
                     aria-label="Read more about the author"
                 >
-                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">kirkzhang</h4>
                 
@@ -720,7 +720,7 @@ nohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/cover.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">kirkzhang</h4>
         
@@ -747,7 +747,7 @@ nohup &#x2F;ashura&#x2F;kafka_2.11-2.2.1&#x2F;bin&#x2F;kafka-server-start.sh &#x
 
         
         
-<div id="cover" style="background-image:url('/assets/images/avatar.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
 <script src="/assets/js/script-oejgoqwxqxfpwex5ev6ukctltwog5vlqaetakgrj0ys9pwba1gtnkqh5ga78.min.js"></script>
