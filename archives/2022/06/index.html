@@ -1268,10 +1268,10 @@ func Max(a int, b int) int &#123;
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-                            aria-label=": 66.加一"
+                            href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+                            aria-label=": 58.最后一个单词的长度"
                         >
-                            66.加一
+                            58.最后一个单词的长度
                         </a>
                     
                 </h1>
@@ -1293,41 +1293,24 @@ func Max(a int, b int) int &#123;
             </div>
             
                 <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">
-package main
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
 
-import &quot;fmt&quot;
+import &quot;strings&quot;
 
 &#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;66 lang&#x3D;golang
+ * @lc app&#x3D;leetcode.cn id&#x3D;58 lang&#x3D;golang
  *
- * [66] 加一
+ * [58] 最后一个单词的长度
  *&#x2F;
-&#x2F;&#x2F;  9 9 9 9 9
+
 &#x2F;&#x2F; @lc code&#x3D;start
-func plusOne(digits []int) []int &#123;
+func lengthOfLastWord(s string) int &#123;
+	words :&#x3D; strings.Split(strings.TrimSpace(s), &quot; &quot;)
 
-	l :&#x3D; len(digits)
-	&#x2F;&#x2F;遍历数组
-	for i :&#x3D; l - 1; i &gt;&#x3D; 0; i-- &#123;
-		digits[i] &#x3D; (digits[i] + 1) % 10
-		fmt.Println(digits[i])
-		&#x2F;&#x2F;判断取模10是否等于零
-		if digits[i] !&#x3D; 0 &#123;
-			return digits
-		&#125;
-	&#125;
-	&#x2F;&#x2F;new一个新数组
-	newArr :&#x3D; make([]int, l+1)
-	&#x2F;&#x2F; digits&#x3D; new int[l + 1];
-	&#x2F;&#x2F;设定第一位为1
-	newArr[0] &#x3D; 1
-	return newArr
-
+	return len(words[len(words)-1])
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-
                     
                         
 
@@ -1336,7 +1319,7 @@ func plusOne(digits []int) []int &#123;
                     
                         <p>
                             <a
-                                href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/#post-footer"
+                                href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
