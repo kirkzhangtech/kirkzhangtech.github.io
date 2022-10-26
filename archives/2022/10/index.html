@@ -357,7 +357,7 @@
             </div>
             
                 <div class="postShorten-content">
-                    <p><img src="/./../../picture/mit6.824/raft_figure_1.png" alt="come on"></p>
+                    <p><img src="/./../../public/picture/home_page.jpg" alt="come on"></p>
 
                     
                         
@@ -414,61 +414,19 @@
 
             </div>
             
-                <div class="postShorten-content">
+                <div class="postShorten-excerpt">
                     <blockquote>
 <p>作者：Eugene Vinitsky</p>
 </blockquote>
-<!--
-Personal Rules of Productive Research 
-Caveats and intent: Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.
--->
-
-
-<p>There’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.</p>
-<h2 id="Run-the-simplest-experiment-first"><a href="#Run-the-simplest-experiment-first" class="headerlink" title="Run the simplest experiment first."></a>Run the simplest experiment first.</h2><p>This is the mistake I make the most often. ML experiments are so easy to mess up you absolutely need to verify at each step that the minimal experiment is working. The minimal experiment is the absolute bare minimum needed to check that either your code works or your idea makes sense. Unfortunately, I don’t think there’s a coherent definition of minimal, it seems to mostly be an aesthetic thing. I’d call it the thing that has the least moving pieces.</p>
-<p>Since nothing is better than concrete details, let me just list all the ways I’ve done this wrong:</p>
-<ol>
-<li><p>I had an RL problem where we had to solve some task where the dynamics were defined by N trajectories. Instead of checking whether I could solve one interesting trajectory perfectly, I kept running the algorithm over all N trajectories. </p>
-</li>
-<li><p>I had a problem that could be run in single or multi-agent mode. Instead of trying to verify correctness of the codebase by running the single-agent version, I jumped right to the multi-agent version.</p>
-</li>
-<li><p>I had a multi-agent problem where I could run it with 100s of agents or just a few. I jumped right to 100s. I’ve done this one three times.</p>
-</li>
-</ol>
-<h2 id="Write-a-mini-version-of-your-paper-before-getting-started"><a href="#Write-a-mini-version-of-your-paper-before-getting-started" class="headerlink" title="Write a mini-version of your paper before getting started"></a>Write a mini-version of your paper before getting started</h2><p>This should consist of</p>
-<p>A short introduction explaining the project<br>A short related work section making clear that the result is both new and relevant (if things work out as you expect)<br>A minimal experiment or theorem that you can use to verify if the idea makes sense.<br>It’s so easy for your ideas to seem clear until you write them down. Once you write them down you start noticing that:</p>
-<p>they might not be all that clear or coherent<br>they might not be all that different than prior work<br>they might not be that interesting<br>Caveat: this doesn’t work for curiosity driven research where you don’t actually know what you’re setting out to find before you get there. However, if you think you know the destination it’s worth checking that you actually want to &#x2F; can get there!</p>
-<h2 id="Keep-an-ultra-detailed-notebook"><a href="#Keep-an-ultra-detailed-notebook" class="headerlink" title="Keep an ultra-detailed notebook"></a>Keep an ultra-detailed notebook</h2><p>I personally under-invested into this at the beginning of my PhD and only really got into it after I had to try to reproduce the results of one of my own papers and ran into huge challenges doing so. At the very least, it winds up saving you time in the long term. At best, it helps structure your thinking and prevents you from losing great ideas.</p>
-<p>Things that at a minimum you should track for reproducibility:</p>
-<p>Experiment notebook:<br>Git hash and branch of the experiment you run<br>Actual command you ran<br>Config of experiment that was run<br>Intent of the experiment i.e. what you were testing<br>Result of the experiment<br>Implied next experiment<br>Code notebook. This might seem a little excessive but each one has saved me hours in return for minutes of extra effort.<br>Bugs you fixed (because I promise you, they will happen again)<br>Tricks for installing things and challenges you ran into (because I promise you, they will happen again)<br>Key commands that you ran (because I promise you, you will want to rerun them at some point)<br>Ideas for potential research projects that spawn while working on this.<br>I personally like notion for this as I have a bunch of templates that I use for generating the structure of each experiment and can throw the corresponding results &#x2F; figures in pretty easily.</p>
-<h2 id="Every-paper-should-be-reproducible-via-1-script"><a href="#Every-paper-should-be-reproducible-via-1-script" class="headerlink" title="Every paper should be reproducible via 1 script"></a>Every paper should be reproducible via 1 script</h2><p>This means a script that: </p>
-<ol>
-<li><p>launches all experiments</p>
-</li>
-<li><p>creates all figures (that aren’t custom powerpoint &#x2F; gimp figures) in one go. Possibly save the powerpoint figure creation file in the repo too (I’m not super confident about this but it makes sense to me)</p>
-</li>
-</ol>
-<p>You’re going to wind up remaking your figures way more often then you expect so the initial time investment is worth it.</p>
-<h2 id="Save-all-your-videos-in-one-place-SAVE-ALL-YOUR-VIDEOS-IN-ONE-PLACE"><a href="#Save-all-your-videos-in-one-place-SAVE-ALL-YOUR-VIDEOS-IN-ONE-PLACE" class="headerlink" title="Save all your videos in one place. SAVE ALL YOUR VIDEOS IN  ONE PLACE"></a>Save all your videos in one place. SAVE ALL YOUR VIDEOS IN  ONE PLACE</h2><p>In a few years you’re going to be giving talks that summarize some of your past work. It is the worst feeling to be hunting for old videos &#x2F; figures from the work or trying to reproduce them from two year old models that you can barely load. </p>
-<p>This also applies to figures, you want to be frequently check-pointing your figures for a paper into a folder somewhere. It will make the following suggestion way easier as it’s easy to make a talk when the figures are already done.</p>
-<h2 id="Present-regularly-seminars-to-your-advisors"><a href="#Present-regularly-seminars-to-your-advisors" class="headerlink" title="Present regularly (seminars, to your advisors)"></a>Present regularly (seminars, to your advisors)</h2><p>This is basically the #1 mistake some of my own students make at the beginning of our work together. I’ll give them a task, they’ll disappear into the ether, and then they’ll return two months later with some issues that could have used early feedback. What’s the point of being part of the research community if you’re not taking advantage of it? Feedback is the fastest way to discover that your ideas need to be cleared up a bit, to get pointers to work that you’ve missed, and to force yourself to keep your work organized in a manner that is legible.</p>
-<h2 id="Suggested-frequency"><a href="#Suggested-frequency" class="headerlink" title="Suggested frequency:"></a>Suggested frequency:</h2><p>If you have a graduate student mentor on a project, check in with them quite often! They’re there to help and know how to get out of some holes you can dig yourself into.<br>Get lunch or informally discuss your work with smart folks basically as much as you can (you are likely to be quite rate-limited on how often you can find a way to do this rather than rate limited by how useful this is). This way you get to know them and probably learn a ton about how they think.<br>Present to your advisors at least every other week<br>Present to your lab group at least once a semester<br>Present to the department at least once a year (but better if once a semester)<br>Present or discuss your work in some informal settings (reading group, small seminar) at least twice a semester<br>Yeah, it’s a lot of presenting.</p>
-
                     
+                        <a
+                            href="/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": 高效研究的个人规则"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             
