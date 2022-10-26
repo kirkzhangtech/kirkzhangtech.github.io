@@ -59,7 +59,7 @@
         
     
 
-<header id="header" data-behavior="4">
+<header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a
@@ -92,7 +92,7 @@
         
     
 
-<nav id="sidebar" data-behavior="4">
+<nav id="sidebar" data-behavior="2">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -324,7 +324,7 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
+            <div id="main" data-behavior="2"
                  class="
                         hasCoverMetaIn
                         ">
@@ -364,99 +364,17 @@
 
             </div>
             
-                <div class="postShorten-content">
-                    <h1 id="1-Vue-js-The-Basics"><a href="#1-Vue-js-The-Basics" class="headerlink" title="1. Vue.js: The Basics"></a>1. Vue.js: The Basics</h1><p>As explained in the preface, Vue.js is the library at the heart of an ecosystem that<br>allows us to create powerful client-side applications. We don’t have to use the<br>whole ecosystem just to build a website, though, so we’ll start by looking at Vue<br>by itself.</p>
-<h2 id="1-1-Why-Vue-js"><a href="#1-1-Why-Vue-js" class="headerlink" title="1.1 Why Vue.js?"></a>1.1 Why Vue.js?</h2><p>Without a framework,we’d end up with a mess of unmaintainable code, the vast<br>majority of which would be dealing with stuff that the framework abstracts away<br>from us. Take the following two code examples, both of which download a list<br>of items from an Ajax resource and display them on the page. The first one is<br>powered by jQuery, while the second one is using Vue.</p>
-<p>Using jQuery, we download the items, select the ul element, and then if there are<br>items,we iterate through them, manually creating a list element, adding the is-<br>blue class if wanted,and setting the text to be the item. Finally, we append it to<br>the ul element:</p>
-<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>ul <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"js-items"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>ul<span class="token operator">></span>
-<span class="token operator">&lt;</span>script<span class="token operator">></span>
-<span class="token function">$</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    $<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'https://example.com/items.json'</span><span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">data</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-            <span class="token keyword">var</span> $itemsUl <span class="token operator">=</span> <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">'.js-items'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>data<span class="token punctuation">.</span>items<span class="token punctuation">.</span>length<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-                <span class="token keyword">var</span> $noItems <span class="token operator">=</span> <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">'li'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                $noItems<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token string">'Sorry, there are no items.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                $itemsUl<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>$noItems<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-                data<span class="token punctuation">.</span>items<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">item</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-                    <span class="token keyword">var</span> $newItem <span class="token operator">=</span> <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">'li'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    $newItem<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token keyword">if</span> <span class="token punctuation">(</span>item<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span><span class="token string">'blue'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-                        $newItem<span class="token punctuation">.</span><span class="token function">addClass</span><span class="token punctuation">(</span><span class="token string">'is-blue'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">&#125;</span>
-                    $itemsUl<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>$newItem<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span></code></pre>
-
-<p>This is what the code does:</p>
-<ol>
-<li>It makes an Ajax request using $.get().</li>
-<li>It selects the element matching <code>.js-items</code> and stores it in the <code>$itemsUl</code> object.</li>
-<li>If there are no items in the list downloaded, it creates an <code>li</code> element,<br>sets the text of the <code>li</code> element to indicate that there were no items,and<br>adds it to the document.If there are items in the list,it iterates through them in a loop.</li>
-<li>For every item in the list, it creates an <code>li</code> element and sets the text to be<br>the item. Then,if the item contains the string blue, it sets the class of<br>the element to is-blue. Finally, it adds the element to the document</li>
-</ol>
-<p>Every step had to be done manually—every element created and appended to the<br>document individually. We have to read all the way through the code to work out<br>exactly what is going on, and it isn’t obvious at all at first glance.<br>With Vue,the code providing the same functionality is much simpler to read and<br>understand—even if you’re not yet familiar with Vue:</p>
-<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>ul <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"js-items"</span><span class="token operator">></span>
-<span class="token operator">&lt;</span>li v<span class="token operator">-</span><span class="token keyword">if</span><span class="token operator">=</span><span class="token string">"!items.length"</span><span class="token operator">></span>Sorry<span class="token punctuation">,</span> there are no items<span class="token punctuation">.</span><span class="token operator">&lt;</span><span class="token operator">/</span>li<span class="token operator">></span>
-<span class="token operator">&lt;</span>li v<span class="token operator">-</span><span class="token keyword">for</span><span class="token operator">=</span><span class="token string">"item in items"</span> <span class="token operator">:</span><span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"&#123; 'is-blue': item.includes('blue') &#125;"</span><span class="token operator">></span>
-<span class="token punctuation">&#123;</span><span class="token punctuation">&#123;</span> item <span class="token punctuation">&#125;</span><span class="token punctuation">&#125;</span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>li<span class="token operator">></span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>ul<span class="token operator">></span>
-<span class="token operator">&lt;</span>script<span class="token operator">></span>
-<span class="token keyword">new</span> <span class="token class-name">Vue</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">el</span><span class="token operator">:</span> <span class="token string">'.js-items'</span><span class="token punctuation">,</span> 
-    <span class="token literal-property property">data</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">items</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token function">created</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'https://example.com/items.json'</span><span class="token punctuation">)</span>
-            <span class="token punctuation">.</span>
-            <span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">res</span><span class="token punctuation">)</span> <span class="token operator">=></span> res<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-            <span class="token punctuation">.</span>
-            <span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">data</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-                <span class="token keyword">this</span><span class="token punctuation">.</span>items <span class="token operator">=</span> data<span class="token punctuation">.</span>items<span class="token punctuation">;</span>
-            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
-</code></pre>
-
-<p>This code does the following:</p>
-<ol>
-<li>It makes an Ajax request using fetch().</li>
-<li>It parses the response from JSON into a JavaScript object.</li>
-<li>It stores the downloaded items in the items data property.</li>
-</ol>
-<blockquote>
-<p>el is abbrivate of element</p>
-</blockquote>
-<p>That’s all the actual logic in the code. Now that the items have been downloaded<br>and stored,we can use Vue’s templating functionality to write the elements to<br>the Document Object Model (DOM), which is how elements are represented on<br>an HTML page. We tell Vue that we want one li element for every item and that<br>the value should be item. Vue handles the creation of the elements and the<br>setting of the class for us.</p>
-<p>Don’t worry about fully understanding the code example if you don’t yet. I’ll<br>slow down and introduce the various concepts one at a time throughout the book.</p>
-<p>Not only is the second example significantly shorter, but it’s also a lot easier to<br>read,as the actual logic of the app is completely separated from the view logic.<br>Instead of having to wade through some jQuery to work out what is being added when,<br>we can look at the template: if there are no items, a warning is displayed;<br>otherwise,the items are displayed as list elements. The difference becomes even<br>more noticeable with larger examples. Imagine we wanted to add a reload button<br>to the page that would send a request to the server, get the new items, and update<br>the page when the user clicks a button. With the Vue example, that’s only a<br>couple of additional lines of code, but with the jQuery example, things start to<br>get complicated.</p>
-<p>In addition to the core Vue framework,several libraries work great with Vue and<br>are maintained by the same people who maintain Vue itself. For routing—<br>displaying different content depending on the URL of the application—there’s<br>vue-router. For managing state—sharing data between components in one global<br>store—there’s vuex,and for unit testing Vue components, there’s vue-test-utils. I<br>cover all three of those libraries and give them a proper introduction later in the<br>book: vue-router in Chapter 5, vuex in Chapter 6, and vue-test-utils in Chapter 7.</p>
-<blockquote>
-<p>all of above text just only illustrated one thing ,Vue is better than jquery, a good framework.<br>including vue-router, which depending on the URL of the application to display different content.<br>vuex managing state—sharing data between components in one global store.<br>vue-test-utils, unit testing utility.</p>
-</blockquote>
-<h2 id="1-2-Installation-and-Setup"><a href="#1-2-Installation-and-Setup" class="headerlink" title="1.2 Installation and Setup"></a>1.2 Installation and Setup</h2>
+                <div class="postShorten-excerpt">
+                    <p>A framework is a JavaScript tool that makes it easier for developers to create<br>rich,interactive websites. Frameworks contain functionality that enable us to<br>make a fully functional web application: manipulating complicated data and<br>displaying it on the page, handling routing client-side instead of having to rely<br>on a server,and sometimes even allowing us to create a full website that needs to<br>hit the server only once for the initial download. Vue.js is the latest popular<br>JavaScript framework and is rapidly increasing in popularity. Evan You, then<br>working at Google, wrote and released the first version of Vue.js in early 2014.<br>At the time of writing, it has over 75,000 stars on GitHub, making it the eighth<br>most starred repository on GitHub, and that number is growing rapidly. Vue has<br>hundreds of collaborators and is downloaded from npm about 40,000 times<br>every day. It contains features that are useful when developing websites and<br>applications: a powerful templating syntax to write to the DOM and listen to<br>events,reactivity so that you don’t need to update the template after your data<br>changes, and functionality that makes it easier for you to manipulate your data.</p>
                     
+                        <a
+                            href="/2022/10/22/vue/vuejs_up_and_running/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": vue.js up and running"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/10/22/vue/vuejs_up_and_running/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             

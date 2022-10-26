@@ -59,7 +59,7 @@
         
     
 
-<header id="header" data-behavior="4">
+<header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a
@@ -92,7 +92,7 @@
         
     
 
-<nav id="sidebar" data-behavior="4">
+<nav id="sidebar" data-behavior="2">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -324,7 +324,7 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
+            <div id="main" data-behavior="2"
                  class="
                         hasCoverMetaIn
                         ">
@@ -365,7 +365,10 @@
             </div>
             
                 <div class="postShorten-content">
-                    <ul>
+                    <span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-Students%E2%80%99-Guide-to-Raf%E6%96%87%E6%A1%A3"><span class="toc-text">二.Students’ Guide to Raf文档</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0raft"><span class="toc-text">实现raft</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E7%BB%86%E8%8A%82"><span class="toc-text">重要的细节</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debugging-Raft"><span class="toc-text">Debugging Raft</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B4%BB%E9%94%81"><span class="toc-text">活锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8D%E6%AD%A3%E7%A1%AE%E7%9A%84RPC"><span class="toc-text">不正确的RPC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B2%A1%E6%9C%89%E6%8C%89%E7%85%A7%E8%AE%BA%E6%96%87%E7%9A%84%E7%90%86%E8%AE%BA%E5%AE%9E%E7%8E%B0raft"><span class="toc-text">没有按照论文的理论实现raft</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#term%E6%B7%B7%E4%B9%B1-term%E4%B8%8D%E7%A8%B3%E5%AE%9A"><span class="toc-text">term混乱(term不稳定)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96"><span class="toc-text">优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Applications-on-top-of-Raft"><span class="toc-text">Applications on top of Raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AppendIndex"><span class="toc-text">AppendIndex</span></a></li></ol></li></ol>
+<ul>
 <li><a href="#%E4%BA%8Cstudents-guide-to-raf%E6%96%87%E6%A1%A3">二.Students’ Guide to Raf文档</a><ul>
 <li><a href="#%E8%83%8C%E6%99%AF">背景</a></li>
 <li><a href="#%E5%AE%9E%E7%8E%B0raft">实现raft</a><ul>
@@ -453,10 +456,6 @@
 <h2 id="Applications-on-top-of-Raft"><a href="#Applications-on-top-of-Raft" class="headerlink" title="Applications on top of Raft"></a>Applications on top of Raft</h2><h2 id="AppendIndex"><a href="#AppendIndex" class="headerlink" title="AppendIndex"></a>AppendIndex</h2><ul>
 <li>2022&#x2F;08&#x2F;21<br>  etcd的raft模块难得不只是一点点，看来不能直接看它和etcd的整合，尝试着理解那个example开始。一个玩具的raftkv.</li>
 </ul>
-
-                    
-                        
-
 
                     
                     

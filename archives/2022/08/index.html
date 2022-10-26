@@ -59,7 +59,7 @@
         
     
 
-<header id="header" data-behavior="4">
+<header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a
@@ -92,7 +92,7 @@
         
     
 
-<nav id="sidebar" data-behavior="4">
+<nav id="sidebar" data-behavior="2">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -324,7 +324,7 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
+            <div id="main" data-behavior="2"
                  class="
                         hasCoverMetaIn
                         ">
@@ -364,27 +364,17 @@
 
             </div>
             
-                <div class="postShorten-content">
-                    <h1 id="1-数据库额启动与关闭"><a href="#1-数据库额启动与关闭" class="headerlink" title="1. 数据库额启动与关闭"></a>1. 数据库额启动与关闭</h1><p>oracle server分为两部分(database: 这部分是指文件系统上的数据，instance则是指后台运行的线程和部分共享内存)。<br>并且数据启动分为三部分：1. <code>nomount</code>  2. <code>mount</code>  3. <code>open</code> 状态</p>
-<ol>
-<li>启动到nomount状态</li>
-</ol>
-
+                <div class="postShorten-excerpt">
+                    <p>摘要:</p>
                     
+                        <a
+                            href="/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": 深入浅出_Oracle_DBA_入门_进阶与诊断案例"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/08/31/oracle/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA_Oracle_DBA_%E5%85%A5%E9%97%A8_%E8%BF%9B%E9%98%B6%E4%B8%8E%E8%AF%8A%E6%96%AD%E6%A1%88%E4%BE%8B/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             
@@ -425,54 +415,19 @@
 
             </div>
             
-                <div class="postShorten-content">
+                <div class="postShorten-excerpt">
                     <blockquote>
 <p>原文链接 : <a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44723724/article/details/125600165">https://blog.csdn.net/weixin_44723724/article/details/125600165</a></p>
 </blockquote>
-<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><p>将不同渠道的api日志入库，方便日后分析和检查系统行为</p>
-<h2 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h2><ol>
-<li>api返回数据格式多样。需要确定以什么样的形式呈现数据，定义表结构.</li>
-<li>json格式的嵌套问题.通过额外定义表进行关联.<ol>
-<li>单表形式<ul>
-<li>json字段就是表字段</li>
-</ul>
-</li>
-<li>多表详细存储<ul>
-<li>关联字段通过外层表名拼接内层表名</li>
-<li>解析 json 的时候，需要把关联键和关联键的值传递进去，关联键的值传递的就是外层表当前行数据的 md5 值，这样就生成了多表之间行数据关联的依据</li>
-</ul>
-</li>
-</ol>
-</li>
-<li>本地多种数据源(不同种数据库).</li>
-<li>通过md5值解决幂等问题，如果导入同一批数据就只是更新导入时间</li>
-</ol>
-<h2 id="代码设计"><a href="#代码设计" class="headerlink" title="代码设计"></a>代码设计</h2><ol>
-<li>工厂模式 : 适配不同种数据源</li>
-<li>抽象sql构建模型 : 将构建sql时公共的代码进行抽象,定义抽象类.<ul>
-<li>固定表名</li>
-<li>列信息</li>
-<li>关联键</li>
-<li>数据集合</li>
-</ul>
-</li>
-</ol>
-
                     
+                        <a
+                            href="/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": API数据自动入库"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/08/27/archive/Api%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E5%85%A5%E5%BA%93/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             
@@ -505,7 +460,7 @@
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/archive/">archive</a>, <a class="category-link" href="/categories/archive/golang/">golang</a>
+    <a class="category-link" href="/categories/golang/">golang</a>
 
 
     
@@ -513,172 +468,19 @@
 
             </div>
             
-                <div class="postShorten-content">
+                <div class="postShorten-excerpt">
                     <blockquote>
 <p>原文链接 : <a target="_blank" rel="noopener" href="https://dev.to/deadlock/golang-writing-memory-efficient-and-cpu-optimized-go-structs-2ick">https://dev.to/deadlock/golang-writing-memory-efficient-and-cpu-optimized-go-structs-2ick</a></p>
 </blockquote>
-<h1 id="Golang编写内存高效和CPU优化的Go结构"><a href="#Golang编写内存高效和CPU优化的Go结构" class="headerlink" title="Golang编写内存高效和CPU优化的Go结构"></a>Golang编写内存高效和CPU优化的Go结构</h1><p>结构是一个类型化的field集合，对于将数据分组记录非常有用。这使得与一个<code>strcut</code>有关的所有数据都被整齐地封装在一个轻量级的类型定义中，然后可以通过定义结构类型上的函数来实现行为。</p>
-<p>这篇博客我将尝试解释我们如何在内存使用和CPU周期方面有效地编写结构。</p>
-<p>让我们考虑下面这个结构，为我的一些奇怪的用例定义畸形资源类型。</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-&#125;
-</code></pre>
-<p>让我们用下面的代码看看TerraformResource结构需要多少内存分配。</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">
-package main
-
-import &quot;fmt&quot;
-import &quot;unsafe&quot;
-
-type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-&#125;
-
-func main() &#123;
-    var d TerraformResource
-    d.Cloud &#x3D; &quot;aws&quot;
-    d.Name &#x3D; &quot;ec2&quot;
-    d.HaveDSL &#x3D; true
-    d.PluginVersion &#x3D; &quot;3.64&quot;
-    d.TerraformVersion &#x3D; &quot;1.1&quot;
-    d.ModuleVersionMajor &#x3D; 1
-    d.IsVersionControlled &#x3D; true
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Total Memory Usage StructType:d %T &#x3D;&gt; [%d]\n&quot;, d, unsafe.Sizeof(d))
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Cloud Field StructType:d.Cloud %T &#x3D;&gt; [%d]\n&quot;, d.Cloud, unsafe.Sizeof(d.Cloud))
-    fmt.Printf(&quot;Name Field StructType:d.Name %T &#x3D;&gt; [%d]\n&quot;, d.Name, unsafe.Sizeof(d.Name))
-    fmt.Printf(&quot;HaveDSL Field StructType:d.HaveDSL %T &#x3D;&gt; [%d]\n&quot;, d.HaveDSL, unsafe.Sizeof(d.HaveDSL))
-    fmt.Printf(&quot;PluginVersion Field StructType:d.PluginVersion %T &#x3D;&gt; [%d]\n&quot;, d.PluginVersion, unsafe.Sizeof(d.PluginVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.IsVersionControlled %T &#x3D;&gt; [%d]\n&quot;, d.IsVersionControlled, unsafe.Sizeof(d.IsVersionControlled))
-    fmt.Printf(&quot;TerraformVersion Field StructType:d.TerraformVersion %T &#x3D;&gt; [%d]\n&quot;, d.TerraformVersion, unsafe.Sizeof(d.TerraformVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.ModuleVersionMajor %T &#x3D;&gt; [%d]\n&quot;, d.ModuleVersionMajor, unsafe.Sizeof(d.ModuleVersionMajor))  
-&#125;</code></pre>
-<p>output如下</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Total Memory Usage StructType:d main.TerraformResource &#x3D;&gt; [88]
-&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Cloud Field StructType:d.Cloud string &#x3D;&gt; [16]
-Name Field StructType:d.Name string &#x3D;&gt; [16]
-HaveDSL Field StructType:d.HaveDSL bool &#x3D;&gt; [1]
-PluginVersion Field StructType:d.PluginVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.IsVersionControlled bool &#x3D;&gt; [1]
-TerraformVersion Field StructType:d.TerraformVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]</code></pre>
-<p>所以TerraformResource结构需要的总内存分配是88字节。这就是TerraformResource类型的内存分配情况<br><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--HubwVUeX--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-memory-map.jpeg" alt="TerraformResource类型的内存分配情况"></p>
-<p>但为什么会有88个字节，16+16+1+16+1+16+4&#x3D;70个字节，这额外的18个字节从何而来？</p>
-<p>当涉及到结构体的内存分配时，它们总是被分配为连续的、字节对齐的内存块，并且字段是按照它们被定义的顺序分配和存储的。在这种情况下，<strong>字节对齐</strong>的概念意味着连续的内存块以与平台字大小相同的偏移量对齐。<br><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--S_4mkd0a--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/02-golang-struct-memory-map.jpeg"></p>
-<p>我们可以清楚地看到，TerraformResource.HaveDSL , TerraformResource.isVersionControlled和TerraformResource.ModuleVersionMajor分别只占用了1个字节、1个字节和4个字节。其余的空间都是用空的焊盘字节填充的。</p>
-<p>所以回到同样的数学问题上</p>
-<blockquote>
-<p>分配字节&#x3D;16字节+16字节+1字节+16字节+1字节+16字节+4字节<br>空垫字节&#x3D;7字节+7字节+4字节&#x3D;18字节<br>总字节数&#x3D;分配字节数+空垫字节数&#x3D;70字节+18字节&#x3D;88字节</p>
-</blockquote>
-<p>那么，我们该如何解决这个问题呢？通过适当的数据结构调整，如果我们重新定义我们的结构，就像这样</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-&#125;
-</code></pre>
-<p>测试代码如下</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-import &quot;fmt&quot;
-import &quot;unsafe&quot;
-
-type TerraformResource struct &#123;
-  Cloud                string                       &#x2F;&#x2F; 16 bytes
-  Name                 string                       &#x2F;&#x2F; 16 bytes
-  PluginVersion        string                       &#x2F;&#x2F; 16 bytes
-  TerraformVersion     string                       &#x2F;&#x2F; 16 bytes
-  ModuleVersionMajor   int32                        &#x2F;&#x2F;  4 bytes
-  HaveDSL              bool                         &#x2F;&#x2F;  1 byte
-  IsVersionControlled  bool                         &#x2F;&#x2F;  1 byte
-&#125;
-
-func main() &#123;
-    var d TerraformResource
-    d.Cloud &#x3D; &quot;aws&quot;
-    d.Name &#x3D; &quot;ec2&quot;
-    d.HaveDSL &#x3D; true
-    d.PluginVersion &#x3D; &quot;3.64&quot;
-    d.TerraformVersion &#x3D; &quot;1.1&quot;
-    d.ModuleVersionMajor &#x3D; 1
-    d.IsVersionControlled &#x3D; true
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Total Memory Usage StructType:d %T &#x3D;&gt; [%d]\n&quot;, d, unsafe.Sizeof(d))
-    fmt.Println(&quot;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot;)
-    fmt.Printf(&quot;Cloud Field StructType:d.Cloud %T &#x3D;&gt; [%d]\n&quot;, d.Cloud, unsafe.Sizeof(d.Cloud))
-    fmt.Printf(&quot;Name Field StructType:d.Name %T &#x3D;&gt; [%d]\n&quot;, d.Name, unsafe.Sizeof(d.Name))
-    fmt.Printf(&quot;HaveDSL Field StructType:d.HaveDSL %T &#x3D;&gt; [%d]\n&quot;, d.HaveDSL, unsafe.Sizeof(d.HaveDSL))
-    fmt.Printf(&quot;PluginVersion Field StructType:d.PluginVersion %T &#x3D;&gt; [%d]\n&quot;, d.PluginVersion, unsafe.Sizeof(d.PluginVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.IsVersionControlled %T &#x3D;&gt; [%d]\n&quot;, d.IsVersionControlled, unsafe.Sizeof(d.IsVersionControlled))
-    fmt.Printf(&quot;TerraformVersion Field StructType:d.TerraformVersion %T &#x3D;&gt; [%d]\n&quot;, d.TerraformVersion, unsafe.Sizeof(d.TerraformVersion))
-    fmt.Printf(&quot;ModuleVersionMajor Field StructType:d.ModuleVersionMajor %T &#x3D;&gt; [%d]\n&quot;, d.ModuleVersionMajor, unsafe.Sizeof(d.ModuleVersionMajor))
-&#125;
-
-</code></pre>
-<p>output如下</p>
-<pre class="language-golang" data-language="golang"><code class="language-golang">go run golang-struct-memory-allocation-optimized.go
-
-&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Total Memory Usage StructType:d main.TerraformResource &#x3D;&gt; [72]
-&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-Cloud Field StructType:d.Cloud string &#x3D;&gt; [16]
-Name Field StructType:d.Name string &#x3D;&gt; [16]
-HaveDSL Field StructType:d.HaveDSL bool &#x3D;&gt; [1]
-PluginVersion Field StructType:d.PluginVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.IsVersionControlled bool &#x3D;&gt; [1]
-TerraformVersion Field StructType:d.TerraformVersion string &#x3D;&gt; [16]
-ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
-</code></pre>
-<p>现在TerraformResource类型的总内存分配是72字节。让我们看看内存的排列方式是什么样子的</p>
-<p><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--V9hRLdR1--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/03-golang-struct-memory-map.jpeg"></p>
-<p>仅仅通过对结构元素进行适当的数据结构对齐，我们就能够将内存占用从88字节减少到72字节….，很好!</p>
-<p>让我们检查一下数学运算</p>
-<blockquote>
-<p>分配字节&#x3D;16字节+16字节+16字节+16字节+4字节+1字节+1字节&#x3D;70字节<br>空垫字节&#x3D;2字节<br>总字节数&#x3D;分配字节数+空垫字节数&#x3D;70字节+2字节&#x3D;72字节</p>
-</blockquote>
-<p>适当的数据结构排列不仅可以帮助我们有效地使用内存，还可以帮助CPU读取周期….，如何？</p>
-<p>CPU以字为单位读取内存，32位系统为4字节，64位系统为8字节。现在，我们的第一个结构类型TerraformResource的声明将需要11个字来让CPU读取所有内容。</p>
-<p><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--YxrCrSAs--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/01-golang-struct-word-length.jpeg"></p>
-<p>然而，优化后的结构只需要9个字，如下图所示<br><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--_N8r3Z9U--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://github.com/kodelint/blog-assets/raw/main/images/02-golang-struct-word-length.jpeg"></p>
-<p>通过正确定义结构体的数据结构，我们能够有效地使用内存分配，并使结构体在CPU读取方面也变得快速有效。</p>
-<p>这只是一个小例子，想想一个有20或30个不同类型字段的大型结构。对数据结构进行深思熟虑的调整真的很有价值……🤩</p>
-<p>希望这篇博客能够对结构的内部结构、其内存分配和所需的CPU读取周期有一些启发。希望这对你有帮助！!</p>
-
                     
+                        <a
+                            href="/2022/08/26/archive/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": 内存高效golang"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/08/26/archive/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             
@@ -719,28 +521,17 @@ ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
 
             </div>
             
-                <div class="postShorten-content">
+                <div class="postShorten-excerpt">
                     <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>本地想更改项目代码的绑定的github链接，但是repo的url变了。<br><code>remote: This repository moved. Please use the new location [new location]</code> 的警示。因為你的git連結位置有變動因此要修改本機端的git remote位置。另外一种场景下载别人的代码库，并做修改最后推到自己的github，这个github repo</p>
-<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><ul>
-<li>绑定本地origin仓库  <pre class="language-bash" data-language="bash"><code class="language-bash">git remote set-url origin https:&#x2F;&#x2F;XXX.git</code></pre></li>
-<li>绑定upstream仓库  <pre class="language-bash" data-language="bash"><code class="language-bash">$ git remote add upstream https:&#x2F;&#x2F;github.com&#x2F;ORIGINAL_OWNER&#x2F;ORIGINAL_REPOSITORY.git</code></pre></li>
-</ul>
-
                     
+                        <a
+                            href="/2022/08/26/archive/remote_github/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": 更新origin 和upstream url链接"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/08/26/archive/remote_github/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             
@@ -992,10 +783,6 @@ ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
 <p>Raft incurs(招致) this extra complexity in the commitment<br>rules because log entries retain their original term num-<br>bers when a leader replicates entries from previous<br>terms. In other consensus algorithms, if a new leader re-<br>replicates entries from prior “terms,” it must do so with<br>its new “term number.” Raft’s approach makes it easier<br>to reason about log entries, since they maintain the same<br>term number over time and across logs. In addition, new<br>leaders in Raft send fewer log entries from previous terms<br>than in other algorithms (other algorithms must send re-<br>dundant log entries to renumber them before they can be<br>committed).</p>
 
                     
-                        
-
-
-                    
                     
                         <p>
                             <a
@@ -1022,7 +809,7 @@ ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/08/04/TED/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/"
+                            href="/2022/08/04/ted/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/"
                             aria-label=": 多巴胺戒断"
                         >
                             多巴胺戒断
@@ -1060,14 +847,10 @@ ModuleVersionMajor Field StructType:d.ModuleVersionMajor int32 &#x3D;&gt; [4]
 </ol>
 
                     
-                        
-
-
-                    
                     
                         <p>
                             <a
-                                href="/2022/08/04/TED/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/#post-footer"
+                                href="/2022/08/04/ted/%E5%A4%9A%E5%B7%B4%E8%83%BA%E6%88%92%E6%96%AD/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >

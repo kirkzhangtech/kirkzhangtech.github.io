@@ -59,7 +59,7 @@
         
     
 
-<header id="header" data-behavior="4">
+<header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a
@@ -92,7 +92,7 @@
         
     
 
-<nav id="sidebar" data-behavior="4">
+<nav id="sidebar" data-behavior="2">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -324,7 +324,7 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
+            <div id="main" data-behavior="2"
                  class="
                         hasCoverMetaIn
                         ">
@@ -364,50 +364,17 @@
 
             </div>
             
-                <div class="postShorten-content">
-                    <!-- ## 1. API介绍
-定义一组与系统交互的界面,是的用户有相对较小的权限操作系统
-
- -->
-<h2 id="1-API介绍"><a href="#1-API介绍" class="headerlink" title="1. API介绍"></a>1. API介绍</h2><h3 id="1-1-什么是API"><a href="#1-1-什么是API" class="headerlink" title="1.1 什么是API"></a>1.1 什么是API</h3><p>定义一组与系统交互的界面,是的用户有相对较小的权限操作系统</p>
-<h3 id="1-2-为什么API重要"><a href="#1-2-为什么API重要" class="headerlink" title="1.2 为什么API重要"></a>1.2 为什么API重要</h3><p>不需要像GUI那样很”cosmetic”</p>
-<h3 id="1-3-什么是面向资源API"><a href="#1-3-什么是面向资源API" class="headerlink" title="1.3 什么是面向资源API"></a>1.3 什么是面向资源API</h3><ul>
-<li>RPC-API<br>RPC APIs are often designed in terms of interfaces and methods. As more and more of these are added over time, the end result can be an overwhelming and confusing API surface due to the fact that developers must learn each method individually. Obviously this is both time consuming and error-prone.<br>RPC的命名没有严格的要求，无状态的，随着RPC的接口增加，接口管理就会面临混乱结果</li>
-<li>HTTP-API<br>The architectural style of REST was introduced, primarily designed to work well with HTTP&#x2F;1.1, but also to help tackle this problem. Its core principle is to define named resources that can be manipulated using a small number of methods. The resources and methods are known as nouns and verbs of APIs. With the HTTP protocol, the resource names naturally map to URLs, and methods naturally map to HTTP methods POST, GET, PUT, PATCH, and DELETE. This results in much fewer things to learn, since developers can focus on the resources and their relationship, and assume that they have the same small number of standard methods.<br>通常url就是资源的映射，对资源的CRUD就是对应HTTP的PATCH,POST,GET DELETE</li>
-</ul>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://cloud.google.com/apis/design/resources">https://cloud.google.com/apis/design/resources</a></p>
-</blockquote>
-<h3 id="1-4-什么是”good”API"><a href="#1-4-什么是”good”API" class="headerlink" title="1.4 什么是”good”API"></a>1.4 什么是”good”API</h3><ul>
-<li>Operational<br>你的API必须得work,高效。</li>
-<li>Expressive<br>你的method必须是具有描述意义的，告诉用户你能做什么</li>
-<li>Simple<br>Another common position on simplicity takes the old saying about the “common<br>case” (“Make the common case fast”) but focuses instead on usability while leaving<br>room for edge cases. This restatement is to “make the common case awesome and the<br>advanced case possible.” This means that whenever you add something that might<br>complicate an API for the benefit of an advanced user, it’s best to keep this complication sufficiently hidden from a typical user only interested in the common case. This<br>keeps the more frequent scenarios simple and easy, while still enabling more<br>advanced features for those who want them</li>
-<li>Predictable<br>方法和参数需要见名知意<br>APIs built using well-known, well-defined, clear</li>
-</ul>
-<h3 id="summary"><a href="#summary" class="headerlink" title="summary"></a>summary</h3><ul>
-<li>Interfaces are contracts that define how two systems should interact with one another.</li>
-<li>APIs are special types of interfaces that define how two computer systems interact with one another, coming in many forms, such as downloadable libraries and web APIs.</li>
-<li>Web APIs are special because they expose functionality over a network, hiding the specific implementation or computational requirements needed for that functionality.</li>
-<li>Resource-oriented APIs are a way of designing APIs to reduce complexity byrelying on a standard set of actions, called methods, across a limited set of things, called resources.</li>
-<li>What makes APIs “good” is a bit ambiguous, but generally good APIs are operational, expressive, simple, and predictable.</li>
-<li>对数据和系统的抽象会决定你的API – 李沐</li>
-</ul>
-
+                <div class="postShorten-excerpt">
+                    <p>摘要:</p>
                     
+                        <a
+                            href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": API Design Patterns"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/22/API_design%E5%8E%9F%E5%88%99/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             
