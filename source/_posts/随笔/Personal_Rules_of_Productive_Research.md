@@ -5,7 +5,7 @@ categories:
 ---
 > 作者：Eugene Vinitsky
 
-<!-- more -->
+
 Personal Rules of Productive Research 
 Caveats and intent: Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.
 <!-- more -->
