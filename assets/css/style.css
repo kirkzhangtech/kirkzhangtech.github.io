@@ -11276,44 +11276,91 @@ figure.highlight,
   .codeblock.yml .number {
     color: #0086b3; }
 
-/*
-// Default code block
 pre > code {
-    background: ;
-    color: ;
-}
+  background: #23241f;
+  color: #f8f8f2; }
 
-// Default inline code
 code {
-    background-color: ;
-}
+  background-color: #a6e22e; }
 
-// Tabbed code block tab
-// If your theme is dark then use a lighter background
-// to see clearly which tab is active
 .codeblock--tabbed figcaption .tab.active {
-    background: ;
-    color: ;
-}
+  background: #ddd;
+  color: #d88; }
 
-// highlight code block
 figure.highlight,
 .codeblock {
-    background: ;
-    color: ;
+  background: #979797;
+  color: #333; }
+  figure.highlight figcaption,
+  .codeblock figcaption {
+    background: #d88;
+    color: #d2d2d2; }
+  figure.highlight .gutter,
+  .codeblock .gutter {
+    background: #b83521;
+    border-right-color: #303030; }
+    figure.highlight .gutter .line,
+    .codeblock .gutter .line {
+      color: #303030; }
 
-    figcaption {
-        background: ;
-        color: ;
-    }
-    .gutter {
-        background: ;
-        border-right-color: ;
-        .line {
-            color: ;
-        }
-    }
-    // PUT YOUR THEME HERE
-
-}
+/*
+Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-license.org/
 */
+.tag,
+.subst {
+  color: #f8f8f2; }
+
+.strong,
+.emphasis {
+  color: #a8a8a2; }
+
+.bullet,
+.quote,
+.number,
+.regexp,
+.literal,
+.link {
+  color: #ae81ff; }
+
+.code,
+.title,
+.section,
+.selector-class {
+  color: #a6e22e; }
+
+.strong {
+  font-weight: bold; }
+
+.emphasis {
+  font-style: italic; }
+
+.keyword,
+.selector-tag,
+.name,
+.attr {
+  color: #f92672; }
+
+.symbol,
+.attribute {
+  color: #66d9ef; }
+
+.params,
+.title.class_,
+.class .title {
+  color: #f8f8f2; }
+
+.string,
+.type,
+.built_in,
+.selector-id,
+.selector-attr,
+.selector-pseudo,
+.addition,
+.variable,
+.template-variable {
+  color: #e6db74; }
+
+.comment,
+.deletion,
+.meta {
+  color: #75715e; }
