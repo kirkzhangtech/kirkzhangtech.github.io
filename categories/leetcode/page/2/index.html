@@ -38,7 +38,16 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/style-qfabngyeqy4bujk0yqtgvk4es1h4x8u5fxt0hwcrptgqlaytn2puqd9gogz3.min.css">
+<link rel="stylesheet" href="/assets/css/all.css">
+
+    
+<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="/assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
 
     <!--STYLES END-->
     
@@ -346,10 +355,10 @@
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"
-                            aria-label=": 67.二进制的求和"
+                            href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
+                            aria-label=": 66.加一"
                         >
-                            67.二进制的求和
+                            66.加一
                         </a>
                     
                 </h1>
@@ -374,50 +383,106 @@
                     <pre class="language-golang" data-language="golang"><code class="language-golang">
 package main
 
+import &quot;fmt&quot;
+
 &#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;67 lang&#x3D;golang
+ * @lc app&#x3D;leetcode.cn id&#x3D;66 lang&#x3D;golang
  *
- * [67] 二进制求和
+ * [66] 加一
+ *&#x2F;
+&#x2F;&#x2F;  9 9 9 9 9
+&#x2F;&#x2F; @lc code&#x3D;start
+func plusOne(digits []int) []int &#123;
+
+	l :&#x3D; len(digits)
+	&#x2F;&#x2F;遍历数组
+	for i :&#x3D; l - 1; i &gt;&#x3D; 0; i-- &#123;
+		digits[i] &#x3D; (digits[i] + 1) % 10
+		fmt.Println(digits[i])
+		&#x2F;&#x2F;判断取模10是否等于零
+		if digits[i] !&#x3D; 0 &#123;
+			return digits
+		&#125;
+	&#125;
+	&#x2F;&#x2F;new一个新数组
+	newArr :&#x3D; make([]int, l+1)
+	&#x2F;&#x2F; digits&#x3D; new int[l + 1];
+	&#x2F;&#x2F;设定第一位为1
+	newArr[0] &#x3D; 1
+	return newArr
+
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
+                            aria-label=": 69.x-的平方根"
+                        >
+                            69.x-的平方根
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+import &quot;math&quot;
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;69 lang&#x3D;golang
+ *
+ * [69] x 的平方根
  *&#x2F;
 
 &#x2F;&#x2F; @lc code&#x3D;start
-func addBinary(a string, b string) string &#123;
-	var carry, sum int
-	i, j :&#x3D; len(a), len(b)
-	if i &lt; j &#123;
-		i, j &#x3D; j, i
-		a, b &#x3D; b, a
-	&#125;
 
-	res :&#x3D; make([]byte, i+1)
+func mySqrt(x int) int &#123;
 
-	for j &gt; 0 &#123;
-		j--
-		i--
-		sum &#x3D; int(a[i]-&#39;0&#39;) + int(b[j]-&#39;0&#39;) + carry
-		carry &#x3D; sum &#x2F; 2
-		sum &#x3D; sum % 2
-		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
-	&#125;
+	return int(math.Sqrt(float64(x)))
 
-	for i &gt; 0 &#123;
-		i--
-		sum &#x3D; int(a[i]-&#39;0&#39;) + carry
-		carry &#x3D; sum &#x2F; 2
-		sum &#x3D; sum % 2
-		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
-	&#125;
-
-	res[0] &#x3D; byte(carry + &#39;0&#39;)
-
-	for i &lt; len(res)-1 &#123;
-		if res[i] &#x3D;&#x3D; &#39;0&#39; &#123;
-			i++
-		&#125; else &#123;
-			break
-		&#125;
-	&#125;
-	return string(res[i:])
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
@@ -425,7 +490,7 @@ func addBinary(a string, b string) string &#123;
                     
                         <p>
                             <a
-                                href="/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/#post-footer"
+                                href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -528,77 +593,6 @@ func Sum(dp []int) &#123;
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-                            aria-label=": 69.x-的平方根"
-                        >
-                            69.x-的平方根
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-import &quot;math&quot;
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;69 lang&#x3D;golang
- *
- * [69] x 的平方根
- *&#x2F;
-
-&#x2F;&#x2F; @lc code&#x3D;start
-
-func mySqrt(x int) int &#123;
-
-	return int(math.Sqrt(float64(x)))
-
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -863,6 +857,86 @@ public:
                     
                         <a
                             class="link-unstyled"
+                            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
+                            aria-label=": 9.回文数"
+                        >
+                            9.回文数
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+import &quot;strconv&quot;
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;9 lang&#x3D;golang
+ *
+ * [9] 回文数
+ *&#x2F;
+
+&#x2F;&#x2F; @lc code&#x3D;start
+func isPalindrome(x int) bool &#123;
+
+	bigString :&#x3D; strconv.Itoa(x)
+	for i :&#x3D; 0; i &lt;&#x3D; len(bigString)&#x2F;2; i++ &#123;
+		if bigString[i] &#x3D;&#x3D; bigString[len(bigString)-1-i] &#123;
+			continue
+		&#125; else &#123;
+			return false
+		&#125;
+
+	&#125;
+	return true
+
+
+
+&#x2F;&#x2F; @lc code&#x3D;end
+&#125;</code></pre>
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
                             href="/2022/06/23/leetcode/94.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86/"
                             aria-label=": 94.二叉树的中序排序"
                         >
@@ -1011,86 +1085,6 @@ public:
         
     </article>
     
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/"
-                            aria-label=": 9.回文数"
-                        >
-                            9.回文数
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-import &quot;strconv&quot;
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;9 lang&#x3D;golang
- *
- * [9] 回文数
- *&#x2F;
-
-&#x2F;&#x2F; @lc code&#x3D;start
-func isPalindrome(x int) bool &#123;
-
-	bigString :&#x3D; strconv.Itoa(x)
-	for i :&#x3D; 0; i &lt;&#x3D; len(bigString)&#x2F;2; i++ &#123;
-		if bigString[i] &#x3D;&#x3D; bigString[len(bigString)-1-i] &#123;
-			continue
-		&#125; else &#123;
-			return false
-		&#125;
-
-	&#125;
-	return true
-
-
-
-&#x2F;&#x2F; @lc code&#x3D;end
-&#125;</code></pre>
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/9.%E5%9B%9E%E6%96%87%E6%95%B0/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
     <div class="pagination-bar">
     <ul class="pagination">
         
@@ -1166,7 +1160,16 @@ func isPalindrome(x int) bool &#123;
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/script-48ck9coqsaipum7yktedc1z371mex3mu18pihz9o0ii90n3cdqorsjc9v8hy.min.js"></script>
+<script src="/assets/js/jquery.js"></script>
+
+
+<script src="/assets/js/jquery.fancybox.js"></script>
+
+
+<script src="/assets/js/thumbs.js"></script>
+
+
+<script src="/assets/js/tranquilpeak.js"></script>
 
 <!--SCRIPTS END-->
 
