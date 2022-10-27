@@ -356,3 +356,137 @@ Solution #2 contains some conditional logic that is used to manually raise the d
 one row will be returned. If more than one row is returned, then the TOO_MANY_ROWS exception is raised; 
 otherwise, the expected output is displayed. In any event, the output that is displayed using either of the 
 solutions will be the same whether successful or not.
+
+## Qualifying Column and Variable Names（变量和表列名相同)
+
+**Problem**
+You have a variable and a column sharing the same name. You want to refer to both in the same SQL
+statement. 
+For example, you decide that you’d like to search for records where LAST_NAME is not equal to a last
+name that is provided by a user via an argument to a procedure call. Suppose you have declared a 
+variable LAST_NAME, and you want to alter the query to read as follows: 
+
+```sql
+SELECT first_name, last_name, email
+ INTO first, last, email 
+ FROM employees 
+WHERE last_name = last_name; 
+```
+How does PL/SQL know which LAST_NAME you are referring to since both the table column name and 
+the variable name are the same? You need a way to differentiate your references. 
+
+**Solution**
+You can use the dot notation to fully qualify the local variable name with the procedure name so that
+PL/SQL can differentiate between the two. The altered query, including the fully qualified 
+procedure_name.variable solution, would read as follows: 
+```sql
+CREATE OR REPLACE PROCEDURE retrieve_emp_info(last_name IN VARCHAR2) AS 
+ first VARCHAR2(20); 
+ last VARCHAR2(25); 
+ email VARCHAR2(25); 
+BEGIN 
+ SELECT first_name, last_name, email 
+ INTO first, last, email 
+ FROM employees 
+ WHERE last_name = retrieve_emp_info.last_name; 
+ DBMS_OUTPUT.PUT_LINE( 
+ 'Employee Information for ID: ' || first || ' ' || last_name || ' - ' || email); 
+EXCEPTION 
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE('No employee matches the last name ' || last_name); 
+END; 
+```
+
+**How It Works**
+
+PL/SQL name resolution(方法) becomes very important in circumstances such as these, and by fully qualifying 
+the names, you can be sure that your code will work as expected. The solution used dot notation to fully 
+qualify the variable name. 
+
+The column name could have been qualified with the table name, as in EMPLOYEES.LAST_NAME. 
+However, there’s no need to qualify the column name in this case. Because the reference occurs within a 
+SELECT, the closest resolution for LAST_NAME becomes the table column of that name. So, in this particular 
+case, it is necessary only to qualify references to variable names in the enclosing PL/SQL block. 
+
+If you are executing a simple BEGIN…END block, then you also have the option of fully qualifying the 
+variable using the dot notation along with the block label. For the purposes of this demonstration, let’s 
+say that the code block shown in the solution was labeled <<emp_info>>. You could then fully qualify a 
+variable named description as follows: 
+
+```text
+side note:
+
+```
+
+```sql
+<<emp_info>>
+DECLARE 
+ last_name VARCHAR2(25) := 'Fay'; 
+ first VARCHAR2(20); 
+ last VARCHAR2(25); 
+ email VARCHAR2(25); 
+BEGIN 
+ SELECT first_name, last_name, email 
+ INTO first, last, email 
+ FROM employees 
+ WHERE last_name = emp_info.last_name; 
+END; 
+```
+
+In this example, the LAST_NAME that is declared in the code block is used within the SELECT..INTO
+query, and it is fully qualified with the code block label.
+
+<text style="font-family:Courier New;color:red">
+summary: 
+1. while code block contain same variable name as parameter, we could use "procedure"(including package name i though) name qualify parameter name at where clause statement.
+2. actualy you could use table name qualify parameter name in code block, but no more works on it,due to in your select statement,
+it had been qualified by table name.
+3. and so on , if you use label on your code block, as case shown above
+</text>
+
+## 2.3. Declaring Variable Types That Match Column Types
+
+**Problem**
+You want to declare some variables in your code block that match the same datatypes as some columns
+in a particular table. If the datatype on one of those columns changes, you’d like the code block to
+automatically update the variable type to match that of the updated column
+
+**Note** 
+Sharp-eyed readers will notice that we cover this problem redundantly in Chapter 1. We cover this
+problem here as well, because the solution is fundamental to working in PL/SQL, especially to working with SQL in
+PL/SQL. We don’t want you to miss what we discuss in this recipe. It is that important.
+
+**Solution**
+Use the `%TYPE` attribute(n.属性) on table columns to identify(v.确定) the types of data that will be returned into your local variables. Instead of providing a hard-coded datatype for a variable, append %TYPE to the database column name. Doing so will apply the datatype from the specified column to the variable you are declaring.
+
+In the following example, the same `SELECT INTO` query is issued, as in the previous problem, to retrieve an employee record from the database. However, in this case, the variables are declared using the `%TYPE` attribute rather than designating a specified datatype for each.
+
+```sql
+DECLARE 
+  first   employees.first_name%TYPE;
+  last    employees.last_name%TYPE;
+  email   employees.email%TYPE;
+BEGIN 
+SELECT 
+  first_name, 
+  last_name, 
+  email INTO first, last, email 
+FROM 
+  employees 
+WHERE 
+  employee_id = & emp_id;
+  DBMS_OUTPUT.PUT_LINE('Employee Information for ID: ' || first || ' ' || last || ' - ' || email);
+EXCEPTION WHEN NO_DATA_FOUND THEN DBMS_OUTPUT.PUT_LINE('No matching employee was found, please try again.');
+WHEN OTHERS THEN DBMS_OUTPUT.PUT_LINE('An unknown error has occured, please try again.');
+END;
+```
+
+As you can see from the solution, the code block looks essentially the same as the one in the previous recipe. The only difference is that here the `%TYPE` attribute of each database column is being used in order to declare your local variable types.
+
+**How It Works**
+The `%TYPE` attribute can become a significant time-saver and savior for declaring variable types, especially if the underlying database column types are subject(会发生变化) to change. This attribute enables the local variable to assume the same datatype of its corresponding database column type at runtime. Retrieving several columns into local application variables can become tedious(`沉闷的`) if you need to continually verify that the datatypes of each variable are the same as those of the columns whose data they will consume.The`%TYPE` attribute can be used when defining variables, constants, fields, and parameters. Using `%TYPE` assures(`保证`) that the variables you declare will always remain synchronized with the datatypes of their corresponding columns.
+
+<text style="font-family:Courier New;color:red">
+summary:  
+at all above explained that we could use `%TYPE` attribute to define variable which the same as table datatype
+</text>
