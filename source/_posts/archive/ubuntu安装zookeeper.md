@@ -6,6 +6,8 @@ categories:
 
 # 搭建zookeeper集群
 
+摘要:当时主要是想在wsl2上面搭建kafka集群
+
 <!-- more -->
 
 首先下载(zookeeper)[https://zookeeper.apache.org/]

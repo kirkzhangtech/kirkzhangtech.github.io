@@ -5,14 +5,14 @@ categories:
 ---
 > 作者：Eugene Vinitsky
 
-<!-- excerpt -->
+
 ![Eugene_Vinitsky_twitter](./../../picture/Eugene_Vinitsky_twitter.png)
 
 Caveats:
 
 This is targeted at MARL researchers (with an emphasis on transportation researchers in MARL) but is somewhat generic except for some of the specific expected skills.
-
 <!-- more -->
+
 
 It is quite hard to understand what a successful first year or two of graduate school looks like. This document is intended to help you set a standard so that you are neither too hard on yourself, stressed out about meeting some imaginary expectation that you could not possibly achieve, nor too easy on yourself because you misunderstand how much hard work is required.
 On the other hand, if you're struggling to hit these expectations we should have a chat to figure out what's going on and find a way to help you! The goal is for you to succeed and these expectations are intended to be a useful guideline, not a source of stress.
