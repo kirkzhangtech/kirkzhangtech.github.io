@@ -59,15 +59,15 @@ sidebar:
     author_links:
         github:
             title: global.github
-            url: https://github.com/
+            url: https://github.com/SimonTeo58
             icon: fab fa-github
         stack_overflow:
             title: global.stack_overflow
-            url: nil
+            url: https://stackoverflow.com/users/11289672/simon-teo
             icon: fab fa-stack-overflow
         twitter:
             title: global.twitter
-            url: nil
+            url: https://twitter.com/shiming_kirk
             icon: fab fa-twitter
         facebook:
             title: global.facebook
@@ -79,11 +79,11 @@ sidebar:
             icon: fab fa-google-plus
         linked_in:
             title: global.linkedin
-            url: nil
+            url: https://www.linkedin.com/in/kirk-zhang-424935235/
             icon: fab fa-linkedin
         mail:
             title: global.mail
-            url: mailto
+            url: zxc741208584@qq.com
             icon: fa fa-envelope
     rss:
         rss:
