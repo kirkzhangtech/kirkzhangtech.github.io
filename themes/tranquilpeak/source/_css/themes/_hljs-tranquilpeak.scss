@@ -65,7 +65,8 @@ figure.highlight,
         }
     }
     // Bash
-    &.bash .code {
+    &.bash 
+    .code {
         .shebang {
             color: map-get($highlight-colors, pewter);
         }
