@@ -10,17 +10,18 @@ coverImage: avatar.jpg
 ---
 > 作者：Eugene Vinitsky
 
-Personal Rules of Productive Research 
-Caveats and intent: Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.
-<!-- more -->
+Personal Rules of Productive Research
 
-There’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.
+Caveats(`['kæviæt] 警告;说明`) and intent(`[ɪn'tɛnt]意图;目的;含义`): Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.
+
+There’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(`vi/vt坚持,强调`) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.
+<!-- more -->
 
 ## Run the simplest experiment first.
 
-This is the mistake I make the most often. ML experiments are so easy to mess up you absolutely need to verify at each step that the minimal experiment is working. The minimal experiment is the absolute bare minimum needed to check that either your code works or your idea makes sense. Unfortunately, I don’t think there’s a coherent definition of minimal, it seems to mostly be an aesthetic thing. I’d call it the thing that has the least moving pieces.
+This is the mistake I make the most often. ML experiments are so easy to mess up you absolutely need to verify at each step that the minimal experiment is working. The minimal experiment is the absolute bare(`adj赤裸的`) minimum needed to check that either your code works or your idea makes sense. Unfortunately, I don’t think there’s a coherent definition of minimal, it seems to mostly be an aesthetic(`[ɛsˈθɛtɪk]adj美的;美学的`) thing. I’d call it the thing that has the least moving pieces.
 
-Since nothing is better than concrete details, let me just list all the ways I’ve done this wrong:
+Since nothing is better than concrete(`adj具体的`) details, let me just list all the ways I’ve done this wrong:
 
 1) I had an RL problem where we had to solve some task where the dynamics were defined by N trajectories. Instead of checking whether I could solve one interesting trajectory perfectly, I kept running the algorithm over all N trajectories. 
 
