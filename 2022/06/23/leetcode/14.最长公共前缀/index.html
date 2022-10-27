@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"package main\n\nimport (\n\t&quot;fmt&quot;\n\t&quot;sort&quot;\n)\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;14 lang&#x3D;golang\n *\n * [14] 最长公共前缀\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc longestCommonPrefix(strs []string) string &#123;\n\tsort.Strings(strs)\n\tfmt.Printf(&quot;min &#x3D; %s , max &#x3D; %s&quot;, strs[0], strs[len(strs)-1])\n\n\tminStrs, maxStrs :&#x3D; strs[0], strs[len(strs)-1]\n\tcommonStrs :&#x3D; make([]byte, 0)\n\tfor i :&#x3D; 0; i &lt; len(minStrs); i++ &#123;\n\t\tif minStrs[i] &#x3D;&#x3D; maxStrs[i] &#123;\n\t\t\tcommonStrs &#x3D; append(commonStrs, minStrs[i])\n\t\t&#125; else &#123;\n\t\t\tbreak\n\t\t&#125;\n\t&#125;\n\treturn string(commonStrs)\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:57+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"14.最长公共前缀","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"package main\n\nimport (\n\t&quot;fmt&quot;\n\t&quot;sort&quot;\n)\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;14 lang&#x3D;golang\n *\n * [14] 最长公共前缀\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc longestCommonPrefix(strs []string) string &#123;\n\tsort.Strings(strs)\n\tfmt.Printf(&quot;min &#x3D; %s , max &#x3D; %s&quot;, strs[0], strs[len(strs)-1])\n\n\tminStrs, maxStrs :&#x3D; strs[0], strs[len(strs)-1]\n\tcommonStrs :&#x3D; make([]byte, 0)\n\tfor i :&#x3D; 0; i &lt; len(minStrs); i++ &#123;\n\t\tif minStrs[i] &#x3D;&#x3D; maxStrs[i] &#123;\n\t\t\tcommonStrs &#x3D; append(commonStrs, minStrs[i])\n\t\t&#125; else &#123;\n\t\t\tbreak\n\t\t&#125;\n\t&#125;\n\treturn string(commonStrs)\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:57+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"14.最长公共前缀","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"}</script>
     <meta name="description" content="package main  import ( 	&quot;fmt&quot; 	&quot;sort&quot; )  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;14 lang&#x3D;golang  *  * [14] 最长公共前缀  *&#x2F;  &#x2F;&#x2F; @lc code&#x3D;start func longestCo">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="14.最长公共前缀">
@@ -212,7 +212,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://github.com/"
+                            href="https://github.com/SimonTeo58"
                             
                                 target="_blank"
                             
@@ -228,7 +228,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="Stack Overflow"
@@ -242,7 +244,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="Twitter"
@@ -284,7 +288,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="LinkedIn"
@@ -298,7 +304,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/mailto"
+                            href="/zxc741208584@qq.com"
                             
                             rel="noopener"
                             title="Mail"

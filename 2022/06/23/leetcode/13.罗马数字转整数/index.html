@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang\n *\n * [13] 罗马数字转整数\n\n 1. I X C 也是写成从大到小\n 2. 左高位，右低位\n 3. 输入: s &#x3D; &quot;MC MX CI V&quot;\n             1100 1010 101 5\n\t输出: 1994\n\t解释: M &#x3D; 1000, CM &#x3D; 900, XC &#x3D; 90, IV &#x3D; 4.\n\n\tMMMCCCXXXIII\n\t1000+1000+1000 -100-100-100-10-10-10+1+1+1\n\tCXCIX\n\t100 -10 +100-1+10\n*&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc romanToInt(s string) int &#123;\n\n\tvar intSum int\n\tfor i :&#x3D; 0; i &lt; len(s)-1; i++ &#123;\n\t\tif char2Int(string(s[i])) &gt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125; else if char2Int(string(s[i])) &lt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum - char2Int(string(s[i]))\n\t\t&#125; else &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125;\n\t&#125;\n\tintSum &#x3D; intSum + char2Int(string(s[len(s)-1]))\n\n\treturn intSum\n\n&#125;\nfunc char2Int(c string) int &#123;\n\tswitch c &#123;\n\tcase &quot;I&quot;:\n\t\treturn 1\n\tcase &quot;V&quot;:\n\t\treturn 5\n\tcase &quot;X&quot;:\n\t\treturn 10\n\tcase &quot;L&quot;:\n\t\treturn 50\n\tcase &quot;C&quot;:\n\t\treturn 100\n\tcase &quot;D&quot;:\n\t\treturn 500\n\tcase &quot;M&quot;:\n\t\treturn 1000\n\t&#125;\n\tpanic(&quot;excep I V X L C D M&quot;)\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:57+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"13.罗马数字转整数","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"package main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang\n *\n * [13] 罗马数字转整数\n\n 1. I X C 也是写成从大到小\n 2. 左高位，右低位\n 3. 输入: s &#x3D; &quot;MC MX CI V&quot;\n             1100 1010 101 5\n\t输出: 1994\n\t解释: M &#x3D; 1000, CM &#x3D; 900, XC &#x3D; 90, IV &#x3D; 4.\n\n\tMMMCCCXXXIII\n\t1000+1000+1000 -100-100-100-10-10-10+1+1+1\n\tCXCIX\n\t100 -10 +100-1+10\n*&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc romanToInt(s string) int &#123;\n\n\tvar intSum int\n\tfor i :&#x3D; 0; i &lt; len(s)-1; i++ &#123;\n\t\tif char2Int(string(s[i])) &gt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125; else if char2Int(string(s[i])) &lt; char2Int(string(s[i+1])) &#123;\n\t\t\tintSum &#x3D; intSum - char2Int(string(s[i]))\n\t\t&#125; else &#123;\n\t\t\tintSum &#x3D; intSum + char2Int(string(s[i]))\n\t\t&#125;\n\t&#125;\n\tintSum &#x3D; intSum + char2Int(string(s[len(s)-1]))\n\n\treturn intSum\n\n&#125;\nfunc char2Int(c string) int &#123;\n\tswitch c &#123;\n\tcase &quot;I&quot;:\n\t\treturn 1\n\tcase &quot;V&quot;:\n\t\treturn 5\n\tcase &quot;X&quot;:\n\t\treturn 10\n\tcase &quot;L&quot;:\n\t\treturn 50\n\tcase &quot;C&quot;:\n\t\treturn 100\n\tcase &quot;D&quot;:\n\t\treturn 500\n\tcase &quot;M&quot;:\n\t\treturn 1000\n\t&#125;\n\tpanic(&quot;excep I V X L C D M&quot;)\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:45:57+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"13.罗马数字转整数","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/13.%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97%E8%BD%AC%E6%95%B4%E6%95%B0/"}</script>
     <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;13 lang&#x3D;golang  *  * [13] 罗马数字转整数   1. I X C 也是写成从大到小  2. 左高位，右低位  3. 输入: s &#x3D; &quot;MC MX CI V&quot;              1100 1010 101 5 	输">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="13.罗马数字转整数">
@@ -212,7 +212,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://github.com/"
+                            href="https://github.com/SimonTeo58"
                             
                                 target="_blank"
                             
@@ -228,7 +228,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="Stack Overflow"
@@ -242,7 +244,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="Twitter"
@@ -284,7 +288,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="LinkedIn"
@@ -298,7 +304,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/mailto"
+                            href="/zxc741208584@qq.com"
                             
                             rel="noopener"
                             title="Mail"

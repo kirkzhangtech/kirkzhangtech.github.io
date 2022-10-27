@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg"},"articleBody":"#include &lt;iostream&gt;\n \nusing namespace std;\n\nstruct ListNode &#123;\n      int val;\n      ListNode *next;\n      ListNode() : val(0), next(nullptr) &#123;&#125;\n      ListNode(int x) : val(x), next(nullptr) &#123;&#125;\n      ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;\n&#125;;\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;83 lang&#x3D;cpp\n *\n * [83] 删除排序链表中的重复元素\n *&#x2F;\n&#x2F;&#x2F; @lc code&#x3D;start\n&#x2F;**\n * Definition for singly-linked list.\n * struct ListNode &#123;\n *     int val;\n *     ListNode *next;\n *     ListNode() : val(0), next(nullptr) &#123;&#125;\n *     ListNode(int x) : val(x), next(nullptr) &#123;&#125;\n *     ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;\n * &#125;;\n *&#x2F;\n\nclass Solution &#123;\npublic:\n    ListNode* deleteDuplicates(ListNode* head) &#123;\n    ListNode *cur &#x3D; head;\n    if (head &#x3D;&#x3D; NULL)&#123;\n        return head;\n    &#125; \n\n    while (cur &amp;&amp; cur-&gt;next  )&#123;\n        ListNode *next &#x3D; cur-&gt;next;\n        if (cur-&gt;val &#x3D;&#x3D; next-&gt;val)&#123;\n            cur-&gt;next &#x3D; next-&gt;next;\n        &#125; else &#123;\n            cur &#x3D; next;\n            \n        &#125;\n    &#125;\n\n        return head;\n    &#125;\n&#125;;\n&#x2F;&#x2F; @lc code&#x3D;end\n","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:26+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"83.删除排序链表中的重复元素","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/","nil","nil","nil","nil","nil","mailto"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"#include &lt;iostream&gt;\n \nusing namespace std;\n\nstruct ListNode &#123;\n      int val;\n      ListNode *next;\n      ListNode() : val(0), next(nullptr) &#123;&#125;\n      ListNode(int x) : val(x), next(nullptr) &#123;&#125;\n      ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;\n&#125;;\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;83 lang&#x3D;cpp\n *\n * [83] 删除排序链表中的重复元素\n *&#x2F;\n&#x2F;&#x2F; @lc code&#x3D;start\n&#x2F;**\n * Definition for singly-linked list.\n * struct ListNode &#123;\n *     int val;\n *     ListNode *next;\n *     ListNode() : val(0), next(nullptr) &#123;&#125;\n *     ListNode(int x) : val(x), next(nullptr) &#123;&#125;\n *     ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;\n * &#125;;\n *&#x2F;\n\nclass Solution &#123;\npublic:\n    ListNode* deleteDuplicates(ListNode* head) &#123;\n    ListNode *cur &#x3D; head;\n    if (head &#x3D;&#x3D; NULL)&#123;\n        return head;\n    &#125; \n\n    while (cur &amp;&amp; cur-&gt;next  )&#123;\n        ListNode *next &#x3D; cur-&gt;next;\n        if (cur-&gt;val &#x3D;&#x3D; next-&gt;val)&#123;\n            cur-&gt;next &#x3D; next-&gt;next;\n        &#125; else &#123;\n            cur &#x3D; next;\n            \n        &#125;\n    &#125;\n\n        return head;\n    &#125;\n&#125;;\n&#x2F;&#x2F; @lc code&#x3D;end\n","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:26+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"83.删除排序链表中的重复元素","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"}</script>
     <meta name="description" content="#include &lt;iostream&gt;   using namespace std;  struct ListNode &amp;#123;       int val;       ListNode *next;       ListNode() : val(0), next(nullptr) &amp;#123;&amp;#125;       ListNode(int x) : val(x), next">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="83.删除排序链表中的重复元素">
@@ -212,7 +212,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://github.com/"
+                            href="https://github.com/SimonTeo58"
                             
                                 target="_blank"
                             
@@ -228,7 +228,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="Stack Overflow"
@@ -242,7 +244,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="Twitter"
@@ -284,7 +288,9 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
                             
                             rel="noopener"
                             title="LinkedIn"
@@ -298,7 +304,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/mailto"
+                            href="/zxc741208584@qq.com"
                             
                             rel="noopener"
                             title="Mail"
