@@ -5,106 +5,123 @@
 // with properties of `.hljs` CSS class of your theme
 // 3. Put your theme where it's indicated just below
 // 4. Remove `.hljs {...}` rules
-// 5. Remove `hljs-` of all CSS class name. E.g : `.hljs-comment` becomes `.comment`
+// 5. Remove `hljs-` of all CSS class name. E.g : `hljs-.comment` becomes `.comment`
 // 6. Comment line 61 (`'themes/tranquilpeak',`) of `source/_css/tranquilpeak.scss` file
 // 7. Run `grunt buildProd` to build the theme and see the result
-/*
+
 // Default code block
 pre > code {
-    background: ;
-    color: ;
+    background: #23241f;
+    color: #f8f8f2;
 }
 
 // Default inline code
 code {
-    background-color: ;
+    background-color: #a6e22e;
 }
 
 // Tabbed code block tab
 // If your theme is dark then use a lighter background
 // to see clearly which tab is active
 .codeblock--tabbed figcaption .tab.active {
-    background: ;
-    color: ;
+    background: #ddd;
+    color: #d88;
 }
 
 // highlight code block
 figure.highlight,
 .codeblock {
-    background: ;
-    color: ;
+    background: #979797;
+    color: #333;
 
     figcaption {
-        background: ;
-        color: ;
+        background: #d88;
+        color: #d2d2d2;
     }
     .gutter {
-        background: ;
-        border-right-color: ;
+        background: rgb(184, 53, 33);
+        border-right-color: #303030;
         .line {
-            color: ;
+            color:  #303030;
         }
     }
     // PUT YOUR THEME HERE
 
 }
-*/
+
+
 /*
-Dark style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-license.org/
 */
 
-.hljs {
-    color: #ddd;
-    background: #303030;
-  }
-  
-  .hljs-keyword,
-  .hljs-selector-tag,
-  .hljs-literal,
-  .hljs-section,
-  .hljs-link {
-    color: white;
-  }
-  
-  
-  .hljs-subst {
-    /* default */
-  }
-  
-  .hljs-string,
-  .hljs-title,
-  .hljs-name,
-  .hljs-type,
-  .hljs-attribute,
-  .hljs-symbol,
-  .hljs-bullet,
-  .hljs-built_in,
-  .hljs-addition,
-  .hljs-variable,
-  .hljs-template-tag,
-  .hljs-template-variable {
-    color: #d88;
-  }
-  
-  .hljs-comment,
-  .hljs-quote,
-  .hljs-deletion,
-  .hljs-meta {
-    color: #979797;
-  }
-  
-  .hljs-keyword,
-  .hljs-selector-tag,
-  .hljs-literal,
-  .hljs-title,
-  .hljs-section,
-  .hljs-doctag,
-  .hljs-type,
-  .hljs-name,
-  .hljs-strong {
-    font-weight: bold;
-  }
-  
-  .hljs-emphasis {
-    font-style: italic;
-  }
+
+
+.tag,
+.subst {
+  color: #f8f8f2;
+}
+
+.strong,
+.emphasis {
+  color: #a8a8a2;
+}
+
+.bullet,
+.quote,
+.number,
+.regexp,
+.literal,
+.link {
+  color: #ae81ff;
+}
+
+.code,
+.title,
+.section,
+.selector-class {
+  color: #a6e22e;
+}
+
+.strong {
+  font-weight: bold;
+}
+
+.emphasis {
+  font-style: italic;
+}
+
+.keyword,
+.selector-tag,
+.name,
+.attr {
+  color: #f92672;
+}
+
+.symbol,
+.attribute {
+  color: #66d9ef;
+}
+
+.params,
+.title.class_,
+.class .title {
+  color: #f8f8f2;
+}
+
+.string,
+.type,
+.built_in,
+.selector-id,
+.selector-attr,
+.selector-pseudo,
+.addition,
+.variable,
+.template-variable {
+  color: #e6db74;
+}
+
+.comment,
+.deletion,
+.meta {
+  color: #75715e;
+}
