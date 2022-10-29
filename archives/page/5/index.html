@@ -346,6 +346,95 @@
                     
                         <a
                             class="link-unstyled"
+                            href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
+                            aria-label=": 28.实现 strStr()"
+                        >
+                            28.实现 strStr()
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;28 lang&#x3D;golang
+ *
+ * [28] 实现 strStr()
+ *&#x2F;
+
+&#x2F;&#x2F; hellabcelp
+&#x2F;&#x2F;  elp
+
+&#x2F;&#x2F; @lc code&#x3D;start
+func strStr(haystack string, needle string) int &#123;
+	if len(needle) &#x3D;&#x3D; 0 &#123;
+		return 0
+	&#125;
+	i, j :&#x3D; 0, 0
+	for j &lt; len(haystack) &#123;
+
+		c :&#x3D; needle[i]
+		ch :&#x3D; haystack[j]
+		if c &#x3D;&#x3D; ch &#123;
+			i++
+			j++
+		&#125; else &#123;
+			j &#x3D; j - i + 1
+			i &#x3D; 0
+		&#125;
+		if i &#x3D;&#x3D; len(needle) &#123;
+			return j - i
+		&#125;
+
+	&#125;
+	return -1
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
                             href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
                             aria-label=": 35.搜索插入位置"
                         >
@@ -773,81 +862,6 @@ func addBinary(a string, b string) string &#123;
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/"
-                            aria-label=": 27.移除元素"
-                        >
-                            27.移除元素
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;27 lang&#x3D;golang
- *
- * [27] 移除元素
- *&#x2F;
-
-&#x2F;&#x2F; @lc code&#x3D;start
-func removeElement(nums []int, val int) int &#123;
-	slow, fast :&#x3D; 0, 0
-	for fast &lt; len(nums) &#123;
-		if val !&#x3D; nums[fast] &#123;
-			nums[slow] &#x3D; nums[fast]
-			slow++
-		&#125;
-		fast++
-
-	&#125;
-	return len(nums[:slow])
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
                             href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
                             aria-label=": 69.x-的平方根"
                         >
@@ -897,108 +911,6 @@ func mySqrt(x int) int &#123;
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-                            aria-label=": 70.爬楼梯"
-                        >
-                            70.爬楼梯
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;70 lang&#x3D;golang
- *
- * [70] 爬楼梯
- *&#x2F;
-
-&#x2F;&#x2F; @lc code&#x3D;start
-&#x2F;&#x2F; int BottomUpCutRod(const std::vector&lt;int&gt; &amp;p, const int &amp;n)
-&#x2F;&#x2F; &#123;
-&#x2F;&#x2F;     std::vector&lt;int&gt; r&#123;0&#125;;
-&#x2F;&#x2F;     for (auto j &#x3D; 1; j &lt;&#x3D; n; ++j)
-&#x2F;&#x2F;     &#123;
-&#x2F;&#x2F;         int q &#x3D; INT8_MIN;
-&#x2F;&#x2F;         for (auto i &#x3D; 1; i &lt;&#x3D; j; ++i)
-&#x2F;&#x2F;         &#123;
-&#x2F;&#x2F;             q &#x3D; std::max(q, p.at(i) + r.at(j - i));
-&#x2F;&#x2F;         &#125;
-&#x2F;&#x2F;         r.push_back(q);
-&#x2F;&#x2F;     &#125;
-&#x2F;&#x2F;     return r.at(n);
-&#x2F;&#x2F; &#125;
-&#x2F;&#x2F; 1 1 2 3 5 8
-&#x2F;&#x2F;   1 2 3 4 5
-func climbStairs(n int) int &#123;
-
-	if n &#x3D;&#x3D; 0 &#123;
-		return 1
-	&#125;
-	if n &#x3D;&#x3D; 1 &#123;
-		return 1
-	&#125;
-	if n &#x3D;&#x3D; 2 &#123;
-		return 2
-	&#125;
-	dp :&#x3D; []int&#123;1, 2&#125;
-	for i :&#x3D; 3; i &lt;&#x3D; n; i++ &#123;
-		Sum(dp)
-	&#125;
-
-	return dp[1]
-&#125;
-func Sum(dp []int) &#123;
-	pre :&#x3D; dp[0]
-	dp[0] &#x3D; dp[1]
-	dp[1] &#x3D; pre + dp[1]
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -1241,6 +1153,108 @@ public:
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/88.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
+                            aria-label=": 70.爬楼梯"
+                        >
+                            70.爬楼梯
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;70 lang&#x3D;golang
+ *
+ * [70] 爬楼梯
+ *&#x2F;
+
+&#x2F;&#x2F; @lc code&#x3D;start
+&#x2F;&#x2F; int BottomUpCutRod(const std::vector&lt;int&gt; &amp;p, const int &amp;n)
+&#x2F;&#x2F; &#123;
+&#x2F;&#x2F;     std::vector&lt;int&gt; r&#123;0&#125;;
+&#x2F;&#x2F;     for (auto j &#x3D; 1; j &lt;&#x3D; n; ++j)
+&#x2F;&#x2F;     &#123;
+&#x2F;&#x2F;         int q &#x3D; INT8_MIN;
+&#x2F;&#x2F;         for (auto i &#x3D; 1; i &lt;&#x3D; j; ++i)
+&#x2F;&#x2F;         &#123;
+&#x2F;&#x2F;             q &#x3D; std::max(q, p.at(i) + r.at(j - i));
+&#x2F;&#x2F;         &#125;
+&#x2F;&#x2F;         r.push_back(q);
+&#x2F;&#x2F;     &#125;
+&#x2F;&#x2F;     return r.at(n);
+&#x2F;&#x2F; &#125;
+&#x2F;&#x2F; 1 1 2 3 5 8
+&#x2F;&#x2F;   1 2 3 4 5
+func climbStairs(n int) int &#123;
+
+	if n &#x3D;&#x3D; 0 &#123;
+		return 1
+	&#125;
+	if n &#x3D;&#x3D; 1 &#123;
+		return 1
+	&#125;
+	if n &#x3D;&#x3D; 2 &#123;
+		return 2
+	&#125;
+	dp :&#x3D; []int&#123;1, 2&#125;
+	for i :&#x3D; 3; i &lt;&#x3D; n; i++ &#123;
+		Sum(dp)
+	&#125;
+
+	return dp[1]
+&#125;
+func Sum(dp []int) &#123;
+	pre :&#x3D; dp[0]
+	dp[0] &#x3D; dp[1]
+	dp[1] &#x3D; pre + dp[1]
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >

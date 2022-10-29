@@ -347,9 +347,9 @@
                         <a
                             class="link-unstyled"
                             href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
-                            aria-label=": MIT6.824之lab2_raft_structure_guide"
+                            aria-label=": raft_structure_guide"
                         >
-                            MIT6.824之lab2_raft_structure_guide
+                            raft_structure_guide
                         </a>
                     
                 </h1>
@@ -372,12 +372,12 @@
             
                 <div class="postShorten-excerpt">
                     <p>Raft Structure Advice</p>
-<p>A Raft instance has to deal with the arrival of external events<br>(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),<br>and it has to execute periodic tasks (elections and heart-beats).<br>There are many ways to structure your Raft code to manage these<br>activities; this document outlines a few ideas.</p>
+<p>A Raft instance has to deal with the arrival of external events<br>(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),<br>and it has to execute periodic tasks (elections and heart-beats).<br>There are many ways to structure(v.) your Raft code to manage these<br>activities; this document outlines(v.) a few ideas.</p>
                     
                         <a
                             href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
                             class="postShorten-excerpt_link link"
-                            aria-label=": MIT6.824之lab2_raft_structure_guide"
+                            aria-label=": raft_structure_guide"
                         >
                             Continue reading
                         </a>
@@ -450,9 +450,9 @@
                         <a
                             class="link-unstyled"
                             href="/2022/10/05/MIT6.824/lab2b/lab2_raft_students_guide/"
-                            aria-label=": MIT6.824之lab2_raft_students_guide"
+                            aria-label=": raft_students_guide"
                         >
-                            MIT6.824之lab2_raft_students_guide
+                            raft_students_guide
                         </a>
                     
                 </h1>
@@ -563,7 +563,8 @@
 <li>如果它没有找到该术语的条目，它应该设置 nextIndex &#x3D; conflictIndex。一个半途而废的解决方案是只使用conflictIndex（而忽略conflictTerm），这简化了实现，但这样一来，领导者有时会向跟随者发送更多的日志条目，而不是严格意义上所需要的，以使他们达到最新状态。</li>
 </ul>
 <h2 id="Applications-on-top-of-Raft"><a href="#Applications-on-top-of-Raft" class="headerlink" title="Applications on top of Raft"></a>Applications on top of Raft</h2><h2 id="AppendIndex"><a href="#AppendIndex" class="headerlink" title="AppendIndex"></a>AppendIndex</h2><ul>
-<li>2022&#x2F;08&#x2F;21<br>  etcd的raft模块难得不只是一点点，看来不能直接看它和etcd的整合，尝试着理解那个example开始。一个玩具的raftkv.</li>
+<li>2022&#x2F;08&#x2F;21<br>etcd的raft模块难得不只是一点点，看来不能直接看它和etcd的整合，尝试着理解<br>那个example开始。一个玩具的raftkv.</li>
+<li>2022&#x2F;10&#x2F;30<br>后面尝试全都是用英语才书写和表达，后面会改为英语写博客和文章，但是中文的书记或者文章<br>就用中文做笔记</li>
 </ul>
 
                     
