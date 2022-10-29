@@ -1,5 +1,5 @@
 ---
-title: MIT6.824之lab2_raft_paper
+title: raft论文(extend)
 categories:
 - 分布式
 - MIT6.824
