@@ -14,8 +14,6 @@ Lua is a powerful, efficient, lightweight, embeddable scripting language. It sup
 
 ## 1 – Introduction
 
-Lua is a powerful, efficient, lightweight, embeddable scripting language. It supports procedural programming, object-oriented programming, functional programming, data-driven programming, and data description.
-
 Lua combines simple procedural syntax with powerful data description constructs based on associative(`adj.联合的`) arrays and extensible semantics. Lua is dynamically typed, runs by interpreting bytecode with a register-based virtual machine, and has automatic memory management with a generational garbage collection, making it ideal for configuration, scripting, and rapid prototyping.
 
 Lua is implemented as a library, written in clean C, the common subset of Standard C and C++. The Lua distribution includes a host program called lua, which uses the Lua library to offer a complete, standalone Lua interpreter, for interactive or batch use. Lua is intended to be used both as a powerful, lightweight, embeddable scripting language for any program that needs one, and as a powerful but lightweight and efficient stand-alone language.

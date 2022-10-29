@@ -1,10 +1,8 @@
 ---
 title: welcome to kirk's blog
-date: 2022-10-25 21:57:45
 ---
 
 ![come on](./../picture/home_page.jpg)
-
 
 # 张士明(kirkzhang)
 
