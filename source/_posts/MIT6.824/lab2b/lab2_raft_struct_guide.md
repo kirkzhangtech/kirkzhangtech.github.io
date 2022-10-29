@@ -1,5 +1,5 @@
 ---
-title: MIT6.824之lab2_raft_structure_guide
+title: raft_structure_guide
 categories:
 - 分布式
 - MIT6.824
@@ -9,8 +9,8 @@ Raft Structure Advice
 A Raft instance has to deal with the arrival of external events
 (Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),
 and it has to execute periodic tasks (elections and heart-beats).
-There are many ways to structure your Raft code to manage these
-activities; this document outlines a few ideas.
+There are many ways to structure(v.) your Raft code to manage these
+activities; this document outlines(v.) a few ideas.
 <!-- more -->
 
 <!-- toc -->
@@ -22,6 +22,7 @@ goroutines. The Go documentation points out that the goroutines can
 perform the updates directly using shared data structures and locks,
 or by passing messages on channels. Experience suggests that for Raft
 it is most straightforward to use shared data and locks.
+
 
 A Raft instance has two time-driven activities: the leader must send
 heart-beats, and others must start an election if too much time has
