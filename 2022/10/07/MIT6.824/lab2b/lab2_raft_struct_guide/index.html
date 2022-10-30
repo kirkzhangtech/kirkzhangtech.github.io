@@ -5,20 +5,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Eden">
-    <title>raft_structure_guide - Eden</title>
+    <meta name="generator" content="CoffeeMan">
+    <title>raft_structure_guide - CoffeeMan</title>
     <meta name="author" content="kirkzhang">
     
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"Raft Structure Advice\nA Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (elections and heart-beats).There are many ways to structure(v.) your Raft code to manage theseactivities; this document outlines(v.) a few ideas.\n\n\n\n\n\nEach Raft instance has a bunch of state (the log, the current index,&amp;c) which must be updated in response to events arising in concurrentgoroutines. The Go documentation points out that the goroutines canperform the updates directly using shared data structures and locks,or by passing messages on channels. Experience suggests that for Raftit is most straightforward to use shared data and locks.\nA Raft instance has two time-driven activities: the leader must sendheart-beats, and others must start an election if too much time haspassed since hearing from the leader. It’s probably best to drive eachof these activities with a dedicated long-running goroutine, ratherthan combining multiple activities into a single goroutine.\n\nIt's probably best to drive each of these activities\nwith a dedicated long-running goroutine\n\n\nThe management of the election timeout is a common source ofheadaches. Perhaps the simplest plan is to maintain a variable in theRaft struct containing the last time at which the peer heard from theleader, and to have the election timeout goroutine periodically checkto see whether the time since then is greater than the timeout period.It’s easiest to use time.Sleep() with a small constant argument todrive the periodic checks. Don’t use time.Ticker and time.Timer;they are tricky to use correctly.\n\nusing hashicorp struct\n\n\nYou’ll want to have a separate long-running goroutine that sendscommitted log entries in order on the applyCh. It must be separate,since sending on the applyCh can block; and it must be a singlegoroutine, since otherwise it may be hard to ensure that you send logentries in log order. The code that advances commitIndex will need tokick the apply goroutine; it’s probably easiest to use a conditionvariable (Go’s sync.Cond) for this.\n\nusing a seperate applier channel\n\n\nEach RPC should probably be sent (and its reply processed) in its owngoroutine, for two reasons: so that unreachable peers don’t delay thecollection of a majority of replies, and so that the heartbeat andelection timers can continue to tick at all times. It’s easiest to dothe RPC reply processing in the same goroutine, rather than sendingreply information over a channel.\n\neasy to unstand , using two different channels to send and process\nreply of RPC\n\n\nKeep in mind that the network can delay RPCs and RPC replies, and whenyou send concurrent RPCs, the network can re-order requests andreplies. Figure 2 is pretty good about pointing out places where RPChandlers have to be careful about this (e.g. an RPC handler shouldignore RPCs with old terms). Figure 2 is not always explicit about RPCreply processing. The leader has to be careful when processingreplies; it must check that the term hasn’t changed since sending theRPC, and must account for the possibility that replies from concurrentRPCs to the same follower have changed the leader’s state (e.g.nextIndex).\n\n\nthis part we should put eyes on checking reply of concurrent RPC, likeelection and heartbeat\n\n","dateCreated":"2022-10-07T08:40:25+08:00","dateModified":"2022-10-30T01:26:15+08:00","datePublished":"2022-10-07T08:40:25+08:00","description":"Raft Structure Advice\nA Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (elections and heart-beats).There are many ways to structure(v.) your Raft code to manage theseactivities; this document outlines(v.) a few ideas.","headline":"raft_structure_guide","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"Raft Structure Advice\nA Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (elections and heart-beats).There are many ways to structure(v.) your Raft code to manage theseactivities; this document outlines(v.) a few ideas.\n\n\n\n\n\nEach Raft instance has a bunch of state (the log, the current index,&amp;c) which must be updated in response to events arising in concurrentgoroutines. The Go documentation points out that the goroutines canperform the updates directly using shared data structures and locks,or by passing messages on channels. Experience suggests that for Raftit is most straightforward to use shared data and locks.\nA Raft instance has two time-driven activities: the leader must sendheart-beats, and others must start an election if too much time haspassed since hearing from the leader. It’s probably best to drive eachof these activities with a dedicated long-running goroutine, ratherthan combining multiple activities into a single goroutine.\n\nIt's probably best to drive each of these activities\nwith a dedicated long-running goroutine\n\n\nThe management of the election timeout is a common source ofheadaches. Perhaps the simplest plan is to maintain a variable in theRaft struct containing the last time at which the peer heard from theleader, and to have the election timeout goroutine periodically checkto see whether the time since then is greater than the timeout period.It’s easiest to use time.Sleep() with a small constant argument todrive the periodic checks. Don’t use time.Ticker and time.Timer;they are tricky to use correctly.\n\nusing hashicorp struct\n\n\nYou’ll want to have a separate long-running goroutine that sendscommitted log entries in order on the applyCh. It must be separate,since sending on the applyCh can block; and it must be a singlegoroutine, since otherwise it may be hard to ensure that you send logentries in log order. The code that advances commitIndex will need tokick the apply goroutine; it’s probably easiest to use a conditionvariable (Go’s sync.Cond) for this.\n\nusing a seperate applier channel\n\n\nEach RPC should probably be sent (and its reply processed) in its owngoroutine, for two reasons: so that unreachable peers don’t delay thecollection of a majority of replies, and so that the heartbeat andelection timers can continue to tick at all times. It’s easiest to dothe RPC reply processing in the same goroutine, rather than sendingreply information over a channel.\n\neasy to unstand , using two different channels to send and process\nreply of RPC\n\n\nKeep in mind that the network can delay RPCs and RPC replies, and whenyou send concurrent RPCs, the network can re-order requests andreplies. Figure 2 is pretty good about pointing out places where RPChandlers have to be careful about this (e.g. an RPC handler shouldignore RPCs with old terms). Figure 2 is not always explicit about RPCreply processing. The leader has to be careful when processingreplies; it must check that the term hasn’t changed since sending theRPC, and must account for the possibility that replies from concurrentRPCs to the same follower have changed the leader’s state (e.g.nextIndex).\n\n\nthis part we should put eyes on checking reply of concurrent RPC, likeelection and heartbeat\n\n","dateCreated":"2022-10-07T08:40:25+08:00","dateModified":"2022-10-30T01:26:15+08:00","datePublished":"2022-10-07T08:40:25+08:00","description":"Raft Structure Advice\nA Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (elections and heart-beats).There are many ways to structure(v.) your Raft code to manage theseactivities; this document outlines(v.) a few ideas.","headline":"raft_structure_guide","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"}</script>
     <meta name="description" content="Raft Structure Advice A Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (election">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="raft_structure_guide">
 <meta property="og:url" content="https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/index.html">
-<meta property="og:site_name" content="Eden">
+<meta property="og:site_name" content="CoffeeMan">
 <meta property="og:description" content="Raft Structure Advice A Raft instance has to deal with the arrival of external events(Start() calls, AppendEntries and RequestVote RPCs, and RPC replies),and it has to execute periodic tasks (election">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-10-07T00:40:25.771Z">
@@ -40,7 +40,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/style-rvz1mgjobfiojncdjcx1b9410sdwol52vnw9ql9cxs84eova2qpbeoukyotf.min.css">
+<link rel="stylesheet" href="/assets/css/style-72nwetezwzcphla7gbbghphtmqcwea1j1m7kxb1olt5fl1ayrvvxcctsmqry.min.css">
 
     <!--STYLES END-->
     
@@ -75,13 +75,13 @@
             href="/"
             aria-label=""
         >
-            Eden
+            CoffeeMan
         </a>
     </div>
     
         
             <a
-                class="header-right-picture "
+                class="header-right-picture open-algolia-search"
                 href="#about"
                 aria-label="Open the link: /#about"
             >
@@ -253,34 +253,6 @@
                         >
                         <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Facebook"
-                        >
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Google +"
-                        >
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
                     </a>
             </li>
             
@@ -468,19 +440,6 @@ reply of RPC
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href=""
-                    title="Share on Facebook"
-                    aria-label="Share on Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
                     title="Share on Twitter"
                     aria-label="Share on Twitter"
                 >
@@ -493,11 +452,11 @@ reply of RPC
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Google+"
-                    aria-label="Share on Google+"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
                 >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
                 </a>
             </li>
         
@@ -596,19 +555,6 @@ reply of RPC
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href=""
-                    title="Share on Facebook"
-                    aria-label="Share on Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
                     title="Share on Twitter"
                     aria-label="Share on Twitter"
                 >
@@ -621,11 +567,11 @@ reply of RPC
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Google+"
-                    aria-label="Share on Google+"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
                 >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
                 </a>
             </li>
         
@@ -666,19 +612,6 @@ reply of RPC
                         class="share-option-btn"
                         target="new"
                         href=""
-                        aria-label="Share on Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href=""
                         aria-label="Share on Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
@@ -691,10 +624,10 @@ reply of RPC
                     <a
                         class="share-option-btn"
                         target="new"
-                        href=""
-                        aria-label="Share on Google+"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
+                        aria-label="global.share_on_wechat"
                     >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
                     </a>
                 </li>
             
@@ -747,7 +680,7 @@ reply of RPC
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/script-ucuowmswenxabipgj0mk7lkl7vrtefwm8jakktpnujgjlgm6sbbmgmeodt0q.min.js"></script>
+<script src="/assets/js/script-y1iyczzgafjagsl4fnkgsmmjz5zlvl9isb3crrpy97f6uanhgsuwmrggvgt5.min.js"></script>
 
 <!--SCRIPTS END-->
 

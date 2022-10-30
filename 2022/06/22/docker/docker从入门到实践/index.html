@@ -5,31 +5,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Eden">
-    <title>docker从入门到实践 - Eden</title>
+    <meta name="generator" content="CoffeeMan">
+    <title>docker从入门到实践 - CoffeeMan</title>
     <meta name="author" content="kirkzhang">
     
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要:\n\n\n\n\n\n1. 什么是docker\n2.docker镜像基本概念与基本命令\n2.1 镜像基本命令\n2.2 定制镜像\n2.2.1 使用Dockerfile定制镜像\n2.2.2 直接用 Git repo构建镜像\n2.2.3 用网络位置上tar构建镜像\n2.2.4 从标准输入输出定制\n2.2.5 从标准输入中读取上下文压缩包进行构建\n\n\n2.3 Dockerfile构建命令详解\n2.3.1 COPY复制\n2.3.2 ADD更高级的复制命令\n2.3.3 CMD容器启动命令\n2.3.4 ENTRYPOINT 入口点\n2.3.5 ENV 设置环境变量\n2.3.6 ARG 构建指令\n2.3.7 VOLUME 定义匿名卷\n2.3.8 EXPOSE 暴露端口\n2.3.9 WORKDIR 指定工作目录\n2.3.10 USER指定当前用户\n2.3.11 HEALTHCHECK 健康检查HEALTHCHECK 支持下列选项\n2.3.12 ONBUILD 为他人作嫁衣裳\n2.3.13 LABEL 为镜像添加元数据\n2.3.14 shell指令\n2.3.15 参考文档\n\n\n2.4 Dockerfile 多阶段构建\n实战多阶段构建镜像\n2.5 构建多种系统架构支持的docker镜像\n2.6 其它制作镜像的方式\n\n\n3. 操作容器\n3.1 容器基本操作\n\n\n4. 访问仓库\n5. 数据管理\n5.1 数据卷\n5.2 挂载主机目录\n\n\n6. 网络\n6.1 端口映射\n6.2 容器互联\n6.3. 配置DNS\n\n\n7. 高级网络配置\n8. Docker Buildx\n9. Docker Compose\n9.1 搭建一个web应用\n\n\n10. 安全\n11. 底层实现\n12. Kubernetes\n13. 实战案例 - CI&#x2F;CD\n\n1. 什么是dockerDocker是云技术的一次革新，2013年以Apache协议开源，基于linux内核的cgroup,namespace以及OverlayFS的UnionFS实现，对进程进行封装，属于操作系统层面的虚拟化技术，由于隔离的进程独立于宿主机因此称为容器\n\n\n\n镜像操作系统分为内核和用户空间，而docker的镜像就是一种特殊的文件系统，除了提供容器运行所需的程序，库，资源，配置等文件外，还包括为运行时准备的的一些配置参数\n\n分层存储Docker 设计时，就充分利用 Union FS 的技术，将其设计为分层存储的架构。所以严格来说，镜像并非是像一个 ISO 那样的打包文件，镜像只是一个虚拟的概念，其实际体现并非由一个文件组成，而是由一组文件系统组成，或者说，由多层文件系统联合组成。\n\n容器容器跟镜像的关系就像是面向对象中类和实例的概念，容器的实质是进程，与宿主机的进程不同，容器拥有自己独立的命空间，因此拥有自己的root文件系统，自己的网络配置，自己的进程空间，自己的用户id空间。进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。一个容器运行时，是以镜像为基础层，在其上创建一个当前容器的存储层，我们可以称这个为容器运行时读写而准备的存储层为 容器存储层容器存储层的生存周期和容器一样，容器消亡时，容器存储层也随之消亡。因此，任何保存于容器存储层的信息都会随容器删除而丢失（后面建议挂载volume）\n\n仓库仓库\n\n\n2.docker镜像基本概念与基本命令2.1 镜像基本命令拉取镜像:\n\ndocker pull [OPTION] NAME\n\n&lt;域名/IP>[:端口号]\n\n运行镜像：\n\ndocker run -it –rm 镜像 [命令 &#x2F;bin&#x2F;bash]  参数列举镜像：\ndocker image ls\ndocker images\ndocker image ls -f since&#x3D;mongo:3.2 &#x2F;&#x2F;查看某个镜像之前创建的镜像，同理也有查看某个镜像之后的镜像\ndocker ps &#x3D; docker container ls &#x2F;&#x2F;现实运行中的容器查看镜像体积\ndocker system df虚悬镜像仓库名和版本号都是none，这是因为新版本的镜像跟旧镜像冲突，，删除虚悬镜像\ndocker image prune\ndocker image ls -f dangling&#x3D;true &#x2F;&#x2F;列举虚悬镜像\ndocker image ls -a &#x2F;&#x2F;有些none镜像不是虚悬镜像是中间镜像以特定格式显示\ndocker image ls -q\ndocker image ls --format &quot;&#123;&#123; .ID &#125;&#125;:&#123;&#123; .Repository &#125;&#125;&quot;  &#x2F;&#x2F;支持go模板用法,方便其他程序调用\ndocker image ls --format &quot;table &#123;&#123; .ID &#125;&#125; \\t &#123;&#123; .Repository &#125;&#125; \\t &#123;&#123; .Tag &#125;&#125;&quot; &#x2F;&#x2F; 会显示title删除镜像\ndocker image rm [选项] &lt;镜像1&gt; [&lt;镜像2&gt; …]\ndocker image rm $(docker image ls -q redis)  &#x2F;&#x2F;使用docker image ls命令配合使用\n\nuntageged和删除  \n\n当该镜像所有的标签都被取消了，该镜像很可能会失去了存在的意义，因此会触发删除行为。镜像是多层存储结构，因此在删除的时候也是从上层向基础层方向依次进行判断删除。镜像的多层结构让镜像复用变得非常容易，因此很有可能某个其它镜像正依赖于当前镜像的某一层。这种情况，依旧不会触发删除该层的行为。直到没有任何层依赖当前层时，才会真实的删除当前层。这就是为什么，有时候会奇怪，为什么明明没有别的标签指向这个镜像，但是它还是存在的原因，也是为什么有时候会发现所删除的层数和自己 docker pull 看到的层数不一样的原因\n\n利用commit来持久化容器变化到镜像(黑箱镜)\ndocker commit \\\n--author &quot;Tao Wang &lt;twang2218@gmail.com&gt;&quot; \\\n--message &quot;修改了默认网页&quot; \\\nwebserver \\\nnginx:v2\n\n\ndocker history 具体查看镜像内的历史记录\n\n2.2 定制镜像2.2.1 使用Dockerfile定制镜像From 关键字指定基础镜像RUN 执行命令,在撰写 Dockerfile 的时候,要经常提醒自己，这并不是在写 Shell 脚本，而是在定义每一层该如何构建，使用docker build 构建编写的Dockerfile  \n\ndocker 命令这样的客户端工具，则是通过这组 API 与 Docker 引擎交互，从而完成各种功能,当服务端需要本地文件时候该怎么获得\n\nCOPY  复制 上下文（context） 目录下的源文件\n\nCOPY .&#x2F;package.json &#x2F;app&#x2F;\n\n复制 上下文（context） 目录下的 package.json,COPY 这类指令中的源文件的路径都是相对路径。现在就可以理解刚才的命令 docker build -t nginx:v3 . 中的这个 .，实际上是在指定上下文的目录，docker build 命令会将该目录下的内容打包交给 Docker 引擎以帮助构建镜像\n\n那么为什么会有人误以为 . 是指定 Dockerfile 所在目录呢？这是因为在默认情况下，如果不额外指定 Dockerfile 的话，会将上下文目录下的名为 Dockerfile 的文件作为 Dockerfile\n如果目录下有些东西确实不希望构建时传给 Docker 引擎，那么可以用 .gitignore 一样的语法写一个 .dockerignore，该文件是用于剔除不需要作为上下文传递给 Docker 引擎的\n实际上 Dockerfile 的文件名并不要求必须为 Dockerfile，而且并不要求必须位于上下文目录中，比如可以用 -f ../Dockerfile.php 参数指定某个文件作为 Dockerfile\n\n2.2.2 直接用 Git repo构建镜像# $env:DOCKER_BUILDKIT&#x3D;0\n# export DOCKER_BUILDKIT&#x3D;0\n$ docker build -t hello-world https:&#x2F;&#x2F;github.com&#x2F;docker-library&#x2F;hello-world.git#master:amd64&#x2F;hello-world\nStep 1&#x2F;3 : FROM scratch\n---&gt;\nStep 2&#x2F;3 : COPY hello &#x2F;\n---&gt; ac779757d46e\nStep 3&#x2F;3 : CMD [&quot;&#x2F;hello&quot;]\n---&gt; Running in d2a513a760ed\nRemoving intermediate container d2a513a760ed\n---&gt; 038ad4142d2b\nSuccessfully built 038ad4142d2b\n\n2.2.3 用网络位置上tar构建镜像如果所给出的 URL 不是个 Git repo，而是个 tar 压缩包，那么 Docker 引擎会下载这个包，并自动解压缩，以其作为上下文，开始构建.  \n2.2.4 从标准输入输出定制docker build - &lt; Dockerfilecat Dockerfile | docker build -因为没有上下文，所以Dockerfile里面不可以使用copy  \n2.2.5 从标准输入中读取上下文压缩包进行构建docker build - &lt; context.tar.gz说白了就是解压后进行构建\n2.3 Dockerfile构建命令详解2.3.1 COPY复制\n将上下文目录的文件复制到容器中的对应的目录下\n支持通配符\n源路径是相对路径，目标路径支持绝对路径\nCOPY 指令，源文件的各种元数据都会保留。比如读、写、执行权限、文件变更时间等。这个特性对于镜像定制很有用。特别是构建相关文件都在使用 Git 进行管理的时候\nexample\n\nCOPY requirements.txt &#x2F;code  &#x2F;&#x2F;copy 文件到容器中的&#x2F;code目录下\n\n2.3.2 ADD更高级的复制命令\n源路径是tar包会在目标路径下解压(非常实用)\nADD 指令会令镜像构建缓存失效，从而可能会令镜像构建变得比较缓慢\n--chown=&lt;user&gt;:&lt;group&gt; 选项来改变文件的所属用户及所属组\n\nADD --chown&#x3D;55:mygroup files* &#x2F;mydir&#x2F;\nADD --chown&#x3D;bin files* &#x2F;mydir&#x2F;\nADD --chown&#x3D;1 files* &#x2F;mydir&#x2F;\nADD --chown&#x3D;10:11 files* &#x2F;mydir&#x2F;\n\n2.3.3 CMD容器启动命令容器既然是进程，那么启动时就需要指定运行参数  \n\nexampleCMD [ &quot;sh&quot;, &quot;-c&quot;, &quot;echo $HOME&quot; ]\n\nFROM ubuntu:18.04\nRUN apt-get update \\\n&amp;&amp; apt-get install -y curl \\\n&amp;&amp; rm -rf &#x2F;var&#x2F;lib&#x2F;apt&#x2F;lists&#x2F;*\nCMD [ &quot;curl&quot;, &quot;-s&quot;, &quot;http:&#x2F;&#x2F;myip.ipip.net&quot; ]\n\n这个时候运行容器，docker run myip 就会打印ip相关信息，但是如果你想加参数-i，以如下方式docker run myip -i 就会报错，因为myip后面传入的参数会被认为是命令，而正确是的方式是docker run myip curl -s http://myip.ipip.net -i，显然这不是一个好的方案。可以使用2.3.4的参数来设计\n2.3.4 ENTRYPOINT 入口点ENTRYPOINT 的目的和 CMD 一样，都是在指定容器启动程序及参数,例子如下\n\n场景一:让镜像像命令一样使用ENTRYPOINT\n\nFROM ubuntu:18.04\nRUN apt-get update \\\n&amp;&amp; apt-get install -y curl \\\n&amp;&amp; rm -rf &#x2F;var&#x2F;lib&#x2F;apt&#x2F;lists&#x2F;*\nENTRYPOINT [ &quot;curl&quot;, &quot;-s&quot;, &quot;http:&#x2F;&#x2F;myip.ipip.net&quot; ]\n&#x2F;&#x2F;再次尝试跑 docker run myip -i，就会将-i作为参数传给curl命令\n\n\n场景二: 应用运行前的准备工作比如 mysql 类的数据库，可能需要一些数据库配置、初始化的工作，这些工作要在最终的 mysql 服务器运行之前解决。\n\nFROM alpine:3.4\nRUN addgroup -S redis &amp;&amp; adduser -S -G redis redis\nENTRYPOINT [&quot;docker-entrypoint.sh&quot;]\nEXPOSE 6379\nCMD [ &quot;redis-server&quot; ]\n&#x2F;&#x2F;redis服务创建了redis用户，并在最后ENTRYPOINT指定了entrypoint.sh的脚本,该脚本的内容就是根据CMD的内容\n&#x2F;&#x2F;来判断，如果是redis-server的话，则切换到redis用户身份启动服务器，否则依旧使用root身份执行。比如：\n\n2.3.5 ENV 设置环境变量可以为后面的RUN命令提供环境变量，是以键值对的形式存在，如果value部分有空格，需要使用双引号括起来\n2.3.6 ARG 构建指令ARG指令有生效范围，如果在FROM之前指定的，那么只能用于FROM指令中\nARG DOCKER_USERNAME&#x3D;library\nFROM $&#123;DOCKER_USERNAME&#125;&#x2F;alpine\nRUN set -x ; echo $&#123;DOCKER_USERNAME&#125;\n\nRUN拿不到变量值，要想使用只能是在FROM命令后面重新指定ARG,多阶段构建需要指定各个阶段的ARG\n2.3.7 VOLUME 定义匿名卷VOLUME /data 挂在匿名卷,向容器&#x2F;data写入的数据最终会落入host磁盘$ docker run -d -v mydata:/data xxxx就使用了 mydata 这个命名卷挂载到了 /data 这个位置，替代了 Dockerfile 中定义的匿名卷的挂载配置\n2.3.8 EXPOSE 暴露端口与-p &lt;宿主端口&gt;:&lt;容器端口&gt;, 映射端口不通，EXPOSE是暴漏容器端口给其他容器\n2.3.9 WORKDIR 指定工作目录使用 WORKDIR 指令可以来指定工作目录（或者称为当前目录），以后各层的当前目录就被改为指定的目录，如该目录不存在，WORKDIR 会帮你建立目录\n2.3.10 USER指定当前用户USER 只是帮助你切换到指定用户而已，这个用户必须是事先建立好的，否则无法切换。\n2.3.11 HEALTHCHECK 健康检查HEALTHCHECK 支持下列选项\n--interval=&lt;间隔&gt;：两次健康检查的间隔，默认为 30 秒；\n--timeout=&lt;时长&gt;：健康检查命令运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒；\n--retries=&lt;次数&gt;：当连续失败指定次数后，则将容器状态视为 unhealthy，默认 3 次。\n\nFROM nginx\nRUN apt-get update &amp;&amp; apt-get install -y curl &amp;&amp; rm -rf &#x2F;var&#x2F;lib&#x2F;apt&#x2F;lists&#x2F;*\nHEALTHCHECK --interval&#x3D;5s --timeout&#x3D;3s \\\nCMD curl -fs http:&#x2F;&#x2F;localhost&#x2F; || exit 1\n\n&#x2F;&#x2F;这里我们设置了每 5 秒检查一次（这里为了试验所以间隔非常短，实际应该相对较长），\n&#x2F;&#x2F;如果健康检查命令超过 3 &#x2F;&#x2F;秒没响应就视为失败，并且使用 &#96;curl -fs http:&#x2F;&#x2F;localhost&#x2F; || exit 1&#96;\n&#x2F;&#x2F;作为健康检查命令。\n\n2.3.12 ONBUILD 为他人作嫁衣裳2.3.13 LABEL 为镜像添加元数据我们还可以用一些标签来申明镜像的作者、文档地址等：\nLABEL org.opencontainers.image.authors&#x3D;&quot;yeasy&quot;\nLABEL org.opencontainers.image.documentation&#x3D;&quot;https:&#x2F;&#x2F;yeasy.gitbooks.io&quot;\n\n2.3.14 shell指令SHELL 指令可以指定 RUN ENTRYPOINT CMD 指令的 shell程序，Linux 中默认为 [&quot;/bin/sh&quot;, &quot;-c&quot;]\n2.3.15 参考文档\nDockerfie 官方文档：https://docs.docker.com/engine/reference/builder/\n\nDockerfile 最佳实践文档：https://docs.docker.com/develop/develop-images/dockerfile_best-practices/\n\nDocker 官方镜像 Dockerfile：https://github.com/docker-library/docs\n\n\n2.4 Dockerfile 多阶段构建\n以前是全部放到一个Dockerfile里面，将编译，测试，打包放在一起，可能导致镜像层次过多，源代码泄露风险\n分多个Dockerfile编写，然后指定文件逐个构建\n使用多阶段构建\n\nFROM golang:alpine as builder\nRUN apk --no-cache add git\nWORKDIR &#x2F;go&#x2F;src&#x2F;github.com&#x2F;go&#x2F;helloworld&#x2F;\nRUN go get -d -v github.com&#x2F;go-sql-driver&#x2F;mysql\nCOPY app.go .\nRUN CGO_ENABLED&#x3D;0 GOOS&#x3D;linux go build -a -installsuffix cgo -o app .\nFROM alpine:latest as prod\nRUN apk --no-cache add ca-certificates\nWORKDIR &#x2F;root&#x2F;\nCOPY --from&#x3D;0 &#x2F;go&#x2F;src&#x2F;github.com&#x2F;go&#x2F;helloworld&#x2F;app .\nCMD [&quot;.&#x2F;app&quot;]\n&#x2F;&#x2F; 构建镜像  docker build -t go&#x2F;helloworld:3 .\n\n- 我们可以使用 `as` 来为某一阶段命名，例如`FROM golang:alpine as builder`\n- 例如当我们只想构建 `builder` 阶段的镜像时，增加 `--target=builder` 参数即可 `$ docker build --target builder -t username/imagename:tag .`\n\n\n构建时从其他镜像复制文件上面例子中我们使用 COPY --from=0 /go/src/github.com/go/helloworld/app . 从上一阶段的镜像中复制文件，我们也可以复制任意镜像中的文件$ COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf\n\n实战多阶段构建镜像实战地址  \n\n生产环境多阶段构建需要保持镜像精简，可以通过&amp;&amp;精简镜像层\n\nrun指令执行完会残留构建镜像完后的文件，直接上生产及其不妥，docker提供了多种方式解决这个问题，重瞳方式叫建造者模式\n\n构建Dockerfile.dev文件\n在此基础之上构建新一层镜像\n编写Dockerfile.prod，把上一步容器的相关代码和文件复制过来\n\n\n多阶段构建方式分析Dockerfile文件\n\n\nFROM mcr.microsoft.com&#x2F;dotnet&#x2F;sdk:6.0 AS build\nWORKDIR &#x2F;source\n\n# copy csproj and restore as distinct layers\nCOPY *.sln .\nCOPY aspnetapp&#x2F;*.csproj .&#x2F;aspnetapp&#x2F;\nRUN dotnet restore\n\n# copy everything else and build app\nCOPY aspnetapp&#x2F;. .&#x2F;aspnetapp&#x2F;\nWORKDIR &#x2F;source&#x2F;aspnetapp\nRUN dotnet publish -c release -o &#x2F;app --no-restore\n\n# final stage&#x2F;image\nFROM mcr.microsoft.com&#x2F;dotnet&#x2F;aspnet:6.0\nWORKDIR &#x2F;app\nCOPY --from&#x3D;build &#x2F;app .&#x2F;\nENTRYPOINT [&quot;dotnet&quot;, &quot;aspnetapp.dll&quot;]\n\n首先注意到，Dockerfile有三个FROM指令。每一个FROM指令构成一个单独的构建阶段  \n\n阶段0：build-env build-env阶段拉取了aspnetcore-build:2.0作为基础镜像，然后设置了工作目录，复制一些应用代码，接着执行两个RUN指令，生成1个镜像层并显著得到一个比原镜像大得多的镜像，包含许多构建工具和应用代码\n\n阶段1：microsoft/aspnetcore:2.0 aspnetcore:2.0阶段拉取了aspnetcore:2.0作为基础镜像，设置工作目录，然后执行COPY --from指令从build-env阶段生成的镜像中复制一些应用代码过来，最后执行ENTRYPOINT指令指定容器的默认应用程序\n\n\n上述构建过程的重点在于COPY --from指令表示从之前的构建阶段复制生产环境相关的应用代码，而不会复制生产环境不需要的构件\n\n2.5 构建多种系统架构支持的docker镜像$ docker manifest inspect golang:alpine查看manifest列表\n\n创建manifest 列表\n设置manifest列表\n查看manifest列表\n推送manifest列表\n测试\n官方博客\n\n2.6 其它制作镜像的方式\n从 rootfs 压缩包导入\n\n$ docker import \\\n    http:&#x2F;&#x2F;download.openvz.org&#x2F;template&#x2F;precreated&#x2F;ubuntu-16.04-x86_64.tar.gz \\\n    openvz&#x2F;ubuntu:16.04\n\nDownloading from http:&#x2F;&#x2F;download.openvz.org&#x2F;template&#x2F;precreated&#x2F;ubuntu-16.04-x86_64.tar.gz\nsha256:412b8fc3e3f786dca0197834a698932b9c51b69bd8cf49e100c35d38c9879213\n&#x2F;&#x2F; 从web远程下载ubuntu然后制作镜像\n\n\nDocker 镜像的导入和导出 docker save 和 docker load ，目前已经不推荐\n\n3. 操作容器3.1 容器基本操作两种启动容器方式，从镜像到容器，启动停止的容器\n\n新建容器\n\n$ docker run -dit --name new_name ubuntu:18.04 &#x2F;bin&#x2F;echo &#39;Hello world&#39;\nHello world\n\n-itd 意思是指容器绑定标准输入输出，然后绑定个伪终端，然后以守护态运行要获取容器的输出信息，可以通过 docker container logs 命令\n\nstop&#x2F;restart 容器docker container ls &#x2F;&#x2F;查看容器docker container restartdocker container stop&#x2F;start\n进入容器docker attach 进入容器docker exec -it 进入容器\n导出&#x2F;导入容器docker export 7691a814370e &gt; ubuntu.tardocker import - test/ubuntu:v1.0docker import url\n删除容器docker container rm trusting_newtondocker container prune 清理所有种植状态的容器\n\n4. 访问仓库\ndocker hub\n私有仓库\n私有仓库高级配置\nnexus3\n\n5. 数据管理5.1 数据卷对数据卷的使用有点像linux的mount，镜像中被挂载的目录文件会复制到宿主机的目录上，独立于容器\n\n创建一个数据卷\n\ndocker volume create my-vol  创建一个数据卷  \ndocker volume ls  列举数据卷  \ndocker volume inspect my_vol 查看某一个数据卷  \n\n\n启动一个挂在了数据卷的容器\n\ndocker run -d -P \\\n    --name web \\\n    # -v my-vol:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \\\n    --mount source&#x3D;my-vol,target&#x3D;&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \\\n    nginx:alpine\n&#x2F;&#x2F;使用my_vol数据卷，映射到&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html\n\n\n查看数据卷具体信息\n\ndocker inspect web &#x2F;&#x2F;数据卷信息在Mounts key下\n....\n&quot;Mountpoint&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes&#x2F;my-vol&#x2F;_data&quot; &#x2F;&#x2F;默认位置\n\n4.删除一个数据卷\ndocker volume rm my-vol\ndocker volume prune &#x2F;&#x2F;删除无主的数据卷\n\n\n数据卷可以在容器间共用\n对数据卷的修改会立马生效\n对数据卷的更新，不会影响镜像\n数据卷默认会一直存在，即使容器被输出\n\n5.2 挂载主机目录\n挂载目录到容器目录\n\n$ docker run -d -P \\\n    --name web \\\n    # -v &#x2F;src&#x2F;webapp:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \\\n    --mount type&#x3D;bind,source&#x3D;&#x2F;src&#x2F;webapp,target&#x3D;&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html, readonly \\\n    nginx:alpine\n\n挂载主机目录 的配置信息在 “Mounts” Key 下面\n\n目录与容器目录绑定，容器写进文件，就会落盘到宿主机上  \n目前如果source不存在就会报错  \n宿主机目录也可以指定readonly\n\n\n挂载宿主机文件到容器文件中source&#x3D;  ,target&#x3D; 关键字处直接替换成文件\n\n6. 网络6.1 端口映射-P 会随即映射-p 特定端口映,可使用多次指定多个端口\n\n$ docker run -d -p 80:80 nginx:alpine hostport:containerport  \n$ docker run -d -p 127.0.0.1:80:80 nginx:alpine 指定地址绑定，容器有自己的网络和地址\n$ docker run -d -p 127.0.0.1::80/udp nginx:alpine 容器80端口随机映射到主机,并指定传输协议\n\n6.2 容器互联\n新建网络\n\ndocker network create -d bridge my-net\n\n-d 参数指定 Docker 网络类型，有 bridge overlay。其中 overlay 网络类型用于 Swarm mode，在本小节中你可以忽略它2. 容器互联\ndocker run -it --rm --name busybox1 --network my-net busybox sh\ndocker run -it --rm --name busybox2 --network my-net busybox sh\n\n\n可以直接ping另外的容器\n\nDocker Compose 可以考虑使用\n\n6.3. 配置DNSTBC\n7. 高级网络配置8. Docker Buildx9. Docker Compose结合实战操纵理解\n9.1 搭建一个web应用\n服务：运行多个相同镜像的实例\n项目：一组应用容器组成的一个完整单元docker compose\n\n10. 安全11. 底层实现12. Kubernetes13. 实战案例 - CI&#x2F;CD","dateCreated":"2022-06-22T20:47:28+08:00","dateModified":"2022-10-26T21:11:24+08:00","datePublished":"2022-06-22T20:47:28+08:00","description":"摘要:","headline":"docker从入门到实践","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/","keywords":"Docker"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要:\n\n\n\n\n\n1. 什么是docker\n2.docker镜像基本概念与基本命令\n2.1 镜像基本命令\n2.2 定制镜像\n2.2.1 使用Dockerfile定制镜像\n2.2.2 直接用 Git repo构建镜像\n2.2.3 用网络位置上tar构建镜像\n2.2.4 从标准输入输出定制\n2.2.5 从标准输入中读取上下文压缩包进行构建\n\n\n2.3 Dockerfile构建命令详解\n2.3.1 COPY复制\n2.3.2 ADD更高级的复制命令\n2.3.3 CMD容器启动命令\n2.3.4 ENTRYPOINT 入口点\n2.3.5 ENV 设置环境变量\n2.3.6 ARG 构建指令\n2.3.7 VOLUME 定义匿名卷\n2.3.8 EXPOSE 暴露端口\n2.3.9 WORKDIR 指定工作目录\n2.3.10 USER指定当前用户\n2.3.11 HEALTHCHECK 健康检查HEALTHCHECK 支持下列选项\n2.3.12 ONBUILD 为他人作嫁衣裳\n2.3.13 LABEL 为镜像添加元数据\n2.3.14 shell指令\n2.3.15 参考文档\n\n\n2.4 Dockerfile 多阶段构建\n实战多阶段构建镜像\n2.5 构建多种系统架构支持的docker镜像\n2.6 其它制作镜像的方式\n\n\n3. 操作容器\n3.1 容器基本操作\n\n\n4. 访问仓库\n5. 数据管理\n5.1 数据卷\n5.2 挂载主机目录\n\n\n6. 网络\n6.1 端口映射\n6.2 容器互联\n6.3. 配置DNS\n\n\n7. 高级网络配置\n8. Docker Buildx\n9. Docker Compose\n9.1 搭建一个web应用\n\n\n10. 安全\n11. 底层实现\n12. Kubernetes\n13. 实战案例 - CI&#x2F;CD\n\n1. 什么是docker什么是 DockerDocker 最初是 dotCloud 公司创始人  在法国期间发起的一个公司内部项目，它是基于 dotCloud 公司多年云服务技术的一次革新，并于 ，主要项目代码在  上进行维护。Docker 项目后来还加入了 Linux 基金会，并成立推动 。Docker 自开源后受到广泛的关注和讨论，至今其  已经超过 5 万 7 千个星标和一万多个 fork。甚至由于 Docker 项目的火爆，在 2013 年底，。Docker 最初是在 Ubuntu 12.04 上开发实现的；Red Hat 则从 RHEL 6.5 开始对 Docker 进行支持；Google 也在其 PaaS 产品中广泛应用 Docker。Docker 使用 Google 公司推出的  进行开发实现，基于 Linux 内核的 ，，以及  类的  等技术，对进程进行封装隔离，属于 。由于隔离的进程独立于宿主和其它的隔离的进程，因此也称其为容器。最初实现是基于 ，从 0.7 版本以后开始去除 LXC，转而使用自行开发的 ，从 1.11 版本开始，则进一步演进为使用和\n2.docker镜像基本概念与基本命令2.1 镜像基本命令拉取镜像:\n\ndocker pull [OPTION] NAME\n\n&lt;域名/IP>[:端口号]\n\n运行镜像：\n\ndocker run -it –rm 镜像 [命令 &#x2F;bin&#x2F;bash]  参数列举镜像：\ndocker image ls\ndocker images\ndocker image ls -f since&#x3D;mongo:3.2 &#x2F;&#x2F;查看某个镜像之前创建的镜像，同理也有查看某个镜像之后的镜像\ndocker ps &#x3D; docker container ls &#x2F;&#x2F;现实运行中的容器查看镜像体积\ndocker system df虚悬镜像仓库名和版本号都是none，这是因为新版本的镜像跟旧镜像冲突，，删除虚悬镜像\ndocker image prune\ndocker image ls -f dangling&#x3D;true &#x2F;&#x2F;列举虚悬镜像\ndocker image ls -a &#x2F;&#x2F;有些none镜像不是虚悬镜像是中间镜像以特定格式显示\ndocker image ls -q\ndocker image ls --format &quot;&#123;&#123; .ID &#125;&#125;:&#123;&#123; .Repository &#125;&#125;&quot;  &#x2F;&#x2F;支持go模板用法,方便其他程序调用\ndocker image ls --format &quot;table &#123;&#123; .ID &#125;&#125; \\t &#123;&#123; .Repository &#125;&#125; \\t &#123;&#123; .Tag &#125;&#125;&quot; &#x2F;&#x2F; 会显示title删除镜像\ndocker image rm [选项] &lt;镜像1&gt; [&lt;镜像2&gt; …]\ndocker image rm $(docker image ls -q redis)  &#x2F;&#x2F;使用docker image ls命令配合使用\n\nuntageged和删除  \n\n当该镜像所有的标签都被取消了，该镜像很可能会失去了存在的意义，因此会触发删除行为。镜像是多层存储结构，因此在删除的时候也是从上层向基础层方向依次进行判断删除。镜像的多层结构让镜像复用变得非常容易，因此很有可能某个其它镜像正依赖于当前镜像的某一层。这种情况，依旧不会触发删除该层的行为。直到没有任何层依赖当前层时，才会真实的删除当前层。这就是为什么，有时候会奇怪，为什么明明没有别的标签指向这个镜像，但是它还是存在的原因，也是为什么有时候会发现所删除的层数和自己 docker pull 看到的层数不一样的原因\n\n利用commit来持久化容器变化到镜像(黑箱镜)\ndocker commit \\\n--author &quot;Tao Wang &lt;twang2218@gmail.com&gt;&quot; \\\n--message &quot;修改了默认网页&quot; \\\nwebserver \\\nnginx:v2\n\n\ndocker history 具体查看镜像内的历史记录\n\n2.2 定制镜像2.2.1 使用Dockerfile定制镜像From 关键字指定基础镜像RUN 执行命令,在撰写 Dockerfile 的时候,要经常提醒自己，这并不是在写 Shell 脚本，而是在定义每一层该如何构建，使用docker build 构建编写的Dockerfile  \n\ndocker 命令这样的客户端工具，则是通过这组 API 与 Docker 引擎交互，从而完成各种功能,当服务端需要本地文件时候该怎么获得\n\nCOPY  复制 上下文（context） 目录下的源文件\n\nCOPY .&#x2F;package.json &#x2F;app&#x2F;\n\n复制 上下文（context） 目录下的 package.json,COPY 这类指令中的源文件的路径都是相对路径。现在就可以理解刚才的命令 docker build -t nginx:v3 . 中的这个 .，实际上是在指定上下文的目录，docker build 命令会将该目录下的内容打包交给 Docker 引擎以帮助构建镜像\n\n那么为什么会有人误以为 . 是指定 Dockerfile 所在目录呢？这是因为在默认情况下，如果不额外指定 Dockerfile 的话，会将上下文目录下的名为 Dockerfile 的文件作为 Dockerfile\n如果目录下有些东西确实不希望构建时传给 Docker 引擎，那么可以用 .gitignore 一样的语法写一个 .dockerignore，该文件是用于剔除不需要作为上下文传递给 Docker 引擎的\n实际上 Dockerfile 的文件名并不要求必须为 Dockerfile，而且并不要求必须位于上下文目录中，比如可以用 -f ../Dockerfile.php 参数指定某个文件作为 Dockerfile\n\n2.2.2 直接用 Git repo构建镜像# $env:DOCKER_BUILDKIT&#x3D;0\n# export DOCKER_BUILDKIT&#x3D;0\n$ docker build -t hello-world https:&#x2F;&#x2F;github.com&#x2F;docker-library&#x2F;hello-world.git#master:amd64&#x2F;hello-world\nStep 1&#x2F;3 : FROM scratch\n---&gt;\nStep 2&#x2F;3 : COPY hello &#x2F;\n---&gt; ac779757d46e\nStep 3&#x2F;3 : CMD [&quot;&#x2F;hello&quot;]\n---&gt; Running in d2a513a760ed\nRemoving intermediate container d2a513a760ed\n---&gt; 038ad4142d2b\nSuccessfully built 038ad4142d2b\n\n2.2.3 用网络位置上tar构建镜像如果所给出的 URL 不是个 Git repo，而是个 tar 压缩包，那么 Docker 引擎会下载这个包，并自动解压缩，以其作为上下文，开始构建.  \n2.2.4 从标准输入输出定制docker build - &lt; Dockerfilecat Dockerfile | docker build -因为没有上下文，所以Dockerfile里面不可以使用copy  \n2.2.5 从标准输入中读取上下文压缩包进行构建docker build - &lt; context.tar.gz说白了就是解压后进行构建\n2.3 Dockerfile构建命令详解2.3.1 COPY复制\n将上下文目录的文件复制到容器中的对应的目录下\n支持通配符\n源路径是相对路径，目标路径支持绝对路径\nCOPY 指令，源文件的各种元数据都会保留。比如读、写、执行权限、文件变更时间等。这个特性对于镜像定制很有用。特别是构建相关文件都在使用 Git 进行管理的时候\nexample\n\nCOPY requirements.txt &#x2F;code  &#x2F;&#x2F;copy 文件到容器中的&#x2F;code目录下\n\n2.3.2 ADD更高级的复制命令\n源路径是tar包会在目标路径下解压(非常实用)\nADD 指令会令镜像构建缓存失效，从而可能会令镜像构建变得比较缓慢\n--chown=&lt;user&gt;:&lt;group&gt; 选项来改变文件的所属用户及所属组\n\nADD --chown&#x3D;55:mygroup files* &#x2F;mydir&#x2F;\nADD --chown&#x3D;bin files* &#x2F;mydir&#x2F;\nADD --chown&#x3D;1 files* &#x2F;mydir&#x2F;\nADD --chown&#x3D;10:11 files* &#x2F;mydir&#x2F;\n\n2.3.3 CMD容器启动命令容器既然是进程，那么启动时就需要指定运行参数  \n\nexampleCMD [ &quot;sh&quot;, &quot;-c&quot;, &quot;echo $HOME&quot; ]\n\nFROM ubuntu:18.04\nRUN apt-get update \\\n&amp;&amp; apt-get install -y curl \\\n&amp;&amp; rm -rf &#x2F;var&#x2F;lib&#x2F;apt&#x2F;lists&#x2F;*\nCMD [ &quot;curl&quot;, &quot;-s&quot;, &quot;http:&#x2F;&#x2F;myip.ipip.net&quot; ]\n\n这个时候运行容器，docker run myip 就会打印ip相关信息，但是如果你想加参数-i，以如下方式docker run myip -i 就会报错，因为myip后面传入的参数会被认为是命令，而正确是的方式是docker run myip curl -s http://myip.ipip.net -i，显然这不是一个好的方案。可以使用2.3.4的参数来设计\n2.3.4 ENTRYPOINT 入口点ENTRYPOINT 的目的和 CMD 一样，都是在指定容器启动程序及参数,例子如下\n\n场景一:让镜像像命令一样使用ENTRYPOINT\n\nFROM ubuntu:18.04\nRUN apt-get update \\\n&amp;&amp; apt-get install -y curl \\\n&amp;&amp; rm -rf &#x2F;var&#x2F;lib&#x2F;apt&#x2F;lists&#x2F;*\nENTRYPOINT [ &quot;curl&quot;, &quot;-s&quot;, &quot;http:&#x2F;&#x2F;myip.ipip.net&quot; ]\n&#x2F;&#x2F;再次尝试跑 docker run myip -i，就会将-i作为参数传给curl命令\n\n\n场景二: 应用运行前的准备工作比如 mysql 类的数据库，可能需要一些数据库配置、初始化的工作，这些工作要在最终的 mysql 服务器运行之前解决。\n\nFROM alpine:3.4\nRUN addgroup -S redis &amp;&amp; adduser -S -G redis redis\nENTRYPOINT [&quot;docker-entrypoint.sh&quot;]\nEXPOSE 6379\nCMD [ &quot;redis-server&quot; ]\n&#x2F;&#x2F;redis服务创建了redis用户，并在最后ENTRYPOINT指定了entrypoint.sh的脚本,该脚本的内容就是根据CMD的内容\n&#x2F;&#x2F;来判断，如果是redis-server的话，则切换到redis用户身份启动服务器，否则依旧使用root身份执行。比如：\n\n2.3.5 ENV 设置环境变量可以为后面的RUN命令提供环境变量，是以键值对的形式存在，如果value部分有空格，需要使用双引号括起来\n2.3.6 ARG 构建指令ARG指令有生效范围，如果在FROM之前指定的，那么只能用于FROM指令中\nARG DOCKER_USERNAME&#x3D;library\nFROM $&#123;DOCKER_USERNAME&#125;&#x2F;alpine\nRUN set -x ; echo $&#123;DOCKER_USERNAME&#125;\n\nRUN拿不到变量值，要想使用只能是在FROM命令后面重新指定ARG,多阶段构建需要指定各个阶段的ARG\n2.3.7 VOLUME 定义匿名卷VOLUME /data 挂在匿名卷,向容器&#x2F;data写入的数据最终会落入host磁盘$ docker run -d -v mydata:/data xxxx就使用了 mydata 这个命名卷挂载到了 /data 这个位置，替代了 Dockerfile 中定义的匿名卷的挂载配置\n2.3.8 EXPOSE 暴露端口与-p &lt;宿主端口&gt;:&lt;容器端口&gt;, 映射端口不通，EXPOSE是暴漏容器端口给其他容器\n2.3.9 WORKDIR 指定工作目录使用 WORKDIR 指令可以来指定工作目录（或者称为当前目录），以后各层的当前目录就被改为指定的目录，如该目录不存在，WORKDIR 会帮你建立目录\n2.3.10 USER指定当前用户USER 只是帮助你切换到指定用户而已，这个用户必须是事先建立好的，否则无法切换。\n2.3.11 HEALTHCHECK 健康检查HEALTHCHECK 支持下列选项\n--interval=&lt;间隔&gt;：两次健康检查的间隔，默认为 30 秒；\n--timeout=&lt;时长&gt;：健康检查命令运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒；\n--retries=&lt;次数&gt;：当连续失败指定次数后，则将容器状态视为 unhealthy，默认 3 次。\n\nFROM nginx\nRUN apt-get update &amp;&amp; apt-get install -y curl &amp;&amp; rm -rf &#x2F;var&#x2F;lib&#x2F;apt&#x2F;lists&#x2F;*\nHEALTHCHECK --interval&#x3D;5s --timeout&#x3D;3s \\\nCMD curl -fs http:&#x2F;&#x2F;localhost&#x2F; || exit 1\n\n&#x2F;&#x2F;这里我们设置了每 5 秒检查一次（这里为了试验所以间隔非常短，实际应该相对较长），\n&#x2F;&#x2F;如果健康检查命令超过 3 &#x2F;&#x2F;秒没响应就视为失败，并且使用 &#96;curl -fs http:&#x2F;&#x2F;localhost&#x2F; || exit 1&#96;\n&#x2F;&#x2F;作为健康检查命令。\n\n2.3.12 ONBUILD 为他人作嫁衣裳2.3.13 LABEL 为镜像添加元数据我们还可以用一些标签来申明镜像的作者、文档地址等：\nLABEL org.opencontainers.image.authors&#x3D;&quot;yeasy&quot;\nLABEL org.opencontainers.image.documentation&#x3D;&quot;https:&#x2F;&#x2F;yeasy.gitbooks.io&quot;\n\n2.3.14 shell指令SHELL 指令可以指定 RUN ENTRYPOINT CMD 指令的 shell程序，Linux 中默认为 [&quot;/bin/sh&quot;, &quot;-c&quot;]\n2.3.15 参考文档\nDockerfie 官方文档：https://docs.docker.com/engine/reference/builder/\n\nDockerfile 最佳实践文档：https://docs.docker.com/develop/develop-images/dockerfile_best-practices/\n\nDocker 官方镜像 Dockerfile：https://github.com/docker-library/docs\n\n\n2.4 Dockerfile 多阶段构建\n以前是全部放到一个Dockerfile里面，将编译，测试，打包放在一起，可能导致镜像层次过多，源代码泄露风险\n分多个Dockerfile编写，然后指定文件逐个构建\n使用多阶段构建\n\nFROM golang:alpine as builder\nRUN apk --no-cache add git\nWORKDIR &#x2F;go&#x2F;src&#x2F;github.com&#x2F;go&#x2F;helloworld&#x2F;\nRUN go get -d -v github.com&#x2F;go-sql-driver&#x2F;mysql\nCOPY app.go .\nRUN CGO_ENABLED&#x3D;0 GOOS&#x3D;linux go build -a -installsuffix cgo -o app .\nFROM alpine:latest as prod\nRUN apk --no-cache add ca-certificates\nWORKDIR &#x2F;root&#x2F;\nCOPY --from&#x3D;0 &#x2F;go&#x2F;src&#x2F;github.com&#x2F;go&#x2F;helloworld&#x2F;app .\nCMD [&quot;.&#x2F;app&quot;]\n&#x2F;&#x2F; 构建镜像  docker build -t go&#x2F;helloworld:3 .\n\n- 我们可以使用 `as` 来为某一阶段命名，例如`FROM golang:alpine as builder`\n- 例如当我们只想构建 `builder` 阶段的镜像时，增加 `--target=builder` 参数即可 `$ docker build --target builder -t username/imagename:tag .`\n\n\n构建时从其他镜像复制文件上面例子中我们使用 COPY --from=0 /go/src/github.com/go/helloworld/app . 从上一阶段的镜像中复制文件，我们也可以复制任意镜像中的文件$ COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf\n\n实战多阶段构建镜像实战地址  \n\n生产环境多阶段构建需要保持镜像精简，可以通过&amp;&amp;精简镜像层\n\nrun指令执行完会残留构建镜像完后的文件，直接上生产及其不妥，docker提供了多种方式解决这个问题，重瞳方式叫建造者模式\n\n构建Dockerfile.dev文件\n在此基础之上构建新一层镜像\n编写Dockerfile.prod，把上一步容器的相关代码和文件复制过来\n\n\n多阶段构建方式分析Dockerfile文件\n\n\nFROM mcr.microsoft.com&#x2F;dotnet&#x2F;sdk:6.0 AS build\nWORKDIR &#x2F;source\n\n# copy csproj and restore as distinct layers\nCOPY *.sln .\nCOPY aspnetapp&#x2F;*.csproj .&#x2F;aspnetapp&#x2F;\nRUN dotnet restore\n\n# copy everything else and build app\nCOPY aspnetapp&#x2F;. .&#x2F;aspnetapp&#x2F;\nWORKDIR &#x2F;source&#x2F;aspnetapp\nRUN dotnet publish -c release -o &#x2F;app --no-restore\n\n# final stage&#x2F;image\nFROM mcr.microsoft.com&#x2F;dotnet&#x2F;aspnet:6.0\nWORKDIR &#x2F;app\nCOPY --from&#x3D;build &#x2F;app .&#x2F;\nENTRYPOINT [&quot;dotnet&quot;, &quot;aspnetapp.dll&quot;]\n\n首先注意到，Dockerfile有三个FROM指令。每一个FROM指令构成一个单独的构建阶段  \n\n阶段0：build-env build-env阶段拉取了aspnetcore-build:2.0作为基础镜像，然后设置了工作目录，复制一些应用代码，接着执行两个RUN指令，生成1个镜像层并显著得到一个比原镜像大得多的镜像，包含许多构建工具和应用代码\n\n阶段1：microsoft/aspnetcore:2.0 aspnetcore:2.0阶段拉取了aspnetcore:2.0作为基础镜像，设置工作目录，然后执行COPY --from指令从build-env阶段生成的镜像中复制一些应用代码过来，最后执行ENTRYPOINT指令指定容器的默认应用程序\n\n\n上述构建过程的重点在于COPY --from指令表示从之前的构建阶段复制生产环境相关的应用代码，而不会复制生产环境不需要的构件\n\n2.5 构建多种系统架构支持的docker镜像$ docker manifest inspect golang:alpine查看manifest列表\n\n创建manifest 列表\n设置manifest列表\n查看manifest列表\n推送manifest列表\n测试\n官方博客\n\n2.6 其它制作镜像的方式\n从 rootfs 压缩包导入\n\n$ docker import \\\n    http:&#x2F;&#x2F;download.openvz.org&#x2F;template&#x2F;precreated&#x2F;ubuntu-16.04-x86_64.tar.gz \\\n    openvz&#x2F;ubuntu:16.04\n\nDownloading from http:&#x2F;&#x2F;download.openvz.org&#x2F;template&#x2F;precreated&#x2F;ubuntu-16.04-x86_64.tar.gz\nsha256:412b8fc3e3f786dca0197834a698932b9c51b69bd8cf49e100c35d38c9879213\n&#x2F;&#x2F; 从web远程下载ubuntu然后制作镜像\n\n\nDocker 镜像的导入和导出 docker save 和 docker load ，目前已经不推荐\n\n3. 操作容器3.1 容器基本操作两种启动容器方式，从镜像到容器，启动停止的容器\n\n新建容器\n\n$ docker run -dit --name new_name ubuntu:18.04 &#x2F;bin&#x2F;echo &#39;Hello world&#39;\nHello world\n\n-itd 意思是指容器绑定标准输入输出，然后绑定个伪终端，然后以守护态运行要获取容器的输出信息，可以通过 docker container logs 命令\n\nstop&#x2F;restart 容器docker container ls &#x2F;&#x2F;查看容器docker container restartdocker container stop&#x2F;start\n进入容器docker attach 进入容器docker exec -it 进入容器\n导出&#x2F;导入容器docker export 7691a814370e &gt; ubuntu.tardocker import - test/ubuntu:v1.0docker import url\n删除容器docker container rm trusting_newtondocker container prune 清理所有种植状态的容器\n\n4. 访问仓库\ndocker hub\n私有仓库\n私有仓库高级配置\nnexus3\n\n5. 数据管理5.1 数据卷对数据卷的使用有点像linux的mount，镜像中被挂载的目录文件会复制到宿主机的目录上，独立于容器\n\n创建一个数据卷\n\ndocker volume create my-vol  创建一个数据卷  \ndocker volume ls  列举数据卷  \ndocker volume inspect my_vol 查看某一个数据卷  \n\n\n启动一个挂在了数据卷的容器\n\ndocker run -d -P \\\n    --name web \\\n    # -v my-vol:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \\\n    --mount source&#x3D;my-vol,target&#x3D;&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \\\n    nginx:alpine\n&#x2F;&#x2F;使用my_vol数据卷，映射到&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html\n\n\n查看数据卷具体信息\n\ndocker inspect web &#x2F;&#x2F;数据卷信息在Mounts key下\n....\n&quot;Mountpoint&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes&#x2F;my-vol&#x2F;_data&quot; &#x2F;&#x2F;默认位置\n\n4.删除一个数据卷\ndocker volume rm my-vol\ndocker volume prune &#x2F;&#x2F;删除无主的数据卷\n\n\n数据卷可以在容器间共用\n对数据卷的修改会立马生效\n对数据卷的更新，不会影响镜像\n数据卷默认会一直存在，即使容器被输出\n\n5.2 挂载主机目录\n挂载目录到容器目录\n\n$ docker run -d -P \\\n    --name web \\\n    # -v &#x2F;src&#x2F;webapp:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html \\\n    --mount type&#x3D;bind,source&#x3D;&#x2F;src&#x2F;webapp,target&#x3D;&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html, readonly \\\n    nginx:alpine\n\n挂载主机目录 的配置信息在 “Mounts” Key 下面\n\n目录与容器目录绑定，容器写进文件，就会落盘到宿主机上  \n目前如果source不存在就会报错  \n宿主机目录也可以指定readonly\n\n\n挂载宿主机文件到容器文件中source&#x3D;  ,target&#x3D; 关键字处直接替换成文件\n\n6. 网络6.1 端口映射-P 会随即映射-p 特定端口映,可使用多次指定多个端口\n\n$ docker run -d -p 80:80 nginx:alpine hostport:containerport  \n$ docker run -d -p 127.0.0.1:80:80 nginx:alpine 指定地址绑定，容器有自己的网络和地址\n$ docker run -d -p 127.0.0.1::80/udp nginx:alpine 容器80端口随机映射到主机,并指定传输协议\n\n6.2 容器互联\n新建网络\n\ndocker network create -d bridge my-net\n\n-d 参数指定 Docker 网络类型，有 bridge overlay。其中 overlay 网络类型用于 Swarm mode，在本小节中你可以忽略它2. 容器互联\ndocker run -it --rm --name busybox1 --network my-net busybox sh\ndocker run -it --rm --name busybox2 --network my-net busybox sh\n\n\n可以直接ping另外的容器\n\nDocker Compose 可以考虑使用\n\n6.3. 配置DNSTBC\n7. 高级网络配置8. Docker Buildx9. Docker Compose结合实战操纵理解\n9.1 搭建一个web应用\n服务：运行多个相同镜像的实例\n项目：一组应用容器组成的一个完整单元docker compose\n\n10. 安全11. 底层实现12. Kubernetes13. 实战案例 - CI&#x2F;CD","dateCreated":"2022-06-22T20:47:28+08:00","dateModified":"2022-10-30T22:38:12+08:00","datePublished":"2022-06-22T20:47:28+08:00","description":"摘要:","headline":"docker从入门到实践","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/22/docker/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/22/docker/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"}</script>
     <meta name="description" content="摘要:">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="docker从入门到实践">
-<meta property="og:url" content="https://simonteo58.github.io/2022/06/22/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/index.html">
-<meta property="og:site_name" content="Eden">
+<meta property="og:url" content="https://simonteo58.github.io/2022/06/22/docker/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/index.html">
+<meta property="og:site_name" content="CoffeeMan">
 <meta property="og:description" content="摘要:">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9b5d51fa80b2435386d16496375409c2~tplv-k3u1fbpfcp-watermark.image">
-<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/89f40405bc364cd295076c36c9d354e5~tplv-k3u1fbpfcp-watermark.image">
 <meta property="og:image" content="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7053651f6091402c9c8ff10c99d1ae34~tplv-k3u1fbpfcp-watermark.image">
 <meta property="article:published_time" content="2022-06-22T12:47:28.131Z">
-<meta property="article:modified_time" content="2022-10-26T13:11:24.295Z">
+<meta property="article:modified_time" content="2022-10-30T14:38:12.927Z">
 <meta property="article:author" content="kirkzhang">
-<meta property="article:tag" content="Docker">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9b5d51fa80b2435386d16496375409c2~tplv-k3u1fbpfcp-watermark.image">
+<meta name="twitter:image" content="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7053651f6091402c9c8ff10c99d1ae34~tplv-k3u1fbpfcp-watermark.image">
 <meta name="twitter:creator" content="@shiming_kirk">
     
         <link rel="publisher" href="https://plus.google.com/nil"/>
@@ -45,7 +42,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/style-rvz1mgjobfiojncdjcx1b9410sdwol52vnw9ql9cxs84eova2qpbeoukyotf.min.css">
+<link rel="stylesheet" href="/assets/css/style-72nwetezwzcphla7gbbghphtmqcwea1j1m7kxb1olt5fl1ayrvvxcctsmqry.min.css">
 
     <!--STYLES END-->
     
@@ -80,13 +77,13 @@
             href="/"
             aria-label=""
         >
-            Eden
+            CoffeeMan
         </a>
     </div>
     
         
             <a
-                class="header-right-picture "
+                class="header-right-picture open-algolia-search"
                 href="#about"
                 aria-label="Open the link: /#about"
             >
@@ -265,34 +262,6 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Facebook"
-                        >
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="/nil"
-                            
-                            rel="noopener"
-                            title="Google +"
-                        >
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
                             href="https://www.linkedin.com/in/kirk-zhang-424935235/"
                             
                                 target="_blank"
@@ -367,7 +336,7 @@
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/CICD/">CICD</a>
+    <a class="category-link" href="/categories/%E5%AE%B9%E5%99%A8/">容器</a>
 
 
     
@@ -447,19 +416,7 @@
 <li><a href="#12-kubernetes">12. Kubernetes</a></li>
 <li><a href="#13-%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B---cicd">13. 实战案例 - CI&#x2F;CD</a></li>
 </ul>
-<h1 id="1-什么是docker"><a href="#1-什么是docker" class="headerlink" title="1. 什么是docker"></a>1. 什么是docker</h1><p>Docker是云技术的一次革新，2013年以Apache协议开源，基于linux内核的<strong>cgroup</strong>,<strong>namespace</strong>以及OverlayFS的<strong>UnionFS</strong>实现，对进程进行封装，属于操作系统层面的虚拟化技术，由于隔离的进程独立于宿主机因此称为容器</p>
-<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9b5d51fa80b2435386d16496375409c2~tplv-k3u1fbpfcp-watermark.image" alt="image.png"></p>
-<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/89f40405bc364cd295076c36c9d354e5~tplv-k3u1fbpfcp-watermark.image" alt="image.png"></p>
-<ul>
-<li><p>镜像<br>操作系统分为<code>内核</code>和<code>用户空间</code>，而docker的镜像就是一种特殊的文件系统，除了提供容器运行所需的程序，库，资源，配置等文件外，还包括为运行时准备的的一些配置参数</p>
-</li>
-<li><p>分层存储<br>Docker 设计时，就充分利用 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Union_mount">Union FS</a> 的技术，将其设计为分层存储的架构。所以严格来说，镜像并非是像一个 <code>ISO</code> 那样的打包文件，镜像只是一个虚拟的概念，其实际体现并非由一个文件组成，而是由一组文件系统组成，或者说，由多层文件系统联合组成。</p>
-</li>
-<li><p>容器<br>容器跟镜像的关系就像是面向对象中类和实例的概念，容器的实质是进程，与宿主机的进程不同，容器拥有自己独立的命空间，因此拥有自己的root文件系统，自己的网络配置，自己的进程空间，自己的用户id空间。进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。<br>一个容器运行时，是以镜像为基础层，在其上创建一个当前容器的存储层，我们可以称这个为容器运行时读写而准备的存储层为 <strong>容器存储层</strong><br>容器存储层的生存周期和容器一样，容器消亡时，容器存储层也随之消亡。因此，任何保存于容器存储层的信息都会随容器删除而丢失（后面建议挂载volume）</p>
-</li>
-<li><p>仓库<br><a target="_blank" rel="noopener" href="https://yeasy.gitbook.io/docker_practice/basic_concept/repository">仓库</a></p>
-</li>
-</ul>
+<h1 id="1-什么是docker"><a href="#1-什么是docker" class="headerlink" title="1. 什么是docker"></a>1. 什么是docker</h1><p>什么是 Docker<br>Docker 最初是 dotCloud 公司创始人  在法国期间发起的一个公司内部项目，它是基于 dotCloud 公司多年云服务技术的一次革新，并于 ，主要项目代码在  上进行维护。Docker 项目后来还加入了 Linux 基金会，并成立推动 。<br>Docker 自开源后受到广泛的关注和讨论，至今其  已经超过 5 万 7 千个星标和一万多个 fork。甚至由于 Docker 项目的火爆，在 2013 年底，。Docker 最初是在 Ubuntu 12.04 上开发实现的；Red Hat 则从 RHEL 6.5 开始对 Docker 进行支持；Google 也在其 PaaS 产品中广泛应用 Docker。<br>Docker 使用 Google 公司推出的  进行开发实现，基于 Linux 内核的 ，，以及  类的  等技术，对进程进行封装隔离，属于 。由于隔离的进程独立于宿主和其它的隔离的进程，因此也称其为容器。最初实现是基于 ，从 0.7 版本以后开始去除 LXC，转而使用自行开发的 ，从 1.11 版本开始，则进一步演进为使用和</p>
 <h1 id="2-docker镜像基本概念与基本命令"><a href="#2-docker镜像基本概念与基本命令" class="headerlink" title="2.docker镜像基本概念与基本命令"></a>2.docker镜像基本概念与基本命令</h1><h2 id="2-1-镜像基本命令"><a href="#2-1-镜像基本命令" class="headerlink" title="2.1 镜像基本命令"></a>2.1 镜像基本命令</h2><p>拉取镜像:</p>
 <ul>
 <li>docker pull [OPTION] NAME</li>
@@ -813,13 +770,6 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
         
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
-                
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Docker/" rel="tag">Docker</a>
-
-            </div>
-        
         
             <div class="post-actions-wrap">
     <nav>
@@ -871,19 +821,6 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href=""
-                    title="Share on Facebook"
-                    aria-label="Share on Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
                     title="Share on Twitter"
                     aria-label="Share on Twitter"
                 >
@@ -896,11 +833,11 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Google+"
-                    aria-label="Share on Google+"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/06/22/docker/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
                 >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
                 </a>
             </li>
         
@@ -999,19 +936,6 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href=""
-                    title="Share on Facebook"
-                    aria-label="Share on Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href=""
                     title="Share on Twitter"
                     aria-label="Share on Twitter"
                 >
@@ -1024,11 +948,11 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href=""
-                    title="Share on Google+"
-                    aria-label="Share on Google+"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/06/22/docker/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
                 >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
                 </a>
             </li>
         
@@ -1069,19 +993,6 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
                         class="share-option-btn"
                         target="new"
                         href=""
-                        aria-label="Share on Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href=""
                         aria-label="Share on Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
@@ -1094,10 +1005,10 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
                     <a
                         class="share-option-btn"
                         target="new"
-                        href=""
-                        aria-label="Share on Google+"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/06/22/docker/docker%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5/"
+                        aria-label="global.share_on_wechat"
                     >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
                     </a>
                 </li>
             
@@ -1150,7 +1061,7 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/script-ucuowmswenxabipgj0mk7lkl7vrtefwm8jakktpnujgjlgm6sbbmgmeodt0q.min.js"></script>
+<script src="/assets/js/script-y1iyczzgafjagsl4fnkgsmmjz5zlvl9isb3crrpy97f6uanhgsuwmrggvgt5.min.js"></script>
 
 <!--SCRIPTS END-->
 
@@ -1167,7 +1078,7 @@ docker run -it --rm --name busybox2 --network my-net busybox sh
               repo: 'SimonTeo58.github.io',
               owner: 'SimonTeo58',
               admin: ['SimonTeo58'],
-              id: '2022/06/22/docker从入门到实践/',
+              id: '2022/06/22/docker/docker从入门到实践/',
               ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
             }).render('gitalk')
           })()
