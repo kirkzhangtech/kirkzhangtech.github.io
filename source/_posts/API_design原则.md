@@ -1,7 +1,7 @@
 ---
 title: API Design Patterns
 categories:
-- WEB-API
+- web-api
 ---
 
 

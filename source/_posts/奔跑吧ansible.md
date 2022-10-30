@@ -1,8 +1,7 @@
 ---
 title: 奔跑吧ansible
 categories:
-- CICD
-tag: ansible
+- 运维
 ---
 
 

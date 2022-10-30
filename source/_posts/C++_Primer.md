@@ -1,9 +1,7 @@
 ---
-highlight: monokai
-theme: juejin
 title: C++ Primer Plus
 categories:
-- CPP
+- cpp
 ---
 
 

@@ -69,14 +69,14 @@ sidebar:
             title: global.twitter
             url: https://twitter.com/shiming_kirk
             icon: fab fa-twitter
-        facebook:
-            title: global.facebook
-            url: nil
-            icon: fab fa-facebook
-        google_plus:
-            title: global.google_plus
-            url: nil
-            icon: fab fa-google-plus
+        # facebook:
+        #     title: global.facebook
+        #     url: nil
+        #     icon: fab fa-facebook
+        # google_plus:
+        #     title: global.google_plus
+        #     url: nil
+        #     icon: fab fa-google-plus
         linked_in:
             title: global.linkedin
             url: https://www.linkedin.com/in/kirk-zhang-424935235/
@@ -108,7 +108,7 @@ header:
     right_link:
         url: /#about
         icon:
-        class:
+        class: open-algolia-search
 
 
 # ------
@@ -117,7 +117,7 @@ header:
 
 # Your biography and your job is editable in each languages files in `languages` folder
 author:
-    email: check my github
+    email: zxc741208584@qq.com
     location: Canton
     # Your profile picture located in folder `source/_images/` (development)
     # or in `source/assets/images/` (production)
@@ -269,15 +269,18 @@ fb_app_id:
 #     share_on_foo_bar: "Share on Foo Bar"
 # ```
 sharing_options:
-    facebook:
-        icon: "fab fa-facebook"
-        url: ""
+    # facebook:
+    #     icon: "fab fa-facebook"
+    #     url: ""
     twitter:
         icon: "fab fa-twitter"
         url: ""
-    google_plus:
-        icon: "fab fa-google-plus"
-        url: ""
+    # google_plus:
+    #     icon: "fab fa-google-plus"
+    #     url: ""
+    wechat:
+        icon: "fa-foo_bar"
+        url: "https://www.foo_bar.com/sharer/sharer.php?u={{post.permalink}}"
 # Business Social Networks
 #    linkedin:
 #        icon: "fab fa-linkedin"

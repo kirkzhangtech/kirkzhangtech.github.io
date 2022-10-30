@@ -1,8 +1,7 @@
 ---
 title: docker从入门到实践
 categories: 
-- CICD
-tag: Docker
+- 容器
 ---
 
 摘要:
@@ -61,25 +60,10 @@ tag: Docker
 
 # 1. 什么是docker
 
-Docker是云技术的一次革新，2013年以Apache协议开源，基于linux内核的**cgroup**,**namespace**以及OverlayFS的**UnionFS**实现，对进程进行封装，属于操作系统层面的虚拟化技术，由于隔离的进程独立于宿主机因此称为容器
-
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9b5d51fa80b2435386d16496375409c2~tplv-k3u1fbpfcp-watermark.image?)
-
-![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/89f40405bc364cd295076c36c9d354e5~tplv-k3u1fbpfcp-watermark.image?)
-
-- 镜像
-操作系统分为`内核`和`用户空间`，而docker的镜像就是一种特殊的文件系统，除了提供容器运行所需的程序，库，资源，配置等文件外，还包括为运行时准备的的一些配置参数
-
-- 分层存储
-Docker 设计时，就充分利用 [Union FS](https://en.wikipedia.org/wiki/Union_mount) 的技术，将其设计为分层存储的架构。所以严格来说，镜像并非是像一个 `ISO` 那样的打包文件，镜像只是一个虚拟的概念，其实际体现并非由一个文件组成，而是由一组文件系统组成，或者说，由多层文件系统联合组成。
-
-- 容器
-容器跟镜像的关系就像是面向对象中类和实例的概念，容器的实质是进程，与宿主机的进程不同，容器拥有自己独立的命空间，因此拥有自己的root文件系统，自己的网络配置，自己的进程空间，自己的用户id空间。进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。
-一个容器运行时，是以镜像为基础层，在其上创建一个当前容器的存储层，我们可以称这个为容器运行时读写而准备的存储层为 **容器存储层**
-容器存储层的生存周期和容器一样，容器消亡时，容器存储层也随之消亡。因此，任何保存于容器存储层的信息都会随容器删除而丢失（后面建议挂载volume）
-
-- 仓库
-[仓库](https://yeasy.gitbook.io/docker_practice/basic_concept/repository)
+什么是 Docker
+Docker 最初是 dotCloud 公司创始人  在法国期间发起的一个公司内部项目，它是基于 dotCloud 公司多年云服务技术的一次革新，并于 ，主要项目代码在  上进行维护。Docker 项目后来还加入了 Linux 基金会，并成立推动 。
+Docker 自开源后受到广泛的关注和讨论，至今其  已经超过 5 万 7 千个星标和一万多个 fork。甚至由于 Docker 项目的火爆，在 2013 年底，。Docker 最初是在 Ubuntu 12.04 上开发实现的；Red Hat 则从 RHEL 6.5 开始对 Docker 进行支持；Google 也在其 PaaS 产品中广泛应用 Docker。
+Docker 使用 Google 公司推出的  进行开发实现，基于 Linux 内核的 ，，以及  类的  等技术，对进程进行封装隔离，属于 。由于隔离的进程独立于宿主和其它的隔离的进程，因此也称其为容器。最初实现是基于 ，从 0.7 版本以后开始去除 LXC，转而使用自行开发的 ，从 1.11 版本开始，则进一步演进为使用和
 
 # 2.docker镜像基本概念与基本命令
 
