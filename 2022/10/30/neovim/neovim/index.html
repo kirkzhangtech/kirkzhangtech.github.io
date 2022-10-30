@@ -6,23 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Eden">
-    <title>67.二进制的求和 - Eden</title>
+    <title>neovim - Eden</title>
     <meta name="author" content="kirkzhang">
     
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"\npackage main\n\n&#x2F;*\n * @lc app&#x3D;leetcode.cn id&#x3D;67 lang&#x3D;golang\n *\n * [67] 二进制求和\n *&#x2F;\n\n&#x2F;&#x2F; @lc code&#x3D;start\nfunc addBinary(a string, b string) string &#123;\n\tvar carry, sum int\n\ti, j :&#x3D; len(a), len(b)\n\tif i &lt; j &#123;\n\t\ti, j &#x3D; j, i\n\t\ta, b &#x3D; b, a\n\t&#125;\n\n\tres :&#x3D; make([]byte, i+1)\n\n\tfor j &gt; 0 &#123;\n\t\tj--\n\t\ti--\n\t\tsum &#x3D; int(a[i]-&#39;0&#39;) + int(b[j]-&#39;0&#39;) + carry\n\t\tcarry &#x3D; sum &#x2F; 2\n\t\tsum &#x3D; sum % 2\n\t\tres[i+1] &#x3D; byte(sum + &#39;0&#39;)\n\t&#125;\n\n\tfor i &gt; 0 &#123;\n\t\ti--\n\t\tsum &#x3D; int(a[i]-&#39;0&#39;) + carry\n\t\tcarry &#x3D; sum &#x2F; 2\n\t\tsum &#x3D; sum % 2\n\t\tres[i+1] &#x3D; byte(sum + &#39;0&#39;)\n\t&#125;\n\n\tres[0] &#x3D; byte(carry + &#39;0&#39;)\n\n\tfor i &lt; len(res)-1 &#123;\n\t\tif res[i] &#x3D;&#x3D; &#39;0&#39; &#123;\n\t\t\ti++\n\t\t&#125; else &#123;\n\t\t\tbreak\n\t\t&#125;\n\t&#125;\n\treturn string(res[i:])\n&#125;\n\n&#x2F;&#x2F; @lc code&#x3D;end","dateCreated":"2022-06-23T00:10:00+08:00","dateModified":"2022-10-25T22:46:26+08:00","datePublished":"2022-06-23T00:10:00+08:00","description":"","headline":"67.二进制的求和","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/"}</script>
-    <meta name="description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;67 lang&#x3D;golang  *  * [67] 二进制求和  *&#x2F;  &#x2F;&#x2F; @lc code&#x3D;start func addBinary(a string, b string) string &amp;#123; 	var carry,">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"","dateCreated":"2022-10-30T13:58:59+08:00","dateModified":"2022-10-30T13:59:47+08:00","datePublished":"2022-10-30T13:58:59+08:00","description":"","headline":"neovim","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/30/neovim/neovim/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","nil","nil","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/30/neovim/neovim/"}</script>
+    <meta name="description" content="随遇而安吧">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="67.二进制的求和">
-<meta property="og:url" content="https://simonteo58.github.io/2022/06/23/leetcode/67.%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%B1%82%E5%92%8C/index.html">
+<meta property="og:title" content="neovim">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/30/neovim/neovim/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="package main  &#x2F;*  * @lc app&#x3D;leetcode.cn id&#x3D;67 lang&#x3D;golang  *  * [67] 二进制求和  *&#x2F;  &#x2F;&#x2F; @lc code&#x3D;start func addBinary(a string, b string) string &amp;#123; 	var carry,">
+<meta property="og:description" content="随遇而安吧">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-06-22T16:10:00.241Z">
-<meta property="article:modified_time" content="2022-10-25T14:46:26.483Z">
+<meta property="article:published_time" content="2022-10-30T05:58:59.000Z">
+<meta property="article:modified_time" content="2022-10-30T05:59:47.267Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@shiming_kirk">
@@ -349,20 +349,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            67.二进制的求和
+            neovim
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
+    <time datetime="2022-10-30T13:58:59+08:00">
 	
-		    Jun 23, 2022
+		    Oct 30, 2022
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+    <a class="category-link" href="/categories/neovim/">neovim</a>
 
 
     
@@ -374,56 +374,7 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <pre class="language-golang" data-language="golang"><code class="language-golang">
-package main
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;67 lang&#x3D;golang
- *
- * [67] 二进制求和
- *&#x2F;
-
-&#x2F;&#x2F; @lc code&#x3D;start
-func addBinary(a string, b string) string &#123;
-	var carry, sum int
-	i, j :&#x3D; len(a), len(b)
-	if i &lt; j &#123;
-		i, j &#x3D; j, i
-		a, b &#x3D; b, a
-	&#125;
-
-	res :&#x3D; make([]byte, i+1)
-
-	for j &gt; 0 &#123;
-		j--
-		i--
-		sum &#x3D; int(a[i]-&#39;0&#39;) + int(b[j]-&#39;0&#39;) + carry
-		carry &#x3D; sum &#x2F; 2
-		sum &#x3D; sum % 2
-		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
-	&#125;
-
-	for i &gt; 0 &#123;
-		i--
-		sum &#x3D; int(a[i]-&#39;0&#39;) + carry
-		carry &#x3D; sum &#x2F; 2
-		sum &#x3D; sum % 2
-		res[i+1] &#x3D; byte(sum + &#39;0&#39;)
-	&#125;
-
-	res[0] &#x3D; byte(carry + &#39;0&#39;)
-
-	for i &lt; len(res)-1 &#123;
-		if res[i] &#x3D;&#x3D; &#39;0&#39; &#123;
-			i++
-		&#125; else &#123;
-			break
-		&#125;
-	&#125;
-	return string(res[i:])
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+            
             
 
 
@@ -437,14 +388,11 @@ func addBinary(a string, b string) string &#123;
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-                    data-tooltip="66.加一"
-                    aria-label="PREVIOUS: 66.加一"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                     </a>
@@ -454,9 +402,9 @@ func addBinary(a string, b string) string &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-                    data-tooltip="69.x-的平方根"
-                    aria-label="NEXT: 69.x-的平方根"
+                    href="/2022/10/29/lua/lua/"
+                    data-tooltip="lua脚本语言"
+                    aria-label="NEXT: lua脚本语言"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -565,14 +513,11 @@ func addBinary(a string, b string) string &#123;
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/66.%E5%8A%A0%E4%B8%80/"
-                    data-tooltip="66.加一"
-                    aria-label="PREVIOUS: 66.加一"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                     </a>
@@ -582,9 +527,9 @@ func addBinary(a string, b string) string &#123;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/06/23/leetcode/69.x-%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9/"
-                    data-tooltip="69.x-的平方根"
-                    aria-label="NEXT: 69.x-的平方根"
+                    href="/2022/10/29/lua/lua/"
+                    data-tooltip="lua脚本语言"
+                    aria-label="NEXT: lua脚本语言"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -778,7 +723,7 @@ func addBinary(a string, b string) string &#123;
               repo: 'SimonTeo58.github.io',
               owner: 'SimonTeo58',
               admin: ['SimonTeo58'],
-              id: '2022/06/23/leetcode/67.二进制求和/',
+              id: '2022/10/30/neovim/neovim/',
               ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
             }).render('gitalk')
           })()
