@@ -2,10 +2,10 @@
 title: 高效研究的个人规则
 categories:
 - 随笔
-# clearReading: true
-# thumbnailImagePosition: bottom
-# thumbnail_image: true
-coverImage: avatar.jpg
+thumbnailImagePosition: top
+thumbnailImage: https://user-images.githubusercontent.com/46363359/198887014-69f99637-39b0-4d6b-bf17-f228dcadb42f.jpg
+coverImage: https://user-images.githubusercontent.com/46363359/198887264-399f1784-ce36-4f14-8850-6ee3f902cca2.jpg
+coverMeta: out
 
 ---
 > 作者：Eugene Vinitsky
@@ -14,9 +14,9 @@ Personal Rules of Productive Research
 
 Caveats(`['kæviæt] 警告;说明`) and intent(`[ɪn'tɛnt]意图;目的;含义`): 
 Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.
-
-There’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(`vi/vt坚持,强调`) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.
 <!-- more -->
+![](http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city.jpg)
+There’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(`vi/vt坚持,强调`) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.
 
 ## Run the simplest experiment first.
 

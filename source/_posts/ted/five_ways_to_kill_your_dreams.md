@@ -1,7 +1,7 @@
 ---
 title: five ways to kill your dreams
 categories: 
-- TED
+- ted
 ---
 > 《five ways to kill your dreams》--TED
 

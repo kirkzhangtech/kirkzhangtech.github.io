@@ -153,9 +153,9 @@ author:
 sidebar_behavior: 2
 # Hide sidebar on all article page to let article take full width to improve reading, and
 # enjoy wide images and cover images. (true: enable, false: disable)
-clear_reading: true
+clear_reading: false
 # Display thumbnail image of each post on index pages (false: disabled, true: enabled)
-thumbnail_image: false
+thumbnail_image: true
 # Display thumbnail image at the right of title in index pages (`right`, `left` or `bottom`)
 # Set this value to `right` if you have old posts to keep the old style on them
 # and define `thumbnailImagePosition` on a post to overwrite this setting
@@ -164,7 +164,7 @@ thumbnail_image_position: bottom
 # there is no thumbnail image as the thumbnail image
 # Set this value to `true` if you have old posts that use the cover image or the first photo as the thumbnail image
 # and set `autoThumbnailImage` to `false` on a post to overwrite this setting
-auto_thumbnail_image: false
+auto_thumbnail_image: true
 # Your blog cover picture. I STRONGLY recommend you to use a CDN to speed up loading of pages.
 # There is many free CDN like Cloudinary or you can also use indirectly
 # by using services like Google Photos.
@@ -173,10 +173,12 @@ auto_thumbnail_image: false
 # or in `source/assets/images/` if you can't or don't want to build the theme,
 # and use relative url : `your-image.png`
 cover_image: cover.jpg
+# cover_image: fyen.jpg
+
 # Your favicon located in folder `source/_images/` (development) or in `source/assets/images/` (production)
 favicon: cover-v1.2.0.jpg
 # Display an image gallery at the end of a post which have photos variables (false: disabled, true: enabled)
-image_gallery: false
+image_gallery: true
 # Pagination behavior of archive, category and tag pages (false: pagination disabled, true: pagination enabled)
 archive_pagination: true
 category_pagination: true
