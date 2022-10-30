@@ -2,8 +2,8 @@
 title: lua reference manual
 categories:
 - lua
-thumbnailImagePosition: left
-thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
+thumbnailImagePosition: bottom
+# thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
 coverImage: https://user-images.githubusercontent.com/46363359/198887282-458603de-a3f5-46c0-a866-488f3ac00b14.jpg
 metaAlignment: center
 coverMeta: out
