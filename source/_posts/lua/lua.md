@@ -1,5 +1,5 @@
 ---
-title: lua reference manual
+title: Lua Reference Manual
 categories:
 - lua
 thumbnailImagePosition: bottom
@@ -8,6 +8,7 @@ coverImage: https://user-images.githubusercontent.com/46363359/198887282-458603d
 metaAlignment: center
 coverMeta: out
 ---
+> 原文链接: https://www.lua.org/manual/5.4/
 
 Lua is a powerful, efficient, lightweight, embeddable scripting language. It supports procedural programming, object-oriented programming, functional programming, data-driven programming, and data description.
 
