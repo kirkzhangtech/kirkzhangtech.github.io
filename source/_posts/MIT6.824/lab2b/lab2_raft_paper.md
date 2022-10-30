@@ -1,5 +1,5 @@
 ---
-title: raft论文(extend)
+title: raft paper (extend)
 categories:
 - 分布式
 - MIT6.824
@@ -198,41 +198,23 @@ VSR算法一开始日志不全的情况下成为leader，然后当某台服务�
 
 ### 5.4.2 提交之前任期内的日志条目
 
-As described in Section 5.3, a leader knows that an en-
-try from its current term is committed once that entry is
-stored on a majority of the servers. If a leader crashes be-
-fore committing an entry, future leaders will attempt to
-ﬁnish replicating the entry. However, a leader cannot im-
-mediately conclude that an entry from a previous term is
-committed once it is stored on a majority of servers.
-Fig-ure 8 illustrates a situation where an old log entry is stored
-on a majority of servers, yet can still be overwritten by a
-future leader.
+As described in Section 5.3, a leader knows that an en-try from its current term is committed once that entry is
+stored on a majority of the servers. If a leader crashes be-fore committing an entry, future leaders will attempt to
+ﬁnish replicating the entry. However, a leader cannot im-mediately conclude that an entry from a previous term is
+committed once it is stored on a majority of servers.Fig-ure 8 illustrates a situation where an old log entry is stored
+on a majority of servers, yet can still be overwritten by afuture leader.
 
 ![figure9](./../../../picture/mit6.824/raft_figure_9.png)
 
-To eliminate problems like the one in Figure 8, Raft
-never commits log entries from previous terms by count-
-ing replicas. Only log entries from the leader’s current
-term are committed by counting replicas; once an entry
-from the current term has been committed in this way,
-then all prior entries are committed indirectly because
-of the Log Matching Property. There are some situations
-where a leader could safely conclude that an older log en-
-try is committed (for example, if that entry is stored on ev-
-ery server), but Raft takes a more conservative approach
-for simplicity.
+To eliminate problems like the one in Figure 8, Raft never commits log entries from previous terms by counting replicas. Only log entries from the leader’s current
+term are committed by counting replicas; once an entry from the current term has been committed in this way,
+then all prior entries are committed indirectly because of the Log Matching Property. There are some situations where a leader could safely conclude that an older log en-
+try is committed (for example, if that entry is stored on ev-ery server), but Raft takes a more conservative approach for simplicity.
 
-Raft incurs(招致) this extra complexity in the commitment
-rules because log entries retain their original term num-
-bers when a leader replicates entries from previous
-terms. In other consensus algorithms, if a new leader re-
-replicates entries from prior “terms,” it must do so with
-its new “term number.” Raft’s approach makes it easier
-to reason about log entries, since they maintain the same
-term number over time and across logs. In addition, new
-leaders in Raft send fewer log entries from previous terms
-than in other algorithms (other algorithms must send re-
-dundant log entries to renumber them before they can be
-committed).
+Raft incurs(招致) this extra complexity in the commitment rules because log entries retain their original term num-
+bers when a leader replicates entries from previous terms. In other consensus algorithms, if a new leader re-
+replicates entries from prior “terms,” it must do so with its new “term number.” Raft’s approach makes it easier
+to reason about log entries, since they maintain the same term number over time and across logs. In addition, new
+leaders in Raft send fewer log entries from previous terms than in other algorithms (other algorithms must send re-
+dundant log entries to renumber them before they can be committed).
 
