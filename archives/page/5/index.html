@@ -381,10 +381,100 @@ func strStr(haystack string, needle string) int &#123;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+                            aria-label=": 35.搜索插入位置"
+                        >
+                            35.搜索插入位置
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang
+ *
+ * [35] 搜索插入位置
+ *&#x2F;
+&#x2F;&#x2F;  [1,3,5,6]
+&#x2F;&#x2F; @lc code&#x3D;start
+func searchInsert(nums []int, target int) int &#123;
+	low :&#x3D; 0
+	high :&#x3D; len(nums) - 1
+	for low &lt;&#x3D; high &#123;
+		&#x2F;&#x2F; midIndex :&#x3D; low + ((high - low) &#x2F; 2)
+		midIndex :&#x3D; (high - low) &#x2F; 2
+
+		midValue :&#x3D; nums[midIndex]
+		if target &#x3D;&#x3D; midValue &#123;
+			return midIndex
+		&#125; else if target &lt; midValue &#123;
+			high &#x3D; midIndex - 1
+		&#125; else &#123;
+			low &#x3D; midIndex + 1
+		&#125;
+	&#125;
+	return high + 1
+
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -467,6 +557,10 @@ func Max(a int, b int) int &#123;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
@@ -537,92 +631,14 @@ func lengthOfLastWord(s string) int &#123;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
-                            aria-label=": 35.搜索插入位置"
-                        >
-                            35.搜索插入位置
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang
- *
- * [35] 搜索插入位置
- *&#x2F;
-&#x2F;&#x2F;  [1,3,5,6]
-&#x2F;&#x2F; @lc code&#x3D;start
-func searchInsert(nums []int, target int) int &#123;
-	low :&#x3D; 0
-	high :&#x3D; len(nums) - 1
-	for low &lt;&#x3D; high &#123;
-		&#x2F;&#x2F; midIndex :&#x3D; low + ((high - low) &#x2F; 2)
-		midIndex :&#x3D; (high - low) &#x2F; 2
-
-		midValue :&#x3D; nums[midIndex]
-		if target &#x3D;&#x3D; midValue &#123;
-			return midIndex
-		&#125; else if target &lt; midValue &#123;
-			high &#x3D; midIndex - 1
-		&#125; else &#123;
-			low &#x3D; midIndex + 1
-		&#125;
-	&#125;
-	return high + 1
-
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -704,6 +720,10 @@ func plusOne(digits []int) []int &#123;
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+
+                    
+                        
+
 
                     
                     
@@ -808,6 +828,10 @@ func addBinary(a string, b string) string &#123;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
@@ -878,6 +902,10 @@ func mySqrt(x int) int &#123;
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
                     
                     
                         <p>
@@ -981,6 +1009,10 @@ func Sum(dp []int) &#123;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
@@ -1083,6 +1115,10 @@ public:
 &#125;;
 &#x2F;&#x2F; @lc code&#x3D;end
 </code></pre>
+                    
+                        
+
+
                     
                     
                         <p>
@@ -1221,6 +1257,10 @@ public:
 &#x2F;&#x2F; @lc code&#x3D;end
 </code></pre></li>
 </ul>
+
+                    
+                        
+
 
                     
                     

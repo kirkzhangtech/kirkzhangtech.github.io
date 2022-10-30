@@ -488,6 +488,10 @@
 </ul>
 
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
@@ -640,6 +644,10 @@
             
                 <div class="postShorten-content">
                     
+                    
+                        
+
+
                     
                     
                         <p>
@@ -1108,6 +1116,10 @@
 <p><img src="/./../../../picture/mit6.824/raft_figure_9.png" alt="figure9"></p>
 <p>To eliminate problems like the one in Figure 8, Raft never commits log entries from previous terms by counting replicas. Only log entries from the leader’s current<br>term are committed by counting replicas; once an entry from the current term has been committed in this way,<br>then all prior entries are committed indirectly because of the Log Matching Property. There are some situations where a leader could safely conclude that an older log en-<br>try is committed (for example, if that entry is stored on ev-ery server), but Raft takes a more conservative approach for simplicity.</p>
 <p>Raft incurs(招致) this extra complexity in the commitment rules because log entries retain their original term num-<br>bers when a leader replicates entries from previous terms. In other consensus algorithms, if a new leader re-<br>replicates entries from prior “terms,” it must do so with its new “term number.” Raft’s approach makes it easier<br>to reason about log entries, since they maintain the same term number over time and across logs. In addition, new<br>leaders in Raft send fewer log entries from previous terms than in other algorithms (other algorithms must send re-<br>dundant log entries to renumber them before they can be committed).</p>
+
+                    
+                        
+
 
                     
                     

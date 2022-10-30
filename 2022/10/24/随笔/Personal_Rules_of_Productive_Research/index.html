@@ -13,7 +13,7 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"\n作者：Eugene Vinitsky\n\nPersonal Rules of Productive Research\nCaveats([&#39;kæviæt] 警告;说明) and intent([ɪn&#39;tɛnt]意图;目的;含义):Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.\nThere’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(vi/vt坚持,强调) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.\n\n\nRun the simplest experiment first.This is the mistake I make the most often. ML experiments are so easy to mess up you absolutely need to verify at each step that the minimal experiment is working. The minimal experiment is the absolute bare(adj赤裸的) minimum needed to check that either your code works or your idea makes sense. Unfortunately, I don’t think there’s a coherent definition of minimal, it seems to mostly be an aesthetic([ɛsˈθɛtɪk]adj美的;美学的) thing. I’d call it the thing that has the least moving pieces.\nSince nothing is better than concrete(adj具体的) details, let me just list all the ways I’ve done this wrong:\n\nI had an RL problem where we had to solve some task where the dynamics were defined by N trajectories. Instead of checking whether I could solve one interesting trajectory perfectly, I kept running the algorithm over all N trajectories. \n\nI had a problem that could be run in single or multi-agent mode. Instead of trying to verify correctness of the codebase by running the single-agent version, I jumped right to the multi-agent version.\n\nI had a multi-agent problem where I could run it with 100s of agents or just a few. I jumped right to 100s. I’ve done this one three times.\n\n\nWrite a mini-version of your paper before getting startedThis should consist of\nA short introduction explaining the projectA short related work section making clear that the result is both new and relevant (if things work out as you expect)A minimal experiment or theorem that you can use to verify if the idea makes sense.It’s so easy for your ideas to seem clear until you write them down. Once you write them down you start noticing that:\nthey might not be all that clear or coherentthey might not be all that different than prior workthey might not be that interestingCaveat: this doesn’t work for curiosity driven research where you don’t actually know what you’re setting out to find before you get there. However, if you think you know the destination it’s worth checking that you actually want to &#x2F; can get there!\nKeep an ultra-detailed notebookI personally under-invested into this at the beginning of my PhD and only really got into it after I had to try to reproduce the results of one of my own papers and ran into huge challenges doing so. At the very least, it winds up saving you time in the long term. At best, it helps structure your thinking and prevents you from losing great ideas.\nThings that at a minimum you should track for reproducibility:\nExperiment notebook:Git hash and branch of the experiment you runActual command you ranConfig of experiment that was runIntent of the experiment i.e. what you were testingResult of the experimentImplied next experimentCode notebook. This might seem a little excessive but each one has saved me hours in return for minutes of extra effort.Bugs you fixed (because I promise you, they will happen again)Tricks for installing things and challenges you ran into (because I promise you, they will happen again)Key commands that you ran (because I promise you, you will want to rerun them at some point)Ideas for potential research projects that spawn while working on this.I personally like notion for this as I have a bunch of templates that I use for generating the structure of each experiment and can throw the corresponding results &#x2F; figures in pretty easily.\nEvery paper should be reproducible via 1 scriptThis means a script that: \n\nlaunches all experiments\n\ncreates all figures (that aren’t custom powerpoint &#x2F; gimp figures) in one go. Possibly save the powerpoint figure creation file in the repo too (I’m not super confident about this but it makes sense to me)\n\n\nYou’re going to wind up remaking your figures way more often then you expect so the initial time investment is worth it.\nSave all your videos in one place. SAVE ALL YOUR VIDEOS IN  ONE PLACEIn a few years you’re going to be giving talks that summarize some of your past work. It is the worst feeling to be hunting for old videos &#x2F; figures from the work or trying to reproduce them from two year old models that you can barely load. \nThis also applies to figures, you want to be frequently check-pointing your figures for a paper into a folder somewhere. It will make the following suggestion way easier as it’s easy to make a talk when the figures are already done.\nPresent regularly (seminars, to your advisors)This is basically the #1 mistake some of my own students make at the beginning of our work together. I’ll give them a task, they’ll disappear into the ether, and then they’ll return two months later with some issues that could have used early feedback. What’s the point of being part of the research community if you’re not taking advantage of it? Feedback is the fastest way to discover that your ideas need to be cleared up a bit, to get pointers to work that you’ve missed, and to force yourself to keep your work organized in a manner that is legible.\nSuggested frequency:If you have a graduate student mentor on a project, check in with them quite often! They’re there to help and know how to get out of some holes you can dig yourself into.Get lunch or informally discuss your work with smart folks basically as much as you can (you are likely to be quite rate-limited on how often you can find a way to do this rather than rate limited by how useful this is). This way you get to know them and probably learn a ton about how they think.Present to your advisors at least every other weekPresent to your lab group at least once a semesterPresent to the department at least once a year (but better if once a semester)Present or discuss your work in some informal settings (reading group, small seminar) at least twice a semesterYeah, it’s a lot of presenting.\n","dateCreated":"2022-10-24T23:33:29+08:00","dateModified":"2022-10-30T22:32:41+08:00","datePublished":"2022-10-24T23:33:29+08:00","description":"\n作者：Eugene Vinitsky\n\nPersonal Rules of Productive Research\nCaveats([&#39;kæviæt] 警告;说明) and intent([ɪn&#39;tɛnt]意图;目的;含义):Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.\nThere’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(vi/vt坚持,强调) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.","headline":"高效研究的个人规则","image":[null,"avatar.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/","thumbnailUrl":"avatar.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"\n作者：Eugene Vinitsky\n\nPersonal Rules of Productive Research\nCaveats([&#39;kæviæt] 警告;说明) and intent([ɪn&#39;tɛnt]意图;目的;含义):Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.\n\nThere’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(vi/vt坚持,强调) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.\nRun the simplest experiment first.This is the mistake I make the most often. ML experiments are so easy to mess up you absolutely need to verify at each step that the minimal experiment is working. The minimal experiment is the absolute bare(adj赤裸的) minimum needed to check that either your code works or your idea makes sense. Unfortunately, I don’t think there’s a coherent definition of minimal, it seems to mostly be an aesthetic([ɛsˈθɛtɪk]adj美的;美学的) thing. I’d call it the thing that has the least moving pieces.\nSince nothing is better than concrete(adj具体的) details, let me just list all the ways I’ve done this wrong:\n\nI had an RL problem where we had to solve some task where the dynamics were defined by N trajectories. Instead of checking whether I could solve one interesting trajectory perfectly, I kept running the algorithm over all N trajectories. \n\nI had a problem that could be run in single or multi-agent mode. Instead of trying to verify correctness of the codebase by running the single-agent version, I jumped right to the multi-agent version.\n\nI had a multi-agent problem where I could run it with 100s of agents or just a few. I jumped right to 100s. I’ve done this one three times.\n\n\nWrite a mini-version of your paper before getting startedThis should consist of\nA short introduction explaining the projectA short related work section making clear that the result is both new and relevant (if things work out as you expect)A minimal experiment or theorem that you can use to verify if the idea makes sense.It’s so easy for your ideas to seem clear until you write them down. Once you write them down you start noticing that:\nthey might not be all that clear or coherentthey might not be all that different than prior workthey might not be that interestingCaveat: this doesn’t work for curiosity driven research where you don’t actually know what you’re setting out to find before you get there. However, if you think you know the destination it’s worth checking that you actually want to &#x2F; can get there!\nKeep an ultra-detailed notebookI personally under-invested into this at the beginning of my PhD and only really got into it after I had to try to reproduce the results of one of my own papers and ran into huge challenges doing so. At the very least, it winds up saving you time in the long term. At best, it helps structure your thinking and prevents you from losing great ideas.\nThings that at a minimum you should track for reproducibility:\nExperiment notebook:Git hash and branch of the experiment you runActual command you ranConfig of experiment that was runIntent of the experiment i.e. what you were testingResult of the experimentImplied next experimentCode notebook. This might seem a little excessive but each one has saved me hours in return for minutes of extra effort.Bugs you fixed (because I promise you, they will happen again)Tricks for installing things and challenges you ran into (because I promise you, they will happen again)Key commands that you ran (because I promise you, you will want to rerun them at some point)Ideas for potential research projects that spawn while working on this.I personally like notion for this as I have a bunch of templates that I use for generating the structure of each experiment and can throw the corresponding results &#x2F; figures in pretty easily.\nEvery paper should be reproducible via 1 scriptThis means a script that: \n\nlaunches all experiments\n\ncreates all figures (that aren’t custom powerpoint &#x2F; gimp figures) in one go. Possibly save the powerpoint figure creation file in the repo too (I’m not super confident about this but it makes sense to me)\n\n\nYou’re going to wind up remaking your figures way more often then you expect so the initial time investment is worth it.\nSave all your videos in one place. SAVE ALL YOUR VIDEOS IN  ONE PLACEIn a few years you’re going to be giving talks that summarize some of your past work. It is the worst feeling to be hunting for old videos &#x2F; figures from the work or trying to reproduce them from two year old models that you can barely load. \nThis also applies to figures, you want to be frequently check-pointing your figures for a paper into a folder somewhere. It will make the following suggestion way easier as it’s easy to make a talk when the figures are already done.\nPresent regularly (seminars, to your advisors)This is basically the #1 mistake some of my own students make at the beginning of our work together. I’ll give them a task, they’ll disappear into the ether, and then they’ll return two months later with some issues that could have used early feedback. What’s the point of being part of the research community if you’re not taking advantage of it? Feedback is the fastest way to discover that your ideas need to be cleared up a bit, to get pointers to work that you’ve missed, and to force yourself to keep your work organized in a manner that is legible.\nSuggested frequency:If you have a graduate student mentor on a project, check in with them quite often! They’re there to help and know how to get out of some holes you can dig yourself into.Get lunch or informally discuss your work with smart folks basically as much as you can (you are likely to be quite rate-limited on how often you can find a way to do this rather than rate limited by how useful this is). This way you get to know them and probably learn a ton about how they think.Present to your advisors at least every other weekPresent to your lab group at least once a semesterPresent to the department at least once a year (but better if once a semester)Present or discuss your work in some informal settings (reading group, small seminar) at least twice a semesterYeah, it’s a lot of presenting.\n","dateCreated":"2022-10-24T23:33:29+08:00","dateModified":"2022-10-30T23:35:03+08:00","datePublished":"2022-10-24T23:33:29+08:00","description":"\n作者：Eugene Vinitsky\n\nPersonal Rules of Productive Research\nCaveats([&#39;kæviæt] 警告;说明) and intent([ɪn&#39;tɛnt]意图;目的;含义):Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.","headline":"高效研究的个人规则","image":["https://user-images.githubusercontent.com/46363359/198887014-69f99637-39b0-4d6b-bf17-f228dcadb42f.jpg","https://user-images.githubusercontent.com/46363359/198887264-399f1784-ce36-4f14-8850-6ee3f902cca2.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/198887014-69f99637-39b0-4d6b-bf17-f228dcadb42f.jpg"}</script>
     <meta name="description" content="作者：Eugene Vinitsky  Personal Rules of Productive Research Caveats([&#39;kæviæt] 警告;说明) and intent([ɪn&#39;tɛnt]意图;目的;含义):Painstakingly extracted via trial and error, ever evolving. Mostly an exercise">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="高效研究的个人规则">
@@ -21,10 +21,12 @@
 <meta property="og:site_name" content="CoffeeMan">
 <meta property="og:description" content="作者：Eugene Vinitsky  Personal Rules of Productive Research Caveats([&#39;kæviæt] 警告;说明) and intent([ɪn&#39;tɛnt]意图;目的;含义):Painstakingly extracted via trial and error, ever evolving. Mostly an exercise">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city.jpg">
 <meta property="article:published_time" content="2022-10-24T15:33:29.906Z">
-<meta property="article:modified_time" content="2022-10-30T14:32:41.197Z">
+<meta property="article:modified_time" content="2022-10-30T15:35:03.167Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city.jpg">
 <meta name="twitter:creator" content="@shiming_kirk">
     
         <link rel="publisher" href="https://plus.google.com/nil"/>
@@ -36,9 +38,12 @@
         <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
     
     
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/198887014-69f99637-39b0-4d6b-bf17-f228dcadb42f.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/198887014-69f99637-39b0-4d6b-bf17-f228dcadb42f.jpg"/>
     
-        <meta property="og:image" content="https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/avatar.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://simonteo58.github.io/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/avatar.jpg"/>
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/198887264-399f1784-ce36-4f14-8850-6ee3f902cca2.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/198887264-399f1784-ce36-4f14-8850-6ee3f902cca2.jpg"/>
     
     
     <!--STYLES-->
@@ -70,7 +75,7 @@
         
     
 
-<header id="header" data-behavior="5">
+<header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a
@@ -103,7 +108,7 @@
         
     
 
-<nav id="sidebar" data-behavior="5">
+<nav id="sidebar" data-behavior="2">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -316,10 +321,20 @@
         <div class="post-header-cover
                     text-left
                     "
-             style="background-image:url('/2022/10/24/%E9%9A%8F%E7%AC%94/Personal_Rules_of_Productive_Research/avatar.jpg');"
-             data-behavior="5">
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/198887264-399f1784-ce36-4f14-8850-6ee3f902cca2.jpg');"
+             data-behavior="2">
             
-                <div class="post-header main-content-wrap text-left">
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
             高效研究的个人规则
@@ -344,16 +359,6 @@
     
 </div>
 
-            
-        </div>
-
-            <div id="main" data-behavior="5"
-                 class="hasCover
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post">
-    
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
@@ -362,9 +367,8 @@
 </blockquote>
 <p>Personal Rules of Productive Research</p>
 <p>Caveats(<code>[&#39;kæviæt] 警告;说明</code>) and intent(<code>[ɪn&#39;tɛnt]意图;目的;含义</code>):<br>Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.</p>
-<p>There’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(<code>vi/vt坚持,强调</code>) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.</p>
 <span id="more"></span>
-
+<p><img src="http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city.jpg"><br>There’s a ton of good blogs and information about how to structure and think about your research vision but comparatively less thinking on what the day to day looks like. I was trying to figure out what rules I would try to insist(<code>vi/vt坚持,强调</code>) my students follow or try and figured it might be helpful for other folks. It seems like a lot but I’d say outside of the detailed notebook most of these are are either a few minutes here or there or a suggestion to add structure to your thinking to aid you in thinking more clearly.</p>
 <h2 id="Run-the-simplest-experiment-first"><a href="#Run-the-simplest-experiment-first" class="headerlink" title="Run the simplest experiment first."></a>Run the simplest experiment first.</h2><p>This is the mistake I make the most often. ML experiments are so easy to mess up you absolutely need to verify at each step that the minimal experiment is working. The minimal experiment is the absolute bare(<code>adj赤裸的</code>) minimum needed to check that either your code works or your idea makes sense. Unfortunately, I don’t think there’s a coherent definition of minimal, it seems to mostly be an aesthetic(<code>[ɛsˈθɛtɪk]adj美的;美学的</code>) thing. I’d call it the thing that has the least moving pieces.</p>
 <p>Since nothing is better than concrete(<code>adj具体的</code>) details, let me just list all the ways I’ve done this wrong:</p>
 <ol>
@@ -411,8 +415,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/2022/10/29/lua/lua/"
-                    data-tooltip="lua脚本语言"
-                    aria-label="PREVIOUS: lua脚本语言"
+                    data-tooltip="lua reference manual"
+                    aria-label="PREVIOUS: lua reference manual"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -516,7 +520,7 @@
 
             </div>
             
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
                     <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
@@ -526,8 +530,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/2022/10/29/lua/lua/"
-                    data-tooltip="lua脚本语言"
-                    aria-label="PREVIOUS: lua脚本语言"
+                    data-tooltip="lua reference manual"
+                    aria-label="PREVIOUS: lua reference manual"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -613,7 +617,7 @@
 
                 </div>
                 
-    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
         <i id="btn-close-shareoptions" class="fa fa-times"></i>
         <ul class="share-options">
             

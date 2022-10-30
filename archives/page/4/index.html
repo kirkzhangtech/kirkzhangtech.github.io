@@ -334,7 +334,7 @@
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/TED/">TED</a>
+    <a class="category-link" href="/categories/ted/">ted</a>
 
 
     
@@ -354,6 +354,10 @@
 <li>动态调整,只专注做好几件事,任务是完成</li>
 <li>关注自我,关注自我成长,多看到自己的进步,多做有价值的付出,多自我反馈，带来持续动力。</li>
 </ol>
+
+                    
+                        
+
 
                     
                     
@@ -408,6 +412,10 @@
             
                 <div class="postShorten-content">
                     
+                    
+                        
+
+
                     
                     
                         <p>
@@ -512,6 +520,10 @@
             
                 <div class="postShorten-content">
                     
+                    
+                        
+
+
                     
                     
                         <p>
@@ -618,6 +630,10 @@
 <td>SELECT * FROM USER_PROCEDURES ;SELECT * FROM USER_PROCEDURES WHERE OBJECT_TYPE&#x3D;’PACKAGE’;SELECT * FROM ALL_PROCEDURES WHERE OBJECT_TYPE&#x3D;’PACKAGE’;SELECT * FROM DBA_PROCEDURES WHERE OBJECT_TYPE&#x3D;’PACKAGE’; SELECT * FROM USER_OBJECTS WHERE OBJECT_TYPE&#x3D;’PACKAGE’;</td>
 </tr>
 </tbody></table>
+
+                    
+                        
+
 
                     
                     
@@ -730,6 +746,10 @@ func char2Int(c string) int &#123;
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
                     
                     
                         <p>
@@ -884,10 +904,101 @@ func isValid(s string) bool &#123;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
+                            aria-label=": 14.最长公共前缀"
+                        >
+                            14.最长公共前缀
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sort&quot;
+)
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;14 lang&#x3D;golang
+ *
+ * [14] 最长公共前缀
+ *&#x2F;
+
+&#x2F;&#x2F; @lc code&#x3D;start
+func longestCommonPrefix(strs []string) string &#123;
+	sort.Strings(strs)
+	fmt.Printf(&quot;min &#x3D; %s , max &#x3D; %s&quot;, strs[0], strs[len(strs)-1])
+
+	minStrs, maxStrs :&#x3D; strs[0], strs[len(strs)-1]
+	commonStrs :&#x3D; make([]byte, 0)
+	for i :&#x3D; 0; i &lt; len(minStrs); i++ &#123;
+		if minStrs[i] &#x3D;&#x3D; maxStrs[i] &#123;
+			commonStrs &#x3D; append(commonStrs, minStrs[i])
+		&#125; else &#123;
+			break
+		&#125;
+	&#125;
+	return string(commonStrs)
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -992,93 +1103,14 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode &#123;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
                     
+                        
+
+
+                    
                     
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/"
-                            aria-label=": 14.最长公共前缀"
-                        >
-                            14.最长公共前缀
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-import (
-	&quot;fmt&quot;
-	&quot;sort&quot;
-)
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;14 lang&#x3D;golang
- *
- * [14] 最长公共前缀
- *&#x2F;
-
-&#x2F;&#x2F; @lc code&#x3D;start
-func longestCommonPrefix(strs []string) string &#123;
-	sort.Strings(strs)
-	fmt.Printf(&quot;min &#x3D; %s , max &#x3D; %s&quot;, strs[0], strs[len(strs)-1])
-
-	minStrs, maxStrs :&#x3D; strs[0], strs[len(strs)-1]
-	commonStrs :&#x3D; make([]byte, 0)
-	for i :&#x3D; 0; i &lt; len(minStrs); i++ &#123;
-		if minStrs[i] &#x3D;&#x3D; maxStrs[i] &#123;
-			commonStrs &#x3D; append(commonStrs, minStrs[i])
-		&#125; else &#123;
-			break
-		&#125;
-	&#125;
-	return string(commonStrs)
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/14.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E7%BC%80/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -1149,6 +1181,10 @@ func removeElement(nums []int, val int) int &#123;
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
                     
                     
                         <p>
