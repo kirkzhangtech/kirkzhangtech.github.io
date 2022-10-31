@@ -443,11 +443,13 @@ In this example, the LAST_NAME that is declared in the code block is used within
 query, and it is fully qualified with the code block label.
 
 <text style="font-family:Courier New;color:red">
-summary: 
+
+summary: </br>
 1. while code block contain same variable name as parameter, we could use "procedure"(including package name i though) name qualify parameter name at where clause statement.
 2. actualy you could use table name qualify parameter name in code block, but no more works on it,due to in your select statement,
 it had been qualified by table name.
 3. and so on , if you use label on your code block, as case shown above
+
 </text>
 
 ## 2.3. Declaring Variable Types That Match Column Types
@@ -790,3 +792,454 @@ DUMMY VARCHAR2(1)
 ```
 Among other things, `DUAL` is useful for obtaining values from the database when no actual table is
 needed. Our solution case is such a situation.
+
+## 2.8. Formatting Query Results 
+
+**Problem**
+Your boss asks you to print the results from a couple of queries in a nicely formatted manner. 
+**Solution** 
+Use a combination of different built-in formatting functions along with the concatenation operator (||) 
+to create a nice-looking basic report. The RPAD and LPAD functions along with the concatenation operator 
+are used together in the following example that displays a list of employees from a company: 
+```sql
+DECLARE 
+ CURSOR emp_cur IS 
+ SELECT first_name, last_name, phone_number 
+ FROM employees; 
+ emp_rec employees%ROWTYPE; 
+BEGIN 
+ FOR emp_rec IN emp_cur LOOP 
+ IF emp_rec.phone_number IS NOT NULL THEN 
+ DBMS_OUTPUT.PUT_LINE(RPAD(emp_rec.first_name || ' ' || emp_rec.last_name, 35,'.') || 
+ emp_rec.phone_number); 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name || 
+ ' does not have a phone number.'); 
+ END IF; 
+ END LOOP; 
+END; 
+The following is another variant of the same report, but this time dashes are used instead of using 
+dots to space out the report: 
+DECLARE 
+ CURSOR emp_cur IS 
+ SELECT first_name, last_name, phone_number 
+ FROM employees; 
+ emp_rec employees%ROWTYPE; 
+BEGIN 
+ FOR emp_rec IN emp_cur LOOP 
+  IF emp_rec.phone_number IS NOT NULL THEN
+  --CHECK FOR INTERNATIONAL PHONE NUMBERS
+        IF length(emp_rec.phone_number) > 12 THEN
+          DBMS_OUTPUT.PUT_LINE(RPAD(emp_rec.first_name || ' ' || emp_rec.last_name, 20)||'-'|| LPAD(emp_rec.phone_number,18));
+        ELSE
+          DBMS_OUTPUT.PUT_LINE(RPAD(emp_rec.first_name || ' ' || emp_rec.last_name, 20)||'-'|| LPAD(emp_rec.phone_number,12));
+        END IF;
+      ELSE
+        DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name ||'does not have a phone number.');
+    END IF;
+  END LOOP;
+END;
+ ```
+
+**How It Works**
+The `RPAD` and `LPAD` functions are used to return the data in a formatted manner. The `RPAD` function takes a
+string of text and pads it on the right by the number of spaces provided by the second parameter. The
+syntax for the `RPAD` function is as follows:
+```sql
+RPAD(input_text, n, character) -- append n piece characters on the right
+```
+
+In this syntax, `n` is the number of spaces used to pad. Similarly, the `LPAD` function pads on the left of
+the provided string. The syntax is exactly the same as `RPAD`; the only difference is the direction of the
+padding. The combination of these two functions, along with the concatenation operator (`||`), provides
+for some excellent formatting options.  
+
+It is important to look at the data being returned before you try to format it, especially to consider
+what formatting options will look best when generating output for presentation. In the case of the
+examples in this recipe, the latter example would be the most reasonable choice of formatting for the
+data being returned, since the phone number includes dots in it. The first example uses dots to space out
+the report, so too many dots may make the output difficult to read. Know your data, and then choose the
+appropriate PL/SQL built-ins to format accordingly.  
+
+Note When using `DBMS_OUTPUT` to display data, please be sure to pay attention to the size of the buffer. You can
+set the buffer size from 2,000 to 1,000,000 bytes by passing the size you desire to the `DBMS_OUTPUT.ENABLE` procedure.
+If you attempt to display content over this size limit, then Oracle will raise an exception.
+
+Oracle provides a number of built-in functions to use when formatting strings. Two others that are
+especially useful are `LTRIM(<string>)` and `RTRIM(<string>)`. These remove leading and trailing spaces,
+respectively. See your Oracle SQL Reference manual for a complete list of available string functions.
+
+## 2.9. Updating Rows Returned by a Query
+
+**Problem** 
+  You’ve queried the database and retrieved a row into a variable. You want to update some values 
+contained in the row and commit them to the database. 
+**Solution** 
+  First, retrieve the database row that you want to update. Second, update the values in the row that need 
+to be changed, and then issue an UPDATE statement to modify the database with the updated values. In 
+the following example, a procedure is created that queries a table of employees for a particular 
+employee. The resulting employee’s department ID is then updated with the new one unless the 
+employee is already a member of the given department.
+```sql
+CREATE OR REPLACE PROCEDURE change_emp_dept(emp_id IN NUMBER, 
+ dept_id IN NUMBER) AS 
+ emp_row employees%ROWTYPE; 
+ dept departments.department_name%TYPE; 
+ rec_count number := 0; 
+BEGIN 
+ SELECT count(*) 
+ INTO rec_count 
+ FROM employees 
+ WHERE employee_id = emp_id; 
+ IF rec_count = 1 THEN 
+ SELECT * 
+ INTO emp_row 
+ FROM employees 
+ WHERE employee_id = emp_id; 
+ IF emp_row.department_id != dept_id THEN 
+ emp_row.department_id := dept_id; 
+ UPDATE employees SET ROW = emp_row 
+ WHERE employee_id = emp_id; 
+ SELECT department_name 
+ INTO dept 
+ from departments 
+ WHERE department_id = dept_id; 
+ DBMS_OUTPUT.PUT_LINE('The employee ' || emp_row.first_name || ' ' || 
+ emp_row.last_name || ' is now in department: ' || dept); 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE('The employee is already in that department...no change'); 
+ END IF; 
+ELSIF rec_count > 1 THEN 
+ DBMS_OUTPUT.PUT_LINE('The employee ID you entered is not unique'); 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE('No employee records match the given employee ID'); 
+ END IF; 
+EXCEPTION 
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE('Invalid employee or department ID, try again'); 
+ WHEN OTHERS THEN 
+ DBMS_OUTPUT.PUT_LINE('Unsuccessful change, please check ID numbers and try again'); 
+END; 
+```
+As you can see, the example queries the database into a record declared using the `%ROWTYPE`
+attribute. The value that needs to be updated is then modified using the data contained in the record. 
+Lastly, using the SET ROW clause updates the table with the modified record.
+**How It Works**
+As you’ve seen in the solution to the recipe, it is possible to update the values of a row returned by a
+query using the `UPDATE...SET` ROW syntax. In many cases, using a single `UPDATE` statement can solve this
+type of transaction. However, in some scenarios where you need to evaluate the current value of a
+particular column, then this solution is the correct choice.
+
+Using the `UPDATE` ROW statement, you can update entire database rows with a single variable of either
+the `%ROWTYPE` or `RECORD` type. The `UPDATE` statement also allows you to return values after the update by
+adding the `RETURNING` clause to the end of the statement followed(v.跟着,听从) by the column names to return and the
+variables that will receive their values. Take a look at this next example:
+
+```sql
+DECLARE
+ first        employees.first_name%TYPE; 
+ last         employees.last_name%TYPE; 
+ new_salary   employees.salary%TYPE; 
+BEGIN 
+ UPDATE employees 
+ SET salary = salary + (salary * .03) 
+ WHERE employee_id = 100  RETURNING first_name, last_name,salary INTO first, last, new_salary; 
+ DBMS_OUTPUT.PUT_LINE('The employee ' || first || ' ' || last || ' now has a salary of: ' || new_salary); 
+END; 
+```
+As you can see, the example outputs the new values that are the result of the update statement.
+Using the RETURNING clause saves a step in that you are not required to requery the table after the update 
+in order to display the updated results.
+
+## 2.10. Updating Rows Returned by a Cursor
+
+**Problem** 
+You’ve created a cursor to use for querying your data. You want to loop through the results using a cursor for loop and update the data as needed. 
+**Solution**
+Use the `WHERE_CURRENT_OF` clause within your loop to update the current data row in the iteration. In the 
+following example, the EMPLOYEES table is queried for all employees in a particular department. The 
+results of the query are then iterated using a FOR loop, and the salary is increased for each employee 
+record that is returned.
+```sql
+
+DECLARE 
+ CURSOR emp_sal_cur IS 
+ SELECT * 
+ FROM employees 
+ WHERE department_id = 60 
+ FOR UPDATE;        --cursor should use `FOR UPDATE` clause statement
+
+ emp_sal_rec emp_sal_cur%ROWTYPE; -- cursor also would define varable using ROWTYPE keyword
+
+ BEGIN 
+ FOR emp_sal_rec IN emp_sal_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE('Old Salary: ' || emp_sal_rec.last_name || ' - ' || emp_sal_rec.salary); 
+    UPDATE employees 
+    SET salary = salary + (salary * .025) 
+    WHERE CURRENT OF emp_sal_cur;  -- current of your_cursor
+ END LOOP; 
+
+ -- Display the updated salaries 
+ FOR emp_sal_rec IN emp_sal_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE('New Salary: ' || emp_sal_rec.last_name || ' - ' || emp_sal_rec.salary); 
+ END LOOP; 
+END;
+
+```
+An update on the `EMPLOYEES` table occurs with each iteration of the loop. The second loop in this 
+example simply displays the new salary result for each employee that was returned by the cursor query. 
+**How It Works**
+Updating values when iterating a cursor can be handy(adj.便利的,手边的), especially when working with a number of(大量) rows.
+There is one main difference between a cursor that allows updating and one(cursor) that does not. That
+difference is the addition of the `FOR UPDATE` clause in the cursor declaration. By using the `FOR UPDATE`
+clause of the `SELECT` statement, you are causing the database to lock the rows that have been read by the
+query. This lock is to ensure that nobody else can modify the rows while you are working with them. The
+lock creates a read-only block on the table rows so that if someone else attempts to modify them while
+you have them locked, then they will have to wait until you have performed either a `COMMIT` or a `ROLLBACK`.
+The `FOR UPDATE` clause has an optional `NOWAIT` keyword. By including this keyword, you will ensure
+that your query does not block your transaction if someone else already has the rows that you are
+querying blocked. The `NOWAIT` keyword tells Oracle not to wait if the requested rows are already locked,
+and control is immediately passed back to your program so that it can continue to run. If the `NOWAIT`
+keyword is omitted and the rows are already locked, then your program will stop and wait until the lock
+has been released.
+
+You can use the cursor with any style of loop, as you’ve seen in previous recipes. No matter which
+type of loop you choose, the `UPDATE` must be coded using the `WHERE CURRENT OF your_cursor` clause to update the
+current row in the cursor iteration. You will need to be sure to commit the changes after this block has
+been run, and in many circumstances the `COMMIT` statement can be coded into this block once it has been
+tested and verified to work correctly. As with any `UPDATE` statement, if you fail to `COMMIT` your changes,
+then the UPDATE will not save any changes to the database, and the updated data will be visible to your
+schema only until you disconnect. Issuing a `COMMIT` after your `UPDATE` statements have been issued is also
+a good practice in this case because it will release the lock on the rows you had queried via the cursor so
+that someone else can update them if needed. If you determine the data that was updated by the code
+block is incorrect, then a `ROLLBACK` will also release the lock.
+
+<text style="font-family:Courier New;color:red">
+
+summary:</br>
+1. if you wanna update data of cursor that returned by select, you can use `WHERE CURRENT OF emp_sal_cur` and `for update`
+2. By using the `FOR UPDATE` clause of the `SELECT` statement,data lock is data level
+3. wether `FOR UPDATE` clause update table data or cursor only?(it should be commit changes for table)
+4. if you fail to `COMMIT` your changes,then the UPDATE will not save any changes to the database, and the updated data will be visible to your
+schema only until you disconnec
+5. `COMMIT` and `ROLLBACK` either release lock
+
+</text> 
+
+## 2.11. Deleting Rows Returned by a Cursor
+
+**Problem**
+There are a series of database rows that you’d like to delete. You’ve created a cursor `FOR LOOP`, and you want to delete some or all rows that have been queried with the cursor.
+**Solution**
+Use a `DELETE` statement within a `FOR LOOP` to delete the rows that are retrieved by the `cursor`. If you create a cursor using the `FOR UPDATE` clause, then you will be able to use the `WHERE CURRENT OF` clause along with the `DELETE` statement to eliminate the current row within each iteration of the cursor. The following example shows how this can be done to remove all job history for a given department ID:
+
+```sql
+CREATE OR REPLACE PROCEDURE remove_job_history(dept_id IN NUMBER) AS 
+
+ CURSOR job_history_cur IS 
+ SELECT * 
+ FROM job_history 
+ WHERE department_id = dept_id 
+ FOR UPDATE; 
+    job_history_rec job_history_cur%ROWTYPE; 
+ BEGIN 
+  FOR job_history_rec IN job_history_cur LOOP 
+    DELETE FROM job_history WHERE CURRENT OF job_history_cur; 
+    DBMS_OUTPUT.PUT_LINE('Job history removed for department ' || dept_id); 
+  END LOOP; 
+END; 
+```
+Using this technique, the job history for the department with the given ID will be removed from the `JOB_HISTORY` table.
+
+**How It Works**
+Much like updating rows using a cursor, the deletion of rows uses the `WHERE CURRENT OF` clause within the `DELETE` statement to remove each row. The cursor query must contain the `FOR UPDATE` clause in order to lock the rows that you are reading until a `COMMIT` or `ROLLBACK` has been issued. As mentioned in the previous recipe, the `NOWAIT` keyword is optional, and it can be used to allow control to be immediately returned to your program if someone else already has locks on the rows that you are interested in updating. In each iteration of the loop, the DELETE statement is used along with the `WHERE CURRENT OF` clause to remove the current cursor record from the database. Once the loop has been completed, then all the rows that had been queried via the cursor should have been deleted. This technique is especially useful if you are going to be performing some further processing on each of the records and then deleting them. One such case would be if you wanted to write each of the records to a history table prior to deleting them. In any case, the cursor `FOR loop` deletion technique is a great way to remove rows from the database and work with the data along the way.
+
+## 2.12. Performing a Transaction
+
+**Problem**
+You need to complete a series of `INSERT` or `UPDATE` statements in order to process a complete transaction. In doing so, you need to ensure that if one of the statements fails, that all of the statements are canceled so that the transaction is not partially processed.
+**Solution**
+Use the transaction control mechanisms that are part of PL/SQL, as well as SQL itself, in order to control your transactions. When all your statements have been completed successfully, issue a `COMMIT` to make them final. On the other hand, if one of the statements does not complete successfully, then perform a `ROLLBACK` to undo all the other changes that have been made and bring the database back to the state that it was in prior(美['praɪɚ],adj.优先的,在先的,在前的) to the transaction occurring.In the following example, the code block entails the body of a script that is to be executed in order to create a new department and add some employees to it. The department change involves an INSERT and UPDATE statement to complete.
+```sql
+DECLARE
+ -- Query all programmers who make more than 4000 
+ -- as they will be moved to the new 'Web Development' department 
+ CURSOR new_dept_cur IS 
+    SELECT * 
+    FROM employees 
+    WHERE job_id = 'IT_PROG'
+    AND salary > 4000 
+    FOR UPDATE; 
+ new_dept_rec         new_dept_cur%ROWTYPE; 
+ current_department   departments.department_id%TYPE; 
+BEGIN 
+ -- Create a new department 
+ INSERT INTO departments values( 
+                                DEPARTMENTS_SEQ.nextval, -- Department ID (sequence value) 
+                                'Web Development', -- Department Title 
+                                103 -- Manager ID 
+                                1700); -- Location ID 
+ -- Obtain the current department ID…the new department ID 
+ SELECT DEPARTMENTS_SEQ.currval 
+ INTO current_department 
+ FROM DUAL; 
+
+ -- Assign all employees to the new department 
+ FOR new_dept_rec IN new_dept_cur LOOP 
+      UPDATE employees 
+      SET department_id = current_department 
+      WHERE CURRENT OF new_dept_cur; 
+ END LOOP;
+
+ COMMIT;
+      DBMS_OUTPUT.PUT_LINE('The transaction has been successfully completed.'); 
+END;
+ ```
+As you can see, a transaction was performed in this block of code. It is important to roll back changes if errors occur along the way so that the transaction is not partially completed.
+
+**How It Works**
+Transaction control is built into the Oracle Database. Any database changes that are made within a code block are visible to the current session only until a COMMIT has been made. The changes that have been made by the statements can be rolled back via the ROLLBACK command up until the point that a COMMIT is issued. Oracle uses table and row locks to ensure that data that has been updated in one session cannot be seen in another session until a COMMIT occurs. A transaction is started when the first statement after the last COMMIT or ROLLBACK is processed or when a session is created. It ends when a COMMIT or ROLLBACK occurs. A transaction is not bound to a single code block, and any code block may contain one or more transactions. Oracle provides a SAVEPOINT command, which places a marker at the current database state so as to allow you to roll back to that point in time in a transaction. Oracle Database automatically issues a SAVEPOINT prior to processing the first statement in any transaction.
+
+As a rule of thumb, it is always a good idea to have exception handling in place in case an exceptionoccurs. However, if an unhandled exception occurs, then the database will roll back the statement that caused the exception, not the entire transaction. Therefore, it is up to the program to handle exceptions and issue the ROLLBACK command if the entire transaction should be undone. If a database crashes and goes down during a transaction, then when the database is restarted, all uncommitted statements are rolled back. All transactions are completed when a COMMIT or ROLLBACK is issued.
+
+
+## 2.13. Ensuring That Multiple Queries "See" the Same Data
+
+**Problem** 
+You are issuing a set of queries against the database, and you need to ensure that none of the table rows change throughout the course of the queries being made. 
+**Solution**
+Set up a read-only transaction in which the current transaction will see the data only as an unchanged snapshot in time. To do so, use the SET TRANSACTION statement to begin a read-only transaction and establish a snapshot of the data so it will be consistent and unchanged from all other updates being made. For instance, the following example displays a block that sets up read-only queries against the database for dollar values from a bank account:
+```sql
+DECLARE 
+ daily_atm_total NUMBER(12,2); 
+ weekly_atm_total NUMBER(12,2); 
+BEGIN 
+ COMMIT; -- ends previous transaction 
+ SET TRANSACTION READ ONLY NAME 'ATM Weekly Summary'; 
+ SELECT SUM (wd_amt) INTO daily_atm_total FROM atm_withdrawals 
+ WHERE to_char(wd_date, 'MM-DD-YYYY') = to_char(SYSDATE, 'MM-DD-YYYY'); 
+ SELECT SUM (weekly_total) INTO weekly_atm_total FROM atm_withdrawals 
+ WHERE to_char(wd_date, 'MM-DD-YYYY') = to_char(SYSDATE - 7, 'MM-DD-YYYY'); 
+ DBMS_OUTPUT.PUT_LINE(daily_atm_total || ' - ' || weekly_atm_total); 
+ COMMIT; -- ends read-only transaction 
+END; 
+```
+Querying the database using read-only transactions will ensure that someone will see the correct values in a situation such as the one depicted in this example.
+
+**How It Works**
+Oftentimes there are situations when you need to ensure that the data being queried throughout a transaction’s life cycle is unchanged by other users’ updates. The classic case is when someone goes to withdraw money from the bank and their spouse is at an ATM machine depositing into the account at the same time. If read consistency were not in place, the individual may view their account balance and see that there was plenty of money to withdraw, and then they’d go to take the money out and receive an error because the spouse had canceled the deposit instead. A read-only transaction allows for read consistency until a `COMMIT` has been issued. If the spouse had confirmed the deposit, then the next query on the account would reflect the additional funds (assuming that the bank were to release them to theaccount in real time).
+Situations such as these require that you provide an environment that is essentially isolated from the outside world. You can use the SET TRANSACTION command to start a read-only transaction, set an isolation level, and assign the current transaction to a rollback segment. The SET TRANSACTION statement must be the first statement in a read-only transaction, and it can appear only once in the transaction. Note that there are some statement restrictions when using a read-only transaction. Only `SELECT INTO`, `OPEN`, `FETCH`, `CLOSE`, `LOCK` `TABLE`, `COMMIT`, and `ROLLBACK` statements can be used; other statements are not allowed.
+
+## 2.14. Executing One Transaction from Within Another
+
+**Problem**
+You are executing a transaction, and you are faced with the need to suspend your current work, issue a completely separate transaction, and then pick up your current work. For example, say you want to log entries into a log table. The log entries should be persisted separately from the current transaction such that if the transaction fails or is rolled back, the log entries will still be completed.
+**Solution**
+Start an autonomous transaction to make the log entry. This will ensure that the log entry is performed separately from the current transaction. In the following example, an employee is deleted from the EMPLOYEES table. Hence, a job is ended, and the job history must be recorded into the JOB_HISTORY table. In the case that something fails within the transaction, the log entry into the JOB_HISTORY table must be intact. This log entry cannot be rolled back because it is performed using an autonomous transaction.The code to encapsulate the autonomous transaction needs to be placed into a named block that can be called when the logging needs to be performed. The following piece of code creates a PL/SQL procedure that performs the log entry using an autonomous transaction. (You will learn more about procedures in Chapter 4.) Specifically notice the declaration of PRAGMA AUTONOMOUS_TRANSACTION. That pragma specifies that the procedure executes as a separate transaction, independent of any calling transaction.
+```sql
+CREATE OR REPLACE PROCEDURE log_job_history ( emp_id IN 
+                                              employees.employee_id%TYPE, 
+                                              Job_id IN jobs.job_id%TYPE, 
+                                              Department_id IN employees.department_id%TYPE, 
+                                              employee_start IN DATE) AS 
+  PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN 
+ INSERT INTO job_history 
+ VALUES (emp_id, 
+ employee_start, 
+ sysdate, 
+ job_id, 
+ department_id); 
+ COMMIT; 
+END;
+
+```
+The `LOG_JOB_HISTORY` procedure inserts an entry into the log table separately from the transaction that is taking place in the calling code block. The following code performs the job termination, and it calls the log_substitution procedure to record the history:
+```sql
+DECLARE
+ CURSOR dept_removal_cur IS 
+    SELECT * 
+    FROM employees 
+    WHERE department_id = 10 
+    FOR UPDATE; 
+ dept_removal_rec dept_removal_cur%ROWTYPE; 
+BEGIN 
+ -- Delete all employees from the database who reside in department 10 
+ FOR dept_removal_rec IN dept_removal_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE('DELETING RECORD NOW'); 
+    DELETE FROM employees WHERE CURRENT OF dept_removal_cur; 
+    -- Log the termination 
+    log_job_history(dept_removal_rec.employee_id, 
+                      dept_removal_rec.job_id, 
+                      dept_removal_rec.department_id, 
+                      dept_removal_rec.hire_date);
+ END LOOP; 
+    DBMS_OUTPUT.PUT_LINE('The transaction has been successfully completed.'); 
+EXCEPTION 
+ -- Handles all errors 
+ WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE('The transaction has been rolled back due to errors, please try again.'); 
+ ROLLBACK; 
+END;
+```
+If this code block is executed and then rolled back, the entry into the job history table remains,because it is performed as a separate, autonomous transaction.
+**How It Works**
+An autonomous transaction is a transaction that is called by another transaction and that runs separately from the calling transaction. Autonomous transactions commit or roll back without affecting the calling transaction. They also have the full functionality of regular transactions; they merely run separately from the main transaction. They allow parallel activity to occur. Even if the main transaction fails or is rolled back, the autonomous transaction can be committed or rolled back independently of any other transactions in progress.
+
+An autonomous transaction must be created with a top-level code block, trigger, procedure,function, or stand-alone named piece of code. In the solution, you saw that a procedure was created torun as an autonomous transaction. That is because it is not possible to create an autonomous transaction within a nested code block. To name a transaction as autonomous, you must place the statement PRAGMA AUTONOMOUS_TRANSACTION within the declaration section of a block encompassing the transaction. To end the transaction, perform a COMMIT or ROLLBACK.
+
+## 2.15. Finding and Removing Duplicate Table Rows
+
+**Problem**
+You have found that for some reason your database contains a table that has duplicate records. You areworking with a database that unfortunately does not use primary key values, so you must manually enforce data integrity. You need a way to remove the duplicate records. However, any query you write to remove one record will also remove its duplicate.
+**Solution**
+The solution to this issue involves two steps. First you need to query the database to find all duplicaterows, and then you need to run a statement to delete one of each duplicate record that is found.The following code block queries the EMPLOYEES table for duplicate rows. When a duplicate is found,it is returned along with a count of duplicates found.
+```sql
+<<duplicate_emp_qry>>
+DECLARE
+CURSOR emp_cur IS
+  SELECT *
+  FROM employees
+  ORDER BY employee_id;
+  emp_count
+  number := 0;
+  total_count
+  number := 0;
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('You will see each duplicated employee listed more ');
+  DBMS_OUTPUT.PUT_LINE('than once in the list below. This will allow you to ');
+  DBMS_OUTPUT.PUT_LINE('review the list and ensure that indeed...there are more ');
+  DBMS_OUTPUT.PUT_LINE('than one of these employee records in the table.');
+  DBMS_OUTPUT.PUT_LINE('Duplicated Employees: ');
+-- Loop through each player in the table
+FOR emp_rec IN emp_cur LOOP
+-- Select the number of records in the table that have the same ID as the current record
+SELECT count(*)
+INTO emp_count
+FROM employees
+WHERE employee_id = emp_rec.employee_id;
+-- If the count is greater than one then a duplicate has been found, so print it out.
+IF emp_count > 1 THEN 
+ DBMS_OUTPUT.PUT_LINE(emp_rec.employee_id || ' - ' || emp_rec.first_name || ' ' || emp_rec.last_name || ' - ' || emp_count); 
+ total_count := total_count + 1; 
+ END IF; 
+ END LOOP; 
+END;
+```
+If the table includes a duplicate, then it is printed out as follows:
+You will see each duplicated employee listed more than once in the list below. This will allow you to review the list and ensure that indeed...there are more 
+than one of these employees in the table.
+Duplicated Employees:
+100 - Steven King - 2
+100 – Steven King - 2
+PL/SQL procedure successfully completed.  
+
+Next, you need to delete the duplicated rows that have been found. The following DELETE statement
+will ensure that one of the duplicates is removed:
+DELETE FROM employees A WHERE ROWID > (
+SELECT min(rowid) FROM employees B
+WHERE A.employee_id = B.employee_id);
+
+**How It Works**
+Usually using primary keys prohibits the entry of duplicate rows into a database table. However, many legacy databases still in use today do not include such constraints. In rare situations, a duplicate key and values are entered into the database that can cause issues when querying data or assigning values. The method shown in the solution for finding duplicate rows is very basic. The solution loops through each record in the table, and during each pass, it queries the table for the number of records found that match the current record’s EMPLOYEE_ID. If the number found is greater than one, then you know that you have found a duplicate. The solution presented here for finding duplicates will work on any table provided that you have a column of data that should contain logically unique values. In the example, each record should contain a different EMPLOYEE_ID, so if there is more than one record with the same EMPLOYEE_ID value, then a duplicate is found. If the table you are working with does not contain any unique columns, then you can concatenate a number of columns in order to obtain a unique combination. For instance, if EMPLOYEES did not contain an EMPLOYEE_ID column, then you could concatenate the FIRST_NAME, LAST_NAME, and EMAIL columns to obtain a unique combination. More likely than not, there will not be two employees in the table with the same name and e-mail address. The second part of the solution involves removing one or more duplicate records from the set. To do so, you have to look at a pseudocolumn known as the ROWID. The ROWID is a pseudocolumn (invisible column) that is found in each table in an Oracle Database that uniquely identifies each row. By comparing these unique ROWID values, you can delete just one of the records, not both. The DELETE statement actually finds the rows that contain the same uniquely identified column(s) and then removes 
+the row with the larger ROWID value.

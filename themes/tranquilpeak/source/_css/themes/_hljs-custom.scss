@@ -10,115 +10,112 @@
 // 7. Run `grunt buildProd` to build the theme and see the result
 
 // Default code block
-/*
+
 pre > code {
-    background: #dfdfd8;
-    color: #f8f8f2;
+    background: #85d8f1d4;
+    color: #252522;
 }
 
 // Default inline code
 code {
-    background-color: #dfdfd8;
+    background-color: #85d8f1d4;
 }
 
 // Tabbed code block tab
 // If your theme is dark then use a lighter background
 // to see clearly which tab is active
 .codeblock--tabbed figcaption .tab.active {
-    background: #dfdfd8;
-    color: #baba1c;
+    background: #85d8f1d4;
+    color: #252522;
 }
 
 // highlight code block
 figure.highlight,
       .codeblock {
-    background: #dfdfd8;
-    color: #baba1c;
+    background: #85d8f1d4;
+    color: #252522;
 
     figcaption {
-        background: #dfdfd8;
-        color: #baba1c;
+        background: #85d8f1d4;
+        color: #252522;
     }
     .gutter {
-        background: #dfdfd8;
-        border-right-color: #dfdfd8;
+        background: #85d8f1d4;
+        border-right-color: #252522;
         .line {
-            color:  #baba1c;
+            color:  #252522;
         }
     }
     // PUT YOUR THEME HERE
 
-   
-      .tag,
-      .subst {
-        color: #f8f8f2;
-      }
-      
-      .strong,
-      .emphasis {
-        color: #a8a8a2;
-      }
-      
-      .bullet,
-      .quote,
-      .number,
-      .regexp,
-      .literal,
-      .link {
-        color: #ae81ff;
-      }
-      
-      .code,
-      .title,
-      .section,
-      .selector-class {
-        color: #a6e22e;
-      }
-      
-      .strong {
-        font-weight: bold;
-      }
-      
-      .emphasis {
-        font-style: italic;
-      }
-      
-      .keyword,
-      .selector-tag,
-      .name,
-      .attr {
-        color: #f92672;
-      }
-      
-      .symbol,
-      .attribute {
-        color: #66d9ef;
-      }
-      
-      .params,
-      .title.class_,
-      .class .title {
-        color: #f8f8f2;
-      }
-      
-      .string,
-      .type,
-      .built_in,
-      .selector-id,
-      .selector-attr,
-      .selector-pseudo,
-      .addition,
-      .variable,
-      .template-variable {
-        color: #e6db74;
-      }
-      
-      .comment,
-      .deletion,
-      .meta {
-        color: #75715e;
-      }
-  
-  
+    // .tag,
+    // .subst {
+    //   color: #f8f8f2;
+    // }
+    
+    // .strong,
+    // .emphasis {
+    //   color: #a8a8a2;
+    // }
+    
+    // .bullet,
+    // .quote,
+    // .number,
+    // .regexp,
+    // .literal,
+    // .link {
+    //   color: #ae81ff;
+    // }
+    
+    // .code,
+    // .title,
+    // .section,
+    // .selector-class {
+    //   color: #a6e22e;
+    // }
+    
+    // .strong {
+    //   font-weight: bold;
+    // }
+    
+    // .emphasis {
+    //   font-style: italic;
+    // }
+    
+    // .keyword,
+    // .selector-tag,
+    // .name,
+    // .attr {
+    //   color: #f92672;
+    // }
+    
+    // .symbol,
+    // .attribute {
+    //   color: #66d9ef;
+    // }
+    
+    // .params,
+    // .title.class_,
+    // .class .title {
+    //   color: #f8f8f2;
+    // }
+    
+    // .string,
+    // .type,
+    // .built_in,
+    // .selector-id,
+    // .selector-attr,
+    // .selector-pseudo,
+    // .addition,
+    // .variable,
+    // .template-variable {
+    //   color: #e6db74;
+    // }
+    
+    // .comment,
+    // .deletion,
+    // .meta {
+    //   color: #75715e;
+    // }
+
 }
-*/
