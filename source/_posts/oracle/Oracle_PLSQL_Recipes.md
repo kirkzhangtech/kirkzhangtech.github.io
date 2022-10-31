@@ -592,3 +592,41 @@ BEGIN
  DBMS_OUTPUT.PUT_LINE('No employee matches the last name provided'); 
 END; 
 ```
+
+**How It Works**
+Records are useful for passing similar data around within an application, but they are also quite useful 
+for simply retrieving data and organizing it nicely as is the case with the solution to this recipe. To create 
+a record, you first declare a record TYPE. This declaration can consist of one or more different datatypes 
+that represent columns of one or more database tables. Once the record type is declared, you create a 
+variable and define it as an instance of the record type. This variable is then used to populate and work with the data stored in the record. 
+
+Cursors work very well with records of data. When declaring a cursor, you can select particular
+columns of data to return into your record. The record variable then takes on the type of cursor%ROWTYPE. 
+In the following example, a cursor is used to determine which fields you want to return from EMPLOYEES. 
+That cursor’s %ROWTYPE attribute is then used to define a record variable that is used for holding the 
+queried data. 
+```sql
+DECLARE
+ CURSOR emp_cur IS 
+ SELECT first_name, last_name, email 
+ FROM employees 
+ WHERE employee_id = 100; 
+ emp_rec emp_cur%ROWTYPE; 
+BEGIN 
+ OPEN emp_cur; 
+ FETCH emp_cur INTO emp_rec; 
+ IF emp_cur %FOUND THEN 
+CLOSE emp_cur; 
+ DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name || 
+ '''s email is ' || emp_rec.email); 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE('No employee matches the provided ID number'); 
+ END IF; 
+EXCEPTION 
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE('No employee matches the last name provided'); 
+END; 
+```
+As you can see in this example, the cursor `%ROWTYPE` attribute creates a record type using the 
+columns that are queried by the cursor. The result is easy-to-read code that gains all the positive effects 
+of declaring record types via the `%ROWTYPE` attribute. 
