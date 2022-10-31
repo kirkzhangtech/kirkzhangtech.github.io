@@ -961,10 +961,10 @@ func strStr(haystack string, needle string) int &#123;
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
-                            aria-label=": 58.最后一个单词的长度"
+                            href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
+                            aria-label=": 35.搜索插入位置"
                         >
-                            58.最后一个单词的长度
+                            35.搜索插入位置
                         </a>
                     
                 </h1>
@@ -988,19 +988,31 @@ func strStr(haystack string, needle string) int &#123;
                 <div class="postShorten-content">
                     <pre class="language-golang" data-language="golang"><code class="language-golang">package main
 
-import &quot;strings&quot;
-
 &#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;58 lang&#x3D;golang
+ * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang
  *
- * [58] 最后一个单词的长度
+ * [35] 搜索插入位置
  *&#x2F;
-
+&#x2F;&#x2F;  [1,3,5,6]
 &#x2F;&#x2F; @lc code&#x3D;start
-func lengthOfLastWord(s string) int &#123;
-	words :&#x3D; strings.Split(strings.TrimSpace(s), &quot; &quot;)
+func searchInsert(nums []int, target int) int &#123;
+	low :&#x3D; 0
+	high :&#x3D; len(nums) - 1
+	for low &lt;&#x3D; high &#123;
+		&#x2F;&#x2F; midIndex :&#x3D; low + ((high - low) &#x2F; 2)
+		midIndex :&#x3D; (high - low) &#x2F; 2
 
-	return len(words[len(words)-1])
+		midValue :&#x3D; nums[midIndex]
+		if target &#x3D;&#x3D; midValue &#123;
+			return midIndex
+		&#125; else if target &lt; midValue &#123;
+			high &#x3D; midIndex - 1
+		&#125; else &#123;
+			low &#x3D; midIndex + 1
+		&#125;
+	&#125;
+	return high + 1
+
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
@@ -1012,7 +1024,7 @@ func lengthOfLastWord(s string) int &#123;
                     
                         <p>
                             <a
-                                href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/#post-footer"
+                                href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -1125,10 +1137,10 @@ func Max(a int, b int) int &#123;
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/"
-                            aria-label=": 35.搜索插入位置"
+                            href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/"
+                            aria-label=": 58.最后一个单词的长度"
                         >
-                            35.搜索插入位置
+                            58.最后一个单词的长度
                         </a>
                     
                 </h1>
@@ -1152,31 +1164,19 @@ func Max(a int, b int) int &#123;
                 <div class="postShorten-content">
                     <pre class="language-golang" data-language="golang"><code class="language-golang">package main
 
+import &quot;strings&quot;
+
 &#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;35 lang&#x3D;golang
+ * @lc app&#x3D;leetcode.cn id&#x3D;58 lang&#x3D;golang
  *
- * [35] 搜索插入位置
+ * [58] 最后一个单词的长度
  *&#x2F;
-&#x2F;&#x2F;  [1,3,5,6]
+
 &#x2F;&#x2F; @lc code&#x3D;start
-func searchInsert(nums []int, target int) int &#123;
-	low :&#x3D; 0
-	high :&#x3D; len(nums) - 1
-	for low &lt;&#x3D; high &#123;
-		&#x2F;&#x2F; midIndex :&#x3D; low + ((high - low) &#x2F; 2)
-		midIndex :&#x3D; (high - low) &#x2F; 2
+func lengthOfLastWord(s string) int &#123;
+	words :&#x3D; strings.Split(strings.TrimSpace(s), &quot; &quot;)
 
-		midValue :&#x3D; nums[midIndex]
-		if target &#x3D;&#x3D; midValue &#123;
-			return midIndex
-		&#125; else if target &lt; midValue &#123;
-			high &#x3D; midIndex - 1
-		&#125; else &#123;
-			low &#x3D; midIndex + 1
-		&#125;
-	&#125;
-	return high + 1
-
+	return len(words[len(words)-1])
 &#125;
 
 &#x2F;&#x2F; @lc code&#x3D;end</code></pre>
@@ -1188,7 +1188,7 @@ func searchInsert(nums []int, target int) int &#123;
                     
                         <p>
                             <a
-                                href="/2022/06/23/leetcode/35.%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE/#post-footer"
+                                href="/2022/06/23/leetcode/58.%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E5%8D%95%E8%AF%8D%E7%9A%84%E9%95%BF%E5%BA%A6/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
