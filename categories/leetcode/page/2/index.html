@@ -38,7 +38,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/style-72nwetezwzcphla7gbbghphtmqcwea1j1m7kxb1olt5fl1ayrvvxcctsmqry.min.css">
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
 
     <!--STYLES END-->
     
@@ -499,112 +499,6 @@ func mySqrt(x int) int &#123;
                     
                         <a
                             class="link-unstyled"
-                            href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
-                            aria-label=": 70.爬楼梯"
-                        >
-                            70.爬楼梯
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;70 lang&#x3D;golang
- *
- * [70] 爬楼梯
- *&#x2F;
-
-&#x2F;&#x2F; @lc code&#x3D;start
-&#x2F;&#x2F; int BottomUpCutRod(const std::vector&lt;int&gt; &amp;p, const int &amp;n)
-&#x2F;&#x2F; &#123;
-&#x2F;&#x2F;     std::vector&lt;int&gt; r&#123;0&#125;;
-&#x2F;&#x2F;     for (auto j &#x3D; 1; j &lt;&#x3D; n; ++j)
-&#x2F;&#x2F;     &#123;
-&#x2F;&#x2F;         int q &#x3D; INT8_MIN;
-&#x2F;&#x2F;         for (auto i &#x3D; 1; i &lt;&#x3D; j; ++i)
-&#x2F;&#x2F;         &#123;
-&#x2F;&#x2F;             q &#x3D; std::max(q, p.at(i) + r.at(j - i));
-&#x2F;&#x2F;         &#125;
-&#x2F;&#x2F;         r.push_back(q);
-&#x2F;&#x2F;     &#125;
-&#x2F;&#x2F;     return r.at(n);
-&#x2F;&#x2F; &#125;
-&#x2F;&#x2F; 1 1 2 3 5 8
-&#x2F;&#x2F;   1 2 3 4 5
-func climbStairs(n int) int &#123;
-
-	if n &#x3D;&#x3D; 0 &#123;
-		return 1
-	&#125;
-	if n &#x3D;&#x3D; 1 &#123;
-		return 1
-	&#125;
-	if n &#x3D;&#x3D; 2 &#123;
-		return 2
-	&#125;
-	dp :&#x3D; []int&#123;1, 2&#125;
-	for i :&#x3D; 3; i &lt;&#x3D; n; i++ &#123;
-		Sum(dp)
-	&#125;
-
-	return dp[1]
-&#125;
-func Sum(dp []int) &#123;
-	pre :&#x3D; dp[0]
-	dp[0] &#x3D; dp[1]
-	dp[1] &#x3D; pre + dp[1]
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                        
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
                             href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/"
                             aria-label=": 83.删除排序链表中的重复元素"
                         >
@@ -690,6 +584,112 @@ public:
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/83.%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/"
+                            aria-label=": 70.爬楼梯"
+                        >
+                            70.爬楼梯
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;70 lang&#x3D;golang
+ *
+ * [70] 爬楼梯
+ *&#x2F;
+
+&#x2F;&#x2F; @lc code&#x3D;start
+&#x2F;&#x2F; int BottomUpCutRod(const std::vector&lt;int&gt; &amp;p, const int &amp;n)
+&#x2F;&#x2F; &#123;
+&#x2F;&#x2F;     std::vector&lt;int&gt; r&#123;0&#125;;
+&#x2F;&#x2F;     for (auto j &#x3D; 1; j &lt;&#x3D; n; ++j)
+&#x2F;&#x2F;     &#123;
+&#x2F;&#x2F;         int q &#x3D; INT8_MIN;
+&#x2F;&#x2F;         for (auto i &#x3D; 1; i &lt;&#x3D; j; ++i)
+&#x2F;&#x2F;         &#123;
+&#x2F;&#x2F;             q &#x3D; std::max(q, p.at(i) + r.at(j - i));
+&#x2F;&#x2F;         &#125;
+&#x2F;&#x2F;         r.push_back(q);
+&#x2F;&#x2F;     &#125;
+&#x2F;&#x2F;     return r.at(n);
+&#x2F;&#x2F; &#125;
+&#x2F;&#x2F; 1 1 2 3 5 8
+&#x2F;&#x2F;   1 2 3 4 5
+func climbStairs(n int) int &#123;
+
+	if n &#x3D;&#x3D; 0 &#123;
+		return 1
+	&#125;
+	if n &#x3D;&#x3D; 1 &#123;
+		return 1
+	&#125;
+	if n &#x3D;&#x3D; 2 &#123;
+		return 2
+	&#125;
+	dp :&#x3D; []int&#123;1, 2&#125;
+	for i :&#x3D; 3; i &lt;&#x3D; n; i++ &#123;
+		Sum(dp)
+	&#125;
+
+	return dp[1]
+&#125;
+func Sum(dp []int) &#123;
+	pre :&#x3D; dp[0]
+	dp[0] &#x3D; dp[1]
+	dp[1] &#x3D; pre + dp[1]
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/70.%E7%88%AC%E6%A5%BC%E6%A2%AF/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
@@ -1166,7 +1166,7 @@ public:
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/script-y1iyczzgafjagsl4fnkgsmmjz5zlvl9isb3crrpy97f6uanhgsuwmrggvgt5.min.js"></script>
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
 
 <!--SCRIPTS END-->
 
