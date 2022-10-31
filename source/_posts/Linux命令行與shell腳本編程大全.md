@@ -356,7 +356,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
     - iostat - reports CPU statistics and input/output statistics for block devices and partitions.
     - mpstat - Processors Statistics
       ```bash
-          `mpstat -P ALl`     #所有processor
+          `mpstat -P ALL`     #所有processor
           `mpstat -P ALL 2 5` #迭代五次间隔两秒
       ```
     - pidstat - Process and Kernel Threads Statistics

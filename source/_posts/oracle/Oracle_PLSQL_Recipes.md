@@ -363,7 +363,7 @@ one row will be returned. If more than one row is returned, then the TOO_MANY_RO
 otherwise, the expected output is displayed. In any event, the output that is displayed using either of the 
 solutions will be the same whether successful or not.
 
-## Qualifying Column and Variable Names（变量和表列名相同)
+## 2.2. Qualifying Column and Variable Names（变量和表列名相同)
 
 **Problem**
 You have a variable and a column sharing the same name. You want to refer to both in the same SQL
@@ -600,7 +600,7 @@ a record, you first declare a record TYPE. This declaration can consist of one o
 that represent columns of one or more database tables. Once the record type is declared, you create a 
 variable and define it as an instance of the record type. This variable is then used to populate and work with the data stored in the record. 
 
-Cursors work very well with records of data. When declaring a cursor, you can select particular
+`Cursor` work very well with records of data. When declaring a cursor, you can select particular
 columns of data to return into your record. The record variable then takes on the type of cursor%ROWTYPE. 
 In the following example, a cursor is used to determine which fields you want to return from EMPLOYEES. 
 That cursor’s %ROWTYPE attribute is then used to define a record variable that is used for holding the 
@@ -630,3 +630,163 @@ END;
 As you can see in this example, the cursor `%ROWTYPE` attribute creates a record type using the 
 columns that are queried by the cursor. The result is easy-to-read code that gains all the positive effects 
 of declaring record types via the `%ROWTYPE` attribute. 
+
+## 2.6. Looping Through Rows from a Query
+
+**Problem**
+A query that you are issuing to the database will return many rows. You want to loop through those rows 
+and process them accordingly. 
+
+**Solution #1**
+There are a couple of different solutions for looping through rows from a query. One is to work directly 
+with a SELECT statement and use a FOR loop along with it. In the following example, you will see this 
+technique in action:
+```sql
+SET SERVEROUTPUT ON; 
+BEGIN 
+ FOR emp IN 
+ ( 
+ SELECT first_name, last_name, email 
+ FROM employees 
+ WHERE commission_pct is not NULL 
+ ) 
+ LOOP 
+ DBMS_OUTPUT.PUT_LINE(emp.first_name || ' ' || emp.last_name || ' - ' || emp.email); 
+ END LOOP; 
+END; 
+```
+
+**Solution #2**
+Similarly, you can choose to use a FOR loop along with a cursor. Here’s an example: 
+```sql
+SET SERVEROUTPUT ON; 
+DECLARE 
+ CURSOR emp_cur IS 
+ SELECT first_name, last_name, email 
+ FROM employees 
+WHERE commission_pct is not NULL; 
+      emp_rec emp_cur%ROWTYPE;
+BEGIN 
+ FOR emp_rec IN emp_cur LOOP 
+ DBMS_OUTPUT.PUT_LINE( 
+ emp_rec.first_name || ' ' || emp_rec.last_name || ' - ' || emp_rec.email); 
+ END LOOP; 
+END; 
+```
+
+**How It Works**
+The `loop` that is used in the first solution is also known as an implicit(adj.含蓄的,暗示的) cursor FOR loop. No variables need to be explicitly defined in that solution, because the FOR loop will automatically create a record using the results of the query. That record will take the name provided in the FOR variable_name IN clause. That 
+record variable can then be used to reference the different columns that are returned by the query. As demonstrated in the second solution to this recipe, a cursor is also a very useful way to loop through the results of a query. This technique is also known as an explicit cursor FOR loop. This technique is very similar to looping through the results of an explicitly listed query. Neither solution requires you to explicitly open and close a cursor. In both cases, the opening and 
+closing is done on your behalf by the FOR loop processing. As you can see, the `FOR loop` with the `SELECT query` in the first example is a bit more concise(adj.简明的,简洁的), and there are fewer lines of code. The first example also contains no declarations. In the second example, with the cursor, there are two declarations that account for more lines of code. However, using the cursor is a standard technique that provides for more reusable code. For instance, you can elect to use the cursor any number of times, and you’ll need to write the query only once when declaring the cursor. On the contrary, if you wanted to reuse the query in the first example, then you would have to rewrite it, 
+and having to write the same query multiple times opens the door to errors and inconsistencies. We recommend Solution #2. 
+
+## 2.7. Obtaining Environment and Session Information
+
+**Problem**
+You want to obtain environment and session information such as the name and IP address of the 
+current user so that the values can be stored into local variables for logging purposes. 
+**Solution**
+Make use of the `SYS_CONTEXT()` built-in function to query the database for the user’s information. Once you
+have obtained the information, then store it into a local variable. At that point, you can do whatever 
+you’d like with it, such as save it in a logging table. The following code block demonstrates this 
+technique: 
+```sql
+<<obtain_user_info>>
+DECLARE 
+  username varchar2(100); 
+  ip_address varchar2(100); 
+BEGIN
+  SELECT SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','IP_ADDRESS') 
+  INTO username, ip_address 
+  FROM DUAL; 
+  DBMS_OUTPUT.PUT_LINE('The connected user is: ' || username || ', and the IP address
+  is ' || 
+  ip_address); 
+END; 
+```
+Once this code block has been run, then the user’s information should be stored into the local
+variables that have been declared within it. 
+
+**How It Works**
+You can use the `SYS_CONTEXT` function to obtain important information regarding the current user’s 
+environment, among other things. It is often times used for auditing(n.审计;查帐) purposes so that a particular code 
+block can grab(vi.攫取;夺取) important information about the connected user such as you’ve seen in the solution to 
+this recipe. The SYS_CONTEXT function allows you to define a namespace and then place parameters 
+within it so that they can be retrieved for use at a later time. The general syntax for the use of 
+`SYS_CONTEXT` is as follows: 
+```sql
+SYS_CONTEXT('namespace','parameter'[,length]) 
+```
+A namespace can be any valid SQL identifier, and it must be created using the CREATE_CONTEXT
+statement. The parameter must be a string or evaluate to a string, and it must be set using the 
+DBMS_SESSION.SET_CONTEXT procedure. The call to SYS_CONTEXT with a valid namespace and parameter 
+will result in the return of a value that has a VARCHAR2 datatype. The default maximum length of the 
+returned value is 256 bytes. However, this default maximum length can be overridden by specifying the 
+length when calling SYS_CONTEXT. The length is an optional parameter. The range of values for the length 
+is 1 to 4000, and if you specify an invalid value, then the default of 256 will be used. 
+The USERENV namespace is automatically available for use because it is a built-in namespace 
+provided by Oracle. The USERENV namespace contains session information for the current user. Table 2-1 
+lists the parameters that are available to use with the USERENV namespace. 
+Table 2-1. USERENV Parameter Listing 
+```sql
+-- Parameter          Description 
+ACTION                Identifies the position in the application name.
+AUDITED_CURSORID      Returns the cursor ID of the SQL that triggered the audit. 
+AUTHENTICATED_DATA    Returns the data being used to authenticate the user. 
+AUTHENTICATION_TYPE   Identifies how the user was authenticated. 
+BG_JOB_ID             If an Oracle Database background process was used to establish the connection, then this returns the job ID of the current session. If no 
+                      background process was established, then NULL is returned. 
+CLIENT_IDENTIFIER     Returns identifier that is set by the application. 
+CLIENT_INFO           Returns up to 64 bytes of user session information that can be stored by an application using the DBMS_APPLICATION_INFO package. 
+CURRENT_SCHEMA        Returns the current session’s default schema.
+CURRENT_SCHEMAID      Returns the current schema’s identifier.
+CURRENT_SQL           Returns the first 4KB of the triggering SQL.
+DB_DOMAIN             Returns the value specified in the DB_DOMAIN parameter. 
+DB_NAME               Returns the value specified in the DB_NAME parameter. 
+DB_UNIQUE_NAME        Returns the value specified in the DB_UNIQUE_NAME parameter. 
+ENTRYID               Returns the current audit entry number. 
+EXTERNAL_NAME         Returns the external name of the database user. 
+FG_JOB_ID             If an Oracle Database foreground process was used to establish the connection, then this returns the job ID of the current session. If no 
+                      foreground process was established, then NULL is returned. 
+GLOBAL_CONTEXT_MEMORY Returns the number being used by the globally accessed context in the 
+                      System Global Area.   
+HOST                  Returns the host name of the machine from which the client has connected. 
+INSTANCE              Returns the instance ID number of the current instance. 
+IP_ADDRESS            Returns the IP address of the machine from which the client has connected. 
+ISDBA                 Returns TRUE if the user was authenticated as a DBA. 
+LANG                  Returns the ISO abbreviation of the language name. 
+LANGUAGE              Returns the language and territory used by the session, along with the 
+                      character set. 
+MODULE                Returns the application name. This name has to be set via the
+                      DBMS_APPLICATION_INFO package. 
+NETWORK_PROTOCOL      Returns the network protocol being used for communication. 
+NLS_CALENDAR          Returns the current calendar of the current session. 
+NLS_CURRENCY          Returns the currency of the current session. 
+NLS_DATE_FORMAT       Returns the date format for the session. 
+NLS_DATE_LANGUAGE     Returns the language being used for expressing dates. 
+NLS_SORT              Returns the BINARY or linguistic sort basis. 
+NLS_TERRITORY         Returns the territory of the current session. 
+OS_USER               Returns the operating system user name of the client that initiated the 
+                      session. 
+PROXY_USER            Returns the name of the database that opened the current session on behalf 
+                      of SESSION_USER. 
+PROXY_USERID          Returns the identifier of the database user who opened the current session on behalf of the SESSION_USER. 
+SERVICE_NAME          Returns the name of the service to which a given session is connected. 
+SESSION_USER          Returns the database user name through which the current user is authenticated. 
+SESSION_USERID        Returns the identifier of the database user name by which the current user is authenticated. 
+SESSIONID             Returns the auditing session identifier. 
+STATEMENTID           Returns the auditing statement identifier. 
+TERMINAL              Returns the operating system identifier for the client of the current session. 
+```
+When `SYS_CONTEXT` is used within any query, it is most commonly issued against the `DUAL` table. The 
+`DUAL` table is installed along with the data dictionary when the Oracle Database is created. This table is 
+really a dummy(adj.虚拟的,假的) table that contains one column that is appropriately named `DUMMY`. This column contains 
+the value `X`.
+```sql
+SQL> desc dual;
+ Name Null? Type 
+ ----------------------------------------- -------- ---------------------------- 
+DUMMY VARCHAR2(1) 
+```
+Among other things, `DUAL` is useful for obtaining values from the database when no actual table is
+needed. Our solution case is such a situation.
