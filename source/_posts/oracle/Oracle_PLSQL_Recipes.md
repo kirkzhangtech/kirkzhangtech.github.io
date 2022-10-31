@@ -4,7 +4,7 @@ categories:
 - oracle
 thumbnailImagePosition: bottom
 # thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
-coverImage: https://user-images.githubusercontent.com/46363359/198889780-c943df8e-6c61-4f43-a017-5b451d79588a.jpg
+coverImage: https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg
 metaAlignment: center
 coverMeta: out
 ---
