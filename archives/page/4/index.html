@@ -864,6 +864,163 @@ func longestCommonPrefix(strs []string) string &#123;
                     
                         <a
                             class="link-unstyled"
+                            href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"
+                            aria-label=": 20.有效的括号"
+                        >
+                            20.有效的括号
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-06-23T00:10:00+08:00">
+	
+		    Jun 23, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/leetcode/">leetcode</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
+
+&#x2F;*
+ * @lc app&#x3D;leetcode.cn id&#x3D;20 lang&#x3D;golang
+ *
+ * [20] 有效的括号
+ *&#x2F;
+
+&#x2F;&#x2F; @lc code&#x3D;start
+type (
+	Stack struct &#123;
+		top    *node
+		length int
+	&#125;
+	node struct &#123;
+		value int
+		prev  *node
+	&#125;
+)
+
+&#x2F;&#x2F; Create a new stack
+func New() *Stack &#123;
+	return &amp;Stack&#123;nil, 0&#125;
+&#125;
+
+&#x2F;&#x2F; Return the number of items in the stack
+func (this *Stack) Len() int &#123;
+	return this.length
+&#125;
+
+&#x2F;&#x2F; View the top item on the stack
+func (this *Stack) Peek() int &#123;
+	if this.length &#x3D;&#x3D; 0 &#123;
+		return 0
+	&#125;
+	return this.top.value
+&#125;
+
+&#x2F;&#x2F; Pop the top item of the stack and return it
+func (this *Stack) Pop() int &#123;
+	if this.length &#x3D;&#x3D; 0 &#123;
+		return 0
+	&#125;
+
+	n :&#x3D; this.top
+	this.top &#x3D; n.prev
+	this.length--
+	return n.value
+&#125;
+
+&#x2F;&#x2F; Push a value onto the top of the stack
+func (this *Stack) Push(value int) &#123;
+	n :&#x3D; &amp;node&#123;value, this.top&#125;
+	this.top &#x3D; n
+	this.length++
+&#125;
+
+&#x2F;&#x2F; 123 &#123;
+&#x2F;&#x2F; 91  [
+&#x2F;&#x2F; 40  (
+&#x2F;&#x2F; 41	)
+&#x2F;&#x2F; 93	]
+&#x2F;&#x2F; 125	&#125;
+&#x2F;&#x2F;主函数
+func isValid(s string) bool &#123;
+	bracket :&#x3D; New()
+
+	for _, v :&#x3D; range s &#123;
+		switch v &#123;
+		case 123:
+			bracket.Push(int(v))
+		case 91:
+			bracket.Push(int(v))
+		case 40:
+			bracket.Push(int(v))
+		case 41:
+			topValue :&#x3D; bracket.Pop()
+			if (int(v) - topValue) !&#x3D; 1 &#123;
+				return false
+			&#125;
+		case 93:
+			topValue :&#x3D; bracket.Pop()
+			if (int(v) - topValue) !&#x3D; 2 &#123;
+				return false
+			&#125;
+		case 125:
+			topValue :&#x3D; bracket.Pop()
+			if (int(v) - topValue) !&#x3D; 2 &#123;
+				return false
+			&#125;
+
+		&#125;
+	&#125;
+	if bracket.Len() !&#x3D; 0 &#123;
+		return false
+	&#125;
+
+	return true
+&#125;
+
+&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/06/23/leetcode/20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
                             href="/2022/06/23/leetcode/21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/"
                             aria-label=": 21.合并两个有序链表"
                         >
@@ -1033,99 +1190,6 @@ func removeElement(nums []int, val int) int &#123;
                         <p>
                             <a
                                 href="/2022/06/23/leetcode/27.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/"
-                            aria-label=": 28.实现 strStr()"
-                        >
-                            28.实现 strStr()
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-06-23T00:10:00+08:00">
-	
-		    Jun 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/leetcode/">leetcode</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <pre class="language-golang" data-language="golang"><code class="language-golang">package main
-
-&#x2F;*
- * @lc app&#x3D;leetcode.cn id&#x3D;28 lang&#x3D;golang
- *
- * [28] 实现 strStr()
- *&#x2F;
-
-&#x2F;&#x2F; hellabcelp
-&#x2F;&#x2F;  elp
-
-&#x2F;&#x2F; @lc code&#x3D;start
-func strStr(haystack string, needle string) int &#123;
-	if len(needle) &#x3D;&#x3D; 0 &#123;
-		return 0
-	&#125;
-	i, j :&#x3D; 0, 0
-	for j &lt; len(haystack) &#123;
-
-		c :&#x3D; needle[i]
-		ch :&#x3D; haystack[j]
-		if c &#x3D;&#x3D; ch &#123;
-			i++
-			j++
-		&#125; else &#123;
-			j &#x3D; j - i + 1
-			i &#x3D; 0
-		&#125;
-		if i &#x3D;&#x3D; len(needle) &#123;
-			return j - i
-		&#125;
-
-	&#125;
-	return -1
-&#125;
-
-&#x2F;&#x2F; @lc code&#x3D;end</code></pre>
-                    
-                        
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/06/23/leetcode/28.%E5%AE%9E%E7%8E%B0-str-str/#post-footer"
                                 class="postShorten-excerpt_link link"
                                 aria-label=""
                             >
