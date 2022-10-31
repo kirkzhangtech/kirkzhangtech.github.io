@@ -2,12 +2,18 @@
 title: Oracle PLSQL Recipes
 categories: 
 - oracle
+thumbnailImagePosition: bottom
+# thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
+coverImage: https://user-images.githubusercontent.com/46363359/198889780-c943df8e-6c61-4f43-a017-5b451d79588a.jpg
+metaAlignment: center
+coverMeta: out
 ---
 摘要: 其实这个讲PLSQL有点基础
 
 <!-- more -->
-
 <!-- toc -->
+
+
 # 1 PL/SQL Fundamentals
 
 ## 1.1 创建plsql代码块
@@ -487,6 +493,102 @@ As you can see from the solution, the code block looks essentially the same as t
 The `%TYPE` attribute can become a significant time-saver and savior for declaring variable types, especially if the underlying database column types are subject(会发生变化) to change. This attribute enables the local variable to assume the same datatype of its corresponding database column type at runtime. Retrieving several columns into local application variables can become tedious(`沉闷的`) if you need to continually verify that the datatypes of each variable are the same as those of the columns whose data they will consume.The`%TYPE` attribute can be used when defining variables, constants, fields, and parameters. Using `%TYPE` assures(`保证`) that the variables you declare will always remain synchronized with the datatypes of their corresponding columns.
 
 <text style="font-family:Courier New;color:red">
-summary:  
+summary: </br>
 at all above explained that we could use `%TYPE` attribute to define variable which the same as table datatype
 </text>
+
+## 2.4. Returning Queried Data into a PL/SQL Record
+
+**Problem** 
+Instead of retrieving only a select few columns via a database query, you’d rather return the entire 
+matching row. It can be a time-consuming task to replicate each of the table's columns in your 
+application by creating a local variable for each along with selecting the correct datatypes. Although you 
+can certainly make use of the `%TYPE` attribute while declaring the variables, you’d rather retrieve the 
+entire row into a single object. Furthermore, you’d like the object that the data is going to be stored into 
+to have the ability to assume the same datatypes for each of the columns being returned just as you 
+would by using the `%TYPE` attribute. 
+**Solution**
+Make use of the `%ROWTYPE` attribute for the particular database table that you are querying. The `%ROWTYPE`
+attribute returns a record type that represents a database row from the specified table. For instance, the 
+following example demonstrates how the %ROWTYPE attribute can store an entire employee table row for a 
+cursor: 
+```sql
+DECLARE 
+ CURSOR emp_cur IS 
+ SELECT * 
+ FROM employees 
+ WHERE employee_id = &emp_id; 
+ -- Declaring a local variable using the ROWTYPE attribute 
+ -- of the employees table 
+ emp_rec employees%ROWTYPE; 
+BEGIN 
+ OPEN emp_cur; 
+ FETCH emp_cur INTO emp_rec; 
+ IF emp_cur%FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE('Employee Information for ID: ' || emp_rec.first_name || ' ' || 
+ emp_rec.last_name || ' - ' || emp_rec.email); 
+ ELSE 
+  DBMS_OUTPUT.PUT_LINE('No matching employee for the given ID');
+ END IF; 
+ CLOSE emp_cur; 
+EXCEPTION 
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE('No employee matches the given emp ID’); 
+END; 
+
+```
+
+**How It Works**
+The `%ROWTYPE` attribute represents an entire database table row as a record type. Each of the 
+corresponding table columns is represented within the record as a variable, and each variable in the 
+record inherits its type from the respective table column. 
+Using the `%ROWTYPE` attribute offers several advantages to declaring each variable individually. For 
+starters, declaring a single record type is much more productive than declaring several local variables to 
+correspond to each of the columns of a table. Also, if any of the table columns’ datatypes is ever 
+adjusted, then your code will not break because the `%ROWTYPE` attribute works in much the same manner 
+as the `%TYPE` attribute of a column in that it will automatically maintain the same datatypes as the 
+corresponding table columns. Therefore, if a column with a type of `VARCHAR2(10)` is changed to 
+`VARCHAR2(100)`, that change will ripple(vt.在…上形成波痕) through into your record definition. 
+Using `%ROWTYPE` also makes your code much easier to read because you are not littering(n.乱丢废物) local 
+variables throughout. Instead, you can use the dot notation to reference each of the different columns 
+that the record type returned by `%ROWTYPE` consists of. For instance, in the solution, the `first_name`, 
+`last_name`, and `email` columns are referenced from the `emp_rec` record type. 
+
+
+## 2.5. Creating Your Own Records to Receive Query Results
+
+**Problem**
+You want to query the database, return several columns from one or more tables, and store them into 
+local variables of a code block for processing. Rather than placing the values of the columns into 
+separate variables, you want to create a single variable that contains all the values. 
+<text style="font-family:Courier New;color:red">
+summary: </br>
+return several columns from one or more tables.
+</text>
+
+**Solution**
+Create a database RECORD containing variables to hold the data you want to retrieve from the database. 
+Since a RECORD can hold multiple variables of different datatypes, they work nicely for grouping data that 
+has been retrieved as a result of a query. 
+In the following example, the database is queried for the name and position of a player. The data 
+that is returned is used to populate(vt.居住于；构成人口) a PL/SQL RECORD containing three separate variables: first name, last 
+name, and position. 
+
+```sql
+DECLARE
+  TYPE emp_info IS RECORD(first employees.first_name%TYPE, 
+                         last employees.last_name%TYPE, 
+                         email employees.email%TYPE); 
+  emp_info_rec emp_info;  -- 用emp_info 类型定义了emp_info_rec变量
+
+BEGIN 
+ SELECT first_name, last_name, email 
+ INTO emp_info_rec 
+ FROM employees 
+ WHERE last_name = 'Vargas'; 
+ DBMS_OUTPUT.PUT_LINE('The queried employee''s email address is ' || emp_info_rec.email); 
+ EXCEPTION 
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE('No employee matches the last name provided'); 
+END; 
+```
