@@ -9,6 +9,7 @@ coverImage: https://user-images.githubusercontent.com/46363359/199011812-44a2e35
 metaAlignment: center
 coverMeta: out
 ---
-
+> 官方文档: https://neovim.io/doc/user/
 摘要: 后面具体学习时候再补充
+
 
