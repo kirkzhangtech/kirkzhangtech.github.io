@@ -5,26 +5,12 @@ categories:
 - MIT6.824
 ---
 
-<!-- more -->
-
-<!-- toc -->
-- [二.Students' Guide to Raf文档](#二students-guide-to-raf文档)
-  - [背景](#背景)
-  - [实现raft](#实现raft)
-    - [重要的细节](#重要的细节)
-  - [Debugging Raft](#debugging-raft)
-    - [活锁](#活锁)
-    - [不正确的RPC](#不正确的rpc)
-    - [没有按照论文的理论实现raft](#没有按照论文的理论实现raft)
-    - [term混乱(term不稳定)](#term混乱term不稳定)
-    - [优化](#优化)
-  - [Applications on top of Raft](#applications-on-top-of-raft)
-  - [AppendIndex](#appendindex)
-
-# 二.Students' Guide to Raf文档
-
 > https://thesquareplanet.com/blog/students-guide-to-raft/ 原文链接
 
+<!-- more -->
+<!-- toc -->
+
+## 前言
 在过去几个月里，我成为了MIT6.824的一名助教.以往这门课程的实验都是基于paxos实现一致性算法,然后今年(2016),我们决定使用raft,raft的设计理念是"理解门槛低"，并且我们也希望这项决定使同学们的生活更简单[在过去的几个月里，我一直是麻省理工学院6.824分布式系统课的教学助理。这门课传统上有一些建立在Paxos共识算法上的实验，但今年，我们决定改用Raft。Raft是 "设计成易于理解的"，我们希望这一改变能使学生的生活更轻松]
 
 这篇实验指南,对应着"教师教学指南"，印证着我们实验室与raft的journey，也希望对学生更好的理解raft内部运行机制，实现raft分布式协议起到帮助,如果你正在寻找Raft和Paxos的对比，或者raft的教学(pedagogical)分析,请前去阅读《教师教学指南》.文章底部包含一些学生提问的关于raft的共性问题的问题列表。如果你遇到的问题不在那些问题之内，请前去检查Q&A系统，这篇文章非常的长,但是它提出的所有点，都是现实中学生(助教)碰到过的问题，这是一篇值得阅读的文章。

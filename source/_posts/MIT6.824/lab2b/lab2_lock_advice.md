@@ -4,9 +4,9 @@ categories:
 - 分布式
 - MIT6.824
 ---
-摘要:
-<!-- more -->
+摘要: 这是一篇mit6.824 raft所结构实验指南
 
+<!-- more -->
 <!-- toc -->
 
 # rule 1
@@ -27,7 +27,6 @@ to pretect code block which gonna be change and other routine read data midway, 
   rf.state = Candidate
   rf.mu.Unlock()
 ```
-
 
 one more goroutine could not read any of above temp updates, so A goroutine should hold locking over the critical section.
 on the other hand , if B goroutine using r.currenTerm or r.state, ,who must hold locking when access r.currenTerm at somewhere

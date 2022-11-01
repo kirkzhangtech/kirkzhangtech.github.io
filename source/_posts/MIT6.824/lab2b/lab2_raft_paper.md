@@ -5,13 +5,11 @@ categories:
 - MIT6.824
 ---
 
+摘要
+raft比paxos更容易理解,在构建大型系统的时候方便实现
 
-# 一.可理解的一致性算法研究-论文
-
-# 摘要
-
-- raft比paxos更容易理解,在构建大型系统的时候方便实现
-
+<!-- more -->
+<!-- toc -->
 
 # 1 介绍
 
@@ -219,7 +217,7 @@ leaders in Raft send fewer log entries from previous terms than in other algorit
 dundant log entries to renumber them before they can be committed).
 
 
-## 非拜占庭条件
+# 非拜占庭条件
 一般地，把出现故障( crash 或 fail-stop，即不响应)但不会伪造信息的情况称为“非拜 占庭错误”( non-byzantine fault)或“故障错误”( Crash Fault);伪造信息恶意响应的情况称为“拜占庭错误”( Byzantine Fault)，对应节点为拜占庭节点。
 
 处理非拜占庭错误的算法有：paxos、raft和其变种
@@ -228,3 +226,5 @@ dundant log entries to renumber them before they can be committed).
 ————————————————
 版权声明：本文为CSDN博主「wahaha13168」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 原文链接：https://blog.csdn.net/wahaha13168/article/details/80808220
+上文的解释还是有点不知所云
+
