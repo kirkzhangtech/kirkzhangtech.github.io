@@ -372,12 +372,14 @@ var ErrFinalToken = errors.New("final token")
 ```
 `ErrFinalToken` is a special sentinel error value. It is intended to be returned by a Split(vt.分离) function to indicate that the token being delivered with the error is the last token and scanning should stop after this one. After ErrFinalToken is received by Scan, scanning stops with no error. The value is useful to stop processing early or when it is necessary to deliver a final empty token. One could achieve the same behavior with a custom error value but providing one here is tidier. See the emptyFinalToken example for a use of this value.
 
-### func ScanBytes(data []byte, atEOF bool) (advance int, token []byte, err error)
+
+## func ScanBytes(data []byte, atEOF bool) (advance int, token []byte, err error)
 ScanBytes is a split function for a Scanner that returns each byte as a token.
 
-### func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error)
-### func ScanRunes(data []byte, atEOF bool) (advance int, token []byte, err error)
-### func ScanWords(data []byte, atEOF bool) (advance int, token []byte, err error)
+## func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error)
+## func ScanRunes(data []byte, atEOF bool) (advance int, token []byte, err error)
+## func ScanWords(data []byte, atEOF bool) (advance int, token []byte, err error)
+
 ## type ReadWriter
 
 ```goalng
@@ -395,8 +397,8 @@ type Reader struct {
 	// contains filtered or unexported fields
 }
 ```
-### func NewReader(rd io.Reader) *Reader
-### func NewReaderSize(rd io.Reader, size int) *Reader
+## func NewReader(rd io.Reader) *Reader
+## func NewReaderSize(rd io.Reader, size int) *Reader
 ### func (b *Reader) Buffered() int
 ### func (b *Reader) Discard(n int) (discarded int, err error)
 ### func (b *Reader) Peek(n int) ([]byte, error)
@@ -418,7 +420,7 @@ type Scanner struct {
 	// contains filtered or unexported fields
 }
 ```
-### func NewScanner(r io.Reader) *Scanner
+## func NewScanner(r io.Reader) *Scanner
 ### func (s *Scanner) Buffer(buf []byte, max int)
 ### func (s *Scanner) Bytes() []byte
 ### func (s *Scanner) Err() error
@@ -438,8 +440,8 @@ type Writer struct {
 }
 ```
 
-### func NewWriter(w io.Writer) *Writer
-### func NewWriterSize(w io.Writer, size int) *Writer
+## func NewWriter(w io.Writer) *Writer
+## func NewWriterSize(w io.Writer, size int) *Writer
 ### func (b *Writer) Available() int
 ### func (b *Writer) AvailableBuffer() []byte
 ### func (b *Writer) Buffered() int
@@ -471,49 +473,49 @@ const iota = 0 // Untyped int.
 var nil Type // Type must be a pointer, channel, func, interface, map, or slice type
 ```
 
-### func append(slice []Type, elems ...Type) []Type
-### func cap(v Type) int
-### func close(c chan<- Type)
-### func complex(r, i FloatType) ComplexType
-### func copy(dst, src []Type) int
-### func delete(m map[Type]Type1, key Type)
-### func imag(c ComplexType) FloatType
-### func len(v Type) int
-### func make(t Type, size ...IntegerType) Type
-### func new(Type) *Type
-### func panic(v any)
-### func print(args ...Type)
-### func println(args ...Type)
-### func real(c ComplexType) FloatType
-### func recover() any
+## func append(slice []Type, elems ...Type) []Type
+## func cap(v Type) int
+## func close(c chan<- Type)
+## func complex(r, i FloatType) ComplexType
+## func copy(dst, src []Type) int
+## func delete(m map[Type]Type1, key Type)
+## func imag(c ComplexType) FloatType
+## func len(v Type) int
+## func make(t Type, size ...IntegerType) Type
+## func new(Type) *Type
+## func panic(v any)
+## func print(args ...Type)
+## func println(args ...Type)
+## func real(c ComplexType) FloatType
+## func recover() any
 
-### type ComplexType
-### type FloatType
-### type IntegerType
-### type Type
-### type Type1
-### type any
-### type bool
-### type byte
-### type comparable
-### type complex128
-### type complex64
-### type error
-### type float32
-### type float64
-### type int
-### type int16
-### type int32
-### type int64
-### type int8
-### type rune
-### type string
-### type uint
-### type uint16
-### type uint32
-### type uint64
-### type uint8
-### type uintptr
+## type ComplexType
+## type FloatType
+## type IntegerType
+## type Type
+## type Type1
+## type any
+## type bool
+## type byte
+## type comparable
+## type complex128
+## type complex64
+## type error
+## type float32
+## type float64
+## type int
+## type int16
+## type int32
+## type int64
+## type int8
+## type rune
+## type string
+## type uint
+## type uint16
+## type uint32
+## type uint64
+## type uint8
+## type uintptr
 
 
 
@@ -530,60 +532,59 @@ const MinRead = 512
 var ErrTooLarge = errors.New("bytes.Buffer: too large")
 
 ```
-
-### func Compare(a, b []byte) int
-### func Contains(b, subslice []byte) bool
-### func ContainsAny(b []byte, chars string) bool
-### func ContainsRune(b []byte, r rune) bool
-### func Count(s, sep []byte) int
-### func Cut(s, sep []byte) (before, after []byte, found bool)
-### func Equal(a, b []byte) bool
-### func EqualFold(s, t []byte) bool
-### func Fields(s []byte) [][]byte
-### func FieldsFunc(s []byte, f func(rune) bool) [][]byte
-### func HasPrefix(s, prefix []byte) bool
-### func HasSuffix(s, suffix []byte) bool
-### func Index(s, sep []byte) int
-### func IndexAny(s []byte, chars string) int
-### func IndexByte(b []byte, c byte) int
-### func IndexFunc(s []byte, f func(r rune) bool) int
-### func IndexRune(s []byte, r rune) int
-### func Join(s [][]byte, sep []byte) []byte
-### func LastIndex(s, sep []byte) int
-### func LastIndexAny(s []byte, chars string) int
-### func LastIndexByte(s []byte, c byte) int
-### func LastIndexFunc(s []byte, f func(r rune) bool) int
-### func Map(mapping func(r rune) rune, s []byte) []byte
-### func Repeat(b []byte, count int) []byte
-### func Replace(s, old, new []byte, n int) []byte
-### func ReplaceAll(s, old, new []byte) []byte
-### func Runes(s []byte) []rune
-### func Split(s, sep []byte) [][]byte
-### func SplitAfter(s, sep []byte) [][]byte
-### func SplitAfterN(s, sep []byte, n int) [][]byte
-### func SplitN(s, sep []byte, n int) [][]byte
-### func Title(s []byte) []byteDEPRECATED
-### func ToLower(s []byte) []byte
-### func ToLowerSpecial(c unicode.SpecialCase, s []byte) []byte
-### func ToTitle(s []byte) []byte
-### func ToTitleSpecial(c unicode.SpecialCase, s []byte) []byte
-### func ToUpper(s []byte) []byte
-### func ToUpperSpecial(c unicode.SpecialCase, s []byte) []byte
-### func ToValidUTF8(s, replacement []byte) []byte
-### func Trim(s []byte, cutset string) []byte
-### func TrimFunc(s []byte, f func(r rune) bool) []byte
-### func TrimLeft(s []byte, cutset string) []byte
-### func TrimLeftFunc(s []byte, f func(r rune) bool) []byte
-### func TrimPrefix(s, prefix []byte) []byte
-### func TrimRight(s []byte, cutset string) []byte
-### func TrimRightFunc(s []byte, f func(r rune) bool) []byte
-### func TrimSpace(s []byte) []byte
-### func TrimSuffix(s, suffix []byte) []byte
+## func Compare(a, b []byte) int
+## func Contains(b, subslice []byte) bool
+## func ContainsAny(b []byte, chars string) bool
+## func ContainsRune(b []byte, r rune) bool
+## func Count(s, sep []byte) int
+## func Cut(s, sep []byte) (before, after []byte, found bool)
+## func Equal(a, b []byte) bool
+## func EqualFold(s, t []byte) bool
+## func Fields(s []byte) [][]byte
+## func FieldsFunc(s []byte, f func(rune) bool) [][]byte
+## func HasPrefix(s, prefix []byte) bool
+## func HasSuffix(s, suffix []byte) bool
+## func Index(s, sep []byte) int
+## func IndexAny(s []byte, chars string) int
+## func IndexByte(b []byte, c byte) int
+## func IndexFunc(s []byte, f func(r rune) bool) int
+## func IndexRune(s []byte, r rune) int
+## func Join(s [][]byte, sep []byte) []byte
+## func LastIndex(s, sep []byte) int
+## func LastIndexAny(s []byte, chars string) int
+## func LastIndexByte(s []byte, c byte) int
+## func LastIndexFunc(s []byte, f func(r rune) bool) int
+## func Map(mapping func(r rune) rune, s []byte) []byte
+## func Repeat(b []byte, count int) []byte
+## func Replace(s, old, new []byte, n int) []byte
+## func ReplaceAll(s, old, new []byte) []byte
+## func Runes(s []byte) []rune
+## func Split(s, sep []byte) [][]byte
+## func SplitAfter(s, sep []byte) [][]byte
+## func SplitAfterN(s, sep []byte, n int) [][]byte
+## func SplitN(s, sep []byte, n int) [][]byte
+## func Title(s []byte) []byteDEPRECATED
+## func ToLower(s []byte) []byte
+## func ToLowerSpecial(c unicode.SpecialCase, s []byte) []byte
+## func ToTitle(s []byte) []byte
+## func ToTitleSpecial(c unicode.SpecialCase, s []byte) []byte
+## func ToUpper(s []byte) []byte
+## func ToUpperSpecial(c unicode.SpecialCase, s []byte) []byte
+## func ToValidUTF8(s, replacement []byte) []byte
+## func Trim(s []byte, cutset string) []byte
+## func TrimFunc(s []byte, f func(r rune) bool) []byte
+## func TrimLeft(s []byte, cutset string) []byte
+## func TrimLeftFunc(s []byte, f func(r rune) bool) []byte
+## func TrimPrefix(s, prefix []byte) []byte
+## func TrimRight(s []byte, cutset string) []byte
+## func TrimRightFunc(s []byte, f func(r rune) bool) []byte
+## func TrimSpace(s []byte) []byte
+## func TrimSuffix(s, suffix []byte) []byte
 
 ## type Buffer
 
-### func NewBuffer(buf []byte) *Buffer
-### func NewBufferString(s string) *Buffer
+## func NewBuffer(buf []byte) *Buffer
+## func NewBufferString(s string) *Buffer
 ### func (b *Buffer) Bytes() []byte
 ### func (b *Buffer) Cap() int
 ### func (b *Buffer) Grow(n int)
@@ -606,7 +607,7 @@ var ErrTooLarge = errors.New("bytes.Buffer: too large")
 ### func (b *Buffer) WriteString(s string) (n int, err error)
 ### func (b *Buffer) WriteTo(w io.Writer) (n int64, err error)
 ## type Reader
-### func NewReader(b []byte) *Reader
+## func NewReader(b []byte) *Reader
 ### func (r *Reader) Len() int
 ### func (r *Reader) Read(b []byte) (n int, err error)
 ### func (r *Reader) ReadAt(b []byte, off int64) (n int, err error)
@@ -626,9 +627,9 @@ var ErrTooLarge = errors.New("bytes.Buffer: too large")
 
 Package bzip2 implements bzip2 decompression.
 
-#### func NewReader(r io.Reader) io.Reader
+### func NewReader(r io.Reader) io.Reader
 ### type StructuralError
-#### func (s StructuralError) Error() string
+### func (s StructuralError) Error() string
 
 ## flate
 Package flate implements the DEFLATE compressed data format, described in RFC 1951. The gzip and zlib packages implement access to DEFLATE-based file formats.
@@ -654,8 +655,8 @@ const (
 	HuffmanOnly = -2
 )
 ```
-#### func NewReader(r io.Reader) io.ReadCloser
-#### func NewReaderDict(r io.Reader, dict []byte) io.ReadCloser
+### func NewReader(r io.Reader) io.ReadCloser
+### func NewReaderDict(r io.Reader, dict []byte) io.ReadCloser
 ### type CorruptInputError
 #### func (e CorruptInputError) Error() string
 ### type InternalError
@@ -667,8 +668,8 @@ const (
 ### type WriteErrorDEPRECATED
 #### func (e *WriteError) Error() string
 ### type Writer
-#### func NewWriter(w io.Writer, level int) (*Writer, error)
-#### func NewWriterDict(w io.Writer, level int, dict []byte) (*Writer, error)
+### func NewWriter(w io.Writer, level int) (*Writer, error)
+### func NewWriterDict(w io.Writer, level int, dict []byte) (*Writer, error)
 #### func (w *Writer) Close() error
 #### func (w *Writer) Flush() error
 #### func (w *Writer) Reset(dst io.Writer)
@@ -716,7 +717,7 @@ type Reader struct {
 	// contains filtered or unexported fields
 }
 ```
-#### func NewReader(r io.Reader) (*Reader, error)
+### func NewReader(r io.Reader) (*Reader, error)
 #### func (z *Reader) Close() error
 #### func (z *Reader) Multistream(ok bool)
 #### func (z *Reader) Read(p []byte) (n int, err error)
@@ -730,8 +731,8 @@ type Writer struct {
 }
 
 ```
-#### func NewWriter(w io.Writer) *Writer
-#### func NewWriterLevel(w io.Writer, level int) (*Writer, error)
+### func NewWriter(w io.Writer) *Writer
+### func NewWriterLevel(w io.Writer, level int) (*Writer, error)
 #### func (z *Writer) Close() error
 #### func (z *Writer) Flush() error
 #### func (z *Writer) Reset(w io.Writer)
@@ -744,8 +745,8 @@ In particular, it implements LZW as used by the GIF and PDF file formats, which 
 
 The TIFF file format uses a similar but incompatible version of the LZW algorithm. See the golang.org/x/image/tiff/lzw package for an implementation.
 
-#### func NewReader(r io.Reader, order Order, litWidth int) io.ReadCloser
-#### func NewWriter(w io.Writer, order Order, litWidth int) io.WriteCloser
+### func NewReader(r io.Reader, order Order, litWidth int) io.ReadCloser
+### func NewWriter(w io.Writer, order Order, litWidth int) io.WriteCloser
 ### type Order
 ```golang
 type Order int
@@ -793,8 +794,8 @@ r.Close()
 ```
 **Constants**
 **Variables**
-#### func NewReader(r io.Reader) (io.ReadCloser, error)
-#### func NewReaderDict(r io.Reader, dict []byte) (io.ReadCloser, error)
+### func NewReader(r io.Reader) (io.ReadCloser, error)
+### func NewReaderDict(r io.Reader, dict []byte) (io.ReadCloser, error)
 ### type Resetter
 ```golang
 type Resetter interface {
@@ -809,9 +810,9 @@ type Writer struct {
 	// contains filtered or unexported fields
 }
 ```
-#### func NewWriter(w io.Writer) *Writer
-#### func NewWriterLevel(w io.Writer, level int) (*Writer, error)
-#### func NewWriterLevelDict(w io.Writer, level int, dict []byte) (*Writer, error)
+### func NewWriter(w io.Writer) *Writer
+### func NewWriterLevel(w io.Writer, level int) (*Writer, error)
+### func NewWriterLevelDict(w io.Writer, level int, dict []byte) (*Writer, error)
 #### func (z *Writer) Close() error
 #### func (z *Writer) Flush() error
 #### func (z *Writer) Reset(w io.Writer)
@@ -827,11 +828,11 @@ The minimum element in the tree is the root, at index 0.
 
 A heap is a common way to implement a priority queue. To build a priority queue, implement the Heap interface with the (negative) priority as the ordering for the Less method, so Push adds items while Pop removes the highest-priority item from the queue. The Examples include such an implementation; the file example_pq_test.go has the complete source.
 
-#### func Fix(h Interface, i int)
-#### func Init(h Interface)
-#### func Pop(h Interface) any
-#### func Push(h Interface, x any)
-#### func Remove(h Interface, i int) any
+### func Fix(h Interface, i int)
+### func Init(h Interface)
+### func Pop(h Interface) any
+### func Push(h Interface, x any)
+### func Remove(h Interface, i int) any
 ### type Interface
 
 ## container/list
@@ -851,7 +852,7 @@ for e := l.Front(); e != nil; e = e.Next() {
 #### func (e *Element) Next() *Element
 #### func (e *Element) Prev() *Element
 ### type List
-#### func New() *List
+### func New() *List
 #### func (l *List) Back() *Element
 #### func (l *List) Front() *Element
 #### func (l *List) Init() *List
