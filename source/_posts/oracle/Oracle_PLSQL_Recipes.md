@@ -1126,18 +1126,18 @@ BEGIN
  COMMIT; -- ends read-only transaction 
 END; 
 ```
-Querying the database using read-only transactions will ensure that someone will see the correct values in a situation such as the one depicted in this example.
+Querying the database using read-only transactions will ensure that someone will see the correct values in a situation such as the one depicted(vt.描述,描画) in this example.
 
 **How It Works**
-Oftentimes there are situations when you need to ensure that the data being queried throughout a transaction’s life cycle is unchanged by other users’ updates. The classic case is when someone goes to withdraw money from the bank and their spouse is at an ATM machine depositing into the account at the same time. If read consistency were not in place, the individual may view their account balance and see that there was plenty of money to withdraw, and then they’d go to take the money out and receive an error because the spouse had canceled the deposit instead. A read-only transaction allows for read consistency until a `COMMIT` has been issued. If the spouse had confirmed the deposit, then the next query on the account would reflect the additional funds (assuming that the bank were to release them to theaccount in real time).
-Situations such as these require that you provide an environment that is essentially isolated from the outside world. You can use the SET TRANSACTION command to start a read-only transaction, set an isolation level, and assign the current transaction to a rollback segment. The SET TRANSACTION statement must be the first statement in a read-only transaction, and it can appear only once in the transaction. Note that there are some statement restrictions when using a read-only transaction. Only `SELECT INTO`, `OPEN`, `FETCH`, `CLOSE`, `LOCK` `TABLE`, `COMMIT`, and `ROLLBACK` statements can be used; other statements are not allowed.
+often times there are situations when you need to ensure that the data being queried throughout a transaction’s life cycle is unchanged by other users’ updates. The classic case is when someone goes to withdraw money from the bank and their spouse(n.配偶) is at an ATM machine depositing into the account at the same time. If read consistency were not in place, the individual may view their account balance and see that there was plenty of money to withdraw, and then they’d go to take the money out and receive an error because the spouse had canceled the deposit(美 [dɪ'pɑzɪt]n.存款,押金) instead. A read-only transaction allows for read consistency until a `COMMIT` has been issued. If the spouse had confirmed the deposit, then the next query on the account would reflect the additional funds (assuming that the bank were to release them to the account in real time).
+Situations such as these require that you provide an environment that is essentially isolated from the outside world. You can use the SET TRANSACTION command to start a read-only transaction, set an isolation level, and assign the current transaction to a `rollback` segment. The SET TRANSACTION statement must be the first statement in a read-only transaction, and it can appear only once in the transaction. Note that there are some statement restrictions when using a read-only transaction. Only `SELECT INTO`, `OPEN`, `FETCH`, `CLOSE`, `LOCK TABLE`, `COMMIT`, and `ROLLBACK` statements can be used; other statements are not allowed.
 
 ## 2.14. Executing One Transaction from Within Another
-
+(nested tracsaction)
 **Problem**
 You are executing a transaction, and you are faced with the need to suspend your current work, issue a completely separate transaction, and then pick up your current work. For example, say you want to log entries into a log table. The log entries should be persisted separately from the current transaction such that if the transaction fails or is rolled back, the log entries will still be completed.
 **Solution**
-Start an autonomous transaction to make the log entry. This will ensure that the log entry is performed separately from the current transaction. In the following example, an employee is deleted from the EMPLOYEES table. Hence, a job is ended, and the job history must be recorded into the JOB_HISTORY table. In the case that something fails within the transaction, the log entry into the JOB_HISTORY table must be intact. This log entry cannot be rolled back because it is performed using an autonomous transaction.The code to encapsulate the autonomous transaction needs to be placed into a named block that can be called when the logging needs to be performed. The following piece of code creates a PL/SQL procedure that performs the log entry using an autonomous transaction. (You will learn more about procedures in Chapter 4.) Specifically notice the declaration of PRAGMA AUTONOMOUS_TRANSACTION. That pragma specifies that the procedure executes as a separate transaction, independent of any calling transaction.
+Start an autonomous transaction to make the log entry. This will ensure that the log entry is performed separately from the current transaction. In the following example, an employee is deleted from the EMPLOYEES table. Hence, a job is ended, and the job history must be recorded into the `JOB_HISTORY` table. In the case that something fails within the transaction, the log entry into the `JOB_HISTORY` table must be intact(adj.完整的,原封不动的). This log entry cannot be rolled back because it is performed using an autonomous transaction.The code to encapsulate(美 [ɪn'kæpsjə'let],vt.压缩,将…装入胶囊) the autonomous transaction needs to be placed into a named block that can be called when the logging needs to be performed. The following piece of code creates a PL/SQL procedure that performs the log entry using an autonomous transaction. (You will learn more about procedures in Chapter 4.) Specifically notice(n.通知,布告) the declaration of `PRAGMA AUTONOMOUS_TRANSACTION`. That pragma specifies that the procedure executes as a separate transaction, independent of any calling transaction.
 ```sql
 CREATE OR REPLACE PROCEDURE log_job_history ( emp_id IN 
                                               employees.employee_id%TYPE, 
@@ -1156,7 +1156,7 @@ BEGIN
 END;
 
 ```
-The `LOG_JOB_HISTORY` procedure inserts an entry into the log table separately from the transaction that is taking place in the calling code block. The following code performs the job termination, and it calls the log_substitution procedure to record the history:
+The `LOG_JOB_HISTORY` procedure inserts an entry into the log table separately from the transaction that is taking place in the calling code block. The following code performs the job termination, and it calls the `log_substitution` procedure to record the history:
 ```sql
 DECLARE
  CURSOR dept_removal_cur IS 
@@ -1179,16 +1179,23 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('The transaction has been successfully completed.'); 
 EXCEPTION 
  -- Handles all errors 
- WHEN NO_DATA_FOUND THEN 
+ WHEN NO_DATA_FOUND THEN
     DBMS_OUTPUT.PUT_LINE('The transaction has been rolled back due to errors, please try again.'); 
- ROLLBACK; 
+    ROLLBACK; 
 END;
 ```
 If this code block is executed and then rolled back, the entry into the job history table remains,because it is performed as a separate, autonomous transaction.
 **How It Works**
-An autonomous transaction is a transaction that is called by another transaction and that runs separately from the calling transaction. Autonomous transactions commit or roll back without affecting the calling transaction. They also have the full functionality of regular transactions; they merely run separately from the main transaction. They allow parallel activity to occur. Even if the main transaction fails or is rolled back, the autonomous transaction can be committed or rolled back independently of any other transactions in progress.
+An autonomous transaction is a transaction that is called by another transaction and that runs separately from the calling transaction. Autonomous transactions commit or roll back without affecting the calling transaction. They also have the full functionality of regular transactions; they merely(adv.仅仅,只不过,只是) run separately from the main transaction. They allow parallel activity to occur. Even if the main transaction fails or is rolled back, the autonomous transaction can be committed or rolled back independently of any other transactions in progress.
 
-An autonomous transaction must be created with a top-level code block, trigger, procedure,function, or stand-alone named piece of code. In the solution, you saw that a procedure was created torun as an autonomous transaction. That is because it is not possible to create an autonomous transaction within a nested code block. To name a transaction as autonomous, you must place the statement PRAGMA AUTONOMOUS_TRANSACTION within the declaration section of a block encompassing the transaction. To end the transaction, perform a COMMIT or ROLLBACK.
+An autonomous transaction must be created with a top-level code block, trigger, procedure,function, or stand-alone named piece of code. In the solution, you saw that a procedure was created to run as an autonomous transaction. That is because it is not possible to create an autonomous transaction within a nested code block. To name a transaction as autonomous, you must place the statement PRAGMA AUTONOMOUS_TRANSACTION within the declaration section of a block encompassing(adj.包含的,包容的,环绕) the transaction. To end the transaction, perform a COMMIT or ROLLBACK.
+
+<text style="font-family:Courier New;color:red">
+
+summary: </br>
+1. They allow parallel activity to occur. Even if the main transaction fails or is rolled back, the autonomous transaction can be committed or rolled back independently of any other transactions in progress.
+
+</text>
 
 ## 2.15. Finding and Removing Duplicate Table Rows
 
