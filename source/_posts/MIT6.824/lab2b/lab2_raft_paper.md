@@ -31,7 +31,7 @@ categories:
     ![raft_figure_1](./../../../picture/mit6.824/raft_figure_1.png)
 
 2. 因为两台状态机按顺序执行相同的`日志`x=1.y=3等等,那么这两个状态机计算的状态和输出的结果也是一样的，所以共识算法要保证日志的一致性是非常重要的工作。即使一些状态机因为机械故障导致宕机(少于raft规定的数量)，但是这些服务器看起来还是像一个整体一样对外提供服务。
-    - 它们确保在所有非拜占庭条件下的安全性（永远不会返回错误的结果），包括网络延迟、分区、以及数据包丢失、重复和重新排序
+    - 它们确保在所有[非拜占庭条件](#非拜占庭条件)下的安全性（永远不会返回错误的结果），包括网络延迟、分区、以及数据包丢失、重复和重新排序
     - 只要有任何一台服务器在运行，它们就能完全发挥可用作用。大部分的服务器都在运行，并能与其他服务器和客户进行通信。彼此之间以及与客户端之间进行通信因此，一个典型的由五台服务器组成的集群可以容忍任何两台服务器的故障,假设服务器的故障是通过停止；它们后来可能从稳定的存储中恢复状态并重新加入集群。
     - 它们并不依赖时间来确保日志的一致性：时钟故障和极端的消息延迟在最坏的情况下会导致可用性问题。延迟，在最坏的情况下，会导致可用性问题。
     - 在通常情况下，只要集群中的大多数follower响应了命令，命令就以完成。一旦集群中的大多数follower对单轮RPC作出反应，一个命令就已经完成。少数缓慢的务器不影响整个系统的性能。
@@ -218,3 +218,13 @@ to reason about log entries, since they maintain the same term number over time 
 leaders in Raft send fewer log entries from previous terms than in other algorithms (other algorithms must send re-
 dundant log entries to renumber them before they can be committed).
 
+
+## 非拜占庭条件
+一般地，把出现故障( crash 或 fail-stop，即不响应)但不会伪造信息的情况称为“非拜 占庭错误”( non-byzantine fault)或“故障错误”( Crash Fault);伪造信息恶意响应的情况称为“拜占庭错误”( Byzantine Fault)，对应节点为拜占庭节点。
+
+处理非拜占庭错误的算法有：paxos、raft和其变种
+
+处理拜占庭错误算法有：pbft、pow算法
+————————————————
+版权声明：本文为CSDN博主「wahaha13168」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/wahaha13168/article/details/80808220
