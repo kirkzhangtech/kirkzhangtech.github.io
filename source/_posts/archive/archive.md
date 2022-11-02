@@ -16,3 +16,4 @@ categories:
 |html 标签，作为总结部分||\<text style="font-family:Courier New;color:red"\>\<\/text\>|
 ||https://michaelnielsen.org/blog/principles-of-effective-research/|高校研究个人准则|
 |fetch DB resources||SELECT * FROM USER_PROCEDURES ;SELECT * FROM USER_PROCEDURES WHERE OBJECT_TYPE='PACKAGE';SELECT * FROM ALL_PROCEDURES WHERE OBJECT_TYPE='PACKAGE';SELECT * FROM DBA_PROCEDURES WHERE OBJECT_TYPE='PACKAGE'; SELECT * FROM USER_OBJECTS WHERE OBJECT_TYPE='PACKAGE';|
+|pdf to markdown|sudo pip install pdf-to-markdown|pdf2md pdf-to-markdown/examples/neihu.pdf|
