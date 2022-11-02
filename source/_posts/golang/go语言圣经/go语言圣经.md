@@ -2,89 +2,29 @@
 title: go语言圣经
 categories:
 - golang
-tag: golang
 ---
 
-摘要:
-<!-- more -->
+摘要: Go语言有时候被描述为"C类似语言",或者是“21世纪的C语言”。Go从C语言继承了相似的表达式语法、控制流结构、基础数据类型、调用参数传值、指针等很多思想，还有C语言一直所看中的编译后机器码的运行效率以及和现有操作系统的无缝适配。
 
+<!-- more -->
 <!-- toc -->
 
-- [1. 入门](#1-入门)
-- [2. 程序结构](#2-程序结构)
-  - [2.1 命名](#21-命名)
-  - [2.2 声明](#22-声明)
-  - [2.3 变量](#23-变量)
-    - [2.3.1 简短变量声明](#231-简短变量声明)
-    - [2.3.2 指针](#232-指针)
-    - [2.3.3 new函数](#233-new函数)
-    - [2.3.4. 变量的生命周期](#234-变量的生命周期)
-  - [2.4 赋值](#24-赋值)
-    - [2.4.1 元组赋值](#241-元组赋值)
-  - [2.5 类型](#25-类型)
-  - [2.6 包和文件](#26-包和文件)
-  - [2.7. 作用域](#27-作用域)
-- [3.基础数据类型](#3基础数据类型)
-  - [3.1 整型](#31-整型)
-  - [3.2 浮点数](#32-浮点数)
-  - [3.3 复数](#33-复数)
-  - [3.4 布尔类型](#34-布尔类型)
-  - [3.5 字符串](#35-字符串)
-- [4. 复合数据类型](#4-复合数据类型)
-  - [4.1 数组](#41-数组)
-  - [4.2 slice](#42-slice)
-    - [4.2.1 append函数](#421-append函数)
-  - [4.3 Map](#43-map)
-  - [4.4 结构体](#44-结构体)
-    - [4.4.1 结构体字面值](#441-结构体字面值)
-    - [4.4.2 结构体的比较](#442-结构体的比较)
-    - [4.4.3 结构体嵌入和匿名成员](#443-结构体嵌入和匿名成员)
-  - [4.5 json字符串](#45-json字符串)
-  - [4.6 文本和HTML模板](#46-文本和html模板)
-- [5. 函数](#5-函数)
-  - [5.1 错误](#51-错误)
-  - [5.2 函数值](#52-函数值)
-  - [5.3 匿名函数](#53-匿名函数)
-  - [5.4 可变参数](#54-可变参数)
-  - [5.5 defer函数](#55-defer函数)
-  - [5.6 panic异常](#56-panic异常)
-  - [5.7 Recovery捕获异常](#57-recovery捕获异常)
-- [6. 方法](#6-方法)
-  - [6.1 方法声明](#61-方法声明)
-  - [6.2 基于指针对象的方法](#62-基于指针对象的方法)
-  - [6.3. 通过嵌入结构体来扩展类型](#63-通过嵌入结构体来扩展类型)
-  - [6.4 封装](#64-封装)
-- [7. 接口](#7-接口)
-  - [7.1. 接口约定](#71-接口约定)
-  - [7.2 接口类型](#72-接口类型)
-  - [7.3 实现接口的条件](#73-实现接口的条件)
-  - [7.4 flag.Value接口](#74-flagvalue接口)
-  - [7.5 接口值](#75-接口值)
-    - [7.5.1. 警告:一个包含nil指针的接口不是nil接口](#751-警告一个包含nil指针的接口不是nil接口)
-  - [7.6. sort.Interface接口](#76-sortinterface接口)
-  - [7.7. http.Handler接口](#77-httphandler接口)
-  - [7.8. error接口](#78-error接口)
-  - [7.9. 类型断言](#79-类型断言)
-  - [7.10. 基于类型断言区别错误类型](#710-基于类型断言区别错误类型)
-  - [7.11. any关键字与泛型](#711-any关键字与泛型)
-- [8. Goroutines和Channels](#8-goroutines和channels)
-  - [8.1 goroutine](#81-goroutine)
-  - [8.2 channel](#82-channel)
-  - [8.3 基于select的多路复用](#83-基于select的多路复用)
-  - [8.4. 并发的退出](#84-并发的退出)
-- [9. 基于共享变量的并发](#9-基于共享变量的并发)
-  - [9.1 sync.Mutex与sync.RMutex互斥锁](#91-syncmutex与syncrmutex互斥锁)
-  - [9.2 sync.Once惰性初始化](#92-synconce惰性初始化)
-  - [9.3 sync.Cond的使用](#93-synccond的使用)
-  - [9.4. Goroutines和线程](#94-goroutines和线程)
-- [10. 包和工具](#10-包和工具)
-- [11. 测试](#11-测试)
-  - [11.1 go test](#111-go-test)
-  - [11.2 测试覆盖率](#112-测试覆盖率)
-  - [11.3 基准测试](#113-基准测试)
-  - [11.4 刨析](#114-刨析)
-  - [11.5 示例函数](#115-示例函数)
-- [12. appendIndex](#12-appendindex)
+# go语言项目
+
+所有的编程语言都反映了语言设计者对编程哲学的反思，通常包括之前的语言所暴露的一些不足地方的改进。Go项目是在Google公司维护超级复杂的几个软件系统遇到的一些问题的反思（但是这类问题绝不是Google公司所特有的）。
+
+正如Rob Pike所说，“软件的复杂性是乘法级相关的”，通过增加一个部分的复杂性来修复问题通常将慢慢地增加其他部分的复杂性。通过增加功能、选项和配置是修复问题的最快的途径，但是这很容易让人忘记简洁的内涵，即从长远来看，简洁依然是好软件的关键因素。
+
+简洁的设计需要在工作开始的时候舍弃不必要的想法，并且在软件的生命周期内严格区别好的改变和坏的改变。通过足够的努力，一个好的改变可以在不破坏原有完整概念的前提下保持自适应，正如Fred Brooks所说的“概念完整性”；而一个坏的改变则不能达到这个效果，它们仅仅是通过肤浅的和简单的妥协来破坏原有设计的一致性。只有通过简洁的设计，才能让一个系统保持稳定、安全和持续的进化。
+
+Go项目包括编程语言本身，附带了相关的工具和标准库，最后但并非代表不重要的是，关于简洁编程哲学的宣言。就事后诸葛的角度来看，Go语言的这些地方都做的还不错：拥有自动垃圾回收、一个包系统、函数作为一等公民、词法作用域、系统调用接口、只读的UTF8字符串等。但是Go语言本身只有很少的特性，也不太可能添加太多的特性。例如，它没有隐式的数值转换，没有构造函数和析构函数，没有运算符重载，没有默认参数，也没有继承，没有泛型，没有异常，没有宏，没有函数修饰，更没有线程局部存储。但是，语言本身是成熟和稳定的，而且承诺保证向后兼容：用之前的Go语言编写程序可以用新版本的Go语言编译器和标准库直接构建而不需要修改代码。
+
+Go语言有足够的类型系统以避免动态语言中那些粗心的类型错误，但是，Go语言的类型系统相比传统的强类型语言又要简洁很多。虽然，有时候这会导致一个“无类型”的抽象类型概念，但是Go语言程序员并不需要像C++或Haskell程序员那样纠结于具体类型的安全属性。在实践中，Go语言简洁的类型系统给程序员带来了更多的安全性和更好的运行时性能。
+
+Go语言鼓励当代计算机系统设计的原则，特别是局部的重要性。它的内置数据类型和大多数的准库数据结构都经过精心设计而避免显式的初始化或隐式的构造函数，因为很少的内存分配和内存初始化代码被隐藏在库代码中了。Go语言的聚合类型（结构体和数组）可以直接操作它们的元素，只需要更少的存储空间、更少的内存写操作，而且指针操作比其他间接操作的语言也更有效率。由于现代计算机是一个并行的机器，Go语言提供了基于CSP的并发特性支持。Go语言的动态栈使得轻量级线程goroutine的初始栈可以很小，因此，创建一个goroutine的代价很小，创建百万级的goroutine完全是可行的。
+
+Go语言的标准库（通常被称为语言自带的电池），提供了清晰的构建模块和公共接口，包含I/O操作、文本处理、图像、密码学、网络和分布式应用程序等，并支持许多标准化的文件格式和编解码协议。库和工具使用了大量的约定来减少额外的配置和解释，从而最终简化程序的逻辑，而且，每个Go程序结构都是如此的相似，因此，Go程序也很容易学习。使用Go语言自带工具构建Go语言项目只需要使用文件名和标识符名称，一个偶尔的特殊注释来确定所有的库、可执行文件、测试、基准测试、例子、以及特定于平台的变量、项目的文档等；Go语言源代码本身就包含了构建规范。
+
 
 # 1. 入门
 
@@ -1853,7 +1793,86 @@ func f(out io.Writer) {
 
 ## 7.6. sort.Interface接口
 
-golang提供了`sort`包帮助进行排序数据,实现排序需要自己实现对应的排序接口.
+排序操作和字符串格式化一样是很多程序经常使用的操作。尽管一个最短的快排程序只要15行就可以搞定，但是一个健壮的实现需要更多的代码，并且我们不希望每次我们需要的时候都重写或者拷贝这些代码。
+
+幸运的是，sort包内置的提供了根据一些排序函数来对任何序列排序的功能。它的设计非常独到。在很多语言中，排序算法都是和序列数据类型关联，同时排序函数和具体类型元素关联。相比之下，Go语言的sort.Sort函数不会对具体的序列和它的元素做任何假设。相反，它使用了一个接口类型sort.Interface来指定通用的排序算法和可能被排序到的序列类型之间的约定。这个接口的实现由序列的具体表示和它希望排序的元素决定，序列的表示经常是一个切片。
+
+一个内置的排序算法需要知道三个东西：序列的长度，表示两个元素比较的结果，一种交换两个元素的方式；这就是sort.Interface的三个方法：
+
+```golang
+package sort
+
+type Interface interface {
+    Len() int
+    Less(i, j int) bool // i, j are indices of sequence elements
+    Swap(i, j int)
+}
+```
+
+为了对序列进行排序，我们需要定义一个实现了这三个方法的类型，然后对这个类型的一个实例应用sort.Sort函数。思考对一个字符串切片进行排序，这可能是最简单的例子了。下面是这个新的类型`StringSlice`和它的`Len`,`Less`和`Swap`方法
+
+```golang
+type StringSlice []string
+func (p StringSlice) Len() int           { return len(p) }
+func (p StringSlice) Less(i, j int) bool { return p[i] < p[j] }
+func (p StringSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+```
+
+现在我们可以通过像下面这样将一个切片转换为一个`StringSlice`类型来进行排序：
+
+`sort.Sort(StringSlice(names))`
+这个转换得到一个相同长度，容量，和基于`names`数组的切片值;并且这个切片值的类型有三个排序需要的方法。
+
+对字符串切片的排序是很常用的需要，所以`sort`包提供了`StringSlice`类型，也提供了`Strings`函数能让上面这些调用简化成`sort.Strings(names)`
+
+这里用到的技术很容易适用到其它排序序列中，例如我们可以忽略大小写或者含有的特殊字符。（本书使用Go程序对索引词和页码进行排序也用到了这个技术，对罗马数字做了额外逻辑处理。）对于更复杂的排序，我们使用相同的方法，但是会用更复杂的数据结构和更复杂地实现`sort.Interface`的方法。
+
+我们会运行上面的例子来对一个表格中的音乐播放列表进行排序。每个track都是单独的一行，每一列都是这个track的属性像艺术家，标题，和运行时间。想象一个图形用户界面来呈现这个表格，并且点击一个属性的顶部会使这个列表按照这个属性进行排序；再一次点击相同属性的顶部会进行逆向排序。让我们看下每个点击会发生什么响应。
+
+下面的变量tracks包含了一个播放列表。（One of the authors apologizes for the other author’s musical tastes.）每个元素都不是Track本身而是指向它的指针。尽管我们在下面的代码中直接存储Tracks也可以工作，sort函数会交换很多对元素，所以如果每个元素都是指针而不是Track类型会更快，指针是一个机器字码长度而Track类型可能是八个或更多。
+
+```golang
+gopl.io/ch7/sorting
+
+
+type Track struct {
+    Title  string
+    Artist string
+    Album  string
+    Year   int
+    Length time.Duration
+}
+
+var tracks = []*Track{
+    {"Go", "Delilah", "From the Roots Up", 2012, length("3m38s")},
+    {"Go", "Moby", "Moby", 1992, length("3m37s")},
+    {"Go Ahead", "Alicia Keys", "As I Am", 2007, length("4m36s")},
+    {"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
+}
+
+func length(s string) time.Duration {
+    d, err := time.ParseDuration(s)
+    if err != nil {
+        panic(s)
+    }
+    return d
+}
+```
+printTracks函数将播放列表打印成一个表格。一个图形化的展示可能会更好点，但是这个小程序使用text/tabwriter包来生成一个列整齐对齐和隔开的表格，像下面展示的这样。注意到*tabwriter.Writer是满足io.Writer接口的。它会收集每一片写向它的数据；它的Flush方法会格式化整个表格并且将它写向os.Stdout（标准输出）。
+
+```golang
+func printTracks(tracks []*Track) {
+    const format = "%v\t%v\t%v\t%v\t%v\t\n"
+    tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
+    fmt.Fprintf(tw, format, "Title", "Artist", "Album", "Year", "Length")
+    fmt.Fprintf(tw, format, "-----", "------", "-----", "----", "------")
+    for _, t := range tracks {
+        fmt.Fprintf(tw, format, t.Title, t.Artist, t.Album, t.Year, t.Length)
+    }
+    tw.Flush() // calculate column widths and print table
+}
+```
+为了能按照Artist字段对播放列表进行排序，我们会像对StringSlice那样定义一个新的带有必须的Len，Less和Swap方法的切片类型。
 
 ```golang
 type byArtist []*Track
@@ -1861,45 +1880,332 @@ func (x byArtist) Len() int           { return len(x) }
 func (x byArtist) Less(i, j int) bool { return x[i].Artist < x[j].Artist }
 func (x byArtist) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 ```
+为了调用通用的排序程序，我们必须先将tracks转换为新的byArtist类型，它定义了具体的排序：
 
-对于自定义的排序，我们也需要实现排序函数.
+`sort.Sort(byArtist(tracks))`
+在按照artist对这个切片进行排序后，printTrack的输出如下
 
 ```golang
-//!+customcode
+Title       Artist          Album               Year Length
+-----       ------          -----               ---- ------
+Go Ahead    Alicia Keys     As I Am             2007 4m36s
+Go          Delilah         From the Roots Up   2012 3m38s
+Ready 2 Go  Martin Solveig  Smash               2011 4m24s
+Go          Moby            Moby                1992 3m37s
+```
+如果用户第二次请求“按照artist排序”，我们会对tracks进行逆向排序。然而我们不需要定义一个有颠倒Less方法的新类型byReverseArtist，因为sort包中提供了Reverse函数将排序顺序转换成逆序。
+`sort.Sort(sort.Reverse(byArtist(tracks)))`
+在按照artist对这个切片进行逆向排序后，printTrack的输出如下
+
+```golang
+Title       Artist          Album               Year Length
+-----       ------          -----               ---- ------
+Go          Moby            Moby                1992 3m37s
+Ready 2 Go  Martin Solveig  Smash               2011 4m24s
+Go          Delilah         From the Roots Up   2012 3m38s
+Go Ahead    Alicia Keys     As I Am             2007 4m36s
+```
+`sort.Reverse`函数值得进行更近一步的学习，因为它使用了（§6.3）章中的组合，这是一个重要的思路。`sort`包定义了一个不公开的`struct`类型`reverse`，它嵌入了一个`sort.Interface`。`reverse`的`Less`方法调用了内嵌的`sort.Interface`值的`Less`方法，但是通过交换索引的方式使排序结果变成逆序。
+
+```golang
+package sort
+
+type reverse struct{ Interface } // that is, sort.Interface
+
+func (r reverse) Less(i, j int) bool { return r.Interface.Less(j, i) }
+
+func Reverse(data Interface) Interface { return reverse{data} }
+```
+`reverse`的另外两个方法`Len`和`Swap`隐式地由原有内嵌的`sort.Interface`提供。因为`reverse`是一个不公开的类型，所以导出函数`Reverse`返回一个包含原有`sort.Interface`值的reverse类型实例。
+
+为了可以按照不同的列进行排序，我们必须定义一个新的类型例如byYear：
+
+```golang
+type byYear []*Track
+func (x byYear) Len() int           { return len(x) }
+func (x byYear) Less(i, j int) bool { return x[i].Year < x[j].Year }
+func (x byYear) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
+```
+在使用sort.Sort(byYear(tracks))按照年对tracks进行排序后，printTrack展示了一个按时间先后顺序的列表：
+
+```golang
+Title       Artist          Album               Year Length
+-----       ------          -----               ---- ------
+Go          Moby            Moby                1992 3m37s
+Go Ahead    Alicia Keys     As I Am             2007 4m36s
+Ready 2 Go  Martin Solveig  Smash               2011 4m24s
+Go          Delilah         From the Roots Up   2012 3m38s
+```
+对于我们需要的每个切片元素类型和每个排序函数，我们需要定义一个新的sort.Interface实现。如你所见，Len和Swap方法对于所有的切片类型都有相同的定义。下个例子，具体的类型customSort会将一个切片和函数结合，使我们只需要写比较函数就可以定义一个新的排序。顺便说下，实现了sort.Interface的具体类型不一定是切片类型；customSort是一个结构体类型。
+
+```golang
 type customSort struct {
-	t    []*Track
-	less func(x, y *Track) bool
+    t    []*Track
+    less func(x, y *Track) bool
 }
 
 func (x customSort) Len() int           { return len(x.t) }
 func (x customSort) Less(i, j int) bool { return x.less(x.t[i], x.t[j]) }
-func (x customSort) Swap(i, j int)      { x.t[i], x.t[j] = x.t[j], x.t[i] }
+func (x customSort) Swap(i, j int)	{ x.t[i], x.t[j] = x.t[j], x.t[i] }
+```
+让我们定义一个多层的排序函数，它主要的排序键是标题，第二个键是年，第三个键是运行时间Length。下面是该排序的调用，其中这个排序使用了匿名排序函数：
 
+```golang
 sort.Sort(customSort{tracks, func(x, y *Track) bool {
-		if x.Title != y.Title {
-			return x.Title < y.Title
-		}
-		if x.Year != y.Year {
-			return x.Year < y.Year
-		}
-		if x.Length != y.Length {
-			return x.Length < y.Length
-		}
-		return false
-	}})
+    if x.Title != y.Title {
+        return x.Title < y.Title
+    }
+    if x.Year != y.Year {
+        return x.Year < y.Year
+    }
+    if x.Length != y.Length {
+        return x.Length < y.Length
+    }
+    return false
+}})
+```
+这下面是排序的结果。注意到两个标题是“Go”的track按照标题排序是相同的顺序，但是在按照year排序上更久的那个track优先。
+```golang
+
+Title       Artist          Album               Year Length
+-----       ------          -----               ---- ------
+Go          Moby            Moby                1992 3m37s
+Go          Delilah         From the Roots Up   2012 3m38s
+Go Ahead    Alicia Keys     As I Am             2007 4m36s
+Ready 2 Go  Martin Solveig  Smash               2011 4m24s
+```
+尽管对长度为n的序列排序需要 O(n log n)次比较操作，检查一个序列是否已经有序至少需要n-1次比较。sort包中的IsSorted函数帮我们做这样的检查。像sort.Sort一样，它也使用sort.Interface对这个序列和它的排序函数进行抽象，但是它从不会调用Swap方法：这段代码示范了IntsAreSorted和Ints函数在IntSlice类型上的使用：
+
+```golang
+values := []int{3, 1, 4, 1}
+fmt.Println(sort.IntsAreSorted(values)) // "false"
+sort.Ints(values)
+fmt.Println(values)                     // "[1 1 3 4]"
+fmt.Println(sort.IntsAreSorted(values)) // "true"
+sort.Sort(sort.Reverse(sort.IntSlice(values)))
+fmt.Println(values)                     // "[4 3 1 1]"
+fmt.Println(sort.IntsAreSorted(values)) // "false"
 ```
 
-`IntsAreSorted(...interface{})` reports whether the slice x is sorted in increasing order.
+为了使用方便，sort包为`[]int`、`[]string`和`[]float64`的正常排序提供了特定版本的函数和类型。对于其他类型，例如`[]int64`或者`[]uint`，尽管路径也很简单，还是依赖我们自己实现。
+
+练习 7.8： 很多图形界面提供了一个有状态的多重排序表格插件：主要的排序键是最近一次点击过列头的列，第二个排序键是第二最近点击过列头的列，等等。定义一个sort.Interface的实现用在这样的表格中。比较这个实现方式和重复使用sort.Stable来排序的方式。
+
+练习 7.9： 使用html/template包（§4.6）替代printTracks将tracks展示成一个HTML表格。将这个解决方案用在前一个练习中，让每次点击一个列的头部产生一个HTTP请求来排序这个表格。
+
+练习 7.10： sort.Interface类型也可以适用在其它地方。编写一个IsPalindrome(s sort.Interface) bool函数表明序列s是否是回文序列，换句话说反向排序不会改变这个序列。假设如果!s.Less(i, j) && !s.Less(j, i)则索引i和j上的元素相等。
 
 ## 7.7. http.Handler接口
 
-http.Handler的实例
+在第一章中,我们粗略的了解了怎么用`net/http`包去实现网络客户端（§1.5）和服务器（§1.7）。在这个小节中，我们会对那些基于`http.Handler`接口的服务器API做更进一步的学习：
 
-## 7.8. error接口
+```golang
+net/http
+package http
+
+type Handler interface {
+    ServeHTTP(w ResponseWriter, r *Request)
+}
+
+func ListenAndServe(address string, h Handler) error
+```
+
+`ListenAndServe`函数需要一个例如'localhost:8000'的服务器地址，和一个所有请求都可以分派的Handler接口实例。它会一直运行，直到这个服务因为一个错误而失败（或者启动失败），它的返回值一定是一个非空的错误。
+
+想象一个电子商务网站，为了销售，将数据库中物品的价格映射成美元。下面这个程序可能是能想到的最简单的实现了。它将库存清单模型化为一个命名为database的map类型，我们给这个类型一个`ServeHttp`方法,这样它可以满足`http.Handler`接口。这个`handler`会遍历整个map并输出物品信息
+
+```golang
+gopl.io/ch7/http1
+
+
+func main() {
+    db := database{"shoes": 50, "socks": 5}
+    log.Fatal(http.ListenAndServe("localhost:8000", db))
+}
+
+type dollars float32
+
+func (d dollars) String() string { return fmt.Sprintf("$%.2f", d) }
+
+type database map[string]dollars
+
+func (db database) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+    for item, price := range db {
+        fmt.Fprintf(w, "%s: %s\n", item, price)
+    }
+}
+```
+如果我们启动这个服务，
+
+```golang
+$ go build gopl.io/ch7/http1
+$ ./http1 &
+```
+
+然后用1.5节中的获取程序（如果你更喜欢可以使用web浏览器）来连接服务器，我们得到下面的输出：
+
+```golang
+$ go build gopl.io/ch1/fetch
+$ ./fetch http://localhost:8000
+shoes: $50.00
+socks: $5.00
+```
+目前为止，这个服务器不考虑URL，只能为每个请求列出它全部的库存清单。更真实的服务器会定义多个不同的URL，每一个都会触发一个不同的行为。让我们使用`/list`来调用已经存在的这个行为并且增加另一个`/price`调用表明单个货品的价格，像这样`/price?item=socks`来指定一个请求参数。
+
+```golang
+gopl.io/ch7/http2
+
+
+func (db database) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+    switch req.URL.Path {
+    case "/list":
+        for item, price := range db {
+            fmt.Fprintf(w, "%s: %s\n", item, price)
+        }
+    case "/price":
+        item := req.URL.Query().Get("item")
+        price, ok := db[item]
+        if !ok {
+            w.WriteHeader(http.StatusNotFound) // 404
+            fmt.Fprintf(w, "no such item: %q\n", item)
+            return
+        }
+        fmt.Fprintf(w, "%s\n", price)
+    default:
+        w.WriteHeader(http.StatusNotFound) // 404
+        fmt.Fprintf(w, "no such page: %s\n", req.URL)
+    }
+}
+```
+
+现在handler基于URL的路径部分(req.URL.Path)来决定执行什么逻辑。如果这个handler不能识别这个路径，它会通过调用w.WriteHeader(http.StatusNotFound)返回客户端一个HTTP错误；这个检查应该在向w写入任何值前完成。（顺便提一下，http.ResponseWriter是另一个接口。它在io.Writer上增加了发送HTTP相应头的方法。）等效地，我们可以使用实用的http.Error函数：
+
+```golang
+msg := fmt.Sprintf("no such page: %s\n", req.URL)
+http.Error(w, msg, http.StatusNotFound) // 404
+```
+
+`/price`的case会调用URL的Query方法来将HTTP请求参数解析为一个map，或者更准确地说一个`net/url`包中`url.Values`(§6.2.1)类型的多重映射。然后找到第一个item参数并查找它的价格。如果这个货品没有找到会返回一个错误。
+
+这里是一个和新服务器会话的例子：
+
+```golang
+$ go build gopl.io/ch7/http2
+$ go build gopl.io/ch1/fetch
+$ ./http2 &
+$ ./fetch http://localhost:8000/list
+shoes: $50.00
+socks: $5.00
+$ ./fetch http://localhost:8000/price?item=socks
+$5.00
+$ ./fetch http://localhost:8000/price?item=shoes
+$50.00
+$ ./fetch http://localhost:8000/price?item=hat
+no such item: "hat"
+$ ./fetch http://localhost:8000/help
+no such page: /help
+```
+显然我们可以继续向ServeHTTP方法中添加case，但在一个实际的应用中，将每个case中的逻辑定义到一个分开的方法或函数中会很实用。此外，相近的URL可能需要相似的逻辑；例如几个图片文件可能有形如/images/*.png的URL。因为这些原因，net/http包提供了一个请求多路器ServeMux来简化URL和handlers的联系。一个ServeMux将一批http.Handler聚集到一个单一的http.Handler中。再一次，我们可以看到满足同一接口的不同类型是可替换的：web服务器将请求指派给任意的http.Handler 而不需要考虑它后面的具体类型。
+
+对于更复杂的应用，一些ServeMux可以通过组合来处理更加错综复杂的路由需求。Go语言目前没有一个权威的web框架，就像Ruby语言有Rails和python有Django。这并不是说这样的框架不存在，而是Go语言标准库中的构建模块就已经非常灵活以至于这些框架都是不必要的。此外，尽管在一个项目早期使用框架是非常方便的，但是它们带来额外的复杂度会使长期的维护更加困难。
+
+在下面的程序中，我们创建一个ServeMux并且使用它将URL和相应处理/list和/price操作的handler联系起来，这些操作逻辑都已经被分到不同的方法中。然后我们在调用ListenAndServe函数中使用ServeMux为主要的handler。
+```golang
+gopl.io/ch7/http3
+
+
+func main() {
+    db := database{"shoes": 50, "socks": 5}
+    mux := http.NewServeMux()
+    mux.Handle("/list", http.HandlerFunc(db.list))
+    mux.Handle("/price", http.HandlerFunc(db.price))
+    log.Fatal(http.ListenAndServe("localhost:8000", mux))
+}
+
+type database map[string]dollars
+
+func (db database) list(w http.ResponseWriter, req *http.Request) {
+    for item, price := range db {
+        fmt.Fprintf(w, "%s: %s\n", item, price)
+    }
+}
+
+func (db database) price(w http.ResponseWriter, req *http.Request) {
+    item := req.URL.Query().Get("item")
+    price, ok := db[item]
+    if !ok {
+        w.WriteHeader(http.StatusNotFound) // 404
+        fmt.Fprintf(w, "no such item: %q\n", item)
+        return
+    }
+    fmt.Fprintf(w, "%s\n", price)
+}
+```
+让我们关注这两个注册到handlers上的调用。第一个db.list是一个方法值（§6.4），它是下面这个类型的值。
+
+
+func(w http.ResponseWriter, req *http.Request)
+也就是说db.list的调用会援引一个接收者是db的database.list方法。所以db.list是一个实现了handler类似行为的函数，但是因为它没有方法（理解：该方法没有它自己的方法），所以它不满足http.Handler接口并且不能直接传给mux.Handle。
+
+语句http.HandlerFunc(db.list)是一个转换而非一个函数调用，因为http.HandlerFunc是一个类型。它有如下的定义：
+```golang
+net/http
+
+
+package http
+
+type HandlerFunc func(w ResponseWriter, r *Request)
+
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
+    f(w, r)
+}
+```
+HandlerFunc显示了在Go语言接口机制中一些不同寻常的特点。这是一个实现了接口http.Handler的方法的函数类型。ServeHTTP方法的行为是调用了它的函数本身。因此HandlerFunc是一个让函数值满足一个接口的适配器，这里函数和这个接口仅有的方法有相同的函数签名。实际上，这个技巧让一个单一的类型例如database以多种方式满足http.Handler接口：一种通过它的list方法，一种通过它的price方法等等。
+
+因为handler通过这种方式注册非常普遍，ServeMux有一个方便的HandleFunc方法，它帮我们简化handler注册代码成这样：
 
 ```golang
 
-package errors_demo
+gopl.io/ch7/http3a
+
+mux.HandleFunc("/list", db.list)
+mux.HandleFunc("/price", db.price)
+```
+从上面的代码很容易看出应该怎么构建一个程序：由两个不同的web服务器监听不同的端口，并且定义不同的URL将它们指派到不同的handler。我们只要构建另外一个ServeMux并且再调用一次`ListenAndServe`（可能并行的）。但是在大多数程序中，一个web服务器就足够了。此外，在一个应用程序的多个文件中定义`HTTP handler`也是非常典型的，如果它们必须全部都显式地注册到这个应用的`ServeMux`实例上会比较麻烦。
+
+所以为了方便，`net/http`包提供了一个全局的`ServeMux`实例`DefaultServerMux`和包级别的`http.Handle`和`http.HandleFunc`函数。现在，为了使用`DefaultServeMux`作为服务器的主`handler`，我们不需要将它传给`ListenAndServe`函数;nil值就可以工作。
+
+然后服务器的主函数可以简化成：
+
+```golang
+gopl.io/ch7/http4
+
+func main() {
+    db := database{"shoes": 50, "socks": 5}
+    http.HandleFunc("/list", db.list)
+    http.HandleFunc("/price", db.price)
+    log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+```
+
+最后，一个重要的提示：就像我们在1.7节中提到的，web服务器在一个新的协程中调用每一个handler，所以当handler获取其它协程或者这个handler本身的其它请求也可以访问到变量时，一定要使用预防措施，比如锁机制。我们后面的两章中将讲到并发相关的知识。
+
+练习 7.11： 增加额外的handler让客户端可以创建，读取，更新和删除数据库记录。例如，一个形如 /update?item=socks&price=6 的请求会更新库存清单里一个货品的价格并且当这个货品不存在或价格无效时返回一个错误值。（注意：这个修改会引入变量同时更新的问题）
+
+练习 7.12： 修改/list的handler让它把输出打印成一个HTML的表格而不是文本。html/template包（§4.6）可能会对你有帮助。
+
+## 7.8. error接口
+从本书的开始，我们就已经创建和使用过神秘的预定义error类型，而且没有解释它究竟是什么。实际上它就是interface类型，这个类型有一个返回错误信息的单一方法：
+
+```golang
+type error interface {
+    Error() string
+}
+```
+创建一个error最简单的方法就是调用errors.New函数，它会根据传入的错误信息返回一个新的error。整个errors包仅只有4行：
+
+```golang
+package errors
 
 func New(text string) error { return &errorString{text} }
 
@@ -1907,8 +2213,21 @@ type errorString struct { text string }
 
 func (e *errorString) Error() string { return e.text }
 ```
-调用`errors.New`函数是非常稀少的，因为有一个方便的封装函数`fmt.Errorf`它还会处理字符串格式化
-另一个error demo实例
+承载errorString的类型是一个结构体而非一个字符串，这是为了保护它表示的错误避免粗心（或有意）的更新。并且因为是指针类型*errorString满足error接口而非errorString类型，所以每个New函数的调用都分配了一个独特的和其他错误不相同的实例。我们也不想要重要的error例如io.EOF和一个刚好有相同错误消息的error比较后相等。
+
+`fmt.Println(errors.New("EOF") == errors.New("EOF")) // "false"`
+调用`errors.New`函数是非常稀少的，因为有一个方便的封装函数fmt.Errorf，它还会处理字符串格式化。我们曾多次在第5章中用到它。
+
+```golang
+package fmt
+
+import "errors"
+
+func Errorf(format string, args ...interface{}) error {
+    return errors.New(Sprintf(format, args...))
+}
+```
+虽然*errorString可能是最简单的错误类型，但远非只有它一个。例如，syscall包提供了Go语言底层系统调用API。在多个平台上，它定义一个实现error接口的数字类型Errno，并且在Unix平台上，Errno的Error方法会从一个字符串表中查找错误消息，如下面展示的这样：
 ```golang
 package syscall
 
@@ -1927,12 +2246,313 @@ func (e Errno) Error() string {
     }
     return fmt.Sprintf("errno %d", e)
 }
+```
+下面的语句创建了一个持有Errno值为2的接口值，表示POSIX ENOENT状况：
 
 var err error = syscall.Errno(2)
 fmt.Println(err.Error()) // "no such file or directory"
 fmt.Println(err)         // "no such file or directory"
+err的值图形化的呈现在图7.6中。
+
+Errno是一个系统调用错误的高效表示方式，它通过一个有限的集合进行描述，并且它满足标准的错误接口。我们会在第7.11节了解到其它满足这个接口的类型。
+
+## 示例-表达式求值
+
+在本节中，我们会构建一个简单算术表达式的求值器。我们将使用一个接口Expr来表示Go语言中任意的表达式。现在这个接口不需要有方法，但是我们后面会为它增加一些。
+
+
+// An Expr is an arithmetic expression.
+type Expr interface{}
+我们的表达式语言包括浮点数符号（小数点）；二元操作符+，-，*， 和/；一元操作符-x和+x；调用pow(x,y)，sin(x)，和sqrt(x)的函数；例如x和pi的变量；当然也有括号和标准的优先级运算符。所有的值都是float64类型。这下面是一些表达式的例子：
+
+```golang
+sqrt(A / pi)
+pow(x, 3) + pow(y, 3)
+(F - 32) * 5 / 9
 ```
-用有限几个进行描述，并且它满足标准错误接口
+下面的五个具体类型表示了具体的表达式类型。Var类型表示对一个变量的引用。（我们很快会知道为什么它可以被输出。）literal类型表示一个浮点型常量。unary和binary类型表示有一到两个运算对象的运算符表达式，这些操作数可以是任意的Expr类型。call类型表示对一个函数的调用；我们限制它的fn字段只能是pow，sin或者sqrt。
+
+```golang
+gopl.io/ch7/eval
+
+
+// A Var identifies a variable, e.g., x.
+type Var string
+
+// A literal is a numeric constant, e.g., 3.141.
+type literal float64
+
+// A unary represents a unary operator expression, e.g., -x.
+type unary struct {
+    op rune // one of '+', '-'
+    x  Expr
+}
+
+// A binary represents a binary operator expression, e.g., x+y.
+type binary struct {
+    op   rune // one of '+', '-', '*', '/'
+    x, y Expr
+}
+
+// A call represents a function call expression, e.g., sin(x).
+type call struct {
+    fn   string // one of "pow", "sin", "sqrt"
+    args []Expr
+}
+```
+为了计算一个包含变量的表达式，我们需要一个environment变量将变量的名字映射成对应的值：
+
+```golang
+type Env map[Var]float64
+```
+我们也需要每个表达式去定义一个Eval方法，这个方法会根据给定的environment变量返回表达式的值。因为每个表达式都必须提供这个方法，我们将它加入到Expr接口中。这个包只会对外公开Expr，Env，和Var类型。调用方不需要获取其它的表达式类型就可以使用这个求值器。
+
+```golang
+type Expr interface {
+    // Eval returns the value of this Expr in the environment env.
+    Eval(env Env) float64
+}
+```
+
+下面给大家展示一个具体的Eval方法。Var类型的这个方法对一个environment变量进行查找，如果这个变量没有在environment中定义过这个方法会返回一个零值，literal类型的这个方法简单的返回它真实的值。
+
+```golang
+func (v Var) Eval(env Env) float64 {
+    return env[v]
+}
+
+func (l literal) Eval(_ Env) float64 {
+    return float64(l)
+}
+```
+unary和binary的Eval方法会递归的计算它的运算对象，然后将运算符op作用到它们上。我们不将被零或无穷数除作为一个错误，因为它们都会产生一个固定的结果——无限。最后，call的这个方法会计算对于pow，sin，或者sqrt函数的参数值，然后调用对应在math包中的函数。
+
+```golang
+func (u unary) Eval(env Env) float64 {
+    switch u.op {
+    case '+':
+        return +u.x.Eval(env)
+    case '-':
+        return -u.x.Eval(env)
+    }
+    panic(fmt.Sprintf("unsupported unary operator: %q", u.op))
+}
+
+func (b binary) Eval(env Env) float64 {
+    switch b.op {
+    case '+':
+        return b.x.Eval(env) + b.y.Eval(env)
+    case '-':
+        return b.x.Eval(env) - b.y.Eval(env)
+    case '*':
+        return b.x.Eval(env) * b.y.Eval(env)
+    case '/':
+        return b.x.Eval(env) / b.y.Eval(env)
+    }
+    panic(fmt.Sprintf("unsupported binary operator: %q", b.op))
+}
+
+func (c call) Eval(env Env) float64 {
+    switch c.fn {
+    case "pow":
+        return math.Pow(c.args[0].Eval(env), c.args[1].Eval(env))
+    case "sin":
+        return math.Sin(c.args[0].Eval(env))
+    case "sqrt":
+        return math.Sqrt(c.args[0].Eval(env))
+    }
+    panic(fmt.Sprintf("unsupported function call: %s", c.fn))
+}
+```
+一些方法会失败。例如，一个call表达式可能有未知的函数或者错误的参数个数。用一个无效的运算符如!或者<去构建一个unary或者binary表达式也是可能会发生的（尽管下面提到的Parse函数不会这样做）。这些错误会让Eval方法panic。其它的错误，像计算一个没有在environment变量中出现过的Var，只会让Eval方法返回一个错误的结果。所有的这些错误都可以通过在计算前检查Expr来发现。这是我们接下来要讲的Check方法的工作，但是让我们先测试Eval方法。
+
+下面的TestEval函数是对evaluator的一个测试。它使用了我们会在第11章讲解的testing包，但是现在知道调用t.Errof会报告一个错误就足够了。这个函数循环遍历一个表格中的输入，这个表格中定义了三个表达式和针对每个表达式不同的环境变量。第一个表达式根据给定圆的面积A计算它的半径，第二个表达式通过两个变量x和y计算两个立方体的体积之和，第三个表达式将华氏温度F转换成摄氏度。
+
+```golang
+func TestEval(t *testing.T) {
+    tests := []struct {
+        expr string
+        env  Env
+        want string
+    }{
+        {"sqrt(A / pi)", Env{"A": 87616, "pi": math.Pi}, "167"},
+        {"pow(x, 3) + pow(y, 3)", Env{"x": 12, "y": 1}, "1729"},
+        {"pow(x, 3) + pow(y, 3)", Env{"x": 9, "y": 10}, "1729"},
+        {"5 / 9 * (F - 32)", Env{"F": -40}, "-40"},
+        {"5 / 9 * (F - 32)", Env{"F": 32}, "0"},
+        {"5 / 9 * (F - 32)", Env{"F": 212}, "100"},
+    }
+    var prevExpr string
+    for _, test := range tests {
+        // Print expr only when it changes.
+        if test.expr != prevExpr {
+            fmt.Printf("\n%s\n", test.expr)
+            prevExpr = test.expr
+        }
+        expr, err := Parse(test.expr)
+        if err != nil {
+            t.Error(err) // parse error
+            continue
+        }
+        got := fmt.Sprintf("%.6g", expr.Eval(test.env))
+        fmt.Printf("\t%v => %s\n", test.env, got)
+        if got != test.want {
+            t.Errorf("%s.Eval() in %v = %q, want %q\n",
+            test.expr, test.env, got, test.want)
+        }
+    }
+}
+```
+对于表格中的每一条记录，这个测试会解析它的表达式然后在环境变量中计算它，输出结果。这里我们没有空间来展示Parse函数，但是如果你使用go get下载这个包你就可以看到这个函数。
+```golang
+go test(§11.1) 命令会运行一个包的测试用例：
+$ go test -v gopl.io/ch7/eval
+```
+这个-v标识可以让我们看到测试用例打印的输出；正常情况下像这样一个成功的测试用例会阻止打印结果的输出。这里是测试用例里fmt.Printf语句的输出：
+
+```golang
+sqrt(A / pi)
+    map[A:87616 pi:3.141592653589793] => 167
+
+pow(x, 3) + pow(y, 3)
+    map[x:12 y:1] => 1729
+    map[x:9 y:10] => 1729
+
+5 / 9 * (F - 32)
+    map[F:-40] => -40
+    map[F:32] => 0
+    map[F:212] => 100
+```
+
+幸运的是目前为止所有的输入都是适合的格式，但是我们的运气不可能一直都有。甚至在解释型语言中，为了静态错误检查语法是非常常见的；静态错误就是不用运行程序就可以检测出来的错误。通过将静态检查和动态的部分分开，我们可以快速的检查错误并且对于多次检查只执行一次而不是每次表达式计算的时候都进行检查。
+
+让我们往Expr接口中增加另一个方法。Check方法对一个表达式语义树检查出静态错误。我们马上会说明它的vars参数。
+
+```golang
+type Expr interface {
+    Eval(env Env) float64
+    // Check reports errors in this Expr and adds its Vars to the set.
+    Check(vars map[Var]bool) error
+}
+```
+具体的Check方法展示在下面。literal和Var类型的计算不可能失败，所以这些类型的Check方法会返回一个nil值。对于unary和binary的Check方法会首先检查操作符是否有效，然后递归的检查运算单元。相似地对于call的这个方法首先检查调用的函数是否已知并且有没有正确个数的参数，然后递归的检查每一个参数。
+
+```golang
+func (v Var) Check(vars map[Var]bool) error {
+    vars[v] = true
+    return nil
+}
+
+func (literal) Check(vars map[Var]bool) error {
+    return nil
+}
+
+func (u unary) Check(vars map[Var]bool) error {
+    if !strings.ContainsRune("+-", u.op) {
+        return fmt.Errorf("unexpected unary op %q", u.op)
+    }
+    return u.x.Check(vars)
+}
+
+func (b binary) Check(vars map[Var]bool) error {
+    if !strings.ContainsRune("+-*/", b.op) {
+        return fmt.Errorf("unexpected binary op %q", b.op)
+    }
+    if err := b.x.Check(vars); err != nil {
+        return err
+    }
+    return b.y.Check(vars)
+}
+
+func (c call) Check(vars map[Var]bool) error {
+    arity, ok := numParams[c.fn]
+    if !ok {
+        return fmt.Errorf("unknown function %q", c.fn)
+    }
+    if len(c.args) != arity {
+        return fmt.Errorf("call to %s has %d args, want %d",
+            c.fn, len(c.args), arity)
+    }
+    for _, arg := range c.args {
+        if err := arg.Check(vars); err != nil {
+            return err
+        }
+    }
+    return nil
+}
+
+var numParams = map[string]int{"pow": 2, "sin": 1, "sqrt": 1}
+```
+我们在两个组中有选择地列出有问题的输入和它们得出的错误。Parse函数（这里没有出现）会报出一个语法错误和Check函数会报出语义错误。
+
+```golang
+x % 2               unexpected '%'
+math.Pi             unexpected '.'
+!true               unexpected '!'
+"hello"             unexpected '"'
+
+log(10)             unknown function "log"
+sqrt(1, 2)          call to sqrt has 2 args, want 1
+```
+Check方法的参数是一个Var类型的集合，这个集合聚集从表达式中找到的变量名。为了保证成功的计算，这些变量中的每一个都必须出现在环境变量中。从逻辑上讲，这个集合就是调用Check方法返回的结果，但是因为这个方法是递归调用的，所以对于Check方法，填充结果到一个作为参数传入的集合中会更加的方便。调用方在初始调用时必须提供一个空的集合。
+
+在第3.2节中，我们绘制了一个在编译期才确定的函数f(x,y)。现在我们可以解析，检查和计算在字符串中的表达式，我们可以构建一个在运行时从客户端接收表达式的web应用并且它会绘制这个函数的表示的曲面。我们可以使用集合vars来检查表达式是否是一个只有两个变量x和y的函数——实际上是3个，因为我们为了方便会提供半径大小r。并且我们会在计算前使用Check方法拒绝有格式问题的表达式，这样我们就不会在下面函数的40000个计算过程（100x100个栅格，每一个有4个角）重复这些检查。
+
+这个ParseAndCheck函数混合了解析和检查步骤的过程：
+```golang
+gopl.io/ch7/surface
+
+
+import "gopl.io/ch7/eval"
+
+func parseAndCheck(s string) (eval.Expr, error) {
+    if s == "" {
+        return nil, fmt.Errorf("empty expression")
+    }
+    expr, err := eval.Parse(s)
+    if err != nil {
+        return nil, err
+    }
+    vars := make(map[eval.Var]bool)
+    if err := expr.Check(vars); err != nil {
+        return nil, err
+    }
+    for v := range vars {
+        if v != "x" && v != "y" && v != "r" {
+            return nil, fmt.Errorf("undefined variable: %s", v)
+        }
+    }
+    return expr, nil
+}
+```
+为了编写这个web应用，所有我们需要做的就是下面这个plot函数，这个函数有和http.HandlerFunc相似的签名：
+
+```golang
+func plot(w http.ResponseWriter, r *http.Request) {
+    r.ParseForm()
+    expr, err := parseAndCheck(r.Form.Get("expr"))
+    if err != nil {
+        http.Error(w, "bad expr: "+err.Error(), http.StatusBadRequest)
+        return
+    }
+    w.Header().Set("Content-Type", "image/svg+xml")
+    surface(w, func(x, y float64) float64 {
+        r := math.Hypot(x, y) // distance from (0,0)
+        return expr.Eval(eval.Env{"x": x, "y": y, "r": r})
+    })
+}
+
+```
+这个plot函数解析和检查在HTTP请求中指定的表达式并且用它来创建一个两个变量的匿名函数。这个匿名函数和来自原来surface-plotting程序中的固定函数f有相同的签名，但是它计算一个用户提供的表达式。环境变量中定义了x，y和半径r。最后plot调用surface函数，它就是gopl.io/ch3/surface中的主要函数，修改后它可以接受plot中的函数和输出io.Writer作为参数，而不是使用固定的函数f和os.Stdout。图7.7中显示了通过程序产生的3个曲面。
+
+练习7.13为Expr增加一个String方法来打印美观的语法树。当再一次解析的时候，检查它的结果是否生成相同的语法树
+
+练习7.14定义一个新的满足Expr接口的具体类型并且提供一个新的操作例如对它运算单元中的最小值的计算。因为Parse函数不会创建这个新类型的实例，为了使用它你可能需要直接构造一个语法树(或者继承parser接口)
+
+练习7.15编写一个从标准输入中读取一个单一表达式的程序，用户及时地提供对于任意变量的值，然后在结果环境变量中计算表达式的值。优雅的处理所有遇到的错误
+
+练习7.16编写一个基于web的计算器程序。
+
 
 ## 7.9. 类型断言
 
