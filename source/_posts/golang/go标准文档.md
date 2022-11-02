@@ -13,7 +13,7 @@ abstarct: Go is an open source programming language that makes it easy to build 
 
   Package tar implements access to tar archives.
 
-  Tape(封装) archives (tar) are a file format for storing a sequence of files that can be read and written in a streaming manner. This package aims to cover most variations of the format, including those produced by GNU and BSD tar tools.
+  Tape(封装,胶带) archives (tar) are a file format for storing a sequence of files that can be read and written in a streaming manner. This package aims to cover most variations of the format, including those produced by GNU and BSD tar tools.
 
 ## Constants
 
@@ -964,54 +964,6 @@ for e := l.Front(); e != nil; e = e.Next() {
 
   Stop turns off a ticker. After Stop, no more ticks will be sent. Stop does not close the channel, to prevent a concurrent goroutine reading from the channel from seeing an erroneous "tick".
 
-# sort
-
-### func Find(n int, cmp func(int) int) (i int, found bool)
-
-### func Float64s(x []float64)
-
-### func Float64sAreSorted(x []float64) bool
-
-### func Ints(x []int)
-
-就是排序基础数据类型int的
-
-### func IntsAreSorted(x []int) bool
-
-### func IsSorted(data Interface) bool
-
-### func Search(n int, f func(int) bool) int
-
-### func SearchFloat64s(a []float64, x float64) int
-### func SearchInts(a []int, x int) int
-### func SearchStrings(a []string, x string) int
-### func Slice(x any, less func(i, j int) bool)
-### func SliceIsSorted(x any, less func(i, j int) bool) bool
-### func SliceStable(x any, less func(i, j int) bool)
-### func Sort(data Interface)
-### func Stable(data Interface)
-### func Strings(x []string)
-### func StringsAreSorted(x []string) bool
-## type Float64Slice
-### func (x Float64Slice) Len() int
-### func (x Float64Slice) Less(i, j int) bool
-### func (p Float64Slice) Search(x float64) int
-### func (x Float64Slice) Sort()
-### func (x Float64Slice) Swap(i, j int)
-## type IntSlice
-### func (x IntSlice) Len() int
-### func (x IntSlice) Less(i, j int) bool
-### func (p IntSlice) Search(x int) int
-### func (x IntSlice) Sort()
-### func (x IntSlice) Swap(i, j int)
-## type Interface
-### func Reverse(data Interface) Interface
-## type StringSlice
-### func (x StringSlice) Len() int
-### func (x StringSlice) Less(i, j int) bool
-### func (p StringSlice) Search(x string) int
-### func (x StringSlice) Sort()
-### func (x StringSlice) Swap(i, j int)
 
 ## type Time
 
