@@ -2304,7 +2304,8 @@ in the data dictionary and can be called by many users. To create a procedure in
 have the CREATE PROCEDURE system privilege. You can create a stored procedure in another schema if you 
 have the CREATE ANY PROCEDURE system privilege. 
 
-4-5. Executing a Stored Procedure 
+## 4-5. Executing a Stored Procedure
+
 Problem 
 You want to execute a stored procedure from SQL*Plus. 
 Solution 
@@ -2322,8 +2323,6 @@ This would invoke the INCREASE_WAGE procedure, passing three parameters: EMPLOYE
 percentage of increase, and an upper salary bound. 
 You can also execute a stored procedure by creating a simple anonymous block that contains the 
 procedure call, as depicted in the following code: 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-72 
 BEGIN 
   procedure_name([param1, param2,…]); 
 END; 
@@ -2366,13 +2365,11 @@ BEGIN
   END LOOP; 
 END;  
  
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-73 
 The procedure GRANT_RAISES applies an increase across the board to all employees. It loops through 
 all employee records, and the INCREASE_WAGE procedure is called with each iteration. The procedure is 
 called without the use of the EXEC keyword since it is being invoked by another procedure rather than 
 directly from the SQL*Plus command line.  
-4-6. Creating Functions Within a Procedure or Code Block 
+## 4-6. Creating Functions Within a Procedure or Code Block 
 Problem 
 You want to create some functions within a stored procedure. You want the functions to be local to the 
 procedure, available only from the procedure’s code block. 
@@ -2430,7 +2427,7 @@ Creating a function or procedure inside a PL/SQL code block can be useful when y
 a function that is only to be used by the containing object. However, if you find that the body of the 
 embedded function may change frequently, then coding a separate stored function may prove to be 
 more efficient. 
-4-7. Passing Parameters by Name 
+## 4-7. Passing Parameters by Name 
 Problem 
 You have a procedure in your database that accepts a large number of parameters. When calling the 
 procedure, you would rather not worry that the positioning of the parameters is correct. 
@@ -2453,8 +2450,6 @@ EXEC process_emp_paycheck(EMP_ID=>10,
    STATE_TAX=>.06, 
    FEDERAL_TAX=>.08); 
  
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-75 
 As you can see, by passing the parameters by name, they do not need to follow the same positional 
 ordering as they do within the declaration of the procedure.  
 How It Works 
@@ -2484,7 +2479,7 @@ EXEC process_emp_paycheck(198, 10, 0,
  
 This particular call passed both of the first parameters by position, those being EMP_ID and PAY_CODE. 
 The last three parameters are passed by named notation.  
-4-8. Setting Default Parameter Values 
+## 4-8. Setting Default Parameter Values 
 Problem 
 You want to create a procedure that accepts several parameters. However, some of those parameters 
 should be made optional and contain default values.  
@@ -2498,8 +2493,6 @@ PROCEDURE process_emp_paycheck(EMP_ID IN NUMBER,
    SICK_USED IN NUMBER, 
    VACATION_USED IN NUMBER, 
    FEDERAL_TAX IN NUMBER DEFAULT .08, 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-76 
    STATE_TAX IN NUMBER DEFAULT .035); 
  
 And here is an example execution: 
@@ -2517,7 +2510,7 @@ the declaration of the variable with the keyword DEFAULT followed by the value, 
 to this recipe. If a default value is declared, then you needn’t specify a value for the parameter when the 
 function or procedure is called. If you do specify a value for a parameter that has a default value, the 
 specified value overrides the default. 
-4-9. Collecting Related Routines into a Single Unit 
+## 4-9. Collecting Related Routines into a Single Unit 
 Problem 
 You have a number of procedures and functions that formulate an entire application when used 
 together. Rather than defining each subprogram individually, you prefer to combine all of them into a 
@@ -2543,8 +2536,6 @@ The specification lists the procedures, functions, and variables that you want t
 outside the package. Think of the specification as the external interface to your package. 
 Next, create the package body: 
  
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-77 
 CREATE OR REPLACE PACKAGE BODY process_employee_time IS 
   PROCEDURE grant_raises (pct_increase IN NUMBER, 
                           upper_bound IN NUMBER) as 
@@ -2597,8 +2588,6 @@ BEGIN
     Results := 'NO EMPLOYEE FOUND'; 
   END IF; 
  
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-78 
   DBMS_OUTPUT.PUT_LINE(results); 
  
   END; 
@@ -2640,8 +2629,6 @@ package because it is probably not a good idea to change a package specification
 hours when a package is in use by others. Doing so may result in unusable objects, and the package 
 users could begin to see errors. However, if changes need to be made to the code within the package 
 body, then you can change that code without affecting public-facing constructs of a package. 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-79 
 Packages are one of the most important constructs that you can create in PL/SQL. You will use 
 packages to combine common code objects for almost any significant application that you write. It is 
 possible to create entire applications without the use of a package, but doing so can create a 
@@ -2649,7 +2636,7 @@ maintenance nightmare because you will begin to see a pool of procedures and fun
 within your database, and it will be difficult to remember which constructs are used for different tasks. 
 Packages are especially handy when writing PL/SQL web applications, and you will learn all about doing 
 this in Chapter 14. 
-4-10. Writing Initialization Code for a Package 
+## 4-10. Writing Initialization Code for a Package 
 Problem 
 You want to execute some code each time a particular PL/SQL package is instantiated in a session. 
 Solution 
@@ -2728,11 +2715,9 @@ time the package is used in that session. If you were to create this package in 
 one of its members, you would see the message print. Although an initialization message is not very
 useful, there are several good reasons to use an initialization block. One such reason is to perform a
 query to obtain some data for the session. 
-4-11. Granting the Ability to Create and Execute Stored Programs 
+## 4-11. Granting the Ability to Create and Execute Stored Programs 
 Problem 
 You want to grant someone the ability to create and execute stored programs. 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-81 
 Solution 
 To grant the ability for a user to create a procedure, function, or package, you must log in to the database 
 with a privileged account and grant the CREATE PROCEDURE privilege to the user. Here’s an example: 
@@ -2752,7 +2737,8 @@ A schema owner can always execute stored code in the schema. However, applicatio
 generally log in as schema owners because of the security risks inherent in doing so. Thus, you will 
 commonly be faced with the need to grant other users execute access on stored code. You do that by 
 granting EXECUTE privileges, as shown in the second solution example.  
-4-12. Executing Packaged Procedures and Functions 
+
+## 4-12. Executing Packaged Procedures and Functions 
 Problem 
 You want to execute one of the procedures or functions contained within a package. 
 Solution 
@@ -2772,8 +2758,6 @@ notation can be used to access any publically accessible member of the package. 
 or procedure that is contained in the package specification can be accessed using the dot notation. 
 Therefore, if your package contained a constant variable within its specification that you wanted to 
 access, it would be possible to do so from outside the package. 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-82 
 For a schema to access and execute package members, it must have the appropriate permissions. To 
 grant EXECUTE permission on a package that you own, use the following syntax: 
  
@@ -2785,7 +2769,8 @@ SQL*Plus command line using the EXEC command.
 synonym for that package within the database. This will help decrease issues while attempting to reference the 
 package and its programs from the different schema because you will not need to specify the schema name in 
 order to qualify the call. Please see Recipe 4-13 for more information regarding public synonyms. 
-4-13. Creating a Public Name for a Stored Program 
+
+## 4-13. Creating a Public Name for a Stored Program 
 Problem 
 You want to allow for any schema to have the ability to reference a particular stored program that is 
 contained within your schema. For instance, the CALC_EMPLOYEE_PAYCHECK procedure should be 
@@ -2813,8 +2798,6 @@ SQL> CREATE PUBLIC SYNONYM calc_employee_paycheck
  
 Now any user with execute privileges on the procedure can invoke it without fully qualifying the 
 name since a public synonym named CALC_EMPLOYEE_PAYCHECK has been created. This is demonstrated in 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-83 
 the next lines of code. Again, the user AdminUser is now logged into the system and executes the 
 procedure. 
  
@@ -2845,14 +2828,13 @@ eventually set in.
 ■ Note Creating a synonym does not give execute access. Creating a public synonym provides only a global name 
 that avoids the need for dot notation. Invokers of a procedure or function still must be granted EXECUTE access, as 
 shown in Recipe 4-11. 
-4-14. Executing Package Programs in Sequence 
+
+## 4-14. Executing Package Programs in Sequence 
 Problem 
 You have created a package that contains all the necessary procedures and functions for your program. 
 Although you can invoke each of these subprograms individually using the 
 package_name.subprogram_name notation, it would be beneficial to execute all of them at the same time 
 by issuing a single statement. 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-84 
 Solution 
 Create a driver procedure within your PL/SQL package that will be used to initiate all the subprograms in 
 turn, and run your entire program. In the following example, a procedure named driver is created inside 
@@ -2904,8 +2886,6 @@ initiate the packaged program, you now make a call to the driver procedure as fo
  
 BEGIN 
    synchronize_data.driver; 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-85 
 END; 
  
 One statement invokes the driver procedure. That procedure in turn invokes the other procedures 
@@ -2930,7 +2910,7 @@ printing out the current status of the program. The driver procedure essentially
 of abstraction that you can take advantage of. The package can be initialized using the default package 
 initialization; then additional initialization or statements can be provided within the driver procedure, 
 and the program caller doesn’t need to know about them. 
-4-15. Implementing a Failure Flag 
+## 4-15. Implementing a Failure Flag 
 Problem 
 You want to create a boolean variable to determine whether one of the subprograms in the package has 
 generated an error. If an error has been generated by one of the subprograms, then the variable will be 
@@ -3035,7 +3015,8 @@ package. If you had a requirement to make a variable global to all PL/SQL object
 well, then you can declare the variable within the package specification. As mentioned in Recipe 4-8, 
 anything declared in the package specification is publically available to any PL/SQL object outside as 
 well as within the package body. 
-4-16. Forcing Data Access to Go Through Packages 
+
+## 4-16. Forcing Data Access to Go Through Packages 
 Problem 
 You have defined all subprograms and packages for a particular application, and you want to allow other 
 users to access these constructs and execute the program but not have access to any data tables directly. 
@@ -3047,8 +3028,6 @@ For instance, if you want to control access to a package named PROCESS_EMPLOYEE_
 along with all required tables, types, and sequences should be loaded into an application schema that 
 has the appropriate permissions required to access the data. For the purposes of this recipe, the 
 application schema name is EMP.  
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-88 
 Next, create a role by which to manage the privileges needed to invoke the package’s procedures 
 and functions. Grant EXECUTE privileges to that role. Grant that role to application users.  
 Your application users will now be able to execute the procedures and functions within the package. 
@@ -3065,7 +3044,8 @@ By forcing users to go through packaged procedures and functions, you limit user
 defined interface that remains under your control. You now have some amount of freedom to modify the 
 underlying tables. So long as you do not change the package interface, you can make changes to the 
 underlying tables without disrupting the application. 
-4-17. Executing Stored Code Under Your Own Privilege Set 
+
+## 4-17. Executing Stored Code Under Your Own Privilege Set 
 Problem 
 You have loaded all of an application’s objects into a single application schema. However, you do not 
 want packages, procedures, and functions to execute as the schema owner. Instead, you want stored 
@@ -3112,7 +3092,8 @@ can constrain the execution of code to the current user’s privilege set. Becau
 have the privileges that are required to execute a particular program, then they will not have access. 
 Simply put, invoker’s rights are a good means of securing your code as long as the approach is used 
 correctly. 
-4-18. Accepting Multiple Parameter Sets in One Function 
+
+## 4-18. Accepting Multiple Parameter Sets in One Function 
 Problem 
 You want to give a function the ability to accept multiple parameter types instead of being constrained 
 to a particular datatype or number of parameters. For example, you want to create a single function that 
@@ -3161,7 +3142,8 @@ troublesome if overused. Be careful that your package is not littered with too m
 procedures or functions because maintenance on such a code base can become a nightmare.
 Overloading has its good use cases, but if it can be avoided by using technique that is easier to follow,
 then it is a good idea to go the simpler route. 
-4-19. Listing the Functions, Procedures, and Packages in a Schema 
+
+## 4-19. Listing the Functions, Procedures, and Packages in a Schema 
 Problem 
 Your team has defined a number of functions, procedures, and packages within a schema. You want to
 generate a listing of all functions, procedures, and packages at the end of each day to evaluate
@@ -3179,8 +3161,6 @@ The next query will return a list of all function names that reside within the s
 SELECT OBJECT_NAME 
 FROM USER_OBJECTS 
 WHERE OBJECT_TYPE = 'FUNCTION'; 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-91 
  
 Lastly, the following query will return a listing of all package names that reside within the schema: 
  
@@ -3224,8 +3204,6 @@ CREATE OR REPLACE FUNCTION "MY_SCHEMA"."CALC_QUARTER_HOUR" (HOURS IN NUMBER)
        END IF; 
    ELSE 
        IF HOURS > 0 AND HOURS <=.375 THEN 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-92 
          CALCULATED_HOURS := .25; 
        ELSIF HOURS > .375 AND HOURS <= .625 THEN 
          CALCULATED_HOURS := .5; 
@@ -3261,12 +3239,9 @@ dictionary via the retrieval subprograms. To learn more about the DBMS_METADATA 
 listing of available subprograms, please refer to the online Oracle documentation at 
 http://download.oracle.com/docs/cd/B28359_01/appdev.111/b28419/d_metada.htm#ARPLS640, which 
 goes into detail regarding each of the subprogram functionalities. 
-C H A P T E R  5 
  
-   
  
-93 
-Triggers 
+# 5. Triggers 
 Triggers play an important role in any database developer’s or database administrator’s career. They 
 provide the ability to execute code upon the occurrence of defined database, schema, or system events. 
 Triggers can be useful for enhancing applications by providing database capabilities when a table event 
