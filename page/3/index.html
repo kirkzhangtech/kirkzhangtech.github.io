@@ -317,6 +317,80 @@
                     
                         <a
                             class="link-unstyled"
+                            href="/2022/10/07/archive/compact_wsl2/"
+                            aria-label=": 压缩wsl2的磁盘"
+                        >
+                            压缩wsl2的磁盘
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-10-07T15:33:59+08:00">
+	
+		    Oct 07, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/archive/">archive</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <span id="more"></span>
+<ol>
+<li><p>shuwdown wsl</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">wsl --shutdown</code></pre>
+</li>
+<li><p>find out wsl file location<br>一般情况下wsl文件位于：C:\Users\Administrator\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\ext4.vhdx</p>
+</li>
+<li><p>备份wsl</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">wsl --export name target_file
+</code></pre>
+<p>name可以通过<code>wsl -l</code>命令进行查看</p>
+</li>
+<li><p>运行diskpart</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">select vdisk file&#x3D;&quot;your location&quot;
+compact vdisk
+</code></pre></li>
+</ol>
+
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/10/07/archive/compact_wsl2/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
                             href="/2022/10/07/MIT6.824/lab2b/lab2_raft_struct_guide/"
                             aria-label=": raft_structure_guide"
                         >
@@ -776,57 +850,6 @@
                             href="/2022/08/26/archive/%E5%86%85%E5%AD%98%E9%AB%98%E6%95%88golang/"
                             class="postShorten-excerpt_link link"
                             aria-label=": 内存高效golang"
-                        >
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/08/26/archive/remote_github/"
-                            aria-label=": 更新origin 和upstream url链接"
-                        >
-                            更新origin 和upstream url链接
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-08-26T21:14:30+08:00">
-	
-		    Aug 26, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/archive/">archive</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>本地想更改项目代码的绑定的github链接，但是repo的url变了。<br><code>remote: This repository moved. Please use the new location [new location]</code> 的警示。因為你的git連結位置有變動因此要修改本機端的git remote位置。另外一种场景下载别人的代码库，并做修改最后推到自己的github，这个github repo</p>
-                    
-                        <a
-                            href="/2022/08/26/archive/remote_github/"
-                            class="postShorten-excerpt_link link"
-                            aria-label=": 更新origin 和upstream url链接"
                         >
                             Continue reading
                         </a>

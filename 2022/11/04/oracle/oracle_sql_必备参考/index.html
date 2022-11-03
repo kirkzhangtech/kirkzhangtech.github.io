@@ -1,0 +1,707 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle Sql必备手册 - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations of the ACM》期刊上。该论文永久地改变了计算世界。Codd建议的关系数据库管理系统模型(relational database management system,RDBMS)最后变成了关系数据库的定义标准．而关系数据库则成了当今使用的主流数据库。\n\n\n\n\n第一章SQL元素进行SQL开发是为了更容易地访问关系数据库,所以,sql能够执行下面几种操作：\n\n从数据库中查询数据\n向数据库中插入数据\n从数据库中删除数据\n创建和操纵数据库对象\n控制对数据库的访问\n\n严格地说，SQL根本不是‘种语言，而是对Oracle数据库传输指令的种方式。它与传统的编程语言在以下几个主要方面有所不同:\n\nSQL提供自动定位数据的能力\nSQL在数据集合上操作，而不是对独立的数据元素操作\nSQL是声明的，而不是过程化的，并且不提供过程控制SQL设计在逻辑层完成;这不需要处理实现的细节简单地说，当在SQL中设计时，你告诉Oracle自己想要干什么，而不是怎样做。但是这种方法利弊并存。考虑下面的SQL语句:\n\n\nSELECTename,deptno,sal,cornn.FROM scott.ermp\nWHEREhiredate &gt; &#39;01-JAN-Q0 &#39; ;\n\n这个简单的SQL语句告诉数据库显示2000年1月1日以后雇佣的职工名字( ename )、部门号( deptno)、薪水（ sal）和佣金( comm)。在“老式的”过程化编程语言巾,这可能需要儿百行代码，但是，在.SQL中只需要3行代码。Oracle在检索数据时并不总是如此灵巧。尽管Oracle内部的“查询优化器”有了稳步提高，但仍然有许多方法可以改进SQL的性能，第八章在讨论SQL语句的调试时将展示这一主题。\n注意:有人将缺乏过程化控制视为SQL的缺点、因此，Oracle公司开发了PL&#x2F;SQL ( ProceduralLanguage&#x2F;SQL，即过程化编程语言&#x2F;SQL),这一内容将在第七章讨论.\nsQL语句也称为SQL命令，由以下儿部分组成:关键字  带有特定Oralce操作意义的保留字。变量    它是可以被动态文本或数宇变量替换的数据元素。SQL有许多对象名，如变量、表或视图。文字常t数据．包括文本字符串和数字。操作符操作一个或多个变量或文字的符号或单词。\n","dateCreated":"2022-11-04T01:05:34+08:00","dateModified":"2022-11-04T01:17:51+08:00","datePublished":"2022-11-04T01:05:34+08:00","description":"摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations of the ACM》期刊上。该论文永久地改变了计算世界。Codd建议的关系数据库管理系统模型(relational database management system,RDBMS)最后变成了关系数据库的定义标准．而关系数据库则成了当今使用的主流数据库。","headline":"Oracle Sql必备手册","image":[null,"https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"}</script>
+    <meta name="description" content="摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle Sql必备手册">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-03T17:05:34.036Z">
+<meta property="article:modified_time" content="2022-11-03T17:17:51.166Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle Sql必备手册
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-04T01:05:34+08:00">
+	
+		    Nov 04, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 主要是讲oracle的sql基础<br>关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations of the ACM》期刊上。该论文永久地改变了计算世界。Codd建议的关系数据库管理系统模型(relational database management system,RDBMS)最后变成了关系数据库的定义标准．而关系数据库则成了当今使用的主流数据库。</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0"><span class="toc-text">第一章</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SQL%E5%85%83%E7%B4%A0"><span class="toc-text">SQL元素</span></a></li></ol></li></ol>
+
+<h1 id="第一章"><a href="#第一章" class="headerlink" title="第一章"></a>第一章</h1><h2 id="SQL元素"><a href="#SQL元素" class="headerlink" title="SQL元素"></a>SQL元素</h2><p>进行SQL开发是为了更容易地访问关系数据库,所以,sql能够执行下面几种操作：</p>
+<ul>
+<li>从数据库中查询数据</li>
+<li>向数据库中插入数据</li>
+<li>从数据库中删除数据</li>
+<li>创建和操纵数据库对象</li>
+<li>控制对数据库的访问</li>
+</ul>
+<p>严格地说，SQL根本不是‘种语言，而是对Oracle数据库传输指令的种方式。它与传统的编程语言在以下几个主要方面有所不同:</p>
+<ul>
+<li>SQL提供自动定位数据的能力</li>
+<li>SQL在数据集合上操作，而不是对独立的数据元素操作</li>
+<li>SQL是声明的，而不是过程化的，并且不提供过程控制SQL设计在逻辑层完成;这不需要处理实现的细节<br>简单地说，当在SQL中设计时，你告诉Oracle自己想要干什么，而不是怎样做。但是这种方法利弊并存。考虑下面的SQL语句:</li>
+</ul>
+<pre class="language-sql" data-language="sql"><code class="language-sql">
+SELECTename,deptno,sal,cornn.FROM scott.ermp
+WHEREhiredate &gt; &#39;01-JAN-Q0 &#39; ;
+</code></pre>
+<p>这个简单的SQL语句告诉数据库显示2000年1月1日以后雇佣的职工名字( ename )、部门号( deptno)、薪水（ sal）和佣金( comm)。在“老式的”过程化编程语言巾,这可能需要儿百行代码，但是，在.SQL中只需要3行代码。Oracle在检索数据时并不总是如此灵巧。尽管Oracle内部的“查询优化器”有了稳步提高，但仍然有许多方法可以改进SQL的性能，第八章在讨论SQL语句的调试时将展示这一主题。</p>
+<p>注意:有人将缺乏过程化控制视为SQL的缺点、因此，Oracle公司开发了PL&#x2F;SQL ( Procedural<br>Language&#x2F;SQL，即过程化编程语言&#x2F;SQL),这一内容将在第七章讨论.</p>
+<p>sQL语句也称为SQL命令，由以下儿部分组成:<br>关键字  带有特定Oralce操作意义的保留字。<br>变量    它是可以被动态文本或数宇变量替换的数据元素。SQL有许多对象名，如变量、表或视图。<br>文字<br>常t数据．包括文本字符串和数字。操作符<br>操作一个或多个变量或文字的符号或单词。</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/03/oracle/OraclePL_SQL_Recipes/"
+                    data-tooltip="Oracle PLSQL Recipes"
+                    aria-label="NEXT: Oracle PLSQL Recipes"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/03/oracle/OraclePL_SQL_Recipes/"
+                    data-tooltip="Oracle PLSQL Recipes"
+                    aria-label="NEXT: Oracle PLSQL Recipes"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/04/oracle/oracle_sql_必备参考/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>
