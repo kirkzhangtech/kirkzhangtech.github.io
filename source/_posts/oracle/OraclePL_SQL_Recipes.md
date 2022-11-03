@@ -1932,13 +1932,9 @@ language. As you can see from the solution, the same code could have been writte
 number” message within the ELSE clause. There are usually better alternatives to using GOTO. 
 
 
-C H A P T E R  4 
- 
-   
- 
-63 
-Functions, Packages,  
-and Procedures 
+
+# 4. Functions, Packages,and Procedures
+
 PL/SQL applications are composed of functions, procedures, and packages. Functions are PL/SQL 
 programs that accept zero or more parameters and always return a result. Procedures are similar to 
 functions, but they are not required to return a result. Packages are a combination of related functions, 
@@ -1957,26 +1953,26 @@ chapter, you should be able to answer these questions at the drop of a hat.
 ■ Note We mention job scheduling in our introduction to this chapter. However, we actually address that topic in 
 Chapter 11, which is an entire chapter dedicated to running PL/SQL jobs, whether for application purposes or for 
 database maintenance. 
-4-1. Creating a Stored Function 
-Problem 
+## 4-1. Creating a Stored Function 
+**Problem** 
 One of your programs is using a few lines of code repeatedly for performing a calculation. Rather than 
 using the same lines of code numerous times throughout your application, it makes more sense to 
-encapsulate the functionality into a common routine that can be called and reused time and time again. 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-64 
-Solution 
+encapsulate(美[ɪn'kæpsjə'let]vt.压缩;将…装入胶囊) the functionality into a common routine that can be called and reused time and time again.
+**Solution**
 Create a stored function to encapsulate your code, and save it into the database. Once stored in the 
 database, any user with execution privileges can invoke the function. Let’s take a look at a function to 
-give you an idea of how they work. 
+give you an idea of how they work.
 In this example, the function is used to round a given number to the nearest quarter. This function 
 works well for accepting a decimal value for labor hours and rounding to the nearest quarter hour. 
- 
+
+```sql
+-- at return part and no paramter name just a type
 CREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS  
   CALCULATED_HOURS NUMBER := 0; 
 BEGIN 
   
    -- if HOURS is greater than one, then calculate the decimal portion 
-•  -- based upon quarterly hours  
+   -- based upon quarterly hours  
  IF HOURS > 1 THEN 
   -- calculate the modulus of the HOURS variable and compare it to • 
   -- fractional values 
@@ -2011,23 +2007,22 @@ BEGIN
   RETURN CALCULATED_HOURS; 
    
 END CALC_QUARTER_HOUR; 
- 
+``` 
 This function accepts one value as input, a decimal value representing a number of hours worked. 
 The function then checks to see whether the value is greater than one, and if so, it performs a series of 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-65 
 manipulations to round the value to the nearest quarter hour. If the value is not greater than one, then 
 the function rounds the given fraction to the nearest quarter.  
 ■ Note See Recipe 4-2 for an example showing the execution of this function. 
-How It Works 
+
+**How It Works** 
 A function is a named body of code that is stored within the database and returns a value. Functions are 
 often used to encapsulate logic so that it can be reused. A function can accept zero or more parameters 
 and always returns a value. A function is comprised of a header, an execution section containing 
 statements, and an optional exception block.  
 For example, the header for our solution function is as follows:  
- 
+```sql 
 CREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS  
- 
+```
 The OR REPLACE clause is optional, but in practice it is something you’ll most always want. Specifying 
 OR REPLACE will replace a function that is already under the same name in the same schema. (A function 
 name must be unique within its schema.)  
@@ -2046,19 +2041,17 @@ The declaration section of the function begins directly after the header, and un
 block, you do not include the DECLARE keyword at the top of this section. Just like the anonymous block, 
 the declaration section is where you will declare any variables, types, or cursors for your function. Our 
 declaration section defines a single variable: 
- 
+ ```sql
   CALCULATED_HOURS NUMBER := 0; 
- 
+ ```
 Following the declaration is the executable section, which is laid out exactly like that of an 
 anonymous block. The only difference with a function is that it always includes a RETURN statement. It 
 can return a value of any datatype as long as it is the same datatype specified in the RETURN clause of the 
 header. 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-66 
 Following the return clause can be an optional EXCEPTION block to handle any errors that were 
 encountered in the function. The following example is the same function that was demonstrated in the 
 solution to this recipe, except that it has an added EXCEPTION block. 
- 
+```sql 
 CREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) 
  RETURN NUMBER AS  
   CALCULATED_HOURS NUMBER := 0; 
@@ -2107,12 +2100,10 @@ EXCEPTION
     DBMS_OUTPUT.PUT_LINE('VALUE ERROR RAISED, TRY AGAIN'); 
     RETURN -1; 
   WHEN OTHERS THEN 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-67 
     DBMS_OUTPUT.PUT_LINE('UNK ERROR RAISED, TRY AGAIN'); 
     RETURN -1; 
 END CALC_QUARTER_HOUR; 
- 
+```
 Again, don’t fret if you are unfamiliar with how to handle exceptions, because they will be discussed 
 in detail later in the book. At this point, it is important to know that you have the ability to declare 
 exceptions that can be caught by code so that your program can process abnormalities or errors 
@@ -2123,15 +2114,17 @@ libraries that consist of functions that are helpful for performing various tran
 fundamental part of PL/SQL programming, just as they are in any other language. It is up to you to 
 ensure that your database is stocked with plenty of useful functions that can be used in your current and 
 future applications. 
-4-2. Executing a Stored Function from a Query 
-Problem 
+
+## 4-2. Executing a Stored Function from a Query 
+
+**Problem** 
 You want to invoke a function from an SQL query. For example, you want to take the quarter-hour 
 rounding function from Recipe 4-1 and invoke it on hourly values in a database table.  
-Solution 
+**Solution** 
 Write a query and invoke the function on values returned by the SELECT statement. In the following lines, 
 the function that was written in the previous recipe will be called. The results of calling the function from 
 within a query are as follows: 
- 
+```sql 
 SQL> select calc_quarter_hour(.17) from dual; 
  
 CALC_QUARTER_HOUR(.17) 
@@ -2143,15 +2136,15 @@ SQL> select calc_quarter_hour(1.3) from dual;
 CALC_QUARTER_HOUR(1.3) 
 ---------------------- 
  1.25 
-How It Works 
+```
+**How It Works** 
 There are a few ways in which a function can be called, one of which is via a query. A function can be 
 executed inline via a SELECT statement, as was the case with the solution to this recipe. A function can 
 also be executed by assigning it to a variable within an anonymous block or another function/procedure. 
 Since all functions return a value, this works quite well. For instance, the following QTR_HOUR variable can 
 be assigned the value that is returned from the function: 
- 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-68 
+
+```sql 
 DECLARE 
   qtr_hour          NUMBER; 
 BEGIN 
@@ -2169,24 +2162,24 @@ BEGIN
   total_hours := hours + calc_quarter_hour(3.2); 
   DBMS_OUTPUT.PUT_LINE(total_hours); 
 END; 
- 
+```
 The way in which your program calls a function depends on its needs. If you need to simply return 
 some results from the database and apply a function to each of the results, then use a query. You may 
 have an application that needs to pass a value to a function and use the result at some later point, in 
 which case assigning the function to a variable would be a good choice for this case. Whatever the case 
 may be, functions provide convenient calling mechanisms to cover most use cases. 
-4-3. Optimizing a Function That Will Always Return the Same Result 
-for a Given Input 
-Problem 
+
+## 4-3. Optimizing a Function That Will Always Return the Same Result for a Given Input 
+**Problem** 
 You want to create a function that will return the same result whenever a given input, or set of inputs, is 
 presented to it. You want the database to optimize based upon that deterministic nature.  
-Solution 
+**Solution**
 Specify the DETERMINISTIC keyword when creating the function to indicate that the function will always 
 return the same result for a given input. For instance, you want to return a specific manager name based 
 upon a given manager ID. Furthermore, you want to optimize for the fact that any given input will 
 always return the same result. The following example demonstrates a function that does so by specifying 
 the DETERMINISTIC keyword:  
- 
+```sql
 CREATE OR REPLACE FUNCTION manager_name(mgr_id IN NUMBER) 
 RETURN VARCHAR2 
 DETERMINISTIC IS 
@@ -2196,8 +2189,6 @@ BEGIN
   IF mgr_id IS NOT NULL THEN 
     SELECT first_name, last_name 
     INTO first_name, last_name 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-69 
     FROM EMPLOYEES 
     WHERE employee_id = mgr_id; 
  
@@ -2209,10 +2200,10 @@ EXCEPTION
   WHEN NO_DATA_FOUND THEN 
     RETURN 'N/A'; 
 END; 
- 
+```
 This function will return the manager name for a matching EMPLOYEE_ID. If there are no matches for 
 the EMPLOYEE_ID found, then N/A will be returned. 
-How It Works 
+**How It Works**
 A deterministic function is one that always returns the same resulting value as long as the parameters 
 that are passed in are the same. This type of function can be useful for improving performance. The 
 function will be executed only once for any given set of parameters. This means that if the same 
@@ -2223,21 +2214,23 @@ The DETERMINISTIC clause is required in a couple of cases. In the event that you
 in an expression of a function-based index, you need to write the function as DETERMINISTIC, or you will 
 receive errors. Similarly, a function must be made DETERMINISTIC if it is being called in an expression of a 
 materialized view query or if the view is marked as ENABLE QUERY REWRITE or REFRESH FAST. 
-4-4. Creating a Stored Procedure 
-Problem 
+
+## 4-4. Creating a Stored Procedure 
+
+**Problem**
+
 There is a database task that you are performing on a regular basis. Rather than executing a script that 
 contains lines of PL/SQL code each time you execute the task, you want to store the code in the database 
 so that you can simply execute the task by name or so that you can schedule it to execute routinely via 
 Oracle Scheduler. 
 ■ Note See Chapter 11 for information on scheduling PL/SQL jobs using Oracle Scheduler. 
-Solution 
+
+**Solution**
 Place the code that is used to perform your task within a stored procedure. The following example 
 creates a procedure named INCREASE_WAGE to update the employee table by giving a designated 
 employee a pay increase. Of course, you will need to execute this procedure for each eligible employee 
 in your department. Storing the code in a procedure makes the task easier to perform. 
- 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-70 
+```sql 
 CREATE OR REPLACE PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
                                            pct_increase IN NUMBER, 
                                            upper_bound IN NUMBER) AS 
@@ -2274,17 +2267,17 @@ example, the employee is being given a 3 percent increase and an upper bound of 
 BEGIN 
   increase_wage(198,.03,5000);
 END; 
+```
 SUCCESSFUL INCREASE
 Statement processed. 
-How It Works 
+
+**How It Works** 
 In the example, the procedure accepts three parameters: the employee number, the percent of increase
 they will receive, and an upper salary bound. You can then invoke the procedure by name, passing in the
 required parameters. 
 The procedure first searches the database for the provided employee number. If a record for that
 employee is found, then the employee record is queried for the current salary. If the salary is less than
 the upper bound and the resulting new salary will still be less than the upper bound, then the increase 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-71 
 will be applied via an UPDATE statement. If the employee is not found, then an alert message will be 
 displayed. As you can see, this procedure can be called for any individual employee, and it will increase 
 their wage accordingly as long as the increase stays within the bound. 
@@ -2294,11 +2287,11 @@ collections. A stored procedure is structured in much the same way as a function
 header, an executable section, and an optional exception-handling block. However, a procedure cannot 
 include a RETURN clause in the header, and it does not return a value. 
 For example, in the solution to this recipe, the procedure contains the following header: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
                                            pct_increase IN NUMBER, 
                                            upper_bound IN NUMBER) AS 
- 
+```
 The header uses the OR REPLACE clause to indicate that this procedure should replace any procedure 
 with the same name that already exists. The procedure accepts three parameters, and although all of 
 them are NUMBER type, any datatype can be accepted as a parameter. The declaration section comes after 
@@ -2310,6 +2303,7 @@ The advantage of using procedures is that code can be encapsulated into a callab
 in the data dictionary and can be called by many users. To create a procedure in your schema, you must 
 have the CREATE PROCEDURE system privilege. You can create a stored procedure in another schema if you 
 have the CREATE ANY PROCEDURE system privilege. 
+
 4-5. Executing a Stored Procedure 
 Problem 
 You want to execute a stored procedure from SQL*Plus. 
