@@ -2519,78 +2519,97 @@ EXEC process_emp_paycheck(198, 10, 0,
 ```
 
 This particular call passed both of the first parameters by position, those being EMP_ID and PAY_CODE. 
-The last three parameters are passed by named notation.  
+The last three parameters are passed by named notation. 
+
+summary :  
+1. if you specify parameter name , then would ignore order of you define parameter
+
+
 ## 4-8. Setting Default Parameter Values 
-Problem 
+
+**Problem** 
 You want to create a procedure that accepts several parameters. However, some of those parameters 
 should be made optional and contain default values.  
-Solution 
+
+**Solution**
 You can allow the procedure caller to omit the parameters if default values are declared for the variables 
 within the procedure. The following example shows a procedure declaration that contains default 
 values: 
- 
+```sql
 PROCEDURE process_emp_paycheck(EMP_ID IN NUMBER, 
    PAY_CODE IN NUMBER, 
    SICK_USED IN NUMBER, 
    VACATION_USED IN NUMBER, 
-   FEDERAL_TAX IN NUMBER DEFAULT .08, 
-   STATE_TAX IN NUMBER DEFAULT .035); 
- 
+   FEDERAL_TAX IN NUMBER DEFAULT .08,  -- could ignore value
+   STATE_TAX IN NUMBER DEFAULT .035);  -- could ignore value
+```
+
 And here is an example execution: 
- 
+
+```sql
 EXEC process_emp_paycheck(EMP_ID=>10, 
                            PAY_CODE=>10, 
                            VACATION_USED=>8.0, 
                            SICK_USED=>8.0); 
- 
+```
+
 Since the procedure contains default values, the parameters can be omitted when the procedure is 
 called. 
-How It Works 
+
+**How It Works** 
 The ability to provide a default value for a variable declaration is optional. To do so, you must provide 
 the declaration of the variable with the keyword DEFAULT followed by the value, as shown in the solution 
 to this recipe. If a default value is declared, then you needn’t specify a value for the parameter when the 
 function or procedure is called. If you do specify a value for a parameter that has a default value, the 
-specified value overrides the default. 
-## 4-9. Collecting Related Routines into a Single Unit 
-Problem 
-You have a number of procedures and functions that formulate an entire application when used 
+specified value overrides the default.
+
+
+## 4-9. Collecting Related Routines into a Single Unit
+
+**Problem** 
+You have a number of procedures and functions that formulate(vt.规划;用公式表示) an entire application when used 
 together. Rather than defining each subprogram individually, you prefer to combine all of them into a 
 single, logically related entity.  
-Solution 
-Create a PL/SQL package that in turn declares and defines each of the procedures together as an 
+
+**Solution**
+Create a PL/SQL package that in turn declares(vt.宣布,声明) and defines each of the procedures together as an 
 organized entity. You declare each of the subprograms in the package specification (otherwise known as 
 a header) and define them in the package body. 
 The following example shows the creation of a PL/SQL package containing two procedures and a 
-variable.  
+variable.
+
 First, you create the package specification: 
- 
-CREATE OR REPLACE PACKAGE process_employee_time IS 
-  total_employee_salary              NUMBER; 
+
+```sql 
+CREATE OR REPLACE PACKAGE process_employee_time IS  
+  total_employee_salary  NUMBER; -- global variable inside 
   PROCEDURE grant_raises(pct_increase IN NUMBER, 
                                               upper_bound IN NUMBER); 
   PROCEDURE increase_wage (empno_in IN NUMBER, 
                            pct_increase IN NUMBER, 
                            upper_bound IN NUMBER) ; 
 END; 
- 
+```
 The specification lists the procedures, functions, and variables that you want to be visible from 
 outside the package. Think of the specification as the external interface to your package. 
 Next, create the package body: 
- 
+
+```sql
 CREATE OR REPLACE PACKAGE BODY process_employee_time IS 
+
   PROCEDURE grant_raises (pct_increase IN NUMBER, 
                           upper_bound IN NUMBER) as 
   CURSOR emp_cur is 
   SELECT employee_id, first_name, last_name 
   FROM employees; 
-BEGIN 
+BEGIN
   -- loop through each record in the employees table 
   FOR emp_rec IN emp_cur LOOP 
       DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name); 
       increase_wage(emp_rec.employee_id, pct_increase, upper_bound); 
   END LOOP; 
 END;  
- 
+
  PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
                           pct_increase IN NUMBER, 
                           upper_bound IN NUMBER) AS 
@@ -2633,14 +2652,16 @@ BEGIN
  
   END; 
 END; 
- 
+```
+
 The package in this example declares a global variable and two procedures within the package 
 specification. The package body then defines both of the procedures and assigns a value to the variable 
 that was declared in the specification. Procedures defined within the package body are defined in the 
 same manner as they would be if they were stand-alone procedures. The difference is that now these two 
 procedures are contained in a single package entity and are therefore related to each other and can 
 share variables declared globally within the package. 
-How It Works 
+
+**How It Works**
 A PL/SQL package can be useful for organizing code into a single construct. Usually the code consists of 
 a grouping of variables, types, cursors, functions, and procedures that perform actions that are logically 
 related to one another. Packages consist of a specification and a body, both of which are stored 
@@ -2648,22 +2669,25 @@ separately in the data dictionary. The specification contains the declarations f
 types, subprograms, and so on, that are defined in the package. The body contains the implementations 
 for each of the subprograms and cursors that are included in the specification, and it can also include 
 implementations for other functions and procedures that are not in the specification. You’ll learn more 
-about this in other recipes. 
+about this in other recipes.
+
 Most packages contain both a specification and a body, and in these cases the specification acts as 
 the interface to the constructs implemented within the body. The items that are included in the 
 specification are available to the public and can be used outside the package. Not all packages contain a 
 body. If there are only declarations of variables or constants in the package, then there is no need for a 
 body to implement anything. Other PL/SQL objects outside the package can reference any variables that 
 are declared in the specification. In other words, declaring a variable within a PL/SQL package 
-specification essentially creates a global variable. 
-■ Note Global variables should be used wisely. The use of global variables can complicate matters when tracking 
+specification essentially creates a global variable.
+
+■ Note Global variables should be used wisely(adv.明智地;聪明地). The use of global variables can complicate matters when tracking 
 down problems or debugging your code. If global variables are used, then it can be hard to determine where 
 values have been set and where initialization of such variables occurs. Following the rules of encapsulation and 
 using local variables where possible can make your life easier.  
 Procedures and functions defined within the package body may call each other, and they can be 
 defined in any order as long as they have been declared within the package specification. If any of the 
 procedures or functions have not been declared in the specification, then they must be defined in the 
-package body prior to being called by any of the other procedures or functions. 
+package body prior to being called by any of the other procedures or functions.
+
 You can change any implementations within a package body without recompiling the specification. 
 This becomes very important when you have other objects in the database that depend on a particular 
 package because it is probably not a good idea to change a package specification during normal business 
@@ -2676,15 +2700,22 @@ possible to create entire applications without the use of a package, but doing s
 maintenance nightmare because you will begin to see a pool of procedures and functions being created 
 within your database, and it will be difficult to remember which constructs are used for different tasks. 
 Packages are especially handy when writing PL/SQL web applications, and you will learn all about doing 
-this in Chapter 14. 
-## 4-10. Writing Initialization Code for a Package 
-Problem 
+summary:  
+1. package differenates individual prodcdure is that pacakge could define global variable and shared each other
+2. could including function not within specification
+3. there are declarations of variables or constants, so no need to struct package body
+
+
+## 4-10. Writing Initialization Code for a Package
+
+**Problem** 
 You want to execute some code each time a particular PL/SQL package is instantiated in a session. 
-Solution 
+
+**Solution**
 Create an initialization block for the package in question. By doing so, you will have the ability to execute 
 code each time the package is initialized. The following example shows the same package that was 
 constructed in Recipe 4-7. However, this time the package contains an initialization block. 
- 
+```sql
 CREATE OR REPLACE PACKAGE BODY process_employee_time IS 
  
   PROCEDURE grant_raises (pct_increase IN NUMBER, 
@@ -2715,8 +2746,6 @@ CREATE OR REPLACE PACKAGE BODY process_employee_time IS
   INTO emp_count 
   FROM employees 
   WHERE employee_id = empno_in; 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-80 
   
   IF emp_count > 0 THEN 
     -- IF EMPLOYEE FOUND, THEN OBTAIN RECORD 
@@ -2742,58 +2771,86 @@ CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES
   END IF; 
   DBMS_OUTPUT.PUT_LINE(results); 
   END increase_wage; 
-   
-  
-BEGIN 
+
+BEGIN
   DBMS_OUTPUT.PUT_LINE('EXECUTING THE INITIALIZATION BLOCK');
-END; 
+END;
+```
 The initialization block in this example is the last code block within the package body. In this case,
 that block lies in the final three lines. 
-How It Works 
+
+**How It Works**
+
 The initialization block for the package in the solution displays a line of text to indicate that the
 initialization block has been executed. The initialization block will execute once per session, the first
 time the package is used in that session. If you were to create this package in your session and invoke
 one of its members, you would see the message print. Although an initialization message is not very
 useful, there are several good reasons to use an initialization block. One such reason is to perform a
 query to obtain some data for the session. 
+
+summary:  
+1. more like java construct function and golang init() function
+2. code struct for initialization
+   ```sql
+    create or replace package XXXX () is
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('EXECUTING THE INITIALIZATION BLOCK');
+    END;
+   ```
+
 ## 4-11. Granting the Ability to Create and Execute Stored Programs 
-Problem 
+
+**Problem**
 You want to grant someone the ability to create and execute stored programs. 
-Solution 
+
+**Solution** 
 To grant the ability for a user to create a procedure, function, or package, you must log in to the database 
 with a privileged account and grant the CREATE PROCEDURE privilege to the user. Here’s an example: 
- 
+```sql
 GRANT CREATE PROCEDURE TO user; 
- 
+```
+
 Similarly, to grant permissions for execution of a procedure, package, or function, you must log in 
 with a privileged account and grant the user EXECUTE permissions on a particular procedure, function, or 
 package. Here’s an example: 
- 
-GRANT EXECUTE ON schema_name.program_name TO schema; 
-How It Works 
+
+```sql
+GRANT EXECUTE ON schema_name.program_name TO schema;
+```
+
+**How It Works**
+
 Before a user can create stored code, the user must be given permission to do so. The solution shows the 
-straightforward approach. The database administrator logs in and grants CREATE PROCEDURE to the 
+straightforward approach. The database administrator logs in and grants `CREATE PROCEDURE` to the 
 schema owner. The schema owner can then log in and create stored code in their schema. 
 A schema owner can always execute stored code in the schema. However, application users do not 
 generally log in as schema owners because of the security risks inherent in doing so. Thus, you will 
 commonly be faced with the need to grant other users execute access on stored code. You do that by 
-granting EXECUTE privileges, as shown in the second solution example.  
+granting `EXECUTE` privileges, as shown in the second solution example.  
+
+summary :  
+1. let A account access B schema objects by execute `GRANT EXECUTE ON schema_name.program_name TO schema;`
 
 ## 4-12. Executing Packaged Procedures and Functions 
-Problem 
+
+**Problem**
 You want to execute one of the procedures or functions contained within a package. 
-Solution 
+
+**Solution** 
 Use the package_name.object_name notation to execute a particular code object within a package. For 
 instance, the following block of code executes the GRANT_RAISES procedure that is contained within the 
 PROCESS_EMPLOYEE_TIME package. 
- 
- BEGIN 
+
+```sql
+BEGIN 
     process_employee_time.grant_raises(.03,4000); 
-  END; 
- 
-The previous code block executes the GRANT_RAISES function, passing .03 for the percentage of 
+END; 
+```
+
+The previous code block executes the `GRANT_RAISES` function, passing `.03` for the percentage of 
 increase and 4000 for the upper bound. 
-How It Works 
+
+***How It Works** 
 Dot notation is used for accessing members of a package. Similar to other languages such as Java, dot 
 notation can be used to access any publically accessible member of the package. Any variable, function, 
 or procedure that is contained in the package specification can be accessed using the dot notation. 
@@ -2801,56 +2858,69 @@ Therefore, if your package contained a constant variable within its specificatio
 access, it would be possible to do so from outside the package. 
 For a schema to access and execute package members, it must have the appropriate permissions. To 
 grant EXECUTE permission on a package that you own, use the following syntax: 
- 
+
+```sql
 GRANT EXECUTE ON package_name TO user_name; 
- 
+```
+
 Dot notation works from within other procedures or functions. It can also be used from the 
 SQL*Plus command line using the EXEC command. 
 ■ Note In most cases, if a package is being used by another schema, then it is a good idea to create a public 
 synonym for that package within the database. This will help decrease issues while attempting to reference the 
 package and its programs from the different schema because you will not need to specify the schema name in 
 order to qualify the call. Please see Recipe 4-13 for more information regarding public synonyms. 
+summary:  
+1. a good way is to create synonyms
 
-## 4-13. Creating a Public Name for a Stored Program 
-Problem 
+## 4-13. Creating a Public Name for a Stored Program
+
+**Problem** 
 You want to allow for any schema to have the ability to reference a particular stored program that is 
-contained within your schema. For instance, the CALC_EMPLOYEE_PAYCHECK procedure should be 
+contained(adj.泰然自若的;从容的;被控制的) within your schema. For instance, the CALC_EMPLOYEE_PAYCHECK procedure should be 
 executable for any of the administrative users of the database. You want these users to have the ability to 
 simply call the procedure rather than preceding the procedure name with the schema using the dot 
 notation. 
-Solution 
+
+**Solution**
 Create a public synonym for the function, procedure, or package. This will allow any user that has 
 EXECUTE privileges on the stored program to call it without specifying the schema name first. Instead, the 
 invoker need only reference the synonym.  
 In the following example, the user AdminUser does not have direct access to the 
 CALC_EMPLOYEE_PAYCHECK procedure, so they must fully qualify the name of the package using the schema 
 name for which the procedure resides. 
- 
+
+```sql
 SQL> exec application_account.calc_employee_paycheck(200); 
 Calculating paycheck with taxes 
 The paycheck total for Whalen is 5200.8 
  
 PL/SQL procedure successfully completed. 
- 
-Next, the database administrator will create a public synonym for the procedure: 
- 
+```
+
+Next, the database administrator will create a public synonym for the procedure:
+
+```sql
 SQL> CREATE PUBLIC SYNONYM calc_employee_paycheck 
            FOR application_user.calc_employee_paycheck; 
- 
+```
+
 Now any user with execute privileges on the procedure can invoke it without fully qualifying the 
 name since a public synonym named CALC_EMPLOYEE_PAYCHECK has been created. This is demonstrated in 
 the next lines of code. Again, the user AdminUser is now logged into the system and executes the 
 procedure. 
- 
+
+```sql
 SQL> exec calc_employee_paycheck(206); 
 Calculating paycheck with taxes 
 The paycheck total for Gietz is 6640.8 
  
 PL/SQL procedure successfully completed. 
- 
+```
+
 As you can see, the procedure name no longer requires the schema name to fully qualify it before 
 being invoked. 
-How It Works 
+
+**How It Works** 
 Creating public synonyms is a useful technique for allowing any user to have access to a stored piece of 
 code without knowing which schema the code belongs to. Any user who has EXECUTE privileges on the 
 code can invoke it without fully qualifying the name. Instead, the invoker specifies the synonym name.  
@@ -2859,35 +2929,48 @@ synonym. It’s actually common for database administrators to take care of crea
 To create a synonym, execute the following statement, replacing the PUB_SYNONYM_NAME identifier 
 with the name of your choice and replacing SCHEMA.STORED_PROGRAM with the schema name and program 
 that you want to make publically accessible: 
- 
+
+```sql
 CREATE PUBLIC SYNONYM pub_synonym_name FOR schema.stored_program; 
- 
+```
+
 The public synonym name does not have to be the same as the actual stored program name, but it is 
 conventional to keep them the same, and it makes things consistent and the names easier to remember. 
 If you begin to have synonym names that differ from the actual program names, then confusion will 
-eventually set in. 
+eventually set in.
+
 ■ Note Creating a synonym does not give execute access. Creating a public synonym provides only a global name 
 that avoids the need for dot notation. Invokers of a procedure or function still must be granted EXECUTE access, as 
 shown in Recipe 4-11. 
 
-## 4-14. Executing Package Programs in Sequence 
-Problem 
+summary:  
+1. grant read/write user access right to execute procedure without schema name
+2. if you want to setup w/r account for schema account.
+   1. create public synonym name for application account
+   2. grant execute/select/update ... on package_name on write_user/read_user
+
+
+## 4-14. Executing Package Programs in Sequence
+
+**Problem** 
 You have created a package that contains all the necessary procedures and functions for your program. 
 Although you can invoke each of these subprograms individually using the 
-package_name.subprogram_name notation, it would be beneficial to execute all of them at the same time 
+`package_name.subprogram_name` notation, it would be beneficial to execute all of them at the same time 
 by issuing a single statement. 
-Solution 
-Create a driver procedure within your PL/SQL package that will be used to initiate all the subprograms in 
-turn, and run your entire program. In the following example, a procedure named driver is created inside 
+
+**Solution**
+Create a driver procedure within your PL/SQL package that will be used to initiate all the subprograms in turn, and run your entire program. In the following example, a procedure named driver is created inside 
 a package, and it will invoke all the other package subprograms in turn: 
 First, create the specification: 
- 
+
+```sql
 CREATE OR REPLACE PACKAGE synchronize_data IS 
   PROCEDURE driver; 
 END; 
- 
+```
 Then, create the body: 
- 
+
+```sql
 CREATE OR REPLACE PACKAGE BODY synchronize_data IS 
   PROCEDURE query_remote_data IS 
     BEGIN 
@@ -2921,17 +3004,21 @@ CREATE OR REPLACE PACKAGE BODY synchronize_data IS
     sync_local_data; 
   END driver; 
 END synchronize_data; 
- 
+```
+
 The driver procedure initiates all the other procedures in the order that they should be executed. To 
 initiate the packaged program, you now make a call to the driver procedure as follows: 
- 
+
+```sql
 BEGIN 
    synchronize_data.driver; 
-END; 
+END;
+```
  
 One statement invokes the driver procedure. That procedure in turn invokes the other procedures 
 in the proper sequence.  
-How It Works 
+
+**How It Works** 
 By creating a single procedure that can be called in order to execute all the other subprograms in turn, 
 you eliminate the potential for calling subprograms in the incorrect order. This will also allow you the 
 convenience of making one call as opposed to numerous calls each time you want to execute the task(s) 
@@ -2939,7 +3026,7 @@ involved. And, if you create the other subprograms as private procedures and fun
 eliminate the risk of a developer invoking them out of order. That’s because you only make the driver 
 procedure public, and you know that the driver invokes in the correct sequence.  
 Oftentimes, packages are used to hold all the database constructs that make up an entire process. In 
-the solution to this recipe, the package entails a database synchronization process, and each procedure 
+the solution to this recipe, the package entails(vt.使需要.必需) a database synchronization process, and each procedure 
 within performs a separate piece of the synchronization. When executed in the correct order, the 
 procedures together perform the complete synchronization task.  
 One could just as easily create a script or manually invoke each package program separately just as 
@@ -2950,19 +3037,26 @@ procedure. Similarly, additional processing can be done in between each procedur
 printing out the current status of the program. The driver procedure essentially provides another layer 
 of abstraction that you can take advantage of. The package can be initialized using the default package 
 initialization; then additional initialization or statements can be provided within the driver procedure, 
-and the program caller doesn’t need to know about them. 
-## 4-15. Implementing a Failure Flag 
-Problem 
+and the program caller doesn’t need to know about them.
+summary: 
+1. Another important factor is that the driver can also be used to perform any additional initialization that must be done prior to executing each procedure
+2. you can take advantage of. The package can be initialized using the default package initialization
+
+
+## 4-15. Implementing a Failure Flag
+
+**Problem** 
 You want to create a boolean variable to determine whether one of the subprograms in the package has 
 generated an error. If an error has been generated by one of the subprograms, then the variable will be 
 set to TRUE. This flag will be evaluated in the driver procedure to determine whether the updates 
 performed by the package should be committed or rolled back. 
-Solution 
+
+**Solution**
 Declare a global variable at the package level, and it will be accessible to all objects within. You can do 
 this by declaring the variable within the package body. The following package illustrates such a variable, 
 where the variable has been declared within the package body so that it is available for all objects in the 
 package only. 
-  
+```sql  
 CREATE OR REPLACE PACKAGE synchronize_data 
 PROCEDURE driver; 
 END; 
@@ -2970,8 +3064,6 @@ END;
 CREATE OR REPLACE PACKAGE BODY synchronize_data IS 
   error_flag BOOLEAN := FALSE; 
  
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-86 
   PROCEDURE query_remote_data is 
      Cursor remote_db_query is 
      SELECT * 
@@ -3024,8 +3116,6 @@ CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES
     IF error_flag = TRUE THEN 
       GOTO error_check; 
     END IF; 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-87 
  
     obtain_updated_record_list; 
     IF error_flag = TRUE THEN 
@@ -3046,8 +3136,9 @@ CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES
     END IF; 
  
   END driver; 
-END; 
-How It Works 
+END;
+```
+**How It Works**  
 Declaring variables in the package body outside any procedures or functions allows them to become 
 accessible to all subprograms within the package. If one or more of the subprograms changes such a 
 variable’s value, then the changed value will be seen throughout the entire package.  
@@ -3058,10 +3149,12 @@ anything declared in the package specification is publically available to any PL
 well as within the package body. 
 
 ## 4-16. Forcing Data Access to Go Through Packages 
-Problem 
+
+**Problem** 
 You have defined all subprograms and packages for a particular application, and you want to allow other 
 users to access these constructs and execute the program but not have access to any data tables directly. 
-Solution 
+
+**Solution**
 Define all the packages, procedures, and functions for your program within a single schema that has 
 access to all the data. All user access should be made from separate schemas, and they should be granted 
 execute privileges on the PL/SQL objects but not access to the tables themselves.  
@@ -3074,7 +3167,8 @@ and functions. Grant EXECUTE privileges to that role. Grant that role to applica
 Your application users will now be able to execute the procedures and functions within the package. 
 Those procedures and functions can in turn update the database tables in the package’s schema. 
 However, users will not have direct access to those tables. All updates must flow through the package. 
-How It Works 
+
+**How It Works**
 To control an application’s data, it is important to restrict access to the tables. The solution in this recipe 
 shows how to create a package in the same schema that contains the application tables. The package 
 thus has access to those tables. Users, however, do not have table-level access. 
@@ -3086,41 +3180,46 @@ defined interface that remains under your control. You now have some amount of f
 underlying tables. So long as you do not change the package interface, you can make changes to the 
 underlying tables without disrupting the application. 
 
+summary:  
+1. big, deep, comprehensive,topic to disuss
+2. allow you must through package to access tables
+
 ## 4-17. Executing Stored Code Under Your Own Privilege Set 
-Problem 
+
+**Problem** 
 You have loaded all of an application’s objects into a single application schema. However, you do not 
 want packages, procedures, and functions to execute as the schema owner. Instead, you want stored 
 code to execute with the privileges and access of the user who is invoking that code.  
-Solution 
-Use invoker’s rights by providing the AUTHID property within the declaration of your program. If the 
+**Solution**
+Use invoker’s rights by providing the `AUTHID` property within the declaration of your program. If the 
 AUTHID property is specified when defining a package, procedure, or function, then you have the ability 
-to specify whether the program should be invoked using the CURRENT_USER privileges or the DEFINER 
+to specify whether the program should be invoked using the `CURRENT_USER` privileges or the `DEFINER` 
 privileges. In the case of this solution, you would rather use the CURRENT_USER privileges to ensure that 
 the user does not have the same level of access as the schema owner. The default is DEFINER. 
 The following code shows how to create a procedure for changing a password, and it uses the AUTHID 
 property to ensure that the procedure will be run using the CURRENT_USER’s privilege set. This particular 
 procedure uses dynamic SQL to create a SQL statement. To learn more about using dynamic SQL, please 
-see Chapter 8. 
- 
+see Chapter 8.
+
+```sql
 CREATE OR REPLACE PROCEDURE change_password(username IN VARCHAR2, 
                                                                                                                     
-new_password IN VARCHAR2)  
+                                          new_password IN VARCHAR2)
 AUTHID CURRENT_USER IS 
  
-  sql_stmt VARCHAR2(100); 
- 
+sql_stmt VARCHAR2(100); 
+
 BEGIN 
     sql_stmt := 'ALTER USER ' ||  username || ' IDENTIFIED BY ' || new_password; 
-     
+    
     EXECUTE IMMEDIATE sql_stmt; 
-  CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-89 
 END; 
- 
+```
 When the user executes this procedure, it will be executed using their own set of permissions. This 
 will prevent them from changing anyone else’s password unless they have the ability to do so under their 
-allotted permission set.  
-How It Works 
+allotted(v.分配;指派;拨给) permission set.  
+
+**How It Works**
 Invoker’s rights are a great way to secure your application if you are planning to limit access to the 
 CURRENT_USER’s privilege set. To allow for invoker’s rights to be set into place, the AUTHID property must 
 be used with the CURRENT_USER keyword in the definition of a stored PL/SQL unit. This property affects 
@@ -3132,45 +3231,68 @@ account, then they can be granted the required level of access via database role
 can constrain the execution of code to the current user’s privilege set. Because of that, if a user does not 
 have the privileges that are required to execute a particular program, then they will not have access. 
 Simply put, invoker’s rights are a good means of securing your code as long as the approach is used 
-correctly. 
+correctly.
+
+summary:  
+1. must execute code by your access right
 
 ## 4-18. Accepting Multiple Parameter Sets in One Function 
-Problem 
+
+**Problem** 
 You want to give a function the ability to accept multiple parameter types instead of being constrained 
 to a particular datatype or number of parameters. For example, you want to create a single function that 
-can accept either one or two parameters and that will perform a slightly different action depending upon 
+can accept either one or two parameters and that will perform a slightly(adv.些微地,轻微地) different action depending upon 
 the number of parameters you pass it.  
-Solution 
+
+**Solution** 
 Use overloading to create multiple functions that are named the same and perform similar functionality 
 but accept a different number of parameters, different ordering of parameters, or parameters of different 
 types. In this recipe, you will see a function named squared that takes a number and returns its value 
 squared. Similarly, there is another function also named squared that accepts two numbers instead of 
 one. This second function is the overloaded version of the original squared. Here is the code for the two 
 functions: 
-  
+
+```sql
 -- Returns the square of the number passed in 
 CREATE OR REPLACE FUNCTION squared (in_num IN NUMBER) 
-    RETURN NUMBER AS 
+RETURN NUMBER AS 
+  -- variables
 BEGIN 
   RETURN in_num * in_num; 
 END; 
-  
+```
+```sql 
  -- Returns the squared sum of two numbers 
 CREATE OR REPLACE FUNCTION squared (in_num IN NUMBER, 
                                     in_num_two IN NUMBER) 
     RETURN NUMBER AS 
-CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
-90 
 BEGIN 
   RETURN (in_num + in_num_two) * (in_num + in_num_two);  
 END; 
-  
+```
+
+another type 
+
+```sql
+CREATE OR REPLACE FUNCTION squared (in_num IN NUMBER, 
+                                    in_num_two IN NUMBER
+                                    out_number_three out NUMBER) 
+    RETURN NUMBER AS 
+NOK   NUMBER;
+
+BEGIN 
+  out_number_three := (in_num + in_num_two) * (in_num + in_num_two);  
+  RETURN NOK;  
+END; 
+
+```
 You can see that each of the previous functions accepts a different number of parameters, but they 
 both perform similar tasks. This is a good illustration for using function overloading because someone
 using this function would expect a similar result to be returned whether calling the function with one
 parameter or two. 
-How It Works 
-Like many other programming languages, PL/SQL offers an overloading of functions. This makes it
+
+**How It Works**
+Like many other programming languages, PL/SQL offers an overloading(重载) of functions. This makes it
 possible to name more than one function by the same name but give each of them different parameter
 types, different parameter ordering, or a different number of parameters. This is also known as changing
 the function signature. A signature for a function consists of the object name and its parameter list. By
@@ -3185,52 +3307,72 @@ Overloading has its good use cases, but if it can be avoided by using technique 
 then it is a good idea to go the simpler route. 
 
 ## 4-19. Listing the Functions, Procedures, and Packages in a Schema 
-Problem 
+
+**Problem** 
 Your team has defined a number of functions, procedures, and packages within a schema. You want to
 generate a listing of all functions, procedures, and packages at the end of each day to evaluate
 productivity. 
-Solution 
+
+**Solution** 
 Use the USER_OBJECTS table to return the program list and prefix packages, procedures, and functions for
 the same program with the same first word to make them easier to find. 
 This first example will return a list of all procedure names that reside within the EMP schema and that
 have a name that is prefixed with EMPTIME: 
+```sql
 SELECT OBJECT_NAME 
 FROM USER_OBJECTS 
 WHERE OBJECT_TYPE = 'PROCEDURE;
 WHERE OBJECT_NAME like 'EMPTIME%'; 
+```
+
 The next query will return a list of all function names that reside within the schema: 
+
+```sql
 SELECT OBJECT_NAME 
 FROM USER_OBJECTS 
 WHERE OBJECT_TYPE = 'FUNCTION'; 
- 
+```
+
 Lastly, the following query will return a listing of all package names that reside within the schema: 
- 
+
+```sql
 SELECT OBJECT_NAME 
 FROM USER_OBJECTS 
-WHERE OBJECT_TYPE = 'PACKAGE'; 
-How It Works 
+WHERE OBJECT_TYPE = 'PACKAGE';
+```
+> get_DDL() 
+
+**How It Works**
 Oracle Database contains many views that contain data useful for application development. Using the 
 USER_OBJECTS table can be very handy when searching for objects within the database. By prefixing like 
 objects with the same first word, it can make searching for a particular selection of objects rather easy.  
 USER_OBJECTS provides the ability to find a certain object type by specifying the OBJECT_TYPE within 
-the query. If no OBJECT_TYPE is specified, then all objects for the schema will be returned. 
-4-20. Viewing Source Code for Stored Programs 
-Problem 
+the query. If no OBJECT_TYPE is specified, then all objects for the schema will be returned.
+
+
+
+
+## 4-20. Viewing Source Code for Stored Programs 
+
+**Problem** 
 You want to retrieve the code for your stored functions, procedures, triggers, and packages. 
-Solution 
-Use the DBMS_METADATA package to assist you in fetching the information. In this case, you will use the 
-DBMS_METADATA.GET_DDL procedure to obtain the code for a stored function. In the following code, the 
+
+**Solution**
+Use the `DBMS_METADATA` package to assist(vi.参加) you in fetching the information. In this case, you will use the 
+`DBMS_METADATA.GET_DDL` procedure to obtain the code for a stored function. In the following code, the 
 DBMS_METADATA package is used to return the DDL for the CALC_QUARTER_HOUR function: 
- 
+
+```sql
 SELECT DBMS_METADATA.GET_DDL('FUNCTION','CALC_QUARTER_HOUR') FROM DUAL; 
- 
+```
+
 The query illustrated previously should produce results that are similar to the following as long as 
-you have the CALC_QUARTER_HOUR function loaded in your database: 
- 
+you have the `CALC_QUARTER_HOUR` function loaded in your database: 
+```sql
 CREATE OR REPLACE FUNCTION "MY_SCHEMA"."CALC_QUARTER_HOUR" (HOURS IN NUMBER) 
- RETURN NUMBER AS 
-    CALCULATED_HOURS NUMBER := 0; 
- BEGIN 
+RETURN NUMBER AS 
+   CALCULATED_HOURS NUMBER := 0; 
+BEGIN 
    IF HOURS > 1 THEN 
         IF MOD(HOURS, 1) <=.125 THEN 
           CALCULATED_HOURS := substr(to_char(HOURS),0,1); 
@@ -3256,22 +3398,25 @@ CREATE OR REPLACE FUNCTION "MY_SCHEMA"."CALC_QUARTER_HOUR" (HOURS IN NUMBER)
    END IF; 
    RETURN CALCULATED_HOURS; 
  END CALC_QUARTER_HOUR; 
- 
+``` 
 The GET_DDL function returns the code that can be used to re-create the procedure or function. This 
 can be a good way to debug code that you may not have authored and do not have on hand. 
 ■ Note The GET_DDL function will not format the code. Rather, it will be returned as a single string of text. By 
 default, the buffer will not be large enough to display all of the DDL. You can change the buffer size by issuing the 
 SET LONG buffersize within SQL*Plus, substituting buffersize with a large integer value. 
-How It Works 
+
+**How It Works**
 You can use the DBMS_METADATA package to retrieve various pieces of information from the database. The 
 solution to this recipe demonstrated how to fetch the DDL for a function. There is an abundance of 
-information that can be obtained by using the DBMS_METADATA package, and GET_DDL barely scratches the 
+information that can be obtained by using the DBMS_METADATA package, and `GET_DDL` barely scratches the 
 surface. 
+
 The GET_DDL function can return the code for each different type of object. To retrieve a the code for 
 an object using GET_DDL, use the following syntax: 
- 
+
+```sql
 SELECT DBMS_METADATA.GET_DDL('object_type','object_name', 'schema') FROM DUAL; 
- 
+```
 The OBJECT_TYPE can be the name of any database object type, including TABLE. For the purposes of 
 PL/SQL code, the OBJECT_TYPE can be FUNCTION, PROCEDURE, PACKAGE, or TRIGGER. The SCHEMA parameter is 
 optional and does not have to be specified if the object resides within the caller’s schema. 
@@ -3281,7 +3426,28 @@ listing of available subprograms, please refer to the online Oracle documentatio
 http://download.oracle.com/docs/cd/B28359_01/appdev.111/b28419/d_metada.htm#ARPLS640, which 
 goes into detail regarding each of the subprogram functionalities. 
  
- 
+summary:  
+
+```text
+It has always been a huge pain to punch the DDL for tables, indexes and stored procedures into a flat file. Oracle now has a dbms_metadata package with a get_ddl function to copy DDL syntax out of the dictionary.
+
+With all of the new storage clauses and advanced parameters, getting table and index definitions has always been a huge problem.  Hence, prior to Oracle, the DBA was generally forced to keep the DDL source code in a special library.  This makes life difficult because the DBA is now forced to maintain and manage versions of tables and index DDL separately from the data dictionary.
+
+Oracle, the DBA will be able to keep all table and index definitions inside the data dictionary (where they belong), and use the get_ddl function to punch-out a copy whenever they need to migrate the object.
+
+Below we see that the get_ddl function is very simple to use, only requiring the object_type and the object_name as import parameter.  Also, make sure to set linesize to a large value, because get_ddl returns a CLOB datatype, and you want SQL*Plus to be able to display the result set.
+
+Set lines 90000
+
+Spool sales_table_ddl.sql
+
+Select dbms_metadata.get_ddl('TABLE','SALES','schema') from dual;
+
+Spool off;
+
+If you like Oracle tuning, you might enjoy my latest book "Oracle Tuning: The Definitive Reference" by Rampant TechPress.  It's only $41.95 (I don't think it is right to charge a fortune for books!) and you can buy it right now at this link:
+```
+
 # 5. Triggers 
 Triggers play an important role in any database developer’s or database administrator’s career. They 
 provide the ability to execute code upon the occurrence of defined database, schema, or system events. 

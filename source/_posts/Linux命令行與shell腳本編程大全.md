@@ -906,7 +906,7 @@ C++编译要使用CMake
     echo "it works"
   fi
   ## style 2
-  if pwd ; then 
+  if [ pwd ] ; then 
     echo "it works"
   fi
 
@@ -987,6 +987,12 @@ C++编译要使用CMake
   esac
 
   ```
+
+summary:  
+
+1. [ 'var1' = 'var2' ] 等待前后留一个空格,然后与两端也要留空格.
+2. `[ $val1 > $val2 ]`直接这样比较字符串会创建一个文件
+3. linux中的字符串是双引号的
 
 # 13. for 循环
 
