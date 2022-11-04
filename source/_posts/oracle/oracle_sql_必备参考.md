@@ -37,7 +37,7 @@ coverMeta: out
 ```sql
 
 SELECTename,deptno,sal,cornn.FROM scott.ermp
-WHEREhiredate > '01-JAN-Q0 ' ;
+WHEREhiredate > '01-JAN-Q0' ;
 
 ```
 这个简单的SQL语句告诉数据库显示2000年1月1日以后雇佣的职工名字( ename )、部门号( deptno)、薪水（ sal）和佣金( comm)。在“老式的”过程化编程语言巾,这可能需要儿百行代码，但是，在.SQL中只需要3行代码。Oracle在检索数据时并不总是如此灵巧。尽管Oracle内部的“查询优化器”有了稳步提高，但仍然有许多方法可以改进SQL的性能，第八章在讨论SQL语句的调试时将展示这一主题。

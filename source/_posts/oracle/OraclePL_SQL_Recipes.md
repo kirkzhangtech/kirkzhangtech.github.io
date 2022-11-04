@@ -2223,6 +2223,7 @@ There is a database task that you are performing on a regular basis. Rather than
 contains lines of PL/SQL code each time you execute the task, you want to store the code in the database 
 so that you can simply execute the task by name or so that you can schedule it to execute routinely via 
 Oracle Scheduler. 
+
 ■ Note See Chapter 11 for information on scheduling PL/SQL jobs using Oracle Scheduler. 
 
 **Solution**
@@ -2306,80 +2307,107 @@ have the CREATE ANY PROCEDURE system privilege.
 
 ## 4-5. Executing a Stored Procedure
 
-Problem 
+**Problem**
 You want to execute a stored procedure from SQL*Plus. 
-Solution 
+
+**Solution** 
 Open SQL*Plus, and connect to the database schema that contains the procedure you are interested in 
 executing. Execute the procedure by issuing the following command: 
  
+```sql
 EXEC procedure_name([param1, param2,...]); 
- 
+```
+
 For instance, to execute the procedure that was created in Recipe 4-3, you would issue the following 
-command: 
- 
+command:
+
+```sql
 EXEC increase_wage(198, .03, 5000); 
- 
-This would invoke the INCREASE_WAGE procedure, passing three parameters: EMPLOYEE_ID, a 
-percentage of increase, and an upper salary bound. 
+```
+
+This would invoke the `INCREASE_WAGE` procedure, passing three parameters: EMPLOYEE_ID, a 
+percentage of increase, and an upper salary bound.
+
 You can also execute a stored procedure by creating a simple anonymous block that contains the 
-procedure call, as depicted in the following code: 
+procedure call, as depicted(vt.描述,描画) in the following code:
+
+```sql
 BEGIN 
   procedure_name([param1, param2,…]); 
 END; 
- 
+```
+
 Using this technique, invoking the stored procedure that was created in Recipe 4-3 would resemble 
 the following: 
- 
+
+```sql
 BEGIN 
   increase_wage(198,.03,5000); 
 END; 
- 
+```
+
 Both techniques work equally well, but the latter would be better to use if you wanted to execute 
 more than one procedure or follow up with more PL/SQL statements. If you are running a single 
-procedure from SQL*Plus, then using EXEC is certainly a good choice. 
-How It Works 
-A stored procedure can be executed using the EXEC keyword. You can also type EXECUTE entirely. Both the 
+procedure from SQL*Plus, then using `EXEC` is certainly a good choice. 
+
+**How It Works**
+
+A stored procedure can be executed using the `EXEC` keyword. You can also type `EXECUTE` entirely. Both the 
 long and shortened versions will work.  
+
 It is also possible to execute a procedure that is contained within other schemas, if the current user 
 has execute privileges on that procedure. In such a scenario, use dot notation to qualify the procedure 
 name. Here’s an example: 
- 
+
+```sql
 EXEC different_schema.increase_wage(emp_rec.employee_id, pct_increase, upper_bound); 
-■ Note To learn more about privileges regarding stored programs, please take a look at Recipe 4-11. 
+```
+
+■ Note To learn more about privileges regarding stored programs, please take a look at Recipe 4-11.
 A procedure can also be invoked from within another procedure by simply typing the name and 
 placing the parameters inside parentheses, if there are any. For instance, the following lines of code 
 demonstrate calling a procedure from within another procedure. The procedure in this example invokes 
 the procedure that was shown in Recipe 4-3. 
- 
+
+```sql
 CREATE OR REPLACE PROCEDURE grant_raises (pct_increase IN NUMBER, 
-                                                                                                         
-upper_bound IN NUMBER) as 
+                                          upper_bound IN NUMBER) as 
   CURSOR emp_cur is 
   SELECT employee_id, first_name, last_name 
   FROM employees; 
 BEGIN 
   -- loop through each record in the employees table 
-  FOR emp_rec IN emp_cur LOOP 
-      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name); 
+  FOR emp_rec IN emp_cur LOOP
+      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name);
+      -- inside A invoke B procedure
       increase_wage(emp_rec.employee_id, pct_increase, upper_bound); 
   END LOOP; 
 END;  
- 
-The procedure GRANT_RAISES applies an increase across the board to all employees. It loops through 
-all employee records, and the INCREASE_WAGE procedure is called with each iteration. The procedure is 
-called without the use of the EXEC keyword since it is being invoked by another procedure rather than 
-directly from the SQL*Plus command line.  
+```
+
+The procedure `GRANT_RAISES` applies an increase across the board to all employees. It loops through 
+all employee records, and the `INCREASE_WAGE` procedure is called with each iteration. The procedure is 
+called without the use of the `EXEC` keyword since it is being invoked by another procedure rather than 
+directly from the SQL*Plus command line.
+
+**summary**
+1. execute procedure by EXEC statement directly
+2. using anonymous code block within procedure name
+3. inside A procedure invoke B procedure
+
 ## 4-6. Creating Functions Within a Procedure or Code Block 
-Problem 
+
+**Problem**
+
 You want to create some functions within a stored procedure. You want the functions to be local to the 
-procedure, available only from the procedure’s code block. 
-Solution 
+procedure, available only from the procedure’s code block.
+
+**Solution**
 Create a stored procedure, and then create functions within the declaration section. The internal 
-functions will accept parameters and return values just as an ordinary stored function would, except that 
-the scope of the functions will be constrained to the outer code block or to the procedure. The procedure 
+functions will accept parameters and return values just as an ordinary(adj.普通的,平凡) stored function would, except that the scope of the functions will be constrained to the outer code block or to the procedure. The procedure 
 that is demonstrated in this solution embodies two functions. One of the functions is used to calculate 
 the federal tax for an employee paycheck, while the other calculates the state tax. 
- 
+```sql
 CREATE OR REPLACE PROCEDURE calc_employee_paycheck(emp_id IN NUMBER) as 
   emp_rec          employees%ROWTYPE; 
   paycheck_total   NUMBER; 
@@ -2390,7 +2418,7 @@ CREATE OR REPLACE PROCEDURE calc_employee_paycheck(emp_id IN NUMBER) as
   BEGIN 
     RETURN sal *  .08; 
   END; 
- 
+
 -- function for federal tax 
  FUNCTION calc_federal (sal IN NUMBER)  
     RETURN NUMBER IS 
@@ -2416,26 +2444,35 @@ EXCEPTION
   WHEN NO_DATA_FOUND THEN 
     RAISE_APPLICATION_ERROR(-20001, 
     'No matching employee for the given ID'); 
-END; 
-How It Works 
-Functions—and procedures too—can be contained within other bodies of code. Creating a function 
+END;
+```
+
+**How It Works**
+
+Functions and procedures too can be contained within other bodies of code. Creating a function 
 within a declaration section will make the function accessible to the block that contains it. The 
 declaration of the function is the same as when you are creating a stored function, with the exception of 
-the CREATE OR REPLACE keywords. Any variables that are declared inside the function will be accessible 
-only to that function, not to the containing object. 
+the `CREATE OR REPLACE` keywords. Any variables that are declared inside the function will be accessible 
+only to that function, not to the containing object.
 Creating a function or procedure inside a PL/SQL code block can be useful when you want to make 
 a function that is only to be used by the containing object. However, if you find that the body of the 
 embedded function may change frequently, then coding a separate stored function may prove to be 
-more efficient. 
+more efficient.
+
 ## 4-7. Passing Parameters by Name 
-Problem 
+
+**Problem**
+
 You have a procedure in your database that accepts a large number of parameters. When calling the 
 procedure, you would rather not worry that the positioning of the parameters is correct. 
-Solution 
+
+**Solution**
+
 Rather than trying to pass all the parameters to the procedure in the correct order, you can pass them by 
 name. The code in this solution calls a procedure that accepts six parameters, and it passes the 
 parameters by name rather than in order. 
 Procedure Declaration: 
+```sql
 PROCEDURE process_emp_paycheck(EMP_ID IN NUMBER, 
    PAY_CODE IN NUMBER, 
    SICK_USED IN NUMBER, 
@@ -2449,16 +2486,19 @@ EXEC process_emp_paycheck(EMP_ID=>10,
    SICK_USED=>8.0, 
    STATE_TAX=>.06, 
    FEDERAL_TAX=>.08); 
- 
+```
 As you can see, by passing the parameters by name, they do not need to follow the same positional 
-ordering as they do within the declaration of the procedure.  
-How It Works 
+ordering as they do within the declaration of the procedure.
+
+**How It Works**
 To pass a parameter by name, you list the parameter name followed by an arrow (consisting of an equal 
 sign and a greater-than symbol) pointing to the value you are passing. The following pseudocode depicts 
-this technique: 
- 
+this technique:
+
+```sql
 procedure_name(parameter=>value); 
- 
+```
+
 Although it can be more verbose to use named parameters, passing parameters by name can be very 
 handy when there are several parameters to pass because you do not need to worry about passing them 
 in the correct order. It is also helpful because it increases readability.  
@@ -2471,12 +2511,13 @@ parameters within the same call. When doing so, you need to place the parameters
 using positional notation first, followed by the parameters that you want to pass using named notation. 
 The following execution illustrates using both positional and named notation while passing parameters 
 to the PROCESS_EMP_PAYCHECK procedure: 
- 
+```sql
 EXEC process_emp_paycheck(198, 10, 0, 
    SICK_USED=>4.0, 
    STATE_TAX=>.05, 
    FEDERAL_TAX=> .04); 
- 
+```
+
 This particular call passed both of the first parameters by position, those being EMP_ID and PAY_CODE. 
 The last three parameters are passed by named notation.  
 ## 4-8. Setting Default Parameter Values 
