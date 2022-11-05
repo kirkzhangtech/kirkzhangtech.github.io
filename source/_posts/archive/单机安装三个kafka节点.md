@@ -1,5 +1,5 @@
 ---
-title: 单机安装三个kafka节点
+title: Kafka On Ubuntu
 categories: 
 - archive
 ---
