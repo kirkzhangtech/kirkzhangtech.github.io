@@ -2,7 +2,10 @@
 title: Gradle On Ubuntu
 categories: 
 - archive
-
+thumbnailImagePosition: bottom
+coverImage: https://user-images.githubusercontent.com/46363359/199011820-d3673e76-0e62-44a0-84eb-9fa8867a6a5e.jpeg
+metaAlignment: center
+coverMeta: out
 ---
 
 > source link: https://linuxize.com/post/how-to-install-gradle-on-ubuntu-20-04/
@@ -108,6 +111,7 @@ Here are the highlights of this release:
 
 For more details see https://docs.gradle.org/6.5.1/release-notes.html
 
+```
 ------------------------------------------------------------
 Gradle 6.5.1
 ------------------------------------------------------------
@@ -122,7 +126,7 @@ JVM:          11.0.7 (Ubuntu 11.0.7+10-post-Ubuntu-3ubuntu1)
 OS:           Linux 5.4.0-26-generic amd64
 Copy
 That’s it. You have installed the latest version of Gradle on your Ubuntu system, and you can start using it.
-
+```
 
 Conclusion
 We’ve shown you how to install Gradle on Ubuntu 20.04. You can now visit the official Gradle Documentation page and learn how to get started with Gradle.
