@@ -6,23 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="CoffeeMan">
-    <title>Oracle Sql必备手册 - CoffeeMan</title>
+    <title>Zookeeper On Ubuntu20.04 - CoffeeMan</title>
     <meta name="author" content="kirkzhang">
     
     
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations of the ACM》期刊上。该论文永久地改变了计算世界。Codd建议的关系数据库管理系统模型(relational database management system,RDBMS)最后变成了关系数据库的定义标准．而关系数据库则成了当今使用的主流数据库。\n\n\n\n\n第一章SQL元素进行SQL开发是为了更容易地访问关系数据库,所以,sql能够执行下面几种操作：\n\n从数据库中查询数据\n向数据库中插入数据\n从数据库中删除数据\n创建和操纵数据库对象\n控制对数据库的访问\n\n严格地说，SQL根本不是‘种语言，而是对Oracle数据库传输指令的种方式。它与传统的编程语言在以下几个主要方面有所不同:\n\nSQL提供自动定位数据的能力\nSQL在数据集合上操作，而不是对独立的数据元素操作\nSQL是声明的，而不是过程化的，并且不提供过程控制SQL设计在逻辑层完成;这不需要处理实现的细节简单地说，当在SQL中设计时，你告诉Oracle自己想要干什么，而不是怎样做。但是这种方法利弊并存。考虑下面的SQL语句:\n\n\nSELECTename,deptno,sal,cornn.FROM scott.ermp\nWHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;\n\n这个简单的SQL语句告诉数据库显示2000年1月1日以后雇佣的职工名字( ename )、部门号( deptno)、薪水（ sal）和佣金( comm)。在“老式的”过程化编程语言巾,这可能需要儿百行代码，但是，在.SQL中只需要3行代码。Oracle在检索数据时并不总是如此灵巧。尽管Oracle内部的“查询优化器”有了稳步提高，但仍然有许多方法可以改进SQL的性能，第八章在讨论SQL语句的调试时将展示这一主题。\n注意:有人将缺乏过程化控制视为SQL的缺点、因此，Oracle公司开发了PL&#x2F;SQL ( ProceduralLanguage&#x2F;SQL，即过程化编程语言&#x2F;SQL),这一内容将在第七章讨论.\nsQL语句也称为SQL命令，由以下儿部分组成:关键字  带有特定Oralce操作意义的保留字。变量    它是可以被动态文本或数宇变量替换的数据元素。SQL有许多对象名，如变量、表或视图。文字常t数据．包括文本字符串和数字。操作符操作一个或多个变量或文字的符号或单词。\n","dateCreated":"2022-11-04T01:05:34+08:00","dateModified":"2022-11-04T13:32:36+08:00","datePublished":"2022-11-04T01:05:34+08:00","description":"摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations of the ACM》期刊上。该论文永久地改变了计算世界。Codd建议的关系数据库管理系统模型(relational database management system,RDBMS)最后变成了关系数据库的定义标准．而关系数据库则成了当今使用的主流数据库。","headline":"Oracle Sql必备手册","image":[null,"https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"}</script>
-    <meta name="description" content="摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"搭建zookeeper集群摘要:当时主要是想在wsl2上面搭建kafka集群\n\n\n首先下载(zookeeper)[https://zookeeper.apache.org/]\n\n将zookeeper复制三份,分别命名为zookeeper-1,zookeeper-2,zookeeper-3\n将zookeeper-1中的zoo.example.cfg文件复制一份改名为: zoo.cfg\n修改config/zoo.cfg文件\n修改端口: clientPort=2181\n修改数据目录: dataDir=/ashura/zookeeper-1/datalog\n增加以下配置: server.1=localhost.:2887:3887 server.2=localhost.:2888:3888 server.3=localhost.:2889:3889 admin.serverPort=8000\n\n\n\n完成的配置文件如下:\n\n# The number of milliseconds of each tick\ntickTime&#x3D;2000\n# The number of ticks that the initial\n# synchronization phase can take\ninitLimit&#x3D;10\n# The number of ticks that can pass between\n# sending a request and getting an acknowledgement\nsyncLimit&#x3D;5\n# the directory where the snapshot is stored.\n# do not use &#x2F;tmp for storage, &#x2F;tmp here is just\n# example sakes.\ndataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog\n# the port at which the clients will connect\nclientPort&#x3D;2181\n# the maximum number of client connections.\n# increase this if you need to handle more clients\n#maxClientCnxns&#x3D;60\n#\n# Be sure to read the maintenance section of the\n# administrator guide before turning on autopurge.\n#\n# http:&#x2F;&#x2F;zookeeper.apache.org&#x2F;doc&#x2F;current&#x2F;zookeeperAdmin.html#sc_maintenance\n#\n# The number of snapshots to retain in dataDir\n#autopurge.snapRetainCount&#x3D;3\n# Purge task interval in hours\n# Set to &quot;0&quot; to disable auto purge feature\n#autopurge.purgeInterval&#x3D;1\nserver.1&#x3D;localhost.:2887:3887\nserver.2&#x3D;localhost.:2888:3888\nserver.3&#x3D;localhost.:2889:3889\n将这份zoo.cfg分别复制到zookeeper-2,zookeeper-3的config目录下.修改zookeeper2的zoo.cfg中clientPort&#x3D;2183,dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog修改zookeeper3的zoo.cfg中clientPort&#x3D;2184,dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog\n创建刚才在配置文件中写的目录\nmkdir &#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog\nmkdir &#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog\nmkdir &#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog\n\n分别{– 在datalog目录下 –}执行以下命令,写入myid。\necho &quot;1&quot; &gt; &#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog&#x2F;myid\necho &quot;2&quot; &gt; &#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog&#x2F;myid\necho &quot;3&quot; &gt; &#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog&#x2F;myid\n\n最后分别启动zookeeper集群\n&#x2F;ashura&#x2F;zookeeper-1&#x2F;bin&#x2F;zkServer.sh start\n&#x2F;ashura&#x2F;zookeeper-2&#x2F;bin&#x2F;zkServer.sh start\n&#x2F;ashura&#x2F;zookeeper-3&#x2F;bin&#x2F;zkServer.sh start\n\n使用如下命令判断是否启动成功\n&#x2F;ashura&#x2F;zookeeper-1&#x2F;bin&#x2F;zkServer.sh status\n&#x2F;ashura&#x2F;zookeeper-2&#x2F;bin&#x2F;zkServer.sh status\n&#x2F;ashura&#x2F;zookeeper-3&#x2F;bin&#x2F;zkServer.sh status","dateCreated":"2022-10-20T21:48:20+08:00","dateModified":"2022-11-05T10:45:09+08:00","datePublished":"2022-10-20T21:48:20+08:00","description":"搭建zookeeper集群摘要:当时主要是想在wsl2上面搭建kafka集群","headline":"Zookeeper On Ubuntu20.04","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/10/20/archive/zookeeper_on_ubuntu/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/10/20/archive/zookeeper_on_ubuntu/"}</script>
+    <meta name="description" content="搭建zookeeper集群摘要:当时主要是想在wsl2上面搭建kafka集群">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Oracle Sql必备手册">
-<meta property="og:url" content="https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/index.html">
+<meta property="og:title" content="Zookeeper On Ubuntu20.04">
+<meta property="og:url" content="https://simonteo58.github.io/2022/10/20/archive/zookeeper_on_ubuntu/index.html">
 <meta property="og:site_name" content="CoffeeMan">
-<meta property="og:description" content="摘要: 主要是讲oracle的sql基础关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations">
+<meta property="og:description" content="搭建zookeeper集群摘要:当时主要是想在wsl2上面搭建kafka集群">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-11-03T17:05:34.036Z">
-<meta property="article:modified_time" content="2022-11-04T05:32:36.916Z">
+<meta property="article:published_time" content="2022-10-20T13:48:20.245Z">
+<meta property="article:modified_time" content="2022-11-05T02:45:09.890Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@shiming_kirk">
@@ -36,9 +36,6 @@
         <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
     
     
-    
-        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg"/>
     
     
     <!--STYLES-->
@@ -313,39 +310,31 @@
 </nav>
 
             
-        <div class="post-header-cover
-                    text-center
-                    "
-             style="background-image:url('https://user-images.githubusercontent.com/46363359/198887021-f1b71975-a6e8-44ca-af02-decfaf7ca9e1.jpg');"
-             data-behavior="2">
-            
-        </div>
-
             <div id="main" data-behavior="2"
-                 class="hasCover
-                        hasCoverMetaOut
+                 class="
+                        hasCoverMetaIn
                         ">
                 
 <article class="post">
     
     
-        <div class="post-header main-content-wrap text-center">
+        <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Oracle Sql必备手册
+            Zookeeper On Ubuntu20.04
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2022-11-04T01:05:34+08:00">
+    <time datetime="2022-10-20T21:48:20+08:00">
 	
-		    Nov 04, 2022
+		    Oct 20, 2022
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/oracle/">oracle</a>
+    <a class="category-link" href="/categories/archive/">archive</a>
 
 
     
@@ -357,33 +346,73 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>摘要: 主要是讲oracle的sql基础<br>关系数据库系统的根源要追溯到1970年，那时E.F,.Codd博土发表了标题为”A Relational Model of Data for Large Shared Data Banks”的论文（注1),当年6月刊登在由美国让算机学会(the Association of Computer Machinery，ACM）主办的《Communciations of the ACM》期刊上。该论文永久地改变了计算世界。Codd建议的关系数据库管理系统模型(relational database management system,RDBMS)最后变成了关系数据库的定义标准．而关系数据库则成了当今使用的主流数据库。</p>
+            <h1 id="搭建zookeeper集群"><a href="#搭建zookeeper集群" class="headerlink" title="搭建zookeeper集群"></a>搭建zookeeper集群</h1><p>摘要:当时主要是想在wsl2上面搭建kafka集群</p>
 <span id="more"></span>
 
-<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0"><span class="toc-text">第一章</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SQL%E5%85%83%E7%B4%A0"><span class="toc-text">SQL元素</span></a></li></ol></li></ol>
-
-<h1 id="第一章"><a href="#第一章" class="headerlink" title="第一章"></a>第一章</h1><h2 id="SQL元素"><a href="#SQL元素" class="headerlink" title="SQL元素"></a>SQL元素</h2><p>进行SQL开发是为了更容易地访问关系数据库,所以,sql能够执行下面几种操作：</p>
+<p>首先下载(zookeeper)[<a target="_blank" rel="noopener" href="https://zookeeper.apache.org/]">https://zookeeper.apache.org/]</a></p>
 <ul>
-<li>从数据库中查询数据</li>
-<li>向数据库中插入数据</li>
-<li>从数据库中删除数据</li>
-<li>创建和操纵数据库对象</li>
-<li>控制对数据库的访问</li>
+<li>将<code>zookeeper</code>复制三份,分别命名为<code>zookeeper-1,zookeeper-2,zookeeper-3</code></li>
+<li>将<code>zookeeper-1</code>中的<code>zoo.example.cfg</code>文件复制一份改名为: <code>zoo.cfg</code></li>
+<li>修改<code>config/zoo.cfg</code>文件<ul>
+<li>修改端口: <code>clientPort=2181</code></li>
+<li>修改数据目录: <code>dataDir=/ashura/zookeeper-1/datalog</code></li>
+<li>增加以下配置: <code>server.1=localhost.:2887:3887 server.2=localhost.:2888:3888 server.3=localhost.:2889:3889 admin.serverPort=8000</code></li>
 </ul>
-<p>严格地说，SQL根本不是‘种语言，而是对Oracle数据库传输指令的种方式。它与传统的编程语言在以下几个主要方面有所不同:</p>
-<ul>
-<li>SQL提供自动定位数据的能力</li>
-<li>SQL在数据集合上操作，而不是对独立的数据元素操作</li>
-<li>SQL是声明的，而不是过程化的，并且不提供过程控制SQL设计在逻辑层完成;这不需要处理实现的细节<br>简单地说，当在SQL中设计时，你告诉Oracle自己想要干什么，而不是怎样做。但是这种方法利弊并存。考虑下面的SQL语句:</li>
+</li>
 </ul>
-<pre class="language-sql" data-language="sql"><code class="language-sql">
-SELECTename,deptno,sal,cornn.FROM scott.ermp
-WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
-</code></pre>
-<p>这个简单的SQL语句告诉数据库显示2000年1月1日以后雇佣的职工名字( ename )、部门号( deptno)、薪水（ sal）和佣金( comm)。在“老式的”过程化编程语言巾,这可能需要儿百行代码，但是，在.SQL中只需要3行代码。Oracle在检索数据时并不总是如此灵巧。尽管Oracle内部的“查询优化器”有了稳步提高，但仍然有许多方法可以改进SQL的性能，第八章在讨论SQL语句的调试时将展示这一主题。</p>
-<p>注意:有人将缺乏过程化控制视为SQL的缺点、因此，Oracle公司开发了PL&#x2F;SQL ( Procedural<br>Language&#x2F;SQL，即过程化编程语言&#x2F;SQL),这一内容将在第七章讨论.</p>
-<p>sQL语句也称为SQL命令，由以下儿部分组成:<br>关键字  带有特定Oralce操作意义的保留字。<br>变量    它是可以被动态文本或数宇变量替换的数据元素。SQL有许多对象名，如变量、表或视图。<br>文字<br>常t数据．包括文本字符串和数字。操作符<br>操作一个或多个变量或文字的符号或单词。</p>
+<p>完成的配置文件如下:</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties">
+# The number of milliseconds of each tick
+tickTime&#x3D;2000
+# The number of ticks that the initial
+# synchronization phase can take
+initLimit&#x3D;10
+# The number of ticks that can pass between
+# sending a request and getting an acknowledgement
+syncLimit&#x3D;5
+# the directory where the snapshot is stored.
+# do not use &#x2F;tmp for storage, &#x2F;tmp here is just
+# example sakes.
+dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog
+# the port at which the clients will connect
+clientPort&#x3D;2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns&#x3D;60
+#
+# Be sure to read the maintenance section of the
+# administrator guide before turning on autopurge.
+#
+# http:&#x2F;&#x2F;zookeeper.apache.org&#x2F;doc&#x2F;current&#x2F;zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount&#x3D;3
+# Purge task interval in hours
+# Set to &quot;0&quot; to disable auto purge feature
+#autopurge.purgeInterval&#x3D;1
+server.1&#x3D;localhost.:2887:3887
+server.2&#x3D;localhost.:2888:3888
+server.3&#x3D;localhost.:2889:3889</code></pre>
+<p>将这份zoo.cfg分别复制到zookeeper-2,zookeeper-3的config目录下.<br>修改zookeeper2的zoo.cfg中clientPort&#x3D;2183,dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog<br>修改zookeeper3的zoo.cfg中clientPort&#x3D;2184,dataDir&#x3D;&#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog</p>
+<p>创建刚才在配置文件中写的目录</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mkdir &#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog
+mkdir &#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog
+mkdir &#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog</code></pre>
 
+<p>分别{– 在datalog目录下 –}执行以下命令,写入myid。</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">echo &quot;1&quot; &gt; &#x2F;ashura&#x2F;zookeeper-1&#x2F;datalog&#x2F;myid
+echo &quot;2&quot; &gt; &#x2F;ashura&#x2F;zookeeper-2&#x2F;datalog&#x2F;myid
+echo &quot;3&quot; &gt; &#x2F;ashura&#x2F;zookeeper-3&#x2F;datalog&#x2F;myid</code></pre>
+
+<p>最后分别启动zookeeper集群</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">&#x2F;ashura&#x2F;zookeeper-1&#x2F;bin&#x2F;zkServer.sh start
+&#x2F;ashura&#x2F;zookeeper-2&#x2F;bin&#x2F;zkServer.sh start
+&#x2F;ashura&#x2F;zookeeper-3&#x2F;bin&#x2F;zkServer.sh start</code></pre>
+
+<p>使用如下命令判断是否启动成功</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">&#x2F;ashura&#x2F;zookeeper-1&#x2F;bin&#x2F;zkServer.sh status
+&#x2F;ashura&#x2F;zookeeper-2&#x2F;bin&#x2F;zkServer.sh status
+&#x2F;ashura&#x2F;zookeeper-3&#x2F;bin&#x2F;zkServer.sh status</code></pre>
             
 
 
@@ -400,9 +429,9 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/11/05/archive/gradle_on_ubuntu/"
-                    data-tooltip="Gradle On Ubuntu"
-                    aria-label="PREVIOUS: Gradle On Ubuntu"
+                    href="/2022/10/22/vue/vuejs_up_and_running/"
+                    data-tooltip="vue.js up and running"
+                    aria-label="PREVIOUS: vue.js up and running"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -414,9 +443,9 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/11/03/oracle/OraclePL_SQL_Recipes/"
-                    data-tooltip="Oracle PLSQL Recipes"
-                    aria-label="NEXT: Oracle PLSQL Recipes"
+                    href="/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"
+                    data-tooltip="Kafka On Ubuntu"
+                    aria-label="NEXT: Kafka On Ubuntu"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -454,7 +483,7 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/10/20/archive/zookeeper_on_ubuntu/"
                     title="global.share_on_wechat"
                     aria-label="global.share_on_wechat"
                 >
@@ -477,7 +506,7 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -515,9 +544,9 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/11/05/archive/gradle_on_ubuntu/"
-                    data-tooltip="Gradle On Ubuntu"
-                    aria-label="PREVIOUS: Gradle On Ubuntu"
+                    href="/2022/10/22/vue/vuejs_up_and_running/"
+                    data-tooltip="vue.js up and running"
+                    aria-label="PREVIOUS: vue.js up and running"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -529,9 +558,9 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2022/11/03/oracle/OraclePL_SQL_Recipes/"
-                    data-tooltip="Oracle PLSQL Recipes"
-                    aria-label="NEXT: Oracle PLSQL Recipes"
+                    href="/2022/10/20/archive/%E5%8D%95%E6%9C%BA%E5%AE%89%E8%A3%85%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9/"
+                    data-tooltip="Kafka On Ubuntu"
+                    aria-label="NEXT: Kafka On Ubuntu"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
@@ -569,7 +598,7 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/10/20/archive/zookeeper_on_ubuntu/"
                     title="global.share_on_wechat"
                     aria-label="global.share_on_wechat"
                 >
@@ -592,7 +621,7 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -626,7 +655,7 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/04/oracle/oracle_sql_%E5%BF%85%E5%A4%87%E5%8F%82%E8%80%83/"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/10/20/archive/zookeeper_on_ubuntu/"
                         aria-label="global.share_on_wechat"
                     >
                         <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
@@ -699,7 +728,7 @@ WHEREhiredate &gt; &#39;01-JAN-Q0&#39; ;
               repo: 'SimonTeo58.github.io',
               owner: 'SimonTeo58',
               admin: ['SimonTeo58'],
-              id: '2022/11/04/oracle/oracle_sql_必备参考/',
+              id: '2022/10/20/archive/zookeeper_on_ubuntu/',
               ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
             }).render('gitalk')
           })()
