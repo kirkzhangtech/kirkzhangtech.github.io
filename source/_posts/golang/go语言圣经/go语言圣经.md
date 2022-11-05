@@ -25,49 +25,402 @@ Go语言鼓励当代计算机系统设计的原则，特别是局部的重要性
 
 Go语言的标准库（通常被称为语言自带的电池），提供了清晰的构建模块和公共接口，包含I/O操作、文本处理、图像、密码学、网络和分布式应用程序等，并支持许多标准化的文件格式和编解码协议。库和工具使用了大量的约定来减少额外的配置和解释，从而最终简化程序的逻辑，而且，每个Go程序结构都是如此的相似，因此，Go程序也很容易学习。使用Go语言自带工具构建Go语言项目只需要使用文件名和标识符名称，一个偶尔的特殊注释来确定所有的库、可执行文件、测试、基准测试、例子、以及特定于平台的变量、项目的文档等；Go语言源代码本身就包含了构建规范。
 
-
 # 1. 入门
+
+## 1.1. hello_world
+
+我们以现已成为传统的“hello world”案例来开始吧，这个例子首次出现于 1978 年出版的 C 语言圣经 《The C Programming Language》（译注：本书作者之一 Brian W. Kernighan 也是《The C Programming Language》一书的作者）。C 语言是直接影响 Go 语言设计的语言之一。这个例子体现了 Go 语言一些核心理念。
+
+```golang
+
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, 世界")
+}
+```
+
+Go 是一门编译型语言，Go 语言的工具链将源代码及其依赖转换成计算机的机器指令（译注：静态编译）。Go 语言提供的工具都通过一个单独的命令 go 调用，go 命令有一系列子命令。最简单的一个子命令就是 run。这个命令编译一个或多个以。`.go` 结尾的源文件，链接库文件，并运行最终生成的可执行文件。（本书使用$表示命令行提示符。）
+
+```bash
+go run helloworld.go
+```
+
+毫无意外，这个命令会输出
+Hello, 世界
+Go 语言原生支持 Unicode，它可以处理全世界任何语言的文本。
+如果不只是一次实验，你肯定希望能够编译这个程序，保存编译结果以备将来之用。可以用 build 子命令：
+
+```bash
+go build helloworld.go
+```
+
+这个命令生成一个名为 helloworld 的可执行的二进制文件(译注:Windows系统下生成的可执行文件是 helloworld.exe,增加了.exe后缀名)，之后你可以随时运行它(译注：在 Windows 系统下在命令行直接输入 helloworld.exe 命令运行),不需任何处理(译注：因为静态编译，所以不用担心在系统库更新的时候冲突，幸福感满满)
+
+```bash
+helloworld
+```
+
+Hello, 世界
+
+本书中所有示例代码上都有一行标记，利用这些标记可以从 gopl.io 网站上本书源码仓库里获取代码;`gopl.io/ch1/helloworld`执行 `go get gopl.io/ch1/helloworld`命令，就会从网上获取代码，并放到对应目录中（需要先安装 Git 或 Hg 之类的版本管理工具，并将对应的命令添加到 PATH 环境变量中。序言已经提及，需要先设置好 GOPATH 环境变量，下载的代码会放在 `$GOPATH/src/gopl.io/ch1/helloworld` 目录）。2.6 和 10.7 节有这方面更详细的介绍。
+
+来讨论下程序本身。Go 语言的代码通过包(package)组织，包类似于其它语言里的库(libraries)或者模块(modules)。一个包由位于单个目录下的一个或多个 .go 源代码文件组成，目录定义包的作用。每个源文件都以一条 package 声明语句开始，这个例子里就是 package main，表示该文件属于哪个包，紧跟着一系列导入（import）的包，之后是存储在这个文件里的程序语句。
+
+Go 的标准库提供了 100 多个包，以支持常见功能，如输入、输出、排序以及文本处理。比如 fmt 包，就含有格式化输出、接收输入的函数。Println 是其中一个基础函数，可以打印以空格间隔的一个或多个值，并在最后添加一个换行符，从而输出一整行。
+
+main包比较特殊。它定义了一个独立可执行的程序，而不是一个库。在main里的main函数也很特殊，它是整个程序执行时的入口（译注：C 系语言差不多都这样）。main 函数所做的事情就是程序做的。当然了，main 函数一般调用其它包里的函数完成很多工作（如：fmt.Println）。
+
+必须告诉编译器源文件需要哪些包，这就是跟随在 package 声明后面的import声明扮演的角色。hello world 例子只用到了一个包，大多数程序需要导入多个包。
+
+必须恰当导入需要的包，缺少了必要的包或者导入了不需要的包，程序都无法编译通过。这项严格要求避免了程序开发过程中引入未使用的包（译注：Go 语言编译过程没有警告信息，争议特性之一）。
+
+import 声明必须跟在文件的 package 声明之后。随后，则是组成程序的函数、变量、常量、类型的声明语句（分别由关键字 func、var、const、type 定义）。这些内容的声明顺序并不重要（译注：最好还是定一下规范）。这个例子的程序已经尽可能短了，只声明了一个函数，其中只调用了一个其他函数。为了节省篇幅，有些时候示例程序会省略 package 和 import 声明，但是，这些声明在源代码里有，并且必须得有才能编译。
+
+一个函数的声明由 func 关键字、函数名、参数列表、返回值列表（这个例子里的 main 函数参数列表和返回值都是空的）以及包含在大括号里的函数体组成。第五章进一步考察函数。
+
+Go 语言不需要在语句或者声明的末尾添加分号，除非一行上有多条语句。实际上，编译器会主动把特定符号后的换行符转换为分号，因此换行符添加的位置会影响 Go 代码的正确解析（译注：比如行末是标识符、整数、浮点数、虚数、字符或字符串文字、关键字 break、continue、fallthrough或 return 中的一个、运算符和分隔符 ++、--、)、] 或 } 中的一个）。举个例子，函数的左括号 { 必须和 func 函数声明在同一行上，且位于末尾，不能独占一行，而在表达式 x+y 中，可在 + 后换行，不能在 + 前换行（译注：以+结尾的话不会被插入分号分隔符，但是以 x 结尾的话则会被分号分隔符，从而导致编译错误）。
+
+Go 语言在代码格式上采取了很强硬的态度。gofmt工具把代码格式化为标准格式（译注：这个格式化工具没有任何可以调整代码格式的参数，Go 语言就是这么任性），并且 go 工具中的 fmt 子命令会对指定包，否则默认为当前目录中所有。go 源文件应用 gofmt 命令。本书中的所有代码都被 gofmt 过。你也应该养成格式化自己的代码的习惯。以法令方式规定标准的代码格式可以避免无尽的无意义的琐碎争执（译注：也导致了 Go 语言的 TIOBE 排名较低，因为缺少撕逼的话题）。更重要的是，这样可以做多种自动源码转换，如果放任 Go 语言代码格式，这些转换就不大可能了。
+
+很多文本编辑器都可以配置为保存文件时自动执行 gofmt，这样你的源代码总会被恰当地格式化。还有个相关的工具：goimports，可以根据代码需要，自动地添加或删除 import 声明。这个工具并没有包含在标准的分发包中，可以用下面的命令安装：
+
+`$ go get golang.org/x/tools/cmd/goimports`
+对于大多数用户来说，下载、编译包、运行测试用例、察看 Go 语言的文档等等常用功能都可以用 go 的工具完成节详细介绍这些知识。
+
+summary:  
+1. go拥有完整的工具链，通常是go的子命令，在命令输入go关键字就可以查看子命令
+2. Go 语言原生支持 Unicode，它可以处理全世界任何语言的文本。
+3. 编写完程序就可以编译成二进制可执行程序使用`go build`
+   1. `go help build` 查看build文档
+   2. go build 选项列表及说明,语法为`usage: go build [-o output] [build flags] [packages]`
+        ```text
+        -o      指定编译输出的软件名称
+        -i      安装作为目标的依赖关系的包(用于增量编译提速)
+        -a      强制重建已经是最新版本的软件包 
+        -n      print the commands but do not run them(只是输出一些运行过程)
+        -p n    the number of programs, such as build commands or (指定内核数量编译程序，包括test binary)
+                test binaries, that can be run in parallel.
+                The default is GOMAXPROCS, normally the number of CPUs available.
+        -race   (同时检测数据竞争状态，只支持 linux/amd64, freebsd/amd64, darwin/amd64 和 windows/amd64)
+                enable data race detection.
+                Supported only on linux/amd64, freebsd/amd64, darwin/amd64, darwin/arm64, windows/amd64,
+                linux/ppc64le and linux/arm64 (only for 48-bit VMA).
+        -msan   (启用与内存消毒器的互操作。仅支持linux / amd64，并且只用Clang / LLVM作为主机C编译器（少用))
+                enable interoperation with memory sanitizer.
+                Supported only on linux/amd64, linux/arm64
+                and only with Clang/LLVM as the host C compiler.
+                On linux/arm64, pie build mode will be used.
+        -asan
+                enable interoperation with address sanitizer.
+                Supported only on linux/arm64, linux/amd64.
+        -v      (打印名称)
+                print the names of packages as they are compiled.
+        -work   (打印临时工作目录名称)
+                print the name of the temporary work directory and
+                do not delete it when exiting.
+        -x      打印输出 执行命令名
+                print the commands.
+
+        -asmflags '[pattern=]arg list'   (传递每个go工具asm调用的参数)
+                arguments to pass on each go tool asm invocation.
+        -buildmode mode             (编译模式 go help buildmode)
+                build mode to use. See 'go help buildmode' for more.
+        -buildvcs                   ()
+                Whether to stamp binaries with version control information
+                ("true", "false", or "auto"). By default ("auto"), version control
+                information is stamped into a binary if the main package, the main module
+                containing it, and the current directory are all in the same repository.
+                Use -buildvcs=false to always omit version control information, or
+                -buildvcs=true to error out if version control information is available but
+                cannot be included due to a missing tool or ambiguous directory structure.
+        -compiler name  (指定编译器)
+                name of compiler to use, as in runtime.Compiler (gccgo or gc).
+        -gccgoflags '[pattern=]arg list'  gccgo编译/连接器参数
+                arguments to pass on each gccgo compiler/linker invocation.
+        -gcflags '[pattern=]arg list'   垃圾回收参数
+                arguments to pass on each go tool compile invocation.
+        -installsuffix suffix           (压缩编译后体积)
+                a suffix to use in the name of the package installation directory,
+                in order to keep output separate from default builds.
+                If using the -race flag, the install suffix is automatically set to race
+                or, if set explicitly, has _race appended to it. Likewise for the -msan
+                and -asan flags. Using a -buildmode option that requires non-default compile
+                flags has a similar effect.
+        -ldflags '[pattern=]arg list'
+                arguments to pass on each go tool link invocation.
+        -linkshared             (链接到以前共享库)
+                build code that will be linked against shared libraries previously
+                created with -buildmode=shared.
+        -mod mode
+                module download mode to use: readonly, vendor, or mod.
+                By default, if a vendor directory is present and the go version in go.mod
+                is 1.14 or higher, the go command acts as if -mod=vendor were set.
+                Otherwise, the go command acts as if -mod=readonly were set.
+                See https://golang.org/ref/mod#build-commands for details.
+        -modcacherw
+                leave newly-created directories in the module cache read-write
+                instead of making them read-only.
+        -modfile file
+                in module aware mode, read (and possibly write) an alternate go.mod
+                file instead of the one in the module root directory. A file named
+                "go.mod" must still be present in order to determine the module root
+                directory, but it is not accessed. When -modfile is specified, an
+                alternate go.sum file is also used: its path is derived from the
+                -modfile flag by trimming the ".mod" extension and appending ".sum".
+        -overlay file
+                read a JSON config file that provides an overlay for build operations.
+                The file is a JSON struct with a single field, named 'Replace', that
+                maps each disk file path (a string) to its backing file path, so that
+                a build will run as if the disk file path exists with the contents
+                given by the backing file paths, or as if the disk file path does not
+                exist if its backing file path is empty. Support for the -overlay flag
+                has some limitations: importantly, cgo files included from outside the
+                include path must be in the same directory as the Go package they are
+                included from, and overlays will not appear when binaries and tests are
+                run through go run and go test respectively.
+        -pkgdir dir     (从指定位置，而不是通常的位置安装和加载所有软件包。例如，当使用非标准配置构建时，使用-pkgdir将生成的包保留在单独的位置。)
+                install and load all packages from dir instead of the usual locations.
+                For example, when building with a non-standard configuration,
+                use -pkgdir to keep generated packages in a separate location.
+        -tags tag,list  (构建出带tag的版本.)
+                a comma-separated list of build tags to consider satisfied during the
+                build. For more information about build tags, see the description of
+                build constraints in the documentation for the go/build package.
+                (Earlier versions of Go used a space-separated list, and that form
+                is deprecated but still recognized.)
+        -trimpath
+                remove all file system paths from the resulting executable.
+                Instead of absolute file system paths, the recorded file names
+                will begin either a module path@version (when using modules),
+                or a plain import path (when using the standard library, or GOPATH).
+        -toolexec 'cmd args'
+                a program to use to invoke toolchain programs like vet and asm.
+                For example, instead of running asm, the go command will run
+                'cmd args /path/to/asm <arguments for asm>'.
+                The TOOLEXEC_IMPORTPATH environment variable will be set,
+                matching 'go list -f {{.ImportPath}}' for the package being built.
+        ```
+4. go拥有丰富的库函数
+5. `go help 子命令(build等等)`
+
+## 1.2 命令行参数(os package)
+
+大多数的程序都是处理输入，产生输出；这也正是“计算”的定义。但是，程序如何获取要处理的输入数据呢？一些程序生成自己的数据，但通常情况下，输入来自于程序外部：文件、网络连接、其它程序的输出、敲键盘的用户、命令行参数或其它类似输入源。下面几个例子会讨论其中几个输入源，首先是命令行参数。
+
+os 包以跨平台的方式，提供了一些与操作系统交互的函数和变量。程序的命令行参数可从os包的 Args变量获取；os 包外部使用 os.Args 访问该变量。
+
+os.Args 变量是一个字符串（string）的 切片（slice）（译注：slice 和 Python 语言中的切片类似，是一个简版的动态数组），切片是 Go 语言的基础概念，稍后详细介绍。现在先把切片 s 当作数组元素序列，序列的长度动态变化，用 s[i] 访问单个元素，用 s[m:n] 获取子序列（译注：和 Python 里的语法差不多）。序列的元素数目为 len(s)。和大多数编程语言类似，区间索引时，Go 语言里也采用左闭右开形式，即，区间包括第一个索引元素，不包括最后一个，因为这样可以简化逻辑。（译注：比如 a=[1,2,3,4,5], a[0:3]=[1,2,3]，不包含最后一个元素）。比如 s[m:n] 这个切片，0≤m≤n≤len(s)，包含 n-m 个元素。
+
+os.Args 的第一个元素：os.Args[0]，是命令本身的名字；其它的元素则是程序启动时传给它的参数。s[m:n] 形式的切片表达式，产生从第 m 个元素到第 n-1 个元素的切片，下个例子用到的元素包含在 os.Args[1:len(os.Args)] 切片中。如果省略切片表达式的 m 或 n，会默认传入 0 或 len(s)，因此前面的切片可以简写成 os.Args[1:]。
+
+下面是 Unix 里 echo 命令的一份实现，echo 把它的命令行参数打印成一行。程序导入了两个包，用括号把它们括起来写成列表形式，而没有分开写成独立的 import 声明。两种形式都合法，列表形式习惯上用得多。包导入顺序并不重要；gofmt 工具格式化时按照字母顺序对包名排序。（示例有多个版本时，我们会对示例编号，这样可以明确当前正在讨论的是哪个。）
+
+```golang
+gopl.io/ch1/echo1
+
+
+// Echo1 prints its command-line arguments.
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+func main() {
+    var s, sep string
+    for i := 1; i < len(os.Args); i++ {
+        s += sep + os.Args[i]
+        sep = " "
+    }
+    fmt.Println(s)
+}
+```
+注释语句以 // 开头。对于程序员来说，// 之后到行末之间所有的内容都是注释，被编译器忽略。按照惯例，我们在每个包的包声明前添加注释；对于 main package，注释包含一句或几句话，从整体角度对程序做个描述。
+
+var 声明定义了两个 string 类型的变量 s 和 sep。变量会在声明时直接初始化。如果变量没有显式初始化，则被隐式地赋予其类型的 零值（zero value），数值类型是 0，字符串类型是空字符串 ""。这个例子里，声明把 s 和 sep 隐式地初始化成空字符串。第 2 章再来详细地讲解变量和声明。
+
+对数值类型，Go 语言提供了常规的数值和逻辑运算符。而对 string 类型，+ 运算符连接字符串（译注：和 C++ 或者 JavaScript 是一样的）。所以表达式：sep + os.Args[i] 表示连接字符串 sep 和 os.Args。程序中使用的语句：s+=sep+os.Args[i] 是一条 赋值语句，将 s 的旧值跟 sep 与 os.Args[i] 连接后赋值回 s，等价于：s=s+sep+os.Args[i]。
+
+运算符 += 是赋值运算符（assignment operator），每种数值运算符或逻辑运算符，如 + 或 *，都有对应的赋值运算符。
+
+echo 程序可以每循环一次输出一个参数，这个版本却是不断地把新文本追加到末尾来构造字符串。字符串 s 开始为空，即值为 ""，每次循环会添加一些文本；第一次迭代之后，还会再插入一个空格，因此循环结束时每个参数中间都有一个空格。这是一种二次加工（quadratic process），当参数数量庞大时，开销很大，但是对于 echo，这种情形不大可能出现。本章会介绍 echo 的若干改进版，下一章解决低效问题。
+
+循环索引变量 i 在 for 循环的第一部分中定义。符号 := 是 短变量声明（short variable declaration）的一部分，这是定义一个或多个变量并根据它们的初始值为这些变量赋予适当类型的语句。下一章有这方面更多说明。
+
+自增语句 i++ 给 i 加 1；这和 i+=1 以及 i=i+1 都是等价的。对应的还有 i-- 给 i 减 1。它们是语句，而不像 C 系的其它语言那样是表达式。所以 j=i++ 非法，而且 ++ 和 -- 都只能放在变量名后面，因此 --i 也非法。
+
+Go 语言只有 for 循环这一种循环语句。for 循环有多种形式，其中一种如下所示：
+
+```golang
+for initialization; condition; post {
+    // zero or more statements
+}
+```
+for 循环三个部分不需括号包围。大括号强制要求，左大括号必须和 post 语句在同一行。
+
+initialization 语句是可选的，在循环开始前执行。initalization 如果存在，必须是一条 简单语句（simple statement），即，短变量声明、自增语句、赋值语句或函数调用。condition 是一个布尔表达式（boolean expression），其值在每次循环迭代开始时计算。如果为 true 则执行循环体语句。post 语句在循环体执行结束后执行，之后再次对 condition 求值。condition 值为 false 时，循环结束。
+
+for 循环的这三个部分每个都可以省略，如果省略 initialization 和 post，分号也可以省略：
+
+```golang
+// a traditional "while" loop
+for condition {
+    // ...
+}
+```
+如果连 condition 也省略了，像下面这样：
+```golang
+
+// a traditional infinite loop
+for {
+    // ...
+}
+```
+这就变成一个无限循环，尽管如此，还可以用其他方式终止循环，如一条 break 或 return 语句。
+
+for 循环的另一种形式，在某种数据类型的区间（range）上遍历，如字符串或切片。echo 的第二版本展示了这种形式：
+```golang
+gopl.io/ch1/echo2
+
+
+// Echo2 prints its command-line arguments.
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+func main() {
+    s, sep := "", ""
+    for _, arg := range os.Args[1:] {
+        s += sep + arg
+        sep = " "
+    }
+    fmt.Println(s)
+}
+```
+每次循环迭代，range 产生一对值；索引以及在该索引处的元素值。这个例子不需要索引，但 range 的语法要求，要处理元素，必须处理索引。一种思路是把索引赋值给一个临时变量（如 temp）然后忽略它的值，但 Go 语言不允许使用无用的局部变量（local variables），因为这会导致编译错误。
+
+Go 语言中这种情况的解决方法是用 空标识符（blank identifier），即 _（也就是下划线）。空标识符可用于在任何语法需要变量名但程序逻辑不需要的时候（如：在循环里）丢弃不需要的循环索引，并保留元素值。大多数的 Go 程序员都会像上面这样使用 range 和 _ 写 echo 程序，因为隐式地而非显式地索引 os.Args，容易写对。
+
+echo 的这个版本使用一条短变量声明来声明并初始化 s 和 seps，也可以将这两个变量分开声明，声明一个变量有好几种方式，下面这些都等价：
+
+```golang
+s := ""
+var s string
+var s = ""
+var s string = ""
+```
+用哪种不用哪种，为什么呢？第一种形式，是一条短变量声明，最简洁，但只能用在函数内部，而不能用于包变量。第二种形式依赖于字符串的默认初始化零值机制，被初始化为 ""。第三种形式用得很少，除非同时声明多个变量。第四种形式显式地标明变量的类型，当变量类型与初值类型相同时，类型冗余，但如果两者类型不同，变量类型就必须了。实践中一般使用前两种形式中的某个，初始值重要的话就显式地指定变量的类型，否则使用隐式初始化。
+
+如前文所述，每次循环迭代字符串 s 的内容都会更新。+= 连接原字符串、空格和下个参数，产生新字符串，并把它赋值给 s。s 原来的内容已经不再使用，将在适当时机对它进行垃圾回收。
+
+如果连接涉及的数据量很大，这种方式代价高昂。一种简单且高效的解决方案是使用 strings 包的 Join 函数：
+
+```golang
+gopl.io/ch1/echo3
+
+
+func main() {
+    fmt.Println(strings.Join(os.Args[1:], " "))
+}
+```
+最后，如果不关心输出格式，只想看看输出值，或许只是为了调试，可以用 Println 为我们格式化输出。
+
+`fmt.Println(os.Args[1:])`
+这条语句的输出结果跟 strings.Join 得到的结果很像，只是被放到了一对方括号里。切片都会被打印成这种格式。
+
+练习 1.1： 修改 echo 程序，使其能够打印 os.Args[0]，即被执行命令本身的名字。
+
+练习 1.2： 修改 echo 程序，使其打印每个参数的索引和值，每个一行。
+
+练习 1.3： 做实验测量潜在低效的版本和使用了 strings.Join 的版本的运行时间差异。（1.6 节讲解了部分 time 包，11.4 节展示了如何写标准测试程序，以得到系统性的性能评测。）
+
+summary:  
+1. os提供跨平台的方式。具体怎么用要参考文档
+2. golang定义参数的方式`var a,b,c int=0,0,0`,还有海马运算符
+      `s := ""`
+      `var s , v string`
+      `var s = ""`
+      `var s string = ""`
+3. `for k,v := range os.Args[1:]{}`
+
+## 1.3 查找重复的行
+
+```golang
+%d          十进制整数
+%x, %o, %b  十六进制，八进制，二进制整数。
+%f, %g, %e  浮点数： 3.141593 3.141592653589793 3.141593e+00
+%t          布尔：true或false
+%c          字符（rune） (Unicode码点)
+%s          字符串
+%q          带双引号的字符串"abc"或带单引号的字符'c'
+%v          变量的自然形式（natural format）
+%T          变量的类型
+%%          字面上的百分号标志（无操作数）
+```
+1. `a := make(map[string]int)`
+2. golang的传递都是值传递，如果不指定的话
+
+## 1.4 GIF动画
+没啥意思，都是介绍功能
+
+## 1.5 获取URL
+这一节主要还是`io`的例子
+
+## 1.6. 并发获取多个URL
+
+开始介绍`go`关键字进行并发还有channel
+
+## 1.7. Web服务
+
+主要还是介绍`net`包
 
 
 # 2. 程序结构
+
 ## 2.1 命名
 
 |功能性关键字|描述|
 |---|---|
 |break|退出循环|
 |case|switch case, select case|
-|chan||
-|const||
-|continue||
-|default||
-|defer||
-|else||
-|fallthrough||
-|for||
-|func||
-|go||
+|chan| var ch chan int, ch := make(chan int),ch := make(chan int,1) |
+|const| const( a int,b int ,c string)|
+|continue| 退出循环 |
+|default| 常见于select {}一起使用 |
+|defer| 函数退出前执行|
+|else| if else|
+|fallthrough| N/A|
+|for| for {}, for i:=0;i < length ;i++{}, for k,v := range Slice{} |
+|func| func (){}|
+|go| 携程|
 |if||
-|import||
-|interface||
-|map||
+|import| |
+|interface| interface{} 是噩梦|
+|map|  a := make(map[int]string) ,var a map[int]string |
 |package||
-|range||
-|return||
-|select||
-|struct||
-|switch||
-|type||
-|var||
-
+|range|for _,_ := range _ {}|
+|return| you know |
+|select| select {case a: }|
+|struct| 相当于java的类,跟c的struct很像|
+|switch| switch conditional {}|
+|type| type A struct {}|
+|var| var a , b, int|
 
 |内建常量|关键字|
 |---|---|
-|true ||
-|false ||
-|iota||
-| nil||
+|true | shit|
+|false | shit|
+|iota| 1,2,3,4....|
+| nil| shit|
 
-|内建类型| 关键字|
+|golang的基本数据类型| 关键字|
 |---|---|
 |int ||
 |int8 ||
@@ -90,7 +443,7 @@ Go语言的标准库（通常被称为语言自带的电池），提供了清晰
 |string ||
 |error||
 
-|内建函数| 关键字|
+|常用内建函数| 关键字|
 |---|---|
 |make||
 |len||
@@ -112,8 +465,8 @@ Go推荐使用`驼峰式`命名:
 - 后面可以跟任意数量的字母、数字或下划线。
 - 名字的开头字母的大小写决定了名字在包外的可见性.如果一个名字是大写字母开头的(译注必须是 在函数外部定义的包级名字;包级函数名本身也是包级名字),那么它将是导出的,也就是说可以被外部的包访问,例如`fmt.Printf`,就可以在包外访问
 
-
 ## 2.2 声明
+
 Go语言主要有四种类型的声明语句:
   
 - var
@@ -169,7 +522,7 @@ Go语言主要有四种类型的声明语句:
   }
   ```
 
-  -  例子1中声明的err是重复,第二个简短声明符的err就是赋值操作，注意该操作是在变量相同作用例子2中这种情况编译不通过,至少有一个是新声明的.[ 实际工程中尽量不要出现例子2 ]
+- 例子1中声明的err是重复,第二个简短声明符的err就是赋值操作，注意该操作是在变量相同作用例子2中这种情况编译不通过,至少有一个是新声明的.[ 实际工程中尽量不要出现例子2 ]
 
   ```golang
   //例子1
@@ -182,11 +535,10 @@ Go语言主要有四种类型的声明语句:
   f, err := os.Create(outfile) // compile error: no new variables
   ```
 
-
 ### 2.3.2 指针
 
-  - `任何类型`的指针的`零值`都是`nil`。如果p指向某个有效变量，那么`p != nil`测试为`真`。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。
-  - 返回局部变量地址也是安全的。
+- `任何类型`的指针的`零值`都是`nil`。如果p指向某个有效变量，那么`p != nil`测试为`真`。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。
+- 返回局部变量地址也是安全的。
 
     ```golang
     func incr(p *int) int {
@@ -198,7 +550,7 @@ Go语言主要有四种类型的声明语句:
     fmt.Println(incr(&v)) // "3" (and v is 3)
     ```
 
-  - 在flag包中,应用到了`指针`技术
+- 在flag包中,应用到了`指针`技术
 
     ```golang
     package main
@@ -218,15 +570,19 @@ Go语言主要有四种类型的声明语句:
         }
     }
     ```
-    - 在此代码例子中使用`flag.Args()`解析非标志参数位,`flag.Parse()`解析标志性参数位,to be continue
+  - 在此代码例子中使用`flag.Args()`解析非标志参数位,`flag.Parse()`解析标志性参数位,to be continue
 
 ### 2.3.3 new函数
+
   表达式new(T)将创建一个T类型的匿名变量，初始化为T类型的零值，然后返回变量地址，返回的指针类型为*T(返回的是指针)
-  - 每次new()返回新的变量地址,比如new(int)
+
+- 每次new()返回新的变量地址,比如new(int)
+
 ### 2.3.4. 变量的生命周期
 
-  - 包一级的声明会伴随程序整个声明周期,但是函数内部则是动态,会被GC回收
-  - 函数的`参数变量`(参数列表)和`返回值变量`都是`局部变量`。它们在函数每次被调用的时候创建,下面循环的`变量t`就是动态创建,用完就扔
+- 包一级的声明会伴随程序整个声明周期,但是函数内部则是动态,会被GC回收
+- 函数的`参数变量`(参数列表)和`返回值变量`都是`局部变量`。它们在函数每次被调用的时候创建,下面循环的`变量t`就是动态创建,用完就扔
+
   ```golang
   for t := 0.0; t < cycles*2*math.Pi; t += res {
     x := math.Sin(t)
@@ -249,7 +605,8 @@ Go语言主要有四种类型的声明语句:
   }
   ```
 
-  - `局部变量逃逸`.因为一个变量的有效周期只取决于是否可达，因此一个循环迭代内部的局部变量的生命周期可能超出其局部作用域。同时，局部变量可能在函数返回之后依然存在。`编译器`会自动选择在`栈`上还是在`堆`上分配局部变量的存储空间,代码如下,`f`函数里的`x变量`必须在`堆`上分配,因为它在函数退出后依然可以通过包一级的`global变量`找到,`g`函数在栈上分配`*y`内存空间
+- `局部变量逃逸`.因为一个变量的有效周期只取决于是否可达，因此一个循环迭代内部的局部变量的生命周期可能超出其局部作用域。同时，局部变量可能在函数返回之后依然存在。`编译器`会自动选择在`栈`上还是在`堆`上分配局部变量的存储空间,代码如下,`f`函数里的`x变量`必须在`堆`上分配,因为它在函数退出后依然可以通过包一级的`global变量`找到,`g`函数在栈上分配`*y`内存空间
+
   ```golang
   var global *int
 
@@ -265,11 +622,11 @@ Go语言主要有四种类型的声明语句:
   }
 
   ```
-  - Go语言的自动垃圾收集器对编写正确的代码是一个巨大的帮助，但也并不是说你完全不用考虑内存了。你虽然不需要显式地分配和释放内存，但是要编写高效的程序你依然需要了解变量的生命周期,比如,如果将指向短生命周期对象的指针保存到具有长生命周期的对象中，特别是保存到全局变量时，会阻止对短生命周期对象的垃圾回收(从而可能影响程序的性能)。
 
-
+- Go语言的自动垃圾收集器对编写正确的代码是一个巨大的帮助，但也并不是说你完全不用考虑内存了。你虽然不需要显式地分配和释放内存，但是要编写高效的程序你依然需要了解变量的生命周期,比如,如果将指向短生命周期对象的指针保存到具有长生命周期的对象中，特别是保存到全局变量时，会阻止对短生命周期对象的垃圾回收(从而可能影响程序的性能)。
 
 ## 2.4 赋值
+
   ```golang
   x = 1                       // 命名变量的赋值
   *p = true                   // 通过指针间接赋值
@@ -302,9 +659,11 @@ Go语言主要有四种类型的声明语句:
   medals[1] = "silver"
   medals[2] = "bronze"
   ```
-  - 对于两个值是否可以用==或!=进行相等比较的能力也和可赋值能力有关系
+
+- 对于两个值是否可以用==或!=进行相等比较的能力也和可赋值能力有关系
 
 ## 2.5 类型
+
   ```golang
   package tempconv
 
@@ -325,19 +684,20 @@ Go语言主要有四种类型的声明语句:
 
   ```
 
-  - 类型声明语句一般出现在包一级，因此如果新创建的类型名字的首字符大写，则在包外部也可以使用
-  - `Celsius`和`Fahrenheit`是两种不同类型,`Celsius(t)`或`Fahrenheit(t)`形式的显式转型,`整数`->`小数`回省略小数部分(CPP在这部分有很详细的讨论)
-  - 如果两个值有着不同的类型，则不能直接进行比较
-  - 命名类型还可以为该类型的值定义新的行为。这些行为表示为一组关联到该类型的函数集合，我们称为类型的方法集后面详细讨论
+- 类型声明语句一般出现在包一级，因此如果新创建的类型名字的首字符大写，则在包外部也可以使用
+- `Celsius`和`Fahrenheit`是两种不同类型,`Celsius(t)`或`Fahrenheit(t)`形式的显式转型,`整数`->`小数`回省略小数部分(CPP在这部分有很详细的讨论)
+- 如果两个值有着不同的类型，则不能直接进行比较
+- 命名类型还可以为该类型的值定义新的行为。这些行为表示为一组关联到该类型的函数集合，我们称为类型的方法集后面详细讨论
 
 ## 2.6 包和文件
 
-  - `名字空间`每个包都对应一个独立的名字空间,例如，在image包中的Decode函数和在unicode/utf16包中的 Decode函数是不同的。要在外部引用该函数，必须显式使用image.Decode或utf16.Decode形式访问
-  - `包的导入`Go语言的规范并没有定义这些源代码的具体含义或包来自哪里，它们是由构建工具来解释的。当使用Go语言自带的go工具箱时（第十章），一个导入路径代表一个目录中的一个或多个Go源文件。
-  - `包的初始化`。包级别声明的变量，如果有初始化表达式则用表达式初始化，还有一些没有初始化表达式的。例如`func init() { /* ... */ }`,`init`不能被调用，也不能被声明。包会按照声明的顺序初始化。
-  - `包的初始化顺序`。如果一个p包导入了q包，那么在p包初始化的时候可以认为q包必然已经初始化过了。初始化工作是自下而上进行的，main包最后被初始化。以这种方式，可以确保在main函数执行之前，所有依赖的包都已经完成初始化工作了
+- `名字空间`每个包都对应一个独立的名字空间,例如，在image包中的Decode函数和在unicode/utf16包中的 Decode函数是不同的。要在外部引用该函数，必须显式使用image.Decode或utf16.Decode形式访问
+- `包的导入`Go语言的规范并没有定义这些源代码的具体含义或包来自哪里，它们是由构建工具来解释的。当使用Go语言自带的go工具箱时（第十章），一个导入路径代表一个目录中的一个或多个Go源文件。
+- `包的初始化`。包级别声明的变量，如果有初始化表达式则用表达式初始化，还有一些没有初始化表达式的。例如`func init() { /* ... */ }`,`init`不能被调用，也不能被声明。包会按照声明的顺序初始化。
+- `包的初始化顺序`。如果一个p包导入了q包，那么在p包初始化的时候可以认为q包必然已经初始化过了。初始化工作是自下而上进行的，main包最后被初始化。以这种方式，可以确保在main函数执行之前，所有依赖的包都已经完成初始化工作了
 
     复杂初始化可以用以下方式
+
     ```golang
     //可以使用匿名函数处理
     var pc [256]byte = func() (pc [256]byte) {
@@ -351,15 +711,15 @@ Go语言主要有四种类型的声明语句:
   
 ## 2.7. 作用域
 
-  - 不要将作用域和生命周期混为一谈，作用域是指文本域，而生命周期是指运行有效时段
-  - 任何在`函数`外部（也就是包级语法域）声明的名字可以在同一个`包`的任何源文件中访问的
-  - 对于导入的包，例如tempconv导入的fmt包，则是对应源文件级的作用域，因此只能在当前的文件中访问导入的fmt包，当前包的其它源文件无法访问在当前源文件导入的包
-  - 控制流标号，就是break、continue或goto语句后面跟着的那种标号，则是
+- 不要将作用域和生命周期混为一谈，作用域是指文本域，而生命周期是指运行有效时段
+- 任何在`函数`外部（也就是包级语法域）声明的名字可以在同一个`包`的任何源文件中访问的
+- 对于导入的包，例如tempconv导入的fmt包，则是对应源文件级的作用域，因此只能在当前的文件中访问导入的fmt包，当前包的其它源文件无法访问在当前源文件导入的包
+- 控制流标号，就是break、continue或goto语句后面跟着的那种标号，则是
     函数级的作用域
 
 几种常见作用域例子
 
-  - 正常情况下作用域例子
+- 正常情况下作用域例子
 
     ```golang
     func f() {}
@@ -373,7 +733,9 @@ Go语言主要有四种类型的声明语句:
         fmt.Println(h) // compile error: undefined: h
     }
     ```
-  - 作用域嵌套,函数中可以进行词法域嵌套
+
+- 作用域嵌套,函数中可以进行词法域嵌套
+
     ```golang
     func main() {
       x := "hello!"
@@ -400,8 +762,10 @@ Go语言主要有四种类型的声明语句:
       }
     }
     ```
-  - 建隐式词法域,隐式作用域
+
+- 建隐式词法域,隐式作用域
   if和switch语句也会在条件部分创建隐式词法域，代码例子如下.第二个if语句嵌套在第一个内部，因此第一个if语句条件初始化词法域声明的变量在第二个if中也可以访问
+
     ```golang
     if x := f(); x == 0 {
       fmt.Println(x)
@@ -412,7 +776,9 @@ Go语言主要有四种类型的声明语句:
     }
     fmt.Println(x, y) // compile error: x and y are not visible here
     ```
+
     如果不想提前声明变量还可以选择如下方式，但这不是Go语言推荐的做法，Go语言的习惯是在if中处理错误然后直接返回
+
     ```golang
     if f, err := os.Open(fname); err != nil {
       return err
@@ -422,8 +788,10 @@ Go语言主要有四种类型的声明语句:
         f.Close()
     }
     ```
-  - 屏蔽其他作用域变暗亮
+
+- 屏蔽其他作用域变暗亮
     cwd在外部已经声明的包级变量，但是:=语句还是将cwd和err重新声明为新的局部变量
+
     ```golang
     var cwd string
 
@@ -434,6 +802,7 @@ Go语言主要有四种类型的声明语句:
         }
     }
     ```
+
     可以用赋值运算符，就不会屏蔽`cwd`变量
 
     ```golang
@@ -451,27 +820,27 @@ Go语言主要有四种类型的声明语句:
 # 3.基础数据类型
 
 - 整型格式控制符
-    |格 式	| 描 述|
+    |格 式 | 描 述|
     |---|---|
-    |%b	| 整型以二进制方式显示|
-    |%o	| 整型以八进制方式显示|
-    |%d	| 整型以十进制方式显示,以锁为例子mutex=&((1 0) 0 0 -1073741824 0)|
-    |%x	| 整型以十六进制方式显示|
-    |%X	| 整型以十六进制、字母大写方式显示|
-    |%c	| 相应Unicode码点所表示的字符|
-    |%U	| Unicode 字符, Unicode格式：123，等同于 "U+007B"|
+    |%b | 整型以二进制方式显示|
+    |%o | 整型以八进制方式显示|
+    |%d | 整型以十进制方式显示,以锁为例子mutex=&((1 0) 0 0 -1073741824 0)|
+    |%x | 整型以十六进制方式显示|
+    |%X | 整型以十六进制、字母大写方式显示|
+    |%c | 相应Unicode码点所表示的字符|
+    |%U | Unicode 字符, Unicode格式：123，等同于 "U+007B"|
 
 - 浮点数格式控制
-    |格 式	| 描 述|
+    |格 式 | 描 述|
     |---|---|
-    |%e	|科学计数法,例如 -1234.456e+78|
-    |%E	|科学计数法,例如 -1234.456E+78|
-    |%f	|有小数点而无指数,例如 123.456|
-    |%g	|根据情况选择 %e 或 %f 以产生更紧凑的（无末尾的0）输出|
-    |%G	|根据情况选择 %E 或 %f 以产生更紧凑的（无末尾的0）输出|
+    |%e |科学计数法,例如 -1234.456e+78|
+    |%E |科学计数法,例如 -1234.456E+78|
+    |%f |有小数点而无指数,例如 123.456|
+    |%g |根据情况选择 %e 或 %f 以产生更紧凑的（无末尾的0）输出|
+    |%G |根据情况选择 %E 或 %f 以产生更紧凑的（无末尾的0）输出|
 
 - 字符串格式化
-    |格 式	|描 述|
+    |格 式 |描 述|
     |---|---|
     |%s| 字符串或切片的无解译字节|
     |%q| 双引号围绕的字符串，由Go语法安全地转义|
@@ -479,28 +848,30 @@ Go语言主要有四种类型的声明语句:
     |%X| 十六进制，大写字母，每字节两个字符|
 
 - 指针格式化
-    |格 式	|描 述|
+    |格 式 |描 述|
     |---|---|
     |%p|十六进制表示，前缀 0x|
 - 通用的占位符
-    |格 式|	描 述|
+    |格 式| 描 述|
     |---|---|
-    |%v	|值的默认格式。只输出字段的值，没有字段名字,eg: requestVote RPC={1,1,0,0}|
+    |%v |值的默认格式。只输出字段的值，没有字段名字,eg: requestVote RPC={1,1,0,0}|
     |%+v|类似%v，但输出结构体时会添加字段名,以RWMutex为例子, &{w:{state:1 sema:0} writerSem:0 readerSem:0 readerCount:-1073741824 readerWait:0}|
     |%#v|相应值的Go语法表示,比如地址用十六进制表示,以RWMutex为例子, &sync.RWMutex{w:sync.Mutex{state:1, sema:0x0}, writerSem:0x0, readerSem:0x0, readerCount:-1073741824, readerWait:0}|
-    |%T	|相应值的类型的Go语法表示,比如以RWMutex为例子,rf.mu=*sync.RWMutex|
-    |%%	|百分号,字面上的%,非占位符含义|
+    |%T |相应值的类型的Go语法表示,比如以RWMutex为例子,rf.mu=*sync.RWMutex|
+    |%% |百分号,字面上的%,非占位符含义|
 
 - 控制宽度
     宽度设置格式: 占位符中间加一个数字, 数字分正负, +: 右对齐, -: 左对齐
-    - 字符串控制
+  - 字符串控制
+
         ```golang
         fmt.Printf("|%s|", "aa") // 不设置宽度
         fmt.Printf("|%5s|", "aa") // 5个宽度,  默认+， 右对齐
         fmt.Printf("|%-5s|", "aa") // 5个宽度, 左对齐
         fmt.Printf("|%05s|", "aa") // |000aa|
         ```
-    - 浮点控制
+  - 浮点控制
+
         ```golang
         a := 54.123456
         fmt.Printf("|%f|", a)  // |54.123456|
@@ -508,6 +879,7 @@ Go语言主要有四种类型的声明语句:
         fmt.Printf("|%-5.1f|", a) // |54.1 |
         fmt.Printf("|%05.1f|", a) // |054.1|
         ```
+
 ## 3.1 整型
 
 1. 因为不同的编译器即使在相同的硬件平台上可能产生不同的大小字节
@@ -529,6 +901,7 @@ Go语言主要有四种类型的声明语句:
 ## 3.3 复数
 
 复数类型：complex64和complex128，分别对应float32和float64两种浮点数精度。内置的complex函数用于构建复数，内建的real和imag函数分别返回复数的实部和虚部:
+
 ```golang
 var x complex128 = complex(1, 2) // 1+2i
 var y complex128 = complex(3, 4) // 3+4i
@@ -565,7 +938,9 @@ if b {
 # 4. 复合数据类型
 
 ## 4.1 数组
+
 数组代码示例
+
 ```golang
 var a [3]int             // array of 3 integers
 fmt.Println(a[0])        // print the first element
@@ -583,11 +958,14 @@ for _, v := range a {
 ```
 
 如果在数组的长度位置出现的是“...”省略号，则表示数组的长度是根据初始化值的个数来计算
+
 ```golang
 q := [...]int{1, 2, 3}
 fmt.Printf("%T\n", q) // "[3]int"
 ```
+
 上面的形式是直接提供顺序初始化值序列，但是也可以指定一个索引和对应值列表的方式初始化
+
 ```golang
 type Currency int
 
@@ -602,20 +980,28 @@ symbol := [...]string{USD: "$", EUR: "€", GBP: "￡", RMB: "￥"}
 
 fmt.Println(RMB, symbol[RMB]) // "3 ￥"
 ```
+
 定义了一个含有100个元素的数组r，最后一个元素被初始化为-1，其它元素都是用0初始化。
+
 ```golang
 r := [...]int{99: -1}
 ```
+
 数组进行比较是比较所有元素是否相等
+
 ## 4.2 slice
+
 创建slice变量
+
 ```golang
 v_len := make([]T, len)
 v_len_cap := make([]T, len, cap) // same as make([]T, cap)[:len]
 s := []int{0, 1, 2, 3, 4, 5}
 ```
+
 `slice`和`数组`典型的不同就是`slice`不指定长度
 `bytes.Equal`函数来判断两个字节型slice是否相等（[]byte)
+
 ```golang
 func equal(x, y []string) bool {
     if len(x) != len(y) {
@@ -640,12 +1026,14 @@ s = []int{}    // len(s) == 0, s != nil
 ```
 
 ### 4.2.1 append函数
+
 (留着放些API东西)
 
-
 ## 4.3 Map
+
 其中K对应的key必须是支持==比较运算符的数据类型,所以map可以通过测试key是否相等来判断是否已经存在  
 创建map
+
 ```golang
 ages := make(map[string]int) // mapping from strings to ints
 ages := map[string]int{
@@ -660,6 +1048,7 @@ delete(ages, "alice") // remove element ages["alice"]
 _ = &ages["bob"] // compile error: cannot take address of map element
 
 ```
+
 Map的迭代顺序是不确定的，并且不同的哈希函数实现可能导致不同的遍历顺序。在实践中，遍历的顺序是随机的，每一次遍历的顺序都不相同。这是故意的，每次都使用随机的遍历顺序可以强制要求程序不会依赖具体的哈希函数实现。如果要按顺序遍历key/value对，我们必须显式地对key进行排序，可以使用sort包的Strings函数对字符串slice进行排序
 
 ```golang
@@ -830,12 +1219,14 @@ fmt.Printf("%#v\n", w)
 // Wheel{Circle:Circle{Point:Point{X:42, Y:8}, Radius:5}, Spokes:20}
 
 ```
+
 需要注意，但是在包外部，因为circle和point没有导出，不能访问它们的成员，因此简短的匿名成员访问语法也是禁止的。
 
 ## 4.5 json字符串
 
 `json.Marshal`包
 代码例子
+
 ```golang
 type Movie struct {
     Title  string
@@ -856,6 +1247,7 @@ var movies = []Movie{
 ```
 
 ## 4.6 文本和HTML模板
+
 (后面需要时候着重的看)
 `text/template和html/template`,们提供了一个将变量值填充到一个文本或HTML格式的模板的机制。模板语言支持流程控制语句
 模板语言demo
@@ -888,7 +1280,9 @@ func main() {
     }
 }
 ```
+
 如果想转化为html则需要编写如下代码
+
 ```golang
 
 import "html/template"
@@ -913,11 +1307,13 @@ var issueList = template.Must(template.New("issuelist").Parse(`
 </table>
 `))
 ```
+
 注意，html/template包已经自动将特殊字符转义，因此我们依然可以看到正确的字面值。如果我们使用text/template包的话，这2个issue将会产生错误，其中“&lt;”四个字符将会被当作小于字符“<”处理，同时“<link>”字符串将会被当作一个链接元素处理，它们都会导致HTML文档结构的改变，从而导致有未知的风险。
 
 # 5. 函数
 
 声明和定义
+
 - switch 控制语句
 
   ```golang
@@ -932,9 +1328,11 @@ var issueList = template.Must(template.New("issuelist").Parse(`
   ```
 
 ## 5.1 错误
+
 通常，导致失败的原因不止一种，尤其是对I/O操作而言，用户需要了解更多的错误信息。因此，额外的返回值不再是简单的布尔类型，而是error类型。
 
 我们有几种处理错误的策略
+
 1. 发生错误时的解析器
 
   发生解析错误后,findLinks 函数构造了一个新的异常信息,既包含了自定义的，也包含了底层解析出错的信息
@@ -952,11 +1350,13 @@ var issueList = template.Must(template.New("issuelist").Parse(`
   我们需要限制重试的时间间隔或重试的次数，防止无限制的重试.
 3. 输出错误信息并结束程序
   输出错误信息并结束程序。需要注意的是，这种策略只应在main中执行,对库函数而言，应仅向上传播错误，除非该错误意味着程序内部包含不一致性，即遇到了bug，才能在库函数中结束程序
+
   ```golang
   if err := WaitForServer(url); err != nil {
     log.Fatalf("Site is down: %v\n", err)
   }
   ```
+
   `log.Fatalf`代码更简洁，并输出自定义格式信息
 
 4. 只是输出错误信息就可以
@@ -982,11 +1382,13 @@ var issueList = template.Must(template.New("issuelist").Parse(`
   // ...use temp dir…
   os.RemoveAll(dir) // ignore errors; $TMPDIR is cleaned periodically
   ```
+
   尽管os.RemoveAll会失败，但上面的例子并没有做错误处理。这是因为操作系统会定期的清理临时目录。正因如此，虽然程序没有处理错误，但程序的逻辑不会因此受到影响
 
 6. 文件结尾错误
 
 io包保证任何由文件结束引起的读取失败都返
+
 ```golang
 package io
 
@@ -1045,7 +1447,9 @@ func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 ```
 
 ## 5.3 匿名函数
+
 函数内部定义的函数可以访问整个词法环境，言外之意就是嵌套的函数可以访问外层函数的变量
+
 ```golang
 // squares返回一个匿名函数。
 // 该匿名函数每次被调用时都会返回下一个数的平方。
@@ -1070,6 +1474,7 @@ func main() {
 > 网页抓取的核心问题就是如何遍历图
 
 警告:捕获迭代变量
+
 ```golang
 var rmdirs []func()
 for _, d := range tempDirs() {
@@ -1093,10 +1498,13 @@ for _, dir := range tempDirs() {
 }
 
 ```
+
 问题出在了循环变量的作用域,循环变量dir在这个词法块中被声明，每一次迭代都是会不断地更新这个值，被`range`语句，解决这个问题的办法就是引入同名变量来覆盖其作用域。
 
 ## 5.4 可变参数
+
 简单的可变参数例子,其实`可变参数`就是个切片的值传递,`interface{}`表示函数的最后一个参数可以接收任意类型
+
 ```golang
 func sum(vals ...int) int {
     total := 0
@@ -1106,6 +1514,7 @@ func sum(vals ...int) int {
     return total
 }
 ```
+
 如果原参数就是切片该怎么传递？可以直接在`实参`后面加省略号
 
 ## 5.5 defer函数
@@ -1117,6 +1526,7 @@ func sum(vals ...int) int {
 当panic发生时会在该goroutine上执行defer函数，打印对应的栈信息
 `regexp`包的使用
 为了方便诊断问题，runtime包允许程序员输出堆栈信息。在下面的例子中，我们通过在main函数中延迟调用printStack输出堆栈信息。
+
 ```golang
 func main() {
     defer printStack()
@@ -1129,8 +1539,8 @@ func printStack() {
 }
 
 ```
-将panic机制类比其他语言异常机制的读者可能会惊讶，runtime.Stack为何能输出已经被释放函数的信息？在Go的panic机制中，延迟函数的调用在释放堆栈信息之前。
 
+将panic机制类比其他语言异常机制的读者可能会惊讶，runtime.Stack为何能输出已经被释放函数的信息？在Go的panic机制中，延迟函数的调用在释放堆栈信息之前。
 
 ## 5.7 Recovery捕获异常
 
@@ -1149,7 +1559,6 @@ func Parse(input string) (s *Syntax, err error) {
     // ...parser...
 }
 ```
-
 
 - 虽然把对panic的处理都集中在一个包下，有助于简化对复杂和不可以预料问题的处理，但作为被广泛遵守的规范，你不应该试图去恢复其他包引起的panic。公有的API应该将函数的运行失败作为error返回，而不是panic。同样的，你也不应该恢复一个由他人开发的函数引起的panic，比如说调用者传入的回调函数，因为你无法确保这样做是安全的。  
 - 有时我们很难完全遵循规范，举个例子，net/http包中提供了一个web服务器，将收到的请求分发给用户提供的处理函数。很显然，我们不能因为某个处理函数引发的panic异常，杀掉整个进程；web服务器遇到处理函数导致的panic时会调用recover，输出堆栈信息，继续运行。这样的做法在实践中很便捷，但也会引起资源泄漏，或是因为recover操作，导致其他问题。
@@ -1198,6 +1607,7 @@ func soleTitle(doc *html.Node) (title string, err error) {
 - 不管你的method的receiver是指针类型还是非指针类型，都是可以通过指针/非指针类型进行调用的，编译器会帮你做类型转换。
 - 在声明一个method的receiver该是指针还是非指针类型时，你需要考虑两方面的因素，第一方面是这个对象本身是不是特别大，如果声明为非指针变量时，调用会产生一次拷贝；第二方面是如果你用指针类型作为receiver，那么你一定要注意，这种指针类型指向的始终是一块内存地址，就算你对其进行了拷贝。熟悉C或者C++的人这里应该很快能明白。
 - 当你定义一个允许nil作为接收器值的方法的类型时，在类型前面的注释中指出nil变量代表的意义是很有必要的，就像我们下面例子里做的这样
+
     ```golang
     func (list *IntList) Sum() int {
     if list == nil {
@@ -1206,6 +1616,7 @@ func soleTitle(doc *html.Node) (title string, err error) {
     return list.Value + list.Tail.Sum()
     }
     ```
+
     如果此时结构体是`nil`调用对象可能会发生类似于空指针异常的错误
 
 ## 6.3. 通过嵌入结构体来扩展类型
@@ -1274,6 +1685,7 @@ func (path Path) TranslateBy(offset Point, add bool) {
 ## 6.4 封装
 
 封装提供了三方面的优点。
+
 1. 首先，因为调用方不能直接修改对象的变量值，其只需要关注少量的语句并且只要弄懂少量变量的可能的值即可.
 2. 第二，隐藏实现的细节，可以防止调用方依赖那些可能变化的具体实现，这样使设计包的程序员在不破坏对外的api情况下能得到更大的自由
 3. bytes.Buffer这个类型作为例子来考虑
@@ -1302,7 +1714,6 @@ func (path Path) TranslateBy(offset Point, add bool) {
     ```
 
 4. 只暴漏关键信息给外部使用者
-
 
 # 7. 接口
 
@@ -1342,7 +1753,7 @@ func (path Path) TranslateBy(offset Point, add bool) {
 package main
 
 import (
-	"fmt"
+ "fmt"
 )
 
 //!+bytecounter
@@ -1350,23 +1761,23 @@ import (
 type ByteCounter int
 
 func (c *ByteCounter) Write(p []byte) (int, error) {
-	*c += ByteCounter(len(p)) // convert int to ByteCounter
-	return len(p), nil
+ *c += ByteCounter(len(p)) // convert int to ByteCounter
+ return len(p), nil
 }
 
 //!-bytecounter
 
 func main() {
-	//!+main
-	var c ByteCounter
-	c.Write([]byte("hello"))
-	fmt.Println(c) // "5", = len("hello")
+ //!+main
+ var c ByteCounter
+ c.Write([]byte("hello"))
+ fmt.Println(c) // "5", = len("hello")
 
-	c = 0 // reset the counter
-	var name = "Dolly"
-	fmt.Fprintf(&c, "hello, %s", name)
-	fmt.Println(c) // "12", = len("hello, Dolly")
-	//!-main
+ c = 0 // reset the counter
+ var name = "Dolly"
+ fmt.Fprintf(&c, "hello, %s", name)
+ fmt.Println(c) // "12", = len("hello, Dolly")
+ //!-main
 }
 ```
 
@@ -1374,10 +1785,10 @@ func main() {
 
 因为它实现了`writer`接口就可以传入到`Fprintf`函数中.总结来说，接口约定了包使用者的行为，但是使用者想创建什么样的实例需要他自己去实现。
 
-
 ## 7.2 接口类型
 
 通过组合定义接口
+
 ```golang
 package io
 type Reader interface {
@@ -1432,12 +1843,13 @@ type ReadWriter interface {
     rwc = w                 // compile error: io.Writer lacks Close method
     ```
 
-- 
-
+-
 
 ## 7.4 flag.Value接口
+
 在linux程序中，你会发现很多程序都支持选项，通过带上参数，程序会有很多丰富的功能
 比如下面demo就是简单的打印选项-period后面的值。
+
 ```golang
     var period = flag.Duration("period", 1*time.Second, "sleep period")
 
@@ -1448,7 +1860,9 @@ type ReadWriter interface {
         fmt.Println()
     }
 ```
+
 这里golang的flag包提供了这种功能，我们可以通过实现flag的接口自定义新的标记符号
+
 ```golang
 package flag
 
@@ -1459,11 +1873,13 @@ type Value interface {
 }
 
 ```
+
 `string() string`方法格式化标记的值  
 `Set(string) error` 解析它的字符串参数，并更新标记变量的值  
 让我们定义一个允许通过摄氏度或者华氏温度变换的形式指定温度的celsiusFlag类型。
 注意celsiusFlag内嵌了一个Celsius类型，因此不用实现本身就已经有String方法了。为了实现flag.Value，我们只需要定义Set方法：
 代码demo如下
+
 - 自定义新的标记符号
 
     <details><summary>温度的转化</summary>
@@ -1564,7 +1980,7 @@ type Value interface {
         if u, err := url.Parse(s); err != nil {
             return err
         } else {
-            *v.URL = *u
+            *v.URL =*u
         }
         return nil
     }
@@ -1579,6 +1995,7 @@ type Value interface {
         fmt.Printf(\`{scheme: %q, host: %q, path: %q}\`, u.Scheme, u.Host, u.Path)
 
     }
+
     ```
 
     </details>
@@ -1604,6 +2021,7 @@ fmt.Printf("%T\n", a) // "*bytes.Buffer"
 ```golang
 var w io.Writer
 ```
+
 ![7.1](./../../../picture/golang语言圣经/ch7-01.png)
 
 在Go语言中，变量总是被一个定义明确的值初始化，即使接口类型也不例外。对于一个接口的零值就是它的类型和值的部分都是nil（图7.1）。
@@ -1629,6 +2047,7 @@ w.Write([]byte("hello")) // panic: nil pointer dereference
 ```golang
 w = os.Stdout
 ```
+
 这个赋值过程调用了一个具体类型到接口类型的隐式转换，这和显式的使用`io.Writer(os.Stdout)`是等价的。这类转换不管是显式的还是隐式的，都会刻画出操作到的类型和值。这个接口值的动态类型被设为`*os.File`指针的类型描述符，它的动态值持有`os.Stdout`的拷贝;这是一个代表处理标准输出的`os.File`类型变量的指针7.2
 ![7.2](./../../../picture/golang语言圣经/ch7-02.png)
 
@@ -1648,6 +2067,7 @@ w.Write([]byte("hello")) // "hello"
 ```golang
 os.Stdout.Write([]byte("hello")) // "hello"
 ```
+
 第三个语句给接口值赋了一个`*bytes.Buffer`类型的值
 
 ```golang
@@ -1668,8 +2088,6 @@ w.Write([]byte("hello")) // writes "hello" to the bytes.Buffers
 ```golang
 w = nil
 ```
-
-
 
 这个重置将它所有的部分都设为`nil`值,把变量`w`恢复到和它之前定义时相同的状态，在图7.1中可以看到。
 
@@ -1697,7 +2115,6 @@ var x interface{} = time.Now()
 那么基本类型相同,复杂类型地址相等
 
 </text>
-
 
 考虑到这点，接口类型是非常与众不同的。其它类型要么是安全的可比较类型(如基本类型和指针)要么是完全不可比较的类型（如切片，映射类型，和函数），但是在比较接口值或者包含了接口值的聚合类型时，我们必须要意识到潜在的panic。同样的风险也存在于使用接口作为map的键或者switch的操作数。只能比较你非常确定它们的动态值是可比较类型的接口值。  
 
@@ -1763,6 +2180,7 @@ if out != nil {
     out.Write([]byte("done!\n")) // panic: nil pointer dereference
 }
 ```
+
 当main函数调用函数f时，它给`f函数`的out参数赋了一个`*bytes.Buffer`的空指针，所以out的动态值是nil。然而，它的动态类型是`*bytes.Buffer`，意思就是out变量是一个包含空指针值的非空接口（如图7.5），所以防御性检查out!=nil的结果依然是true。
 
 ![7.5](./../../../picture/golang语言圣经/ch7-05.png)
@@ -1787,6 +2205,7 @@ func f(out io.Writer) {
     }
 }
 ```
+
 <text style="font-family:Courier New;color:red">
 总结一句话就是动态类型不为nil,动态值为nil,这个变量也是不要nil
 </text>
@@ -1858,6 +2277,7 @@ func length(s string) time.Duration {
     return d
 }
 ```
+
 printTracks函数将播放列表打印成一个表格。一个图形化的展示可能会更好点，但是这个小程序使用text/tabwriter包来生成一个列整齐对齐和隔开的表格，像下面展示的这样。注意到*tabwriter.Writer是满足io.Writer接口的。它会收集每一片写向它的数据；它的Flush方法会格式化整个表格并且将它写向os.Stdout（标准输出）。
 
 ```golang
@@ -1872,6 +2292,7 @@ func printTracks(tracks []*Track) {
     tw.Flush() // calculate column widths and print table
 }
 ```
+
 为了能按照Artist字段对播放列表进行排序，我们会像对StringSlice那样定义一个新的带有必须的Len，Less和Swap方法的切片类型。
 
 ```golang
@@ -1880,6 +2301,7 @@ func (x byArtist) Len() int           { return len(x) }
 func (x byArtist) Less(i, j int) bool { return x[i].Artist < x[j].Artist }
 func (x byArtist) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 ```
+
 为了调用通用的排序程序，我们必须先将tracks转换为新的byArtist类型，它定义了具体的排序：
 
 `sort.Sort(byArtist(tracks))`
@@ -1893,6 +2315,7 @@ Go          Delilah         From the Roots Up   2012 3m38s
 Ready 2 Go  Martin Solveig  Smash               2011 4m24s
 Go          Moby            Moby                1992 3m37s
 ```
+
 如果用户第二次请求“按照artist排序”，我们会对tracks进行逆向排序。然而我们不需要定义一个有颠倒Less方法的新类型byReverseArtist，因为sort包中提供了Reverse函数将排序顺序转换成逆序。
 `sort.Sort(sort.Reverse(byArtist(tracks)))`
 在按照artist对这个切片进行逆向排序后，printTrack的输出如下
@@ -1905,6 +2328,7 @@ Ready 2 Go  Martin Solveig  Smash               2011 4m24s
 Go          Delilah         From the Roots Up   2012 3m38s
 Go Ahead    Alicia Keys     As I Am             2007 4m36s
 ```
+
 `sort.Reverse`函数值得进行更近一步的学习，因为它使用了（§6.3）章中的组合，这是一个重要的思路。`sort`包定义了一个不公开的`struct`类型`reverse`，它嵌入了一个`sort.Interface`。`reverse`的`Less`方法调用了内嵌的`sort.Interface`值的`Less`方法，但是通过交换索引的方式使排序结果变成逆序。
 
 ```golang
@@ -1916,6 +2340,7 @@ func (r reverse) Less(i, j int) bool { return r.Interface.Less(j, i) }
 
 func Reverse(data Interface) Interface { return reverse{data} }
 ```
+
 `reverse`的另外两个方法`Len`和`Swap`隐式地由原有内嵌的`sort.Interface`提供。因为`reverse`是一个不公开的类型，所以导出函数`Reverse`返回一个包含原有`sort.Interface`值的reverse类型实例。
 
 为了可以按照不同的列进行排序，我们必须定义一个新的类型例如byYear：
@@ -1926,6 +2351,7 @@ func (x byYear) Len() int           { return len(x) }
 func (x byYear) Less(i, j int) bool { return x[i].Year < x[j].Year }
 func (x byYear) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 ```
+
 在使用sort.Sort(byYear(tracks))按照年对tracks进行排序后，printTrack展示了一个按时间先后顺序的列表：
 
 ```golang
@@ -1936,6 +2362,7 @@ Go Ahead    Alicia Keys     As I Am             2007 4m36s
 Ready 2 Go  Martin Solveig  Smash               2011 4m24s
 Go          Delilah         From the Roots Up   2012 3m38s
 ```
+
 对于我们需要的每个切片元素类型和每个排序函数，我们需要定义一个新的sort.Interface实现。如你所见，Len和Swap方法对于所有的切片类型都有相同的定义。下个例子，具体的类型customSort会将一个切片和函数结合，使我们只需要写比较函数就可以定义一个新的排序。顺便说下，实现了sort.Interface的具体类型不一定是切片类型；customSort是一个结构体类型。
 
 ```golang
@@ -1946,8 +2373,9 @@ type customSort struct {
 
 func (x customSort) Len() int           { return len(x.t) }
 func (x customSort) Less(i, j int) bool { return x.less(x.t[i], x.t[j]) }
-func (x customSort) Swap(i, j int)	{ x.t[i], x.t[j] = x.t[j], x.t[i] }
+func (x customSort) Swap(i, j int) { x.t[i], x.t[j] = x.t[j], x.t[i] }
 ```
+
 让我们定义一个多层的排序函数，它主要的排序键是标题，第二个键是年，第三个键是运行时间Length。下面是该排序的调用，其中这个排序使用了匿名排序函数：
 
 ```golang
@@ -1964,7 +2392,9 @@ sort.Sort(customSort{tracks, func(x, y *Track) bool {
     return false
 }})
 ```
+
 这下面是排序的结果。注意到两个标题是“Go”的track按照标题排序是相同的顺序，但是在按照year排序上更久的那个track优先。
+
 ```golang
 
 Title       Artist          Album               Year Length
@@ -1974,6 +2404,7 @@ Go          Delilah         From the Roots Up   2012 3m38s
 Go Ahead    Alicia Keys     As I Am             2007 4m36s
 Ready 2 Go  Martin Solveig  Smash               2011 4m24s
 ```
+
 尽管对长度为n的序列排序需要 O(n log n)次比较操作，检查一个序列是否已经有序至少需要n-1次比较。sort包中的IsSorted函数帮我们做这样的检查。像sort.Sort一样，它也使用sort.Interface对这个序列和它的排序函数进行抽象，但是它从不会调用Swap方法：这段代码示范了IntsAreSorted和Ints函数在IntSlice类型上的使用：
 
 ```golang
@@ -2035,11 +2466,12 @@ func (db database) ServeHTTP(w http.ResponseWriter, req *http.Request) {
     }
 }
 ```
+
 如果我们启动这个服务，
 
 ```golang
-$ go build gopl.io/ch7/http1
-$ ./http1 &
+go build gopl.io/ch7/http1
+./http1 &
 ```
 
 然后用1.5节中的获取程序（如果你更喜欢可以使用web浏览器）来连接服务器，我们得到下面的输出：
@@ -2050,6 +2482,7 @@ $ ./fetch http://localhost:8000
 shoes: $50.00
 socks: $5.00
 ```
+
 目前为止，这个服务器不考虑URL，只能为每个请求列出它全部的库存清单。更真实的服务器会定义多个不同的URL，每一个都会触发一个不同的行为。让我们使用`/list`来调用已经存在的这个行为并且增加另一个`/price`调用表明单个货品的价格，像这样`/price?item=socks`来指定一个请求参数。
 
 ```golang
@@ -2105,11 +2538,13 @@ no such item: "hat"
 $ ./fetch http://localhost:8000/help
 no such page: /help
 ```
+
 显然我们可以继续向ServeHTTP方法中添加case，但在一个实际的应用中，将每个case中的逻辑定义到一个分开的方法或函数中会很实用。此外，相近的URL可能需要相似的逻辑；例如几个图片文件可能有形如/images/*.png的URL。因为这些原因，net/http包提供了一个请求多路器ServeMux来简化URL和handlers的联系。一个ServeMux将一批http.Handler聚集到一个单一的http.Handler中。再一次，我们可以看到满足同一接口的不同类型是可替换的：web服务器将请求指派给任意的http.Handler 而不需要考虑它后面的具体类型。
 
 对于更复杂的应用，一些ServeMux可以通过组合来处理更加错综复杂的路由需求。Go语言目前没有一个权威的web框架，就像Ruby语言有Rails和python有Django。这并不是说这样的框架不存在，而是Go语言标准库中的构建模块就已经非常灵活以至于这些框架都是不必要的。此外，尽管在一个项目早期使用框架是非常方便的，但是它们带来额外的复杂度会使长期的维护更加困难。
 
 在下面的程序中，我们创建一个ServeMux并且使用它将URL和相应处理/list和/price操作的handler联系起来，这些操作逻辑都已经被分到不同的方法中。然后我们在调用ListenAndServe函数中使用ServeMux为主要的handler。
+
 ```golang
 gopl.io/ch7/http3
 
@@ -2141,13 +2576,14 @@ func (db database) price(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintf(w, "%s\n", price)
 }
 ```
-让我们关注这两个注册到handlers上的调用。第一个db.list是一个方法值（§6.4），它是下面这个类型的值。
 
+让我们关注这两个注册到handlers上的调用。第一个db.list是一个方法值（§6.4），它是下面这个类型的值。
 
 func(w http.ResponseWriter, req *http.Request)
 也就是说db.list的调用会援引一个接收者是db的database.list方法。所以db.list是一个实现了handler类似行为的函数，但是因为它没有方法（理解：该方法没有它自己的方法），所以它不满足http.Handler接口并且不能直接传给mux.Handle。
 
 语句http.HandlerFunc(db.list)是一个转换而非一个函数调用，因为http.HandlerFunc是一个类型。它有如下的定义：
+
 ```golang
 net/http
 
@@ -2160,6 +2596,7 @@ func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
     f(w, r)
 }
 ```
+
 HandlerFunc显示了在Go语言接口机制中一些不同寻常的特点。这是一个实现了接口http.Handler的方法的函数类型。ServeHTTP方法的行为是调用了它的函数本身。因此HandlerFunc是一个让函数值满足一个接口的适配器，这里函数和这个接口仅有的方法有相同的函数签名。实际上，这个技巧让一个单一的类型例如database以多种方式满足http.Handler接口：一种通过它的list方法，一种通过它的price方法等等。
 
 因为handler通过这种方式注册非常普遍，ServeMux有一个方便的HandleFunc方法，它帮我们简化handler注册代码成这样：
@@ -2171,6 +2608,7 @@ gopl.io/ch7/http3a
 mux.HandleFunc("/list", db.list)
 mux.HandleFunc("/price", db.price)
 ```
+
 从上面的代码很容易看出应该怎么构建一个程序：由两个不同的web服务器监听不同的端口，并且定义不同的URL将它们指派到不同的handler。我们只要构建另外一个ServeMux并且再调用一次`ListenAndServe`（可能并行的）。但是在大多数程序中，一个web服务器就足够了。此外，在一个应用程序的多个文件中定义`HTTP handler`也是非常典型的，如果它们必须全部都显式地注册到这个应用的`ServeMux`实例上会比较麻烦。
 
 所以为了方便，`net/http`包提供了一个全局的`ServeMux`实例`DefaultServerMux`和包级别的`http.Handle`和`http.HandleFunc`函数。现在，为了使用`DefaultServeMux`作为服务器的主`handler`，我们不需要将它传给`ListenAndServe`函数;nil值就可以工作。
@@ -2195,6 +2633,7 @@ func main() {
 练习 7.12： 修改/list的handler让它把输出打印成一个HTML的表格而不是文本。html/template包（§4.6）可能会对你有帮助。
 
 ## 7.8. error接口
+
 从本书的开始，我们就已经创建和使用过神秘的预定义error类型，而且没有解释它究竟是什么。实际上它就是interface类型，这个类型有一个返回错误信息的单一方法：
 
 ```golang
@@ -2202,6 +2641,7 @@ type error interface {
     Error() string
 }
 ```
+
 创建一个error最简单的方法就是调用errors.New函数，它会根据传入的错误信息返回一个新的error。整个errors包仅只有4行：
 
 ```golang
@@ -2213,6 +2653,7 @@ type errorString struct { text string }
 
 func (e *errorString) Error() string { return e.text }
 ```
+
 承载errorString的类型是一个结构体而非一个字符串，这是为了保护它表示的错误避免粗心（或有意）的更新。并且因为是指针类型*errorString满足error接口而非errorString类型，所以每个New函数的调用都分配了一个独特的和其他错误不相同的实例。我们也不想要重要的error例如io.EOF和一个刚好有相同错误消息的error比较后相等。
 
 `fmt.Println(errors.New("EOF") == errors.New("EOF")) // "false"`
@@ -2227,7 +2668,9 @@ func Errorf(format string, args ...interface{}) error {
     return errors.New(Sprintf(format, args...))
 }
 ```
+
 虽然*errorString可能是最简单的错误类型，但远非只有它一个。例如，syscall包提供了Go语言底层系统调用API。在多个平台上，它定义一个实现error接口的数字类型Errno，并且在Unix平台上，Errno的Error方法会从一个字符串表中查找错误消息，如下面展示的这样：
+
 ```golang
 package syscall
 
@@ -2247,6 +2690,7 @@ func (e Errno) Error() string {
     return fmt.Sprintf("errno %d", e)
 }
 ```
+
 下面的语句创建了一个持有Errno值为2的接口值，表示POSIX ENOENT状况：
 
 var err error = syscall.Errno(2)
@@ -2260,7 +2704,6 @@ Errno是一个系统调用错误的高效表示方式，它通过一个有限的
 
 在本节中，我们会构建一个简单算术表达式的求值器。我们将使用一个接口Expr来表示Go语言中任意的表达式。现在这个接口不需要有方法，但是我们后面会为它增加一些。
 
-
 // An Expr is an arithmetic expression.
 type Expr interface{}
 我们的表达式语言包括浮点数符号（小数点）；二元操作符+，-，*， 和/；一元操作符-x和+x；调用pow(x,y)，sin(x)，和sqrt(x)的函数；例如x和pi的变量；当然也有括号和标准的优先级运算符。所有的值都是float64类型。这下面是一些表达式的例子：
@@ -2270,6 +2713,7 @@ sqrt(A / pi)
 pow(x, 3) + pow(y, 3)
 (F - 32) * 5 / 9
 ```
+
 下面的五个具体类型表示了具体的表达式类型。Var类型表示对一个变量的引用。（我们很快会知道为什么它可以被输出。）literal类型表示一个浮点型常量。unary和binary类型表示有一到两个运算对象的运算符表达式，这些操作数可以是任意的Expr类型。call类型表示对一个函数的调用；我们限制它的fn字段只能是pow，sin或者sqrt。
 
 ```golang
@@ -2300,11 +2744,13 @@ type call struct {
     args []Expr
 }
 ```
+
 为了计算一个包含变量的表达式，我们需要一个environment变量将变量的名字映射成对应的值：
 
 ```golang
 type Env map[Var]float64
 ```
+
 我们也需要每个表达式去定义一个Eval方法，这个方法会根据给定的environment变量返回表达式的值。因为每个表达式都必须提供这个方法，我们将它加入到Expr接口中。这个包只会对外公开Expr，Env，和Var类型。调用方不需要获取其它的表达式类型就可以使用这个求值器。
 
 ```golang
@@ -2325,6 +2771,7 @@ func (l literal) Eval(_ Env) float64 {
     return float64(l)
 }
 ```
+
 unary和binary的Eval方法会递归的计算它的运算对象，然后将运算符op作用到它们上。我们不将被零或无穷数除作为一个错误，因为它们都会产生一个固定的结果——无限。最后，call的这个方法会计算对于pow，sin，或者sqrt函数的参数值，然后调用对应在math包中的函数。
 
 ```golang
@@ -2364,6 +2811,7 @@ func (c call) Eval(env Env) float64 {
     panic(fmt.Sprintf("unsupported function call: %s", c.fn))
 }
 ```
+
 一些方法会失败。例如，一个call表达式可能有未知的函数或者错误的参数个数。用一个无效的运算符如!或者<去构建一个unary或者binary表达式也是可能会发生的（尽管下面提到的Parse函数不会这样做）。这些错误会让Eval方法panic。其它的错误，像计算一个没有在environment变量中出现过的Var，只会让Eval方法返回一个错误的结果。所有的这些错误都可以通过在计算前检查Expr来发现。这是我们接下来要讲的Check方法的工作，但是让我们先测试Eval方法。
 
 下面的TestEval函数是对evaluator的一个测试。它使用了我们会在第11章讲解的testing包，但是现在知道调用t.Errof会报告一个错误就足够了。这个函数循环遍历一个表格中的输入，这个表格中定义了三个表达式和针对每个表达式不同的环境变量。第一个表达式根据给定圆的面积A计算它的半径，第二个表达式通过两个变量x和y计算两个立方体的体积之和，第三个表达式将华氏温度F转换成摄氏度。
@@ -2403,11 +2851,14 @@ func TestEval(t *testing.T) {
     }
 }
 ```
+
 对于表格中的每一条记录，这个测试会解析它的表达式然后在环境变量中计算它，输出结果。这里我们没有空间来展示Parse函数，但是如果你使用go get下载这个包你就可以看到这个函数。
+
 ```golang
 go test(§11.1) 命令会运行一个包的测试用例：
 $ go test -v gopl.io/ch7/eval
 ```
+
 这个-v标识可以让我们看到测试用例打印的输出；正常情况下像这样一个成功的测试用例会阻止打印结果的输出。这里是测试用例里fmt.Printf语句的输出：
 
 ```golang
@@ -2435,6 +2886,7 @@ type Expr interface {
     Check(vars map[Var]bool) error
 }
 ```
+
 具体的Check方法展示在下面。literal和Var类型的计算不可能失败，所以这些类型的Check方法会返回一个nil值。对于unary和binary的Check方法会首先检查操作符是否有效，然后递归的检查运算单元。相似地对于call的这个方法首先检查调用的函数是否已知并且有没有正确个数的参数，然后递归的检查每一个参数。
 
 ```golang
@@ -2483,6 +2935,7 @@ func (c call) Check(vars map[Var]bool) error {
 
 var numParams = map[string]int{"pow": 2, "sin": 1, "sqrt": 1}
 ```
+
 我们在两个组中有选择地列出有问题的输入和它们得出的错误。Parse函数（这里没有出现）会报出一个语法错误和Check函数会报出语义错误。
 
 ```golang
@@ -2494,11 +2947,13 @@ math.Pi             unexpected '.'
 log(10)             unknown function "log"
 sqrt(1, 2)          call to sqrt has 2 args, want 1
 ```
+
 Check方法的参数是一个Var类型的集合，这个集合聚集从表达式中找到的变量名。为了保证成功的计算，这些变量中的每一个都必须出现在环境变量中。从逻辑上讲，这个集合就是调用Check方法返回的结果，但是因为这个方法是递归调用的，所以对于Check方法，填充结果到一个作为参数传入的集合中会更加的方便。调用方在初始调用时必须提供一个空的集合。
 
 在第3.2节中，我们绘制了一个在编译期才确定的函数f(x,y)。现在我们可以解析，检查和计算在字符串中的表达式，我们可以构建一个在运行时从客户端接收表达式的web应用并且它会绘制这个函数的表示的曲面。我们可以使用集合vars来检查表达式是否是一个只有两个变量x和y的函数——实际上是3个，因为我们为了方便会提供半径大小r。并且我们会在计算前使用Check方法拒绝有格式问题的表达式，这样我们就不会在下面函数的40000个计算过程（100x100个栅格，每一个有4个角）重复这些检查。
 
 这个ParseAndCheck函数混合了解析和检查步骤的过程：
+
 ```golang
 gopl.io/ch7/surface
 
@@ -2525,6 +2980,7 @@ func parseAndCheck(s string) (eval.Expr, error) {
     return expr, nil
 }
 ```
+
 为了编写这个web应用，所有我们需要做的就是下面这个plot函数，这个函数有和http.HandlerFunc相似的签名：
 
 ```golang
@@ -2543,6 +2999,7 @@ func plot(w http.ResponseWriter, r *http.Request) {
 }
 
 ```
+
 这个plot函数解析和检查在HTTP请求中指定的表达式并且用它来创建一个两个变量的匿名函数。这个匿名函数和来自原来surface-plotting程序中的固定函数f有相同的签名，但是它计算一个用户提供的表达式。环境变量中定义了x，y和半径r。最后plot调用surface函数，它就是gopl.io/ch3/surface中的主要函数，修改后它可以接受plot中的函数和输出io.Writer作为参数，而不是使用固定的函数f和os.Stdout。图7.7中显示了通过程序产生的3个曲面。
 
 练习7.13为Expr增加一个String方法来打印美观的语法树。当再一次解析的时候，检查它的结果是否生成相同的语法树
@@ -2553,7 +3010,6 @@ func plot(w http.ResponseWriter, r *http.Request) {
 
 练习7.16编写一个基于web的计算器程序。
 
-
 ## 7.9. 类型断言
 
 语法上它看起来像`x.(T)`被称为断言类型，这里`x`表示一个接口的类型和T表示一个类型,详细解释，一个类型断言检查它操作对象的动态类型是否和断言的类型是否匹配,分两种情况
@@ -2561,6 +3017,7 @@ func plot(w http.ResponseWriter, r *http.Request) {
 - (T传入的是具体类型，X是动态类型),然后类型断言检查`X`的动态类型是否和`T`相同.如果检查成功了类型断言的结果就是`X`的动态值
 
 - (T传入的是接口类型，X是动态类型),然后类型断言检查是否`x`的动态类型满足T,如果这个检查成功了，动态值没有获取到；这个结果仍然是一个有相同动态类型和值部分的接口值
+
     ```golang
 
     var w io.Writer
@@ -2578,31 +3035,32 @@ func plot(w http.ResponseWriter, r *http.Request) {
     }
     ```
 
-
 ## 7.10. 基于类型断言区别错误类型
+
 对这些判断的一个缺乏经验的实现可能会去检查错误消息是否包含了特定的子字符串，但是处理I/O错误的逻辑可能一个和另一个平台非常的不同，所以这种方案并不健壮，并且对相同的失败可能会报出各种不同的错误消息。在测试的过程中，通过检查错误消息的子字符串来保证特定的函数以期望的方式失败是非常有用的，但对于线上的代码是不够的。
 
 一个更可靠的方式是使用一个专门的类型来描述结构化的错误。os包中定义了一个PathError类型来描述在文件路径操作中涉及到的失败，像Open或者Delete操作；并且定义了一个叫LinkError的变体来描述涉及到两个文件路径的操作，像Symlink和Rename。这下面是os.PathError：
+
 ```golang
 
 
 package main
 
 import (
-	"errors"
-	"fmt"
-	"os"
-	"syscall"
+ "errors"
+ "fmt"
+ "os"
+ "syscall"
 )
 
 type PathError struct {
-	Op   string
-	Path string
-	Err  error
+ Op   string
+ Path string
+ Err  error
 }
 
 func (e *PathError) Error() string {
-	return e.Op + " " + e.Path + ": " + e.Err.Error()
+ return e.Op + " " + e.Path + ": " + e.Err.Error()
 }
 
 var ErrNotExist = errors.New("file does not exist")
@@ -2611,23 +3069,25 @@ var ErrNotExist = errors.New("file does not exist")
 // report that a file or directory does not exist. It is satisfied by
 // ErrNotExist as well as some syscall errors.
 func IsNotExist(err error) bool {
-	if pe, ok := err.(*PathError); ok {
-		err = pe.Err
-	}
-	return err == syscall.ENOENT || err == ErrNotExist
+ if pe, ok := err.(*PathError); ok {
+  err = pe.Err
+ }
+ return err == syscall.ENOENT || err == ErrNotExist
 }
 
 func main() {
-	_, err := os.Open("/no/such/file")
-	fmt.Println(os.IsNotExist(err)) // "true"
+ _, err := os.Open("/no/such/file")
+ fmt.Println(os.IsNotExist(err)) // "true"
 }
 ```
 
 ## 7.11. any关键字与泛型
+
 类型定义时不限制`形参类型`，在函数调用的时候再指定`具体类型`.  `any`其实是`interface{}`的别名
 泛型好处:  (1).在编译期间对类型进行检查以提高类型安全(2).通过指定类型消除强制类型转换(3).能够减少代码重复性，提供更通用的功能函数。
 
 - 类型泛型
+
   ```golang
     package main
 
@@ -2650,15 +3110,19 @@ func main() {
         fmt.Println(int32Map)
     }
   ```
+
   这里面的T,K,V都是占位符号,`ListType`只能在那三种类型中选择,同理`MapType`也是
 - 接口泛型
+
   ```golang
   type GenericStackInterface[T any] interface {
     Push(element T)
     Pop() T
   }
   ```
+
 - 泛型函数
+
   ```golang
     func minInt[T int | int8 | int16 | int32](a, b T) T {
     if a < b {
@@ -2712,14 +3176,17 @@ func main() {
         return b
     }
   ```
+
   如果进入`constraints`源代码查看其具体代码的话，会发现在 Ordered 类型中也是有各种数字类型组合起来的。但是有一点奇怪的地方就是这里的类型集合中，各种类型前加了一个波浪线~, 表示衍生类型，即使用 type 自定义的类型也可以被识别到，只要底层类型一致即可。比如 ~int 可以包含 int 和 type MyInt int 等多种类型
 
-
-
 # 8. Goroutines和Channels
+
 (多看看本章代码)
+
 ## 8.1 goroutine
+
 通过代码示例了解`goroutine`的使用
+
 ```golang
 func main() {
     go spinner(100 * time.Millisecond)
@@ -2744,11 +3211,13 @@ func fib(x int) int {
     return fib(x-1) + fib(x-2)
 }
 ```
+
 ## 8.2 channel
 
 这里应该还得看一下uber编码规范
 
 - 无缓冲channel
+
     ```golang
     ch <- x
     x = <-chan //取出元素
@@ -2756,14 +3225,16 @@ func fib(x int) int {
     close(ch) // 关闭chan
     ```
 
-    - 串联channel
-    
-    - 单方向channel
+  - 串联channel
+
+  - 单方向channel
 
 - 缓冲channel
+
     ```golang
     ch = make(chan string, 3) //channel容量为3
     ```
+
 ## 8.3 基于select的多路复用
 
 <details>
@@ -2864,106 +3335,106 @@ package main
 // it terminates quickly when the user hits return.
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"sync"
-	"time"
+ "fmt"
+ "os"
+ "path/filepath"
+ "sync"
+ "time"
 )
 
 //!+1
 var done = make(chan struct{})
 
 func cancelled() bool {
-	select {
-	case <-done:
-		return true
-	default:
-		return false
-	}
+ select {
+ case <-done:
+  return true
+ default:
+  return false
+ }
 }
 
 //!-1
 
 func main() {
-	// Determine the initial directories.
-	roots := os.Args[1:]
-	if len(roots) == 0 {
-		roots = []string{"."}
-	}
+ // Determine the initial directories.
+ roots := os.Args[1:]
+ if len(roots) == 0 {
+  roots = []string{"."}
+ }
 
-	//!+2
-	// Cancel traversal when input is detected.
-	go func() {
-		os.Stdin.Read(make([]byte, 1)) // read a single byte
-		close(done)
-	}()
-	//!-2
+ //!+2
+ // Cancel traversal when input is detected.
+ go func() {
+  os.Stdin.Read(make([]byte, 1)) // read a single byte
+  close(done)
+ }()
+ //!-2
 
-	// Traverse each root of the file tree in parallel.
-	fileSizes := make(chan int64)
-	var n sync.WaitGroup
-	for _, root := range roots {
-		n.Add(1)
-		go walkDir(root, &n, fileSizes)
-	}
-	go func() {
-		n.Wait()
-		close(fileSizes)
-	}()
+ // Traverse each root of the file tree in parallel.
+ fileSizes := make(chan int64)
+ var n sync.WaitGroup
+ for _, root := range roots {
+  n.Add(1)
+  go walkDir(root, &n, fileSizes)
+ }
+ go func() {
+  n.Wait()
+  close(fileSizes)
+ }()
 
-	// Print the results periodically.
-	tick := time.Tick(500 * time.Millisecond)
-	var nfiles, nbytes int64
+ // Print the results periodically.
+ tick := time.Tick(500 * time.Millisecond)
+ var nfiles, nbytes int64
 loop:
-	//!+3
-	for {
-		select {
-		case <-done:
-			// Drain fileSizes to allow existing goroutines to finish.
-			for range fileSizes {
-				// Do nothing.
-			}
-			return
-		case size, ok := <-fileSizes:
-			// ...
-			//!-3
-			if !ok {
-				break loop // fileSizes was closed
-			}
-			nfiles++
-			nbytes += size
-		case <-tick:
-			printDiskUsage(nfiles, nbytes)
-		}
-	}
-	printDiskUsage(nfiles, nbytes) // final totals
+ //!+3
+ for {
+  select {
+  case <-done:
+   // Drain fileSizes to allow existing goroutines to finish.
+   for range fileSizes {
+    // Do nothing.
+   }
+   return
+  case size, ok := <-fileSizes:
+   // ...
+   //!-3
+   if !ok {
+    break loop // fileSizes was closed
+   }
+   nfiles++
+   nbytes += size
+  case <-tick:
+   printDiskUsage(nfiles, nbytes)
+  }
+ }
+ printDiskUsage(nfiles, nbytes) // final totals
 }
 
 func printDiskUsage(nfiles, nbytes int64) {
-	fmt.Printf("%d files  %.1f GB\n", nfiles, float64(nbytes)/1e9)
+ fmt.Printf("%d files  %.1f GB\n", nfiles, float64(nbytes)/1e9)
 }
 
 // walkDir recursively walks the file tree rooted at dir
 // and sends the size of each found file on fileSizes.
 //!+4
 func walkDir(dir string, n *sync.WaitGroup, fileSizes chan<- int64) {
-	defer n.Done()
-	if cancelled() {
-		return
-	}
-	for _, entry := range dirents(dir) {
-		// ...
-		//!-4
-		if entry.IsDir() {
-			n.Add(1)
-			subdir := filepath.Join(dir, entry.Name())
-			go walkDir(subdir, n, fileSizes)
-		} else {
-			fileSizes <- entry.Size()
-		}
-		//!+4
-	}
+ defer n.Done()
+ if cancelled() {
+  return
+ }
+ for _, entry := range dirents(dir) {
+  // ...
+  //!-4
+  if entry.IsDir() {
+   n.Add(1)
+   subdir := filepath.Join(dir, entry.Name())
+   go walkDir(subdir, n, fileSizes)
+  } else {
+   fileSizes <- entry.Size()
+  }
+  //!+4
+ }
 }
 
 //!-4
@@ -2973,29 +3444,29 @@ var sema = make(chan struct{}, 20) // concurrency-limiting counting semaphore
 // dirents returns the entries of directory dir.
 //!+5
 func dirents(dir string) []os.FileInfo {
-	select {
-	case sema <- struct{}{}: // acquire token
-	case <-done:
-		return nil // cancelled
-	}
-	defer func() { <-sema }() // release token
+ select {
+ case sema <- struct{}{}: // acquire token
+ case <-done:
+  return nil // cancelled
+ }
+ defer func() { <-sema }() // release token
 
-	// ...read directory...
-	//!-5
+ // ...read directory...
+ //!-5
 
-	f, err := os.Open(dir)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "du: %v\n", err)
-		return nil
-	}
-	defer f.Close()
+ f, err := os.Open(dir)
+ if err != nil {
+  fmt.Fprintf(os.Stderr, "du: %v\n", err)
+  return nil
+ }
+ defer f.Close()
 
-	entries, err := f.Readdir(0) // 0 => no limit; read all entries
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "du: %v\n", err)
-		// Don't return: Readdir may return partial results.
-	}
-	return entries
+ entries, err := f.Readdir(0) // 0 => no limit; read all entries
+ if err != nil {
+  fmt.Fprintf(os.Stderr, "du: %v\n", err)
+  // Don't return: Readdir may return partial results.
+ }
+ return entries
 }
 ```
 
@@ -3003,28 +3474,32 @@ func dirents(dir string) []os.FileInfo {
 </details>
 
 # 9. 基于共享变量的并发
+
 (多看这章代码)
 避免数据竞争的三个方法
+
 - 并发读数据不会有数据竞争问题
 - 避免从多个goroutine中访问变量，使用独立变量
 - 临界区控制
 
 - 总结
-    - 数据竞争: 程序在多个goroutine交叉执行操作时，导致数据不一致.  
-    - `包级别`的导出函数一般情况下都是并发安全的。由于package级的变量没法被限制在单一的gorouine，所以修改这些变量“必须”使用互斥条件。
+  - 数据竞争: 程序在多个goroutine交叉执行操作时，导致数据不一致.  
+  - `包级别`的导出函数一般情况下都是并发安全的。由于package级的变量没法被限制在单一的gorouine，所以修改这些变量“必须”使用互斥条件。
     (多看看本章代码)
 
 ## 9.1 sync.Mutex与sync.RMutex互斥锁
 
 比如银行存款查询余额的场景，因为所有的余额查询请求是顺序执行的，这样会互斥地获得锁，并且会暂时阻止其它的goroutine运行。由于Balance函数只需要读取变量的状态，所以我们同时让多个Balance调用并发运行事实上是安全的，只要在运行的时候没有存款或者取款(这句话很关键要没有)操作就行。在这种场景下我们需要一种特殊类型的锁，其允许多个只读操作并行执行，但写操作会完全互斥。这种锁叫作“多读单写”锁
+
 - 总结
-    - 避免临界区中的变量在中途被其他的goroutine修改
-    - 使用mutex包进行互斥goroutine
-    - 一个deferred Unlock即使在临界区发生`panic`时依然会执行
-    - golang不支持重入锁
-    - sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞，但是sync.RWMutex.RLock()阻塞之间不阻塞
+  - 避免临界区中的变量在中途被其他的goroutine修改
+  - 使用mutex包进行互斥goroutine
+  - 一个deferred Unlock即使在临界区发生`panic`时依然会执行
+  - golang不支持重入锁
+  - sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞，但是sync.RWMutex.RLock()阻塞之间不阻塞
 
 ## 9.2 sync.Once惰性初始化
+
 如果初始化的成本太高，需要延迟的初始化对象。可考虑使用`sync.Once`
 <detials>
 <summary>sync.One的demo</summary>
@@ -3033,9 +3508,7 @@ func dirents(dir string) []os.FileInfo {
 </pre>
 </details>
 
-
 ## 9.3 sync.Cond的使用
-
 
 1. 使用场景: `sync.Cond` 经常用在多个goroutine等待,一个goroutine通知,如果是一读一等待使用`sync.Mutx`和`chan`就可以
 2. `sync.Cond`的[方法](https://pkg.go.dev/sync@go1.19#Cond)
@@ -3055,7 +3528,7 @@ func dirents(dir string) []os.FileInfo {
 
     ```
 
-    Cond 实例都会关联一个锁`L`(互斥锁 *Mutex，或读写锁 *RWMutex);当修改条件或者调用`Wait()`方法时,必须加锁
+    Cond 实例都会关联一个锁`L`(互斥锁 *Mutex，或读写锁*RWMutex);当修改条件或者调用`Wait()`方法时,必须加锁
 
     ```golang
     // Signal wakes one goroutine waiting on c, if there is any.
@@ -3079,11 +3552,13 @@ func dirents(dir string) []os.FileInfo {
         ... make use of condition ...
         c.L.Unlock()
     ```
+
     调用`Wait`会自动释放锁 `c.L`,并挂起调用者所在的`goroutine`，因此当前协程会阻塞在`Wait`方法调用的地方。
     如果其他协程调用了`Signal`或`Broadcast`唤醒了该协程,那么`Wait`方法在结束阻塞时,会重新给`c.L`加锁，
     并且继续执行`Wait`后面的代码
 
 3. Cond代码示例
+
     ```golang
     var done = false
 
@@ -3141,17 +3616,13 @@ func dirents(dir string) []os.FileInfo {
     010101010101010101011001100101011010010100110...
   ```
 
-
-
 - 总结
-    - 通过广播机制来取消goroutines
-    - 确保主函数退出，routines也随即退出
-
-
-
+  - 通过广播机制来取消goroutines
+  - 确保主函数退出，routines也随即退出
 
 # 10. 包和工具
-互联网上已经发布了非常多的Go语言开源包，它们可以通过 http://godoc.org 检索
+
+互联网上已经发布了非常多的Go语言开源包，它们可以通过 <http://godoc.org> 检索
 
 - 包的声明 ： 通过`package.struct`的形式访问我们的下载的`package`,但是也有同名的例如`math/rand`和`crypto/rand`，这种要重新指定包名，只影响当前文件，同时也解决了那些又臭又长的包名
 - 文件开头以`_`和`.`的会被忽略
@@ -3172,6 +3643,7 @@ func dirents(dir string) []os.FileInfo {
   - 内部包 : 一个internal包只能被和internal目录有同一个父目录的包所导入。例如，net/http/internal/chunked内部包只能被net/http/httputil或net/http包导入，但是不能被net/url包导入。不过net/url包却可以导入net/http/httputil包
   - 搜索包 : `go list`列出工作区相关包,还可以查看完整包的原信息,例如`hash`包`go list -json hash`
     - 命令行参数-f则允许用户使用text/template包（§4.6）的模板语言定义输出文本的格式
+
       ```golang
       //windows环境下注意
       go list -f '{{.ImportPath}} -> {{join .Imports " "}}' compress/...
@@ -3185,6 +3657,7 @@ func dirents(dir string) []os.FileInfo {
 # 11. 测试
 
 go test选项含义
+
 ```bash
 
 -args 传递参数到test binary(到时候补一个demo)
@@ -3196,11 +3669,12 @@ go test选项含义
 
 ```
 
-
 ## 11.1 go test
+
 一个测试函数是以`Test`为函数名前缀的函数
 一个基准测试函数是以`Benchmark`为函数名前缀的函数
 一个示例函数是以`Example`为函数名前缀的函数，提供一个由编译器保证正确性的示例文档
+
 ```golang
 - `go test -v `会打印每个函数的名字和运行时间
 - `go test -run= `会去匹配正则表达式，只有被匹配到的才会被执行
@@ -3211,13 +3685,14 @@ go test选项含义
 - `go test -v hello_test.go` 执行某一文件下的测试cases,但是该文件中如果调用了其它文件中的模块会报错
 - `go test -v hello_test.go -test.run TestHello` 测试单个函数
 ```
+
 - 组织多个测试用例
   
   即使表格中前面的数据导致了测试的失败，表格后面的测试数据依然会运行测试，因此在一个测试中我们可能了解多个失败的信息,可以使用`t.Fatal`或`t.Fatalf`停止当前测试函数
     <details>
     <summary>组织多测试用例</summary>
     <pre>
-    
+
     ```golang
     func TestIsPalindrome(t *testing.T) {
     var tests = []struct {
@@ -3331,12 +3806,14 @@ go test选项含义
     }
   
   ```
+
   还有种方式就是不导出，直接在包名下写测试函数，然后进行测试源代码
 
 - 白盒测试
 
   TBC,代码的内部实现对于测试人员来说是可见的，言外之意就是能看到内部实现,测试内部实现，这个实现可能是未导出的
 - 外部测试包
+
   ```golang
   package pprint_test
     //这时候就可以在
@@ -3354,6 +3831,7 @@ go test选项含义
     }
     
   ```
+
   使用 Go 官方的代码风格：pprint_test.go 文件，因为pprint_test在 pprint 目录下，通过在 import 时，使用` . `选项，可以直接调用PPrint()方法
 - 编写有效的测试
   1. 一个好的测试不应该引发其他无关的错误信息，它只要清晰简洁地描述问题的症状即可，有时候可能还需要一些上下文信息
@@ -3374,16 +3852,18 @@ go test选项含义
 1. `-bench`也是正则匹配,BenchmarkIsPalindrome-8,8表示的是GOMAXPROCS的值,`-benchmem`命令行标志参数将在报告中包含内存的分配数据统计
 2. 比较型的基准测试就是普通程序代码,它们通常是单参数的函数，由几个不同数量级的基准测试函数调用,通过函数参数来指定输入的大小，但是参数变量对于每个具体的基准测试都是固定的。要避免直接修改b.N来控制输入的大小。除非你将它作为一个固定大小的迭代计算输入，否则基准测试的结果将毫无意义。所有的测试cases都要保留，随着项目的发展，都需要做回归测试
 
-
 ## 11.4 刨析
+
 TBC
 
 ## 11.5 示例函数
+
 示例函数有三个用处。
+
 1. 最主要的一个是作为文档，根据示例函数的后缀名部分，godoc这个web文档服务器会将示例函数关联到某个具体函数或包本身，因此ExampleIsPalindrome示例函数将是IsPalindrome函数文档的一部分，Example示例函数将是包文档的一部分。
 2. 在go test执行测试的时候也会运行示例函数测试。如果示例函数内含有类似上面例子中的// Output:格式的注释，那么测试工具会执行这个示例函数，然后检查示例函数的标准输出与注释是否匹配
 3. 提供一个真实的演练场，它使用了Go Playground让用户可以在浏览器中在线编辑和运行每个示例函数
 
-
 # 12. appendIndex
+
 1. 线程内再重启一个线程，然后就可以通过加锁，进行隔离开，但此时任然是两个线程的间的交替
