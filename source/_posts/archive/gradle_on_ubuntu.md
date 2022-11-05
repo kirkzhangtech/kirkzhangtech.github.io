@@ -17,8 +17,8 @@ Gradle combines the best features of Ant and Maven . Unlike its predecessors, wh
 
 This guide explains how to install Gradle on Ubuntu 20.04. We’ll download the latest release of Gradle from their official website.
 
-
 ## Prerequisites
+
 The instructions assume that you are logged in as root or user with [sudo privileges](https://linuxize.com/post/how-to-create-a-sudo-user-on-ubuntu/)
 
 Installing OpenJDK

@@ -3465,19 +3465,13 @@ applications as a whole. By learning how to incorporate these recipes into your 
 able to solve many issues and enhance a number of your application features. Triggers can be one of the 
 most useful tools to add to a DBA or application developer’s arsenal. 
 
-## 5-1. Automatically Generating Column Values 
+## 5-1. Automatically Generating Column Values(how use before insert)
 
 **Problem** 
-You want to automatically generate certain column values for newly inserted rows. For example, one of 
-your tables includes a date field that you want to have populated with the current date when a record is 
-inserted. 
+You want to automatically generate certain column values for newly inserted rows. For example, one of your tables includes a date field that you want to have populated with the current date when a record is inserted. 
 
 **Solution** 
-Create a trigger that executes BEFORE INSERT on the table. The trigger will capture the system date and 
-populate this date field with it prior to inserting the row into the database. The following code 
-demonstrates how to create a trigger that provides this type of functionality for your application. In the 
-example, the EMPLOYEES table is going to have its HIRE_DATE populated with the current date when a 
-record is inserted into the EMPLOYEES table. 
+Create a trigger that executes BEFORE INSERT on the table. The trigger will capture the system date and populate this date field with it prior to inserting the row into the database. The following code demonstrates how to create a trigger that provides this type of functionality for your application. In the example, the EMPLOYEES table is going to have its HIRE_DATE populated with the current date when a record is inserted into the EMPLOYEES table. 
 
 ```sql
 CREATE or REPLACE TRIGGER populate_hire_date 
@@ -3648,14 +3642,14 @@ to update several employee records to change their manager from the old one to t
 
 **Solution** 
 Create an AFTER UPDATE trigger that will be executed only when the MANAGER_ID column is updated. The 
-following trigger uses a cursor to obtain the employees that are supervised by the old manager. The 
+following trigger uses a cursor to obtain the employees that are supervised(adj.有监督的) by the old manager. The 
 trigger then determines whether the MANAGER_ID column has been updated, and if so, it loops through 
 each employee who has the old manager in their record, and it updates the MANAGER_ID column to reflect 
 the new manager’s ID. 
- 
+```sql
 CREATE OR REPLACE TRIGGER dept_mgr_update 
-AFTER UPDATE OF manager_id 
-    ON departments 
+AFTER UPDATE OF manager_id   -- column name
+    ON departments  --table
 FOR EACH ROW 
 DECLARE 
   CURSOR emp_cur IS 
@@ -3673,65 +3667,76 @@ BEGIN
      END LOOP; 
    
 END; 
- 
+```
 This trigger will be executed only if the MANAGER_ID column of the DEPARTMENTS table is updated. 
 Triggers that have this ability provide for better database performance, because the trigger is not 
 executed each time the DEPARTMENTS table has been updated. 
-How It Works 
+
+**How It Works** 
 Triggers can specify columns that must have their values updated in order to cause the trigger to 
 execute. This allows the developer to have finer-grained control over when the trigger executes. You can 
 take a few different strategies in order to cause a trigger to execute upon an update of a specified 
 column. As is demonstrated in the solution to this recipe, you can specify the column in the trigger 
 declaration. This is one of the easiest approaches to take, and it causes the trigger to execute only if that 
-CHAPTER 5  TRIGGERS 
-98 
 specified column is updated. Alternatively, you can use a conditional predicate in the trigger body to 
 determine whether the row you had specified in the declaration is indeed being updated. A conditional 
 predicate can be used along with a specified column name to determine whether a specified action is 
 being performed on the named column. You can use three conditional predicates, INSERTING, UPDATING, 
 and DELETING. Therefore, a conditional predicate such as the following can be used to determine whether 
 a specified column is being updated by the current statement: 
- 
+
+```sql 
 IF UPDATING ('my_column') THEN 
   -- Some statements 
 END IF; 
- 
-Using a conditional predicate ensures that the code in the THEN clause is executed only if a specified 
+```
+
+Using a conditional predicate(vt.断定为) ensures that the code in the THEN clause is executed only if a specified 
 action is occurring against the named column. These predicates can also be used along with other 
 conditions to have finer-grained control over your statements. For instance, if you want to ensure that a 
 column was being updated and also that the current date does not match some end date, then you can 
 combine those two conditions with an AND boolean operator. The following code demonstrates this type 
 of conditional statement: 
- 
+
+```sql
 IF UPDATING ('my_column') AND end_date > SYSDATE THEN 
   -- Some statements 
 END IF; 
- 
+```
+
 If you prefer to use the technique demonstrated in the solution to this recipe, then you can still 
-check to ensure that the specified column is being updated by using the IF UPDATING predicate without 
-the column name specified. This technique would look like the following statement: 
- 
+check to ensure that the specified column is being updated by using the `IF UPDATING` predicate without 
+the column name specified. This technique would look like the following statement:
+
+```sql 
 IF UPDATING THEN 
   --some statements 
 END IF; 
- 
+```
+
 As mentioned in the solution to this recipe, specifying a specific column can help decrease the 
 amount of times that the trigger is fired because it is executed only when the specified column has been 
 updated. Another advantage to using this level of constraint within your triggers is that you can add 
 more triggers to the table if needed. For instance, if you needed to create another trigger to fire AFTER 
 UPDATE on another column on the same table, then it would be possible to do so with less chance of a 
-conflict. On the contrary, if you were using a simple AFTER UPDATE trigger, then chances of a conflict are 
+conflict. On the contrary(adj.相反的), if you were using a simple AFTER UPDATE trigger, then chances of a conflict are 
 more likely to occur. 
-5-4. Making a View Updatable 
-Problem 
+
+summary:  
+1. three types of update checking
+
+
+## 5-4. Making a View Updatable 
+
+**Problem** 
 You are working with a database view, and it needs to be updated. However, the view is not a simple 
 view and is therefore read-only. If you tried to update a column value on the view, then you would 
 receive an error. 
-Solution 
-Use an INSTEAD OF trigger to specify the result of an update against the view, thus making the view 
+
+**Solution** 
+Use an `INSTEAD OF` trigger to specify the result of an update against the view, thus making the view 
 updatable. For example, let’s begin with the following view definition: 
-  CHAPTER 5  TRIGGERS 
-99 
+```sql
 CREATE OR REPLACE VIEW EMP_JOB_VIEW AS 
   SELECT EMP.employee_ID, EMP.first_name, EMP.last_name, 
          EMP.email, JOB.job_title, 
@@ -3742,11 +3747,12 @@ CREATE OR REPLACE VIEW EMP_JOB_VIEW AS
   WHERE JOB.job_id = EMP.job_id 
   AND DEPT.department_id = EMP.department_id 
   ORDER BY EMP.last_name;  
- 
+```
+
 Given the EMP_JOB_VIEW just shown, if you attempt to make an update to a column, then you will 
 receive an error. The following demonstrates the consequences of attempting to update the 
 DEPARTMENT_NAME column of the view. 
- 
+```sql
 SQL> update emp_job_view 
   2  set department_name = 'dept' 
   3  where department_name = 'Sales'; 
@@ -3754,13 +3760,14 @@ where department_name = 'Sales'
       * 
 ERROR at line 3: 
 ORA-01779: cannot modify a column which maps to a non key-preserved table 
- 
-However, using the INSTEAD OF clause, you can create a trigger to implement the logic for an UPDATE 
-statement issued against the view. Here’s an example: 
- 
+```
+However, using the `INSTEAD OF` clause, you can create a trigger to implement the logic for an UPDATE 
+statement issued against the view. Here’s an example:
+
+```sql
 CREATE OR REPLACE TRIGGER update_emp_view 
 INSTEAD OF UPDATE ON emp_job_view 
-REFERENCING NEW AS NEW 
+REFERENCING NEW AS NEW   -- note
 FOR EACH ROW 
 DECLARE 
   emp_rec                        employees%ROWTYPE; 
@@ -3784,8 +3791,6 @@ BEGIN
      
     UPDATE employees 
     SET email = :new.email, 
-CHAPTER 5  TRIGGERS 
-100 
     first_name = :new.first_name, 
     last_name = :new.last_name 
     WHERE employee_id = :new.employee_id;
@@ -3793,21 +3798,28 @@ EXCEPTION
  WHEN NO_DATA_FOUND THEN 
     DBMS_OUTPUT.PUT_LINE('No matching record exists'); 
 END; 
+```
+
 The following are the results of issuing an update on the view when the UPDATE_EMP_VIEW trigger is in
 place. The UPDATE is issued, and the INSTEAD OF trigger executes instead of the database’s built-in logic.
 The result is that the rows containing a DEPARTMENT_NAME of Sales will be updated in the view. Hence, the
-underlying row in the DEPARTMENTS table is updated to reflect the change.  
+underlying(v.放在…的下面) row in the DEPARTMENTS table is updated to reflect the change.
+
+```sql
 SQL> update emp_job_view 
   2  set department_name = 'Sales Dept' 
   3  where department_name = 'Sales'; 
 34 rows updated. 
+```
 If you were to query the view after performing the update, then you would see that the view data has
 been updated to reflect the requested change. If you read through the code in the trigger body, you can
-see the magician behind the curtain. 
-How It Works 
+see the magician behind the curtain(n.幕;窗帘).
+
+**How It Works** 
 Oftentimes it is beneficial to have access to view data via a trigger event. However, there are some views
-that are read-only, and data manipulation is not allowed. Views that include any of the following
-constructs are not updatable and therefore require the use of an INSTEAD OF trigger for manipulation: 
+that are read-only, and data manipulation(n.操纵;操作) is not allowed. Views that include any of the following
+constructs are not updatable and therefore require the use of an `INSTEAD OF` trigger for manipulation: 
+```
 •SET 
 •DISTINCT 
 •GROUP BY, ORDER BY, CONNECT BY 
@@ -3816,33 +3828,40 @@ constructs are not updatable and therefore require the use of an INSTEAD OF trig
 •Subquery within a SELECT or containing the WITH READ ONLY clause 
 •Collection expressions 
 •Aggregate or analytic functions 
+```
 A trigger that has been created with the INSTEAD OF clause allows you to declare a view name to be acted
 upon, and then once the specified event occurs, the trigger is fired, which causes the actual INSERT,
 UPDATE, or DELETE statement to occur. The trigger body actually acts upon the real tables behind the
 scenes using the values that have been specified in the action. 
-The format for the INSTEAD OF trigger is the same as any other trigger with the addition of the
+The format for the `INSTEAD OF` trigger is the same as any other trigger with the addition of the
 INSTEAD OF clause. You can see in the solution to this recipe that an additional clause has been specified,
-namely, REFERENCING NEW AS NEW. The REFERENCING clause can be used by triggers to specify how you 
-  CHAPTER 5  TRIGGERS 
-101 
-want to prefix :NEW or :OLD values. This allows you to use any alias for :NEW or :OLD, so it is possible to 
-reference a new value using :blah.my_value if you used the following clause when you declared your 
+namely, `REFERENCING NEW AS NEW`. The `REFERENCING` clause can be used by triggers to specify how you 
+want to prefix `:NEW` or `:OLD` values. This allows you to use any alias for `:NEW` or `:OLD`, so it is possible to 
+reference a new value using `:blah.my_value` if you used the following clause when you declared your 
 trigger: 
- 
+```sql
 REFERENCING NEW AS BLAH 
- 
+```
+
 Although there is no real magic at work behind an INSTEAD OF trigger, they do abstract some of the 
 implementation details away from the typical user such that working with a view is no different from 
 working with an actual table. 
-5-5. Altering the Functionality of Applications 
-Problem 
+
+summary:  
+1. (the changes of view be reflected at basic table)  
+
+
+## 5-5. Altering the Functionality of Applications
+
+**Problem**
 You want to modify a third-party application, but you are not in a position to change the source code. 
 Either you are not allowed to change the source or you simply do not have access to make changes. 
 As an example, let’s consider a form in one application used to create jobs within the JOBS table. You 
 want to enhance the application so that mail is sent to all the administrative staff members when a new 
 job is created. However, your company does not own the license to modify the source code of the 
-application. 
-Solution 
+application.
+
+**Solution** 
 You can often use triggers to add functionality to an application behind the scenes, without modifying 
 application code. Sometimes you have to think creatively to come up with a trigger or blend of triggers 
 that accomplishes your goal.  
@@ -3852,7 +3871,7 @@ send an e-mail containing that information to all administrative personnel. In t
 some necessary information regarding the new job entry is obtained and processed by the SEND_EMAIL 
 procedure, which in turn sends the mail. 
 First, here is the code for the trigger: 
- 
+```sql
 CREATE OR REPLACE TRIGGER send_job_alert 
   AFTER INSERT ON jobs 
   FOR EACH ROW 
@@ -3869,11 +3888,10 @@ BEGIN
   SEND_EMAIL(to_address, v_subject,  v_message); 
                
 END; 
- 
-CHAPTER 5  TRIGGERS 
-102 
+``` 
 Next is the stored procedure that actually sends the e-mail: 
- 
+
+```sql
 CREATE OR REPLACE PROCEDURE send_email(to_address IN VARCHAR2, 
                                         subject IN VARCHAR2, 
                                         message IN VARCHAR2) AS 
@@ -3884,24 +3902,29 @@ BEGIN
                message => message, 
              mime_type => 'text; charset=us-ascii'); 
 END; 
- 
+```
+
 A trigger has the ability to call any other PL/SQL named block as long as it is in the same schema or 
 the schema that contains the trigger has the correct privileges to access the named block in the other 
 schema. 
-How It Works 
+
+**How It Works**
+
 The ability to use triggers for altering third-party applications can be extremely beneficial. Using a DML 
 trigger on INSERT, UPDATE, or DELETE of a particular table is a good way to control what occurs with 
 application data once a database event occurs. This technique will be transparent to any application 
 users because the trigger would most likely be executed when the user saves a record via a button that is 
 built into the application. 
+
 Although creating database triggers to alter functionality can be beneficial, you must also be careful 
 not to create a trigger that will have an adverse effect on the application. For instance, if you create a 
 trigger that updates some data that has been entered and the application is expecting to do something 
-different with the data, then the application may not work as expected. One way to remedy this issue 
+different with the data, then the application may not work as expected. One way to remedy(vt.补救;治疗;纠正) this issue 
 would be to create an autonomous transaction. Autonomous transactions ensure that an application 
 continues to run even if a dependent body of code fails. In this case, an autonomous transaction could 
 prevent a failed trigger from crashing an application. To learn more about using autonomous 
 transactions, please refer to Recipe 2-13. 
+
 Another issue that could arise is one where too many triggers are created on the same table for the 
 same event. You must be careful when creating triggers and be aware of all other triggers that will be 
 executed during the same event. By default, Oracle does not fire triggers in any specific order, and the 
@@ -3910,37 +3933,46 @@ other triggers, because your application will eventually fail! If you must creat
 execute on the same table for the same event, then please ensure that you are using proper techniques 
 to make the triggers execute in the correct order. For more information on this topic, please refer to 
 Recipe 5-11. 
+
 The trigger in this particular recipe called a stored procedure. This was done so that the trigger body 
 performed a specific task and remained concise. Triggers can call as many stored procedures as 
 required, as long as the trigger itself is less than or equal to 32KB in size. The stored procedure in the 
 solution to this recipe is used to send an e-mail. As such, maintaining a separate procedure to perform 
 the task of sending e-mail will allow the trigger body to remain concise, and the procedure can also be 
 used elsewhere if needed. 
-  CHAPTER 5  TRIGGERS 
-103 
 USING ORACLE’S UTL_MAIL PACKAGE 
 The e-mail in the solution to this recipe is sent using Oracle’s UTL_MAIL package. You will learn more 
 about using this package in a later chapter, but for the purposes of testing this recipe, it is important to 
 know that the UTL_MAIL package is not enabled by default. To install it, you must log in as the SYS user 
 and execute the utlmail.sql and prvtmail.plb scripts that reside within the 
-$ORACLE_HOME/rdbms/admin directory.  
+`$ORACLE_HOME/rdbms/admin` directory.  
 An outgoing mail server must also be defined by setting the SMTP_OUT_SERVER initialization parameter 
-prior to use. 
-5-6. Validating Input Data 
-Problem 
+prior to use.
+
+summary:  
+1. You must be careful when creating triggers and be aware of all other triggers that will be executed during the same event,Do not create triggers that depend upon 
+other triggers
+2. triggers invoked no order
+3. `UTL_MAIL` PACKAGE is good tool send out mail
+
+## 5-6. Validating Input Data 
+
+**Problem** 
 You want to validate data before allowing it to be inserted into a table. If the input data does not pass 
 your business-rules test, you want the INSERT statement to fail. For example, you want to ensure that an 
 e-mail address field in the EMPLOYEE table never contains the domain portion of an e-mail address, in 
 other words, that it never contains the @ character or anything following the @ character. 
+
 ■ Note Recipe 5-7 presents an alternative solution to this same problem that involves silently cleansing erroneous 
 data as it is inserted.  
-Solution 
-Generally speaking, do validation using BEFORE triggers, because that lets you trap errors prior to changes 
+
+**Solution**
+Generally speaking, do validation using BEFORE triggers, because that lets you trap(vt.诱捕;使…受限制) errors prior to changes 
 being made to the data. For this recipe, you can write a BEFORE INSERT trigger to examine the e-mail 
 address for any new employee. Raise an error if that address contains an @ character. The following 
 example demonstrates a trigger that uses this technique. If an attempt to enter an invalid e-mail address 
 occurs, an error will be raised. 
- 
+```sql
 CREATE OR REPLACE TRIGGER check_email_address 
 BEFORE INSERT ON employees 
 FOR EACH ROW 
@@ -3949,33 +3981,35 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20001, 'INVALID EMAIL ADDRESS'); 
   END IF; 
 END; 
-CHAPTER 5  TRIGGERS 
-104 
-How It Works 
+```
+
+**How It Works** 
 A BEFORE INSERT trigger is useful for performing the validation of data before it is inserted into the 
 database. In the solution to this recipe, a trigger is created that will check to ensure that a string that 
-supposedly contains an e-mail address does indeed have an @ character within it. The trigger uses the 
-Oracle built-in INSTR function inside a conditional statement to determine whether the @ character 
+supposedly(adv.可能;按照推测) contains an e-mail address does indeed have an @ character within it. The trigger uses the 
+Oracle built-in `INSTR` function inside a conditional statement to determine whether the @ character 
 exists. If the character does not exist within the string, then the trigger will raise a user-defined error 
 message. On the other hand, if the string does contain the character, then the trigger will not do 
-anything. 
-Coding a trigger for validation of data is quite common. Although the solution to this recipe checks 
+anything. Coding a trigger for validation of data is quite common. Although the solution to this recipe checks 
 to ensure that an e-mail address is valid, you could write similar triggers to perform similar validation on 
 other datatypes. 
-5-7. Scrubbing Input Data 
-Problem 
-You are interested in examining and correcting user input prior to it being inserted into a database table.  
-Solution 
+
+## 5-7. Scrubbing(v.用力擦洗) Input Data 
+
+**Problem** 
+You are interested in examining(检查) and correcting user input prior to it being inserted into a database table.  
+
+**Solution**
 Use a BEFORE INSERT trigger to scrub the data prior to allowing it to be inserted into the table. By using a 
 trigger, you will have access to the data before it is inserted, which will provide you with the ability to 
 assess the data before it is persisted.  
 In this particular example, a trigger is being used to examine the data that was entered on a form for 
 insertion into the EMPLOYEES table. The e-mail field is being validated to ensure that it is in a valid format. 
-In particular, the e-mail field for the EMPLOYEES table includes only the address portion to the left of the @ 
+In particular, the e-mail field for the EMPLOYEES table includes only the address portion(n.部分;一份) to the left of the @ 
 symbol. This trigger ensures that even if someone had entered the entire e-mail address, then only the 
 valid portion would be inserted into the database. The following example demonstrates this 
 functionality: 
- 
+```sql
 CREATE OR REPLACE TRIGGER check_email_address 
 BEFORE INSERT ON employees 
 FOR EACH ROW 
@@ -3987,41 +4021,51 @@ BEGIN
   END IF; 
  :new.email := temp_email; 
 END; 
- 
+```
+
 The trigger in this example uses a couple of different PL/SQL built-in functions to ensure that the 
-data being inserted into the EMPLOYEES.EMAIL table is formatted correctly. 
-How It Works 
+data being inserted into the EMPLOYEES.EMAIL table is formatted correctly.
+
+**How It Works**
+
 BEFORE INSERT triggers work very nicely for verifying data prior to inserting it into the database. Since 
-insert triggers have access to the :NEW qualifier, the values that are going to be inserted into the database 
-  CHAPTER 5  TRIGGERS 
-105 
-table can be tested to ensure that they conform to the proper standards and can then be manipulated if 
-need be. When used in a BEFORE trigger, the :NEW value can be altered, allowing triggers to change values 
-prior to when they are inserted. The :OLD qualifier will allow one to access the NULL old values, but they 
+insert triggers have access to the `:NEW` qualifier, the values that are going to be inserted into the database 
+table can be tested to ensure that they conform(vi.符合;遵照) to the proper standards and can then be manipulated(v.操作) if 
+need be. When used in a BEFORE trigger, the `:NEW` value can be altered, allowing triggers to change values 
+prior to when they are inserted. The `:OLD` qualifier will allow one to access the `NULL` old values, but they 
 cannot be changed. 
+
 Validating data with triggers can be very useful if used appropriately. As a rule of thumb, you should 
 not attempt to create triggers for validating data that can be performed declaratively. For instance, if you 
 need to ensure that a column of data is never NULL, then you should place a NOT NULL constraint on that 
-column. There are only a couple of circumstances where you are required to enforce constraints within 
+column.There are only a couple of circumstances where you are required to enforce(vt. 实施，执行；强迫，强制) constraints within 
 triggers, and those are as follows: 
-• If you do not have access to the database objects to alter the table and add 
-constraints because doing so would cause issues with a program that is in place 
+• If you do not have access to the database objects to alter the table and add constraints because doing so would cause issues with a program that is in place 
 • If the business logic cannot be reflected in a simple, declarative trigger 
-• If your application requires a constraint to be enforced only part of the time 
+• If your application requires a constraint to be enforced only part of the time
  
 In all other circumstances, try to use database-level constraints because that is their job, and it can 
 be done much more efficiently than using a trigger. However, trigger validation is perfect for situations 
 such as those depicted in the solution to this recipe, where complex business rules must be validated 
-that are not possible with built-in constraints. 
-5-8. Replacing a Column’s Value 
-Problem 
+that are not possible with built-in constraints.
+
+summary:  
+1. above three rules must be clear
+2. `INSTR`'s functionality
+3. try to use database-level constraints because that is their job, and it can be done much more efficiently than using a trigger
+
+
+## 5-8. Replacing a Column’s Value 
+
+**Problem**
 You want to verify that a column value is in the correct format when it is entered into the database.  If it 
 is not in the correct format, then you want to adjust the value so that it is in the correct format before 
 inserting into the database. For example, upon creation of an employee record, it is essential that the e-
 mail address follows a certain format.  If the e-mail address is not uniform with other employee e-mail 
 addresses, then it needs to be adjusted.  You want to write a trigger that ensures that the new employee 
 EMAIL value will be in the correct format. 
-Solution 
+
+**Solution** 
 Check the format using a BEFORE trigger. For this recipe, use a BEFORE INSERT trigger to determine 
 whether the new EMAIL value is in the correct format.  If it is not, then adjust the value accordingly so that 
 the new e-mail address will start with the first letter of the employee’s first name, followed by the 
@@ -4029,7 +4073,8 @@ employee’s last name.  If the new e-mail address is not unique, then a number 
 of it to ensure that it will be unique. 
 The following trigger demonstrates a BEFORE INSERT trigger that checks and updates the EMAIL value 
 as described. This trigger will be fired whenever someone inserts values into the EMPLOYEES table. 
- 
+
+```sql
 CREATE OR REPLACE TRIGGER populate_emp_email 
 BEFORE INSERT ON employees 
 FOR EACH ROW 
@@ -4038,11 +4083,9 @@ DECLARE
   success_flag         BOOLEAN := FALSE; 
   temp_email           employees.email%TYPE; 
   email_idx            NUMBER := 0; 
-CHAPTER 5  TRIGGERS 
-106 
 BEGIN 
   -- check to see if the email address is in the correct format 
-  IF :new.email != UPPER(SUBSTR(:new.first_name,0,1) || :new.last_name) THEN 
+  IF :new.email != UPPER(SUBSTR(:new.first_name,0,1) || :new.last_name) THEN   --- more like linux style
     -- check the database to ensure that the new email address will be unique 
     temp_email := UPPER(SUBSTR(:new.first_name,0,1) || :new.last_name); 
     WHILE success_flag = FALSE LOOP 
@@ -4064,12 +4107,14 @@ BEGIN
   END IF; 
  
 END; 
- 
+```
+
 The value of the e-mail address must always follow the same format, and this trigger ensures that 
 the any new EMAIL values will follow that format. If the new EMAIL value does follow the correct format, 
 then it will be inserted into the database without changes, but if it does not follow the correct format, 
 then this trigger will adjust the value accordingly. 
-How It Works 
+
+**How It Works** 
 Another frequent usage of triggers is to replace a value that someone is trying to insert into the database 
 with some other value. Much like ensuring data integrity, you must write to the :NEW qualifier value in 
 order to replace another value that was entered. When the :NEW value is overwritten, then that new value 
@@ -4081,23 +4126,27 @@ Any DML trigger can include multiple trigger events, including INSERT, UPDATE, o
 combination of these three events can be used to fire a trigger. The events that are to be used for firing a 
 trigger must be listed with the OR keyword between them. The following line of code is an example of 
 using all three events on a BEFORE trigger: 
- 
+
+```sql
 BEFORE INSERT OR UPDATE OR DELETE ON employees 
- 
+```
+
 The events can be in any order within the BEFORE clause. Any combination of these three events can 
 also be used with the AFTER trigger. The main difference between the BEFORE and AFTER triggers is what 
 type of access each has to the :NEW and :OLD qualifiers. Table 4-1 lists the different types of triggers and 
 their subsequent access to the qualifiers. 
-  CHAPTER 5  TRIGGERS 
-107 
-Table 4-1. Trigger Types and Qualifier Acccess 
+Table 4-1. 
+
+```sql
+Trigger Types and Qualifier Acccess 
 Trigger Type :NEW :OLD 
 BEFORE Writeable Always contains NULL 
 AFTER Not writeable  Always contains populated values 
 INSERT Contains values  Contains NULL 
 DELETE Contains NULL  Contains populated values 
 UPDATE Contains populated values Contains populated values 
- 
+```
+
 A BEFORE trigger has write access to values using the :NEW qualifier, and AFTER triggers do not since 
 the data has already been inserted or updated in the table. INSERT triggers have meaningful access to 
 values with the :NEW qualifier only; variables using the :OLD qualifier will be NULL. UPDATE triggers have 
@@ -4107,14 +4156,23 @@ Performing tasks such as replacing values with triggers should be used only on a
 This type of trigger can cause confusion for those who do not have access to the trigger code. It is also 
 important to ensure that triggers do not act upon each other in order to avoid mutating table errors. This 
 can occur if one trigger is updating the values of a table and another trigger is attempting to examine the 
-values of the table at the same time. 
-5-9. Triggering on a System Event 
-Problem 
+values of the table at the same time.
+
+summary:  
+1. BEFORE trigger has write access,  AFTER triggers do not
+2. DELETE triggers have meaningful access only to values using the :old qualifier; values using the :new qualifier will be NULL
+3. INSERT triggers have meaningful access to values with the :NEW qualifier only; variables using the :OLD qualifier will be NULL
+4. UPDATE triggers have meaningful access to values using both the :NEW and :OLD qualifiers
+
+## 5-9. Triggering on a System Event 
+
+**Problem** 
 You want to write a trigger that executes on a system event such as a login. For example, you want to 
 increase security a bit for your database and ensure that users are logging into the database only during 
 the week. In an effort to help control security, you want to receive an e-mail alert if someone logs into 
 the database on the weekend. 
-Solution 
+
+**Solution**
 Create a system-level trigger that will log an event into a table if anyone logs into the database during off-
 hours. To notify you as promptly as possible, it may also be a good idea to send an e-mail when this 
 event occurs. To create a system-level trigger, use the AFTER LOGON ON DATABASE clause in your trigger 
@@ -4122,20 +4180,18 @@ definition.
 The first step in creating this solution is to create an audit table. In the audit table you will want to 
 capture the IP address of the user’s machine, the time and date of the login, and the authenticated 
 username. The following code will create a table to hold this information: 
- 
+```sql
 CREATE TABLE login_audit_table( 
 ID                        NUMBER PRIMARY KEY,   -- Populated by sequence number 
 login_audit_seq 
 AUDIT_DATE                DATE NOT NULL, 
-CHAPTER 5  TRIGGERS 
-108 
 AUDIT_USER          VARCHAR2(50) NOT NULL, 
 AUDIT_IP            VARCHAR2(50) NOT NULL, 
 AUDIT_HOST          VARCHAR2(50) NOT NULL); 
- 
+```
 Now that the auditing table has been created, it is time to create the trigger. The following code 
 demonstrates the creation of a logon trigger: 
- 
+```sql
 CREATE OR REPLACE TRIGGER login_audit_event 
 AFTER LOGON ON DATABASE 
 DECLARE 
@@ -4158,14 +4214,17 @@ BEGIN
                         v_message); 
  
 END; 
- 
+```
+
 This simple trigger will fire each time someone logs into the database. To reduce the overhead of 
 this trigger being initiated during normal business hours, this trigger should be disabled during normal 
 business hours. It is possible to create a stored procedure that disables and enables the trigger and then 
 schedule that procedure to be executed at certain times. However, if there are only a few users who will 
 be logging into the database each day, then trigger controls such as these are not necessary. 
-How It Works 
+
+**How It Works**
 Triggers are a great way to audit system events on a database. There are several types of system triggers: 
+```sql
 • AFTER STARTUP 
 • BEFORE SHUTDOWN 
 • AFTER LOGON 
@@ -4173,15 +4232,15 @@ Triggers are a great way to audit system events on a database. There are several
 • AFTER SUSPEND 
 • AFTER SERVERERROR 
 • AFTER DB_ROLE_CHANGE 
-  CHAPTER 5  TRIGGERS 
-109 
+```
 Each of these system events can be correlated to a trigger when the trigger includes the ON DATABASE 
 clause, as shown here: 
- 
+
+```sql
 CREATE OR REPLACE system_trigger 
 trigger_type ON DATABASE 
 …   
- 
+```
 System triggers fire once for each correlating system event that occurs. Therefore, if there is a system 
 trigger defined for both the LOGON and LOGOFF events, each will be fired one time for every user who logs 
 onto or off the database. System triggers are excellent tools for helping audit database system events. 
@@ -4200,27 +4259,39 @@ the event occurs.
 The SERVERERROR event is fired whenever an Oracle server error occurs. The SERVERERROR event can 
 be useful for detecting user SQL errors or logging system errors. However, there are a few cases in which 
 an Oracle server error does not trigger this event. Those Oracle errors are as follows: 
+
+```sql
 • ORA-01403:  No data found 
 • ORA-01422:  Exact fetch returns more than requested number of rows 
 • ORA-01423:  Error encountered while checking for extra rows in exact fetch 
 • ORA-01034:  ORACLE not available 
 • ORA-04030:  Out of process memory when trying to allocate bytes 
- 
+``` 
 System event triggers can assist a DBA in administration of the database. These triggers can also 
 help developers if SQL errors are triggering SERVERERROR events and notifying of possible SQL problems 
 in the application. 
-5-10. Triggering on a Schema-Related Event 
-Problem 
+
+summary:  
+1. System triggers are excellent tools for helping audit database system events
+2. the different system events have access only to certain types of events
+3. SHUTDOWN triggers have access to the BEFORE event only because the database is unavailable after SHUTDOWN
+4. oracle contains itself audit subsystem that us powerful
+
+
+## 5-10. Triggering on a Schema-Related Event 
+
+**Problem** 
 You want to trigger on an event related to a change in a database schema. For example, if someone drops 
 a database table on accident, it could cause much time and grief attempting to restore and recover data 
 to its original state. Rather than doing so, you want to place a control mechanism into the database that 
 will ensure that administrators cannot delete essential tables. 
-CHAPTER 5  TRIGGERS 
-110 
-Solution 
+
+**Solution** 
 Use a PL/SQL database trigger to raise an exception and send an alert to the DBA if someone attempts to
 drop a table. This will prevent any tables from inadvertently being dropped, and it will also allow the
 administrator to know whether someone is potentially trying to drop tables. 
+
+```sql
 CREATE OR REPLACE TRIGGER ddl_trigger
 BEFORE CREATE OR ALTER OR DROP 
 ON SCHEMA 
@@ -4241,23 +4312,28 @@ BEGIN
   SEND_EMAIL('DBA-GROUP@mycompany.com', 
              v_subject, 
              v_message);
-END; 
+END;
+```
 In this situation, both the user who attempts to drop the table and the members of the DBA-GROUP
 mailing list will be notified. 
-How It Works 
+
+**How It Works**
 You can use triggers to log or prevent certain database activities from occurring. In this recipe, you saw
 how to create a trigger that will prevent a table from being dropped. The trigger will be executed prior to
 any CREATE, ALTER, or DROP within the current schema. Within the body of the trigger, the event is checked
 to see whether it is a DROP, and actions are taken if so.  
 ■ Note To be even more fine-grained, it is possible to specify a particular schema for the trigger to use.  Doing so
 would look like the following: 
+
+```sql
 BEFORE CREATE ALTER OR DROP ON HR.SCHEMA 
 … 
-  CHAPTER 5  TRIGGERS 
-111 
+```
+
 There are several other DDL trigger operations that can be used to help administer a database or 
 application. The following are these operations along with the type of trigger that can be used with it: 
- 
+
+```sql
 BEFORE / AFTER ALTER 
 BEFORE / AFTER ANALYZE 
 BEFORE / AFTER ASSOCIATE STATISTICS 
@@ -4273,7 +4349,8 @@ BEFORE / AFTER RENAME
 BEFORE / AFTER REVOKE 
 BEFORE / AFTER TRUNCATE 
 AFTER SUSPEND 
- 
+```
+
 All DDL triggers can be fired using either BEFORE or AFTER event types. In most cases, triggers that are 
 fired before a DDL event occurs are used to prevent the event from happening. On the other hand, 
 triggers that are fired after an event occurs usually log information or send an e-mail. In the solution to 
@@ -4281,16 +4358,19 @@ this recipe, a combination of those two situations exists. The BEFORE event type
 trigger is being used to prevent the tables from being dropped. However, logging or e-mailing can also 
 occur to advise interested parties of the event. Typically a logging event occurs with an AFTER trigger so 
 that the event has already occurred and the database is in a consistent state prior to the logging. 
-5-11. Firing Two Triggers on the Same Event 
-Problem 
+
+## 5-11. Firing Two Triggers on the Same Event 
+
+**Problem** 
 There is a requirement to create a trigger to enter the SYSDATE into the HIRE_DATE column of the 
 LOCATIONS table. However, there is already a trigger in place that is fired BEFORE INSERT on the table, and 
 you do not want the two triggers to conflict. 
-Solution 
+
+**Solution**
 Use the FOLLOWS clause to ensure the ordering of the execution of the triggers. The following example 
 shows the creation of two triggers that are to be executed BEFORE INSERT on the EMPLOYEES table.  
 First, we’ll create a trigger to verify that a new employee’s salary falls within range: 
- 
+```sql 
 CREATE OR REPLACE TRIGGER verify_emp_salary 
 BEFORE INSERT ON employees 
 FOR EACH ROW 
@@ -4300,8 +4380,6 @@ DECLARE
 BEGIN 
   SELECT min_salary, max_salary 
   INTO v_min_sal, v_max_sal 
-CHAPTER 5  TRIGGERS 
-112 
   FROM JOBS 
   WHERE JOB_ID = :new.JOB_ID; 
  
@@ -4313,9 +4391,9 @@ CHAPTER 5  TRIGGERS
        'You cannot give a salary less than the min in this category'); 
   END IF; 
 END; 
- 
+```
 Next, you’ll create a trigger to force the hire date to be the current date: 
- 
+```sql
 CREATE or REPLACE TRIGGER populate_hire_date 
 BEFORE INSERT 
     ON employees 
@@ -4325,42 +4403,53 @@ DECLARE
 BEGIN 
     :new.hire_date := sysdate; 
 END; 
+```
  
 Since it does not make sense to change the hire date if the record will not be inserted, you want the 
 VERIFY_EMP_SALARY trigger to fire first. The FOLLOWS clause in the POPULATE_HIRE_DATE trigger ensures that 
 this will be the case. 
-How It Works 
-Oracle 11g introduced the FOLLOWS clause into the Oracle trigger that allows you to specify the ordering in 
+
+**How It Works**
+Oracle 11g introduced the `FOLLOWS` clause into the Oracle trigger that allows you to specify the ordering in 
 which triggers should execute. The FOLLOWS clause specifies the trigger that should fire prior to the trigger 
 being created. In other words, if you specify the FOLLOWS clause when creating a trigger, then you should 
 name a trigger that you want to have executed prior to your new trigger. Hence, if you specify a trigger in 
 the FOLLOWS clause that does not already exist, you will receive a compile error. 
-■ Note The PRECEDES clause was introduced in Oracle 11g as well. You can use this clause to specify the 
-opposite situation that is resolved using the FOLLOWS clause. If you specify PRECEDES instead of FOLLOWS, then the 
-trigger being created will fire prior to the trigger that you specify after the PRECEDES clause. 
+
+■ Note The `PRECEDES`(v.领先(precede的三单形式);在…之先) clause was introduced in Oracle 11g as well. You can use this clause to specify the 
+opposite situation that is resolved using the FOLLOWS clause. If you specify `PRECEDES` instead of `FOLLOWS`, then the 
+trigger being created will fire prior to the trigger that you specify after the `PRECEDES` clause. 
 By default, Oracle triggers fire in any arbitrary ordering. In the past, there was no way to guarantee 
-the order in which triggers were to be executed. The addition of the FOLLOWS clause now allows you to do 
+the order in which triggers were to be executed. The addition of the `FOLLOWS` clause now allows you to do 
 so. However, it is important that you do not make triggers dependent upon each other. Doing so could 
 cause issues of one of the triggers were to be dropped for some reason. It is bad design to create a trigger 
-that depends on the successful completion of another trigger, so the FOLLOWS clause should be used only 
+that depends on the successful completion of another trigger, so the `FOLLOWS` clause should be used only 
 in situations where there is no dependency. 
-  CHAPTER 5  TRIGGERS 
-113 
-5-12. Creating a Trigger That Fires on Multiple Events 
-Problem 
+
+summary:  
+1. if you wanna make sure two triggers keep up order to be executed, please use follow clause
+2. dependent triggers is bad design
+
+
+
+## 5-12. Creating a Trigger That Fires on Multiple Events
+
+**Problem** 
 You have logic that is very similar for two different events. Thus, you want to combine that logic into a 
 single trigger that fires for both. For example, let’s assume that we want to create a single trigger on the 
 EMPLOYEES table with code to fire after each row that is inserted or modified and also with code to fire at 
-the end of each of those statements’ executions.  
-Solution 
-Use a compound trigger to combine all the triggers into a single body of code. The trigger in this solution 
+the end of each of those statements’ executions. 
+
+**Solution** 
+Use a compound(adj.复合的;混合的) trigger to combine all the triggers into a single body of code. The trigger in this solution 
 will execute based upon various timing points. It will execute AFTER EACH ROW in the EMPLOYEES table has 
 been updated, as well as AFTER the entire update statement has been executed. The AFTER EACH ROW 
 section of the trigger will audit the inserts and updates made on the table, and the AFTER STATEMENT 
 section of the trigger will send notification to the DBA regarding audits that have occurred on the table. 
-The following code shows the creation of a compound trigger that comprises each of these two 
+The following code shows the creation of a compound trigger that comprises(vt.包含;由…组成) each of these two 
 triggers into one body of code: 
- 
+
+```sql 
 CREATE OR REPLACE TRIGGER emp_table_auditing 
   FOR INSERT OR UPDATE ON employees 
     COMPOUND TRIGGER 
@@ -4392,8 +4481,6 @@ CREATE OR REPLACE TRIGGER emp_table_auditing
         INSERT INTO update_access_log VALUES( 
           update_access_seq.nextval, 
           SYS_CONTEXT('USERENV','SESSION_USER'), 
-CHAPTER 5  TRIGGERS 
-114 
           sysdate, 
           :old.salary, 
           :new.salary, 
@@ -4420,28 +4507,30 @@ CHAPTER 5  TRIGGERS
   END AFTER STATEMENT; 
  
 END emp_table_auditing; 
- 
+
+``` 
 The insert and update events are audited via the trigger that is coded using the AFTER EACH ROW 
 clause, and then the AFTER STATEMENT trigger sends a notification to alert the DBA of each audit. The two 
 triggers share a global variable that is declared prior to the code for the first trigger. 
-How It Works 
+
+**How It Works**
+
 Prior to Oracle 11g, there was no easy way to create multiple triggers that were able to share the same global 
 variable. The compound trigger was introduced with the release of Oracle 11g, and it allows multiple triggers for 
 the same table to be embodied within a single trigger. Compound triggers allow you to code different timing 
 points within the same trigger; those different events are as follows in logical execution order: 
+```sql
 • BEFORE STATEMENT 
 • BEFORE EACH ROW 
 • AFTER EACH ROW 
 • AFTER STATEMENT 
- 
+```
 Each of these timing points allows for the declaration of different trigger execution points. Using a 
 compound trigger allows you to create a trigger that performs some actions: BEFORE INSERT on a table 
 and AFTER INSERT on a table all within the same trigger body. In the case of the solution to this recipe, an 
 AFTER UPDATE trigger is coded within the same compound trigger as an AFTER STATEMENT trigger. The 
 logical order of execution allows you to code triggers that depend upon others using this technique. In 
 other recipes within this chapter, you have learned that it is not good programming practice to code 
-  CHAPTER 5  TRIGGERS 
-115 
 triggers that depend upon each other. This is mainly because if one trigger is invalidated or dropped, 
 then the other trigger that depends on it will automatically be invalidated. Since a compound trigger is 
 one body of code, either the entire trigger is valid or invalid. Therefore, the failure points between two 
@@ -4454,52 +4543,59 @@ within this section is visible to all triggers within the compound trigger body,
 solution, you can use the first AFTER EACH ROW to update the value of the global variable, which is then in 
 turn used within the AFTER STATEMENT trigger. The overall compound trigger structure is as follows: 
  
-CREATE OR REPLACE TRIGGER trigger-name 
-   FOR trigger-action ON table-name 
+```sql
+CREATE OR REPLACE TRIGGER trigger_name 
+   FOR trigger_action ON table_name 
      COMPOUND TRIGGER 
     -- Global declaration section 
    global_variable VARCHAR2(10); 
-    BEFORE STATEMENT IS 
-   BEGIN 
+  BEFORE STATEMENT IS 
+  BEGIN 
      NULL; 
  -- Statements go here. 
-   END BEFORE STATEMENT; 
-    BEFORE EACH ROW IS 
-   BEGIN 
-     NULL; 
--- Statements go here.   END BEFORE EACH ROW; 
-    AFTER EACH ROW IS  
+  END BEFORE STATEMENT; 
+  
+  BEFORE EACH ROW IS 
+  BEGIN 
+    NULL; 
+-- Statements go here.   
+  END BEFORE EACH ROW; 
+  
+  AFTER EACH ROW IS  
   BEGIN 
      NULL; 
 -- Statements go here. 
-   END AFTER EACH ROW; 
-    AFTER STATEMENT IS 
-   BEGIN 
-     NULL; 
+  END AFTER EACH ROW; 
+  
+  AFTER STATEMENT IS 
+  BEGIN 
+    NULL; 
  -- Statements go here. 
-   END AFTER STATEMENT; 
-  END trigger-name;  
- 
-Compound triggers can be very useful for incorporating several different timed events on the same 
+  END AFTER STATEMENT; 
+  
+  END trigger_name;  
+```
+Compound triggers can be very useful for incorporating several different timed(different stage data change) events on the same 
 database table. Not only do they allow for easier maintenance because all code resides within one trigger 
 body, but they also allow for shared variables among the trigger events as well as more robust 
 dependency management. 
-5-13. Creating a Trigger in a Disabled State 
-Problem 
+
+## 5-13. Creating a Trigger in a Disabled State 
+
+**Problem** 
 After a planning meeting, your company has decided that it would be a great idea to create a trigger to 
-send notification of updates to employee salaries. Since the trigger will be tied into the system-wide 
-k
-CHAPTER 5  TRIGGERS 
-116 
+send notification of updates to employee salaries. Since the trigger will be tied into the system-wide k
 database application, you want to ensure that it compiles before enabling it so that it will not affect the 
 rest of the application.  
-Solution 
+
+**Solution** 
 Create a trigger that is in a disabled state by default. This will afford you the opportunity to ensure that 
 the trigger has compiled successfully before you enable it. Use the new DISABLE clause to ensure that 
 your trigger is in DISABLED state by default. 
 The following trigger sends messages to employees when their salary is changed. The trigger is 
 disabled by default to ensure that the application is not adversely affected if there is a compilation error. 
- 
+
+```sql
 CREATE OR REPLACE TRIGGER send_salary_notice 
 AFTER UPDATE OF SALARY ON employees 
 FOR EACH ROW 
@@ -4517,18 +4613,23 @@ BEGIN
              v_subject, 
              v_message); 
 END;   
- 
+```
 On an annual basis, this trigger can be enabled via the following syntax: 
- 
+
+```sql
 ALTER TRIGGER send_salary_notice ENABLE; 
- 
+```
+
 It can then be disabled again using the same syntax: 
- 
+```sql 
 ALTER TRIGGER send_salary_notice DISABLE; 
-How It Works 
+```
+
+**How It Works** 
 Another welcome new feature with Oracle 11g is the ability to create triggers that are DISABLED by default. 
 The syntax for creating a trigger in this fashion is as follows: 
- 
+
+```sql
 CREATE OR REPLACE TRIGGER trigger_name 
 ON UPDATE OR INSERT OR DELETION OF table_name 
 [FOR EACH ROW] 
@@ -4538,17 +4639,12 @@ DECLARE
 BEGIN 
   -- Statements go here. 
 END; 
-  CHAPTER 5  TRIGGERS 
-117 
+```
 The new DISABLED clause is used upon creation of a trigger. By default, a trigger is ENABLED by creation, 
 and this clause allows for the opposite to hold true. 
  
-C H A P T E R  6 
- 
-   
- 
-119 
-Type Conversion 
+
+# 6.Type Conversion 
 Type conversion takes place in almost every PL/SQL program. It is important to know how to convert 
 from one datatype to another so that your applications can contain more versatility. Not only are 
 datatype conversions important to developers, but they can also be a godsend to database 
@@ -4564,7 +4660,8 @@ not recommended that you rely on implicit conversion, because you never know exa
 convert something. The recipes in this chapter will show you more reliable explicit conversion 
 techniques that will give you the ability to convert types in such a way that your application will be rock 
 solid. 
-6-1. Converting a String to a Number 
+
+## 6-1. Converting a String to a Number 
 Problem 
 You need to convert some strings into numbers. For instance, your application contains several strings 
 that are entered via a user input screen. These strings need to be converted into numbers so that they 
