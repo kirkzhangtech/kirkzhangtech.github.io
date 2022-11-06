@@ -79,27 +79,29 @@ Paste the following configuration:
 export GRADLE_HOME=/opt/gradle/latest
 export PATH=${GRADLE_HOME}/bin:${PATH}
 ```
-here if you have self-gover system variables, please refer your setup 
+here if you have self-managed system variables, please refer your setup 
 
 Save and close the file. This script will be sourced at shell startup.
 
-
-
 Make the script executable :
+
 ```bash
 sudo chmod +x /etc/profile.d/gradle.sh
 ```
+
 Load the environment variables in the current shell session using the source command:
 
 ```bash
 source /etc/profile.d/gradle.sh
 ```
+
 Verifying the Gradle Installation
 To validate that Gradle is installed properly use the gradle -v command which will display the Gradle version:
 
 ```bash
 gradle -v
 ```
+
 You should see something like the following:
 
 Welcome to Gradle 6.5.1!
