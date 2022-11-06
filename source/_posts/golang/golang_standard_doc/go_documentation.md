@@ -1003,8 +1003,9 @@ var ErrProcessDone = errors.New("os: process already finished")
 ```
 ErrProcessDone indicates a Process has finished.
 
-fucntion
-func Chdir(dir string) error
+**fucntion**
+
+**func Chdir(dir string) error**
 Chdir changes the current working directory to the named directory. If there is an error, it will be of type *PathError.
 ```golang
 package main
@@ -1030,10 +1031,9 @@ func main() {
 $ Current working directory:  /home/kirkzhang/go-workspace
 
 ```
-summary:  
-more like `cd` command in linux
+NOTE : more like `cd` command in linux
 
-func Chmod(name string, mode FileMode) error
+**func Chmod(name string, mode FileMode) error**
 Chmod changes the mode of the named file to mode. If the file is a symbolic link, it changes the mode of the link's target. If there is an error, it will be of type *PathError.
 
 A different subset of the mode bits are used, depending on the operating system.
@@ -1062,7 +1062,7 @@ func main() {
 
 ```
 
-func Chown(name string, uid, gid int) error
+**func Chown(name string, uid, gid int) error**
 Chown changes the numeric uid and gid of the named file. If the file is a symbolic link, it changes the uid and gid of the link's target. A uid or gid of -1 means to not change that value. If there is an error, it will be of type *PathError.
 
 On Windows or Plan 9, Chown always returns the syscall.EWINDOWS or EPLAN9 error, wrapped in *PathError.
@@ -1072,17 +1072,17 @@ Chtimes changes the access and modification times of the named file, similar to 
 
 The underlying filesystem may truncate or round the values to a less precise time unit. If there is an error, it will be of type *PathError.
 
-func Clearenv()
+**func Clearenv()**
 Clearenv deletes all environment variables.
 func DirFS(dir string) fs.FS
 DirFS returns a file system (an fs.FS) for the tree of files rooted at the directory dir.
 
 Note that DirFS("/prefix") only guarantees that the Open calls it makes to the operating system will begin with "/prefix": DirFS("/prefix").Open("file") is the same as os.Open("/prefix/file"). So if /prefix/file is a symbolic link pointing outside the /prefix tree, then using DirFS does not stop the access any more than using os.Open does. Additionally, the root of the fs.FS returned for a relative path, DirFS("prefix"), will be affected by later calls to Chdir. DirFS is therefore not a general substitute for a chroot-style security mechanism when the directory tree contains arbitrary content.
 
-func Environ() []string
+**func Environ() []string**
 Environ returns a copy of strings representing the environment, in the form "key=value".
 
-func Executable() (string, error)
+**func Executable() (string, error)**
 Executable returns the path name for the executable that started the current process. There is no guarantee that the path is still pointing to the correct executable. If a symlink was used to start the process, depending on the operating system, the result might be the symlink or the path it pointed to. If a stable result is needed, path/filepath.EvalSymlinks might help.
 
 Executable returns an absolute path unless an error occurred.
@@ -1234,6 +1234,100 @@ func (e *SyscallError) Unwrap() error
 
 # 8. time
 
+> source page: <https://pkg.go.dev/time@go1.19.3>
+
+**Index**
+
+- <a href="#time.After">func After(d Duration) <-chan Time</a>
+- <a href="#time.Sleep">func Sleep(d Duration)</a>
+func Tick(d Duration) <-chan Time
+type Duration
+func ParseDuration(s string) (Duration, error)
+func Since(t Time) Duration
+func Until(t Time) Duration
+func (d Duration) Abs() Duration
+func (d Duration) Hours() float64
+func (d Duration) Microseconds() int64
+func (d Duration) Milliseconds() int64
+func (d Duration) Minutes() float64
+func (d Duration) Nanoseconds() int64
+func (d Duration) Round(m Duration) Duration
+func (d Duration) Seconds() float64
+func (d Duration) String() string
+func (d Duration) Truncate(m Duration) Duration
+type Location
+func FixedZone(name string, offset int) *Location
+func LoadLocation(name string) (*Location, error)
+func LoadLocationFromTZData(name string, data []byte) (*Location, error)
+func (l *Location) String() string
+type Month
+func (m Month) String() string
+type ParseError
+func (e *ParseError) Error() string
+type Ticker
+func NewTicker(d Duration) *Ticker
+func (t *Ticker) Reset(d Duration)
+func (t *Ticker) Stop()
+type Time
+func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
+func Now() Time
+func Parse(layout, value string) (Time, error)
+func ParseInLocation(layout, value string, loc *Location) (Time, error)
+func Unix(sec int64, nsec int64) Time
+func UnixMicro(usec int64) Time
+func UnixMilli(msec int64) Time
+func (t Time) Add(d Duration) Time
+func (t Time) AddDate(years int, months int, days int) Time
+func (t Time) After(u Time) bool
+func (t Time) AppendFormat(b []byte, layout string) []byte
+func (t Time) Before(u Time) bool
+func (t Time) Clock() (hour, min, sec int)
+func (t Time) Date() (year int, month Month, day int)
+func (t Time) Day() int
+func (t Time) Equal(u Time) bool
+func (t Time) Format(layout string) string
+func (t Time) GoString() string
+func (t *Time) GobDecode(data []byte) error
+func (t Time) GobEncode() ([]byte, error)
+func (t Time) Hour() int
+func (t Time) ISOWeek() (year, week int)
+func (t Time) In(loc *Location) Time
+func (t Time) IsDST() bool
+func (t Time) IsZero() bool
+func (t Time) Local() Time
+func (t Time) Location() *Location
+func (t Time) MarshalBinary() ([]byte, error)
+func (t Time) MarshalJSON() ([]byte, error)
+func (t Time) MarshalText() ([]byte, error)
+func (t Time) Minute() int
+func (t Time) Month() Month
+func (t Time) Nanosecond() int
+func (t Time) Round(d Duration) Time
+func (t Time) Second() int
+func (t Time) String() string
+func (t Time) Sub(u Time) Duration
+func (t Time) Truncate(d Duration) Time
+func (t Time) UTC() Time
+func (t Time) Unix() int64
+func (t Time) UnixMicro() int64
+func (t Time) UnixMilli() int64
+func (t Time) UnixNano() int64
+func (t *Time) UnmarshalBinary(data []byte) error
+func (t *Time) UnmarshalJSON(data []byte) error
+func (t *Time) UnmarshalText(data []byte) error
+func (t Time) Weekday() Weekday
+func (t Time) Year() int
+func (t Time) YearDay() int
+func (t Time) Zone() (name string, offset int)
+func (t Time) ZoneBounds() (start, end Time)
+type Timer
+func AfterFunc(d Duration, f func()) *Timer
+func NewTimer(d Duration) *Timer
+func (t *Timer) Reset(d Duration) bool
+func (t *Timer) Stop() bool
+type Weekday
+func (d Weekday) String() string
+
 **Constants**
   ```golang
   const (
@@ -1257,10 +1351,13 @@ func (e *SyscallError) Unwrap() error
   )
   ```
 
-func After(d Duration) <-chan Time
+<a id="time.After">func After</a>
+func After(d Duration) <-chan Time**
 
-  After waits for the duration to elapse and then sends the current time on the returned channel. It is equivalent to NewTimer(d).C. The underlying Timer is not recovered by the garbage collector until the timer fires. If efficiency is a concern, use NewTimer instead and call Timer.Stop if the timer is no longer needed.这里需要注意，这个After(d Duration)是指返回一次的时间戳，想要使用还要再次初始化
+After waits for the duration to elapse and then sends the current time on the returned channel. It is equivalent to NewTimer(d).C. The underlying Timer is not recovered by the garbage collector until the timer fires. If efficiency is a concern, use NewTimer instead and call Timer.Stop if the timer is no longer needed.  
+这里需要注意，这个After(d Duration)是指返回一次的时间戳，想要使用还要再次初始化
 
+<a id="time.Sleep">func Sleep</a>
 func Sleep(d Duration)
 
 func Tick(d Duration) <-chan Time
