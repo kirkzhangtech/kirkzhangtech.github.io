@@ -5,6 +5,7 @@ categories:
 tag: golang
 ---
 
+> source link: <https://pkg.go.dev/std>
 abstarct: Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
 <!-- more -->
 <!-- toc -->
