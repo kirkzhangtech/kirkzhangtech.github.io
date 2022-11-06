@@ -1153,7 +1153,7 @@ On Windows, it returns -1.
 ### func UserHomeDir() (string, error)
 ### func WriteFile(name string, data []byte, perm FileMode) error
 ## type DirEntry
-### func ReadDir(name string) ([]DirEntry, error)
+## func ReadDir(name string) ([]DirEntry, error)
 ## type File
 ### func Create(name string) (*File, error)
 ### func CreateTemp(dir, pattern string) (*File, error)
