@@ -318,6 +318,501 @@
                     
                         <a
                             class="link-unstyled"
+                            href="/2022/11/07/archive/Go_Error_%E5%A4%84%E7%90%86%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/"
+                            aria-label=": Spring Bean默认是单例的，高并发情况下，如何保证并发安全？"
+                        >
+                            Spring Bean默认是单例的，高并发情况下，如何保证并发安全？
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-11-07T03:14:22+08:00">
+	
+		    Nov 07, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/golang/">golang</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <blockquote>
+<p>source page : <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/EvkMQCPwg-B0fZonpwXodg">https://mp.weixin.qq.com/s/EvkMQCPwg-B0fZonpwXodg</a></p>
+</blockquote>
+<p>错误处理一直以一是编程必需要面对的问题，错误处理如果做的好的话，代码的稳定性会很好。不同的语言有不同的出现处理的方式。Go 语言也一样，在本篇文章中，我们来讨论一下 Go 语言的错误处理方式。</p>
+<h2 id="一、Error-vs-Exception"><a href="#一、Error-vs-Exception" class="headerlink" title="一、Error vs Exception"></a>一、Error vs Exception</h2><h3 id="1-1-Error"><a href="#1-1-Error" class="headerlink" title="1.1 Error"></a>1.1 Error</h3><p>错误是程序中可能出现的问题，比如连接数据库失败，连接网络失败等，在程序设计中，错误处理是业务的一部分。<br>Go 内建一个 error 接口类型作为 go 的错误标准处理</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">http:&#x2F;&#x2F;golang.org&#x2F;pkg&#x2F;builtin&#x2F;#error
+
+&#x2F;&#x2F; 接口定义
+type error interface &#123;
+   Error() string
+&#125;
+http:&#x2F;&#x2F;golang.org&#x2F;src&#x2F;pkg&#x2F;errors&#x2F;errors.go
+
+&#x2F;&#x2F; 实现
+func New(text string) error &#123;
+   return &amp;errorString&#123;text&#125;
+&#125;
+
+type errorString struct &#123;
+   s string
+&#125;
+
+func (e *errorString) Error() string &#123;
+   return e.s
+&#125;</code></pre>
+<h3 id="1-2-Exception"><a href="#1-2-Exception" class="headerlink" title="1.2 Exception"></a>1.2 Exception</h3><p>异常是指在不该出现问题的地方出现问题，是预料之外的，比如空指针引用，下标越界，向空 map 添加键值等<br>人为制造被自动触发的异常，比如：数组越界，向空 map 添加键值对等。<br>手工触发异常并终止异常，比如：连接数据库失败主动 panic。</p>
+<h3 id="1-3-panic"><a href="#1-3-panic" class="headerlink" title="1.3 panic"></a>1.3 panic</h3><p>对于真正意外的情况，那些表示不可恢复的程序错误，不可恢复才使用 panic。对于其他的错误情况，我们应该是期望使用 error 来进行判定<br>go 源代码很多地方写 panic, 但是工程实践业务代码不要主动写 panic，理论上 panic 只存在于 server 启动阶段，比如 config 文件解析失败，端口监听失败等等，所有业务逻辑禁止主动 panic，所有异步的 goroutine 都要用 recover 去兜底处理。</p>
+<h3 id="1-4-总结"><a href="#1-4-总结" class="headerlink" title="1.4 总结"></a>1.4 总结</h3><p>理解了错误和异常的真正含义，我们就能理解 Go 的错误和异常处理的设计意图。传统的 try…catch…结构，很容易让开发人员把错误和异常混为一谈，甚至把业务错误处理的一部分当做异常来处理，于是你会在程序中看到一大堆的 catch…</p>
+<p>Go 开发团队认为错误应该明确地当成业务的一部分，任何可以预见的问题都需要做错误处理，于是在 Go 代码中，任何调用者在接收函数返回值的同时也需要对错误进行处理，以防遗漏任何运行时可能的错误</p>
+<p>异常则是意料之外的，甚至你认为在编码中不可能发生的，Go 遇到异常会自动触发 panic（恐慌），触发 panic 程序会自动退出。除了程序自动触发异常，一些你认为不可允许的情况你也可以手动触发异常</p>
+<p>另外，在 Go 中除了触发异常，还可以终止异常并可选的对异常进行错误处理，也就是说，错误和异常是可以相互转换的</p>
+<h2 id="二、Go-处理错误的三种方式"><a href="#二、Go-处理错误的三种方式" class="headerlink" title="二、Go 处理错误的三种方式"></a>二、Go 处理错误的三种方式</h2><h3 id="2-1-经典-Go-逻辑"><a href="#2-1-经典-Go-逻辑" class="headerlink" title="2.1 经典 Go 逻辑"></a>2.1 经典 Go 逻辑</h3><p>直观的返回 error</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F; ZooTour struct
+type ZooTour interface &#123;
+    Enter() error
+    VisitPanda(panda *Panda) error
+    Leave() error
+&#125;</code></pre>
+<p>&#x2F;&#x2F; 分步处理，每个步骤可以针对具体返回结果进行处理</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func Tour(t ZooTour1, panda *Panda) error &#123;
+    if err :&#x3D; t.Enter(); err !&#x3D; nil &#123;
+        return errors.WithMessage(err, &quot;Enter failed.&quot;)
+    &#125;
+    if err :&#x3D; t.VisitPanda(); err !&#x3D; nil &#123;
+        return errors.WithMessage(err, &quot;VisitPanda failed.&quot;)
+    &#125;
+    &#x2F;&#x2F; ...
+
+    return nil
+&#125;</code></pre>
+
+<h3 id="2-2-屏蔽过程中的-error-的处理"><a href="#2-2-屏蔽过程中的-error-的处理" class="headerlink" title="2.2 屏蔽过程中的 error 的处理"></a>2.2 屏蔽过程中的 error 的处理</h3><p>将 error 保存到对象内部，处理逻辑交给每个方法，本质上仍是顺序执行。标准库的bufio、database&#x2F;sql包中的Rows等都是这样实现的，有兴趣可以去看下源码</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">type ZooTour interface &#123;
+    Enter() error
+    VisitPanda(panda *Panda) error
+    Leave() error
+    Err() error
+&#125;
+
+func Tour(t ZooTour, panda *Panda) error &#123;
+
+    t.Enter()
+    t.VisitPanda(panda)
+    t.Leave()
+
+    &#x2F;&#x2F; 集中编写业务逻辑代码,最后统一处理error
+    if err :&#x3D; t.Err(); err !&#x3D; nil &#123;
+        return errors.WithMessage(err, &quot;ZooTour failed&quot;)
+    &#125;
+    return nil
+&#125;</code></pre>
+<h3 id="2-3-利用函数式编程延迟运行"><a href="#2-3-利用函数式编程延迟运行" class="headerlink" title="2.3 利用函数式编程延迟运行"></a>2.3 利用函数式编程延迟运行</h3><p>分离关注点 - 遍历访问用数据结构定义运行顺序，根据场景选择，如顺序、逆序、二叉树树遍历等。运行逻辑将代码的控制流逻辑抽离，灵活调整。kubernetes 中的 visitor 对此就有很多种扩展方式，分离了数据和行为，有兴趣可以去扩展阅读</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">type Walker interface &#123;
+    Next MyFunc
+&#125;
+type SliceWalker struct &#123;
+    index int
+    funs []MyFunc
+&#125;
+
+func NewEnterFunc() MyFunc &#123;
+    return func(t ZooTour) error &#123;
+        return t.Enter()
+    &#125;
+&#125;
+
+func BreakOnError(t ZooTour, walker Walker) error &#123;
+    for &#123;
+        f :&#x3D; walker.Next()
+        if f &#x3D;&#x3D; nil &#123;
+            break
+        &#125;
+        if err :&#x3D; f(t); err :&#x3D; nil &#123;
+          &#x2F;&#x2F; 遇到错误break或者continue继续执行
+      &#125;
+    &#125;
+&#125;</code></pre>
+
+<h3 id="2-4-三种方式对比"><a href="#2-4-三种方式对比" class="headerlink" title="2.4 三种方式对比"></a>2.4 三种方式对比</h3><p>上面这三个例子，是 Go 项目处理错误使用频率最高的三种方式，也可以应用在 error 以外的处理逻辑。<br>case 1: 如果业务逻辑不是很清楚，比较推荐 case1<br>case 2: 代码很少去改动，类似标准库，可以使用 case2<br>case 3: 比较复杂的场景，复杂到抽象成一种设计模式</p>
+<h2 id="三、分层下的-Error-Handling"><a href="#三、分层下的-Error-Handling" class="headerlink" title="三、分层下的 Error Handling"></a>三、分层下的 Error Handling</h2><h3 id="3-1-一个常见的三层调用"><a href="#3-1-一个常见的三层调用" class="headerlink" title="3.1 一个常见的三层调用"></a>3.1 一个常见的三层调用</h3><p>&#x2F;&#x2F; controller</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">if err :&#x3D; mode.ParamCheck(param); err !&#x3D; nil &#123;
+    log.Errorf(&quot;param&#x3D;%+v&quot;, param)
+    return errs.ErrInvalidParam
+&#125;
+
+return mode.ListTestName(&quot;&quot;)
+
+&#x2F;&#x2F; service
+_, err :&#x3D; dao.GetTestName(ctx, settleId)
+    if err !&#x3D; nil &#123;
+    log.Errorf(&quot;GetTestName failed. err: %v&quot;, err)
+    return errs.ErrDatabase
+&#125;
+
+&#x2F;&#x2F; dao
+if err !&#x3D; nil &#123;
+    log.Errorf(&quot;GetTestDao failed. uery: %s error(%v)&quot;, sql, err)
+&#125;</code></pre>
+
+<h3 id="3-2-问题总结"><a href="#3-2-问题总结" class="headerlink" title="3.2 问题总结"></a>3.2 问题总结</h3><p>分层开发导致的处处打印日志<br>难以获取详细的堆栈关联<br>根因丢失</p>
+<h3 id="3-3-Wrap-erros"><a href="#3-3-Wrap-erros" class="headerlink" title="3.3 Wrap erros"></a>3.3 Wrap erros</h3><p>Go 相关的错误处理方法很多，但大多为过渡方案，这里就不一一分析了（类似 github.com&#x2F;juju&#x2F;errors 库，有兴趣可以了解）。这里我以 github.com&#x2F;pkg&#x2F;errors 为例，这个也是官方 Proposal 的重点参考对象。<br>错误要被日志记录。<br>应用程序处理错误，保证 100%完整性。<br>之后不再报告当前错误（错误只被处理一次）。<br>github.com&#x2F;pkg&#x2F;errors 包主要包含以下几个方法，如果我们要新生成一个错误，可以使用 New 函数,生成的错误，自带调用堆栈信息。如果有一个现成的 error ，我们需要对他进行再次包装处理，这时候有三个函数可以选择（WithMessage&#x2F;WithStack&#x2F;Wrapf）。其次，如果需要对源错误类型进行自定义判断可以使用 Cause,可以获得最根本的错误原因。</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">&#x2F;&#x2F; 新生成一个错误, 带堆栈信息
+func New(message string) error
+
+&#x2F;&#x2F; 只附加新的信息
+func WithMessage(err error, message string) error
+
+&#x2F;&#x2F; 只附加调用堆栈信息
+func WithStack(err error) error
+
+&#x2F;&#x2F; 同时附加堆栈和信息
+func Wrapf(err error, format string, args ...interface&#123;&#125;) error
+
+&#x2F;&#x2F; 获得最根本的错误原因
+func Cause(err error) error</code></pre>
+<p>以常见的一个三层架构为例：</p>
+<p>Dao 层使用 Wrap 上抛错误</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">if err !&#x3D; nil &#123;
+    if errors.Is(err, sql.ErrNoRows) &#123;
+        return nil, errors.Wrapf(ierror.ErrNotFound, &quot;query:%s&quot;, query)
+    &#125;
+    return nil, errors.Wrapf(ierror.ErrDatabase,
+        &quot;query: %s error(%v)&quot;, query, err)
+&#125;</code></pre>
+<p>Service 层追加信息</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">bills, err :&#x3D; a.Dao.GetName(ctx, param)
+if err !&#x3D; nil &#123;
+    return result, errors.WithMessage(err, &quot;GetName failed&quot;)
+&#125;</code></pre>
+<p>MiddleWare 统一打印错误日志<br>&#x2F;&#x2F; 请求响应组装</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func (Format) Handle(next ihttp.MiddleFunc) ihttp.MiddleFunc &#123;
+    return func(ctx context.Context, req *http.Request, rsp *ihttp.Response) error &#123;
+        format :&#x3D; &amp;format&#123;Time: time.Now().Unix()&#125;
+        err :&#x3D; next(ctx, req, rsp)
+        format.Data &#x3D; rsp.Data
+        if err !&#x3D; nil &#123;
+            format.Code, format.Msg &#x3D; errCodes(ctx, err)
+        &#125;
+        rsp.Data &#x3D; format
+        return nil
+    &#125;
+&#125;</code></pre>
+<p>&#x2F;&#x2F; 获取错误码</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func errCodes(ctx context.Context, err error) (int, string) &#123;
+    if err !&#x3D; nil &#123;
+        log.CtxErrorf(ctx, &quot;error: [%+v]&quot;, err)
+    &#125;
+    var myError &#x3D; new(erro.IError)
+    if errors.As(err, &amp;myError) &#123;
+        return myError.Code, myError.Msg
+    &#125;
+
+    return code.ServerError, i18n.CodeMessage(code.ServerError)
+&#125;</code></pre>
+<p>和其他库进行协作 如果和其他库进行协作，考虑使用 errors.Wrap 或者 errors.Wrapf 保存堆栈信息。同样适用 于和标准库协作的时候。</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">_, err :&#x3D; os.Open(path)
+if err !&#x3D; nil &#123;
+   return errors.Wrapf(err, &quot;Open failed. [%s]&quot;, path)
+&#125;</code></pre>
+<p>包内如果调用其他包内的函数，通常简单的直接 return err<br>最终效果样例：</p>
+<h3 id="3-4-关键点总结"><a href="#3-4-关键点总结" class="headerlink" title="3.4 关键点总结"></a>3.4 关键点总结</h3><p>MyError 作为全局 error 的底层实现，保存具体的错误码和错误信息；<br>MyError 向上返回错误时，第一次先用 Wrap 初始化堆栈，后续用 WithMessage 增加堆栈信息；<br>要判断 error 是否为指定的错误时，可以使用 errors.Cause 获取 root error，再进行和 sentinel error 判定；<br>github.com&#x2F;pkg&#x2F;errors 和标准库的 error 完全兼容，可以先替换、后续改造历史遗留的代码；<br>打印 error 的堆栈需要用%+v，而原来的%v 依旧为普通字符串方法；同时也要注意日志采集工具是否支持多行匹配；<br>log error 级别的打印栈，warn 和 info 可不打印堆栈；<br>可结合统一错误码使用：<a target="_blank" rel="noopener" href="https://google-cloud.gitbook.io/api-design-guide/errors">https://google-cloud.gitbook.io/api-design-guide/errors</a></p>
+<h2 id="四、errgroup-集中错误处理"><a href="#四、errgroup-集中错误处理" class="headerlink" title="四、errgroup 集中错误处理"></a>四、errgroup 集中错误处理</h2><p>官方的 ErrGroup 非常简单，其实就是解决小型多任务并发任务。基本用法 golang.org&#x2F;x&#x2F;sync&#x2F;errgroup 包下定义了一个 Group struct，它就是我们要介绍的 ErrGroup 并发原语，底层也是基于 WaitGroup 实现的。在使用 ErrGroup 时，我们要用到三个方法，分别是 WithContext、Go 和 Wait。</p>
+<h3 id="4-1-背景"><a href="#4-1-背景" class="headerlink" title="4.1 背景"></a>4.1 背景</h3><p>通常，在写业务代码性能优化时经常将一个通用的父任务拆成几个小任务并发执行。此时需要将一个大的任务拆成几个小任务并发执行，来提高QPS，我们需要再业务代码里嵌入以下逻辑，但这种方式存在问题：</p>
+<p>每个请求都开启 goroutinue，会有一定的性能开销。</p>
+<p>野生的 goroutinue，生命周期管理比较困难。</p>
+<p>收到类似 SIGQUIT 信号时，无法平滑退出。</p>
+<h3 id="4-2-errgroup函数签名"><a href="#4-2-errgroup函数签名" class="headerlink" title="4.2 errgroup函数签名"></a>4.2 errgroup函数签名</h3><pre class="language-golang" data-language="golang"><code class="language-golang">type Group
+    func WithContext(ctx context.Context) (*Group, context.Context)
+    func (g *Group) Go(f func() error)
+    func (g *Group) Wait() error</code></pre>
+<p>整个包就一个 Group 结构体</p>
+<p>通过 WithContext 可以创建一个带取消的 Group<br>当然除此之外也可以零值的 Group 也可以直接使用，但是出错之后就不会取消其他的 goroutine 了<br>Go 方法传入一个 func() error 内部会启动一个 goroutine 去处理<br>Wait 类似 WaitGroup 的 Wait 方法，等待所有的 goroutine 结束后退出，返回的错误是一个出错的 err</p>
+<h2 id="4-3-使用案例"><a href="#4-3-使用案例" class="headerlink" title="4.3 使用案例"></a>4.3 使用案例</h2><p>注意这里有一个坑，在后面的代码中不要把 ctx 当做父 context 又传给下游，因为 errgroup 取消了，这个 context 就没用了，会导致下游复用的时候出错</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func TestErrgroup() &#123;
+   eg, ctx :&#x3D; errgroup.WithContext(context.Background())
+   for i :&#x3D; 0; i &lt; 100; i++ &#123;
+      i :&#x3D; i
+      eg.Go(func() error &#123;
+         time.Sleep(2 * time.Second)
+         select &#123;
+         case &lt;-ctx.Done():
+            fmt.Println(&quot;Canceled:&quot;, i)
+            return nil
+         default:
+            fmt.Println(&quot;End:&quot;, i)
+            return nil
+         &#125;&#125;)&#125;
+   if err :&#x3D; eg.Wait(); err !&#x3D; nil &#123;
+      log.Fatal(err)
+   &#125;
+&#125;</code></pre>
+
+<h3 id="4-4-errgroup拓展包"><a href="#4-4-errgroup拓展包" class="headerlink" title="4.4 errgroup拓展包"></a>4.4 errgroup拓展包</h3><p>B 站拓展包</p>
+<p>相比官方的结构，B 站的结构多出了一个函数签名管道和一个函数签名切片,并把 Context 直接放入了返回的 Group 结构，返回仅返回一个 Group 结构指针。</p>
+<pre class="language-`golang" data-language="`golang"><code class="language-`golang">type Group struct &#123;
+   err     error
+   wg      sync.WaitGroup
+   errOnce sync.Once
+
+   workerOnce sync.Once
+   ch         chan func(ctx context.Context) error
+   chs        []func(ctx context.Context) error
+
+   ctx    context.Context
+   cancel func()
+&#125;
+
+func WithContext(ctx context.Context) *Group &#123;
+   return &amp;Group&#123;ctx: ctx&#125;
+&#125;</code></pre>
+<p>Go 方法可以看出并不是直接起协程的（如果管道已经初始化好了），而是优先将函数签名放入管道，管道如果满了就放入切片。</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func (g *Group) Go(f func(ctx context.Context) error) &#123;
+   g.wg.Add(1)
+   if g.ch !&#x3D; nil &#123;
+      select &#123;
+      case g.ch &lt;- f:
+      default:
+         g.chs &#x3D; append(g.chs, f)
+      &#125;
+      return
+   &#125;
+   go g.do(f)
+&#125;</code></pre>
+<p>GOMAXPROCS函数其实是起了一个并发池来控制协程数量，传入最大协程数量进行并发消费管道里的函数签名</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">func (g *Group) GOMAXPROCS(n int) &#123;
+   if n &lt;&#x3D; 0 &#123;
+      panic(&quot;errgroup: GOMAXPROCS must great than 0&quot;)
+   &#125;
+   g.workerOnce.Do(func() &#123;
+      g.ch &#x3D; make(chan func(context.Context) error, n)
+      for i :&#x3D; 0; i &lt; n; i++ &#123;
+         go func() &#123;
+            for f :&#x3D; range g.ch &#123;
+               g.do(f)
+            &#125;
+         &#125;()
+      &#125;
+   &#125;)
+&#125;</code></pre>
+<p>整个流程梳理下来其实就是启动一个固定数量的并发池消费任务，Go 函数其实是向管道中发送任务的生产者，这个设计中有意思的是他的协程生命周期的控制，他的控制方式是每发送一个任务都进行 WaitGroup 加一，在最后结束时的 wait 函数中进行等待，等待所有的请求都处理完才会关闭管道，返出错误。</p>
+<p>tips:</p>
+<p>B 站拓展包主要解决了官方 ErrGroup 的几个痛点 1. 控制并发量。2.Recover 住协程的 Panic 并打出堆栈信息。<br>Go 方法并发的去调用在量很多的情况下会产生死锁，因为他的切片不是线程安全的，如果要并发，并发数量一定不能过大，一旦动用了任务切片，那么很有可能就在 wait 方法那里 hold 住了。这个可以加个锁来优化。<br>Wg watigroup 只在 Go 方法中进行 Add()，并没有控制消费者的并发，Wait 的逻辑就是分发者都分发完成，直接关闭管道，让消费者并发池自行销毁，不去管控，一旦逻辑中有完全 hold 住的方法那么容易产生内存泄漏。</p>
+
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/11/07/archive/Go_Error_%E5%A4%84%E7%90%86%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+            <a
+                href="/2022/11/07/archive/Go_Error_%E5%A4%84%E7%90%86%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/"
+                aria-label=": Spring Bean默认是单例的，高并发情况下，如何保证并发安全？"
+            >
+                <div class="postShorten-thumbnailimg">
+                    <img alt="" src="https://user-images.githubusercontent.com/46363359/198889790-d187ff0d-edfb-4952-bdfb-9b71edb1118a.jpg"/>
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2022/11/07/java/spring/single_bean_concurrency/"
+                            aria-label=": Spring Bean默认是单例的，高并发情况下，如何保证并发安全？"
+                        >
+                            Spring Bean默认是单例的，高并发情况下，如何保证并发安全？
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-11-07T03:10:48+08:00">
+	
+		    Nov 07, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/java/">java</a>, <a class="category-link" href="/categories/java/spring/">spring</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <blockquote>
+<p>source page: <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/BF-Z7yHqpAKursLtC2QIHA">https://mp.weixin.qq.com/s/BF-Z7yHqpAKursLtC2QIHA</a></p>
+</blockquote>
+<p>Spring的bean默认都是单例的，某些情况下，单例是并发不安全的，以Controller举例，问题根源在于，我们可能会在Controller中定义成员变量，如此一来，多个请求来临，进入的都是同一个单例的Controller对象，并对此成员变量的值进行修改操作，因此会互相影响，无法达到并发安全（不同于线程隔离的概念，后面会解释到）的效果。<br>1一、抛出问题<br>首先来举个例子，证明单例的并发不安全性：</p>
+<pre class="language-java" data-language="java"><code class="language-java">@Controller
+public class HomeController &#123;
+    private int i;
+    @GetMapping(&quot;testsingleton1&quot;)
+    @ResponseBody
+    public int test1() &#123;
+        return ++i;
+    &#125;
+&#125;</code></pre>
+<p>多次访问此url，可以看到每次的结果都是自增的，所以这样的代码显然是并发不安全的。</p>
+<p>2二、解决方案<br>因此，我们为了让无状态的海量Http请求之间不受影响，我们可以采取以下几种措施：</p>
+<p>2.1 单例变原型<br>对web项目，可以Controller类上加注解@Scope(“prototype”)或@Scope(“request”)，对非web项目，在Component类上添加注解@Scope(“prototype”)。</p>
+<p>优点：实现简单；</p>
+<p>缺点：很大程度上增大了bean创建实例化销毁的服务器资源开销。</p>
+<p>2.2 线程隔离类ThreadLocal<br>有人想到了线程隔离类ThreadLocal，我们尝试将成员变量包装为ThreadLocal，以试图达到并发安全，同时打印出Http请求的线程名，修改代码如下：</p>
+<pre class="language-java" data-language="java"><code class="language-java">@Controller
+public class HomeController &#123;
+    private ThreadLocal&lt;Integer&gt; i &#x3D; new ThreadLocal&lt;&gt;();
+    @GetMapping(&quot;testsingleton1&quot;)
+    @ResponseBody
+    public int test1() &#123;
+        if (i.get() &#x3D;&#x3D; null) &#123;
+            i.set(0);
+        &#125;
+        i.set(i.get().intValue() + 1);
+        log.info(&quot;&#123;&#125; -&gt; &#123;&#125;&quot;, Thread.currentThread().getName(), i.get());
+        return i.get().intValue();
+    &#125;
+&#125;</code></pre>
+<p>多次访问此url测试一把，打印日志如下：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">[INFO ] 2021-12-03 11:49:08,226 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-1 -&gt; 1
+[INFO ] 2021-12-03 11:49:16,457 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-2 -&gt; 1
+[INFO ] 2021-12-03 11:49:17,858 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-3 -&gt; 1
+[INFO ] 2021-12-03 11:49:18,461 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-4 -&gt; 1
+[INFO ] 2021-12-03 11:49:18,974 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-5 -&gt; 1
+[INFO ] 2021-12-03 11:49:19,696 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-6 -&gt; 1
+[INFO ] 2021-12-03 11:49:22,138 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-7 -&gt; 1
+[INFO ] 2021-12-03 11:49:22,869 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-9 -&gt; 1
+[INFO ] 2021-12-03 11:49:23,617 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-8 -&gt; 1
+[INFO ] 2021-12-03 11:49:24,569 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-10 -&gt; 1
+[INFO ] 2021-12-03 11:49:25,218 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-1 -&gt; 2
+[INFO ] 2021-12-03 11:49:25,740 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-2 -&gt; 2
+[INFO ] 2021-12-03 11:49:43,308 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-3 -&gt; 2
+[INFO ] 2021-12-03 11:49:44,420 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-4 -&gt; 2
+[INFO ] 2021-12-03 11:49:45,271 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-5 -&gt; 2
+[INFO ] 2021-12-03 11:49:45,808 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-6 -&gt; 2
+[INFO ] 2021-12-03 11:49:46,272 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-7 -&gt; 2
+[INFO ] 2021-12-03 11:49:46,489 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-9 -&gt; 2
+[INFO ] 2021-12-03 11:49:46,660 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-8 -&gt; 2
+[INFO ] 2021-12-03 11:49:46,820 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-10 -&gt; 2
+[INFO ] 2021-12-03 11:49:46,990 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-1 -&gt; 3
+[INFO ] 2021-12-03 11:49:47,163 com.cjia.ds.controller.HomeController.test1(HomeController.java:50)
+http-nio-8080-exec-2 -&gt; 3
+......</code></pre>
+<p>从日志分析出，二十多次的连续请求得到的结果有1有2有3等等，而我们期望不管我并发请求有多少，每次的结果都是1；同时可以发现web服务器默认的请求线程池大小为10，这10个核心线程可以被之后不同的Http请求复用，所以这也是为什么相同线程名的结果不会重复的原因。</p>
+<p>总结：ThreadLocal的方式可以达到线程隔离，但还是无法达到并发安全。</p>
+<p>2.3 尽量避免使用成员变量<br>有人说，单例bean的成员变量这么麻烦，能不用成员变量就尽量避免这么用，在业务允许的条件下，将成员变量替换为RequestMapping方法中的局部变量，多省事。这种方式自然是最恰当的，本人也是最推荐。代码修改如下：</p>
+<pre class="language-java" data-language="java"><code class="language-java">@Controller
+public class HomeController &#123;
+    @GetMapping(&quot;testsingleton1&quot;)
+    @ResponseBody
+    public int test1() &#123;
+         int i &#x3D; 0;
+         &#x2F;&#x2F; TODO biz code
+         return ++i;
+    &#125;
+&#125;</code></pre>
+<p>但当很少的某种情况下，必须使用成员变量呢，我们该怎么处理？</p>
+<p>2.4 使用并发安全的类<br>Java作为功能性超强的编程语言，API丰富，如果非要在单例bean中使用成员变量，可以考虑使用并发安全的容器，如ConcurrentHashMap、ConcurrentHashSet等等等等，将我们的成员变量（一般可以是当前运行中的任务列表等这类变量）包装到这些并发安全的容器中进行管理即可。</p>
+<p>2.5 分布式或微服务的并发安全<br>如果还要进一步考虑到微服务或分布式服务的影响，方式4便不足以处理了，所以可以借助于可以共享某些信息的分布式缓存中间件如Redis等，这样即可保证同一种服务的不同服务实例都拥有同一份共享信息（如当前运行中的任务列表等这类变量）。另外，欢迎关注公众号后端面试那些事，回复：简历，即可免费获取优质简历模板。</p>
+<p>3三、补充说明<br>spring bean作用域有以下5个：</p>
+<p>singleton：单例模式，当spring创建applicationContext容器的时候，spring会欲初始化所有的该作用域实例，加上lazy-init就可以避免预处理；<br>prototype：原型模式，每次通过getBean获取该bean就会新产生一个实例，创建后spring将不再对其管理；<br>（下面是在web项目下才用到的）</p>
+<p>request：搞web的大家都应该明白request的域了吧，就是每次请求都新产生一个实例，和prototype不同就是创建后，接下来的管理，spring依然在监听；<br>session：每次会话，同上；<br>global session：全局的web域，类似于servlet中的application。</p>
+<p>END</p>
+
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/11/07/java/spring/single_bean_concurrency/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+            <a
+                href="/2022/11/07/java/spring/single_bean_concurrency/"
+                aria-label=": Spring Bean默认是单例的，高并发情况下，如何保证并发安全？"
+            >
+                <div class="postShorten-thumbnailimg">
+                    <img alt="" src="https://user-images.githubusercontent.com/46363359/198889790-d187ff0d-edfb-4952-bdfb-9b71edb1118a.jpg"/>
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
                             href="/2022/11/07/archive/jupyterlab_wsl2/"
                             aria-label=": JuypterLab on wsl2"
                         >
@@ -828,117 +1323,6 @@ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
                 </div>
             </a>
             
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/10/24/%E9%9A%8F%E7%AC%94/Expectation_setting/"
-                            aria-label=": Expectation setting"
-                        >
-                            Expectation setting
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-10-24T23:28:34+08:00">
-	
-		    Oct 24, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <blockquote>
-<p>作者：Eugene Vinitsky</p>
-</blockquote>
-<p><img src="/./../../picture/Eugene_Vinitsky_twitter.png" alt="Eugene_Vinitsky_twitter"></p>
-<p>Caveats:</p>
-<p>This is targeted at MARL researchers (with an emphasis on transportation researchers in MARL) but is somewhat generic except for some of the specific expected skills.</p>
-<p>It is quite hard to understand what a successful first year or two of graduate school looks like. This document is intended to help you set a standard so that you are neither too hard on yourself, stressed out about meeting some imaginary expectation that you could not possibly achieve, nor too easy on yourself because you misunderstand how much hard work is required.<br>On the other hand, if you’re struggling to hit these expectations we should have a chat to figure out what’s going on and find a way to help you! The goal is for you to succeed and these expectations are intended to be a useful guideline, not a source of stress.</p>
-                    
-                        <a
-                            href="/2022/10/24/%E9%9A%8F%E7%AC%94/Expectation_setting/"
-                            class="postShorten-excerpt_link link"
-                            aria-label=": Expectation setting"
-                        >
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2022/10/23/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E9%9C%80%E8%A6%811368%E4%B8%AA%E5%8D%95%E8%AF%8D/"
-                            aria-label=": 为什么只需要1368个单词"
-                        >
-                            为什么只需要1368个单词
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2022-10-23T17:07:23+08:00">
-	
-		    Oct 23, 2022
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <blockquote>
-<p>《1368个单词就够了》</p>
-</blockquote>
-<p>摘要: 为什么会只需要1368个词汇呢？</p>
-                    
-                        <a
-                            href="/2022/10/23/%E9%9D%9E%E6%8A%80%E6%9C%AF%E7%B1%BB/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E9%9C%80%E8%A6%811368%E4%B8%AA%E5%8D%95%E8%AF%8D/"
-                            class="postShorten-excerpt_link link"
-                            aria-label=": 为什么只需要1368个单词"
-                        >
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
         
     </article>
     
