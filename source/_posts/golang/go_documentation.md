@@ -10,13 +10,15 @@ abstarct: Go is an open source programming language that makes it easy to build 
 <!-- more -->
 <!-- toc -->
 
-# package tar
+# 1. archive
+
+## 1.1 tar
 
   Package tar implements access to tar archives.
 
   Tape(封装,胶带) archives (tar) are a file format for storing a sequence of files that can be read and written in a streaming manner. This package aims to cover most variations of the format, including those produced by GNU and BSD tar tools.
 
-## Constants
+**Constants**
 
   ```golang
   const (
@@ -57,7 +59,7 @@ abstarct: Go is an open source programming language that makes it easy to build 
   )
   ```
 
-## Variables
+**Variables**
 
   ```golang
   var (
@@ -68,7 +70,7 @@ abstarct: Go is an open source programming language that makes it easy to build 
   )
   ```
 
-## type Format
+type Format
 
   ```golang
   type Format int
@@ -150,11 +152,11 @@ abstarct: Go is an open source programming language that makes it easy to build 
 
   ```
 
-### func (f Format) String() string
+func (f Format) String() string
   
   打印tar的格式
 
-## type Header
+type Header
   
   ```golang
     type Header struct {
@@ -224,35 +226,35 @@ abstarct: Go is an open source programming language that makes it easy to build 
 
   ```
 
-### func FileInfoHeader(fi fs.FileInfo, link string) (*Header, error)
+func FileInfoHeader(fi fs.FileInfo, link string) (*Header, error)
 
-### func (h*Header) FileInfo() fs.FileInfo
+func (h*Header) FileInfo() fs.FileInfo
 
-## type Reader
+type Reader
 
-### func NewReader(r io.Reader) *Reader
+func NewReader(r io.Reader) *Reader
 
-### func (tr*Reader) Next() (*Header, error)
+func (tr*Reader) Next() (*Header, error)
 
-### func (tr*Reader) Read(b []byte) (int, error)
+func (tr*Reader) Read(b []byte) (int, error)
 
-## type Writer
+type Writer
 
-### func NewWriter(w io.Writer) *Writer
+func NewWriter(w io.Writer) *Writer
 
-### func (tw*Writer) Close() error
+func (tw*Writer) Close() error
 
-### func (tw *Writer) Flush() error
+func (tw *Writer) Flush() error
 
-### func (tw*Writer) Write(b []byte) (int, error)
+func (tw*Writer) Write(b []byte) (int, error)
 
-### func (tw *Writer) WriteHeader(hdr*Header) error
+func (tw *Writer) WriteHeader(hdr*Header) error
 
-# zip package
+## 1.2 zip
 
 Package zip provides support for reading and writing ZIP archives.
 
-## Constants
+**Constants**
 
   ```golang
   const (
@@ -261,7 +263,7 @@ Package zip provides support for reading and writing ZIP archives.
   )
   ```
 
-## Variables
+**Variables**
 
   ```golang
   var (
@@ -272,74 +274,74 @@ Package zip provides support for reading and writing ZIP archives.
 
   ```
 
-### func RegisterCompressor(method uint16, comp Compressor)
+func RegisterCompressor(method uint16, comp Compressor)
 
-### func RegisterDecompressor(method uint16, dcomp Decompressor)
+func RegisterDecompressor(method uint16, dcomp Decompressor)
 
-## type Compressor
+type Compressor
 
-## type Decompressor
+type Decompressor
 
-## type File
+type File
 
-### func (f *File) DataOffset() (offset int64, err error)
+func (f *File) DataOffset() (offset int64, err error)
 
-### func (f*File) Open() (io.ReadCloser, error)
+func (f*File) Open() (io.ReadCloser, error)
 
-### func (f *File) OpenRaw() (io.Reader, error)
+func (f *File) OpenRaw() (io.Reader, error)
 
-## type FileHeader
+type FileHeader
 
-### func FileInfoHeader(fi fs.FileInfo) (*FileHeader, error)
+func FileInfoHeader(fi fs.FileInfo) (*FileHeader, error)
 
-### func (h *FileHeader) FileInfo() fs.FileInfo
+func (h *FileHeader) FileInfo() fs.FileInfo
 
-### func (h*FileHeader) ModTime() time.TimeDEPRECATED
+func (h*FileHeader) ModTime() time.TimeDEPRECATED
 
-### func (h *FileHeader) Mode() (mode fs.FileMode)
+func (h *FileHeader) Mode() (mode fs.FileMode)
 
-### func (h*FileHeader) SetModTime(t time.Time)DEPRECATED
+func (h*FileHeader) SetModTime(t time.Time)DEPRECATED
 
-### func (h *FileHeader) SetMode(mode fs.FileMode)
+func (h *FileHeader) SetMode(mode fs.FileMode)
 
-## type ReadCloser
+type ReadCloser
 
-### func OpenReader(name string) (*ReadCloser, error)
+func OpenReader(name string) (*ReadCloser, error)
 
-### func (rc *ReadCloser) Close() error
+func (rc *ReadCloser) Close() error
 
-## type Reader
+type Reader
 
-### func NewReader(r io.ReaderAt, size int64) (*Reader, error)
+func NewReader(r io.ReaderAt, size int64) (*Reader, error)
 
-### func (r *Reader) Open(name string) (fs.File, error)
+func (r *Reader) Open(name string) (fs.File, error)
 
-### func (z*Reader) RegisterDecompressor(method uint16, dcomp Decompressor)
+func (z*Reader) RegisterDecompressor(method uint16, dcomp Decompressor)
 
-## type Writer
+type Writer
 
-### func NewWriter(w io.Writer) *Writer
+func NewWriter(w io.Writer) *Writer
 
-### func (w*Writer) Close() error
+func (w*Writer) Close() error
 
-### func (w \*Writer) Copy(f\*File) error
+func (w \*Writer) Copy(f\*File) error
 
-### func (w *Writer) Create(name string) (io.Writer, error)
+func (w *Writer) Create(name string) (io.Writer, error)
 
-### func (w\*Writer) CreateHeader(fh\*FileHeader) (io.Writer, error)
+func (w\*Writer) CreateHeader(fh\*FileHeader) (io.Writer, error)
 
-### func (w\*Writer) CreateRaw(fh\*FileHeader) (io.Writer, error)
+func (w\*Writer) CreateRaw(fh\*FileHeader) (io.Writer, error)
 
-### func (w*Writer) Flush() error
+func (w*Writer) Flush() error
 
-### func (w *Writer) RegisterCompressor(method uint16, comp Compressor)
+func (w *Writer) RegisterCompressor(method uint16, comp Compressor)
 
-### func (w*Writer) SetComment(comment string) error
+func (w*Writer) SetComment(comment string) error
 
-### func (w *Writer) SetOffset(n int64)
+func (w *Writer) SetOffset(n int64)
 
 
-# bufio
+# 2. bufio
 
 Package bufio implements buffered I/O. It wraps an io.Reader or io.Writer object, creating another object (Reader or Writer) that also implements the interface but provides buffering and some help for textual(adj.本文的,按原文的) I/O.
 
@@ -374,14 +376,14 @@ var ErrFinalToken = errors.New("final token")
 `ErrFinalToken` is a special sentinel error value. It is intended to be returned by a Split(vt.分离) function to indicate that the token being delivered with the error is the last token and scanning should stop after this one. After ErrFinalToken is received by Scan, scanning stops with no error. The value is useful to stop processing early or when it is necessary to deliver a final empty token. One could achieve the same behavior with a custom error value but providing one here is tidier. See the emptyFinalToken example for a use of this value.
 
 
-## func ScanBytes(data []byte, atEOF bool) (advance int, token []byte, err error)
+func ScanBytes(data []byte, atEOF bool) (advance int, token []byte, err error)
 ScanBytes is a split function for a Scanner that returns each byte as a token.
 
-## func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error)
-## func ScanRunes(data []byte, atEOF bool) (advance int, token []byte, err error)
-## func ScanWords(data []byte, atEOF bool) (advance int, token []byte, err error)
+func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error)
+func ScanRunes(data []byte, atEOF bool) (advance int, token []byte, err error)
+func ScanWords(data []byte, atEOF bool) (advance int, token []byte, err error)
 
-## type ReadWriter
+type ReadWriter
 
 ```goalng
 type ReadWriter struct {
@@ -390,50 +392,50 @@ type ReadWriter struct {
 }
 ```
 
-### func NewReadWriter(r *Reader, w *Writer) *ReadWriter
-## type Reader
+func NewReadWriter(r *Reader, w *Writer) *ReadWriter
+type Reader
 
 ```golang
 type Reader struct {
 	// contains filtered or unexported fields
 }
 ```
-## func NewReader(rd io.Reader) *Reader
-## func NewReaderSize(rd io.Reader, size int) *Reader
-### func (b *Reader) Buffered() int
-### func (b *Reader) Discard(n int) (discarded int, err error)
-### func (b *Reader) Peek(n int) ([]byte, error)
-### func (b *Reader) Read(p []byte) (n int, err error)
-### func (b *Reader) ReadByte() (byte, error)
-### func (b *Reader) ReadBytes(delim byte) ([]byte, error)
-### func (b *Reader) ReadLine() (line []byte, isPrefix bool, err error)
-### func (b *Reader) ReadRune() (r rune, size int, err error)
-### func (b *Reader) ReadSlice(delim byte) (line []byte, err error)
-### func (b *Reader) ReadString(delim byte) (string, error)
-### func (b *Reader) Reset(r io.Reader)
-### func (b *Reader) Size() int
-### func (b *Reader) UnreadByte() error
-### func (b *Reader) UnreadRune() error
-### func (b *Reader) WriteTo(w io.Writer) (n int64, err error)
-## type Scanner
+func NewReader(rd io.Reader) *Reader
+func NewReaderSize(rd io.Reader, size int) *Reader
+func (b *Reader) Buffered() int
+func (b *Reader) Discard(n int) (discarded int, err error)
+func (b *Reader) Peek(n int) ([]byte, error)
+func (b *Reader) Read(p []byte) (n int, err error)
+func (b *Reader) ReadByte() (byte, error)
+func (b *Reader) ReadBytes(delim byte) ([]byte, error)
+func (b *Reader) ReadLine() (line []byte, isPrefix bool, err error)
+func (b *Reader) ReadRune() (r rune, size int, err error)
+func (b *Reader) ReadSlice(delim byte) (line []byte, err error)
+func (b *Reader) ReadString(delim byte) (string, error)
+func (b *Reader) Reset(r io.Reader)
+func (b *Reader) Size() int
+func (b *Reader) UnreadByte() error
+func (b *Reader) UnreadRune() error
+func (b *Reader) WriteTo(w io.Writer) (n int64, err error)
+type Scanner
 ```golang
 type Scanner struct {
 	// contains filtered or unexported fields
 }
 ```
-## func NewScanner(r io.Reader) *Scanner
-### func (s *Scanner) Buffer(buf []byte, max int)
-### func (s *Scanner) Bytes() []byte
-### func (s *Scanner) Err() error
-### func (s *Scanner) Scan() bool
-### func (s *Scanner) Split(split SplitFunc)
-### func (s *Scanner) Text() string
-## type SplitFunc
+func NewScanner(r io.Reader) *Scanner
+func (s *Scanner) Buffer(buf []byte, max int)
+func (s *Scanner) Bytes() []byte
+func (s *Scanner) Err() error
+func (s *Scanner) Scan() bool
+func (s *Scanner) Split(split SplitFunc)
+func (s *Scanner) Text() string
+type SplitFunc
 ```golang
 type SplitFunc func(data []byte, atEOF bool) (advance int, token []byte, err error)
 
 ```
-## type Writer
+type Writer
 
 ```golng
 type Writer struct {
@@ -441,22 +443,22 @@ type Writer struct {
 }
 ```
 
-## func NewWriter(w io.Writer) *Writer
-## func NewWriterSize(w io.Writer, size int) *Writer
-### func (b *Writer) Available() int
-### func (b *Writer) AvailableBuffer() []byte
-### func (b *Writer) Buffered() int
-### func (b *Writer) Flush() error
-### func (b *Writer) ReadFrom(r io.Reader) (n int64, err error)
-### func (b *Writer) Reset(w io.Writer)
-### func (b *Writer) Size() int
-### func (b *Writer) Write(p []byte) (nn int, err error)
-### func (b *Writer) WriteByte(c byte) error
-### func (b *Writer) WriteRune(r rune) (size int, err error)
-### func (b *Writer) WriteString(s string) (int, error)
+func NewWriter(w io.Writer) *Writer
+func NewWriterSize(w io.Writer, size int) *Writer
+func (b *Writer) Available() int
+func (b *Writer) AvailableBuffer() []byte
+func (b *Writer) Buffered() int
+func (b *Writer) Flush() error
+func (b *Writer) ReadFrom(r io.Reader) (n int64, err error)
+func (b *Writer) Reset(w io.Writer)
+func (b *Writer) Size() int
+func (b *Writer) Write(p []byte) (nn int, err error)
+func (b *Writer) WriteByte(c byte) error
+func (b *Writer) WriteRune(r rune) (size int, err error)
+func (b *Writer) WriteString(s string) (int, error)
 
 
-# builtin
+# 3. builtin
 
 Package builtin provides documentation for Go's predeclared identifiers. The items documented here are not actually in package builtin but their descriptions here allow godoc to present documentation for the language's special identifiers.
 
@@ -474,165 +476,166 @@ const iota = 0 // Untyped int.
 var nil Type // Type must be a pointer, channel, func, interface, map, or slice type
 ```
 
-## func append(slice []Type, elems ...Type) []Type
-## func cap(v Type) int
-## func close(c chan<- Type)
-## func complex(r, i FloatType) ComplexType
-## func copy(dst, src []Type) int
-## func delete(m map[Type]Type1, key Type)
-## func imag(c ComplexType) FloatType
-## func len(v Type) int
-## func make(t Type, size ...IntegerType) Type
-## func new(Type) *Type
-## func panic(v any)
-## func print(args ...Type)
-## func println(args ...Type)
-## func real(c ComplexType) FloatType
-## func recover() any
+func append(slice []Type, elems ...Type) []Type
+func cap(v Type) int
+func close(c chan<- Type)
+func complex(r, i FloatType) ComplexType
+func copy(dst, src []Type) int
+func delete(m map[Type]Type1, key Type)
+func imag(c ComplexType) FloatType
+func len(v Type) int
+func make(t Type, size ...IntegerType) Type
+func new(Type) *Type
+func panic(v any)
+func print(args ...Type)
+func println(args ...Type)
+func real(c ComplexType) FloatType
+func recover() any
 
-## type ComplexType
-## type FloatType
-## type IntegerType
-## type Type
-## type Type1
-## type any
-## type bool
-## type byte
-## type comparable
-## type complex128
-## type complex64
-## type error
-## type float32
-## type float64
-## type int
-## type int16
-## type int32
-## type int64
-## type int8
-## type rune
-## type string
-## type uint
-## type uint16
-## type uint32
-## type uint64
-## type uint8
-## type uintptr
+type ComplexType
+type FloatType
+type IntegerType
+type Type
+type Type1
+type any
+type bool
+type byte
+type comparable
+type complex128
+type complex64
+type error
+type float32
+type float64
+type int
+type int16
+type int32
+type int64
+type int8
+type rune
+type string
+type uint
+type uint16
+type uint32
+type uint64
+type uint8
+type uintptr
 
+# 4. bytes
 
-
-# bytes
 Package bytes implements functions for the manipulation of byte slices. It is analogous to the facilities of the strings package.
 
 **constants**
+
 ```golang
 const MinRead = 512
 ```
 
 **variables**
+
 ```golang
 var ErrTooLarge = errors.New("bytes.Buffer: too large")
 
 ```
-## func Compare(a, b []byte) int
-## func Contains(b, subslice []byte) bool
-## func ContainsAny(b []byte, chars string) bool
-## func ContainsRune(b []byte, r rune) bool
-## func Count(s, sep []byte) int
-## func Cut(s, sep []byte) (before, after []byte, found bool)
-## func Equal(a, b []byte) bool
-## func EqualFold(s, t []byte) bool
-## func Fields(s []byte) [][]byte
-## func FieldsFunc(s []byte, f func(rune) bool) [][]byte
-## func HasPrefix(s, prefix []byte) bool
-## func HasSuffix(s, suffix []byte) bool
-## func Index(s, sep []byte) int
-## func IndexAny(s []byte, chars string) int
-## func IndexByte(b []byte, c byte) int
-## func IndexFunc(s []byte, f func(r rune) bool) int
-## func IndexRune(s []byte, r rune) int
-## func Join(s [][]byte, sep []byte) []byte
-## func LastIndex(s, sep []byte) int
-## func LastIndexAny(s []byte, chars string) int
-## func LastIndexByte(s []byte, c byte) int
-## func LastIndexFunc(s []byte, f func(r rune) bool) int
-## func Map(mapping func(r rune) rune, s []byte) []byte
-## func Repeat(b []byte, count int) []byte
-## func Replace(s, old, new []byte, n int) []byte
-## func ReplaceAll(s, old, new []byte) []byte
-## func Runes(s []byte) []rune
-## func Split(s, sep []byte) [][]byte
-## func SplitAfter(s, sep []byte) [][]byte
-## func SplitAfterN(s, sep []byte, n int) [][]byte
-## func SplitN(s, sep []byte, n int) [][]byte
-## func Title(s []byte) []byteDEPRECATED
-## func ToLower(s []byte) []byte
-## func ToLowerSpecial(c unicode.SpecialCase, s []byte) []byte
-## func ToTitle(s []byte) []byte
-## func ToTitleSpecial(c unicode.SpecialCase, s []byte) []byte
-## func ToUpper(s []byte) []byte
-## func ToUpperSpecial(c unicode.SpecialCase, s []byte) []byte
-## func ToValidUTF8(s, replacement []byte) []byte
-## func Trim(s []byte, cutset string) []byte
-## func TrimFunc(s []byte, f func(r rune) bool) []byte
-## func TrimLeft(s []byte, cutset string) []byte
-## func TrimLeftFunc(s []byte, f func(r rune) bool) []byte
-## func TrimPrefix(s, prefix []byte) []byte
-## func TrimRight(s []byte, cutset string) []byte
-## func TrimRightFunc(s []byte, f func(r rune) bool) []byte
-## func TrimSpace(s []byte) []byte
-## func TrimSuffix(s, suffix []byte) []byte
+func Compare(a, b []byte) int
+func Contains(b, subslice []byte) bool
+func ContainsAny(b []byte, chars string) bool
+func ContainsRune(b []byte, r rune) bool
+func Count(s, sep []byte) int
+func Cut(s, sep []byte) (before, after []byte, found bool)
+func Equal(a, b []byte) bool
+func EqualFold(s, t []byte) bool
+func Fields(s []byte) [][]byte
+func FieldsFunc(s []byte, f func(rune) bool) [][]byte
+func HasPrefix(s, prefix []byte) bool
+func HasSuffix(s, suffix []byte) bool
+func Index(s, sep []byte) int
+func IndexAny(s []byte, chars string) int
+func IndexByte(b []byte, c byte) int
+func IndexFunc(s []byte, f func(r rune) bool) int
+func IndexRune(s []byte, r rune) int
+func Join(s [][]byte, sep []byte) []byte
+func LastIndex(s, sep []byte) int
+func LastIndexAny(s []byte, chars string) int
+func LastIndexByte(s []byte, c byte) int
+func LastIndexFunc(s []byte, f func(r rune) bool) int
+func Map(mapping func(r rune) rune, s []byte) []byte
+func Repeat(b []byte, count int) []byte
+func Replace(s, old, new []byte, n int) []byte
+func ReplaceAll(s, old, new []byte) []byte
+func Runes(s []byte) []rune
+func Split(s, sep []byte) [][]byte
+func SplitAfter(s, sep []byte) [][]byte
+func SplitAfterN(s, sep []byte, n int) [][]byte
+func SplitN(s, sep []byte, n int) [][]byte
+func Title(s []byte) []byteDEPRECATED
+func ToLower(s []byte) []byte
+func ToLowerSpecial(c unicode.SpecialCase, s []byte) []byte
+func ToTitle(s []byte) []byte
+func ToTitleSpecial(c unicode.SpecialCase, s []byte) []byte
+func ToUpper(s []byte) []byte
+func ToUpperSpecial(c unicode.SpecialCase, s []byte) []byte
+func ToValidUTF8(s, replacement []byte) []byte
+func Trim(s []byte, cutset string) []byte
+func TrimFunc(s []byte, f func(r rune) bool) []byte
+func TrimLeft(s []byte, cutset string) []byte
+func TrimLeftFunc(s []byte, f func(r rune) bool) []byte
+func TrimPrefix(s, prefix []byte) []byte
+func TrimRight(s []byte, cutset string) []byte
+func TrimRightFunc(s []byte, f func(r rune) bool) []byte
+func TrimSpace(s []byte) []byte
+func TrimSuffix(s, suffix []byte) []byte
 
-## type Buffer
+type Buffer
 
-## func NewBuffer(buf []byte) *Buffer
-## func NewBufferString(s string) *Buffer
-### func (b *Buffer) Bytes() []byte
-### func (b *Buffer) Cap() int
-### func (b *Buffer) Grow(n int)
-### func (b *Buffer) Len() int
-### func (b *Buffer) Next(n int) []byte
-### func (b *Buffer) Read(p []byte) (n int, err error)
-### func (b *Buffer) ReadByte() (byte, error)
-### func (b *Buffer) ReadBytes(delim byte) (line []byte, err error)
-### func (b *Buffer) ReadFrom(r io.Reader) (n int64, err error)
-### func (b *Buffer) ReadRune() (r rune, size int, err error)
-### func (b *Buffer) ReadString(delim byte) (line string, err error)
-### func (b *Buffer) Reset()
-### func (b *Buffer) String() string
-### func (b *Buffer) Truncate(n int)
-### func (b *Buffer) UnreadByte() error
-### func (b *Buffer) UnreadRune() error
-### func (b *Buffer) Write(p []byte) (n int, err error)
-### func (b *Buffer) WriteByte(c byte) error
-### func (b *Buffer) WriteRune(r rune) (n int, err error)
-### func (b *Buffer) WriteString(s string) (n int, err error)
-### func (b *Buffer) WriteTo(w io.Writer) (n int64, err error)
-## type Reader
-## func NewReader(b []byte) *Reader
-### func (r *Reader) Len() int
-### func (r *Reader) Read(b []byte) (n int, err error)
-### func (r *Reader) ReadAt(b []byte, off int64) (n int, err error)
-### func (r *Reader) ReadByte() (byte, error)
-### func (r *Reader) ReadRune() (ch rune, size int, err error)
-### func (r *Reader) Reset(b []byte)
-### func (r *Reader) Seek(offset int64, whence int) (int64, error)
-### func (r *Reader) Size() int64
-### func (r *Reader) UnreadByte() error
-### func (r *Reader) UnreadRune() error
-### func (r *Reader) WriteTo(w io.Writer) (n int64, err error)
+func NewBuffer(buf []byte) *Buffer
+func NewBufferString(s string) *Buffer
+func (b *Buffer) Bytes() []byte
+func (b *Buffer) Cap() int
+func (b *Buffer) Grow(n int)
+func (b *Buffer) Len() int
+func (b *Buffer) Next(n int) []byte
+func (b *Buffer) Read(p []byte) (n int, err error)
+func (b *Buffer) ReadByte() (byte, error)
+func (b *Buffer) ReadBytes(delim byte) (line []byte, err error)
+func (b *Buffer) ReadFrom(r io.Reader) (n int64, err error)
+func (b *Buffer) ReadRune() (r rune, size int, err error)
+func (b *Buffer) ReadString(delim byte) (line string, err error)
+func (b *Buffer) Reset()
+func (b *Buffer) String() string
+func (b *Buffer) Truncate(n int)
+func (b *Buffer) UnreadByte() error
+func (b *Buffer) UnreadRune() error
+func (b *Buffer) Write(p []byte) (n int, err error)
+func (b *Buffer) WriteByte(c byte) error
+func (b *Buffer) WriteRune(r rune) (n int, err error)
+func (b *Buffer) WriteString(s string) (n int, err error)
+func (b *Buffer) WriteTo(w io.Writer) (n int64, err error)
+type Reader
+func NewReader(b []byte) *Reader
+func (r *Reader) Len() int
+func (r *Reader) Read(b []byte) (n int, err error)
+func (r *Reader) ReadAt(b []byte, off int64) (n int, err error)
+func (r *Reader) ReadByte() (byte, error)
+func (r *Reader) ReadRune() (ch rune, size int, err error)
+func (r *Reader) Reset(b []byte)
+func (r *Reader) Seek(offset int64, whence int) (int64, error)
+func (r *Reader) Size() int64
+func (r *Reader) UnreadByte() error
+func (r *Reader) UnreadRune() error
+func (r *Reader) WriteTo(w io.Writer) (n int64, err error)
 
 
-# compress
+# 5. compress
 
-## bzip2
+## 5.1 bzip2
 
 Package bzip2 implements bzip2 decompression.
 
-### func NewReader(r io.Reader) io.Reader
-### type StructuralError
-### func (s StructuralError) Error() string
+func NewReader(r io.Reader) io.Reader
+type StructuralError
+func (s StructuralError) Error() string
 
-## flate
+flate
 Package flate implements the DEFLATE compressed data format, described in RFC 1951. The gzip and zlib packages implement access to DEFLATE-based file formats.
 
 **Constants**
@@ -656,28 +659,28 @@ const (
 	HuffmanOnly = -2
 )
 ```
-### func NewReader(r io.Reader) io.ReadCloser
-### func NewReaderDict(r io.Reader, dict []byte) io.ReadCloser
-### type CorruptInputError
-#### func (e CorruptInputError) Error() string
-### type InternalError
-#### func (e InternalError) Error() string
-### type ReadErrorDEPRECATED
-#### func (e *ReadError) Error() string
-### type Reader
-### type Resetter
-### type WriteErrorDEPRECATED
-#### func (e *WriteError) Error() string
-### type Writer
-### func NewWriter(w io.Writer, level int) (*Writer, error)
-### func NewWriterDict(w io.Writer, level int, dict []byte) (*Writer, error)
-#### func (w *Writer) Close() error
-#### func (w *Writer) Flush() error
-#### func (w *Writer) Reset(dst io.Writer)
-#### func (w *Writer) Write(data []byte) (n int, err error)
+func NewReader(r io.Reader) io.ReadCloser
+func NewReaderDict(r io.Reader, dict []byte) io.ReadCloser
+type CorruptInputError
+#func (e CorruptInputError) Error() string
+type InternalError
+#func (e InternalError) Error() string
+type ReadErrorDEPRECATED
+#func (e *ReadError) Error() string
+type Reader
+type Resetter
+type WriteErrorDEPRECATED
+#func (e *WriteError) Error() string
+type Writer
+func NewWriter(w io.Writer, level int) (*Writer, error)
+func NewWriterDict(w io.Writer, level int, dict []byte) (*Writer, error)
+#func (w *Writer) Close() error
+#func (w *Writer) Flush() error
+#func (w *Writer) Reset(dst io.Writer)
+#func (w *Writer) Write(data []byte) (n int, err error)
 
 
-## gzip
+## 5.2 gzip
 Package gzip implements reading and writing of gzip format compressed files, as specified in RFC 1952.
 
 **Constants**
@@ -701,7 +704,7 @@ var (
 	ErrHeader = errors.New("gzip: invalid header")
 )
 ```
-### type Header
+type Header
 ```golang
 type Header struct {
 	Comment string    // comment
@@ -711,19 +714,19 @@ type Header struct {
 	OS      byte      // operating system type
 }
 ```
-### type Reader
+type Reader
 ```golang
 type Reader struct {
 	Header // valid after NewReader or Reader.Reset
 	// contains filtered or unexported fields
 }
 ```
-### func NewReader(r io.Reader) (*Reader, error)
-#### func (z *Reader) Close() error
-#### func (z *Reader) Multistream(ok bool)
-#### func (z *Reader) Read(p []byte) (n int, err error)
-#### func (z *Reader) Reset(r io.Reader) error
-### type Writer
+func NewReader(r io.Reader) (*Reader, error)
+#func (z *Reader) Close() error
+#func (z *Reader) Multistream(ok bool)
+#func (z *Reader) Read(p []byte) (n int, err error)
+#func (z *Reader) Reset(r io.Reader) error
+type Writer
 
 ```golang
 type Writer struct {
@@ -732,36 +735,36 @@ type Writer struct {
 }
 
 ```
-### func NewWriter(w io.Writer) *Writer
-### func NewWriterLevel(w io.Writer, level int) (*Writer, error)
-#### func (z *Writer) Close() error
-#### func (z *Writer) Flush() error
-#### func (z *Writer) Reset(w io.Writer)
-#### func (z *Writer) Write(p []byte) (int, error)
+func NewWriter(w io.Writer) *Writer
+func NewWriterLevel(w io.Writer, level int) (*Writer, error)
+#func (z *Writer) Close() error
+#func (z *Writer) Flush() error
+#func (z *Writer) Reset(w io.Writer)
+#func (z *Writer) Write(p []byte) (int, error)
 
-## lzw
+## 5.3 lzw
 Package lzw implements the Lempel-Ziv-Welch compressed data format, described in T. A. Welch, “A Technique for High-Performance Data Compression”, Computer, 17(6) (June 1984), pp 8-19.
 
 In particular, it implements LZW as used by the GIF and PDF file formats, which means variable-width codes up to 12 bits and the first two non-literal codes are a clear code and an EOF code.
 
 The TIFF file format uses a similar but incompatible version of the LZW algorithm. See the golang.org/x/image/tiff/lzw package for an implementation.
 
-### func NewReader(r io.Reader, order Order, litWidth int) io.ReadCloser
-### func NewWriter(w io.Writer, order Order, litWidth int) io.WriteCloser
-### type Order
+func NewReader(r io.Reader, order Order, litWidth int) io.ReadCloser
+func NewWriter(w io.Writer, order Order, litWidth int) io.WriteCloser
+type Order
 ```golang
 type Order int
 ```
-### type Reader
+type Reader
 ```golang
 type Reader struct {
 	// contains filtered or unexported fields
 }
 ```
-#### func (r *Reader) Close() error
-#### func (r *Reader) Read(b []byte) (int, error)
-#### func (r *Reader) Reset(src io.Reader, order Order, litWidth int)
-### type Writer
+#func (r *Reader) Close() error
+#func (r *Reader) Read(b []byte) (int, error)
+#func (r *Reader) Reset(src io.Reader, order Order, litWidth int)
+type Writer
 ```golang
 type Writer struct {
 	// contains filtered or unexported fields
@@ -769,13 +772,13 @@ type Writer struct {
 ```
 
 
-#### func (w *Writer) Close() error
-#### func (w *Writer) Reset(dst io.Writer, order Order, litWidth int)
-#### func (w *Writer) Write(p []byte) (n int, err error)
+#func (w *Writer) Close() error
+#func (w *Writer) Reset(dst io.Writer, order Order, litWidth int)
+#func (w *Writer) Write(p []byte) (n int, err error)
 
 
 
-## compress/zlib
+## 5.4 compress/zlib
 **Overview**
 Package zlib implements reading and writing of zlib format compressed data, as specified in RFC 1950.
 
@@ -795,9 +798,9 @@ r.Close()
 ```
 **Constants**
 **Variables**
-### func NewReader(r io.Reader) (io.ReadCloser, error)
-### func NewReaderDict(r io.Reader, dict []byte) (io.ReadCloser, error)
-### type Resetter
+func NewReader(r io.Reader) (io.ReadCloser, error)
+func NewReaderDict(r io.Reader, dict []byte) (io.ReadCloser, error)
+type Resetter
 ```golang
 type Resetter interface {
 	// Reset discards any buffered data and resets the Resetter as if it was
@@ -805,23 +808,25 @@ type Resetter interface {
 	Reset(r io.Reader, dict []byte) error
 }
 ```
-### type Writer
+type Writer
 ```golang
 type Writer struct {
 	// contains filtered or unexported fields
 }
 ```
-### func NewWriter(w io.Writer) *Writer
-### func NewWriterLevel(w io.Writer, level int) (*Writer, error)
-### func NewWriterLevelDict(w io.Writer, level int, dict []byte) (*Writer, error)
-#### func (z *Writer) Close() error
-#### func (z *Writer) Flush() error
-#### func (z *Writer) Reset(w io.Writer)
-#### func (z *Writer) Write(p []byte) (n int, err error)
+func NewWriter(w io.Writer) *Writer
+func NewWriterLevel(w io.Writer, level int) (*Writer, error)
+func NewWriterLevelDict(w io.Writer, level int, dict []byte) (*Writer, error)
+#func (z *Writer) Close() error
+#func (z *Writer) Flush() error
+#func (z *Writer) Reset(w io.Writer)
+#func (z *Writer) Write(p []byte) (n int, err error)
 
 
-# container
-## container/heap
+# 6. container
+
+## 6.1 container/heap
+
 **Overview**
 Package heap provides heap operations for any type that implements heap.Interface. A heap is a tree with the property that each node is the minimum-valued node in its subtree.
 
@@ -829,14 +834,14 @@ The minimum element in the tree is the root, at index 0.
 
 A heap is a common way to implement a priority queue. To build a priority queue, implement the Heap interface with the (negative) priority as the ordering for the Less method, so Push adds items while Pop removes the highest-priority item from the queue. The Examples include such an implementation; the file example_pq_test.go has the complete source.
 
-### func Fix(h Interface, i int)
-### func Init(h Interface)
-### func Pop(h Interface) any
-### func Push(h Interface, x any)
-### func Remove(h Interface, i int) any
-### type Interface
+func Fix(h Interface, i int)
+func Init(h Interface)
+func Pop(h Interface) any
+func Push(h Interface, x any)
+func Remove(h Interface, i int) any
+type Interface
 
-## container/list
+## 6.2 container/list
 
 **Overview**
 Package list implements a doubly linked list.
@@ -849,28 +854,28 @@ for e := l.Front(); e != nil; e = e.Next() {
 
 ```
 
-### type Element
-#### func (e *Element) Next() *Element
-#### func (e *Element) Prev() *Element
-### type List
-### func New() *List
-#### func (l *List) Back() *Element
-#### func (l *List) Front() *Element
-#### func (l *List) Init() *List
-#### func (l *List) InsertAfter(v any, mark *Element) *Element
-#### func (l *List) InsertBefore(v any, mark *Element) *Element
-#### func (l *List) Len() int
-#### func (l *List) MoveAfter(e, mark *Element)
-#### func (l *List) MoveBefore(e, mark *Element)
-#### func (l *List) MoveToBack(e *Element)
-#### func (l *List) MoveToFront(e *Element)
-#### func (l *List) PushBack(v any) *Element
-#### func (l *List) PushBackList(other *List)
-#### func (l *List) PushFront(v any) *Element
-#### func (l *List) PushFrontList(other *List)
-#### func (l *List) Remove(e *Element) any
+type Element
+func (e \*Element) Next() \*Element
+func (e \*Element) Prev() \*Element
+type List
+func New() \*List
+func (l \*List) Back() \*Element
+func (l \*List) Front() \*Element
+func (l \*List) Init() \*List
+func (l \*List) InsertAfter(v any, mark \*Element) \*Element
+func (l \*List) InsertBefore(v any, mark \*Element) \*Element
+func (l \*List) Len() int
+func (l \*List) MoveAfter(e, mark \*Element)
+func (l \*List) MoveBefore(e, mark \*Element)
+func (l \*List) MoveToBack(e \*Element)
+func (l \*List) MoveToFront(e \*Element)
+func (l \*List) PushBack(v any) \*Element
+func (l \*List) PushBackList(other \*List)
+func (l \*List) PushFront(v any) \*Element
+func (l \*List) PushFrontList(other \*List)
+func (l \*List) Remove(e \*Element) any
 
-# os
+# 7. os
 
 **overview**
 Package os provides a platform-independent interface to operating system functionality. The design is Unix-like, although the error handling is Go-like; failing calls return values of type error rather than error numbers. Often, more information is available within the error. For example, if a call that takes a file name fails, such as Open or Stat, the error will include the failing file name when printed and will be of type *PathError, which may be unpacked for more information.
@@ -998,8 +1003,8 @@ var ErrProcessDone = errors.New("os: process already finished")
 ```
 ErrProcessDone indicates a Process has finished.
 
-## fucntion
-### func Chdir(dir string) error
+fucntion
+func Chdir(dir string) error
 Chdir changes the current working directory to the named directory. If there is an error, it will be of type *PathError.
 ```golang
 package main
@@ -1028,7 +1033,7 @@ $ Current working directory:  /home/kirkzhang/go-workspace
 summary:  
 more like `cd` command in linux
 
-### func Chmod(name string, mode FileMode) error
+func Chmod(name string, mode FileMode) error
 Chmod changes the mode of the named file to mode. If the file is a symbolic link, it changes the mode of the link's target. If there is an error, it will be of type *PathError.
 
 A different subset of the mode bits are used, depending on the operating system.
@@ -1056,164 +1061,164 @@ func main() {
 
 ```
 
-### func Chown(name string, uid, gid int) error
+func Chown(name string, uid, gid int) error
 Chown changes the numeric uid and gid of the named file. If the file is a symbolic link, it changes the uid and gid of the link's target. A uid or gid of -1 means to not change that value. If there is an error, it will be of type *PathError.
 
 On Windows or Plan 9, Chown always returns the syscall.EWINDOWS or EPLAN9 error, wrapped in *PathError.
 
-### func Chtimes(name string, atime time.Time, mtime time.Time) error
+func Chtimes(name string, atime time.Time, mtime time.Time) error
 Chtimes changes the access and modification times of the named file, similar to the Unix utime() or utimes() functions.
 
 The underlying filesystem may truncate or round the values to a less precise time unit. If there is an error, it will be of type *PathError.
 
-### func Clearenv()
+func Clearenv()
 Clearenv deletes all environment variables.
-### func DirFS(dir string) fs.FS
+func DirFS(dir string) fs.FS
 DirFS returns a file system (an fs.FS) for the tree of files rooted at the directory dir.
 
 Note that DirFS("/prefix") only guarantees that the Open calls it makes to the operating system will begin with "/prefix": DirFS("/prefix").Open("file") is the same as os.Open("/prefix/file"). So if /prefix/file is a symbolic link pointing outside the /prefix tree, then using DirFS does not stop the access any more than using os.Open does. Additionally, the root of the fs.FS returned for a relative path, DirFS("prefix"), will be affected by later calls to Chdir. DirFS is therefore not a general substitute for a chroot-style security mechanism when the directory tree contains arbitrary content.
 
-### func Environ() []string
+func Environ() []string
 Environ returns a copy of strings representing the environment, in the form "key=value".
 
-### func Executable() (string, error)
+func Executable() (string, error)
 Executable returns the path name for the executable that started the current process. There is no guarantee that the path is still pointing to the correct executable. If a symlink was used to start the process, depending on the operating system, the result might be the symlink or the path it pointed to. If a stable result is needed, path/filepath.EvalSymlinks might help.
 
 Executable returns an absolute path unless an error occurred.
 
 The main use case is finding resources located relative to an executable.
 
-### func Exit(code int)
+func Exit(code int)
 Exit causes the current program to exit with the given status code. Conventionally, code zero indicates success, non-zero an error. The program terminates immediately; deferred functions are not run.
 
 For portability, the status code should be in the range [0, 125].
-### func Expand(s string, mapping func(string) string) string
+func Expand(s string, mapping func(string) string) string
 Expand replaces ${var} or $var in the string based on the mapping function. For example, os.ExpandEnv(s) is equivalent to os.Expand(s, os.Getenv).
-### func ExpandEnv(s string) string
+func ExpandEnv(s string) string
 ExpandEnv replaces ${var} or $var in the string according to the values of the current environment variables. References to undefined variables are replaced by the empty string.
-### func Getegid() int
+func Getegid() int
 Getegid returns the numeric effective group id of the caller.
 
 On Windows, it returns -1.
-### func Getenv(key string) string
+func Getenv(key string) string
 Getenv retrieves the value of the environment variable named by the key. It returns the value, which will be empty if the variable is not present. To distinguish between an empty value and an unset value, use LookupEnv.
-### func Geteuid() int
+func Geteuid() int
 
-### func Getgid() int
+func Getgid() int
 Geteuid returns the numeric effective user id of the caller.
 
 On Windows, it returns -1.
-### func Getgroups() ([]int, error)
+func Getgroups() ([]int, error)
 Getgid returns the numeric group id of the caller.
 
 On Windows, it returns -1.
-### func Getpagesize() int
+func Getpagesize() int
 Getgroups returns a list of the numeric ids of groups that the caller belongs to.
 
 On Windows, it returns syscall.EWINDOWS. See the os/user package for a possible alternative.
-### func Getpid() int
+func Getpid() int
 Getpagesize returns the underlying system's memory page size.
-### func Getppid() int
+func Getppid() int
 Getpid returns the process id of the caller.
-### func Getuid() int
+func Getuid() int
 Geteuid returns the numeric effective user id of the caller.
 
 On Windows, it returns -1.
-### func Getwd() (dir string, err error)
+func Getwd() (dir string, err error)
 Getgid returns the numeric group id of the caller.
 
 On Windows, it returns -1.
-### func Hostname() (name string, err error)
-### func IsExist(err error) bool
-### func IsNotExist(err error) bool
-### func IsPathSeparator(c uint8) bool
-### func IsPermission(err error) bool
-### func IsTimeout(err error) bool
-### func Lchown(name string, uid, gid int) error
-### func Link(oldname, newname string) error
-### func LookupEnv(key string) (string, bool)
-### func Mkdir(name string, perm FileMode) error
-### func MkdirAll(path string, perm FileMode) error
-### func MkdirTemp(dir, pattern string) (string, error)
-### func NewSyscallError(syscall string, err error) error
-### func Pipe() (r *File, w *File, err error)
-### func ReadFile(name string) ([]byte, error)
-### func Readlink(name string) (string, error)
-### func Remove(name string) error
-### func RemoveAll(path string) error
-### func Rename(oldpath, newpath string) error
-### func SameFile(fi1, fi2 FileInfo) bool
-### func Setenv(key, value string) error
-### func Symlink(oldname, newname string) error
-### func TempDir() string
-### func Truncate(name string, size int64) error
-### func Unsetenv(key string) error
-### func UserCacheDir() (string, error)
-### func UserConfigDir() (string, error)
-### func UserHomeDir() (string, error)
-### func WriteFile(name string, data []byte, perm FileMode) error
-## type DirEntry
-## func ReadDir(name string) ([]DirEntry, error)
-## type File
-### func Create(name string) (*File, error)
-### func CreateTemp(dir, pattern string) (*File, error)
-### func NewFile(fd uintptr, name string) *File
-### func Open(name string) (*File, error)
-### func OpenFile(name string, flag int, perm FileMode) (*File, error)
-### func (f *File) Chdir() error
-### func (f *File) Chmod(mode FileMode) error
-### func (f *File) Chown(uid, gid int) error
-### func (f *File) Close() error
-### func (f *File) Fd() uintptr
-### func (f *File) Name() string
-### func (f *File) Read(b []byte) (n int, err error)
-### func (f *File) ReadAt(b []byte, off int64) (n int, err error)
-### func (f *File) ReadDir(n int) ([]DirEntry, error)
-### func (f *File) ReadFrom(r io.Reader) (n int64, err error)
-### func (f *File) Readdir(n int) ([]FileInfo, error)
-### func (f *File) Readdirnames(n int) (names []string, err error)
-### func (f *File) Seek(offset int64, whence int) (ret int64, err error)
-### func (f *File) SetDeadline(t time.Time) error
-### func (f *File) SetReadDeadline(t time.Time) error
-### func (f *File) SetWriteDeadline(t time.Time) error
-### func (f *File) Stat() (FileInfo, error)
-### func (f *File) Sync() error
-### func (f *File) SyscallConn() (syscall.RawConn, error)
-### func (f *File) Truncate(size int64) error
-### func (f *File) Write(b []byte) (n int, err error)
-### func (f *File) WriteAt(b []byte, off int64) (n int, err error)
-### func (f *File) WriteString(s string) (n int, err error)
-## type FileInfo
-### func Lstat(name string) (FileInfo, error)
-### func Stat(name string) (FileInfo, error)
-## type FileMode
-## type LinkError
-### func (e *LinkError) Error() string
-### func (e *LinkError) Unwrap() error
-## type PathError
-## type ProcAttr
-## type Process
-### func FindProcess(pid int) (*Process, error)
-### func StartProcess(name string, argv []string, attr \*ProcAttr) (\*Process, error)
-### func (p *Process) Kill() error
-### func (p *Process) Release() error
-### func (p *Process) Signal(sig Signal) error
-### func (p \*Process) Wait() (\*ProcessState, error)
-## type ProcessState
-### func (p *ProcessState) ExitCode() int
-### func (p *ProcessState) Exited() bool
-### func (p *ProcessState) Pid() int
-### func (p *ProcessState) String() string
-### func (p *ProcessState) Success() bool
-### func (p *ProcessState) Sys() any
-### func (p *ProcessState) SysUsage() any
-### func (p *ProcessState) SystemTime() time.Duration
-### func (p *ProcessState) UserTime() time.Duration
-## type Signal
-## type SyscallError
-### func (e *SyscallError) Error() string
-### func (e *SyscallError) Timeout() bool
-### func (e *SyscallError) Unwrap() error
+func Hostname() (name string, err error)
+func IsExist(err error) bool
+func IsNotExist(err error) bool
+func IsPathSeparator(c uint8) bool
+func IsPermission(err error) bool
+func IsTimeout(err error) bool
+func Lchown(name string, uid, gid int) error
+func Link(oldname, newname string) error
+func LookupEnv(key string) (string, bool)
+func Mkdir(name string, perm FileMode) error
+func MkdirAll(path string, perm FileMode) error
+func MkdirTemp(dir, pattern string) (string, error)
+func NewSyscallError(syscall string, err error) error
+func Pipe() (r *File, w *File, err error)
+func ReadFile(name string) ([]byte, error)
+func Readlink(name string) (string, error)
+func Remove(name string) error
+func RemoveAll(path string) error
+func Rename(oldpath, newpath string) error
+func SameFile(fi1, fi2 FileInfo) bool
+func Setenv(key, value string) error
+func Symlink(oldname, newname string) error
+func TempDir() string
+func Truncate(name string, size int64) error
+func Unsetenv(key string) error
+func UserCacheDir() (string, error)
+func UserConfigDir() (string, error)
+func UserHomeDir() (string, error)
+func WriteFile(name string, data []byte, perm FileMode) error
+type DirEntry
+func ReadDir(name string) ([]DirEntry, error)
+type File
+func Create(name string) (*File, error)
+func CreateTemp(dir, pattern string) (*File, error)
+func NewFile(fd uintptr, name string) *File
+func Open(name string) (*File, error)
+func OpenFile(name string, flag int, perm FileMode) (*File, error)
+func (f *File) Chdir() error
+func (f *File) Chmod(mode FileMode) error
+func (f *File) Chown(uid, gid int) error
+func (f *File) Close() error
+func (f *File) Fd() uintptr
+func (f *File) Name() string
+func (f *File) Read(b []byte) (n int, err error)
+func (f *File) ReadAt(b []byte, off int64) (n int, err error)
+func (f *File) ReadDir(n int) ([]DirEntry, error)
+func (f *File) ReadFrom(r io.Reader) (n int64, err error)
+func (f *File) Readdir(n int) ([]FileInfo, error)
+func (f *File) Readdirnames(n int) (names []string, err error)
+func (f *File) Seek(offset int64, whence int) (ret int64, err error)
+func (f *File) SetDeadline(t time.Time) error
+func (f *File) SetReadDeadline(t time.Time) error
+func (f *File) SetWriteDeadline(t time.Time) error
+func (f *File) Stat() (FileInfo, error)
+func (f *File) Sync() error
+func (f *File) SyscallConn() (syscall.RawConn, error)
+func (f *File) Truncate(size int64) error
+func (f *File) Write(b []byte) (n int, err error)
+func (f *File) WriteAt(b []byte, off int64) (n int, err error)
+func (f *File) WriteString(s string) (n int, err error)
+type FileInfo
+func Lstat(name string) (FileInfo, error)
+func Stat(name string) (FileInfo, error)
+type FileMode
+type LinkError
+func (e *LinkError) Error() string
+func (e *LinkError) Unwrap() error
+type PathError
+type ProcAttr
+type Process
+func FindProcess(pid int) (*Process, error)
+func StartProcess(name string, argv []string, attr \*ProcAttr) (\*Process, error)
+func (p *Process) Kill() error
+func (p *Process) Release() error
+func (p *Process) Signal(sig Signal) error
+func (p \*Process) Wait() (\*ProcessState, error)
+type ProcessState
+func (p *ProcessState) ExitCode() int
+func (p *ProcessState) Exited() bool
+func (p *ProcessState) Pid() int
+func (p *ProcessState) String() string
+func (p *ProcessState) Success() bool
+func (p *ProcessState) Sys() any
+func (p *ProcessState) SysUsage() any
+func (p *ProcessState) SystemTime() time.Duration
+func (p *ProcessState) UserTime() time.Duration
+type Signal
+type SyscallError
+func (e *SyscallError) Error() string
+func (e *SyscallError) Timeout() bool
+func (e *SyscallError) Unwrap() error
 
 
 
@@ -1251,182 +1256,182 @@ On Windows, it returns -1.
   )
   ```
 
-### func After(d Duration) <-chan Time
+func After(d Duration) <-chan Time
 
   After waits for the duration to elapse and then sends the current time on the returned channel. It is equivalent to NewTimer(d).C. The underlying Timer is not recovered by the garbage collector until the timer fires. If efficiency is a concern, use NewTimer instead and call Timer.Stop if the timer is no longer needed.这里需要注意，这个After(d Duration)是指返回一次的时间戳，想要使用还要再次初始化
 
-### func Sleep(d Duration)
+func Sleep(d Duration)
 
-### func Tick(d Duration) <-chan Time
+func Tick(d Duration) <-chan Time
 
-## type Duration
+type Duration
 
-### func ParseDuration(s string) (Duration, error)
+func ParseDuration(s string) (Duration, error)
 
-### func Since(t Time) Duration
+func Since(t Time) Duration
 
-### func Until(t Time) Duration
+func Until(t Time) Duration
 
-### func (d Duration) Abs() Duration
+func (d Duration) Abs() Duration
 
-### func (d Duration) Hours() float64
+func (d Duration) Hours() float64
 
-### func (d Duration) Microseconds() int64
+func (d Duration) Microseconds() int64
 
-### func (d Duration) Milliseconds() int64
+func (d Duration) Milliseconds() int64
 
-### func (d Duration) Minutes() float64
+func (d Duration) Minutes() float64
 
-### func (d Duration) Nanoseconds() int64
+func (d Duration) Nanoseconds() int64
 
-### func (d Duration) Round(m Duration) Duration
+func (d Duration) Round(m Duration) Duration
 
-### func (d Duration) Seconds() float64
+func (d Duration) Seconds() float64
 
-### func (d Duration) String() string
+func (d Duration) String() string
 
-### func (d Duration) Truncate(m Duration) Duration
+func (d Duration) Truncate(m Duration) Duration
 
-## type Location
+type Location
 
-### func FixedZone(name string, offset int) *Location
+func FixedZone(name string, offset int) *Location
 
-### func LoadLocation(name string) (*Location, error)
+func LoadLocation(name string) (*Location, error)
 
-### func LoadLocationFromTZData(name string, data []byte) (*Location, error)
+func LoadLocationFromTZData(name string, data []byte) (*Location, error)
 
-### func (l*Location) String() string
+func (l*Location) String() string
 
-## type Month
+type Month
 
-### func (m Month) String() string
+func (m Month) String() string
 
-## type ParseError
+type ParseError
 
-### func (e *ParseError) Error() string
+func (e *ParseError) Error() string
 
-## type Ticker
+type Ticker
 
   A Ticker holds a channel that delivers “ticks” of a clock at **intervals**.
 
-### func NewTicker(d Duration) *Ticker
+func NewTicker(d Duration) *Ticker
 
   NewTicker returns a new Ticker containing a channel that will send the current time on the channel after each tick. The period of the ticks is specified by the duration argument. **The ticker will adjust the time interval or drop ticks to make up for slow receivers**. The duration d must be greater than zero; if not, NewTicker will panic. Stop the ticker to release associated resources.
 
-### func (t *Ticker) Reset(d Duration)
+func (t *Ticker) Reset(d Duration)
 
   Reset stops a ticker and resets its period to the specified duration. The next tick will arrive after the new period elapses. The duration d must be greater than zero; if not, Reset will panic.
 
-### func (t *Ticker) Stop()
+func (t *Ticker) Stop()
 
   Stop turns off a ticker. After Stop, no more ticks will be sent. Stop does not close the channel, to prevent a concurrent goroutine reading from the channel from seeing an erroneous "tick".
 
 
-## type Time
+type Time
 
-### func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
+func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
 
-### func Now() Time
+func Now() Time
 
-### func Parse(layout, value string) (Time, error)
+func Parse(layout, value string) (Time, error)
 
-### func ParseInLocation(layout, value string, loc *Location) (Time, error)
+func ParseInLocation(layout, value string, loc *Location) (Time, error)
 
-### func Unix(sec int64, nsec int64) Time
+func Unix(sec int64, nsec int64) Time
 
-### func UnixMicro(usec int64) Time
+func UnixMicro(usec int64) Time
 
-### func UnixMilli(msec int64) Time
+func UnixMilli(msec int64) Time
 
-### func (t Time) Add(d Duration) Time
+func (t Time) Add(d Duration) Time
 
-### func (t Time) AddDate(years int, months int, days int) Time
+func (t Time) AddDate(years int, months int, days int) Time
 
-### func (t Time) After(u Time) bool
+func (t Time) After(u Time) bool
 
-### func (t Time) AppendFormat(b []byte, layout string) []byte
+func (t Time) AppendFormat(b []byte, layout string) []byte
 
-### func (t Time) Before(u Time) bool
+func (t Time) Before(u Time) bool
 
-### func (t Time) Clock() (hour, min, sec int)
+func (t Time) Clock() (hour, min, sec int)
 
-### func (t Time) Date() (year int, month Month, day int)
+func (t Time) Date() (year int, month Month, day int)
 
-### func (t Time) Day() int
+func (t Time) Day() int
 
-### func (t Time) Equal(u Time) bool
+func (t Time) Equal(u Time) bool
 
-### func (t Time) Format(layout string) string
+func (t Time) Format(layout string) string
 
-### func (t Time) GoString() string
+func (t Time) GoString() string
 
-### func (t *Time) GobDecode(data []byte) error
+func (t *Time) GobDecode(data []byte) error
 
-### func (t Time) GobEncode() ([]byte, error)
+func (t Time) GobEncode() ([]byte, error)
 
-### func (t Time) Hour() int
+func (t Time) Hour() int
 
-### func (t Time) ISOWeek() (year, week int)
+func (t Time) ISOWeek() (year, week int)
 
-### func (t Time) In(loc*Location) Time
+func (t Time) In(loc*Location) Time
 
-### func (t Time) IsDST() bool
+func (t Time) IsDST() bool
 
-### func (t Time) IsZero() bool
+func (t Time) IsZero() bool
 
-### func (t Time) Local() Time
+func (t Time) Local() Time
 
-### func (t Time) Location() *Location
+func (t Time) Location() *Location
 
-### func (t Time) MarshalBinary() ([]byte, error)
+func (t Time) MarshalBinary() ([]byte, error)
 
-### func (t Time) MarshalJSON() ([]byte, error)
+func (t Time) MarshalJSON() ([]byte, error)
 
-### func (t Time) MarshalText() ([]byte, error)
+func (t Time) MarshalText() ([]byte, error)
 
-### func (t Time) Minute() int
+func (t Time) Minute() int
 
-### func (t Time) Month() Month
+func (t Time) Month() Month
 
-### func (t Time) Nanosecond() int
+func (t Time) Nanosecond() int
 
-### func (t Time) Round(d Duration) Time
+func (t Time) Round(d Duration) Time
 
-### func (t Time) Second() int
+func (t Time) Second() int
 
-### func (t Time) String() string
+func (t Time) String() string
 
-### func (t Time) Sub(u Time) Duration
+func (t Time) Sub(u Time) Duration
 
-### func (t Time) Truncate(d Duration) Time
+func (t Time) Truncate(d Duration) Time
 
-### func (t Time) UTC() Time
+func (t Time) UTC() Time
 
-### func (t Time) Unix() int64
+func (t Time) Unix() int64
 
-### func (t Time) UnixMicro() int64
+func (t Time) UnixMicro() int64
 
-### func (t Time) UnixMilli() int64
+func (t Time) UnixMilli() int64
 
-### func (t Time) UnixNano() int64
+func (t Time) UnixNano() int64
 
-### func (t*Time) UnmarshalBinary(data []byte) error
+func (t*Time) UnmarshalBinary(data []byte) error
 
-### func (t *Time) UnmarshalJSON(data []byte) error
+func (t *Time) UnmarshalJSON(data []byte) error
 
-### func (t*Time) UnmarshalText(data []byte) error
+func (t*Time) UnmarshalText(data []byte) error
 
-### func (t Time) Weekday() Weekday
+func (t Time) Weekday() Weekday
 
-### func (t Time) Year() int
+func (t Time) Year() int
 
-### func (t Time) YearDay() int
+func (t Time) YearDay() int
 
-### func (t Time) Zone() (name string, offset int)
+func (t Time) Zone() (name string, offset int)
 
-### func (t Time) ZoneBounds() (start, end Time)
+func (t Time) ZoneBounds() (start, end Time)
 
-### type Timer
+type Timer
 
   ```golang
   type Timer struct {
@@ -1437,95 +1442,95 @@ On Windows, it returns -1.
 
   这里的C用于接收
 
-### func AfterFunc(d Duration, f func()) *Timer
+func AfterFunc(d Duration, f func()) *Timer
 
-### func NewTimer(d Duration)*Timer
+func NewTimer(d Duration)*Timer
 
-### func (t *Timer) Reset(d Duration) bool
+func (t *Timer) Reset(d Duration) bool
 
-### func (t*Timer) Stop() bool
+func (t*Timer) Stop() bool
 
-## type Weekday
+type Weekday
 
-### func (d Weekday) String() string
+func (d Weekday) String() string
 
 # rand
 
-## function not method of rand
+function not method of rand
 
-### func ExpFloat64() float64
+func ExpFloat64() float64
 
-### func Float32() float32
+func Float32() float32
 
-### func Float64() float64
+func Float64() float64
 
-### func Int() int
+func Int() int
 
-### func Int31() int32
+func Int31() int32
 
-### func Int31n(n int32) int32
+func Int31n(n int32) int32
 
-### func Int63() int64
+func Int63() int64
 
-### func Int63n(n int64) int64
+func Int63n(n int64) int64
 
-### func Intn(n int) int
+func Intn(n int) int
 
-### func NormFloat64() float64
+func NormFloat64() float64
 
-### func Perm(n int) []int
+func Perm(n int) []int
 
-### func Read(p []byte) (n int, err error)
+func Read(p []byte) (n int, err error)
 
-### func Seed(seed int64)
+func Seed(seed int64)
 
-### func Shuffle(n int, swap func(i, j int))
+func Shuffle(n int, swap func(i, j int))
 
-### func Uint32() uint32
+func Uint32() uint32
 
-### func Uint64() uint64
+func Uint64() uint64
 
-## type Rand
+type Rand
 
-### func New(src Source) *Rand
+func New(src Source) *Rand
 
-### func (r*Rand) ExpFloat64() float64
+func (r*Rand) ExpFloat64() float64
 
-### func (r *Rand) Float32() float32
+func (r *Rand) Float32() float32
 
-### func (r*Rand) Float64() float64
+func (r*Rand) Float64() float64
 
-### func (r *Rand) Int() int
+func (r *Rand) Int() int
 
-### func (r*Rand) Int31() int32
+func (r*Rand) Int31() int32
 
-### func (r *Rand) Int31n(n int32) int32
+func (r *Rand) Int31n(n int32) int32
 
-### func (r*Rand) Int63() int64
+func (r*Rand) Int63() int64
 
-### func (r *Rand) Int63n(n int64) int64
+func (r *Rand) Int63n(n int64) int64
 
-### func (r*Rand) Intn(n int) int
+func (r*Rand) Intn(n int) int
 
-### func (r *Rand) NormFloat64() float64
+func (r *Rand) NormFloat64() float64
 
-### func (r*Rand) Perm(n int) []int
+func (r*Rand) Perm(n int) []int
 
-### func (r *Rand) Read(p []byte) (n int, err error)
+func (r *Rand) Read(p []byte) (n int, err error)
 
-### func (r*Rand) Seed(seed int64)
+func (r*Rand) Seed(seed int64)
 
   Seed使用提供的种子值将生成器初始化为一个确定的状态。Seed不应该与其他Rand方法并发调用。
 
-### func (r *Rand) Shuffle(n int, swap func(i, j int))
+func (r *Rand) Shuffle(n int, swap func(i, j int))
 
-### func (r*Rand) Uint32() uint32
+func (r*Rand) Uint32() uint32
 
-### func (r *Rand) Uint64() uint64
+func (r *Rand) Uint64() uint64
 
-## type Source
+type Source
 
-### func NewSource(seed int64) Source
+func NewSource(seed int64) Source
 
   NewSource返回一个新的伪随机源，其种子为给定值。与顶级函数使用的默认Source不同，这个Source对于多个goroutine的并发使用是不安全的。
 
@@ -1536,7 +1541,7 @@ On Windows, it returns -1.
 
   ```
 
-## type Source64
+type Source64
 
   Source64是一个也可以直接生成[0, 1<<64]范围内的均匀分布的伪随机uint64值的Source。如果一个Rand r的底层Source s实现了Source64，那么r.Uint64返回对s.Uint64的一次调用结果，而不是对s.Int63的两次调用。  
   Source64的结构
@@ -1548,8 +1553,8 @@ On Windows, it returns -1.
   }
   ```
 
-## type Zipf
+type Zipf
 
-### func NewZipf(r \*Rand, s float64, v float64, imax uint64)\*Zipf
+func NewZipf(r \*Rand, s float64, v float64, imax uint64)\*Zipf
 
-### func (z *Zipf) Uint64() uint64
+func (z *Zipf) Uint64() uint64
