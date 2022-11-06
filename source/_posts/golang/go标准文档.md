@@ -869,6 +869,362 @@ for e := l.Front(); e != nil; e = e.Next() {
 #### func (l *List) PushFrontList(other *List)
 #### func (l *List) Remove(e *Element) any
 
+# os
+
+**overview**
+Package os provides a platform-independent interface to operating system functionality. The design is Unix-like, although the error handling is Go-like; failing calls return values of type error rather than error numbers. Often, more information is available within the error. For example, if a call that takes a file name fails, such as Open or Stat, the error will include the failing file name when printed and will be of type *PathError, which may be unpacked for more information.
+
+The os interface is intended to be uniform across all operating systems. Features not generally available appear in the system-specific package syscall.
+
+Here is a simple example, opening a file and reading some of it.
+```golang
+file, err := os.Open("file.go") // For read access.
+if err != nil {
+	log.Fatal(err)
+}
+```
+If the open fails, the error string will be self-explanatory, like
+```golang
+open file.go: no such file or directory
+```
+The file's data can then be read into a slice of bytes. Read and Write take their byte counts from the length of the argument slice.
+
+```golang
+data := make([]byte, 100)
+count, err := file.Read(data)
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("read %d bytes: %q\n", count, data[:count])
+```
+Note: The maximum number of concurrent operations on a File may be limited by the OS or the system. The number should be high, but exceeding(adj.超越的) it may degrade(vt.贬低) performance or cause other issues.
+
+summary:  
+1. failing calls return values of type error rather than error numbers.like above open file failed. and emit "open file.go: no such file or directory"
+2.  The maximum number of concurrent operations on a File may be limited by the OS or the system(not know the root cause and knowledge)
+
+**Constants**
+```golang
+const (
+	// Exactly one of O_RDONLY, O_WRONLY, or O_RDWR must be specified.
+	O_RDONLY int = syscall.O_RDONLY // open the file read-only.
+	O_WRONLY int = syscall.O_WRONLY // open the file write-only.
+	O_RDWR   int = syscall.O_RDWR   // open the file read-write.
+	// The remaining values may be or'ed in to control behavior.
+	O_APPEND int = syscall.O_APPEND // append data to the file when writing.
+	O_CREATE int = syscall.O_CREAT  // create a new file if none exists.
+	O_EXCL   int = syscall.O_EXCL   // used with O_CREATE, file must not exist.
+	O_SYNC   int = syscall.O_SYNC   // open for synchronous I/O.
+	O_TRUNC  int = syscall.O_TRUNC  // truncate regular(adj. 定期的) writable file when opened.
+)
+```
+Flags to OpenFile wrapping those of the underlying system. Not all flags may be implemented on a given system.
+```golang
+const (
+	SEEK_SET int = 0 // seek relative to the origin of the file
+	SEEK_CUR int = 1 // seek relative to the current offset
+	SEEK_END int = 2 // seek relative to the end
+)
+```
+Deprecated: Use io.SeekStart, io.SeekCurrent, and io.SeekEnd.
+```golang
+const (
+	PathSeparator     = '/' // OS-specific path separator
+	PathListSeparator = ':' // OS-specific path list separator
+)
+```
+```golang
+const (
+	// The single letters are the abbreviations
+	// used by the String method's formatting.
+	ModeDir        = fs.ModeDir        // d: is a directory
+	ModeAppend     = fs.ModeAppend     // a: append-only
+	ModeExclusive  = fs.ModeExclusive  // l: exclusive use
+	ModeTemporary  = fs.ModeTemporary  // T: temporary file; Plan 9 only
+	ModeSymlink    = fs.ModeSymlink    // L: symbolic link
+	ModeDevice     = fs.ModeDevice     // D: device file
+	ModeNamedPipe  = fs.ModeNamedPipe  // p: named pipe (FIFO)
+	ModeSocket     = fs.ModeSocket     // S: Unix domain socket
+	ModeSetuid     = fs.ModeSetuid     // u: setuid
+	ModeSetgid     = fs.ModeSetgid     // g: setgid
+	ModeCharDevice = fs.ModeCharDevice // c: Unix character device, when ModeDevice is set
+	ModeSticky     = fs.ModeSticky     // t: sticky
+	ModeIrregular  = fs.ModeIrregular  // ?: non-regular file; nothing else is known about this file
+
+	// Mask for the type bits. For regular files, none will be set.
+	ModeType = fs.ModeType
+
+	ModePerm = fs.ModePerm // Unix permission bits, 0o777
+)
+```
+The defined file mode bits are the most significant bits of the FileMode. The nine least-significant bits are the standard Unix `rwxrwxrwx` permissions. The values of these bits should be considered part of the public API and may be used in wire protocols or disk representations: they must not be changed, although new bits might be added.
+```golang
+const DevNull = "/dev/null"
+```
+DevNull is the name of the operating system's “null device.” On Unix-like systems, it is "/dev/null"; on Windows, "NUL".
+
+**variables**
+```golang
+var (
+	// ErrInvalid indicates an invalid argument.
+	// Methods on File will return this error when the receiver is nil.
+	ErrInvalid = fs.ErrInvalid // "invalid argument"
+
+	ErrPermission = fs.ErrPermission // "permission denied"
+	ErrExist      = fs.ErrExist      // "file already exists"
+	ErrNotExist   = fs.ErrNotExist   // "file does not exist"
+	ErrClosed     = fs.ErrClosed     // "file already closed"
+
+	ErrNoDeadline       = errNoDeadline()       // "file type does not support deadline"
+	ErrDeadlineExceeded = errDeadlineExceeded() // "i/o timeout"
+)
+```
+Portable analogs of some common system call errors.
+
+Errors returned from this package may be tested against these errors with errors.Is.
+
+`Stdin`, `Stdout`, and `Stderr` are open Files pointing to the standard input, standard output, and standard error file descriptors.
+
+Note that the Go runtime writes to standard error for panics and crashes; closing Stderr may cause those messages to go elsewhere, perhaps to a file opened later.
+```golang
+var Args []string
+```
+
+Args hold the command-line arguments, starting with the program name.
+
+```golang
+var ErrProcessDone = errors.New("os: process already finished")
+```
+ErrProcessDone indicates a Process has finished.
+
+## fucntion
+### func Chdir(dir string) error
+Chdir changes the current working directory to the named directory. If there is an error, it will be of type *PathError.
+```golang
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+)
+
+func main() {
+	if err := os.Chdir("/home/kirkzhang/go-workspace"); err != nil {
+		log.Fatal(err)
+	}
+	CurDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Println("Current working directory: ", CurDir)
+	}
+}
+
+$ Current working directory:  /home/kirkzhang/go-workspace
+
+```
+summary:  
+more like `cd` command in linux
+
+### func Chmod(name string, mode FileMode) error
+Chmod changes the mode of the named file to mode. If the file is a symbolic link, it changes the mode of the link's target. If there is an error, it will be of type *PathError.
+
+A different subset of the mode bits are used, depending on the operating system.
+
+On Unix, the mode's permission bits, ModeSetuid, ModeSetgid, and ModeSticky are used.
+
+On Windows, only the 0200 bit (owner writable) of mode is used; it controls whether the file's read-only attribute is set or cleared. The other bits are currently unused. For compatibility with Go 1.12 and earlier, use a non-zero mode. Use mode 0400 for a read-only file and 0600 for a readable+writable file.
+
+On Plan 9, the mode's permission bits, ModeAppend, ModeExclusive, and ModeTemporary are used.
+```golang
+func main() {
+	if err := os.Chmod("./hello_world.go", os.ModePerm); err != nil {
+  // if err := os.Chmod("./hello_world.go", os.FileMode.Perm(777));
+		log.Fatal(err)
+	}
+	CurDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Println("Current working directory: ", CurDir)
+	}
+
+}
+
+
+```
+
+### func Chown(name string, uid, gid int) error
+Chown changes the numeric uid and gid of the named file. If the file is a symbolic link, it changes the uid and gid of the link's target. A uid or gid of -1 means to not change that value. If there is an error, it will be of type *PathError.
+
+On Windows or Plan 9, Chown always returns the syscall.EWINDOWS or EPLAN9 error, wrapped in *PathError.
+
+### func Chtimes(name string, atime time.Time, mtime time.Time) error
+Chtimes changes the access and modification times of the named file, similar to the Unix utime() or utimes() functions.
+
+The underlying filesystem may truncate or round the values to a less precise time unit. If there is an error, it will be of type *PathError.
+
+### func Clearenv()
+Clearenv deletes all environment variables.
+### func DirFS(dir string) fs.FS
+DirFS returns a file system (an fs.FS) for the tree of files rooted at the directory dir.
+
+Note that DirFS("/prefix") only guarantees that the Open calls it makes to the operating system will begin with "/prefix": DirFS("/prefix").Open("file") is the same as os.Open("/prefix/file"). So if /prefix/file is a symbolic link pointing outside the /prefix tree, then using DirFS does not stop the access any more than using os.Open does. Additionally, the root of the fs.FS returned for a relative path, DirFS("prefix"), will be affected by later calls to Chdir. DirFS is therefore not a general substitute for a chroot-style security mechanism when the directory tree contains arbitrary content.
+
+### func Environ() []string
+Environ returns a copy of strings representing the environment, in the form "key=value".
+
+### func Executable() (string, error)
+Executable returns the path name for the executable that started the current process. There is no guarantee that the path is still pointing to the correct executable. If a symlink was used to start the process, depending on the operating system, the result might be the symlink or the path it pointed to. If a stable result is needed, path/filepath.EvalSymlinks might help.
+
+Executable returns an absolute path unless an error occurred.
+
+The main use case is finding resources located relative to an executable.
+
+### func Exit(code int)
+Exit causes the current program to exit with the given status code. Conventionally, code zero indicates success, non-zero an error. The program terminates immediately; deferred functions are not run.
+
+For portability, the status code should be in the range [0, 125].
+### func Expand(s string, mapping func(string) string) string
+Expand replaces ${var} or $var in the string based on the mapping function. For example, os.ExpandEnv(s) is equivalent to os.Expand(s, os.Getenv).
+### func ExpandEnv(s string) string
+ExpandEnv replaces ${var} or $var in the string according to the values of the current environment variables. References to undefined variables are replaced by the empty string.
+### func Getegid() int
+Getegid returns the numeric effective group id of the caller.
+
+On Windows, it returns -1.
+### func Getenv(key string) string
+Getenv retrieves the value of the environment variable named by the key. It returns the value, which will be empty if the variable is not present. To distinguish between an empty value and an unset value, use LookupEnv.
+### func Geteuid() int
+
+### func Getgid() int
+Geteuid returns the numeric effective user id of the caller.
+
+On Windows, it returns -1.
+### func Getgroups() ([]int, error)
+Getgid returns the numeric group id of the caller.
+
+On Windows, it returns -1.
+### func Getpagesize() int
+Getgroups returns a list of the numeric ids of groups that the caller belongs to.
+
+On Windows, it returns syscall.EWINDOWS. See the os/user package for a possible alternative.
+### func Getpid() int
+Getpagesize returns the underlying system's memory page size.
+### func Getppid() int
+Getpid returns the process id of the caller.
+### func Getuid() int
+Geteuid returns the numeric effective user id of the caller.
+
+On Windows, it returns -1.
+### func Getwd() (dir string, err error)
+Getgid returns the numeric group id of the caller.
+
+On Windows, it returns -1.
+### func Hostname() (name string, err error)
+### func IsExist(err error) bool
+### func IsNotExist(err error) bool
+### func IsPathSeparator(c uint8) bool
+### func IsPermission(err error) bool
+### func IsTimeout(err error) bool
+### func Lchown(name string, uid, gid int) error
+### func Link(oldname, newname string) error
+### func LookupEnv(key string) (string, bool)
+### func Mkdir(name string, perm FileMode) error
+### func MkdirAll(path string, perm FileMode) error
+### func MkdirTemp(dir, pattern string) (string, error)
+### func NewSyscallError(syscall string, err error) error
+### func Pipe() (r *File, w *File, err error)
+### func ReadFile(name string) ([]byte, error)
+### func Readlink(name string) (string, error)
+### func Remove(name string) error
+### func RemoveAll(path string) error
+### func Rename(oldpath, newpath string) error
+### func SameFile(fi1, fi2 FileInfo) bool
+### func Setenv(key, value string) error
+### func Symlink(oldname, newname string) error
+### func TempDir() string
+### func Truncate(name string, size int64) error
+### func Unsetenv(key string) error
+### func UserCacheDir() (string, error)
+### func UserConfigDir() (string, error)
+### func UserHomeDir() (string, error)
+### func WriteFile(name string, data []byte, perm FileMode) error
+## type DirEntry
+### func ReadDir(name string) ([]DirEntry, error)
+## type File
+### func Create(name string) (*File, error)
+### func CreateTemp(dir, pattern string) (*File, error)
+### func NewFile(fd uintptr, name string) *File
+### func Open(name string) (*File, error)
+### func OpenFile(name string, flag int, perm FileMode) (*File, error)
+### func (f *File) Chdir() error
+### func (f *File) Chmod(mode FileMode) error
+### func (f *File) Chown(uid, gid int) error
+### func (f *File) Close() error
+### func (f *File) Fd() uintptr
+### func (f *File) Name() string
+### func (f *File) Read(b []byte) (n int, err error)
+### func (f *File) ReadAt(b []byte, off int64) (n int, err error)
+### func (f *File) ReadDir(n int) ([]DirEntry, error)
+### func (f *File) ReadFrom(r io.Reader) (n int64, err error)
+### func (f *File) Readdir(n int) ([]FileInfo, error)
+### func (f *File) Readdirnames(n int) (names []string, err error)
+### func (f *File) Seek(offset int64, whence int) (ret int64, err error)
+### func (f *File) SetDeadline(t time.Time) error
+### func (f *File) SetReadDeadline(t time.Time) error
+### func (f *File) SetWriteDeadline(t time.Time) error
+### func (f *File) Stat() (FileInfo, error)
+### func (f *File) Sync() error
+### func (f *File) SyscallConn() (syscall.RawConn, error)
+### func (f *File) Truncate(size int64) error
+### func (f *File) Write(b []byte) (n int, err error)
+### func (f *File) WriteAt(b []byte, off int64) (n int, err error)
+### func (f *File) WriteString(s string) (n int, err error)
+## type FileInfo
+### func Lstat(name string) (FileInfo, error)
+### func Stat(name string) (FileInfo, error)
+## type FileMode
+## type LinkError
+### func (e *LinkError) Error() string
+### func (e *LinkError) Unwrap() error
+## type PathError
+## type ProcAttr
+## type Process
+### func FindProcess(pid int) (*Process, error)
+### func StartProcess(name string, argv []string, attr \*ProcAttr) (\*Process, error)
+### func (p *Process) Kill() error
+### func (p *Process) Release() error
+### func (p *Process) Signal(sig Signal) error
+### func (p \*Process) Wait() (\*ProcessState, error)
+## type ProcessState
+### func (p *ProcessState) ExitCode() int
+### func (p *ProcessState) Exited() bool
+### func (p *ProcessState) Pid() int
+### func (p *ProcessState) String() string
+### func (p *ProcessState) Success() bool
+### func (p *ProcessState) Sys() any
+### func (p *ProcessState) SysUsage() any
+### func (p *ProcessState) SystemTime() time.Duration
+### func (p *ProcessState) UserTime() time.Duration
+## type Signal
+## type SyscallError
+### func (e *SyscallError) Error() string
+### func (e *SyscallError) Timeout() bool
+### func (e *SyscallError) Unwrap() error
+
+
+
+
+
+
+
+
+
+
+
+
 # time package
 
 **Constants**

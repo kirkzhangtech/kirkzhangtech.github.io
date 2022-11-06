@@ -100,111 +100,36 @@ summary:
         -o      指定编译输出的软件名称
         -i      安装作为目标的依赖关系的包(用于增量编译提速)
         -a      强制重建已经是最新版本的软件包 
-        -n      print the commands but do not run them(只是输出一些运行过程)
+        -n      (只是输出一些运行过程)
         -p n    the number of programs, such as build commands or (指定内核数量编译程序，包括test binary)
-                test binaries, that can be run in parallel.
-                The default is GOMAXPROCS, normally the number of CPUs available.
         -race   (同时检测数据竞争状态，只支持 linux/amd64, freebsd/amd64, darwin/amd64 和 windows/amd64)
-                enable data race detection.
-                Supported only on linux/amd64, freebsd/amd64, darwin/amd64, darwin/arm64, windows/amd64,
-                linux/ppc64le and linux/arm64 (only for 48-bit VMA).
         -msan   (启用与内存消毒器的互操作。仅支持linux / amd64，并且只用Clang / LLVM作为主机C编译器（少用))
-                enable interoperation with memory sanitizer.
-                Supported only on linux/amd64, linux/arm64
-                and only with Clang/LLVM as the host C compiler.
-                On linux/arm64, pie build mode will be used.
         -asan
-                enable interoperation with address sanitizer.
-                Supported only on linux/arm64, linux/amd64.
         -v      (打印名称)
-                print the names of packages as they are compiled.
         -work   (打印临时工作目录名称)
-                print the name of the temporary work directory and
-                do not delete it when exiting.
         -x      打印输出 执行命令名
-                print the commands.
-
         -asmflags '[pattern=]arg list'   (传递每个go工具asm调用的参数)
-                arguments to pass on each go tool asm invocation.
         -buildmode mode             (编译模式 go help buildmode)
-                build mode to use. See 'go help buildmode' for more.
-        -buildvcs                   ()
-                Whether to stamp binaries with version control information
-                ("true", "false", or "auto"). By default ("auto"), version control
-                information is stamped into a binary if the main package, the main module
-                containing it, and the current directory are all in the same repository.
-                Use -buildvcs=false to always omit version control information, or
-                -buildvcs=true to error out if version control information is available but
-                cannot be included due to a missing tool or ambiguous directory structure.
+        -buildvcs   
         -compiler name  (指定编译器)
-                name of compiler to use, as in runtime.Compiler (gccgo or gc).
         -gccgoflags '[pattern=]arg list'  gccgo编译/连接器参数
-                arguments to pass on each gccgo compiler/linker invocation.
         -gcflags '[pattern=]arg list'   垃圾回收参数
-                arguments to pass on each go tool compile invocation.
         -installsuffix suffix           (压缩编译后体积)
-                a suffix to use in the name of the package installation directory,
-                in order to keep output separate from default builds.
-                If using the -race flag, the install suffix is automatically set to race
-                or, if set explicitly, has _race appended to it. Likewise for the -msan
-                and -asan flags. Using a -buildmode option that requires non-default compile
-                flags has a similar effect.
         -ldflags '[pattern=]arg list'
-                arguments to pass on each go tool link invocation.
         -linkshared             (链接到以前共享库)
-                build code that will be linked against shared libraries previously
-                created with -buildmode=shared.
         -mod mode
-                module download mode to use: readonly, vendor, or mod.
-                By default, if a vendor directory is present and the go version in go.mod
-                is 1.14 or higher, the go command acts as if -mod=vendor were set.
-                Otherwise, the go command acts as if -mod=readonly were set.
-                See https://golang.org/ref/mod#build-commands for details.
         -modcacherw
-                leave newly-created directories in the module cache read-write
-                instead of making them read-only.
         -modfile file
-                in module aware mode, read (and possibly write) an alternate go.mod
-                file instead of the one in the module root directory. A file named
-                "go.mod" must still be present in order to determine the module root
-                directory, but it is not accessed. When -modfile is specified, an
-                alternate go.sum file is also used: its path is derived from the
-                -modfile flag by trimming the ".mod" extension and appending ".sum".
         -overlay file
-                read a JSON config file that provides an overlay for build operations.
-                The file is a JSON struct with a single field, named 'Replace', that
-                maps each disk file path (a string) to its backing file path, so that
-                a build will run as if the disk file path exists with the contents
-                given by the backing file paths, or as if the disk file path does not
-                exist if its backing file path is empty. Support for the -overlay flag
-                has some limitations: importantly, cgo files included from outside the
-                include path must be in the same directory as the Go package they are
-                included from, and overlays will not appear when binaries and tests are
-                run through go run and go test respectively.
         -pkgdir dir     (从指定位置，而不是通常的位置安装和加载所有软件包。例如，当使用非标准配置构建时，使用-pkgdir将生成的包保留在单独的位置。)
-                install and load all packages from dir instead of the usual locations.
-                For example, when building with a non-standard configuration,
-                use -pkgdir to keep generated packages in a separate location.
         -tags tag,list  (构建出带tag的版本.)
-                a comma-separated list of build tags to consider satisfied during the
-                build. For more information about build tags, see the description of
-                build constraints in the documentation for the go/build package.
-                (Earlier versions of Go used a space-separated list, and that form
-                is deprecated but still recognized.)
         -trimpath
-                remove all file system paths from the resulting executable.
-                Instead of absolute file system paths, the recorded file names
-                will begin either a module path@version (when using modules),
-                or a plain import path (when using the standard library, or GOPATH).
         -toolexec 'cmd args'
-                a program to use to invoke toolchain programs like vet and asm.
-                For example, instead of running asm, the go command will run
-                'cmd args /path/to/asm <arguments for asm>'.
-                The TOOLEXEC_IMPORTPATH environment variable will be set,
-                matching 'go list -f {{.ImportPath}}' for the package being built.
         ```
 4. go拥有丰富的库函数
-5. `go help 子命令(build等等)`
+5. `func` 接收器、函数名、参数列表、返回值列表
+6. 函数的左括号 { 必须和 func 函数声明在同一行上，且位于末尾，不能独占一行(第一节对格式有说明)
+7. gofmt工具把代码格式化为标准格式,只能服从
 
 ## 1.2 命令行参数(os package)
 
@@ -336,13 +261,10 @@ func main() {
 这条语句的输出结果跟 strings.Join 得到的结果很像，只是被放到了一对方括号里。切片都会被打印成这种格式。
 
 练习 1.1： 修改 echo 程序，使其能够打印 os.Args[0]，即被执行命令本身的名字。
-
 练习 1.2： 修改 echo 程序，使其打印每个参数的索引和值，每个一行。
-
 练习 1.3： 做实验测量潜在低效的版本和使用了 strings.Join 的版本的运行时间差异。（1.6 节讲解了部分 time 包，11.4 节展示了如何写标准测试程序，以得到系统性的性能评测。）
-
 summary:  
-1. os提供跨平台的方式。具体怎么用要参考文档
+1. `os`包提供跨平台的方式。具体怎么用要参考文档
 2. golang定义参数的方式`var a,b,c int=0,0,0`,还有海马运算符
       `s := ""`
       `var s , v string`
@@ -357,15 +279,16 @@ summary:
 %x, %o, %b  十六进制，八进制，二进制整数。
 %f, %g, %e  浮点数： 3.141593 3.141592653589793 3.141593e+00
 %t          布尔：true或false
-%c          字符（rune） (Unicode码点)
+%c          字符(rune)(Unicode码点)
 %s          字符串
 %q          带双引号的字符串"abc"或带单引号的字符'c'
 %v          变量的自然形式（natural format）
 %T          变量的类型
 %%          字面上的百分号标志（无操作数）
 ```
+
 1. `a := make(map[string]int)`
-2. golang的传递都是值传递，如果不指定的话
+2. golang的传递都是值传递
 
 ## 1.4 GIF动画
 没啥意思，都是介绍功能
