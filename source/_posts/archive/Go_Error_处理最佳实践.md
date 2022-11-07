@@ -1,5 +1,5 @@
 ---
-title: Spring Bean默认是单例的，高并发情况下，如何保证并发安全？
+title: Go Error 处理最佳实践
 categories: 
 - golang
 thumbnailImagePosition: bottom
@@ -8,14 +8,18 @@ coverImage: https://user-images.githubusercontent.com/46363359/198889790-d187ff0
 metaAlignment: center
 coverMeta: out
 ---
-> source page : <https://mp.weixin.qq.com/s/EvkMQCPwg-B0fZonpwXodg>
+> source page: <https://mp.weixin.qq.com/s/EvkMQCPwg-B0fZonpwXodg>
 
+摘要 ： 错误处理一直以一是编程必需要面对的问题，错误处理如果做的好的话，代码的稳定性会很好。不同的语言有不同的出现处理的方式。Go 语言也一样，在本篇文章中，我们来讨论一下 Go 语言的错误处理方式。
 
+<!-- more -->
 
-错误处理一直以一是编程必需要面对的问题，错误处理如果做的好的话，代码的稳定性会很好。不同的语言有不同的出现处理的方式。Go 语言也一样，在本篇文章中，我们来讨论一下 Go 语言的错误处理方式。
+<!-- toc -->
 
 ## 一、Error vs Exception
+
 ### 1.1 Error
+
 错误是程序中可能出现的问题，比如连接数据库失败，连接网络失败等，在程序设计中，错误处理是业务的一部分。
 Go 内建一个 error 接口类型作为 go 的错误标准处理
 
