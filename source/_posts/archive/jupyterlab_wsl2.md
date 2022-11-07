@@ -4,6 +4,7 @@ categories:
 - archive
 ---
 安装 Miniconda
+<!-- more -->
 ```text
 下载安装
 # 下载
