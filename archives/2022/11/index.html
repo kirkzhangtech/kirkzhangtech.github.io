@@ -470,42 +470,17 @@
 
             </div>
             
-                <div class="postShorten-content">
+                <div class="postShorten-excerpt">
                     <p>安装 Miniconda</p>
-<pre class="language-text" data-language="text"><code class="language-text">下载安装
-# 下载
-wget -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh
-# 安装
-bash Miniconda3-latest-Linux-x86_64.sh</code></pre>
-<p>添加镜像</p>
-<pre class="language-text" data-language="text"><code class="language-text">conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free
-conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge</code></pre>
-
-<p>安装 JupyterLab<br>第一步非常简单，命令如下</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">conda install -c conda-forge jupyterlab</code></pre>
-<p>关键是第二步，让 JupyterLab 自动打开宿主浏览器。打开配置文件jupyter_notebook_config.py。</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">vi ~&#x2F;.jupyter&#x2F;jupyter_notebook_config.py</code></pre>
-<p>修改下面这如下一行</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">c.NotebookApp.use_redirect_file &#x3D; False</code></pre>
-<p>退回到主界面，在<code>~/.bashrc</code> 或<code>~/.zshrc</code>文件末尾添加，指定默认浏览器地址，其中，&#x2F;mnt&#x2F;之后的部分是你默认浏览器的在 Windows 上的地址</p>
-<pre class="language-bash" data-language="bash"><code class="language-bash">export BROWSER&#x3D;&#39;&#x2F;mnt&#x2F;c&#x2F;scoop&#x2F;apps&#x2F;firefox&#x2F;current&#x2F;firefox.exe&#39;</code></pre>
-<p>使用source刷新后，就可以愉快地使用 Linux 版的 Python 了。</p>
-
                     
+                        <a
+                            href="/2022/11/07/archive/jupyterlab_wsl2/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": JuypterLab on wsl2"
+                        >
+                            Continue reading
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2022/11/07/archive/jupyterlab_wsl2/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
                     
                 </div>
             

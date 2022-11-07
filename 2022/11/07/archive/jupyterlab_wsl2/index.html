@@ -13,16 +13,16 @@
         <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"安装 Miniconda\n下载安装\n# 下载\nwget -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh\n# 安装\nbash Miniconda3-latest-Linux-x86_64.sh\n添加镜像\nconda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free\nconda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge\n\n安装 JupyterLab第一步非常简单，命令如下\nconda install -c conda-forge jupyterlab\n关键是第二步，让 JupyterLab 自动打开宿主浏览器。打开配置文件jupyter_notebook_config.py。\nvi ~&#x2F;.jupyter&#x2F;jupyter_notebook_config.py\n修改下面这如下一行\nc.NotebookApp.use_redirect_file &#x3D; False\n退回到主界面，在~/.bashrc 或~/.zshrc文件末尾添加，指定默认浏览器地址，其中，&#x2F;mnt&#x2F;之后的部分是你默认浏览器的在 Windows 上的地址\nexport BROWSER&#x3D;&#39;&#x2F;mnt&#x2F;c&#x2F;scoop&#x2F;apps&#x2F;firefox&#x2F;current&#x2F;firefox.exe&#39;\n使用source刷新后，就可以愉快地使用 Linux 版的 Python 了。\n","dateCreated":"2022-11-07T02:52:09+08:00","dateModified":"2022-11-07T03:02:48+08:00","datePublished":"2022-11-07T02:52:09+08:00","description":"","headline":"JuypterLab on wsl2","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/07/archive/jupyterlab_wsl2/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/07/archive/jupyterlab_wsl2/"}</script>
-    <meta name="description" content="安装 Miniconda 下载安装 # 下载 wget -c https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;anaconda&#x2F;miniconda&#x2F;Miniconda3-latest-Linux-x86_64.sh # 安装 bash Miniconda3-latest-Linux-x86_64.sh 添加镜像 conda config --add channels ht">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"安装 Miniconda\n\n下载安装\n# 下载\nwget -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh\n# 安装\nbash Miniconda3-latest-Linux-x86_64.sh\n添加镜像\nconda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free\nconda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge\n\n安装 JupyterLab第一步非常简单，命令如下\nconda install -c conda-forge jupyterlab\n关键是第二步，让 JupyterLab 自动打开宿主浏览器。打开配置文件jupyter_notebook_config.py。\nvi ~&#x2F;.jupyter&#x2F;jupyter_notebook_config.py\n修改下面这如下一行\nc.NotebookApp.use_redirect_file &#x3D; False\n退回到主界面，在~/.bashrc 或~/.zshrc文件末尾添加，指定默认浏览器地址，其中，&#x2F;mnt&#x2F;之后的部分是你默认浏览器的在 Windows 上的地址\nexport BROWSER&#x3D;&#39;&#x2F;mnt&#x2F;c&#x2F;scoop&#x2F;apps&#x2F;firefox&#x2F;current&#x2F;firefox.exe&#39;\n使用source刷新后，就可以愉快地使用 Linux 版的 Python 了。\n","dateCreated":"2022-11-07T02:52:09+08:00","dateModified":"2022-11-07T22:14:58+08:00","datePublished":"2022-11-07T02:52:09+08:00","description":"安装 Miniconda","headline":"JuypterLab on wsl2","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/07/archive/jupyterlab_wsl2/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/07/archive/jupyterlab_wsl2/"}</script>
+    <meta name="description" content="安装 Miniconda">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="JuypterLab on wsl2">
 <meta property="og:url" content="https://simonteo58.github.io/2022/11/07/archive/jupyterlab_wsl2/index.html">
 <meta property="og:site_name" content="CoffeeMan">
-<meta property="og:description" content="安装 Miniconda 下载安装 # 下载 wget -c https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;anaconda&#x2F;miniconda&#x2F;Miniconda3-latest-Linux-x86_64.sh # 安装 bash Miniconda3-latest-Linux-x86_64.sh 添加镜像 conda config --add channels ht">
+<meta property="og:description" content="安装 Miniconda">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-11-06T18:52:09.867Z">
-<meta property="article:modified_time" content="2022-11-06T19:02:48.047Z">
+<meta property="article:modified_time" content="2022-11-07T14:14:58.009Z">
 <meta property="article:author" content="kirkzhang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@shiming_kirk">
@@ -347,6 +347,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>安装 Miniconda</p>
+<span id="more"></span>
 <pre class="language-text" data-language="text"><code class="language-text">下载安装
 # 下载
 wget -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh
