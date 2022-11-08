@@ -2,19 +2,234 @@
 title: Oracle PLSQL Recipes
 categories: 
 - oracle
-thumbnailImagePosition: bottom
-# thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
-coverImage: https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg
-metaAlignment: center
-coverMeta: out
+# thumbnailImagePosition: bottom
+# # thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
+# coverImage: https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg
+# metaAlignment: center
+# coverMeta: out
 ---
 
 摘要: 其实这个讲PLSQL有点基础
 
 <!-- more -->
 
-<!-- toc -->
-
+- [1 PL/SQL Fundamentals](#1-plsql-fundamentals)
+  - [1.1 创建plsql代码块](#11-创建plsql代码块)
+  - [1.2 在plsql种执行plsql代码块](#12-在plsql种执行plsql代码块)
+  - [1.3 store code in script](#13-store-code-in-script)
+  - [1.4 执行你的脚本](#14-执行你的脚本)
+  - [1.5 接受用户的输入从键盘中](#15-接受用户的输入从键盘中)
+  - [1.6 Displaying Results in SQL*Plus](#16-displaying-results-in-sqlplus)
+  - [1.7 Commenting Your Code](#17-commenting-your-code)
+  - [1.8 Referencing a Block of Code](#18-referencing-a-block-of-code)
+  - [1.9. Referring to Variables from Nested Blocks](#19-referring-to-variables-from-nested-blocks)
+  - [1.10. Ignoring Substitution Variables](#110-ignoring-substitution-variables)
+  - [1.11. Changing the Substitution Variable Character](#111-changing-the-substitution-variable-character)
+  - [1.12. Creating a Variable to Match a Database Column Type](#112-creating-a-variable-to-match-a-database-column-type)
+- [2.基础sql](#2基础sql)
+  - [2.1 Retrieving a Single Row from the Database](#21-retrieving-a-single-row-from-the-database)
+  - [2.2. Qualifying Column and Variable Names（变量和表列名相同)](#22-qualifying-column-and-variable-names变量和表列名相同)
+  - [2.3. Declaring Variable Types That Match Column Types](#23-declaring-variable-types-that-match-column-types)
+  - [2.4. Returning Queried Data into a PL/SQL Record](#24-returning-queried-data-into-a-plsql-record)
+  - [2.5. Creating Your Own Records to Receive Query Results](#25-creating-your-own-records-to-receive-query-results)
+  - [2.6. Looping Through Rows from a Query](#26-looping-through-rows-from-a-query)
+  - [2.7. Obtaining Environment and Session Information](#27-obtaining-environment-and-session-information)
+  - [2.8. Formatting Query Results](#28-formatting-query-results)
+  - [2.9. Updating Rows Returned by a Query](#29-updating-rows-returned-by-a-query)
+  - [2.10. Updating Rows Returned by a Cursor](#210-updating-rows-returned-by-a-cursor)
+  - [2.11. Deleting Rows Returned by a Cursor](#211-deleting-rows-returned-by-a-cursor)
+  - [2.12. Performing a Transaction](#212-performing-a-transaction)
+  - [2.13. Ensuring That Multiple Queries "See" the Same Data](#213-ensuring-that-multiple-queries-see-the-same-data)
+  - [2.14. Executing One Transaction from Within Another](#214-executing-one-transaction-from-within-another)
+  - [2.15. Finding and Removing Duplicate Table Rows](#215-finding-and-removing-duplicate-table-rows)
+- [3. Looping and Logic](#3-looping-and-logic)
+  - [3.1. Choosing When to Execute Code](#31-choosing-when-to-execute-code)
+  - [3-2. Choosing Between Two Mutually Exclusive Conditions](#3-2-choosing-between-two-mutually-exclusive-conditions)
+  - [3.3. Evaluating Multiple Mutually Exclusive Conditions](#33-evaluating-multiple-mutually-exclusive-conditions)
+  - [3.4 Driving from an Expression Having Multiple Outcomes](#34-driving-from-an-expression-having-multiple-outcomes)
+  - [3.5. Looping Until a Specified Condition Is Met](#35-looping-until-a-specified-condition-is-met)
+  - [3.6. Iterating Cursor Results Until All Rows Have Been Returned](#36-iterating-cursor-results-until-all-rows-have-been-returned)
+  - [3.7. Iterating Until a Condition Evaluates to FALSE](#37-iterating-until-a-condition-evaluates-to-false)
+  - [3.8.Bypassing the Current Loop Iteration](#38bypassing-the-current-loop-iteration)
+  - [3.9. Iterating a Fixed Number of Times](#39-iterating-a-fixed-number-of-times)
+  - [3.11 Iterating in Increments Other Than One](#311-iterating-in-increments-other-than-one)
+  - [3.12. Stepping Through a Loop Based on Odd-Numbered Increments](#312-stepping-through-a-loop-based-on-odd-numbered-increments)
+  - [3.13. Exiting an Outer Loop Prematurely](#313-exiting-an-outer-loop-prematurely)
+  - [3.14. Jumping to a Designated Location in Code](#314-jumping-to-a-designated-location-in-code)
+- [4. Functions, Packages,and Procedures](#4-functions-packagesand-procedures)
+  - [4-1. Creating a Stored Function](#4-1-creating-a-stored-function)
+  - [4-2. Executing a Stored Function from a Query](#4-2-executing-a-stored-function-from-a-query)
+  - [4-3. Optimizing a Function That Will Always Return the Same Result for a Given Input](#4-3-optimizing-a-function-that-will-always-return-the-same-result-for-a-given-input)
+  - [4-4. Creating a Stored Procedure](#4-4-creating-a-stored-procedure)
+  - [4-5. Executing a Stored Procedure](#4-5-executing-a-stored-procedure)
+  - [4-6. Creating Functions Within a Procedure or Code Block](#4-6-creating-functions-within-a-procedure-or-code-block)
+  - [4-7. Passing Parameters by Name](#4-7-passing-parameters-by-name)
+  - [4-8. Setting Default Parameter Values](#4-8-setting-default-parameter-values)
+  - [4-9. Collecting Related Routines into a Single Unit](#4-9-collecting-related-routines-into-a-single-unit)
+  - [4-10. Writing Initialization Code for a Package](#4-10-writing-initialization-code-for-a-package)
+  - [4-11. Granting the Ability to Create and Execute Stored Programs](#4-11-granting-the-ability-to-create-and-execute-stored-programs)
+  - [4-12. Executing Packaged Procedures and Functions](#4-12-executing-packaged-procedures-and-functions)
+  - [4-13. Creating a Public Name for a Stored Program](#4-13-creating-a-public-name-for-a-stored-program)
+  - [4-14. Executing Package Programs in Sequence](#4-14-executing-package-programs-in-sequence)
+  - [4-15. Implementing a Failure Flag](#4-15-implementing-a-failure-flag)
+  - [4-16. Forcing Data Access to Go Through Packages](#4-16-forcing-data-access-to-go-through-packages)
+  - [4-17. Executing Stored Code Under Your Own Privilege Set](#4-17-executing-stored-code-under-your-own-privilege-set)
+  - [4-18. Accepting Multiple Parameter Sets in One Function](#4-18-accepting-multiple-parameter-sets-in-one-function)
+  - [4-19. Listing the Functions, Procedures, and Packages in a Schema](#4-19-listing-the-functions-procedures-and-packages-in-a-schema)
+  - [4-20. Viewing Source Code for Stored Programs](#4-20-viewing-source-code-for-stored-programs)
+- [5. Triggers](#5-triggers)
+  - [5-1. Automatically Generating Column Values(how use before insert)](#5-1-automatically-generating-column-valueshow-use-before-insert)
+  - [5-2. Keeping Related Values in Sync](#5-2-keeping-related-values-in-sync)
+  - [5-3. Responding to an Update of a Specific Table Column](#5-3-responding-to-an-update-of-a-specific-table-column)
+  - [5-4. Making a View Updatable](#5-4-making-a-view-updatable)
+  - [5-5. Altering the Functionality of Applications](#5-5-altering-the-functionality-of-applications)
+  - [5-6. Validating Input Data](#5-6-validating-input-data)
+  - [5-7. Scrubbing(v.用力擦洗) Input Data](#5-7-scrubbingv用力擦洗-input-data)
+  - [5-8. Replacing a Column’s Value](#5-8-replacing-a-columns-value)
+  - [5-9. Triggering on a System Event](#5-9-triggering-on-a-system-event)
+  - [5-10. Triggering on a Schema-Related Event](#5-10-triggering-on-a-schema-related-event)
+  - [5-11. Firing Two Triggers on the Same Event](#5-11-firing-two-triggers-on-the-same-event)
+  - [5-12. Creating a Trigger That Fires on Multiple Events](#5-12-creating-a-trigger-that-fires-on-multiple-events)
+  - [5-13. Creating a Trigger in a Disabled State](#5-13-creating-a-trigger-in-a-disabled-state)
+- [6.Type Conversion](#6type-conversion)
+  - [6-1. Converting a String to a Number](#6-1-converting-a-string-to-a-number)
+  - [6-2. Converting a String to a Date](#6-2-converting-a-string-to-a-date)
+  - [6-3. Converting a Number to a String](#6-3-converting-a-number-to-a-string)
+  - [6-4. Converting a Date to a String](#6-4-converting-a-date-to-a-string)
+  - [6-5. Converting Strings to Timestamps](#6-5-converting-strings-to-timestamps)
+  - [6-6. Writing ANSI-Compliant Conversions](#6-6-writing-ansi-compliant-conversions)
+  - [6-7. Implicitly Converting Between PLS_INTEGER and NUMBER](#6-7-implicitly-converting-between-pls_integer-and-number)
+- [7. Numbers, Strings, and Dates](#7-numbers-strings-and-dates)
+  - [7-1. Concatenating Strings](#7-1-concatenating-strings)
+  - [7-2. Adding Some Number of Days to a Date](#7-2-adding-some-number-of-days-to-a-date)
+  - [7-3. Adding a Number of Months to a Date](#7-3-adding-a-number-of-months-to-a-date)
+  - [7-4. Adding Years to a Date](#7-4-adding-years-to-a-date)
+  - [7-5. Determining the Interval Between Two Dates](#7-5-determining-the-interval-between-two-dates)
+  - [7-6. Adding Hours, Minutes, Seconds, or Days to a Given Date](#7-6-adding-hours-minutes-seconds-or-days-to-a-given-date)
+  - [7-7. Returning the First Day of a Given Month](#7-7-returning-the-first-day-of-a-given-month)
+  - [7-8. Returning the Last Day of a Given Month](#7-8-returning-the-last-day-of-a-given-month)
+  - [7-9. Rounding a Number](#7-9-rounding-a-number)
+  - [7-10. Rounding a Datetime Value](#7-10-rounding-a-datetime-value)
+  - [7-11. Tracking Time to a Millisecond](#7-11-tracking-time-to-a-millisecond)
+  - [7-12. Associating a Time Zone with a Date and Time](#7-12-associating-a-time-zone-with-a-date-and-time)
+  - [7-13. Finding a Pattern Within a String](#7-13-finding-a-pattern-within-a-string)
+  - [7-14. Determining the Position of a Pattern Within a String](#7-14-determining-the-position-of-a-pattern-within-a-string)
+  - [7-15. Finding and Replacing Text Within a String](#7-15-finding-and-replacing-text-within-a-string)
+- [8. Dynamic SQL](#8-dynamic-sql)
+  - [8-1. Executing a Single Row Query That Is Unknown at Compile Time](#8-1-executing-a-single-row-query-that-is-unknown-at-compile-time)
+  - [8-2. Executing a Multiple Row Query That Is Unknown at Compile](#8-2-executing-a-multiple-row-query-that-is-unknown-at-compile)
+  - [8-3. Writing a Dynamic INSERT Statement](#8-3-writing-a-dynamic-insert-statement)
+  - [8-4. Writing a Dynamic Update Statement](#8-4-writing-a-dynamic-update-statement)
+  - [8-5. Writing a Dynamic Delete Statement](#8-5-writing-a-dynamic-delete-statement)
+  - [8-6. Returning Data from a Dynamic Query into a Record](#8-6-returning-data-from-a-dynamic-query-into-a-record)
+  - [8-7. Executing a Dynamic Block of PL/SQL](#8-7-executing-a-dynamic-block-of-plsql)
+  - [8-8. Creating a Table at Runtime](#8-8-creating-a-table-at-runtime)
+  - [8-9. Altering a Table at Runtime](#8-9-altering-a-table-at-runtime)
+  - [8-10. Finding All Tables That Include a Specific Column Value](#8-10-finding-all-tables-that-include-a-specific-column-value)
+  - [8-11 Storing Dynamic SQL in Large Objects](#8-11-storing-dynamic-sql-in-large-objects)
+  - [8-12. Passing NULL Values to Dynamic SQL](#8-12-passing-null-values-to-dynamic-sql)
+  - [8-13. Switching Between DBMS_SQL and Native Dynamic SQL](#8-13-switching-between-dbms_sql-and-native-dynamic-sql)
+  - [8-14. Guarding Against SQL Injection Attacks](#8-14-guarding-against-sql-injection-attacks)
+- [9. Exceptions](#9-exceptions)
+  - [9-1. Trapping an Exception](#9-1-trapping-an-exception)
+  - [9-2. Catching Unknown Exceptions](#9-2-catching-unknown-exceptions)
+  - [9-3. Creating and Raising Named Programmer-Defined Exceptions](#9-3-creating-and-raising-named-programmer-defined-exceptions)
+  - [9-4. Determining Which Error Occurred Inside the OTHERS Handler](#9-4-determining-which-error-occurred-inside-the-others-handler)
+  - [9-5. Raising User-Defined Exceptions Without an Exception Handler](#9-5-raising-user-defined-exceptions-without-an-exception-handler)
+  - [9-6. Redirecting Control After an Exception Is Raised](#9-6-redirecting-control-after-an-exception-is-raised)
+  - [9-7. Raising Exceptions and Continuing Processing](#9-7-raising-exceptions-and-continuing-processing)
+  - [9-8. Associating Error Numbers with Exceptions That Have No Name](#9-8-associating-error-numbers-with-exceptions-that-have-no-name)
+  - [9-9. Tracing an Exception to Its Origin](#9-9-tracing-an-exception-to-its-origin)
+  - [9-10. Displaying PL/SQL Compiler Warnings](#9-10-displaying-plsql-compiler-warnings)
+- [10. PL/SQL Collections and Records](#10-plsql-collections-and-records)
+  - [10-1. Creating and Accessing a VARRAY](#10-1-creating-and-accessing-a-varray)
+  - [10-2. Creating and Accessing an Indexed Table](#10-2-creating-and-accessing-an-indexed-table)
+  - [10-3. Creating Simple Records](#10-3-creating-simple-records)
+  - [10-4. Creating and Accessing Record Collections](#10-4-creating-and-accessing-record-collections)
+  - [10-5. Creating and Accessing Hash Array Collections](#10-5-creating-and-accessing-hash-array-collections)
+  - [10-6. Creating and Accessing Complex Collections](#10-6-creating-and-accessing-complex-collections)
+  - [10-7. Passing a Collection As a Parameter](#10-7-passing-a-collection-as-a-parameter)
+  - [10-8. Returning a Collection As a Parameter](#10-8-returning-a-collection-as-a-parameter)
+  - [10-9. Counting the Members in a Collection](#10-9-counting-the-members-in-a-collection)
+  - [10-10. Deleting a Record from a Collection](#10-10-deleting-a-record-from-a-collection)
+  - [10-11. Checking Whether an Element Exists](#10-11-checking-whether-an-element-exists)
+  - [10-12. Increasing the Size of a Collection](#10-12-increasing-the-size-of-a-collection)
+  - [10-13. Navigating Collections](#10-13-navigating-collections)
+  - [10-14. Trimming a Collection](#10-14-trimming-a-collection)
+- [11. Automating Routine Tasks](#11-automating-routine-tasks)
+  - [11-1. Scheduling Recurring Jobs](#11-1-scheduling-recurring-jobs)
+  - [11-2. E-mailing Output from a Scheduled Job](#11-2-e-mailing-output-from-a-scheduled-job)
+  - [11-3. Using E-mail for Job Status Notification](#11-3-using-e-mail-for-job-status-notification)
+  - [11-4. Refreshing a Materialized View on a Timed Interval](#11-4-refreshing-a-materialized-view-on-a-timed-interval)
+  - [11-5. Synchronizing Data with a Remote Data Source](#11-5-synchronizing-data-with-a-remote-data-source)
+  - [11-6. Scheduling a Job Chain](#11-6-scheduling-a-job-chain)
+- [12. Oracle SQL Developer](#12-oracle-sql-developer)
+  - [12-1. Creating Standard and Privileged Database Connections](#12-1-creating-standard-and-privileged-database-connections)
+  - [12-2. Obtaining Information About Tables](#12-2-obtaining-information-about-tables)
+  - [12-3. Enabling Output to Be Displayed](#12-3-enabling-output-to-be-displayed)
+  - [12-4. Writing and Executing PL/SQL](#12-4-writing-and-executing-plsql)
+  - [12-5. Creating and Executing a Script](#12-5-creating-and-executing-a-script)
+  - [12-6. Accepting User Input for Substitution Variables](#12-6-accepting-user-input-for-substitution-variables)
+  - [12-7. Saving Pieces of Code for Quick Access](#12-7-saving-pieces-of-code-for-quick-access)
+  - [12-8. Creating a Function](#12-8-creating-a-function)
+  - [12-9. Creating a Stored Procedure](#12-9-creating-a-stored-procedure)
+  - [12-10. Creating a Package Header and Body](#12-10-creating-a-package-header-and-body)
+  - [12-11. Creating a Trigger](#12-11-creating-a-trigger)
+  - [12-12. Debugging Stored Code](#12-12-debugging-stored-code)
+  - [12-13. Compiling Code Within the Navigator](#12-13-compiling-code-within-the-navigator)
+- [13. Analyzing and Improving](#13-analyzing-and-improving)
+  - [13-1. Installing DBMS_PROFILER](#13-1-installing-dbms_profiler)
+  - [13-2. Identifying Bottlenecks](#13-2-identifying-bottlenecks)
+  - [13-3. Speeding Up Read/Write Loops](#13-3-speeding-up-readwrite-loops)
+  - [13-2, where each iteration passes only one record at a time from the collection to the database. The](#13-2-where-each-iteration-passes-only-one-record-at-a-time-from-the-collection-to-the-database-the)
+  - [13-4. Passing Large or Complex Collections as OUT Parameters](#13-4-passing-large-or-complex-collections-as-out-parameters)
+  - [13-5. Optimizing Computationally Intensive Code](#13-5-optimizing-computationally-intensive-code)
+  - [13-6. Improving Initial Execution Running Time](#13-6-improving-initial-execution-running-time)
+- [14. Using PL/SQL on the Web](#14-using-plsql-on-the-web)
+  - [14-1. Running a PL/SQL Procedure on the Web](#14-1-running-a-plsql-procedure-on-the-web)
+  - [14-2. Creating a Common Set of HTML Page Generation Procedures](#14-2-creating-a-common-set-of-html-page-generation-procedures)
+  - [14-3 Creating an Input Form](#14-3-creating-an-input-form)
+  - [14-4. Creating a Web–based Report Using PL/SQL Procedures](#14-4-creating-a-webbased-report-using-plsql-procedures)
+  - [14-6. Creating a Web Form Dropdown List from a Database Query](#14-6-creating-a-web-form-dropdown-list-from-a-database-query)
+  - [14-7. Creating a Sortable Web Report](#14-7-creating-a-sortable-web-report)
+  - [14-8. Passing Data Between Web Pages](#14-8-passing-data-between-web-pages)
+  - [14-9. Viewing Errors for Debugging Web Apps](#14-9-viewing-errors-for-debugging-web-apps)
+  - [14-10. Generating JavaScript via PL/SQL](#14-10-generating-javascript-via-plsql)
+  - [14-11. Generating XML Output](#14-11-generating-xml-output)
+  - [14-12. Creating an Input Form with AJAX](#14-12-creating-an-input-form-with-ajax)
+- [15. Java in the Database](#15-java-in-the-database)
+  - [15-1. Creating a Java Database Class](#15-1-creating-a-java-database-class)
+  - [15-2. Loading a Java Database Class into a Database](#15-2-loading-a-java-database-class-into-a-database)
+  - [15-3. Loading a Compiled Java Class Into the Database](#15-3-loading-a-compiled-java-class-into-the-database)
+  - [15-4. Exposing a Java Class As a Stored Procedure](#15-4-exposing-a-java-class-as-a-stored-procedure)
+  - [15-5. Executing a Java Stored Procedure](#15-5-executing-a-java-stored-procedure)
+  - [15-6. Calling a Java Stored Procedure from PL/SQL](#15-6-calling-a-java-stored-procedure-from-plsql)
+  - [15-7. Passing Parameters Between PL/SQL and Java](#15-7-passing-parameters-between-plsql-and-java)
+  - [15-8. Creating and Calling a Java Database Function](#15-8-creating-and-calling-a-java-database-function)
+  - [15-9. Creating a Java Database Trigger](#15-9-creating-a-java-database-trigger)
+  - [15-10. Passing Data Objects from PL/SQL to Java](#15-10-passing-data-objects-from-plsql-to-java)
+  - [15-11. Embedding a Java Class Into a PL/SQL Package](#15-11-embedding-a-java-class-into-a-plsql-package)
+  - [15-12. Loading Java Libraries Into the Database](#15-12-loading-java-libraries-into-the-database)
+  - [15-13. Removing a Java Class](#15-13-removing-a-java-class)
+  - [15-14. Retrieving Database Metadata with Java](#15-14-retrieving-database-metadata-with-java)
+  - [15-15. Querying the Database to Help Resolve Java](#15-15-querying-the-database-to-help-resolve-java)
+- [16. Accessing PL/SQL from JDBC,](#16-accessing-plsql-from-jdbc)
+  - [16-1. Accessing a PL/SQL Stored Procedure via JDBC](#16-1-accessing-a-plsql-stored-procedure-via-jdbc)
+  - [16-2. Accessing a PL/SQL Stored Function from JDBC](#16-2-accessing-a-plsql-stored-function-from-jdbc)
+  - [16-3.  Accessing PL/SQL Web Procedures with HTTP](#16-3--accessing-plsql-web-procedures-with-http)
+  - [16-4. Accessing PL/SQL from Jython](#16-4-accessing-plsql-from-jython)
+  - [16-5. Accessing PL/SQL from Groovy](#16-5-accessing-plsql-from-groovy)
+- [17. Unit Testing With utPLSQL](#17-unit-testing-with-utplsql)
+  - [17-1. Testing Stored PL/SQL Code Without Unit Tests](#17-1-testing-stored-plsql-code-without-unit-tests)
+  - [17-2. Installing the utPLSQL Unit Testing Framework](#17-2-installing-the-utplsql-unit-testing-framework)
+  - [17-3. Building a utPLSQL Test Package](#17-3-building-a-utplsql-test-package)
+  - [17-4. Writing a utPLSQL Unit Test Procedure](#17-4-writing-a-utplsql-unit-test-procedure)
+  - [17-5. Running a utPLSQL Test](#17-5-running-a-utplsql-test)
+  - [17-6. Building a utPLSQL Test Suite](#17-6-building-a-utplsql-test-suite)
+  - [17-7. Running a utPLSQL Test Suite](#17-7-running-a-utplsql-test-suite)
+  - [17-8. Reconfiguring utPLSQL Parameters](#17-8-reconfiguring-utplsql-parameters)
+  - [17-9. Redirecting utPLSQL Test Results to a File](#17-9-redirecting-utplsql-test-results-to-a-file)
+  - [17-10. Automating Unit Tests for PL/SQL and Java Stored Procedures Using Ant](#17-10-automating-unit-tests-for-plsql-and-java-stored-procedures-using-ant)
 
 # 1 PL/SQL Fundamentals
 
@@ -7159,7 +7374,7 @@ query should be defined as a cursor variable so that it can be parsed via a FOR 
 value that is contained within a view if it is not an updatable view. 
 Now that the cursor is ready to parse all table names that contain a matching column, it is time to 
 loop through the cursor and query each table that contains that column for a matching value. A user 
-passes two values into the procedure: current manager ID and new manager ID. In the **Solution** to this 
+passes two values into the procedure: current manager ID and new manager ID. In the Solution to this 
 recipe, each table that contains a matching column is queried so that you can see how many matches 
 were found prior to the updates taking place. A counter is used to tally the number of matches found 
 throughout the tables. Next, looping through the cursor again performs the actual updates. This time, 
@@ -7478,11 +7693,11 @@ for the USERNAME:
  
 The strange-looking text that you see here can cause major issues because it essentially changes the 
 query to read as follows: 
- 
+```sql
 SELECT password 
 FROM user_records 
 WHERE username = 'WHATEVER ' OR username is NOT NULL; 
- 
+```
 Bind variables can be used to guard against SQL injection attacks, because their contents are not 
 interpreted at all by Oracle. The value of a bind variable is never parsed as part of the string containing 
 the SQL query or statement to be executed. Thus, the use of bind variables provides absolute protection 
@@ -7493,8 +7708,7 @@ There are ways to validate user input depending upon the type of input you are r
 instance, to verify the integrity of user input, you can use regular expressions. If you are expecting to 
 receive an e-mail address from a user input field, then the value that is passed into your code should be 
 verified to ensure that it is in proper format of an e-mail address. Here’s an example: 
-CHAPTER 8  DYNAMIC SQL 
-186 
+```sql
 IF owa_pattern.match(email_variable,'^\w{1,}[.,0-9,a-z,A-Z,_]\w{1,}' || 
            '[.,0-9,a-z,A-Z,_]\w{1,}'|| 
            '@\w{1,}[.,0-9,a-z,A-Z,_]\' || 
@@ -7502,7 +7716,7 @@ IF owa_pattern.match(email_variable,'^\w{1,}[.,0-9,a-z,A-Z,_]\w{1,}' ||
   -- Perform valid transaction 
 ELSE 
   -- Raise an error message 
- 
+```
 It is imperative that you do not allow users of your applications to see the Oracle error codes that are 
 returned by an error. Use proper exception handling (covered in Chapter 9) to ensure that you are 
 catching any possible exceptions and returning a vaguely descriptive error message to the user. It is not 
@@ -7512,33 +7726,18 @@ Using bind variables, validating user input, and displaying user-friendly and ap
 messages can help ensure that your database is not attacked. It is never an enjoyable experience to 
 explain to your users that all usernames and passwords were compromised. Time is much better spent 
 securing your code than going back to clean up after a malicious attack. 
-C H A P T E R  9 
- 
-   
- 
-187 
-Exceptions 
+
+# 9. Exceptions 
 Exceptions are a fundamental part of any well-written program. They are used to display user-friendly 
 error messages when an error is raised by an application, nondefault exception handling, and 
-sometimes recovery so that an application can continue. Surely you have seen your fair share of ORA-
-XXXXX error messages. Although these messages are extremely useful to a developer for debugging and 
-correcting issues, they are certainly foreign to the average application user and can be downright 
-frightening to see.  
-Imagine that you are working with a significant number of updates via an application form, and 
-after you submit your 150th update, an Oracle error is displayed. Your first reaction would be of panic, 
-hoping that you haven’t just lost all of the work you had completed thus far. By adding exception 
-handling to an application, you can ensure that exceptions are handled in an orderly fashion so that no 
-work is lost. You can also create a nicer error message to let the user know all changes have been saved 
+sometimes recovery so that an application can continue. Surely you have seen your fair share of ORA-XXXXX error messages. Although these messages are extremely useful to a developer for debugging and 
+correcting issues, they are certainly foreign to the average application user and can be downright frightening to see.  
+Imagine that you are working with a significant number of updates via an application form, and after you submit your 150th update, an Oracle error is displayed. Your first reaction would be of panic, hoping that you haven’t just lost all of the work you had completed thus far. By adding exception handling to an application, you can ensure that exceptions are handled in an orderly fashion so that no work is lost. You can also create a nicer error message to let the user know all changes have been saved 
 up to this point so that sheer panic doesn’t set in when the exception is raised. 
-Exceptions can also be raised as a means to provide informative detail regarding processes that are 
-occurring within your application. They are not merely restricted to being used when Oracle encounters 
-an issue. You can raise your own exceptions as well when certain circumstances are encountered in your 
-application. 
-Whatever the case may be, exception handling should be present in any production-quality 
-application code. This chapter will cover some basics of how to use exception handling in your code. 
-Along the way, you will learn some key tips on how exception handling can make your life easier. In the 
-end, you should be fully armed to implement exception handling for your applications. 
-9-1. Trapping an Exception 
+Exceptions can also be raised as a means to provide informative detail regarding processes that are occurring within your application. They are not merely restricted to being used when Oracle encounters an issue. You can raise your own exceptions as well when certain circumstances are encountered in your application. 
+Whatever the case may be, exception handling should be present in any production-quality application code. This chapter will cover some basics of how to use exception handling in your code. Along the way, you will learn some key tips on how exception handling can make your life easier. In the end, you should be fully armed to implement exception handling for your applications. 
+
+## 9-1. Trapping an Exception 
 **Problem** 
 A procedure in your application has the potential to cause an exception to be raised. Rather than let the 
 program exit and return control to the host machine, you want to perform some cleanup to ensure data 
@@ -7550,7 +7749,7 @@ used to obtain employee information based upon a primary key value or an e-mail 
 with the EXCEPTION keyword in the following example, an exception-handling block has been added to 
 the end of the procedure in order to handle any exceptions that may occur when no matching record is 
 found. 
- 
+```sql
 CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
   emp_qry            VARCHAR2(500); 
   emp_first          employees.first_name%TYPE; 
@@ -7600,16 +7799,15 @@ BEGIN
                          'THE @ OR A POSITIVE INTEGER VALUE FOR THE ' || 
                          'EMPLOYEE ID.'); 
 END; 
- 
+```
 Here are the results of calling the procedure with various arguments: 
  
-  CHAPTER 9  EXCEPTIONS 
-189 
+```sql
 SQL> EXEC OBTAIN_EMP_DETAIL(000); 
 THE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD 
  
 PL/SQL procedure successfully completed. 
- 
+
 SQL> EXEC OBTAIN_EMP_DETAIL('TEST'); 
 YOU MUST ENTER AN EMAIL ADDRESS INCLUDING THE @ OR A POSITIVE INTEGER VALUE FOR 
 THE EMPLOYEE ID. 
@@ -7620,7 +7818,8 @@ SQL> EXEC OBTAIN_EMP_DETAIL(200);
 Jennifer Whalen - JWHALEN 
  
 PL/SQL procedure successfully completed. 
- 
+
+``` 
 This procedure is essentially the same as the one demonstrated in Recipe 8-1. The difference is that 
 when an exception is raised, the control will go into the exception block. At that time, the code you place 
 within the exception block will determine the next step to take as opposed to simply raising an Oracle 
@@ -7636,16 +7835,16 @@ define your own exceptions, which are known as user defined.
 An exception-handling block is structured like a CASE statement in that a series of exceptions is listed 
 followed by a separate set of statements to be executed for each outcome. The standard format for an 
 exception-handling block is as follows: 
- 
+```sql
 EXCEPTION 
   WHEN name_of_exception THEN 
     -- One or more statements 
- 
+```
 Exception blocks begin with the EXCEPTION keyword, followed by a series of WHEN..THEN clauses that 
 describe different possible exceptions along with the set of statements that should be executed if the 
 exception is caught. The exception name can be one of the Oracle internally defined exceptions, or it can 
 be the name of an exception that has been declared within your code. To learn more about declaring 
-exceptions, please see Recipe 9-3 in this chapter. In the **Solution** to this recipe, the internally defined 
+exceptions, please see Recipe 9-3 in this chapter. In the Solution to this recipe, the internally defined 
 NO_DATA_FOUND exception is raised if an unknown e-mail address is entered into the procedure because 
 there will be no rows returned from the query. When the exception block encounters the WHEN clause that 
 corresponds with NO_DATA_FOUND, the statements immediately following the THEN keyword are executed. 
@@ -7654,54 +7853,36 @@ application, this is where you will place any cleanup or error handling that sho
 maintain the integrity of the data accessed by your application. 
 An exception block can contain any number of WHEN..THEN clauses, and therefore, any number of 
 exceptions can each contain their own set of handler statements. Even if a simple message was to be 
-CHAPTER 9  EXCEPTIONS 
-190 
-displayed, as is the case with the **Solution** to this recipe, a different and more descriptive error message
+displayed, as is the case with the Solution to this recipe, a different and more descriptive error message
 can be coded for each different exception that may possibly be raised. This situation is reflected in the
-second exception handler contained within the **Solution** because it returns a different error message
+second exception handler contained within the Solution because it returns a different error message
 than the first. 
 As mentioned previously, Oracle contains a number of internally defined exceptions. Table 9-1
 provides a list of the internally defined exceptions, along with a description of their usage. 
 Table 9-1. Oracle Internal Exceptions 
-Exception Code Description 
-ACCESS_INTO_NULL -6530 Values are assigned to an uninitialized object. 
-CASE_NOT_FOUND -6592 No matching choice is available within CASE statement, and no
-ELSE clause has been defined. 
-COLLECTION_IS_NULL  -6531 Program attempts to apply collection methods other than 
-EXISTS to varray or a nested table that has not yet been
-initialized. 
-CURSOR_ALREADY_OPEN -6511 Program attempts to open a cursor that is already open. 
-DUP_VAL_ON_INDEX -1 Program attempts to store duplicate values in a unique index
-column. 
-INVALID_CURSOR -1001 Program attempts to use a cursor operation that is allowed. 
-INVALID_NUMBER -1722 Conversion of string into number is incorrect because of the
-string not being a number. 
-LOGIN_DEINIED -1017 Program attempts to log in to the database using an incorrect
-user name and/or password. 
-NO_DATA_FOUND +100 SELECT statement returns no rows. 
-NOT_LOGGED_ON -1012 Program attempts to issue a database call without being
-connected to the database. 
-PROGRAM_ERROR -6501 Internal **Problem** exists. 
-ROWTYPE_MISMATCH -6504 Cursor variables are incompatible. A host cursor variable must
-have a compatible return type that matches a PL/SQL cursor
-variable. 
-SELF_IS_NULL -30625 Instance of object type is not initialized. 
-STORAGE_ERROR -6500 PL/SQL ran out of memory or was corrupted. 
-  CHAPTER 9  EXCEPTIONS 
-191 
-Exception Code Description 
-SUBSCRIPT_BEYOND_COUNT  – 6533  Program references nested table or varray element using an 
-index number that goes beyond the number of elements 
-within the object. 
-SYS_INVALID_ROWID -1410  Conversion of character string into ROWID fails because 
-character string does not represent a valid row ID. 
-TIMEOUT_ON_RESOURCE -51  Oracle Database is waiting for resource, and timeout occurs. 
-TOO_MANY_ROWS -1422  Attempts to select more than one row using a SELECT INTO 
-statement. 
-VALUE_ERROR -6502  Program attempts to perform an invalid arithmetic, 
-conversion, or truncation operation. 
-ZERO_DIVIDE -1476  Program attempts to divide a number by zero. 
- 
+```sql
+Exception               Code Description 
+ACCESS_INTO_NULL        -6530 Values are assigned to an uninitialized object. 
+CASE_NOT_FOUND          -6592 No matching choice is available within CASE statement, and no ELSE clause has been defined. 
+COLLECTION_IS_NULL      -6531 Program attempts to apply collection methods other than EXISTS to varray or a nested table that has not yet been initialized. 
+CURSOR_ALREADY_OPEN     -6511 Program attempts to open a cursor that is already open. 
+DUP_VAL_ON_INDEX        -1 Program attempts to store duplicate values in a unique index column. 
+INVALID_CURSOR          -1001 Program attempts to use a cursor operation that is allowed. 
+INVALID_NUMBER          -1722 Conversion of string into number is incorrect because of the string not being a number. 
+LOGIN_DEINIED           -1017 Program attempts to log in to the database using an incorrect user name and/or password. 
+NO_DATA_FOUND           +100 SELECT statement returns no rows. 
+NOT_LOGGED_ON           -1012 Program attempts to issue a database call without being connected to the database. 
+PROGRAM_ERROR           -6501 Internal Problem exists. 
+ROWTYPE_MISMATCH        -6504 Cursor variables are incompatible. A host cursor variable must have a compatible return type that matches a PL/SQL cursor variable. 
+SELF_IS_NULL            -30625 Instance of object type is not initialized. 
+STORAGE_ERROR           -6500 PL/SQL ran out of memory or was corrupted. 
+SUBSCRIPT_BEYOND_COUNT  -6533  Program references nested table or varray element using an index number that goes beyond the number of elements within the object. 
+SYS_INVALID_ROWID       -1410  Conversion of character string into ROWID fails because character string does not represent a valid row ID. 
+TIMEOUT_ON_RESOURCE     -51  Oracle Database is waiting for resource, and timeout occurs. 
+TOO_MANY_ROWS           -1422  Attempts to select more than one row using a SELECT INTO statement. 
+VALUE_ERROR             -6502  Program attempts to perform an invalid arithmetic,conversion, or truncation operation. 
+ZERO_DIVIDE             -1476  Program attempts to divide a number by zero. 
+```
 An exception handler’s scope corresponds to its enclosing code block. They have the same scope as 
 a variable would have within a code block. If your code contains a nested code block, an exception 
 handler that is contained within the nested code block can only handle exceptions raised within that 
@@ -7712,7 +7893,7 @@ block, then the exception is propagated to the outer code block to look for a co
 there. If no handler is found, then runtime will be passed to the procedure or function that called it or 
 the host system, which is what you do not want to have occur. The following code demonstrates an 
 example of using an exception handler within a nested code block: 
- 
+```sql
 DECLARE 
   CURSOR emp_cur IS 
   SELECT * 
@@ -7732,8 +7913,6 @@ BEGIN
       WHERE department_id = emp_rec.department_id; 
       DBMS_OUTPUT.PUT_LINE('Department: ' || emp_dept); 
     EXCEPTION 
-CHAPTER 9  EXCEPTIONS 
-192 
       WHEN NO_DATA_FOUND THEN 
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN INNER BLOCK'); 
     END; 
@@ -7742,27 +7921,30 @@ EXCEPTION
   WHEN NO_DATA_FOUND THEN 
    DBMS_OUTPUT.PUT_LINE('EXCEPTION IN OUTER BLOCK'); 
 END; 
- 
+```
 Multiple exceptions can be listed within the same exception handler if you want to execute the same 
 set of statements when either of them is raised. You can do this within the WHEN clause by including two 
 or more exception names and placing the OR keyword between them. Using this technique, if either of 
 the exceptions that are contained within the clause is raised, then the set of statements that follows will 
 be executed. Let’s take a look at an exception handler that contains two exceptions within the same 
 handler: 
- 
+```sql
 EXCEPTION 
   WHEN NO_DATA_FOUND OR INVALID_EMAIL_ADDRESS THEN 
     --  statements to execute 
   WHEN OTHERS THEN 
     --  statements to execute 
-END; 
+END;
+```
 ■ Note You cannot place the AND keyword in between exceptions because no two exceptions can be raised at the 
 same time. 
 It is easy to include basic exception handling in your application. Code an exception-handling block 
 at the end of each code block that may raise an exception. It is pertinent that you test your application 
 under various conditions to try to predict which possible exceptions may be raised; each of those 
 possibilities should be accounted for within the exception-handling block of your code. 
-9-2. Catching Unknown Exceptions 
+
+## 9-2. Catching Unknown Exceptions 
+
 **Problem** 
 Some exceptions are being raised when executing one of your procedures and you want to ensure that 
 all unforeseen exceptions are handled using an exception handler. 
@@ -7770,11 +7952,9 @@ all unforeseen exceptions are handled using an exception handler.
 Use an exception handler, and specify OTHERS for the exception name to catch all the exceptions that 
 have not been caught by previous handlers. In the following example, the same code from Recipe 9-1 
 has been modified to add an OTHERS exception handler: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
   emp_qry                   VARCHAR2(500); 
-  CHAPTER 9  EXCEPTIONS 
-193 
   emp_first                 employees.first_name%TYPE; 
   emp_last                  employees.last_name%TYPE; 
   email                     employees.email%TYPE; 
@@ -7821,11 +8001,9 @@ BEGIN
       DBMS_OUTPUT.PUT_LINE('AN UNEXPECTED ERROR HAS OCCURRED, PLEASE ' || 
                          'TRY AGAIN'); 
 END; 
- 
+```
 In this example, if an unexpected exception were to be raised, then the program control would 
 transfer to the statements immediately following the WHEN OTHERS THEN clause.  
-CHAPTER 9  EXCEPTIONS 
-194 
 ■ Note In a real-world application, an exception should be manually reraised within the OTHERS handler. To learn 
 more about determining the exception that was raised, please see Recipe 9-4. 
 **How It Works** 
@@ -7836,7 +8014,7 @@ be used only to assist developers in finding application bugs rather than as a c
 The format for using the OTHERS handler is the same as it is with other named exceptions; the only 
 difference is that it should be the last handler to be coded in the exception handler. The following 
 pseudocode depicts a typical exception handler that includes an OTHERS handler: 
- 
+```sql
 EXCEPTION 
   WHEN named_exception1 THEN 
     -- perform statements 
@@ -7844,7 +8022,8 @@ EXCEPTION
     -- perform statements 
   WHEN OTHERS THEN 
     -- perform statements 
-WHEN TO USE THE OTHERS HANDLER 
+  WHEN TO USE THE OTHERS HANDLER 
+```
 It is important to note that the OTHERS handler is not used to avoid handling expected exceptions properly. 
 Each exception that may possibly be raised should be handled within its own exception-handling block. 
 The OTHERS handler should be used only to catch those exceptions that are not expected. Most often, the 
@@ -7856,7 +8035,8 @@ occur. However, if you have one set of statements to run for any type of excepti
 is reasonable to include only an OTHERS exception handler to catch exceptions that are unexpected. If no 
 named exceptions are handled and an exception handler includes only an OTHERS handler, then the 
 statements within that handler will be executed whenever any exception occurs within an application. 
-9-3. Creating and Raising Named Programmer-Defined Exceptions 
+
+## 9-3. Creating and Raising Named Programmer-Defined Exceptions 
 **Problem** 
 You want to alert the users of your application when a specific event occurs. The event does not raise an 
 Oracle exception, but it is rather an application-specific exception. You want to associate this event with 
@@ -7868,7 +8048,7 @@ Declare a named user-defined exception, and associate it with the event for whic
 raising an exception. In the following example, a user-defined exception is declared and raised within a 
 code block. When the exception is raised, the application control is passed to the statements contained 
 within the exception handler for the named user exception. 
- 
+```sql
 CREATE OR REPLACE PROCEDURE salary_increase(emp_id IN NUMBER, 
                                             pct_increase IN NUMBER) AS 
    
@@ -7921,7 +8101,7 @@ CHAPTER 9  EXCEPTIONS
                   'PLEASE TRY AGAIN OR CONTACT ADMINISTRATOR' || pct_increase); 
  
 END; 
- 
+```
 As you can see from the code, the exception block can accept one or more handlers. The named 
 user exception is declared within the declaration section of the procedure, and the exception can be 
 raised anywhere within the containing block. 
@@ -7932,9 +8112,9 @@ A PL/SQL application can contain any number of custom exceptions. When a develop
 own exception, it is known as a user-defined exception. A user-defined exception must be declared 
 within the declaration section of a package, function, procedure, or anonymous code block. To declare 
 an exception, use the following: 
- 
+```sql
 exception_name  EXCEPTION; 
- 
+```
 You can provide any name as long as it applies to the standard naming convention and is not the 
 same as an internally defined exception name. It is a coding convention to code exception names using 
 uppercase lettering, but lowercase would work as well since PL/SQL is not a case-sensitive language. 
@@ -7953,9 +8133,8 @@ As seen in the **Solution** to this recipe, catching a named user exception is e
 catching an internally defined exception. Code the WHEN..THEN clause, naming the exception that you 
 want to catch. When the exception is raised, any statements contained within that particular exception 
 handler will be executed. 
-  CHAPTER 9  EXCEPTIONS 
-197 
-9-4. Determining Which Error Occurred Inside the OTHERS Handler 
+
+## 9-4. Determining Which Error Occurred Inside the OTHERS Handler 
 **Problem** 
 Your code is continually failing via an exception, and the OTHERS handler is being invoked. You need to 
 determine the exact cause of the exception so that it can be repaired. 
@@ -7965,7 +8144,7 @@ DBMS_UTILITY.FORMAT_ERROR_STACK functions to return the Oracle error code and me
 exception that has been raised. The following example demonstrates the usage of these functions, along 
 with the procedure that was used in Recipe 9-3, for obtaining the error code and message when the 
 OTHERS handler is invoked. 
- 
+```sql
 CREATE OR replace PROCEDURE salary_increase(emp_id       IN NUMBER,  
                                             pct_increase IN NUMBER)  
 AS  
@@ -8002,8 +8181,6 @@ EXCEPTION
                      || 'GIVEN ID'); WHEN invalid_increase THEN  
     dbms_output.Put_line('UNSUCCESSFUL INCREASE.  YOU CANNOT INCREASE THE '  
                      || 'EMPLOYEE '  
-CHAPTER 9  EXCEPTIONS 
-198 
                      || 'SALARY BY '  
                      || pct_increase  
                      || ' PERCENT...PLEASE ENTER '  
@@ -8021,7 +8198,7 @@ WHEN OTHERS THEN
                      || ' - '  
                      || error_message); 
 END;  
- 
+```
 When this procedure is executed, the following error will be returned: 
  
 UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS OCCURRED, PLEASE TRY AGAIN OR CONTACT 
@@ -8052,23 +8229,23 @@ limitation.
 However, SQLERRM does have its place, because there are some benefits of using it. A handy feature of 
 SQLERRM is that you can pass an error number to it and retrieve the corresponding error message. Any 
 error number that is passed to SQLERRM should be negative; otherwise, you will receive the message User-
-  CHAPTER 9  EXCEPTIONS 
-199 
 defined error. Table 9-2 displays the error number ranges and their corresponding messages using 
 SQLCODE and SQLERRM. 
+```text
 Table 9-2. SQLCODE Return Codes and Meanings 
-Code Description 
+Code                          Description 
 Negative Oracle Error Number  Internal Oracle exception 
-0 No exceptions raised 
-+1 User-defined exception 
-+100 NO_DATA_FOUND 
--20000 to -20999 User-defined error with PRAGMA EXCEPTION_INIT 
+0                             No exceptions raised 
++1                            User-defined exception 
++100                          NO_DATA_FOUND 
+-20000 to -20999              User-defined error with PRAGMA EXCEPTION_INIT
+```
 ■ Note PRAGMA EXCEPTION_INIT is used to associate an Oracle error number with an exception name. 
 If you choose to use SQLERRM, the code is not much different from using 
 DBMS_UTILITY.FORMAT_ERROR_STACK, but you will probably need to include some code to truncate the 
 result. The next example demonstrates the same example that was used in the **Solution** to this recipe, but 
 it uses SQLERRM instead of DBMS_UTILITY.FORMAT_ERROR_STACK. 
- 
+```sql
 CREATE OR replace PROCEDURE salary_increase(emp_id       IN NUMBER,  
                                             pct_increase IN NUMBER)  
 AS  
@@ -8091,8 +8268,6 @@ BEGIN
     SET    salary = ( salary + ( salary * pct_increase ) )  
     WHERE  employee_id = emp_id;  
  
-CHAPTER 9  EXCEPTIONS 
-200 
     dbms_output.Put_line('SUCCESSFUL SALARY INCREASE FOR EMPLOYEE #: '  
                          || emp_id  
                          || '.  NEW SALARY = '  
@@ -8120,12 +8295,14 @@ dbms_output.Put_line('UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS OCCURRED, '
                      || error_number  
                      || ' - '  
                      || error_message); 
-END;  
+END;
+```
 There are some other tools that can be used to further diagnose which errors are being raised and
 even to see the entire stack trace. These tools are further explained within Recipe 9-9. By combining the
 techniques learned in this recipe with those you will learn about in Recipe 9-9, you are sure to have a
 better chance of diagnosing your application issues. 
-9-5. Raising User-Defined Exceptions Without an Exception Handler 
+
+## 9-5. Raising User-Defined Exceptions Without an Exception Handler 
 **Problem** 
 Your application includes some error handling that is specific to your application. For instance, you
 want to ensure that the input value for a procedure is in the valid format to be an e-mail address. Rather
@@ -8134,11 +8311,9 @@ exception inline and provide an error number as well.
 **Solution** 
 This scenario is perfect for using the RAISE_APPLICATION_ERROR procedure. Test the e-mail address that is
 passed into the procedure to ensure that it follows certain criteria. If it does not contain a specific 
-  CHAPTER 9  EXCEPTIONS 
-201 
 characteristic of a valid e-mail address, use the RAISE_APPLICATION_ERROR procedure to display an 
 exception message to the user. Here’s an example: 
- 
+```sql 
 CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_email IN VARCHAR2) IS 
   emp_qry       VARCHAR2(500); 
   emp_first     employees.first_name%TYPE; 
@@ -8173,20 +8348,18 @@ CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_email IN VARCHAR2) IS
     END IF; 
  
 END; 
- 
+```
 As you can see, there is no exception handler in this example. When the conditions are met, an 
 exception is raised inline via RAISE_APPLICATION_EXCEPTION. 
 **How It Works** 
 The RAISE_APPLICATION_EXCEPTION procedure can associate an error number with an error message. The 
 format for calling the RAISE_APPLICATION_EXCEPTION procedure is as follows: 
- 
+```sql
 RAISE_APPLICATION_EXCEPTION(exception_number,  
                            exception_message[, retain_error_stack]); 
- 
+```
 where exception_number is a number within the range of -20000 to -20999, and exception_message is a 
 string of text that is equal to or less than 2KB in length. The optional retain_error_stack is a BOOLEAN 
-CHAPTER 9  EXCEPTIONS 
-202 
 value that tells Oracle whether this exception should be added to the existing error stack or whether the 
 error stack should be wiped clean and this exception should be placed into it. By default, the value is 
 FALSE, and all other exceptions are removed from the error stack, leaving this exception as the only one 
@@ -8214,7 +8387,8 @@ message. This technique can become quite useful if you are interested in using a
 for your exceptions, but you still need to perform proper exception handling when errors occur. You 
 could use the OTHERS exception handler to call the function or procedure that uses 
 RAISE_APPLICATION_EXCEPTION, passing the error number and a proper exception message. 
-9-6. Redirecting Control After an Exception Is Raised 
+
+## 9-6. Redirecting Control After an Exception Is Raised 
 **Problem** 
 After an exception is raised within an application, usually the statements within the exception handler 
 are executed, and then control goes to the next statement in the calling program or outside the current 
@@ -8222,14 +8396,12 @@ code block. Rather than printing an error message and exiting your code block af
 want to perform some further activity. For instance, let’s say you are interested in logging the exception 
 in a database table. You have a procedure for adding entries to the log table, and you want to make use 
 of that procedure. 
-  CHAPTER 9  EXCEPTIONS 
-203 
 **Solution** 
 Invoke the procedure from within the exception handler. When the exception is raised, program control 
 will be passed to the appropriate handler. The handler itself can provide an exception message for the 
 user, but it will also call the procedure that is to be used for logging the exception in the database. The 
 following example demonstrates this technique: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE log_error_messages(error_code  IN NUMBER, 
                                                 message    IN VARCHAR2) AS 
 PRAGMA AUTONOMOUS_TRANSACTION; 
@@ -8275,8 +8447,6 @@ CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS
    
       DBMS_OUTPUT.PUT_LINE(emp_first || ' ' || emp_last || ' - ' || email); 
     ELSE  
-CHAPTER 9  EXCEPTIONS 
-204 
       DBMS_OUTPUT.PUT_LINE('THE INFORMATION YOU HAVE USED DOES ' || 
                            'NOT MATCH ANY EMPLOYEE RECORD'); 
     END IF; 
@@ -8293,7 +8463,7 @@ CHAPTER 9  EXCEPTIONS
                            'TRY AGAIN'); 
         log_error_messages(SQLCODE, DBMS_UTILITY.FORMAT_ERROR_STACK); 
  END; 
- 
+```
 In this scenario, the log_error_messages procedure would be called from within each of the 
 exception handlers. Since it is an autonomous transaction, the log_error_messages procedure will 
 execute without affecting the calling procedure. This ensures that no issues will arise if 
@@ -8312,7 +8482,9 @@ is raised. This allows the program control to be passed to the procedure or func
 when that body of code has completed execution, control is passed back to the exception handler. This 
 is a very useful technique for logging exceptions but can also be used for various other tasks such as 
 sending an e-mail alert or performing some database cleanup. 
-9-7. Raising Exceptions and Continuing Processing 
+
+## 9-7. Raising Exceptions and Continuing Processing 
+
 **Problem** 
 The application you are coding requires a series of INSERT, UPDATE, and DELETE statements to be called. 
 You want to add proper exception handling to your code and also ensure that processing continues and 
@@ -8320,11 +8492,9 @@ all of the statements are executed even if an exception is raised.
 **Solution** 
 Enclose each statement within its own code block, and provide an exception handler for each of the 
 blocks. When an exception is raised within one of the nested blocks, then control will be passed back to 
-  CHAPTER 9  EXCEPTIONS 
-205 
 the main code block, and execution will continue. This style of coding is displayed in the following 
 example: 
- 
+```sql 
 CREATE OR REPLACE PROCEDURE delete_employee (in_emp_id   IN NUMBER) AS 
   BEGIN 
     -- ENTER INITIAL NESTED CODE BLOCK TO PERFORM DELETE 
@@ -8345,7 +8515,7 @@ CREATE OR REPLACE PROCEDURE delete_employee (in_emp_id   IN NUMBER) AS
 EXCEPTION WHEN OTHERS THEN 
   -- perform statements 
 END; 
- 
+```
 As this code stands, no exception will go on to become an unhanded exception because the 
 outermost code block contains an exception handler using the OTHERS exception name. Every nested 
 code block contains a handler, so every exception that is encountered in this application will be caught. 
@@ -8366,9 +8536,8 @@ this recipe works well. There is one main code block that embodies two nested co
 blocks contains essential statements that need to be run. If an exception is raised within the DELETE 
 block, then program control is passed back to its outer code block, and processing continues. In this 
 case, both essential statements will always be executed, even if exceptions are raised. 
-CHAPTER 9  EXCEPTIONS 
-206 
-9-8. Associating Error Numbers with Exceptions That Have No Name 
+
+## 9-8. Associating Error Numbers with Exceptions That Have No Name 
 **Problem** 
 You want to associate an error number to those errors that do not have predefined names. 
 **Solution** 
@@ -8376,7 +8545,7 @@ Make use of PRAGMA EXCEPTION_INIT to tell the compiler to associate an Oracle er
 exception name. This will allow the use of an easy-to-identify name rather than an obscure error 
 number when working with the exception. The example in this recipe shows how an error number can 
 be associated with an exception name and how the exception can later be raised. 
- 
+```sql
 CREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, 
                                               hours   IN NUMBER DEFAULT 1) 
 RETURN NUMBER AS 
@@ -8396,7 +8565,7 @@ BEGIN
 EXCEPTION WHEN DIVISOR_IS_ZERO THEN 
   DBMS_OUTPUT.PUT_LINE('You cannot pass a zero for the number of hours'); 
 END; 
- 
+```
 The exception declared within this example is associated with the ORA-01476 error code. When a 
 divide-by-zero exception occurs, then the handler is executed. 
 **How It Works** 
@@ -8407,22 +8576,20 @@ from the code base for some length of time.
 The PRAGMA EXCEPTION_INIT must be declared within the declaration section of your code. The 
 exception that is to be associated with the error number must be declared prior to the PRAGMA 
 declaration. The format for using PRAGMA EXCEPTION_INIT is as follows: 
- 
+```sql
 DECLARE 
   exception_name   EXCEPTION; 
   PRAGMA EXCEPTION_INIT(exception_name, <<exception_code>>); 
 BEGIN 
-  CHAPTER 9  EXCEPTIONS 
-207 
   -- Perform statements 
 EXCEPTION 
   WHEN exception_name THEN 
     -- Perform error handling 
 END; 
- 
+```
 The exception_name in this pseudocode refers to the name of the exception you are declaring. The 
 <<exception_code>> is the number of the ORA-xxxxx error that you are associating with the exception. In 
-the **Solution** to this recipe, ORA-01476 is associated with the exception. That exception in particular 
+the Solution to this recipe, ORA-01476 is associated with the exception. That exception in particular 
 denotes divisor is equal to zero. When this exception is raised, it is easier to identify the cause of the 
 error via the DIVISOR_IS_ZERO identifier than by the -01476 code. 
 Whenever possible, it is essential to provide an easy means of identification for portions of code that 
@@ -8431,7 +8598,8 @@ see the exception often enough. Even then, an exception handler with the number 
 obscure. In this case, it is always best to associate a more common name to the exception so that the 
 code can instantly have meaning to someone who is unfamiliar with the code or to you when you need 
 to maintain the code for years to come.  
-9-9. Tracing an Exception to Its Origin  
+
+## 9-9. Tracing an Exception to Its Origin  
 **Problem** 
 Your application continues to raise an exception that is being caught with the OTHERS handler. You’ve 
 used SQLCODE and DBMS_UTILITY.FORMAT_ERROR_STACK to help you find the cause of the exception but are 
@@ -8440,7 +8608,7 @@ still unable to do so.
 Use the stack trace for the exception to trace the error back to its origination. In particular, use 
 DBMS_UTILITY.FORMAT_ERROR_BACKTRACE and DBMS_UTILITY.FORMAT_CALL_TRACE to help you find the cause 
 of the exception. The following **Solution** demonstrates the use of FORMAT_ERROR_BACKTRACE: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
   emp_qry             VARCHAR2(500); 
   emp_first           employees.first_name%TYPE; 
@@ -8459,8 +8627,6 @@ CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS
       emp_qry := emp_qry || 'WHERE EMAIL = :emp_info'; 
     ELSE 
       SELECT COUNT(*) 
-CHAPTER 9  EXCEPTIONS 
-208 
       INTO valid_id_count 
       FROM employees 
       WHERE employee_id = emp_info; 
@@ -8496,25 +8662,23 @@ CHAPTER 9  EXCEPTIONS
                            'TRY AGAIN'); 
         DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); 
  END; 
- 
+```
 Here are the results when calling within invalid argument information: 
- 
+```sql
 SQL> exec obtain_emp_detail('junea@'); 
 THE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD 
 ORA-06512: at "OBTAIN_EMP_DETAIL", line 32 
  
  
 PL/SQL procedure successfully completed. 
- 
+```
 As you can see, the exact line number that caused the exception to be raised is displayed. This is 
 especially useful if you use a development environment that includes line numbering for your source 
 code. If not, then you can certainly count out the line numbers manually. 
 Similarly, DBMS_UTILITY.FORMAT_CALL_STACK lists the object number, line, and object where the issue 
 had occurred. The following example uses the same procedure as the previous example, but this time 
 DBMS_UTILITY.FORMAT_CALL_STACK is used in the exception handler: 
- 
-  CHAPTER 9  EXCEPTIONS 
-209 
+```sql 
 CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
   emp_qry                VARCHAR2(500); 
   emp_first              employees.first_name%TYPE; 
@@ -8567,10 +8731,10 @@ CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS
         DBMS_OUTPUT.PUT_LINE('AN UNEXPECTED ERROR HAS OCCURRED, PLEASE ' || 
                            'TRY AGAIN'); 
         DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_CALL_STACK); 
-CHAPTER 9  EXCEPTIONS 
-210 
- END; 
-Here are the results when calling within invalid argument information: 
+ END;
+```
+Here are the results when calling within invalid argument information:
+```sql
 SQL> exec obtain_emp_detail('june@'); 
 THE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD
 ----- PL/SQL Call Stack ----- 
@@ -8580,8 +8744,9 @@ name
 24DD3280     47  procedure OBTAIN_EMP_DETAIL
 273AA66C      1 
 anonymous block 
-PL/SQL procedure successfully completed. 
-Each of the two utilities demonstrated in this **Solution** serves an explicit purpose—to assist you in
+PL/SQL procedure successfully completed.
+```
+Each of the two utilities demonstrated in this Solution serves an explicit purpose—to assist you in
 finding the cause of exceptions in your applications. 
 **How It Works** 
 Oracle provides a few different utilities to help diagnose and repair issues with code. The utilities
@@ -8590,7 +8755,7 @@ code. DBMS_UTILITY.FORMAT_ERROR_BACKTRACE is used to display the list of lines t
 at which your application fails. This utility was added in Oracle Database 10g. Its ability to identify the
 exact line number where the code has failed can save the time of reading through each line to look for
 the errors. Using this information along with the Oracle exception that is raised should give you enough
-insight to determine the exact cause of the **Problem**. 
+insight to determine the exact cause of the Problem. 
 The result from DBMS_UTILITY.FORMAT_ERROR_BACKTRACE can be assigned to a variable since it is a
 function. Most likely a procedure will be used to log the exceptions so that they can be reviewed at a later
 time. Such a procedure could accept the variable containing the result from
@@ -8605,9 +8770,8 @@ Using a combination of these utilities when debugging and developing your code i
 You may find it useful to create helper functions that contain calls to these utilities so that you can easily
 log all stack traces into a database table or a file for later viewing. These can be of utmost importance
 when debugging issues or evaluating application execution. 
-  CHAPTER 9  EXCEPTIONS 
-211 
-9-10. Displaying PL/SQL Compiler Warnings  
+
+## 9-10. Displaying PL/SQL Compiler Warnings  
 **Problem** 
 You are interested in making your code more robust by ensuring that no issues will crop up as time goes 
 by and the code evolves. You want to have the PL/SQL compiler alert you of possible issues with your 
@@ -8620,7 +8784,7 @@ work best for your debugging purposes.
 First let’s take a look at using ALTER SESSION to enable and configure warnings for your 
 environment. This technique can be very useful when you want to enable warnings for an entire session. 
 The following example shows how to enable warnings and how to display them given a short code block: 
- 
+```sql
 ALTER SESSION SET PLSQL_WARNINGS = 'ENABLE:ALL'; 
  
 CREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, 
@@ -8640,7 +8804,8 @@ LINE/COL
 -------------------------------------------------------------------------------- 
 ERROR 
 -------------------------------------------------------------------------------- 
-1/1 
+1/1
+```
 PLW-05018: unit CALCULATE_SALARY_HOURS omitted optional AUTHID clause; 
  default value DEFINER used 
  
@@ -8648,7 +8813,7 @@ Next, let’s look at the DBMS_WARNINGS package. Use of this technique is more h
 development environment such as PL/SQL Developer that compiles your code for you. The following is 
 an example of performing the same CREATE OR REPLACE FUNCTION as earlier, but this time using 
 DBMS_WARNINGS: 
- 
+```sql
 SQL> CALL DBMS_WARNING.SET_WARNING_SETTING_STRING('ENABLE:ALL','SESSION'); 
  
 Call completed. 
@@ -8672,7 +8837,8 @@ LINE/COL
 -------------------------------------------------------------------------------- 
 ERROR 
 -------------------------------------------------------------------------------- 
-1/1 
+1/1
+```
 PLW-05018: unit CALCULATE_SALARY_HOURS omitted optional AUTHID clause; default v 
 alue DEFINER used 
  
@@ -8690,41 +8856,33 @@ The PLSQL_WARNINGS compilation parameter must be used to enable or disable warni
 session. By setting it, you can control the types of warnings that are displayed, along with how much 
 information is displayed and even how it is displayed. This parameter can be set using the ALTER SESSION 
 statement. The format for setting this parameter using ALTER SESSION is as follows: 
- 
+```sql
 ALTER SESSION SET PLSQL_WARNINGS = "[ENABLE/DISABLE:PARAMETER]" 
- 
+```
 The PLSQL_WARNINGS compilation parameter accepts a number of different parameters that each tell 
 the compiler what types of warnings to display and what to ignore. There are three different categories of 
 warnings that can be used. Table 9-3 shows the different types of warnings along with their descriptions. 
-  CHAPTER 9  EXCEPTIONS 
-213 
-Table 9-3. Warning Categories 
-Category Description 
-PERFORMANCE May hinder application performance 
-INFORMATIONAL May complicate application maintenance but contains no immediate 
-issues 
-SECURE May cause unexpected or incorrect results 
-ALL Includes all the categories 
- 
+```text
+Table 9-3. Warning  Categories 
+Category                  Description 
+PERFORMANCE               May hinder application performance 
+INFORMATIONAL             May complicate application maintenance but contains no immediate issues 
+SECURE                    May cause unexpected or incorrect results ALL Includes all the categories 
+```
 The DBMS_WARNINGS package works in a similar fashion: it accepts the same arguments as the 
 PLSQL_WARNINGS parameter. The difference is that you can control when the warnings are enabled or 
 disabled by placing the call to the package in locations that you choose. This does not matter much 
 when working via SQL*Plus, but if you are using a development environment such as Oracle SQL 
 Developer, then DBMS_WARNINGS must be used. The format for calling this procedure is as follows: 
- 
+```sql
 CALL DBMS_WARNING.SET_WARNING_SETTING_STRING('warning_category:value','scope'); 
- 
+```
 The categories are the same as PLSQL_WARNINGS, as are the values of the categories. The scope determines 
 whether the warnings will be used for the duration of the session or for all sessions. There are various 
 other options that can be used with the DBMS_WARNINGS package. To learn more about these options, 
 please see the Oracle Database 11g documentation. 
 
-C H A P T E R  10 
- 
-   
- 
-215 
-PL/SQL Collections and Records 
+# 10. PL/SQL Collections and Records 
 Collections are single-dimensional arrays of data all with the same datatype and are accessed by an 
 index; usually the index is a number, but it can be a string. Collections indexed by strings are commonly 
 known as hash arrays. 
@@ -8733,7 +8891,8 @@ stored in the database. The record data structure in PL/SQL allows you to manipu
 record level. PL/SQL provides an easy method to define a record’s structure based on a database table’s 
 structure or a cursor. Combining records and collections provide a powerful programming advantage 
 described in the following recipes. 
-10-1. Creating and Accessing a VARRAY 
+
+## 10-1. Creating and Accessing a VARRAY 
 **Problem** 
 You have a small, static list of elements that you initialize once and that would benefit from using in a 
 loop body. 
@@ -8743,7 +8902,7 @@ index. Begin by declaring a datatype of varray with a fixed number of elements, 
 datatype of the elements. Next, declare the variable that will hold the data using the newly defined type. 
 For example, the following code creates a varying array to hold the abbreviations for the days of the 
 week: 
- 
+```sql
 DECLARE 
  
 TYPE    dow_type IS VARRAY(7) OF VARCHAR2(3); 
@@ -8758,9 +8917,6 @@ BEGIN
 END; 
  
 Results 
- 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-216 
 Sun 
 Mon 
 Tue 
@@ -8768,6 +8924,7 @@ Wed
 Thu 
 Fri 
 Sat 
+```
 **How It Works** 
 The type statement dow_type defines a data structure to store seven instances of VARCHAR2(3). This is 
 sufficient space to hold the abbreviations of the seven days of the week. The dow variable is defined as a 
@@ -8779,13 +8936,14 @@ elements in the VARRAY, so the LOOP increments from one to seven. The DBMS_OUTPU
 displays its value. 
 A VARRAY is best used when you know the size the array and it will not likely change. The VARRAY 
 construct also allows you to initialize its values in the declaration section. 
-10-2. Creating and Accessing an Indexed Table 
+
+## 10-2. Creating and Accessing an Indexed Table 
 **Problem** 
 You need to store a group of numbers for later processing in another procedure. 
 **Solution** 
 Create an indexed table using an integer index to reference the elements. For example, this recipe loads 
 values into an indexed table of numbers.  
- 
+```sql
 DECLARE 
  
 TYPE    num_type IS TABLE OF number INDEX BY BINARY_INTEGER; 
@@ -8801,12 +8959,12 @@ BEGIN
    -- call subroutine to process numbers; 
    -- total := total_table (nums); 
 END;  
-  CHAPTER 10  PL/SQL COLLECTIONS AND RECORDS 
-217 
+```
+
 **How It Works** 
 PL/SQL tables are indexed collections of data of the same type. The datatype can be any of the built-in 
 datatypes provided by PL/SQL; in this example, the datatype is a number. Here are some things to note 
-about the example: 
+about the example:
 • The TYPE statement declares a TABLE of numbers. 
 • The INDEX BY clause defines how the array is accessed, in this case by an INTEGER.  
 • The array is populated by assigning values to specific indexes.  
@@ -8815,14 +8973,15 @@ than those imposed by Oracle, which is -231 – 231. Indexed tables are best sui
 number of elements stored is not known until runtime. 
 This recipe is an example of a TABLE indexed by an INTEGER. PL/SQL provides for tables indexed by 
 strings as well. See Recipe 10-5 for an example. 
-10-3. Creating Simple Records 
+
+## 10-3. Creating Simple Records 
 **Problem** 
 You need a PL/SQL data structure to group related employee data to make manipulating the group 
 easier. 
 **Solution** 
 Define a record structure of the related employee data, and then create a variable to hold the record 
 structure. In this example, a simple RECORD structure is defined and initialized. 
- 
+```sql
 DECLARE 
  
 TYPE    rec_type IS RECORD ( 
@@ -8837,15 +8996,15 @@ begin
    rec.department       := 'IT'; 
    rec.salary           := '5000'; 
  
-END; 
+END;
+```
 **How It Works** 
 Record structures are created in PL/SQL by using the TYPE statement along with a RECORD structure 
 format. The fields defined in the record structure can be, and often are, of different datatypes. Record 
 structures use dot notation to access individual fields. Once defined, the rec_type record structure in the 
 **Solution** can be used throughout the code to create as many instantiations of data structures as needed. 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-218 
-10-4. Creating and Accessing Record Collections 
+
+## 10-4. Creating and Accessing Record Collections 
 **Problem** 
 You need to load records from a database table or view into a simple data structure that would benefit 
 from use in a loop body or to pass as a parameter to another function or procedure. You want to act 
@@ -8854,7 +9013,7 @@ upon sets of records as a single unit.
 Use a TYPE to define a TABLE based on the database table structure. The following example declares a 
 cursor and then uses it to declare the table of records. The result is a variable named recs that holds the 
 data fetched by the cursor. 
- 
+```sql
 DECLARE 
  
 CURSOR  driver IS 
@@ -8878,10 +9037,8 @@ BEGIN
    END LOOP; 
  
 END; 
- 
-When you execute this block of code, you will see a message such as the following: 
- 
-103 records found 
+```
+When you execute this block of code, you will see a message such as the following: 103 records found 
 **How It Works** 
 The TYPE statement defines a data structure using the attributes (columns) of the employees table as 
 elements within the structure. The TABLE OF clause defines multiple instances of the record structure. 
@@ -8889,15 +9046,14 @@ The INDEX BY clause defines the index method, in this case an integer. Think of 
 spreadsheet with the rows being separate records from the database and the columns being the 
 attributes (fields) in the database. The recipe works whether your cursor selects all the fields (SELECT *) 
 or selects just a subset of fields from the table.  
-  CHAPTER 10  PL/SQL COLLECTIONS AND RECORDS 
-219 
 The BULK COLLECT portion of the fetch statement is more efficient than looping through the data in a 
 standard cursor loop because PL/SQL switches control to the database just once to retrieve the data as 
 opposed to switching to the database for each record retrieved in a cursor FOR .. LOOP. In a BULK 
 COLLECT, all records meeting the query condition are retrieved and stored in the data structure in a single 
 operation. Once the records are retrieved, processing may occur in a standard FOR .. standard FOR .. 
 LOOP. 
-10-5. Creating and Accessing Hash Array Collections  
+
+## 10-5. Creating and Accessing Hash Array Collections  
 **Problem** 
 You want to use a single cursor to query employee data and sum the salaries across departments.  
 **Solution** 
@@ -8907,7 +9063,7 @@ a hashed collection. Define your cursor to select employee data, joined with the
 hash array collection to total by department by using the INDEX BY option to index your collection based 
 on the department name rather than an integer. The following code example illustrates this more 
 efficient approach: 
- 
+```sql
 DECLARE 
  
 CURSOR  driver IS 
@@ -8936,12 +9092,12 @@ BEGIN
    LOOP 
       EXIT WHEN dept IS NULL; 
       DBMS_OUTPUT.PUT_LINE (to_char (totals(dept),  '999,999.00') || ' ' || dept); 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-220 
       dept := totals.NEXT(dept); 
    END LOOP; 
-END;  
+END; 
+```
 When you execute this block of code, you will see the following results: 
+```text
 20,310.00 Accounting
 58,720.00 Executive
 51,600.00 Finance
@@ -8952,6 +9108,7 @@ When you execute this block of code, you will see the following results:
 304,500.00 Sales
 156,400.00 Shipping
 35,295.00 Web Developments 
+```
 **How It Works** 
 The TOTAL_TYPES PL/SQL type is defined as a collection of numbers that is indexed by the department
 name. Indexing by department name gives the advantage of automatically sorting the results by
@@ -8965,7 +9122,8 @@ department name from the totals array using the FIRST method. In this example, t
 accounting. A loop is required to process the remaining records. The NEXT method is used to find the
 next department name—in alphabetical order—and this process repeats until all departments are
 displayed.  
-10-6. Creating and Accessing Complex Collections 
+
+## 10-6. Creating and Accessing Complex Collections 
 **Problem** 
 You need a routine to load managers and their corresponding employees from the database and store
 them in one data structure. The data must be loaded in a manner such that direct reports are associated
@@ -8976,8 +9134,7 @@ Combine records and collections to define one data structure capable of storing 
 allows you to use data structures you create via the type statement as datatypes within other collections.
 Once your data structures are defined, use dot notation to distinguish attributes within the collections.
 Use the structure’s index to reference items within the table. For example: 
-  CHAPTER 10  PL/SQL COLLECTIONS AND RECORDS 
-221 
+```sql
 SET SERVEROUT ON SIZE 1000000 
  
 DECLARE 
@@ -9030,8 +9187,6 @@ BEGIN
       OPEN emp_cursor (recs(i).mgr.employee_id); 
       FETCH emp_cursor BULK COLLECT INTO recs(i).emps; 
       CLOSE emp_cursor; 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-222 
    END LOOP; 
  
         -- traverse the data structure to display the manager and direct reports 
@@ -9044,7 +9199,7 @@ CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS
    END LOOP; 
  
 END;  
- 
+```
 Executing this code block produces the following results: 
  
 Manager: Cambrault 
@@ -9080,11 +9235,10 @@ the data structure; no temporary data structure is needed because the structure 
 exactly matches the target data structure. 
 Now that the data is stored in the data structure, it can be passed to another routine for processing. 
 Grouping large sets of related data is an efficient method for exchanging data between routines. This 
-  CHAPTER 10  PL/SQL COLLECTIONS AND RECORDS 
-223 
 helps separate data retrieval routines from business processing routines. It’s a very powerful feature in 
 PL/SQL, as you’ll see in the next recipe. 
-10-7. Passing a Collection As a Parameter 
+
+## 10-7. Passing a Collection As a Parameter 
 **Problem** 
 You want to pass a collection as a parameter to a procedure or function. For example, you have a data 
 structure that contains employee data, and you need to pass the data to a routine that prints employee 
@@ -9096,7 +9250,7 @@ the called procedure; therefore, it must be defined globally, prior to defining 
 that uses it. 
 In this example, employee data is fetched from the database into a collection and then passed to a 
 subroutine for processing. 
- 
+```sql
 set serverout on size 1000000 
  
 DECLARE 
@@ -9127,12 +9281,10 @@ BEGIN
    FETCH driver BULK COLLECT INTO recs; 
    CLOSE driver; 
  
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-224 
    print_paycheck (recs); 
  
 END;  
- 
+```
 Results 
  
 Pay to the order of: Ellen Abel $11,000.00 
@@ -9153,14 +9305,14 @@ between routines with a single parameter. The data structure emps_type is define
 employee records that can be passed to any function or procedure that requires employee data for 
 processing. This recipe is especially useful in that the logic of who receives a paycheck can be removed 
 from the routine that does the printing or the routine that archives the payroll data, for example. 
-10-8. Returning a Collection As a Parameter 
+## 10-8. Returning a Collection As a Parameter 
 **Problem** 
 Retrieving a collection of data is a common need. For example, you need a function that returns all 
 employee data and is easily called from any procedure. 
 **Solution** 
 Write a function that returns a complete collection of employee data. In this example, a package is used 
 to globally define a collection of employee records and return all employee data as a collection. 
- 
+```sql
 CREATE OR REPLACE PACKAGE empData AS 
  
 type    emps_type is table of employees%ROWTYPE INDEX BY BINARY_INTEGER; 
@@ -9172,8 +9324,6 @@ END empData;
 CREATE OR REPLACE PACKAGE BODY empData as 
  
 FUNCTION get_emp_data RETURN emps_type is 
-  CHAPTER 10  PL/SQL COLLECTIONS AND RECORDS 
-225 
  
 cursor  driver is 
 select  * 
@@ -9204,10 +9354,9 @@ begin
    dbms_output.put_line ('Employee Records: ' || emp_recs.COUNT); 
  
 END;  
- 
+```
 Executing this block of code produces the following results. 
- 
-Employee Records: 103 
+ Employee Records: 103 
 **How It Works** 
 By defining a PACKAGE, the data structure emps_type is available for use by any package, procedure, or 
 function that has access rights to it.1 The function get_emp_data within the common package contains all 
@@ -9221,16 +9370,15 @@ one routine to fix all the applications that use it.
 1 To grant access rights, enter the following command: grant execute on empData to SCHEMA, where SCHEMA is 
 the user name that requires access. To grant access to every user in the database, use grant execute on empData 
 to PUBLIC;. 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-226 
-10-9. Counting the Members in a Collection  
+
+## 10-9. Counting the Members in a Collection  
 **Problem** 
 You have a collection, and you need to determine the total number of elements in the collection. 
 **Solution** 
 Invoke the built-in COUNT method on the collection. For example, the following code creates two 
 collections: a varying array and an INDEX BY array. The code then invokes the COUNT method on both 
 collections, doing so before and after adding some records to each. 
- 
+```sql
 DECLARE 
  
 TYPE    vtype   IS VARRAY(3) OF DATE; 
@@ -9252,7 +9400,7 @@ BEGIN
    DBMS_OUTPUT.PUT_LINE ('cdates size is: ' || cdates.COUNT); 
  
 END;  
- 
+```
 Executing this block of code produces the following results: 
  
 vdates size is: 1 
@@ -9266,11 +9414,10 @@ Assigning a value directly to cdates(i) is allowed because cdates is an INDEX BY
 Assigning a value to vdates in the loop would cause an error because the array has only one defined 
 value. See the EXTEND method later in this chapter for more information on assigning values to non-INDEX 
 BY collections. 
-  CHAPTER 10  PL/SQL COLLECTIONS AND RECORDS 
-227 
 The COUNT method is especially useful when used on a collection populated with a fetch from BULK 
 COLLECT statement to determine the number of records fetched or to process records in a FOR .. LOOP. 
-10-10. Deleting a Record from a Collection 
+
+## 10-10. Deleting a Record from a Collection 
 **Problem** 
 You need to randomly select employees from a collection. Using a random generator may select the 
 same employee more than once, so you need to remove the record from the collection before selecting 
@@ -9280,7 +9427,7 @@ Invoke the built-in DELETE method on the collection. For example, the following 
 of employees and then randomly selects one from the collection. The selected employee is removed 
 from the collection using the DELETE method. This process is repeated until three employees have been 
 selected. 
- 
+```sql
 DECLARE 
  
 CURSOR  driver IS 
@@ -9313,13 +9460,11 @@ BEGIN
 --      so the random number generator has the correct count. 
       recs.DELETE(recs.COUNT); 
    END LOOP; 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-228 
  
    DBMS_RANDOM.TERMINATE; 
  
 END; 
- 
+```
 Executing this block of code produces the following results: 
  
 Olson 
@@ -9333,7 +9478,8 @@ method is used to reduce the number of elements, which changes the value returne
 method for the next randomly generated number. 
   Note: The DELETE method applies only to collections that are indexed. You can invoke DELETE only if the 
 collection’s underlying TYPE definition contains the INDEX BY clause. 
-10-11. Checking Whether an Element Exists 
+
+## 10-11. Checking Whether an Element Exists 
 **Problem** 
 You are processing elements in a collection but cannot be certain that each element exists. Referencing 
 an element in a collection that does not exist will throw an exception. You want to avoid exceptions by 
@@ -9343,7 +9489,7 @@ Use the EXISTS method to test whether a collection has a value for a particular 
 following **Solution**, a table collection is created, and then the second element is deleted. It is important 
 to note that a deleted element or an element that was never initialized is not equivalent to an element 
 with a null value. 
- 
+```sql
 DECLARE 
  
 TYPE ctype IS TABLE OF DATE INDEX BY BINARY_INTEGER; 
@@ -9367,7 +9513,7 @@ BEGIN
    END LOOP; 
  
 END;  
- 
+```
 Executing this block of code produces the following results: 
  
 cdates(1)= 07-AUG-10 
@@ -9386,20 +9532,19 @@ subscript 2.
  
 cdates(1)= 
 cdates(3)= 
-10-12. Increasing the Size of a Collection 
+
+## 10-12. Increasing the Size of a Collection 
 **Problem** 
 You have a VARRAY with a defined maximum size, but not all elements are initialized, and you need to 
 add more elements to the collection. 
 **Solution** 
 Use the EXTEND method to create new elements within the predefined boundaries. The following 
 example adds five elements using a loop: 
- 
+```sql
 DECLARE 
  
 TYPE    vtype   IS VARRAY(5) OF DATE; 
 vdates  vtype := vtype (sysdate, sysdate+1, sysdate+2); -- initialize 3 of the 5 elements 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-230 
 BEGIN 
    DBMS_OUTPUT.PUT_LINE ('vdates size is: ' || vdates.COUNT); 
    FOR i IN 1..5 LOOP 
@@ -9409,7 +9554,8 @@ BEGIN
       END IF; 
    END LOOP; 
    DBMS_OUTPUT.PUT_LINE ('vdates size is: ' || vdates.COUNT); 
-END;  
+END; 
+```
 Executing this block of code produces the following results: 
 vdates size is: 3
 vdates size is: 5 
@@ -9423,19 +9569,19 @@ The EXTEND method applies to TABLE and VARRAY collections that are not indexed. 
 EXTEND method applies when the TABLE or VARRAY type definition does not contain the INDEX BY
 clause. To assign a value to a collection that is indexed, simply reference the collection using the index
 value.  
-10-13. Navigating Collections 
+
+## 10-13. Navigating Collections 
 **Problem** 
 You need a routine to display sales totaled by region, which is stored in a collection of numbers, but the
 collection is indexed by a character string. Using a LOOP from 1 to the maximum size will not work. 
 **Solution** 
 Use the FIRST and LAST method to traverse the collection allowing PL/SQL to supply the proper index
 values. In this example, sales amounts are stored in a TABLE indexed by a string. 
+```sql
 DECLARE 
 TYPE    ntype   IS TABLE OF NUMBER INDEX BY VARCHAR2(5);
 nlist   ntype; 
 idx     VARCHAR2(5); 
-  CHAPTER 10  PL/SQL COLLECTIONS AND RECORDS 
-231 
 total   integer := 0; 
  
 BEGIN 
@@ -9456,7 +9602,7 @@ BEGIN
    DBMS_OUTPUT.PUT_LINE ('Total: ' || total); 
  
 END;  
- 
+```
 Executing this block of code produces the following results: 
  
 East = 75 
@@ -9474,9 +9620,8 @@ To traverse the collection in reverse alphabetical order, simply initialize the 
 Then replace the nlist.NEXT with nlist.PRIOR. 
   Note The FIRST, NEXT, PRIOR, and LAST methods are most useful with associative arrays but also work with 
 collections indexed by an integer. 
-CHAPTER 10 PL/SQL COLLECTIONS AND RECORDS 
-232 
-10-14. Trimming a Collection 
+
+## 10-14. Trimming a Collection 
 **Problem** 
 You need to remove one or more items from the end of a non-INDEX BY collection. The DELETE method 
 will not work because it applies only to INDEX BY collections. 
@@ -9484,7 +9629,7 @@ will not work because it applies only to INDEX BY collections.
 Use the TRIM method to remove one or more elements from the end of the collection. In this example, a 
 VARRY is initialized with five elements. The TRIM method is used to remove elements from the end of the 
 collection. 
- 
+```sql
 DECLARE 
  
 TYPE    vtype   IS VARRAY(5) OF DATE; 
@@ -9499,7 +9644,7 @@ BEGIN
    DBMS_OUTPUT.PUT_LINE ('vdates size is: ' || vdates.COUNT); 
  
 END;  
- 
+```
 Executing this block of code produces the following results: 
  
 vdates size is: 5 
@@ -9516,17 +9661,14 @@ collection, then executing a FOR .. LOOP from one to the collection’s COUNT wi
 if you attempt to access the element that was deleted without checking whether it EXISTS, an exception is 
 thrown. Second, the COUNT method will return a value that is less than the collection’s maximum index 
 value, which means the FOR .. LOOP will not process all elements in the collection. 
-C H A P T E R  11 
- 
-   
- 
-233 
-Automating Routine Tasks 
+
+# 11. Automating Routine Tasks 
 Oracle provides methods to schedule one-time and recurring jobs within the database, which is 
 beneficial when you want to automate repetitive tasks and run them at times when a DBA may not be 
 available. This chapter provides recipes to help you get started scheduling jobs (especially PL/SQL jobs), 
 capturing output, sending e-mail notifications, and keeping data in sync with other databases. 
-11-1. Scheduling Recurring Jobs 
+
+## 11-1. Scheduling Recurring Jobs 
 **Problem** 
 You want to schedule a PL/SQL procedure to run at a fixed time or at fixed intervals. 
 **Solution** 
@@ -9535,13 +9677,15 @@ run on a recurring schedule. Suppose, for example, that you need to run a stored
 calc_commissions every night at 2:30 a.m. to calculate commissions based on the employees’ salaries. 
 Normally, commissions would be based on sales, but the default HR schema doesn’t provide that table, 
 so we’ll use an alternate calculation for demonstration purposes: 
- 
+```sql
 EXEC DBMS_SCHEDULER.CREATE_JOB (               - 
            JOB_NAME=>'nighly_commissions',     - 
            JOB_TYPE=>'STORED_PROCEDURE',       - 
          JOB_ACTION=>'calc_commisions',        - 
             ENABLED=>TRUE,                     - 
-    REPEAT_INTERVAL=>'FREQ=DAILY;INTERVAL=1;BYHOUR=02;BYMINUTE=30'); 
+    REPEAT_INTERVAL=>'FREQ=DAILY;INTERVAL=1;BYHOUR=02;BYMINUTE=30');
+```
+
 **How It Works** 
 The DBMS_SCHEDULER.CREATE_JOB procedure sets up a nightly batch job. JOB_NAME must be unique. The 
 JOB_TYPE, in this example, is STORED_PROCEDURE. This informs the scheduler the job is a PL/SQL procedure 
@@ -9553,8 +9697,6 @@ schema, then include the schema name, for example, HR.calc_commission. If the pr
 larger package, include that as well, for example, HR.my_package.calc_commission. 
 ENABLED is set to TRUE to tell the scheduler to run at the next scheduled time. By default, the ENABLED 
 parameter is FALSE and would require a call to the DBMS_SCHEDULER.ENABLE procedure to enable the job. 
-CHAPTER 11  AUTOMATING ROUTINE TASKS 
-234 
 The REPEAT_INTERVAL is an important part of the CREATE_JOB routine. It identifies the frequency, in 
 this case DAILY. The INTERVAL tells scheduler to run the job every day, as opposed to 2 or 3, which would 
 run every other day, or every third day. The BYHOUR and BYMINUTE sections specifies the exact time of the 
@@ -9562,7 +9704,8 @@ day to run. In this example, the job will run at 2:30 a.m.
 The scheduled job, nightly_commissions, runs the stored procedure calc_commission, which reads 
 the data, calculates the commission, and stores the commission records. Running this job nightly keeps 
 the employees’ commission data current with respect to daily sales figures. 
-11-2. E-mailing Output from a Scheduled Job 
+
+## 11-2. E-mailing Output from a Scheduled Job 
 **Problem** 
 You have a scheduled job that runs a stored procedure at a regular interval. The procedure produces 
 output that ordinarily would be sent to the screen via the DBMS_OUTPUT.PUT_LINE procedure, but since it 
@@ -9572,7 +9715,7 @@ Save the output in a CLOB variable and then send it to the target distribution l
 UTL_MAIL.SEND procedure. For example, suppose you want to audit the employee table periodically to 
 find all employees who have not been assigned to a department within the company. Here’s a procedure 
 to do that: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE employee_audit AS 
  
 CURSOR    driver IS    -- find all employees not in a department 
@@ -9600,12 +9743,11 @@ BEGIN
               SENDER=>'someone@mycompany.com', 
           RECIPIENTS=>'audit_list@mycompany.com', 
              SUBJECT=>'Employee Audit Results', 
-  CHAPTER 11  AUTOMATING ROUTINE TASKS 
-235 
              MESSAGE=>buffer); 
    END IF; 
  
-END; 
+END;
+```
 **How It Works** 
 The procedure is very straightforward in that it finds all employees with no department. When run as a 
 scheduled job, calls to DBMS_OUTPUT.PUT_LINE won’t work because there is no “screen” to view the output. 
@@ -9613,7 +9755,8 @@ Instead, the output is collected in a CLOB variable to later use in the UTL_MAIL
 remember in this recipe is there is no screen output from a stored procedure while running as a 
 scheduled job. You must store the intended output and either write it to an operating system file or, as in 
 this example, send it to users in an e-mail. 
-11-3. Using E-mail for Job Status Notification 
+
+## 11-3. Using E-mail for Job Status Notification 
 **Problem** 
 You have a scheduled job that is running on a regular basis, and you need to know whether the job fails 
 for any reason. 
@@ -9621,10 +9764,11 @@ for any reason.
 Use the ADD_JOB_EMAIL_NOTIFICATION procedure to set up an e-mail notification that sends an e-mail 
 when the job fails to run successfully. Note, this **Solution** builds on Recipe 11-1 where a nightly batch job 
 was set up to calculate commissions. 
- 
+```sql
 EXEC DBMS_SCHEDULER.ADD_JOB_EMAIL_NOTIFICATION (    - 
       JOB_NAME=>'nightly_commissions', - 
     RECIPIENTS=> 'me@my_company.com,dist_list@my_company.com'); 
+```
 **How It Works** 
 The previous recipe is the simplest example of automating e-mail in the event a job fails. The 
 ADD_JOB_EMAIL_NOTIFICATION procedure accepts several parameters; however, the only required 
@@ -9643,8 +9787,6 @@ up to run. The database produced an e-mail with the following subject and body:
 SUBJECT: Oracle Scheduler Job Notification - HR.NIGHTLY_COMMISSIONS JOB_FAILED 
 BODY: 
 Job: JYTHON.NIGHTLY_COMMISSIONS 
-CHAPTER 11  AUTOMATING ROUTINE TASKS 
-236 
 Event: JOB_FAILED 
 Date: 28-AUG-10 03.15.30.102000 PM US/CENTRAL 
 Log id: 1118 
@@ -9654,23 +9796,24 @@ Failure count: 1
 Retry count: 0 
 Error code: 6575 
 Error message: ORA-06575: Package or function CALC_COMMISSIONS is in an invalid state 
-11-4. Refreshing a Materialized View on a Timed Interval 
+
+## 11-4. Refreshing a Materialized View on a Timed Interval 
 **Problem** 
 You have a materialized view that must be refreshed on a scheduled basis to reflect changes made to the 
 underlying table. 
 **Solution** 
 First, create the materialized view with a CREATE MATERIALIZED VIEW statement. In this example, a 
 materialized view is created consisting of the department and its total salary.: 
- 
+```sql
 CREATE MATERIALIZED VIEW dept_salaries 
 BUILD IMMEDIATE 
 AS 
 SELECT department_id, SUM(salary) total_salary 
 FROM employees 
 GROUP BY department_id; 
- 
+```
 Display the contents of the materialized view: 
- 
+```sql
 SELECT * 
 FROM dept_salaries 
 ORDER BY department_id; 
@@ -9689,9 +9832,7 @@ DEPARTMENT_ID TOTAL_SALARY
           100        51600 
           110        20300 
                       7000 
- 
-  CHAPTER 11  AUTOMATING ROUTINE TASKS 
-237 
+```
 Use the EXEC DBMS_REFRESH.MAKE procedure to set up a refresh of the materialized view: 
  
 EXEC DBMS_REFRESH.MAKE ('HR_MVs', 'dept_salaries', SYSDATE, 'TRUNC(SYSDATE)+1'); 
@@ -9704,7 +9845,7 @@ SET salary = salary * 1.03;
 COMMIT; 
  
 Note that the materialized view has not changed: 
- 
+```sql
 SELECT * 
 FROM dept_salaries 
 ORDER BY department_id; 
@@ -9723,13 +9864,13 @@ DEPARTMENT_ID TOTAL_SALARY
           100        51600 
           110        20300 
                       7000 
- 
+```
 Next, manually refresh the materialized view: 
- 
+```sql
 EXEC DBMS_REFRESH.REFRESH ('HR_MVs'); 
- 
+```
 The materialized view now reflects the updated salaries: 
- 
+```sql
 SELECT * 
 FROM dept_salaries 
 ORDER BY department_id; 
@@ -9744,12 +9885,11 @@ DEPARTMENT_ID TOTAL_SALARY
            60        36050 
            70        10300 
            80       314768 
-CHAPTER 11  AUTOMATING ROUTINE TASKS 
-238 
            90        59740 
           100        53148 
           110        20909 
-                      7210 
+                      7210
+```
 **How It Works** 
 The DBMS_REFRESH.MAKE procedure creates a list of materialized views that refresh at a specified time. 
 Although you could schedule a job that calls the DBMS_REFRESH.REFRESH procedure to refresh the view, the 
@@ -9783,21 +9923,17 @@ synchronized with a materialized view, and you do not want to duplicate data ent
 **Solution** 
 Write a procedure that creates a connection to the remote HR database and performs the steps needed 
 to synchronize the two databases. Then use the EXEC DBMS_SCHEDULER.CREATE_JOB procedure to run the 
-  CHAPTER 11  AUTOMATING ROUTINE TASKS 
-239 
 procedure on a regular basis. Suppose, for example, that your Oracle Database instance requires data 
 from the HR employee table, which is in another instance. In addition, your employee table contains 
 tables with foreign key references on the employee_id that prevents you from using a materialized view 
 to keep the HR employee table in synchronization. 
 Create a database connection to the remote HR database, and then download the data on a regular 
 basis: 
- 
+```sql
 CREATE DATABASE LINK hr_data 
 CONNECT TO hr 
 IDENTIFIED BY hr_password 
-USING 
-'(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=node_name)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=h
-r_service_name)))'; 
+USING '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=node_name)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=hr_service_name)))'; 
  
 CREATE OR REPLACE PROCEDURE sync_hr_data AS 
  
@@ -9837,8 +9973,6 @@ BEGIN
        OR    NVL(commission_pct,-1)    <> NVL(recs(i).commission_pct,-1) 
        OR    NVL(manager_id,-1)        <> NVL(recs(i).manager_id,-1) 
        OR    NVL(department_id,-1)     <> NVL(recs(i).department_id,-1) 
-CHAPTER 11  AUTOMATING ROUTINE TASKS 
-240 
         ); 
    END LOOP; 
 -- find all new rows in the HR database since the last refresh 
@@ -9854,7 +9988,8 @@ EXEC DBMS_SCHEDULER.CREATE_JOB (            -
           JOB_TYPE=>'STORED_PROCEDURE',     - 
         JOB_ACTION=>'sync_hr_data',         - 
            ENABLED=>TRUE,                   - 
-    REPEAT_INTERVAL=>'FREQ=DAILY;INTERVAL=1;BYHOUR=00;BYMINUTE=30'); 
+    REPEAT_INTERVAL=>'FREQ=DAILY;INTERVAL=1;BYHOUR=00;BYMINUTE=30');
+```
 **How It Works** 
 A database link is required to access the data. This recipe focuses more on the synchronization process,
 but the creation of the database link is demonstrated here. This link, when used, will remotely log into
@@ -9882,6 +10017,7 @@ Figure 11-1. Flowchart representation of a job chain.
 The following code shows how you can use the CREATE_CHAIN, CREATE_PROGRAM, DEFINE_CHAIN_STEP, 
 and DEFINE_CHAIN_RULE options to implement the order of execution shown in Figure 11-1. 
  
+```sql
 -- Define the Chain 
 BEGIN 
    DBMS_SCHEDULER.CREATE_CHAIN ( 
@@ -9907,8 +10043,6 @@ END;
  
 BEGIN 
    DBMS_SCHEDULER.CREATE_PROGRAM ( 
-CHAPTER 11  AUTOMATING ROUTINE TASKS 
-242 
     PROGRAM_NAME    => 'Program3',   
     PROGRAM_TYPE    => 'STORED_PROCEDURE',   
     PROGRAM_ACTION  => 'Procedure3', 
@@ -9961,8 +10095,6 @@ BEGIN
  
 END; 
  
-  CHAPTER 11  AUTOMATING ROUTINE TASKS 
-243 
 BEGIN 
    DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( 
     CHAIN_NAME   => 'Chain1', 
@@ -9998,7 +10130,8 @@ BEGIN
     JOB_ACTION      => 'Chain1', 
     REPEAT_INTERVAL => 'freq=daily;byhour=3;byminute=0;bysecond=0', 
     enabled         => TRUE); 
-END; 
+END;
+```
 **How It Works** 
 Defining and scheduling a job chain may seem daunting at first but can be broken down into the 
 following steps: 
@@ -10008,8 +10141,6 @@ Create each step in the chain.
 Create the rules that link the chain together. 
 Enable the chain. 
 Schedule the chain as a job to run a specific time or interval. 
-CHAPTER 11  AUTOMATING ROUTINE TASKS 
-244 
  
 The DBMS_SCHEDULER.CREATE_CHAIN procedure creates a chain named as Chain1.  
  Note The chain_name must be unique and will be used in subsequent steps. 
@@ -10047,8 +10178,6 @@ will generate a unique name.
 In this example, the first call to the DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure sets the condition 
 to TRUE and the action to START Step1. This causes step 1 to run immediately when the chain starts. The 
 next call to the DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure defines the action to take when step 1 
-  CHAPTER 11  AUTOMATING ROUTINE TASKS 
-245 
 completes successfully. In this example, steps 2.1 and 2.2 are started. Starting multiple steps 
 simultaneously allows you to schedule steps to run in parallel. In the third call to the 
 DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure, the condition waits for the successful completion of 
@@ -10066,12 +10195,7 @@ manually with a call to the DBMS_SCHEDULE.RUN_CHAIN procedure or, as shown in th
 to the DBMS_SCHEDULE.CREATE_JOB procedure. See Recipe 11-1 for more information on scheduling a job. 
  
  
-C H A P T E R  12 
- 
-   
- 
-247 
-Oracle SQL Developer 
+# 12. Oracle SQL Developer 
 Tools can be useful for increasing productivity while developing code. They oftentimes allow you to take 
 shortcuts when coding by providing templates to start from or by providing autocompletion as words 
 are typed. A good development tool can also be useful by incorporating several different utilities and 
@@ -10085,7 +10209,8 @@ chapter will focus on developing and maintaining Oracle PL/SQL code using the to
 will learn how to configure database connections and obtain information from database objects. In the 
 end, you should feel comfortable developing PL/SQL applications using the Oracle SQL Developer 
 environment. 
-12-1. Creating Standard and Privileged Database Connections 
+
+## 12-1. Creating Standard and Privileged Database Connections 
 **Problem** 
 You want to create a persistent connection to your database from within Oracle SQL Developer using 
 both privileged and standard accounts so that you can work with your database. 
@@ -10094,9 +10219,6 @@ Open Oracle SQL Developer, and select New from the File menu. This will open the
 window. Select the Database Connection option, and click OK. A New/Select Database Connection 
 window opens, which has a list of existing database connections on the left side and an input form for 
 creating a new connection on the right side, as shown in Figure 12-1. 
- 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-248 
  
 Figure 12-1. Creating a database connection 
 If you are creating a standard connection, choose the Basic connection type. If you are creating a 
@@ -10117,9 +10239,6 @@ available to the user account that you used to initiate the connection to the da
 tree menu located within the left pane of the environment. Figure 12-2 shows a sample of what you will 
 see when your database connection has been established. 
  
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-249 
- 
 Figure 12-2. Database connection in the navigator 
  Note If you plan to develop PL/SQL code for system events such as an AFTER LOGON trigger, you should create a 
 separate connection for the privileged user using SYSDBA. This will allow you to traverse the privileged database 
@@ -10130,7 +10249,7 @@ other features offered by the environment are not useful, but it would take an e
 feature that Oracle SQL Developer has to offer. Indeed, there are entire books on the topic. This book 
 strives to provide you with the education and concepts that you will need to know to develop complete 
 and robust PL/SQL applications using Oracle SQL Developer. 
-12-2. Obtaining Information About Tables 
+## 12-2. Obtaining Information About Tables 
 **Problem** 
 You are interested in learning more about a particular database table. You also want to look at system 
 triggers and other privileged PL/SQL objects. 
@@ -10138,8 +10257,6 @@ triggers and other privileged PL/SQL objects.
 Use the Oracle SQL Developer navigator to select the table that you want to view information about, as 
 demonstrated in Figure 12-3.  
  
-CHAPTER 12  ORACLE SQL DEVELOPER 
-250 
 Figure 12-3. Viewing table information 
 The editor window will then populate with a tab that consists of a worksheet and several subtabs.
 Each of these tabs provides different information about the table you are inspecting. Figure 12-4 shows
@@ -10159,9 +10276,6 @@ columns to be edited and then committed to the database. For a PL/SQL developer,
 editing data within a table that is being used for application debugging or testing purposes. 
 The Triggers tab will be useful to PL/SQL developers because it displays a selectable list of all table
 triggers. You can also create new triggers from the tab. Figure 12-5 shows the Triggers tab. 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-251 
- 
  
 Figure 12-5. Triggers tab of editor 
 When a trigger is selected on the Triggers tab, its DDL is displayed in a panel on the bottom half of 
@@ -10169,11 +10283,9 @@ the window. The green arrow button will allow the trigger to be executed, and th
 interval of time. You will learn more about trigger development in Recipe 12-11. 
 Oracle SQL Developer provides very useful information regarding database tables for PL/SQL 
 developers. It also provides convenient access for trigger development and manipulation. 
-12-3. Enabling Output to Be Displayed 
+## 12-3. Enabling Output to Be Displayed 
 **Problem** 
 You want to display the results of DBMS_OUTPUT within Oracle SQL Developer. 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-252 
 **Solution** 
 Enable DBMS_OUTPUT for your connection via the Dbms Output pane. This pane resides on the lower-right 
 side of the IDE. Do so by selecting the green plus icon within the pane and then choosing the desired 
@@ -10182,7 +10294,6 @@ the desired connection and then clicking the OK button, you will be prompted for
 connection if you are not already connected. Once a successful password has been entered, then 
 DBMS_OUTPUT will be enabled for the specified connection. 
  
- 
 Figure 12-6. Select Connection dialog box 
 After enabling the DBMS_OUTPUT option, you will be able to see the output from DBMS_OUTPUT within 
 Oracle SQL Developer. This can be very useful, especially for testing purposes. 
@@ -10190,7 +10301,7 @@ Oracle SQL Developer. This can be very useful, especially for testing purposes.
 The easiest way to enable SERVEROUTPUT for a particular database connection is to enable DBMS_OUTPUT 
 from within the Dbms Output window. Doing so will enable output to be displayed within the pane 
 when the code is executed. 
-  Note For more information on the DBMS_OUTPUT package, please see Recipe 1-6. 
+Note For more information on the DBMS_OUTPUT package, please see Recipe 1-6. 
 Selecting the Dbms Output option from the View menu will open the DBMS_OUTPUT pane. This pane 
 gives you several options that include the ability to save the script output, change the buffer size, and 
 even print the output. To enable SERVEROUTPUT via the pane, you must select the green plus symbol and 
@@ -10198,22 +10309,20 @@ choose a database connection. You will see the correct script output if you run 
 enabling DBMS_OUTPUT via one of the two options we have discussed. Figure 12-7 shows the Dbms Output 
 pane. 
  
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-253 
- 
 Figure 12-7. Dbms Output pane 
 Once a connection has been established using the Dbms Output pane, all DBMS_OUTPUT code that is 
 executed against that connection will be displayed within the pane. It is possible to have more than one 
 connection established within the pane, and in this case different tabs can be used to select the 
 connection of your choice. 
-12-4. Writing and Executing PL/SQL 
+
+## 12-4. Writing and Executing PL/SQL 
 **Problem** 
 You want to use Oracle SQL Developer to execute an anonymous block of code. 
 **Solution** 
 Establish a connection to the database of your choice, and the SQL worksheet will automatically open. 
 Once the worksheet has opened, you can type the code directly into it. For the purposes of this recipe, 
 type or copy/paste the following anonymous block into a SQL worksheet: 
- 
+```sql
 DECLARE 
   CURSOR emp_cur IS 
   SELECT * FROM employees; 
@@ -10224,12 +10333,9 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name); 
   END LOOP; 
 END; 
- 
+```
 Figure 12-8 shows the Oracle SQL Developer worksheet after this anonymous block has been 
 written into it. 
- 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-254 
  
 Figure 12-8. Oracle SQL Developer worksheet with PL/SQL anonymous block 
 **How It Works** 
@@ -10256,9 +10362,6 @@ the option you want to use and then hit the Tab key. Oracle SQL Developer provid
 autocompletion for table and column names and even SQL statement GROUP BY and ORDER BY clauses. 
 Take a look at Figure 12-9 to see the autocomplete feature in action. 
  
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-255 
- 
 Figure 12-9. Autocomplete drop-down list 
 Another feature that helps productivity is to use Oracle SQL Developer snippets. To learn more 
 about snippets, please see Recipe 12-7. Within the SQL worksheet toolbar, there is a group of buttons 
@@ -10277,8 +10380,6 @@ icons. The first icon in the toolbar (as shown in Figure 12-8) is a green arrow 
 in the worksheet and display the result in a separate pane. The second icon in the toolbar (as shown in 
 Figure 12-8) that resembles a piece of paper with a green arrow in front will execute the code within the 
 worksheet and then display the output in a pane that can be saved as script output. 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-256 
  Note It is possible to have more than one SQL statement or PL/SQL block within the SQL worksheet at the same 
 time. In doing so, only the highlighted code will be executed when the green arrow button is selected. If all the 
 code is selected, then a separate output pane will appear for the output of each block or statement. However, if 
@@ -10288,7 +10389,8 @@ Other toolbar options within the SQL worksheet include the ability to COMMIT or 
 that are made, run an explain plan on the current code, or set up autotrace. The SQL worksheet is like 
 SQL*Plus with many additional features. It provides the power of many tools in one easy-to-use 
 environment. 
-12-5. Creating and Executing a Script 
+## 12-5. Creating and Executing a Script
+
 **Problem** 
 You are interested in creating a PL/SQL script using Oracle SQL Developer that will run against your 
 database. Once it has been created, you want to save it and then execute it. 
@@ -10301,24 +10403,20 @@ in a file name for your script, and choose a directory in which to store it. For
 demonstration, choose the file name select_employees, browse and choose the desired storage location, 
 and click OK. At this point, a new tab opens in the Oracle SQL Developer editor. This tab represents the 
 SQL file you have just created. Type the following script into the editor for demonstration purposes: 
- 
+```sql
 DECLARE 
   CURSOR emp_cur IS 
   SELECT * FROM employees; 
-   
   emp_rec emp_cur%ROWTYPE; 
 BEGIN 
   FOR emp_rec IN emp_cur LOOP 
     DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || ' ' || emp_rec.last_name); 
   END LOOP; 
 END; 
- 
+``` 
 After the script has been typed into the editor, your Oracle SQL Developer editor should resemble 
 that shown in Figure 12-11. Save your script by clicking the Save icon that looks like a disk, or choose 
 Save from the File menu. 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-257 
- 
  
 Figure 12-11. Typing a script into the SQL editor  
 To execute the script, click the Run Script icon that is the second icon from the left above the editor, 
@@ -10327,8 +10425,7 @@ choose an existing connection, create a new connection, or edit an existing conn
 database connection that coincides with the schema for this book. Once you select the connection, the 
 script will execute against the database, and you will see another pane appear in the lower half of the 
 Oracle SQL Developer window. This is the Script Output pane, and you should see a message that states 
-“anonymous block completed.” The editor should now look like Figure 12-12. 
- 
+"anonymous block completed."The editor should now look like Figure 12-12. 
  
 Figure 12-12. Anonymous block completed 
 **How It Works** 
@@ -10339,8 +10436,6 @@ from within the preferences window, which is located within the Tools menu. The 
 keywords is blue. 
 When the script is executed, it prompts for a database connection to use. Once that connection has 
 been selected and established, then the script is run against the database. The script may not display any 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-258 
 useful results by default, unless the SERVEROUTPUT has been enabled via the Dbms Output pane. To learn 
 more about enabling DBMS_OUTPUT, please see Recipe 12-3. 
 When you select the Save option, the script is written to disk to a file having the name you specified 
@@ -10351,7 +10446,7 @@ the options of an ordinary SQL worksheet (see Figure 12-13).
  
  
 Figure 12-13. Loaded script 
-12-6. Accepting User Input for Substitution Variables 
+## 12-6. Accepting User Input for Substitution Variables 
 **Problem** 
 You want to create a PL/SQL application that accepts user input from the keyboard. To test the input, 
 you want to have Oracle SQL Developer prompt you for input. 
@@ -10363,7 +10458,7 @@ Just as SQL*Plus treats the ampersand as a token to denote user input, Oracle SQ
 same. When an ampersand is encountered, Oracle SQL Developer will display a pop-up box to prompt 
 the user for the input. For example, type or copy and paste the following code into the SQL worksheet, 
 and then select the Run Statement toolbar button. 
- 
+```
 DECLARE 
     email     VARCHAR2(25); 
 BEGIN 
@@ -10373,21 +10468,19 @@ BEGIN
   WHERE employee_id = &emp_id; 
  
   DBMS_OUTPUT.PUT_LINE('Email Address for ID: ' || email); 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-259 
 EXCEPTION  
   WHEN OTHERS THEN 
     DBMS_OUTPUT.PUT_LINE('An unknown error has occured, please try again.'); 
 END; 
- 
+```
 When the code is executed, you will be prompted to provide a value for the emp_id variable. A 
 separate dialog box that looks like the one shown in Figure 12-14 is displayed. 
- 
  
 Figure 12-14. Entering substitution variable 
 If the value being accepted from the user is a string, then the ampersand-variable must be placed 
 within single quotes. For example, &last_name would be used to prompt for user entry of a string value. 
-12-7. Saving Pieces of Code for Quick Access 
+
+## 12-7. Saving Pieces of Code for Quick Access 
 **Problem** 
 You want to save a portion of code so that it can be made easily reusable by other PL/SQL programs. 
   Tip This recipe also works for frequently used bits of SQL. 
@@ -10401,8 +10494,6 @@ button for editing an existing snippet. There is also a drop-down menu that cons
 options that organize each of the snippets into a different category. Figure 12-15 shows the Snippets 
 pane. 
  
-CHAPTER 12  ORACLE SQL DEVELOPER 
-260 
 Figure 12-15. Snippets 
 The snippet is used by dragging its text onto a SQL worksheet or script. Once dragged onto the
 worksheet, the actual code is displayed in a template fashion. In some cases, you will need to change a
@@ -10415,12 +10506,9 @@ tooltip for the snippet. The name of the snippet will appear in the Snippets pan
 The text of the snippet itself will be placed into the worksheet once you drag the name of your snippet to
 a worksheet or script. 
 Figure 12-16. Save Snippet pane 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-261 
 The Edit Snippet icon (the one with the pencil through it) brings up another window that allows you 
 to choose an existing snippet to edit, create a new snippet, or delete a snippet. Only those snippets that 
 you have created are available for editing. Figure 12-17 displays the Edit Snippets window. 
- 
  
 Figure 12-17. Edit Snippets window 
 The snippets are actually saved within an XML file named UserSnippets.xml. This file is located in 
@@ -10431,17 +10519,15 @@ UserSnippets.xml file into other user sqldeveloper directories and make the snip
 users can certainly be advantageous. 
 Snippets can be useful for saving the time of typing a SQL or PL/SQL construct. They can also be 
 beneficial if you do not remember the exact syntax of a particular piece of code. They provide quick 
-access to template-based **Solution**s. 
-12-8. Creating a Function 
+access to template-based **Solution**s.
+
+## 12-8. Creating a Function 
 **Problem** 
 You want to create a function using Oracle SQL Developer. 
 **Solution** 
 You can manually create the function by typing the code into the SQL worksheet for the database 
 connection for which you want to create. You can also use the Create Function Wizard within Oracle 
-SQL Developer to provide some assistance throughout the function creation process. There are a couple 
-p
-CHAPTER 12  ORACLE SQL DEVELOPER 
-262 
+SQL Developer to provide some assistance throughout the function creation process. There are a couple
 of different ways to invoke the Create Function Wizard. If you go to the File menu and select New, the 
 Create a New window opens, and Function is one of the available options. You can also reach the same 
 menu by selecting the New toolbar button. Both of these paths will lead you to the same window 
@@ -10465,8 +10551,6 @@ Once within the Create PL/SQL Function window, you will be able to name the func
 any parameters that will need to be used. The first parameter in the list is already defined by default, and 
 it represents the function’s return value. You can change the return type by selecting from the list of 
 datatype options within the Type column of the parameter listing.  
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-263 
 To add a new parameter, click the plus symbol on the right side of the window, and a new line will 
 be added to the parameter-listing table. You can then populate the name of the parameter, select a 
 datatype and mode, and designate a default value if one should exist. After all parameters have been 
@@ -10489,8 +10573,6 @@ your cursor will be placed on the line of code that needs to be repaired. Figure
 Figure 12-20. Compilation errors in Function Editor 
 Once you have successfully compiled and saved the function into the database, it can be executed 
 for testing purposes using the green arrow icon within the Function Editor window. When you execute 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-264 
 the function, the Run PL/SQL window will be displayed. If you defined any parameters for the function, 
 you can supply values for them within the PL/SQL Block portion of the window. You can then click OK to 
 execute the function using the value(s) you have defined within the window, and the results will be 
@@ -10513,7 +10595,7 @@ function is not compiled successfully, then you can make changes to it and choos
 265 
 within the right-click contextual menu to recompile the code. Similarly, the menu can be used to invoke 
 the profiler, debug, or administer privileges for the function. 
-12-9. Creating a Stored Procedure 
+## 12-9. Creating a Stored Procedure 
 **Problem** 
 You want to create a stored procedure using Oracle SQL Developer. 
 **Solution** 
@@ -10559,8 +10641,6 @@ Once you have completed and saved the Create PL/SQL Procedure form, the code is 
 SQL worksheet that is a procedure editor that contains buttons and tabs for working with the stored 
 procedure, as shown in Figure 12-26. 
  
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-267 
  
 Figure 12-26. Stored Procedure Wizard 
 The worksheet contains six tabs that can be used to find out more information about the stored 
@@ -10569,7 +10649,7 @@ Other information includes dependencies, references, details, and profiles. You 
 procedure by typing into the editor. The editor will perform autocompletion where appropriate, and 
 snippets can be dragged into the editor.  
 Next, copy the following procedure into the editor for testing purposes: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE INCREASE_WAGE 
 ( 
   EMPNO_IN IN NUMBER, 
@@ -10595,15 +10675,12 @@ BEGIN
  
   DBMS_OUTPUT.PUT_LINE(RESULTS); 
 END; 
- 
+```
 Once the procedure has been coded, select the Save option from the File menu, or click the Save 
 icon that contains an image of a disk. This will compile and store the procedure into the database. You 
 can alternatively use the Gears button to compile and save, which will produce the same results. If any 
 compilation errors are found, they will be displayed in a pane below the editor along with the line 
 number on which the error was found (Figure 12-27). 
- 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-268 
  
 Figure 12-27. Compilation errors 
 If you double-click the error message, the cursor will be placed into the line of code that contains 
@@ -10614,22 +10691,19 @@ list of procedures for the database connection.
 To execute the procedure, right-click it within the navigator, and choose the Run option; this will 
 cause the Run PL/SQL window to open. This window is shown in Figure 12-28. 
  
- 
 Figure 12-28. Run PL/SQL procedure window 
 At this point, you have the option to save the file to disk or open another SQL file. If you want to test 
 the procedure, then you can assign some values to the parameters within this window. Assign the values 
 directly within the code that is listed in the PL/SQL Block section of the Run PL/SQL window. When you 
 click OK, then the procedure will be executed. The results of the execution will be displayed in the log 
 pane that is located below the editor pane.  
-12-10. Creating a Package Header and Body 
+## 12-10. Creating a Package Header and Body 
 **Problem** 
 You want to create a package and store it into the database using Oracle SQL Developer. 
 **Solution** 
 Use the Create Package Wizard, or type the PL/SQL package code into a SQL worksheet. To start the 
 wizard, go to the File menu, and select the New option. Once the Create a New dialog box opens, select 
 Package, as shown in Figure 12-29. 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-269 
  
  
 Figure 12-29. Creating a new package 
@@ -10650,10 +10724,7 @@ Package Wizard, you will be prompted to enter a package name. For the purposes o
 the name PROCESS_EMPLOYEE_TIME, and click OK. If there is an existing object that has the same name, 
 then you will be alerted via a red pop-up message (Figure 12-30). 
  
- 
 Figure 12-30. Naming the PL/SQL package using creation wizard 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-270 
  Note If you want to enter all code in lowercase for readability within the tool, you can select the check box
 before clicking OK once the package has been named.  PL/SQL is not a case-sensitive language, so case does not
 affect code execution. 
@@ -10661,12 +10732,14 @@ After proceeding, the package editor is opened, and it contains some standard pa
 code using the name that you placed into the wizard. As you can see from Figure 12-31, the package
 editor contains several tabs, along with a search bar and Run, Debug, Compile, and Profile buttons.
 Enter the following example code into the text box on the Code tab: 
+```sql
 CREATE OR REPLACE PACKAGE process_employee_time IS 
   total_employee_salary              NUMBER; 
   PROCEDURE grant_raises(pct_increase IN NUMBER); 
   PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
                            Pct_increase IN NUMBER) ;
-END; 
+END;
+```
 Figure 12-31. Package editor window 
 Click the Save button to compile and store the package into the database. Once this has been
 completed, then the package header should be successfully stored in the database. Next, a package body
@@ -10674,13 +10747,11 @@ will need to be added in order to make the package functional. This can be done 
 Package subfolder within the navigator. Once expanded, select the package for which you want to create
 a body. Right-click the selected package, and select the Create Body option (Figure 12-32). 
 Figure 12-32. Creating a package body 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-271 
 Next, the standard package body creation code will be added to an editor much like the SQL 
 worksheet. You can now edit this code accordingly to ensure that it performs the correct actions. Type 
 the following package body into the editor, and then click the Save button to compile and store the 
 package body: 
- 
+```sql
 CREATE OR REPLACE PACKAGE BODY process_employee_time AS 
   PROCEDURE grant_raises ( 
     pct_increase IN NUMBER) as 
@@ -10723,18 +10794,15 @@ BEGIN
    
  END increase_wage; 
 END process_employee_time; 
- 
+```
 If any compilation errors are encountered, an error window will be displayed providing the line 
 number and specific error message that needs to be addressed. After any compile errors are repaired, the 
 package body will be successfully created. You can then use the navigator to expand the package name 
 and see the package body listed within it. Right-clicking the package body in the navigator offers some 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-272 
 options such as Edit, Run, Compile, Profile, and Debug. You will learn more about debugging in Recipe 
 12-12. The Edit option will open the package body editor if it is not already open. The Run option will 
 open the Run PL/SQL window, which allows you to select a procedure or function to execute from the 
 chosen package (Figure 12-33). 
- 
  
 Figure 12-33. Running the PL/SQL package 
 Once a function or procedure is chosen from the Run PL/SQL window, it is executed using the 
@@ -10745,7 +10813,8 @@ the code to a file or load code from an existing file.
 Oracle SQL Developer makes developing PL/SQL packages easy. All the tools that are needed to 
 successfully create, edit, and manage packages are available within the environment. Whether you are a 
 beginner or seasoned expert, these tools will make package development and maintenance a breeze. 
-12-11. Creating a Trigger 
+
+## 12-11. Creating a Trigger 
 **Problem** 
 You need to create a DML database trigger that validates data prior to inserting it into a table, and you 
 want to use Oracle SQL Developer to do so. For instance, you want to create a trigger that will validate an 
@@ -10755,9 +10824,6 @@ Use the Create Trigger Wizard, type the PL/SQL trigger code into a SQL worksheet
 options that are available from the database table worksheet. To start the wizard, go to the File menu 
 and select the New option. Once the Create a New dialog box opens, select Trigger. This will open the 
 Create Trigger window, as shown in Figure 12-34. 
- 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-273 
  
 Figure 12-34. Creating a new trigger 
 The Create Trigger window simplifies the process of creating a trigger because it provides all the 
@@ -10782,18 +10848,14 @@ whether the trigger is to be executed based upon a specific column.
 If you attempt to enter a trigger name that matches an existing object in the database within the 
 specified schema, you will receive an error message, as shown in Figure 12-35. 
  
-CHAPTER 12  ORACLE SQL DEVELOPER 
-274 
- 
 Figure 12-35. Create Trigger window–—object already exists 
 After finishing with the Create Trigger Wizard and clicking the OK button, the initial trigger creation 
 code will be displayed in an editor (Figure 12-36). 
  
- 
 Figure 12-36. Trigger Editor 
 Type the following code into the editor, and hit the Save button to compile the code and save it into 
 the database: 
- 
+```sql 
 TRIGGER CHECK_EMAIL_ADDRESS 
 BEFORE INSERT ON employees 
 FOR EACH ROW 
@@ -10802,9 +10864,7 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20001, 'INVALID EMAIL ADDRESS'); 
   END IF; 
 END; 
- 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-275 
+```
 The Save button will automatically compile the code, and the output will appear in the Messages 
 pane below the editor, as shown in Figure 12-37. 
  
@@ -10821,9 +10881,8 @@ modifications.
 Using the Create Trigger Wizard in Oracle SQL Developer can greatly reduce the time it takes to 
 create a database trigger. By selecting the appropriate options within the wizard, you will be left with 
 only the trigger functionality to code.  
-CHAPTER 12  ORACLE SQL DEVELOPER 
-276 
-12-12. Debugging Stored Code 
+
+## 12-12. Debugging Stored Code 
 **Problem** 
 One of your stored procedures contains logical errors, and you want to use Oracle SQL Developer to help 
 you find the cause. 
@@ -10834,11 +10893,9 @@ and modify variable values at runtime to investigate a **Problem** with your cod
 invoke the debugger for a particular piece of code. When a code object is opened within the editor, the 
 toolbar will contain a red “bug” icon that can be used to invoke the debugger (Figure 12-39).  
  
- 
 Figure 12-39. Debugger icon 
 The right-click contextual menu within the navigator also contains a Debug option for procedures 
 and packages (Figure 12-40). 
- 
  
 Figure 12-40. Debugger option in Navigator 
 **How It Works** 
@@ -10851,8 +10908,6 @@ debugger must be granted some database permissions. The user must be granted the
 PROCEDURE privilege to have debug capabilities on any procedure or DEBUG <procedure name> to allow 
 debugging capabilities on a single procedure. The DEBUG CONNECT SESSION privilege must also be granted 
 in order to allow access to the debugging session. 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-277 
 After a user has been granted the proper permissions for debugging, the next step is to place a 
 breakpoint (or several) into the code that will be debugged. For the purposes of this recipe, the 
 INCREASE_WAGE procedure will be loaded into the procedure editor, and a breakpoint will be set by 
@@ -10861,13 +10916,11 @@ the debugger to pause execution at. Once the cursor is in the desired location, 
 place the breakpoint. Figure 12-41 shows a breakpoint that has been placed at the beginning of a SELECT 
 statement within the INCREASE_WAGE procedure. 
  
- 
 Figure 12-41. Setting a breakpoint 
 After one or more breakpoints have been placed, the code needs to be compiled for debug. To do so, 
 use the icon in the editor toolbar for compiling, and select the Compile for Debug option. Once the code 
 has been compiled for debug, its icon in the navigator will adopt a green bug to indicate that it is ready 
 for debugging (Figure 12-42). 
- 
  
 Figure 12-42. Code ready for debug 
 Next, the debugger can be started by selecting the debug icon within the editor or by right-clicking 
@@ -10875,12 +10928,9 @@ the code within the navigator and selecting the Debug option. If the user who is
 does not have appropriate permissions to debug, then error messages such as those shown in Figure 12-
 43 will be displayed. 
  
- 
 Figure 12-43. User not granted necessary permissions 
 Assuming that the user has the correct permissions to debug, the Debug PL/SQL window will be 
 displayed. This window provides information about the code that is being debugged including the target 
-CHAPTER 12  ORACLE SQL DEVELOPER 
-278 
 name, the parameters, and a PL/SQL block that will be executed in order to debug the code. The code 
 that is contained within the PL/SQL block portion of the screen can be modified so that the parameters 
 being passed into the code (if any) can be set to the values you choose (Figure 12-44). In Figure 12-44, 
@@ -10904,13 +10954,12 @@ The Oracle SQL Developer debugger is a useful tool and provides an intuitive use
 DBMS_DEBUG_JDWP utility. Although this recipe covers only the basics to get you started, if you spend time 
 using each feature of the debugger, then you will learn more powerful ways to help you maintain and 
 debug issues found in your code. 
-12-13. Compiling Code Within the Navigator 
+
+## 12-13. Compiling Code Within the Navigator 
 **Problem** 
 You want to compile some PL/SQL code within Oracle SQL Developer. In this **Solution**, the navigation 
 menu of your Oracle SQL Developer environment contains code that has a red X on it. This means the 
 code needs to be compiled or that it contains an error. 
-  CHAPTER 12  ORACLE SQL DEVELOPER 
-279 
 **Solution** 
 Select the code that needs to be compiled, and right-click (Ctrl+click) it. A menu will be displayed that 
 lists several options. Select the Compile option from that menu (Figure 12-45). 
@@ -10938,18 +10987,15 @@ each on a separate line, within the Messages window. The messages will contain t
 as the line number that caused the exception to be raised. Double-clicking each error message will take 
 you directly to the line of code that raised the exception so that you can begin working on repairs. 
 
-C H A P T E R  13 
  
-   
- 
-281 
-Analyzing and Improving 
-Performance 
-This chapter introduces several methods to help you analyze your code to improve its performance in 
+
+# 13. Analyzing and Improving 
+Performance This chapter introduces several methods to help you analyze your code to improve its performance in 
 terms of runtime or memory usage. Many recipes use the DBMS_PROFILE package, which is supplied by 
 Oracle, to help in the analysis. It is a useful tool for identifying which lines of code consume the most 
 execution time. 
-13-1. Installing DBMS_PROFILER 
+
+## 13-1. Installing DBMS_PROFILER 
 **Problem** 
 You want to analyze and diagnose your code to find bottlenecks and areas where excess execution time 
 is being spent, but the DBMS_PROFILER package is not installed. 
@@ -10962,17 +11008,17 @@ To install the DBMS_PROFILER packages, follow these steps:
 The packages are owned by the SYS account; therefore, it requires DBA login 
 access. Start by opening a SQL Plus connect with the connect sys command. If 
 the operation is successful, the system will respond with the message 
+
 “Connected.”  
 connect sys/sys_pwd as sysdba 
 Connected. 
 Once connected, run the profload.sql script that can be found within the 
 RDBMS/ADMIN directory contained in your Oracle Database home. The system 
 will respond with a series of messages like those shown next. 
+```
 @[Oracle_Home]/RDBMS/ADMIN/profload.sql 
- 
+```
 You should see the following output after executing the script: 
-CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-282 
  
 Package created. 
 Grant succeeded. 
@@ -11010,9 +11056,8 @@ CREATE PUBLIC SYNONYM plsql_profiler_data FOR plsql_profiler_data;
 CREATE PUBLIC SYNONYM plsql_profiler_units FOR plsql_profiler_units; 
 CREATE PUBLIC SYNONYM plsql_profiler_runs FOR plsql_profiler_runs; 
 CREATE PUBLIC SYNONYM plsql_profiler_runnumber FOR plsql_profiler_runnumber; 
-  CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-283 
-13-2. Identifying Bottlenecks 
+
+## 13-2. Identifying Bottlenecks 
 **Problem** 
 You notice that a PL/SQL program is running slowly, and you need to identify what sections of the code 
 are causing it to perform poorly. 
@@ -11020,18 +11065,18 @@ are causing it to perform poorly.
 Use the DBMS_PROFILER routines to analyze the code and find potential bottlenecks. In the following 
 example, the profiler is used to collect statistics on a run of a program, and then a query displays the 
 statistics.  
- 
+```sql
 EXEC DBMS_PROFILER.START_PROFILER ('Test1', 'Testing One'); 
 EXEC sync_hr_data;    -- the procedure identifed has having a bottleneck 
 EXEC DBMS_PROFILER.FLUSH_DATA; 
 EXEC DBMS_PROFILER.STOP_PROFILER; 
- 
+```
 Now that the profile data is collected, you can query the underlying tables to see the results of the 
 analysis: 
  
 COL line# FORMAT 999 
 COL hundredth FORMAT a6 
- 
+```sql
 SELECT    d.line#, 
           to_char (d.total_time/10000000, '999.00') hundredth, 
           s.text 
@@ -11047,7 +11092,8 @@ AND    d.unit_number     = u.unit_number
 AND    s.name            = u.unit_name 
 AND    s.line            = d.line# 
 ORDER BY d.line#; 
- 
+```
+
 Here are the results of the previous query: 
  
  1     .00 PROCEDURE sync_hr_data AS 
@@ -11058,10 +11104,8 @@ Here are the results of the previous query:
 10    1.64       UPDATE      employees 
 15     .01 END sync_hr_data; 
  
-CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-284 
 Here is the complete source code for the sync_hr_data procedure: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE sync_hr_data AS 
  
 CURSOR    driver IS 
@@ -11076,7 +11120,8 @@ BEGIN
       WHERE  employee_id = recs.employee_id; 
    END LOOP; 
  
-END sync_hr_data; 
+END sync_hr_data;
+``` 
 **How It Works** 
 There are four steps necessary to collect statistics on a running procedure: 
 1. Call the DBMS_PROFILER.START_PROFILER routine to begin the process of 
@@ -11100,16 +11145,15 @@ Selecting records in the loop and then updating them causes the program to switc
 PL/SQL and the database engine. Each iteration of the LOOP causes this switch to occur. In this example, 
 there were 107 employee records updated. The next recipe shows you how to improve the performance 
 of this procedure. 
-  CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-285 
-13-3. Speeding Up Read/Write Loops 
+
+## 13-3. Speeding Up Read/Write Loops 
 **Problem** 
 You have identified a loop that reads and writes large batches of data. You want to speed it up. 
 **Solution** 
 Use a BULK COLLECT statement to fetch the target data records, and then use a FORALL loop to update the 
 local database. For example, suppose you want to speed up the sync_hr_data procedure demonstrated 
 in Chapter 11: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE sync_hr_data AS 
  
 CURSOR    driver IS 
@@ -11131,24 +11175,22 @@ BEGIN
       WHERE     employee_id = recs(i).employee_id; 
  
 END sync_hr_data; 
- 
+```
 Run the profiler procedures to collect additional statistics: 
- 
+```sql
 EXEC DBMS_PROFILER.START_PROFILER ('Test2', 'Testing Two'); 
 EXEC sync_hr_data; 
 EXEC DBMS_PROFILER.FLUSH_DATA; 
 EXEC DBMS_PROFILER.STOP_PROFILER; 
- 
+```
 Query the underlying tables to see the results of the analysis: 
- 
+```sql
 COL line# FORMAT 999 
 COL hundreth FORMAT A6 
- 
+
 SELECT    d.line#, 
           TO_CHAR (d.total_time/10000000, '999.00') hundreths, 
           s.text 
-CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-286 
 FROM    user_source             s, 
         plsql_profiler_data     d, 
         plsql_profiler_units    u, 
@@ -11161,7 +11203,7 @@ AND      d.unit_number     = u.unit_number
 AND      s.name            = u.unit_name 
 AND      s.line            = d.line# 
 ORDER BY d.line#; 
- 
+``` 
  1     .00 PROCEDURE sync_hr_data AS 
  3     .00 CURSOR    driver is 
  4   11.54 SELECT    * 
@@ -11176,7 +11218,8 @@ The procedure is updated from the previous recipe to use a BULK COLLECT statemen
 into a collection. The update statement uses the FORALL command to pass the entire collection of data to 
 the Oracle engine for processing rather than updating one row at a time. BULK COLLECT and FORALL loops 
 pass the entire dataset of the collections to the database engine for processing, unlike the loop in recipe 
-13-2, where each iteration passes only one record at a time from the collection to the database. The 
+
+## 13-2, where each iteration passes only one record at a time from the collection to the database. The 
 constant switching back and forth between PL/SQL and the database engine creates unnecessary 
 overhead. 
 Perform the following steps to collect statistics on the update procedure: 
@@ -11195,18 +11238,17 @@ nanoseconds. The query results show three lines of code with actual execution ti
 Comparing these results with the previous recipe, we note a 28 percent improvement, 2.25 to 1.61, 
 in fetching the records via the BULK COLLECT statement, and a 30 percent improvement, 1.64 to 1.15, in 
 the writing of the records via the FORALL statements. This improvement is realized while processing only 
-  CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-287 
 107 records. Greater gains can be realized with larger data sets, especially when selecting records via a 
 remote database link as there are fewer context switches between PL/SQL and the Oracle engine. 
-13-4. Passing Large or Complex Collections as OUT Parameters 
+
+## 13-4. Passing Large or Complex Collections as OUT Parameters 
 **Problem** 
 You have a procedure or function that accepts one or more large or complex collections that are also OUT 
 parameters, and you need a more efficient method to pass these variables. 
 **Solution** 
 Pass the parameters to your procedure or function by reference using the NOCOPY option on the 
 procedure or function declaration. 
- 
+```sql
 CREATE OR REPLACE PACKAGE no_copy_test AS 
  
    TYPE rec_type IS TABLE OF all_objects%ROWTYPE INDEX BY BINARY_INTEGER; 
@@ -11214,8 +11256,9 @@ CREATE OR REPLACE PACKAGE no_copy_test AS
  
 END no_copy_test; 
 / 
+```
 show error 
- 
+```sql
 CREATE OR REPLACE PACKAGE BODY no_copy_test AS 
  
 PROCEDURE proc1 (rec_list IN OUT rec_type) IS 
@@ -11224,7 +11267,7 @@ BEGIN
       rec_list(i) := rec_list(i); 
    END LOOP; 
 END; 
- 
+
 PROCEDURE proc2 (rec_list IN OUT NOCOPY  rec_type) IS 
 BEGIN 
    FOR i IN 1..rec_list.COUNT LOOP 
@@ -11242,8 +11285,6 @@ recs        rec_type;
 rec_count   integer; 
  
 BEGIN 
-CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-288 
  
    OPEN driver; 
    FETCH DRIVER BULK COLLECT INTO recs; 
@@ -11259,10 +11300,12 @@ CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE
 END test; 
  
 END no_copy_test; 
- 
+/
+```
+```sql
 set serverout on  -- Enable output from DBMS_OUTPUT statements 
 EXEC no_copy_test.test; 
- 
+```
 Running the procedure produced the following output: 
  
 03-NOV-10 05.05.14.865000000 PM -05:00 
@@ -11281,21 +11324,20 @@ The output from the test shows the first procedure, which passed its parameter b
 to run than the second procedure, which passed its parameter by REFERENCE. In this example, the 
 USER_OBJECTS table was used as the data for the parameter, which retrieved only 6,570 records. Larger 
 performance gains can be realized with more records and more complex data structures. 
-13-5. Optimizing Computationally Intensive Code 
+
+## 13-5. Optimizing Computationally Intensive Code 
 **Problem** 
 You have computationally intensive code that you want to optimize to decrease its running time. 
 **Solution** 
 Recompile the package, procedure, or function in native mode using the NATIVE setting: 
  
-  CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-289 
 ALTER PACKAGE my_package COMPILE BODY PLSQL_CODE_TYPE=NATIVE REUSE SETTINGS; 
 ALTER PROCEDURE my_procedure COMPILE PLSQL_CODE_TYPE=NATIVE REUSE SETTINGS; 
 ALTER FUNCTION my_function COMPILE PLSQL_CODE_TYPE=NATIVE REUSE SETTINGS; 
  
 Here is an example of a computationally intensive procedure. It uses the factorial function from 
 Recipe 17-4. 
- 
+```sql
 CREATE OR REPLACE PROCEDURE factorial_test as 
  
 fact    NUMBER; 
@@ -11316,16 +11358,17 @@ EXEC factorial_test
  
 PL/SQL procedure successfully completed. 
 Elapsed: 00:00:01.18 
- 
+```
 Now, recompile the code using the NATIVE option and rerun the test, noting any change in running 
 time: 
- 
+```sql
 ALTER PROCEDURE factorial_test COMPILE PLSQL_CODE_TYPE=NATIVE REUSE SETTINGS; 
  
 EXEC factorial_test 
  
 PL/SQL procedure successfully completed. 
 Elapsed: 00:00:00.42 
+```
 **How It Works** 
 The ALTER. . .COMPILE command invokes the compiler on the named object. The syntax differs slightly 
 when recompiling a PACKAGE body in that the BODY clause follows the COMPILE statement. The 
@@ -11337,9 +11380,8 @@ statements (in other words, SELECT, INSERT, UPDATE, and DELETE). In the previous
 function is called repeatedly to simulate a computationally intensive procedure. When the procedure is 
 compiled in the default, interpretive method, it completes its run in 1.18 seconds. When compiled in 
 NATIVE mode, it completes in 0.42 seconds. This is a 64 percent improvement in running time! 
-CHAPTER 13  ANALYZING AND IMPROVING PERFORMANCE 
-290 
-13-6. Improving Initial Execution Running Time 
+
+## 13-6. Improving Initial Execution Running Time 
 **Problem** 
 You have a procedure that you run frequently, and you want to improve its overall running time by
 minimizing its startup time. 
@@ -11347,9 +11389,11 @@ minimizing its startup time.
 Use the DBMS_SHAPRED_POOL.KEEP procedure to keep a permanent copy of your code in the shared
 memory pool. For example, the following statement pins the procedure my_large_procedure in the
 database’s shared memory pool: 
+```sql
 DBMS_SHARED_POOL.KEEP ( 
    Name => 'my_large_procedure',  
    flag => 'P'); 
+```
 **How It Works** 
 The DBMS_SHARED_POOL.KEEP procedure permanently keeps your code in the shared memory pool. By
 default, when PL/SQL code is executed, Oracle must first read the entire block of code into memory if it
@@ -11367,12 +11411,8 @@ The most commonly used values for FLAG are as follows:
 •Q: Specifies the object is a sequence 
 You must have execute privileges on the DBMS_SHARED_POOL package to pin your code. An account with
 SYSDBA privileges must grant execute on DBMS_SHARED_POOL to your schema or to public. 
-C H A P T E R  14 
- 
-   
- 
-291 
-Using PL/SQL on the Web 
+
+# 14. Using PL/SQL on the Web 
 Oracle’s Application Server provides a powerful gateway that exposes your PL/SQL procedures to web 
 browsers. The gateway is defined using a Data Access Descriptor (DAD) that runs PL/SQL code as either 
 the user defined in the DAD or as the user running the web application. 
@@ -11381,7 +11421,8 @@ HTML tags. In addition to making your code easier to read and manage, the toolki
 code through Apache directly to the client web browser. 
 The following recipes teach you how to write PL/SQL procedures that produce interactive web 
 pages. These recipes can be combined to create **Solution**s for complex business applications. 
-14-1. Running a PL/SQL Procedure on the Web 
+
+## 14-1. Running a PL/SQL Procedure on the Web 
 **Problem** 
 You’d like to make your PL/SQL procedures accessible to users in a web browser via the Oracle 
 Application Server. 
@@ -11391,7 +11432,7 @@ the Oracle Application Server to define the connection information required betw
 the Oracle Application Server and the Oracle database that holds the PL/SQL procedures you wish to 
 run. In this example the mod_plsql configuration file dads.conf (located in [Oracle_Home]\Apache\ 
 modplsql\conf) is edited to define the DAD. 
- 
+```sql
 <Location /DAD_NAME> 
     SetHandler pls_handler 
     Order deny,allow 
@@ -11407,10 +11448,8 @@ modplsql\conf) is edited to define the DAD.
     PlsqlFetchBufferSize 128 
     PlsqlCGIEnvironmentList QUERY_STRING 
     PlsqlErrorStyle DebugStyle 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-292 
 </Location> 
- 
+```
 You may repeat the <Location> data for additional DADs as required; perhaps one DAD for every 
 major application. You must restart the Oracle Application Server for changes to the DAD configuration 
 file to take effect. 
@@ -11419,12 +11458,12 @@ To verify that your DAD is configured properly and will run your PL/SQL code, lo
 database defined in your DAD. The Oracle database account is defined in the PlsqlDatabaseUsername, 
 PlsqlDatabasePassword and PlsqlDatabaseConnectString statements. Next, compile the following test 
 procedure. 
- 
+```sql
 create or replace procedure test as 
 begin 
    htp.p ('Hello World!'); 
 end; 
- 
+```
 Finally, point your web browser to http://node_name/DAD_NAME/test. Where node_name is the 
 name of the machine where the Oracle Application Server is installed and DAD_NAME is the name assigned 
 your DAD in the <Location> tag within the mod_plsql configuration file and test is the name of the 
@@ -11452,9 +11491,8 @@ TNS_ENTRY name and the user must have execute privileges to the requested proced
 must be accessible to the ORACLE_SCHEMA_NAME specified in PlsqlDatabaseUsername. In other words, the 
 schema must own the procedure or, if owned by another schema, it must have execute privileges to the 
 procedure. 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-293 
-14-2. Creating a Common Set of HTML Page Generation Procedures 
+
+## 14-2. Creating a Common Set of HTML Page Generation Procedures 
 **Problem** 
 Every web page you generate with a PL/SQL procedure requires a common HTML tag to start and 
 another to finish every web page, and you do not wish to repeat the code to add those tags in every 
@@ -11464,14 +11502,15 @@ Create a package that contains calls to the PL/SQL Web Toolkit procedures that p
 necessary to properly display a well-formed,1 HTML web page. In this example a package is created with 
 two procedures, one to generate the HTML tags required to start a page and one to generate the closing 
 HTML tags to finish a page. 
- 
+```sql
 CREATE OR REPLACE PACKAGE common AS 
  
    PROCEDURE header (title VARCHAR2); 
    PROCEDURE footer; 
  
 END common; 
- 
+```
+```sql
 CREATE OR REPLACE PACKAGE BODY common AS 
  
 PROCEDURE header (title VARCHAR2) IS 
@@ -11491,16 +11530,14 @@ BEGIN
    htp.header (2, title); 
  
 END HEADER; 
- 
+
 PROCEDURE footer IS 
  
 BEGIN 
- 
-                                                 
+                                                
 1 A well-formed HTML web page conforms to the standards defined by The World Wide Web Consortium 
 (W3C). You can validate your HTML web pages at http://validator.w3.org/. 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-294 
+
 -- This is a great place to add legal disclaimers, about us, contact us, etc. links 
    htp.hr;  -- horizontal line 
    htp.anchor ('http://www.mynode.com/legal_statement.html', 'Disclaimer'); 
@@ -11511,20 +11548,24 @@ CHAPTER 14  USING PL/SQL ON THE WEB
 END footer; 
  
 END common; 
+```
+
 **How It Works** 
 Recipe 14-1 includes a test procedure to verify the DAD is setup correctly; however the test procedure 
 does not produce a well-formed HTML page. Here is the updated example from Recipe 14-1, this time 
 with calls to the common header and footer procedures. 
- 
+
+```sql
 create or replace procedure test as 
 begin 
    common.header ('Test Page'); 
    htp.p ('Hello World!'); 
    common.footer; 
 end; 
- 
+```
+
 This procedure, when called from a web browser, produces the following HTML code. 
- 
+```html
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/ 
 TR/REC-html40/loose.dtd"> 
 <HTML> 
@@ -11537,7 +11578,7 @@ TR/REC-html40/loose.dtd">
 Hello World! 
 </BODY> 
 </HTML> 
- 
+```
 The header routine generates the necessary opening HTML code to properly display a web page. It 
 begins by setting the document type, then sending the opening <HTML> and <HEAD> tags. It sets the 
 content-type to the character set defined in the Apache environment variable, which is retrieved using a 
@@ -11550,11 +11591,10 @@ good place to include any legal disclaimers or other useful text or links requir
 generated. 
 Oftentimes when creating an application, you will create several procedures that will make use of 
 the same code. You could copy the code throughout your procedures, but it is more efficient and safer to 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-295 
 write once and use in many different places. The creation of a common codebase that is accessible to 
 each PL/SQL object within a schema can be quite an effective **Solution** for storing such code. 
-14-3 Creating an Input Form 
+
+## 14-3 Creating an Input Form 
 **Problem** 
 You require a web page that accepts and processes data entered by users. The data should be collected 
 on the opening page and processed (stored in a table, used to update rows in a table, etc.) when the user 
@@ -11564,6 +11604,7 @@ Create a package using the Oracle PL/SQL Web Toolkit to display a data entry for
 results. In this example a simple data entry form is created to collect employee information and send the 
 user’s input to a second procedure for processing.  
 ■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe. 
+```sql
 CREATE OR REPLACE PACKAGE input_form AS 
  
    null_array OWA_UTIL.IDENT_ARR; 
@@ -11575,7 +11616,8 @@ CREATE OR REPLACE PACKAGE input_form AS
                      comments   varchar2); 
  
 END input_form; 
- 
+```
+```sql
 CREATE OR REPLACE PACKAGE BODY input_form AS 
  
 PROCEDURE html IS 
@@ -11651,7 +11693,9 @@ BEGIN
   
 END submit; 
  
-END input_form; 
+END input_form;
+```
+
 **How It Works** 
 Access the web page using a link with an HTML anchor URL of http://node.mycompany.com/DAD_NAME/ 
 input_form.html. 
@@ -11683,11 +11727,9 @@ The procedure ends with a calls to htp.formSubmit and htp.formClose, which gener
 submit button and the closing </FORM> tag. When the user clicks the submit button, the client’s web 
 browser sends the data entered into the form to the submit routine within the input_form package. 
  
-CHAPTER 14  USING PL/SQL ON THE WEB 
-298 
- 
 Figure 14-1. Form generated by the input_form.html procedure 
 Table 14-1. Common form procedures in the PL/SQL Web Toolkit 
+```text
 Toolkit Procedure HTML Tag 
 htp.formCheckbox <INPUT TYPE="CHECKBOX"> 
 htp.formClose </FORM> 
@@ -11701,14 +11743,14 @@ htp.formSelectClose </SELECT>
 htp.formSelectOpen <SELECT> 
 htp.formSelectOption <OPTION> 
 htp.formSubmit <INPUT TYPE="SUBMIT"> 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-299 
 Toolkit Procedure  HTML Tag 
 htp.formText <INPUT TYPE="TEXT"> 
 htp.formTextarea <TEXTAREA></TEXTAREA> 
 htp.formTextareaClose </TEXTAREA> 
 htp.formTextareaOpen <TEXTAREA> 
-14-4. Creating a Web–based Report Using PL/SQL Procedures 
+```
+
+## 14-4. Creating a Web–based Report Using PL/SQL Procedures 
 **Problem** 
 You need to generate a web page report that displays the results of a database query.  
 **Solution** 
@@ -11720,21 +11762,20 @@ table in the HR schema.
 each procedure you wish to access in the package specification.  
  
 ■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe. 
+```sql
 CREATE OR REPLACE PACKAGE emp_rpt AS 
  
    PROCEDURE html; 
    PROCEDURE rpt (emp_id VARCHAR2); 
  
 END emp_rpt; 
- 
+
 CREATE OR REPLACE PACKAGE BODY emp_rpt AS 
  
 PROCEDURE html IS 
  
 BEGIN 
  
-CHAPTER 14  USING PL/SQL ON THE WEB 
-300 
    common.header ('Employee Report'); 
    htp.formOpen ('emp_rpt.rpt', 'POST'); 
    htp.p ('Employee ID:'); 
@@ -11775,8 +11816,6 @@ BEGIN
       show_row ('Salary', rec.salary); 
       show_row ('Commission %', rec.commission_pct); 
       htp.tableClose; 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-301 
    ELSE 
       htp.header (3, 'No such employee ID ' || emp_id); 
    END IF; 
@@ -11791,6 +11830,8 @@ EXCEPTION
 END rpt; 
  
 END emp_rpt; 
+```
+
 **How It Works** 
 Users access the web page using the URL http://node.mycompany.com/DAD_NAME/emp_rpt.html.  
 ■ Note See Recipe 14-1 for more on how to define the DAD_NAME. 
@@ -11813,8 +11854,6 @@ to the user that the employee ID is not valid.
 The exception is necessary to trap the error generated if the user enters a non-numeric employee 
 ID. Another option is to validate the user’s input prior to using it in the cursor query. 
 ■ Note See recipe 14-10 for an example of validating user input. 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-302 
  
 Figure 14-2. Results from entering employee ID 200 on the previous data entry screen 
 14-5. Displaying Data from Tables 
@@ -11828,6 +11867,8 @@ within SQL*Plus.
 ■ Note See Recipe 14-1 to define a DAD and direct your browser to run your procedure.  
  
 ■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe.  
+
+```sql
 CREATE OR REPLACE PROCEDURE descr_emp IS 
  
 BEGIN 
@@ -11847,6 +11888,8 @@ BEGIN
    common.footer; 
  
 END descr_emp; 
+```
+
 **How It Works** 
 Users access the web page using the URL http://node.mycompany.com/DAD_NAME/emp_rpt.html. The 
 descr_emp procedure calls the owa_util.tablePrint procedure, which is included in the PL/SQL Web 
@@ -11857,18 +11900,16 @@ the procedure shows all columns. The cclauses parameter allows you to add a wher
 order by statement. If no where clause is specified, all rows are returned. The output is shown in Figure 
 14-3. 
  
- 
 Figure 14-3. Results of the descr_emp procedure 
-14-6. Creating a Web Form Dropdown List from a Database Query 
+
+## 14-6. Creating a Web Form Dropdown List from a Database Query 
 **Problem** 
 Your web form requires a dropdown list whose elements are drawn from a database table. 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-304 
 **Solution** 
 Use the htp.formSelectOpen, htp.formSelectOption and htp.formSelectClose procedures in the PL/SQL 
 Web Toolkit to generate the required HTML tags. For example, suppose you need to use the HR schema 
 to create a dropdown list of job titles from the JOBS table. Here’s how you’d do it. 
- 
+```sql
 create or replace procedure job_list as 
  
 cursor  driver is 
@@ -11890,13 +11931,9 @@ begin
    common.footer; 
  
 end job_list; 
- 
+```
 This procedure produces the following web page. 
- 
- 
 Figure 14-4. Dropdown list created by job_list procedure 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-305 
 **How It Works** 
 The htp.formSelectOpen procedure generates the HTML <SELECT NAME="id">, which defines the 
 dropdown list in the web browser. In addition the procedure uses the second parameter as the prompt 
@@ -11913,7 +11950,8 @@ The call to htp.formSelectClose generates the </SELECT> HTML tag to close the dr
 Dropdown lists usually appear within the <FORM> tags to accept user input and process that input on a 
 subsequent page.  
 ■ Note See Recipe 14-3 for more information on creating an input form. 
-14-7. Creating a Sortable Web Report 
+
+## 14-7. Creating a Sortable Web Report 
 **Problem** 
 You need a report that displays data that is sorted by a field the user selects.  
 **Solution** 
@@ -11924,15 +11962,14 @@ employee ID.
 ■ Note See Recipe 14-1 to define a DAD and direct your browser to run your procedure.  
  
 ■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe.  
+```sql
 CREATE OR REPLACE PACKAGE sorted AS 
  
    PROCEDURE html; 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-306 
    PROCEDURE rpt (sort_order VARCHAR2); 
  
 END sorted; 
- 
+
 CREATE OR REPLACE PACKAGE BODY sorted AS 
  
 PROCEDURE html IS 
@@ -11981,8 +12018,6 @@ BEGIN
       htp.tableData (rec.salary); 
       htp.tableData (rec.employee_id); 
       htp.tableRowClose; 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-307 
    END LOOP; 
  
    htp.tableClose; 
@@ -11991,6 +12026,8 @@ BEGIN
 END rpt; 
  
 END sorted; 
+```
+
 **How It Works** 
 Users access the web page using the URL http://node.mycompany.com/DAD_NAME/sorted.html.  
 ■ Note See Recipe 14-1 for more on how to to define the DAD_NAME. 
@@ -12014,18 +12051,17 @@ the numeric and date fields to strings that sort properly. For example, if the d
 dd-Mon-yy, then the hire dates will sort by the day of the month first, then by the month’s abbreviation 
 and year. The desired sort order is year, month, then day. 
  
-CHAPTER 14  USING PL/SQL ON THE WEB 
-308 
  
 Figure 14-5. Initial data entry screen showing the sort options 
-14-8. Passing Data Between Web Pages 
+
+## 14-8. Passing Data Between Web Pages 
 **Problem** 
 You have a multi-page data entry form in which the final page requires data entered on pages that 
 precede it. You need to pass the data gathered on previous pages to the current page. 
 **Solution** 
 Pass the name/value pairs from previous pages using the htp.formHidden procedure in the PL/SQL Web 
 Toolkit. In this recipe each parameter is passed to the next form using hidden HTML elements. 
- 
+```sql
 CREATE OR REPLACE PACKAGE multi AS 
  
    PROCEDURE page1; 
@@ -12051,8 +12087,6 @@ END page1;
  
 PROCEDURE page2 (var1 VARCHAR2) IS 
  
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-309 
 begin 
  
    htp.formOpen ('multi.page3', 'POST'); 
@@ -12094,11 +12128,10 @@ BEGIN
 END process; 
  
 END multi; 
+```
 **How It Works** 
 Users access the web page using the URL http://node.mycompany.com/DAD_NAME/multi.page1.  
 ■ Note See Recipe 14.1 to define the DAD_NAME. 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-310 
 The page1 procedure within the mulit package prompts the user for an input value, which is passed
 to procedure page2 as its parameter, var1. The htp.formHidden call in the page2 procedure produces an
 HTML <INPUT> tag of type HIDDEN. In this recipe it produces the following HTML code in the client’s web
@@ -12107,7 +12140,8 @@ first page of this multi-part form.
 The page2 procedure then accepts more user input into the form variable var2, which is passed to
 page3 along with var1 collected on the first input page. The third page accepts the final user input and
 passes it to the process procedure, where final processing occurs. 
-14-9. Viewing Errors for Debugging Web Apps 
+
+## 14-9. Viewing Errors for Debugging Web Apps 
 **Problem** 
 You have a PL/SQL package or procedure called from a web client that generates errors and you need to
 view the error message. 
@@ -12116,24 +12150,22 @@ Choose one of the following two **Solution**s, depending on your circumstances.
 **Solution** #1 
 If the package is in use in a production environment, then check the output of the Apache error log file.
 The log file location is defined in the httpd.conf configuration file. The default log file location is
-[oracle_home]\Apache\Apache\logs directory. Open the log file and search for the errors generated with
+`[oracle_home]\Apache\Apache\logs directory`. Open the log file and search for the errors generated with
 a timestamp that corresponds to the approximate time the error was generated. 
 **Solution** #2 
 If the application is in development or running in a non-production environment, change the default
 error style within the DAD used to produce the web page that failed. The error style is defined in the
-DADS.CONF file located in [oracle_homme]\Apache\modplsql\conf. Set the PlsqlErrorStyle to DebugStyle.  
+DADS.CONF file located in `[oracle_homme]\Apache\modplsql\conf`. Set the PlsqlErrorStyle to DebugStyle.  
 ■ Note See recipe 14-1 for more information on defining DADs. 
 **How It Works** 
 **Solution** #1 
 The PL/SQL module within Apache logs all errors, complete with timestamps. New errors are written to
-the end of the error log. This **Solution** is recommended for production environments where the display
+the end of the error log. This Solution is recommended for production environments where the display
 of Apache environment variables may pose security issues. 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-311 
 Here’s an example of an error message written to the error log. In this example, a procedure was 
 called from the Web but was missing required parameters. 
  
-[error] [client 127.0.0.1] mod_plsql: /DAD_NAME/class_sched.list HTTP-404 
+`[error] [client 127.0.0.1] mod_plsql: /DAD_NAME/class_sched.list HTTP-404 `
  
 class_sched.list: SIGNATURE (parameter names) MISMATCH 
 VARIABLES IN FORM NOT IN PROCEDURE:  
@@ -12145,9 +12177,9 @@ in the Apache log file plus a list of all Apache environment variables and their
 recommended for non-production environments where errors are more likely to occur during 
 development and testing. It has the advantage of immediate, onscreen feedback for developers and 
 testers. 
- 
+
 The following is an example of an error message written to the web browser. 
- 
+```
 class_sched.list: SIGNATURE (parameter names) MISMATCH 
 VARIABLES IN FORM NOT IN PROCEDURE:  
 NON-DEFAULT VARIABLES IN PROCEDURE NOT IN FORM: THIS_ID, THIS_ID_TYPE 
@@ -12163,22 +12195,22 @@ NON-DEFAULT VARIABLES IN PROCEDURE NOT IN FORM: THIS_ID, THIS_ID_TYPE
     PLSQL_GATEWAY=WebDb 
     GATEWAY_IVERSION=3 
         << snip >> 
-14-10. Generating JavaScript via PL/SQL 
+```
+## 14-10. Generating JavaScript via PL/SQL
+
 **Problem** 
 Your procedure requires JavaScript but you do not have access to the Oracle application server to store 
 the script file to make it accessible from Apache. 
 **Solution** 
 Use the Oracle PL/SQLWeb Toolkit to output JavaScript within your PL/SQL procedure. There are two 
 steps to define and enable a JavaScript within your PL/SQL procedure. 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-312 
 First, define the JavaScript source on the web page that requires access to your 
 JavaScript routine using the HTML tag <SCRIPT>. 
-Define a PL/SQL procedure to match the name of the <SCRIPT> tag’s source (SRC) 
+Define a PL/SQL procedure to match the name of the <SCRIPT> tag’s source(src)
 property. 
 In the following example the html procedure defines the <SCRIPT> tag with the source set to 
 empID.js and the js procedure generates the JavaScript code. 
- 
+```sql
 CREATE OR REPLACE PACKAGE empID IS 
  
    PROCEDURE html; 
@@ -12230,19 +12262,20 @@ function validateNumber (theNumber) {
 END js; 
  
 END empID; 
+```
 **How It Works** 
 Begin by creating the package specification for empID, which exposes the html and js procedures. Next 
 create the package body with two procedures, html and js. 
 The html procedure generates the opening HTML code with a call to common.header. Next, the 
-procedure generates a <SCRIPT> tag that identifies the location of the JavaScript to include in the user’s 
-browser. The <SCRIPT> tag of this form is one of the few HTML tags not predefined in the PL/SQL Web 
+procedure generates a <--SCRIPT--> tag that identifies the location of the JavaScript to include in the user’s 
+browser. The <--SCRIPT--> tag of this form is one of the few HTML tags not predefined in the PL/SQL Web 
 Toolkit. 
-The <SCRIPT> tag takes advantage of the owa_util package, which is also part of the PL/SQL Web 
+The <--SCRIPT--> tag takes advantage of the owa_util package, which is also part of the PL/SQL Web 
 Toolkit, to dynamically generate the web address of the JavaScript using the settings of the Apache 
 environment values. This method avoids your having to hard-code the URL of the script into the 
 procedure and allows it to run in any environment—development, integration, production, etc. The URL 
 generated references the JavaScript package defined later in the package body. 
-Next, the html procedure generates the <FORM> tag with emp_rpt.rpt as its target. When the user 
+Next, the html procedure generates the <--FORM--> tag with emp_rpt.rpt as its target. When the user 
 clicks the Submit button the form will call the PL/SQL procedure emp_rpt.rpt defined in Recipe 14-4. It 
 will not call a procedure within the empID package. 
 The htp.formText routine contains an extra parameter to include the JavaScript necessary to run 
@@ -12254,12 +12287,11 @@ message shown.
 The js procedure consists of a simple print statement that contains the entire contents of the 
 JavaScript code. JavaScript allows either single or double quotes for character strings. Using double 
 quotes in the JavaScript code avoids conflicts with the single quote requirements of PL/SQL. 
- 
- 
+
 Figure 14-6. Error message generated by JavaScript when a non-numeric employee ID is entered 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-314 
-14-11. Generating XML Output 
+
+## 14-11. Generating XML Output 
+
 **Problem** 
 You need to provide XML data for PL/SQL or other consumers of data from your Oracle database. 
 **Solution** 
@@ -12267,7 +12299,8 @@ Use Oracle’s built-in DBMS_XMLGEN package to extract data from the database in
 then output the data through the Apache web server. In this example a generic procedure builds and 
 outputs XML formatted data based on the SQL query statement passed to it. This procedure can be used 
 in any application that requires XML output extracted from database tables. 
- 
+
+```sql
 CREATE OR REPLACE PROCEDURE gen_xml (sql_stmt VARCHAR2) IS 
  
 string          VARCHAR2(4000); 
@@ -12303,13 +12336,13 @@ BEGIN
    END IF; 
  
 END gen_xml; 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-315 
+```
+
 **How It Works** 
 The newcontext procedure in the dbms_xmlgen package executes the query passed to it in the first 
 parameter. The getxml procedure returns the data in XML format. Each row of data from the select 
-statement is enclosed in the XML tags <ROW>. Each field in the row is enclosed by its attribute (field) 
-name in the database. For example, the employee ID is enclosed in the XML tag <EMPLOYEE_ID>. 
+statement is enclosed in the XML tags <--ROW-->. Each field in the row is enclosed by its attribute (field) 
+name in the database. For example, the employee ID is enclosed in the XML tag <--EMPLOYEE_ID-->. 
 The owa_util.mime_header is called to output the proper string to the client’s browser, indicating the 
 content of the web page is in standard XML format. At this point it is sufficient to simply output the XML 
 data returned by the call to xmlgen with an htp.p statement. However, this approach works only if the 
@@ -12318,10 +12351,10 @@ length in bytes of the XML data does not exceed the maximum allowed by the htp.p
 call to htp.p exceeds the maximum length. 
 The final IF statement returns an empty XML tag set if the result of the query returns no rows. 
 Without the empty tag set your Ajax call will fail because the Ajax call to parse the data from the XML 
-structure requires the <ROWSET> tags. 
+structure requires the <--ROWSET--> tags. 
 Here is an example of the XML output produced from Recipe 14-12. Only the first two data rows 
 retrieved are displayed. 
- 
+```html
 <ROWSET> 
  <ROW> 
   <EMPLOYEE_ID>101</EMPLOYEE_ID> 
@@ -12332,7 +12365,9 @@ retrieved are displayed.
   <LAST_NAME>De Haan</LAST_NAME> 
  </ROW> 
 </ROWSET> 
-14-12. Creating an Input Form with AJAX 
+```
+
+## 14-12. Creating an Input Form with AJAX 
 **Problem** 
 You need a web application that can interactively retrieve data based on partial data entered by the user. 
 The data must be retrieved before the user clicks the Submit button to process the page. 
@@ -12346,10 +12381,8 @@ defined with an ID, which is required by JavaScript to access the list and load 
 subordinates. 
 The package contains the procedure xml, which is required to produce the XML data required by the 
 Ajax call. The PL/SQL procedure ajax.xml is called by the web browser within the AjaxMgr.js procedure. 
- 
+```sql
 CREATE OR REPLACE PACKAGE ajax IS 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-316 
  
    PROCEDURE html; 
    PROCEDURE xml (ID INTEGER); 
@@ -12402,8 +12435,6 @@ END html;
 PROCEDURE xml (ID INTEGER) IS 
  
 BEGIN 
-  CHAPTER 14  USING PL/SQL ON THE WEB 
-317 
  
 -- see recipe 14-11 for more information on the gen_xml procedure. 
    gen_xml ('SELECT employee_id, last_name '    || 
@@ -12413,16 +12444,17 @@ BEGIN
  
 END xml; 
  
-END ajax; 
+END ajax;
+```
 **How It Works** 
 The recipe begins by defining the package specification with two packages, html and xml. The html 
 package generates the HTML data entry form and the xml procedure generates the XML data required by 
 the call to Ajax. 
 The html procedure generates the opening HTML code with a call to common.header. Next, the 
-procedure generates a <SCRIPT> tag that identifies the location of the JavaScript to include in the user’s 
-browser. The <SCRIPT> tag of this form is one of the few HTML tags not pre-defined in the PL/SQL Web 
+procedure generates a <--SCRIPT--> tag that identifies the location of the JavaScript to include in the user’s 
+browser. The <--SCRIPT--> tag of this form is one of the few HTML tags not pre-defined in the PL/SQL Web 
 Toolkit. 
-The <SCRIPT> tag takes advantage of the owa_util package, which is also part of the PL/SQL Web 
+The <--SCRIPT--> tag takes advantage of the owa_util package, which is also part of the PL/SQL Web 
 Toolkit. It dynamically generates the web address of the JavaScript based on Apache environment 
 values. This method avoids hard-coding the URL into the procedure and allows it to run in any 
 environment—development, integration, production, etc.  
@@ -12435,7 +12467,7 @@ the manager’s dropdown list.
 The manager’s dropdown list, mgr, is created using the htp.formSelectOpen procedure with an 
 additional parameter to define the JavaScript to execute when the selected item in the list changes. A 
 change to the manager’s dropdown list invokes the JavaScript procedure loadEmployees, which was 
-defined earlier in the <SCRIPT> tag. 
+defined earlier in the <--SCRIPT--> tag. 
 The employee’s dropdown list, emp, is also created using the htp.formSelectOpen procedure with an 
 additional parameter to define the ID name of the object in the Web browser’s DOM2. This ID is required 
 by the JavaScript to dynamically rebuild the employee dropdown list if the value in the manager 
@@ -12444,8 +12476,6 @@ Note the Subordinate list is now populated.
                                                  
 2 A DOM (Document Object Model) “is a cross-platform and language-independent convention for 
 representing and interacting with objects in HTML, XHTML and XML documents.” – Wikipedia. 
-CHAPTER 14  USING PL/SQL ON THE WEB 
-318 
 The xml procedure calls the gen_xml procedure, created in Recipe 14-11, to generate the data 
 required to populate the employee dropdown list via the Ajax call. The gen_xml procedure is generic in 
 that it only requires the select statement need to produce the XML output. 
@@ -12455,12 +12485,8 @@ Figure 14-7. Manager dropdown list with empty subordinate dropdown list
  
  
 Figure 14-8. Subordinate list after being populated by Ajax 
-C H A P T E R  15 
- 
-   
- 
-319 
-Java in the Database 
+
+# 15. Java in the Database 
  
 Java plays an important role in the application development space today. It has become increasingly 
 popular over the years, because it is cross-platform, powerful, and easy to learn. Although Java 
@@ -12480,7 +12506,8 @@ but in this chapter, we will focus only on using the Java types in conjunction w
 which, after all, is the subject of this book. For complete documentation on using Java inside Oracle 
 Database, please see the Oracle Java developers guide at 
 http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm. 
-15-1. Creating a Java Database Class  
+
+## 15-1. Creating a Java Database Class  
 **Problem** 
 You want to write a Java class that will query the database and return a result.  
 **Solution** 
@@ -12492,7 +12519,7 @@ class shown here will be stored into a file named Employees.java.
  
 import java.sql.*; 
 import oracle.jdbc.*; 
- 
+```java
 public class Employees { 
   public static void getItEmps(){ 
 CHAPTER 15  JAVA IN THE DATABASE 
@@ -12521,11 +12548,13 @@ CHAPTER 15  JAVA IN THE DATABASE
           System.err.println("ERROR: " + ex); 
       }           
   }; 
+```
 The following lines from SQL*Plus show how to execute this Java in the database, followed by the
 output from the program. Prior to executing the code, you must load it into the database and compile it.
 You will learn more about doing this in the next recipe. To learn more about executing Java in the
 database, please see Recipe 15-5. For now, it is important to see the output that will result from a
 successful call to this Java program. 
+```sql
 SQL> exec get_it_emps;
 Alexander Hunold AHUNOLD
 Bruce Ernst BERNST
@@ -12533,14 +12562,13 @@ David Austin DAUSTIN
 Valli Pataballa VPATABAL
 Diana Lorentz DLORENTZ 
 PL/SQL procedure successfully completed. 
+```
 The Java class in this example performs a simple query and then prints the result. Although this
 class does not demonstrate the full potential of using Java, it is a good segue into Java database
 development.  
 **How It Works** 
 Java is a mature language that can be used in conjunction with PL/SQL. Sometimes it makes sense to
 code portions of your application in Java, while in other instances it may make sense to code the entire 
-  CHAPTER 15  JAVA IN THE DATABASE 
-321 
 application in Java. Both PL/SQL and Java can coexist in the same application, and you must use PL/SQL 
 to access Java via the database. 
 This recipe demonstrates how to create a simple Java class that queries the database for EMPLOYEE 
@@ -12572,7 +12600,8 @@ The Oracle Java virtual machine (JVM) also supports the use of SQLJ for database
 SQLJ is beyond the scope of this book, but if you are interested in learning about it JVM, then please refer 
 to the Oracle Java Developer Guide, which can be found at 
 http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm. 
-15-2. Loading a Java Database Class into a Database 
+
+## 15-2. Loading a Java Database Class into a Database 
 **Problem** 
 You want to load a Java class into a schema within your Oracle Database. 
 **Solution** #1 
@@ -12581,12 +12610,10 @@ the Java source into a SQL file. This is the easiest way to create a Java class 
 database if you are not working directly on the database server but rather remotely using an editor or 
 SQL*Plus. The following lines of SQL code will load the Java class that was created in Recipe 15-1 into the 
 database using the CREATE JAVA command: 
- 
+```sql
 CREATE OR REPLACE JAVA SOURCE NAMED "Employees" AS 
 import java.sql.*; 
 import oracle.jdbc.*; 
-CHAPTER 15  JAVA IN THE DATABASE 
-322 
  
 public class Employees { 
   public static void getItEmps(){ 
@@ -12615,7 +12642,8 @@ public class Employees {
           System.err.println("ERROR: " + ex); 
           } 
       }           
-  }; 
+  };
+```
 Next, you need to compile the code. To do so, use the ALTER JAVA CLASS <name> RESOLVE command. 
 The following line of code compiles the Employees Java source: 
  
@@ -12634,8 +12662,6 @@ After the command is issued, you will be prompted for the password to the user w
 using the –user option. By issuing the –resolve option, you will be loading the Java into the database and 
 compiling at the same time. This saves you the step of issuing the ALTER JAVA CLASS <name> RESOLVE 
 command. 
-  CHAPTER 15  JAVA IN THE DATABASE 
-323 
 **How It Works** 
 You can load Java source code into the database directly using the CREATE JAVA SOURCE command. This 
 will load the source and make it accessible to the schema in which it was loaded. Once loaded, you can 
@@ -12665,12 +12691,11 @@ can be used. If your code does not compile, then you can check the USER_ERRORS t
 issue(s) are preventing the code from compiling successfully. The USER_ERRORS table describes the 
 current errors on all the objects that are contained within the user’s schema. To learn more about 
 querying the USER_ERRORS table, please refer to Recipe 15-15. 
-15-3. Loading a Compiled Java Class Into the Database 
+
+## 15-3. Loading a Compiled Java Class Into the Database 
 **Problem** 
 You want to load a compiled Java class into the database so that you can use one or more of its methods 
 as stored procedures. 
-CHAPTER 15  JAVA IN THE DATABASE 
-324 
 **Solution** 
 Use the loadjava command-line utility to load the compiled Java class into the database. The following 
 line of code demonstrates how to use the loadjava utility to load a compiled Java class file named 
@@ -12689,15 +12714,16 @@ the ORACLE_HOME environment variable to be sure you will be invoking the correct
 utility for your database. The loadjava utility is located within the bin directory of the Oracle Database 
 home. The following statements show how to set these two environment variables on a Windows 
 machine: 
- 
+```sql
 SET ORACLE_SID=MYDATABASE 
 SET ORACLE_HOME=<PATH_TO_ORACLE_HOME> 
+```
 If you happen to be working on a Unix or Linux machine, the equivalent commands would be as 
 follows: 
- 
+```sql
 setenv ORACLE_SID = MYDATABASE 
 setenv ORACLE_HOME= <PATH_TO_ORACLE_HOME> 
- 
+```
 You must have the following permissions in order to use the loadjava utility: 
 • CREATE PROCEDURE 
 • CREATE TABLE 
@@ -12715,9 +12741,9 @@ within your PL/SQL code as well. To do this, issue a call to DBMS_JAVA.loadjava,
 separated by spaces. This is demonstrated by the following lines of text in SQL*Plus: 
  
 call dbms_java.loadjava(‘Employees.class’); 
-  CHAPTER 15  JAVA IN THE DATABASE 
-325 
-15-4. Exposing a Java Class As a Stored Procedure 
+
+
+## 15-4. Exposing a Java Class As a Stored Procedure 
 **Problem** 
 You have created a Java stored procedure and loaded it into the database, and now you want to access it 
 via PL/SQL. 
@@ -12726,9 +12752,10 @@ Create a PL/SQL call specification for the Java class. The PL/SQL call specifica
 the call to the Java class, enabling you to have access to the class from PL/SQL. The following code 
 demonstrates the creation of a call specification for the Java class that was created in Recipe 15-1 and 
 loaded into the database in Recipe 15-2. 
- 
+```sql
 CREATE OR REPLACE PROCEDURE get_it_emps AS LANGUAGE JAVA 
 NAME 'Employees.getItEmps()'; 
+```
 **How It Works** 
 To make the Java class accessible from the database, you must create a PL/SQL call specification 
 (sometimes known as PL/SQL wrapper) for the stored Java code. A call specification maps a Java method 
@@ -12746,7 +12773,8 @@ methods belong to the class, rather than to an instance of the class. This means
 for each class. Instance methods belong to an instance of the class. This means that if a new instance of the class 
 is created, a new method will be created with that instance. Class methods have access to class variables 
 (otherwise known as static), whereas instance methods have access only to instance variables. 
-15-5. Executing a Java Stored Procedure 
+
+## 15-5. Executing a Java Stored Procedure 
 **Problem** 
 You want to execute a Java stored procedure that you have created from within SQL*Plus. 
 CHAPTER 15  JAVA IN THE DATABASE 
@@ -12754,7 +12782,7 @@ CHAPTER 15  JAVA IN THE DATABASE
 **Solution** 
 Call the PL/SQL call specification that maps to the Java stored procedure. The following SQL*Plus code 
 demonstrates how to execute the Java class for which you created a call specification in Recipe 15-3. 
- 
+```sql
 SQL> set serveroutput on 
 SQL> call dbms_java.set_output(2000); 
  
@@ -12767,7 +12795,8 @@ David Austin DAUSTIN
 Valli Pataballa VPATABAL 
 Diana Lorentz DLORENTZ 
  
-PL/SQL procedure successfully completed. 
+PL/SQL procedure successfully completed.
+``` 
 As you can see, when the code is executed, the results are returned to SQL*Plus and displayed as if it 
 were the output of a PL/SQL procedure or function. 
 **How It Works** 
@@ -12780,23 +12809,22 @@ displayed. Similarly, if the buffer size is set too small, then only a portion o
 Personally, we recommend setting the output size to 2000 and moving up from there if needed. To set 
 the buffer size, issue this command: 
  
-CALL DBMS_JAVA.SET_OUTPUT(buffer_size); 
+`CALL DBMS_JAVA.SET_OUTPUT(buffer_size); `
 The Java will be executed seamlessly and display the result, if any, just as if it were a PL/SQL 
 response. In the **Solution** to this recipe, the get_it_emps PL/SQL procedure is called. Since get_it_emps is 
 a call specification, it will invoke the underlying Java class method getItEmps() that actually performs the 
 query and displays the content. 
-15-6. Calling a Java Stored Procedure from PL/SQL 
+
+## 15-6. Calling a Java Stored Procedure from PL/SQL 
 **Problem** 
 You want to access a Java stored procedure from within one of your PL/SQL applications. For instance, 
 you are creating a PL/SQL procedure, and you want to make a call to a Java stored procedure from 
 within it. 
-  CHAPTER 15  JAVA IN THE DATABASE 
-327 
 **Solution** 
 Make a call to the Java stored procedure using the call specification that you created for it. The following 
 code demonstrates a PL/SQL package that makes a call to a Java stored procedure and then resumes 
 PL/SQL execution once the call has been made. 
- 
+```sql
 CREATE OR REPLACE PROCEDURE employee_reports AS 
   CURSOR emp_cur IS 
   SELECT first_name, last_name, email 
@@ -12818,8 +12846,9 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('----------------------------'); 
   get_it_emps; 
 END; 
+```
 This results in the following output: 
- 
+```sql
 SQL> EXEC EMPLOYEE_REPORTS 
 Employees from Shipping Department 
 ---------------------------------- 
@@ -12840,8 +12869,7 @@ Valli Pataballa VPATABAL
 Diana Lorentz DLORENTZ 
  
 PL/SQL procedure successfully completed. 
-CHAPTER 15  JAVA IN THE DATABASE 
-328 
+```
 The call to the Java stored procedure from within the PL/SQL procedure is seamless. It is integrated 
 into the PL/SQL procedure body and invoked as if it were PL/SQL. 
 **How It Works** 
@@ -12856,7 +12884,8 @@ very useful to create database jobs utilizing Java stored procedures by developi
 procedure or anonymous block that makes a series of calls to different Java stored procedures or 
 functions that perform the actual processing. PL/SQL and Java in the database can be very 
 complementary to each other. 
-15-7. Passing Parameters Between PL/SQL and Java 
+
+## 15-7. Passing Parameters Between PL/SQL and Java 
 **Problem** 
 You want to pass parameters from PL/SQL to a Java stored procedure that expects them. 
 **Solution** 
@@ -12867,7 +12896,7 @@ accept a department ID as an input argument. It will then query the database for
 belong to that department and display them.  
 The following code is the enhanced Java method that will be added the Employees class contained 
 within the Employees.java file: 
- 
+```sql
 public static void getItEmpsByDept(int departmentId){ 
       String firstName = null; 
       String lastName = null; 
@@ -12897,6 +12926,7 @@ public static void getItEmpsByDept(int departmentId){
           System.err.println("ERROR: " + ex); 
           } 
   } 
+```
 Once this method has been added to the Employees class, then the Java source should be loaded into 
 the database using the technique demonstrated in Recipe 15-2.  
  Note You must include the OR REPLACE clause of the CREATE JAVA statement if the Employees source is 
@@ -12905,12 +12935,13 @@ Once the Java has been loaded into the database and compiled, you will need to c
 specification that will be used by PL/SQL for accessing the Java stored procedure. The following code 
 demonstrates a call specification that will accept a parameter when invoked and pass it to the Java 
 stored procedure: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE get_it_emps_by_dept(dept_id IN NUMBER) 
  AS LANGUAGE JAVA 
 NAME 'Employees.getItEmpsByDept(int)'; 
+```
 The procedure can now be called by passing a department ID value as such: 
- 
+```sql
 SQL> exec get_it_emps_by_dept(60);                          
 Alexander Hunold AHUNOLD 
 Bruce Ernst BERNST 
@@ -12918,7 +12949,8 @@ David Austin DAUSTIN
 Valli Pataballa VPATABAL 
 Diana Lorentz DLORENTZ 
  
-PL/SQL procedure successfully completed. 
+PL/SQL procedure successfully completed.
+```
 **How It Works** 
 The call specification is what determines how a Java stored procedure or function’s arguments are 
 mapped to PL/SQL arguments. To implement parameters, the call specification must match each 
@@ -12928,26 +12960,24 @@ the specification matches an argument that is coded within the Java stored proce
 The datatypes that Java uses do not match those used in PL/SQL. In fact, a translation must take 
 place when passing parameters listed as a PL/SQL datatype to a Java stored procedure that accepts 
 parameters as a Java datatype. If you are familiar enough with each of the two languages, the translation 
-CHAPTER 15  JAVA IN THE DATABASE 
-330 
 is fairly straightforward. However, there are always those cases where one is not sure what datatype to
 match against. Table 15-1 lists some of the most common datatypes and how they map between Java
 and PL/SQL. For a complete datatype map, please refer to the Oracle documentation at
 http://download.oracle.com/docs/cd/B28359_01/java.111/b31225/chsix.htm#CHDFACEE. 
+```text
 Table 15-1. Datatype Map 
-SQL Datatype Java Type 
-CHAR oracle.sql.CHAR 
-VARCHAR java.lang.String 
-LONG java.lang.String 
-NUMBER java.lang.Integer,Java.lang.Float,Java.lang.Double,Java.
-math.BigDecimal,Java.lang.Byte,Oracle.sql.NUMBER,Java.la
-ng.Short, 
-DATE    oracle.sql.DATE 
-TIMESTAMP oracle.sql.TIMESTAMP 
-TIMESTAMP WITH TIME ZONE oracle.sql.TIMESTAMPTZ 
-TIMESTAMP WITH LOCAL TIME ZONE  oracle.sql.TIMESTAMPLTZ 
-BLOB oracle.sql.BLOB 
-CLOB oracle.sql.CLOB 
+SQL Datatype      Java Type 
+CHAR              oracle.sql.CHAR 
+VARCHAR           java.lang.String 
+LONG              java.lang.String 
+NUMBER            java.lang.Integer,Java.lang.Float,Java.lang.Double,Java. math.BigDecimal,Java.lang.Byte,Oracle.sql.NUMBER,Java.lang.Short, 
+DATE              oracle.sql.DATE 
+TIMESTAMP         oracle.sql.TIMESTAMP 
+TIMESTAMP         WITH TIME ZONE oracle.sql.TIMESTAMPTZ 
+TIMESTAMP         WITH LOCAL TIME ZONE  oracle.sql.TIMESTAMPLTZ 
+BLOB              oracle.sql.BLOB 
+CLOB              oracle.sql.CLOB 
+```
 Creating a PL/SQL call specification that includes parameters must use the fully qualified Java class
 name when specifying the parameter datatypes in the Java class method signature. If an incorrect
 datatype is specified, then an exception will be thrown. For instance, if you want to pass a VARCHAR2 from
@@ -12956,7 +12986,8 @@ type java.lang.String. The following pseudocode demonstrates this type of call s
 CREATE OR REPLACE PROCEDURE procedure_name(value   VARCHAR2)
 AS LANGUAGE JAVA 
 NAME ‘JavaClass.javaMethod(java.lang.String)’; 
-15-8. Creating and Calling a Java Database Function 
+
+## 15-8. Creating and Calling a Java Database Function 
 **Problem** 
 You want to create a database function using the Java language. 
   CHAPTER 15  JAVA IN THE DATABASE 
@@ -12967,7 +12998,7 @@ specification allows for the same number of parameters to pair up with the Java 
 returning result. For this recipe, you will add a function to the Employees Java class that will accept an 
 employee ID and return that employee’s job title. The following code is the Java source for the function 
 named getEmpJobTitle: 
- 
+```java
 public static String getEmpJobTitle(int empId){ 
       String jobTitle = null; 
       try { 
@@ -12996,6 +13027,7 @@ public static String getEmpJobTitle(int empId){
                  } 
                                     return jobTitle; 
   } 
+```
 Next is the call specification for the function: 
  
 CREATE OR REPLACE FUNCTION get_emp_job_title(emp_id IN NUMBER) 
@@ -13003,14 +13035,14 @@ RETURN VARCHAR2 AS LANGUAGE JAVA
 NAME 'Employees.getEmpJobTitle(int) return java.lang.String'; 
 The function can now be called just like a PL/SQL function would. The following lines of code show 
 a SQL SELECT statement that calls the function passing an employee ID number of 200. 
- 
+```sql
 SQL> select get_emp_job_title(200) from dual; 
  
 GET_EMP_JOB_TITLE(200) 
 -------------------------------------------------------------------------------- 
 Administration Assistant 
-CHAPTER 15  JAVA IN THE DATABASE 
-332 
+```
+
 **How It Works** 
 The difference between a stored procedure and a stored function is that a function always returns a 
 value. In the Java language, a method may or may not return a value. The difference between a PL/SQL 
@@ -13018,7 +13050,7 @@ call specification for a Java stored procedure and a PL/SQL call specifcation fo
 PL/SQL call specification will specify a return value if it is being used to invoke an underlying function.  
 In the **Solution** to this recipe, the example PL/SQL call specification returns a VARCHAR2 data type because 
 the Java function that is being called will return a Java String. 
-15-9. Creating a Java Database Trigger 
+## 15-9. Creating a Java Database Trigger 
 **Problem** 
 You want to create a database trigger that uses a Java stored procedure to do its work. 
 **Solution** 
@@ -13028,7 +13060,7 @@ stored procedure.
 For example, suppose you need a trigger to audit INSERT events on the EMPLOYEES table and record 
 them in another table. First, you must create the table that will be used to record each of the logged 
 events. The following DDL creates one: 
- 
+```sql
 CREATE TABLE EMPLOYEE_AUDIT_LOG ( 
 employee_id     NUMBER, 
 enter_date      DATE); 
@@ -13052,28 +13084,30 @@ public static void employeeAudit(int empId){
           } 
        
   } 
-  CHAPTER 15  JAVA IN THE DATABASE 
-333 
+```
 Next, the PL/SQL call specification for the Java stored procedure must be created. The following is 
 the code to implement the call specification: 
- 
+```sql
 CREATE OR REPLACE PROCEDURE emp_audit(emp_id NUMBER) 
 AS LANGUAGE JAVA 
 NAME 'Employees.employeeAudit(int)'; 
- 
+```
+
 Finally, a trigger to call the EMP_AUDIT procedure must be created. The trigger will be executed on 
 INSERT to the EMPLOYEES table. The following code will generate the trigger to call EMP_AUDIT: 
- 
+```sql
 CREATE OR REPLACE TRIGGER emp_audit_ins 
 AFTER INSERT ON EMPLOYEES 
 FOR EACH ROW 
 CALL emp_audit(:new.employee_id); 
+```
+
 Once all these pieces have been successfully created within the database, the EMP_AUDIT_INS trigger 
 will be executed each time there is an INSERT made to the EMPLOYEES table. In turn, the trigger will call the 
 EMP_AUDIT PL/SQL procedure, which calls the Java method contained within the Employees class. The 
 SQL*Plus output shown here demonstrates an INSERT into the EMPLOYEES table, followed by a query on 
 the EMPLOYEE_AUDIT_LOG table to show that the trigger has been invoked: 
- 
+```sql
 SQL> insert into employees values( 
    employees_seq.nextval, 
    'Jane', 
@@ -13088,21 +13122,21 @@ SQL> insert into employees values(
    null); 
  
 1 row created. 
- 
+
 SQL> select * from employee_audit_log; 
  
 EMPLOYEE_ID ENTER_DAT 
 ----------- --------- 
     265 02-NOV-10 
- 
+
+```
+
 **How It Works** 
 A Java-based trigger combines the power of Java code with the native ease of performing data 
 manipulation using PL/SQL triggers. Although creating a Java trigger requires more steps than using 
 native PL/SQL, the Java code is portable. If your application is supported on more than one database 
 platform, this lets you write code once and deploy it in many environments. It also makes sense to code 
 a trigger using Java if you require the use of Java libraries or technologies that are unavailable to PL/SQL. 
-CHAPTER 15  JAVA IN THE DATABASE 
-334 
 In the **Solution** to this recipe, a trigger was created that will insert a row into an audit table each time 
 an INSERT is made on the EMPLOYEES table. The actual work is performed within a Java method that is 
 added to a Java class and loaded into the database. For more information on loading Java into the 
@@ -13114,7 +13148,8 @@ stored procedure that was created.
 Creating a Java-based trigger entails a series of steps. Each piece of code depends upon the others, 
 and like a domino effect, the trigger will call the procedure that in turn executes the Java method. This 
 **Solution** opens the world of Java libraries and thousands of possibilities to the standard PL/SQL trigger. 
-15-10. Passing Data Objects from PL/SQL to Java 
+
+## 15-10. Passing Data Objects from PL/SQL to Java 
 **Problem** 
 You have retrieved a row of data from the database using PL/SQL, and you want to populate a PL/SQL 
 object type with that data and then pass the populated data object to a Java procedure.  
@@ -13128,7 +13163,7 @@ anonymous block that queries each employee, loads an Employee object with the da
 to the Java method, and returns the result. 
 First, add the following Java method to the Employees class you’ve used with previous recipes in this 
 chapter: 
- 
+```java
 public static String getEmpDepartment(oracle.sql.STRUCT emp) { 
      
     String deptName = null; 
@@ -13148,8 +13183,6 @@ public static String getEmpDepartment(oracle.sql.STRUCT emp) {
                         "FROM DEPARTMENTS DEPT, " + 
             "EMPLOYEES EMP " + 
                         "WHERE EMP.EMPLOYEE_ID = ? " + 
-  CHAPTER 15  JAVA IN THE DATABASE 
-335 
             "AND DEPT.DEPARTMENT_ID = EMP.DEPARTMENT_ID"; 
  
            PreparedStatement pstmt = conn.prepareStatement(sql); 
@@ -13168,10 +13201,11 @@ public static String getEmpDepartment(oracle.sql.STRUCT emp) {
         deptName = "N/A"; 
       } 
       return deptName; 
-  } 
+  }
+```
 Next, create the PL/SQL object that will contain employee information. The following SQL 
 statement will create this object: 
- 
+```sql
 CREATE TYPE Employee AS OBJECT ( 
 emp_id NUMBER(6), 
 first VARCHAR2(20), 
@@ -13180,26 +13214,26 @@ email VARCHAR2(25),
 job VARCHAR2(10), 
 dept NUMBER(4) 
 ); 
+```
 Now you need to create the call specification for the Java method. Since the method is returning a 
 value, the call specification needs to be a PL/SQL function that accepts an Employee object and returns a 
 String value. The following code demonstrates such a call specification for the getEmpDepartment Java 
 method: 
- 
+```sql
 CREATE OR REPLACE FUNCTION get_emp_department (emp Employee) RETURN VARCHAR2 AS 
 LANGUAGE JAVA 
 NAME 'Employees.getEmpDepartment(oracle.sql.STRUCT) return java.lang.String'; 
+```
 Finally, call the new Java function from within an anonymous block. The following PL/SQL block 
 uses a cursor to traverse the EMPLOYEES table and populates an Employee object with each iteration. In 
 turn, the object is passed to the Java stored procedure via the PL/SQL function GET_EMP_DEPARTMENT, and 
 the corresponding DEPARTMENT_NAME is returned. 
- 
+```sql
 DECLARE 
   CURSOR emp_cur IS 
   SELECT * FROM EMPLOYEES; 
    
   emp_rec    emp_cur%ROWTYPE; 
-CHAPTER 15  JAVA IN THE DATABASE 
-336 
   emp        Employee; 
 BEGIN 
   FOR emp_rec IN emp_cur LOOP 
@@ -13213,6 +13247,7 @@ BEGIN
             get_emp_department(emp)); 
   END LOOP; 
 END; 
+```
 **How It Works** 
 Passing objects to Java code should be second nature to you since Java is an object-oriented language. 
 You can create PL/SQL objects as well and use them within your PL/SQL and Java mashup applications. 
@@ -13236,20 +13271,19 @@ information along with region information. There are no tables that contain both
 order to retrieve the information together, you are forced into either using a SQL query that contains 
 table joins or creating a database view. In such a case, it may be easier to populate the object using 
 PL/SQL and then hand it off to the Java program for processing. 
-15-11. Embedding a Java Class Into a PL/SQL Package 
+
+## 15-11. Embedding a Java Class Into a PL/SQL Package 
 **Problem** 
 You are interested in creating a Java class and making each of its methods and attributes available to 
 PL/SQL in an organized unit of code. 
 **Solution** 
 Use a PL/SQL package to declare each of the attributes and methods that reside within the Java class, 
 and then create separate call specifications for each of the Java methods within the PL/SQL package 
-  CHAPTER 15  JAVA IN THE DATABASE 
-337 
 body. The following code demonstrates the creation of a PL/SQL package named EMP_PKG, which 
 declares each of the methods that reside within the Employee Java class and makes them available to 
 PL/SQL via call specifications that are implemented within the package body. 
 First, create the package header as follows: 
- 
+```sql
 CREATE OR REPLACE PACKAGE EMP_PKG AS 
  
     PROCEDURE get_it_emps; 
@@ -13286,16 +13320,15 @@ CREATE PACKAGE BODY EMP_PKG AS
     NAME 'Employees.getEmpDepartment(oracle.sql.STRUCT) return java.lang.String'; 
  
 END; 
+```
 Now the package can be used to call each of the underlying Java stored procedures instead of having 
 separate PL/SQL procedures and functions for each. The following anonymous block has been modified 
 to make use of the PL/SQL package for calling GET_EMP_DEPARTMENT rather than a stand-alone function. 
- 
+```sql
 DECLARE 
   CURSOR emp_cur IS 
   SELECT * FROM EMPLOYEES; 
    
-CHAPTER 15  JAVA IN THE DATABASE 
-338 
   emp_rec    emp_cur%ROWTYPE; 
   emp        Employee; 
 BEGIN 
@@ -13310,6 +13343,7 @@ BEGIN
             emp_pkg.get_emp_department(emp)); 
   END LOOP; 
 END; 
+```
 **How It Works** 
 In programming, it is a best practice to organize code in a way that makes it easy to maintain.  Placing 
 related procedures and functions inside a single PL/SQL package is one such application of that 
@@ -13325,7 +13359,8 @@ contains the implementations that are to be used within a single PL/SQL applicat
 may make more sense to combine all call specifications into a single PL/SQL package.  
 Using PL/SQL package to group call specifications is a good idea. Not only will this technique make 
 for easier maintenance, but it also makes for more uniform applications with consistent interfaces. 
-15-12. Loading Java Libraries Into the Database 
+
+## 15-12. Loading Java Libraries Into the Database 
 **Problem** 
 You want to create a Java class that utilizes some external Java libraries. To do so, you must load those 
 external libraries into the database. 
@@ -13334,15 +13369,13 @@ Use the loadjava utility to store the external libraries into the database. In t
 class containing a method that uses the JavaMail API to send e-mail will be loaded into the database. The 
 method relies on some external Java libraries to use the JavaMail API. The following loadjava commands 
 demonstrate the loading of three essential JAR files for using the JavaMail API: 
- 
+
 loadjava –u <username> mail.jar 
 loadjava –u <username> standard.jar 
 loadjava –u <username> activation.jar 
  
-  CHAPTER 15  JAVA IN THE DATABASE 
-339 
 Next, load the Java source for the JavaUtils class into the database: 
- 
+```sql
 CREATE OR REPLACE JAVA SOURCE NAMED "JavaUtils" AS 
 import java.util.*; 
 import java.util.logging.Level; 
@@ -13382,17 +13415,16 @@ false));
         } catch (MessagingException ex) { 
             Logger.getLogger(JavaUtils.class.getName()).log(Level.SEVERE, null, ex); 
         }  
-    }; 
+    };
+```
 Compile the Java sources using the ALTER JAVA SOURCE command. The sources should compile 
 without issues since the JAR files containing the required library references have been loaded into the 
 database. If the JAR files had not been loaded, then the class would not compile successfully. 
- 
-ALTER JAVA SOURCE "JavaUtils" RESOLVE; 
+
+`ALTER JAVA SOURCE "JavaUtils" RESOLVE;` 
 Lastly, create the call specification for the sendMail Java stored procedure. In this case, a PL/SQL 
 package will be created that contains the call specification for sendMail. 
- 
-CHAPTER 15  JAVA IN THE DATABASE 
-340 
+```sql 
 CREATE OR REPLACE PACKAGE JAVA_UTILS AS 
     PROCEDURE send_mail(subject VARCHAR2, 
                         recipient VARCHAR2, 
@@ -13407,6 +13439,7 @@ CREATE OR REPLACE PACKAGE BODY JAVA_UTILS AS
     NAME 'JavaUtils.sendMail(java.lang.String, java.lang.String, java.lang.String)'; 
     
 END; 
+```
 The stored procedure can now be executed using the following command: 
 EXEC java_utils.send_mail('Test','myemail@mycompany.com','Test Message'); 
 If the message is sucessfully sent, you will see the following output: 
@@ -13426,22 +13459,21 @@ Additional options are not necessary to load a JAR file into the schema that you
 flag. Since the JAR file consists of compiled Java libraries, there is no need to resolve the library once
 loaded. As indicated in the **Solution** to this recipe, you can begin to import classes from the libraries as
 soon as they have been loaded. 
-15-13. Removing a Java Class 
+
+## 15-13. Removing a Java Class 
 **Problem** 
 You want to drop a Java class from your database. 
-  CHAPTER 15  JAVA IN THE DATABASE 
-341 
 **Solution** 
 Issue the SQL DROP JAVA command along with the schema and object name you want to drop. For 
 instance, you want to drop the Java source for the Employees class. In this case, you would issue the 
 following command: 
  
-DROP JAVA SOURCE “Employees”;  
+`DROP JAVA SOURCE “Employees”;`
 **How It Works** 
 There may come a time when you need to drop a Java class or sources from the database. For instance, if 
 you no longer want to maintain or allow access to a particular Java class, it may make sense to drop it. 
 The DROP JAVA SOURCE command does this by passing the name of the class or source as demonstrated 
-within the **Solution** to this recipe.  
+within the Solution to this recipe.  
  Note Be careful not to drop a Java class if other Java procedures or PL/SQL call specifications depend upon it. 
 Doing so will invalidate any dependent code, and you will receive an error if you try to execute. The data dictionary 
 provides views, such as DBA_DEPENDENCIES, that can be queried in order to find dependent objects. 
@@ -13457,18 +13489,17 @@ The dropjava utility actually invokes the DROP JAVA SOURCE command. The downside
 utility is that you must be located on the database server to use it. I recommend using the DROP JAVA 
 SOURCE command from SQL*Plus if possible because it tends to make life easier if you are working within 
 SQL*Plus on a machine that is remote from the server. 
-15-14. Retrieving Database Metadata with Java 
+
+## 15-14. Retrieving Database Metadata with Java 
 **Problem** 
 You are interested in retrieving some metadata regarding the database from within your Java stored 
 procedure. In this recipe, you want to list all the schemas within the database. 
 **Solution** 
 Create a Java stored procedure that utilizes the OracleDatabaseMetaData object to pull information from 
 the connection. In the following example, a Java stored procedure is created that utilizes the 
-CHAPTER 15  JAVA IN THE DATABASE 
-342 
 OracleDatabaseMetaData object to retrieve schema names from the Oracle connection. This Java method 
 will be added to the JavaUtils class. 
- 
+```java 
 public static void listDatabaseSchemas() { 
         Connection conn = null; 
         try { 
@@ -13487,6 +13518,7 @@ public static void listDatabaseSchemas() {
             System.out.println(ex); 
         }  
     } 
+```
 The output from the execution of this Java method will be a list of all database schemas. 
 **How It Works** 
 Sometimes it may be useful to use Java code for obtaining database metadata. One such instance might 
@@ -13500,32 +13532,31 @@ For a complete listing of the different options available via the OracleDatabase
 refer to the online documentation at 
 www.oracle.com/technology/docs/tech/java/sqlj_jdbc/doc_library/javadoc/oracle.jdbc.driver.Orac
 leDatabaseMetaData.html. 
- 
+
 In the **Solution** to this recipe, a Java Connection object is obtained using jdbc:default:connection. 
 The getMetaData method can be called on a Connection object and casted to an OracleDatabaseMetaData 
 object type. This **Solution** demonstrates this technique and then uses the object to retrieve information 
 about the database. 
-  CHAPTER 15  JAVA IN THE DATABASE 
-343 
-15-15. Querying the Database to Help Resolve Java  
+
+## 15-15. Querying the Database to Help Resolve Java  
 Compilation Issues 
 **Problem** 
 You are attempting to compile Java source within the database, and you are receiving an unsuccessful 
-result. You need to determine the underlying issue to the **Problem** that is preventing the Java source 
+result. You need to determine the underlying issue to the Problem that is preventing the Java source 
 from compiling correctly. 
 **Solution** 
 Query the USER_ERRORS table to determine the cause of the compilation issue. For example, suppose the 
 JavaUtils class source is loaded into the database with an incorrect variable name. This will cause a 
 compiler error that will be displayed within the USER_ERRORS table. The following is an excerpt from a 
 SQL*Plus session where an attempt has been made to compile the code: 
- 
+```sql
 SQL> ALTER JAVA SOURCE "JavaUtils" RESOLVE; 
- 
+```
 Warning: Java altered with compilation errors. 
  
 Since compilation errors have occurred, query the USER_ERRORS table to determine the exact cause of 
 the error so that it can be repaired. The following query demonstrates this technique: 
- 
+```sql
 SQL> COL TEXT FOR A25 
 SQL> SELECT NAME, TYPE, LINE, TEXT 
   2  FROM USER_ERRORS 
@@ -13552,21 +13583,16 @@ JavaUtils               JAVA SOURCE         0
  
 JavaUtils               JAVA SOURCE         0 1 error 
  
-CHAPTER 15  JAVA IN THE DATABASE 
-344 
 7 rows selected. 
+```
 **How It Works** 
 The USER_ERRORS table contains the most recent errors generated by PL/SQL or Java code. It is the most 
 useful way to determine the issues that are causing compilation errors when attempting to resolve Java 
 source errors. Unlike PL/SQL, you are unable to issue the SHOW ERRORS command to display the most 
 recent compiler errors. The Java compiler, as well as the PL/SQL compiler, writes output to the 
 USER_ERRORS table, making it a beneficial tool when writing Java code for the database. 
-C H A P T E R  16 
- 
-   
- 
-345 
-Accessing PL/SQL from JDBC, 
+
+# 16. Accessing PL/SQL from JDBC, 
 HTTP, Groovy, and Jython 
 Java programs run on a virtual machine known as the Java virtual machine (JVM). A version of the JVM is 
 available for most operating systems and is deployed on millions of servers, desktops, phones, and even 
@@ -13585,7 +13611,8 @@ the JVM. It is meant for the purpose of demonstrating how to access PL/SQL code 
 languages. The Java online community is outstanding, and a plethora of resources are available on the 
 Web for learning about Java or other languages on the JVM. For more detailed information, please 
 consult those resources, because this chapter will only provide **Solution**s targeting PL/SQL integration. 
-16-1. Accessing a PL/SQL Stored Procedure via JDBC 
+
+## 16-1. Accessing a PL/SQL Stored Procedure via JDBC 
 **Problem** 
 You are writing a Java application that uses JDBC to access data, but you also want to call some PL/SQL 
 stored procedures from within your Java application. 
@@ -13595,12 +13622,10 @@ consists of a PL/SQL code block that calls the stored procedure. For example, co
 Java class that contains a method named increaseWage(). This method uses JDBC to obtain a database 
 connection, create a CallableStatement, and then invoke the PL/SQL stored procedure that passes in the 
 required variables. 
- 
+```java
+
 import java.sql.*; 
 import oracle.jdbc.*; 
-CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-346 
- 
 public class EmployeeFacade { 
  
  public void increaseWage() 
@@ -13641,7 +13666,8 @@ public class EmployeeFacade {
           System.err.println("A database exception has occurred."); 
       } 
   } 
-} 
+}
+```
 Running this code within an integrated development environment such as NetBeans would result in 
 the following output: 
  
@@ -13651,8 +13677,7 @@ BUILD SUCCESSFUL (total time: 4 seconds)
 The EmployeeFacade class contains a main() method that is used to initiate the execution of the 
 increaseWage() method. The increaseWage() method initializes three variables that are passed to the 
 increase_wage PL/SQL stored procedure using a CallableStatement. 
- CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-347 
+
 **How It Works** 
 It is possible to invoke a PL/SQL stored procedure from a JDBC call just as if you were issuing a call from 
 PL/SQL. You can do so by passing a PL/SQL code block that contains the procedure call as a string to the 
@@ -13695,8 +13720,6 @@ notice that the throws SQLException clause has been placed within the method dec
 Java method contains a throws clause within the declaration, then you must code an exception handler 
 for any Java code that calls the method. In this **Solution**, the throws clause has been put into place to 
 handle any exceptions that may be raised when closing the connection within the exception-handling 
-CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-348 
 catch block. For more information on Java exception handling, please see the online documentation 
 available at http://download.oracle.com/javase/tutorial/essential/exceptions/handling.html. 
 The JDBC API can be used to call PL/SQL stored procedures by passing a PL/SQL code block in the 
@@ -13706,7 +13729,8 @@ with JDBC, then you can learn more about it at www.oracle.com/technetwork/java/o
 141217.html. It can be used for creating small Java programs or enterprise-level Java applications. The 
 JDBC API has been around since the early days of Java, so it is quite mature and allows you to access the 
 database and your PL/SQL programs directly. 
-16-2. Accessing a PL/SQL Stored Function from JDBC 
+
+## 16-2. Accessing a PL/SQL Stored Function from JDBC 
 **Problem** 
 You want to utilize a PL/SQL function from a Java application that uses the JDBC API to connect to an 
 Oracle Database and returns a value to the Java application.  
@@ -13716,7 +13740,7 @@ containing the function call to the CallableStatement. The following example dem
 method that accepts a parameter of type double and then makes a JDBC call to the PL/SQL function 
 calc_quarter_hour using the parameter. It is assumed that this Java method is to be added into the class 
 that was created in Recipe 16-1. 
- 
+```java
 public void calcQuarterHour(double hours) 
             throws SQLException { 
         float returnValue; 
@@ -13742,16 +13766,15 @@ public void calcQuarterHour(double hours)
             conn.close(); 
             System.out.println("The calculated value: " + returnValue); 
         } catch (SQLException e) { 
- CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-349 
             ret_code = e.getErrorCode(); 
             System.err.println(ret_code + e.getMessage()); 
             conn.close(); 
         } 
-    } 
+    }
+```
 Update the main method from the class that was created in Recipe 16-1 to the following code in 
 order to make a call to the new calcQuarterHour method. 
- 
+```java
 public static void main(String[] args) { 
         EmployeeFacade facade = new EmployeeFacade(); 
         try { 
@@ -13760,14 +13783,14 @@ public static void main(String[] args) {
             System.err.println("A database exception has occurred."); 
         } 
     } 
- 
+```
 Running this code within an integrated development environment such as NetBeans would result in 
 the following output: 
- 
+```sql
 run: 
 The calculated value: 7.75 
 BUILD SUCCESSFUL (total time: 1 second) 
- 
+```
 Values can be passed as parameters from Java to PL/SQL, and in turn, PL/SQL can pass return 
 values back to Java. This helps form a seamless integration between the two languages. 
 **How It Works** 
@@ -13787,13 +13810,11 @@ Once a connection has been obtained, a CallableStatement is created by calling t
 java.sql.Connection prepareCall() method and passing a Java String that contains the call to the 
 PL/SQL function. The function call is in the following format: 
  
-{? = call calc_quarter_hour(?)} 
+`{? = call calc_quarter_hour(?)} `
  
 The String is surrounded by curly braces ({}), and the call to the PL/SQL function is preceded by 
 the ? = characters. The question mark (?) character represents a bind variable in a Java prepared 
 statement.  Bind variables are used to represent the returning value as well as the parameter value that 
-CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-350 
 will be passed into the function. The first ? character represents the returning value, whereas the ?
 character within the parentheses correlates to the parameter being passed to the function. The PL/SQL
 function is invoked using the call keyword followed by the function name. 
@@ -13823,7 +13844,8 @@ not stored in the database will incur at least a minor performance hit when work
 because of connections and round-trips to and from the database server. If you have a PL/SQL function
 that works with the database, then it can be more efficient to call the PL/SQL function from your Java
 application rather than reproducing that function in Java code. 
-16-3.  Accessing PL/SQL Web Procedures with HTTP 
+
+## 16-3.  Accessing PL/SQL Web Procedures with HTTP 
 **Problem** 
 You are developing a Java web application that uses an Oracle Database. You have already created a
 PL/SQL web application that displays some particular data from your database that is generated from an
@@ -13838,15 +13860,13 @@ application that generates a list of employees on a web page. Suppose further th
 written PL/SQL web application that, given an employee_id, displays employee record details in a
 browser. You want to combine that functionality with your Java program so that when you click one of
 the employees in the list generated by the Java web program, it passes the selected employee’s ID to the 
- CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-351 
 PL/SQL web program. In turn, the PL/SQL program will display the detail for that ticket. In the following 
 example, the EMP_RPT package that was introduced in Recipe 14-4 is accessed via a Java Server Faces 
 page. 
  Note JSF is the Java standard for creation of server-side user interfaces. To learn more about this technology, 
 please see the online documentation at www.oracle.com/technetwork/java/javaee/javaserverfaces-
 139869.html. 
- 
+```html
 <?xml version='1.0' encoding='UTF-8' ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
@@ -13885,8 +13905,6 @@ please see the online documentation at www.oracle.com/technetwork/java/javaee/ja
                                     </h:column> 
                                     <h:column > 
                                         <h:outputText value="Last Name"/> 
-CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-352 
                                     </h:column> 
                                     <h:column > 
                                         <h:outputText value="Email"/> 
@@ -13925,7 +13943,7 @@ server:7778/DAD/emp_rpt.rpt"
  
     </body> 
 </html> 
- 
+```
 The JSF tags in this example would generate a web page that looks similar to Figure 16-1. However, 
 it is important to note that JSF contains template functionality, so the look and feel of the user interface 
 can be changed significantly if a different template were applied. 
@@ -13944,14 +13962,12 @@ In this case, the link will redirect users to a PL/SQL application that accepts 
 and in turn displays a result. Figure 16-2 shows the output from the PL/SQL web application when the e-
 mail user name SKING is selected from the JSF page. 
  
-CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-354 
  
 Figure 16-2.  PL/SQL web application output 
  
 **How It Works** 
 Developing Java web applications and PL/SQL web applications can be quite different. However, 
-accessing one from the other can be quite easy and can create powerful **Solution**s. In this recipe, a 
+accessing one from the other can be quite easy and can create powerful Solutions. In this recipe, a 
 mashup consisting of a standard web URL passes data from a Java application to a PL/SQL stored 
 procedure, and then the PL/SQL stored procedure displays content via a web page.  
 The PL/SQL stored procedure in this recipe utilizes the built-in UTL_HTTP package to display content in 
@@ -13963,7 +13979,7 @@ incorporating the host name, the DAD, and the procedure to be used can access th
 Please see Recipe 14-1 to learn more about creating DADs. For more details regarding the creation of 
 web content using PL/SQL, please refer to Chapter 14. 
 The Java application Extensible Hypertext Markup Language (XHTML) page that is displayed in the 
-**Solution** to this recipe creates a listing of employee names by querying the database using EJB 
+Solution to this recipe creates a listing of employee names by querying the database using EJB 
 technology. Enterprise Java Beans (EJB) is part of the Java Enterprise Edition stack that is used for object 
 relational mapping of Java code and database entities. For more information regarding EJB technology, 
 please refer to the documentation at www.oracle.com/technetwork/java/index-jsp-140203.html.  
@@ -13974,18 +13990,16 @@ access, and the name of the PL/SQL stored procedure, which is EMP_RPT.RPT in thi
 contains an embedded parameter that is passed to the stored procedure upon invocation. The following 
 code shows an example of a URL that is generated by the Java application: 
  
-<a href="http://my-web-server:port/hr/EMP_RPT.RPT?emp_id=200"> 
+`<a href="http://my-web-server:port/hr/EMP_RPT.RPT?emp_id=200"> `
 The code that generates this URL is written in Java Server Faces using Facelets markup, as shown 
 here: 
- 
+```html
 <h:outputLink value="http://my-oracle-application-server:port/DAD/emp_rpt.rpt" 
                                             target="_blank"> 
- CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-355 
                <f:param name="emp_id" value="#{emp.employeeId}"/> 
                <h:outputText id="email" value="#{emp.email}"/> 
 </h:outputLink> 
- 
+```
 The &emp_id=200 portion of the URL is the parameter name and value that is passed to the 
 EMP_RPT.RPT procedure when called. In the case of the JSF markup, #{emp.employeeId} will pass this 
 value as a parameter to the URL. In turn, the EMP_RPT.RPT procedure queries the EMPLOYEES table for the 
@@ -14000,7 +14014,7 @@ similar fashion. A regular HTML page can include links to any PL/SQL stored proc
 deployed and made available using a DAD. This is a simple technique that can be used to allow 
 applications to use data that resides in a remote database. 
  
-16-4. Accessing PL/SQL from Jython 
+## 16-4. Accessing PL/SQL from Jython 
 **Problem** 
 You are working with a Jython program and want to call some PL/SQL stored procedures or functions 
 from it. 
@@ -14014,13 +14028,13 @@ CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON
 from __future__ import with_statement 
 from com.ziclix.python.sql import zxJDBC 
  
-# Set up connection variables 
+Set up connection variables 
 jdbc_url = "jdbc:oracle:thin:@host:1521:dbname" 
 username = "user" 
 password = "password" 
 driver = "oracle.jdbc.driver.OracleDriver" 
  
-# obtain a connection using the with-statment 
+obtain a connection using the with-statment 
 with zxJDBC.connect(jdbc_url, username, password, driver) as conn: 
     with conn: 
         with conn.cursor() as c: 
@@ -14035,7 +14049,7 @@ Use a Python web framework, such as Django, along with Jython to create a web ap
 deployment to a Java application server. Use the selected web framework’s built-in syntax to invoke the 
 stored procedure or function call.  
  
-DJANGO 
+`DJANGO`
 Django is a popular web framework that is used with the Python programming language. Django has 
 worked with Jython since the release of Jython 2.5. Django takes a model-view-controller approach to 
 web design, whereas all code is separated from web pages. The web pages use templating that makes it 
@@ -14048,16 +14062,15 @@ For example, here’s how you might use the Django web framework to create a cal
 stored procedure CALC_QUARTER_HOUR that was demonstrated in Recipe 4-1. The following code 
 demonstrates an excerpt taken from a Django view to make a call to an Oracle PL/SQL function: 
  
-# Views.py 
+`Views.py`
 from django.db import connection 
- 
+```python
 def calc_hours(self, hours_in): 
- CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-357 
         cursor = connection.cursor() 
         ret = cursor.callproc("CALC_QUARTER_HOUR", (hours_in))# calls PROCEDURE OR FUNCTION 
         cursor.close() 
         return ret 
+```
 This view code only demonstrates a function written in Python or Jython that will perform the call to 
 the database and return a result. 
 **How It Works** 
@@ -14069,8 +14082,8 @@ offer, which is a tremendous asset to any developer. Jython is one of the first 
 developed to run on the JVM. It has matured over the years, although it remains a bit behind its sister 
 language Python in release number. Jython can be used for developing scripts, desktop applications, and 
 enterprise-level web applications. 
-Using the zxJDBC API to Solve the **Problem** 
-In the first **Solution** to this recipe, Jython’s zxJDBC API is used to perform tasks against an Oracle 
+Using the zxJDBC API to Solve the Problem
+In the first Solution to this recipe, Jython’s zxJDBC API is used to perform tasks against an Oracle 
 Database. zxJDBC is an extension of the Java JDBC API that allows Jython developers to program JDBC 
 calls in a Python-like syntax. Working with zxJDBC can be very efficient. It is similar to working with 
 regular Java JDBC code, except the syntax makes development a bit easier since there are fewer lines of 
@@ -14085,20 +14098,18 @@ and database administrators use Jython to script their nightly jobs, allowing zx
 functions and stored procedures. This is one alternative to using Oracle Scheduler for executing 
 database tasks, and it can allow for much more flexibility because all the libraries available for use on the 
 JVM are at your disposal.  
-Using Django to Solve the **Problem** 
+Using Django to Solve the Problem
 Although zxJDBC is a great way to work with the database, there are other techniques that can be used 
 for creation of web content that accesses PL/SQL. Many Jython users create web applications using 
 different Python web frameworks. One such Python web framework is Django, and it can be used along 
 with Jython to productively create web applications that run on the Java platform. The Django 
 framework uses an object-oriented approach to work with the database. In other terms, Django provides 
-an object-relational mapping **Solution** that allows developers to work with Python objects representing 
+an object-relational mapping Solution that allows developers to work with Python objects representing 
 database tables rather than working directly with SQL. 
  
 Django uses a model.py file to map a database table to a Python object. A views.py file is used to 
 implement separate views for the web site, and a urls.py file is used to contain the valid URL mappings 
-CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-358 
-for a Django application. In the **Solution** to this recipe, a Python function that would go into the views.py 
+for a Django application. In the Solution to this recipe, a Python function that would go into the views.py 
 file is displayed. The purpose of this function is to make a connection to the database and invoke a 
 PL/SQL function call. The Django framework handles database connections for you by declaring some 
 parameters for the database connection within a settings.py file for the project. As you can see from the 
@@ -14107,7 +14118,7 @@ code is similar to using zxJDBC for calling a PL/SQL stored procedure or functio
 callProc() function is used to make the function call, and the syntax for performing that task is as 
 follows: 
  
-cursor.callProc(function_or_procedure_name,(parameter_one, parameter_two, etc)) 
+`cursor.callProc(function_or_procedure_name,(parameter_one, parameter_two, etc))`
  
 The function or procedure name should be a string value, and the parameters can passed as a tuple 
 or listed one by one, separated by commas. If calling a PL/SQL function, the callProc() function should 
@@ -14119,14 +14130,15 @@ made.
 For more information on using the Django web framework, please visit the project home page at  
 www.djangoproject.com. To use the Django web framework with Jython, you will also need to include the 
 django-jython site package at http://code.google.com/p/django-jython/. 
-16-5. Accessing PL/SQL from Groovy 
+
+## 16-5. Accessing PL/SQL from Groovy 
 **Problem** 
 You are writing a Groovy program and want to call some PL/SQL stored procedures or functions from it. 
 **Solution** 
 Use GroovySQL to establish a database connection, and make the call to the PL/SQL stored program. For 
 example, here’s how you would use of GroovySQL to connect to an Oracle Database and call a PL/SQL 
 function: 
- 
+```java
 import groovy.sql.Sql 
 import oracle.jdbc.driver.OracleTypes 
  
@@ -14138,10 +14150,10 @@ dept_id = 50
 sql.call('{? = call calc_quarter_hour(?)}', [Sql.DOUBLE, 6.35]) { qtr_hour-> 
   println qtr_hour 
 } 
+```
 Short and to the point, the Groovy script in this example connects to an Oracle Database, executes a 
 PL/SQL function call, returns a value, and prints the result. 
- CHAPTER 16  ACCESSING PL/SQL FROM JDBC, HTTP, GROOVY, AND JYTHON 
-359 
+
 **How It Works** 
 Groovy is a unique JVM language that is useful for developing productive and efficient applications. It 
 can be used for developing a wide variety of applications, from scripts to enterprise-level web 
@@ -14163,7 +14175,7 @@ JDBC API, whereas you pass a string that is enclosed in curly braces in the foll
 following example demonstrates a call to the CALC_QUARTER_HOUR PL/SQL function that was written in 
 Recipe 4-1: 
  
-{? = call calc_quarter_hour(?)} 
+`{? = call calc_quarter_hour(?)} `
  
 The question mark characters (?) correlate to bind variables. The second argument that is passed to 
 the call() method is a list of parameters including the return type and value of the parameter that will 
@@ -14182,12 +14194,7 @@ language will allow for the same PL/SQL connectivity across most languages that 
 more information regarding the use of Groovy, Groovy SQL, or closures in Groovy, please see the online 
 documentation at http://groovy.codehaus.org/Beginners+Tutorial. 
 
-C H A P T E R  17 
- 
-   
- 
-361 
-Unit Testing With utPLSQL 
+# 17. Unit Testing With utPLSQL 
 Testing is a necessary evil of the application development process. Sadly, testing is oftentimes 
 overlooked or bypassed when time is short. Distribution of untested or undertested code can lead to 
 code that is riddled with bugs and to disappointed users. Unit testing with a well-constructed framework 
@@ -14208,7 +14215,8 @@ includes recipes that show how to use the framework for testing PL/SQL objects, 
 suites, and how to automate your unit tests. In the end, you will learn to make the unit testing process a 
 functional part of your development process. As a result of using unit testing, your applications will be 
 successful, and you will spend much less time maintaining the code base. 
-17-1. Testing Stored PL/SQL Code Without Unit Tests  
+
+## 17-1. Testing Stored PL/SQL Code Without Unit Tests  
 **Problem** 
 You want to ensure that a block of PL/SQL code is working properly, but don’t want to take the time to 
 write a unit test. 
@@ -14220,9 +14228,7 @@ example demonstrates this tactic for placing comments into strategic locations w
 block in order to help determine if code is functioning as expected. For example, suppose you wish to 
 quickly test the function we introduced in the example for Recipe 4-1. Here’s how you’d modify it to 
 quickly test the correctness of its results.  
- 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-362 
+```sql 
 CREATE OR REPLACE 
 FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS 
   CALCULATED_HOURS NUMBER := 0; 
@@ -14275,25 +14281,24 @@ BEGIN
         DBMS_OUTPUT.Put_LINE('The hours passed in will use standard rounding'); 
         CALCULATED_HOURS := ROUND(HOURS,1); 
     END IF; 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-363 
  
   END IF; 
  
   RETURN CALCULATED_HOURS; 
  
 END CALC_QUARTER_HOUR; 
- 
+/
+```
 When the CALC_QUARTER_HOUR function is executed with a value of 7.34, the comments will be 
 displayed as seen in the next snippet from a SQL*Plus session. 
- 
+```sql
 SQL> set serveroutput on 
 SQL> select calc_quarter_hour(7.34) from dual; 
  
 CALC_QUARTER_HOUR(7.34) 
 ----------------------- 
                   7.25 
- 
+```
 The value passed in was greater than one hour... 
 The decimal portion <= .375 
 **How It Works** 
@@ -14316,11 +14321,10 @@ remove the output statements before code is released into production. This can t
 could be better spent on development. As a means for testing small units of code, using DBMS_OUTPUT 
 statements works quite well. However, if you wish to develop entire test suites and automated unit 
 testing then you should go on to read Recipe 17-2 regarding utPLSQL. 
-17-2. Installing the utPLSQL Unit Testing Framework 
+
+## 17-2. Installing the utPLSQL Unit Testing Framework 
 **Problem** 
 You’ve chosen the utPLSQL unit-testing framework for PL/SQL for your work, and you want to install it. 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-364 
 **Solution** 
 First, download the utPLSQL sources from http://utplsql.sourceforge.net/. Once you have obtained 
 the sources, use the following steps to install the utPLSQL package into the database for which you wish 
@@ -14328,6 +14332,7 @@ to write unit tests, and make it available for all schemas.
 Create a user to host the utPLSQL tables, packages, and other objects. In this 
 example, the user will be named UTP, and the default permanent and 
 temporary tablespaces will be used. 
+```sql
 SQL> create user utp identified by abc123; 
 Grant privileges to the newly created UTP user using the GRANT privilege_name TO 
 user_name statement, replacing values with the appropriate privilege and 
@@ -14341,7 +14346,7 @@ username. The user will require the following privileges:
  Drop public synonym 
 Install the objects by running the ut_i_do.sql script. 
 SQL> @ut_i_do install 
- 
+```
 Once these steps have been completed then you will have the ability to run unit tests on packages 
 that are loaded into different schemas within the database. 
 **How It Works** 
@@ -14359,11 +14364,10 @@ been granted, running the ut_i_do.sql script and passing the install parameter w
 installation of the framework. After completion, you can begin to build unit test packages and install 
 them into different schemas within the database, depending on which PL/SQL objects that you wish to 
 test.  
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-365 
 ■ Note Unit tests will be executed from the same schema in which the PL/SQL object that is being tested resides, 
 not from the schema that contains the utPLSQL framework objects. 
-17-3. Building a utPLSQL Test Package 
+
+## 17-3. Building a utPLSQL Test Package 
 **Problem** 
 You would like to build a unit test package for one or more of the PL/SQL objects in your database 
 schema. 
@@ -14378,17 +14382,20 @@ create a unit test package to test the code for the CALC_QUARTERLY_HOURS
 function of Recipe 17-1. This package header should be stored into a file 
 named ut_calc_quarter_hour.pks and loaded into the database whose objects 
 you are testing. 
+```sql
 CREATE OR REPLACE PACKAGE ut_calc_quarter_hour 
 IS 
   PROCEDURE ut_setup; 
   PROCEDURE ut_teardown; 
  
   PROCEDURE ut_calc_quarter_hour; 
-END ut_calc_quarter_hour; 
+END ut_calc_quarter_hour;
+```
 Create the package body that implements the procedures specified by the unit test 
 package header and save it as a file with the same name as the header, but this 
 time with a .pkb suffix. The following package body should be stored into a file 
 named ut_calc_quarter_hour.pkb and loaded into the database. 
+```sql
 CREATE OR REPLACE PACKAGE BODY ut_calc_quarter_hour 
 IS 
  
@@ -14401,8 +14408,6 @@ PROCEDURE ut_teardown IS
 BEGIN 
   NULL; 
 END; 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-366 
  
 PROCEDURE ut_calc_quarter_hour IS 
 BEGIN 
@@ -14413,6 +14418,7 @@ BEGIN
 END ut_calc_quarter_hour; 
  
 END ut_calc_quarter_hour; 
+```
 The package body in this example conforms to the format that must be used for testing packages 
 using the utPLSQL framework. 
 ■ Note The .pks and .pkb suffixes could be changed to something different, like .sql, if you wish. You could 
@@ -14428,7 +14434,7 @@ the unit test. The unit test prefix can be changed, but ut_ is the default. For 
 changing the unit test prefix, please see Recipe 12-8. 
 The test package body must contain both a setup and teardown procedure. These procedures must 
 also be given names that use the same prefix you have chosen for your unit testing. Therefore, as you can 
-see in the **Solution** to this recipe, the package header declares ut_setup and ut_teardown procedures. The 
+see in the Solution to this recipe, the package header declares ut_setup and ut_teardown procedures. The 
 ut_setup procedure is to initialize the variables or data structures the unit test procedure uses. When a 
 unit test is executed, ut_setup is always the first procedure to execute. The ut_teardown procedure is 
 used to clean up after all of the tests have been run. You should use this procedure to destroy all of the 
@@ -14438,16 +14444,16 @@ executed last, after all unit tests have been run.
 procedure in the ut_setup procedure as well. By default, registration of unit test procedures occurs automatically, 
 so you do not need to register them within ut_setup. If you are interested in learning more about manual unit test 
 registration, please see the online documentation that can be found at: http://utplsql.oracledeveloper.nl/ 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-367 
 The package must also contain an implementation for your unit test procedures. The unit test 
 procedure names should begin with the ut_ prefix followed by the name of the PL/SQL object that you 
-are testing. In the case of the **Solution** for this recipe, the procedure name is ut_calc_quarter_hour. The 
-**Solution** to this recipe does not contain any unit tests per se, but in order to perform a valid unit test of 
+are testing. In the case of the Solution for this recipe, the procedure name is ut_calc_quarter_hour. The 
+Solution to this recipe does not contain any unit tests per se, but in order to perform a valid unit test of 
 the PL/SQL object, you must define a test case for each possible scenario using the assertion routines 
 that are made available by utAssert. To learn more about the different assertion routines, please see 
 Recipe 17-4. 
-17-4. Writing a utPLSQL Unit Test Procedure 
+
+## 17-4. Writing a utPLSQL Unit Test Procedure 
+
 **Problem** 
 You have a PL/SQL object that you’d like to test to verify it returns the expected values.  
 **Solution** 
@@ -14455,7 +14461,7 @@ Create a utPLSQL test package to test every code branch and computation within y
 utPLSQL assertion statements to test every foreseeable use case for the function. For example, suppose 
 you wish to test a simple factorial function that contains four code branches, each of which returns a 
 value. Here’s the target function: 
- 
+```sql
 CREATE OR REPLACE FUNCTION factorial (fact INTEGER) RETURN INTEGER is 
  
 BEGIN 
@@ -14467,12 +14473,12 @@ BEGIN
    END IF; 
  
 END factorial; 
- 
+```
 Next, create the unit test package to test the factorial function. Name the package using the same 
 name as the function to be tested and adding the prefix ut_ to it In this example, you’ll name the 
 package ut_factorial. Create the three required procedures within the package for setup, teardown, 
 and testing. Remember to save the file as a PKS file (i.e., one with a .pks file extension).  
- 
+```sql
 CREATE OR REPLACE PACKAGE ut_factorial IS 
  
    PROCEDURE ut_setup; 
@@ -14480,16 +14486,15 @@ CREATE OR REPLACE PACKAGE ut_factorial IS
    PROCEDURE ut_factorial; 
  
 END ut_factorial; 
- 
+```
 Now create the unit testing package body. No code is required for the ut_setup or the ut_teardown 
 procedures as these are usually reserved for code that updates the database prior to or after running the 
 tests. For example, the setup procedure may insert records that are required only by the unit test, which 
 means that the teardown routine must clean up any data the test leaves behind. The ut_factorial 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-368 
+
 procedure is built with a series of assert statements that test each code branch in the factorial 
 function. Remember to save the file as a PKB file (i.e., one with a .pkb file extension). 
- 
+```sql 
 CREATE OR REPLACE PACKAGE BODY ut_factorial IS 
  
 PROCEDURE ut_setup IS 
@@ -14511,6 +14516,7 @@ BEGIN
 END ut_factorial; 
  
 END ut_factorial; 
+```
 **How It Works** 
 The utPLSQL package contains a number of tests that can be used to ensure that your code is working 
 properly. Each of these tests is an assertion, which is a statement that evaluates to either true or false 
@@ -14525,13 +14531,12 @@ third parameter to retrieve the value from dual. If the factorial is updated in 
 branch no longer returns the expected value, the unit test will fail. This test should be performed after 
 modifying the factorial function to test for bugs introduced by the update. Table 17-1 lists the different 
 assertion tests that are part of the utAssert package. 
+```text
 Table 17-1. utPLSQL Assertion Tests 
 Assertion Name Description 
 utAssert.eq Checks equality of scalar values 
 utAssert.eq_refc_query Checks equality of RefCursor and Query 
 utAssert.eq_refc_table Checks equality of RefCursor and Database Tables 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-369 
 Assertion Name  Description 
 utAssert.eqcoll Checks equality of collections 
 utAssert.eqcollapi Checks equality of collections 
@@ -14550,11 +14555,12 @@ utAssert.previous_failed Checks if the previous assertion failed
 utAssert.previous_passed Checks if the previous assertion passed 
 utAssert.this Generic “this” procedure 
 utAssert.throws Checks if a procedure or function throws an exception 
- 
+```
 There are many other tests that can also be used to help build your unit test packages. For an entire 
 list of the tests that are available, please see the documentation that can be found online at: 
 http://utplsql.oracledeveloper.nl/. 
-17-5. Running a utPLSQL Test 
+
+## 17-5. Running a utPLSQL Test 
 **Problem** 
 With a unit test package defined, you want to run it to verify that a function returns the values you expect 
 under a variety of scenarios. 
@@ -14566,7 +14572,7 @@ test you built in 17-4. To do so, enter the following commands.
 set serverout on 
 exec utPLSQL.test('factorial', recompile_in => FALSE) 
 Executing the commands above produces the following output. 
-. 
+```text
 >    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS 
 >   S    S  U     U  C   C   C   C  E        S    S   S    S 
 >  S        U     U C     C C     C E       S        S 
@@ -14576,9 +14582,9 @@ Executing the commands above produces the following output.
 >         S U     U C     C C     C E              S        S 
 >   S    S   U   U   C   C   C   C  E        S    S   S    S 
 >    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS 
-. 
+```
 SUCCESS: "factorial" 
-. 
+```text
 > Individual Test Case Results: 
 > 
 SUCCESS - factorial.UT_FACTORIAL: ISNULL "is NULL test" Expected "" and got "" 
@@ -14600,10 +14606,11 @@ FACTORIAL(5) from dual does match that of "select 120 from dual"
 > NONE FOUND 
  
 PL/SQL procedure successfully completed. 
- 
 SQL> spool off 
+```
 What if one of your test cases fails? Suppose that one of the test cases for the FACTORIAL test has 
 been modified so that a failure will result. Following is the resulting output from a failed unit test. 
+```sql
 SQL> exec utPLSQL.test('factorial', recompile_in => FALSE) 
 . 
 >  FFFFFFF   AA     III  L      U     U RRRRR   EEEEEEE 
@@ -14636,11 +14643,10 @@ FAILURE - factorial.UT_FACTORIAL: EQQUERY "N! Test" Result: Result set for
 > 
 > Errors recorded in utPLSQL Error Log: 
 > 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-373 
 > NONE FOUND 
- 
+
 PL/SQL procedure successfully completed. 
+```
 **How It Works** 
 The utPLSQL framework makes it easy to execute all of the tests that you have setup within a unit test 
 package; you need only to enter a utPLSQL.test command. In the **Solution** to this recipe, the SET 
@@ -14650,7 +14656,8 @@ utPLSQL.test procedure passes two parameters, the first is the name of the unit 
 you do not specify the name of the package built for the unit test. Instead, you pass the name of the 
 function being tested. The second parameter tells the utPLSQL.test procedure not to recompile any of 
 the code before running the test. 
-17-6. Building a utPLSQL Test Suite 
+
+## 17-6. Building a utPLSQL Test Suite 
 **Problem** 
 You have created numerous unit test procedures that you must run every time you modify your code. 
 Running each test individually is both time-consuming and error-prone, as you may forget to run a test 
@@ -14673,18 +14680,18 @@ Once the suite is created, use the utPackage.add procedure to add existing unit 
 first parameter must match the name of an existing test suite. The second parameter is the name of the 
 unit test to run. As more unit tests are developed, they can be added to the suite to provide an easy 
 method to run all tests at once. 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-374 
-17-7. Running a utPLSQL Test Suite 
+
+## 17-7. Running a utPLSQL Test Suite 
 **Problem** 
 You have defined a test suite and now wish to run the tests. 
 **Solution** 
 Use the utPLSQL.testSuite routine to run your tests. For example, here’s how run the test suite defined 
 in Recipe 17-6. 
- 
-exec utPLSQL.testSuite ('My Test Suite', recompile_in=>false); 
+
+`exec utPLSQL.testSuite ('My Test Suite', recompile_in=>false);`
  
 Executing the above test suite produces the following results. 
+```sql
 SQL> exec utPLSQL.testSuite ('My Test Suite', recompile_in=>false); 
 . 
 >    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS 
@@ -14786,8 +14793,6 @@ the unit test that failed. In the following output, one of the test cases for th
 FAILURE: "FACTORIAL" 
 . 
 > Individual Test Case Results: 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-378 
 > 
 SUCCESS - FACTORIAL.UT_FACTORIAL: ISNULL "is NULL test" Expected "" and got "" 
 > 
@@ -14859,8 +14864,7 @@ that of "select 7 from dual"
 > 
 > NONE FOUND 
 PL/SQL procedure successfully completed. 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-381 
+```
 **How It Works** 
 The utPLSQL.testSuite procedure steps though each unit test added using the utPackage.add procedure 
 and executes each test. In turn, each test executes and sends its results to the screen. This is a quick 
@@ -14869,7 +14873,8 @@ test fails, all of the remaining tests in the suite will continue to execute, an
 noted in the output. This is very useful as it will allow tests of many PL/SQL objects at once, and you will 
 be able to see which tests had issues and which did not. 
 ■ Hint Spool the output to a file if the number of tests exceeds the screen buffer’s capacity. 
-17-8. Reconfiguring utPLSQL Parameters 
+
+## 17-8. Reconfiguring utPLSQL Parameters 
 **Problem** 
 You would like to change some of the configurations for your utPLSQL install. For instance, you would 
 like to change the prefix for all of your unit test packages so that, instead of beginning with ut_, they all 
@@ -14879,11 +14884,11 @@ Use the utConfig package to alter the configurations for utPLSQL. For this **Sol
 utConfig can be used to change the prefix that is used for all of your test packages. For example, here’s 
 how to change the prefix for your test packages from ut_ to test_ using the utConfig package for the 
 current schema. 
- 
+```sql
 SQL> exec utConfig.setPrefix('test_'); 
  
 PL/SQL procedure successfully completed. 
- 
+```
 After executing the statement in the example, the utPLSQL unit test framework will look for test 
 packages beginning with the test_ prefix rather than ut_ within the current schema, until the prefix is 
 changed again using the utConfig package. 
@@ -14896,12 +14901,12 @@ utConfig.setPrefix(). The setPrefix() procedure also accepts an additional schem
 specify the schema to which the configuration option will be applied. If you do not pass a schema name, 
 the changes will occur within the current schema. The actual format for executing the 
 utConfig.setPrefix procedure is as follows: 
- 
+```sql
 exec utConfig.setPrefix(desired_prefix, [schema]); 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-382 
+```
 There are many configurable options that can be changed using the utConfig package. Table 17-2 
 shows the complete list of options. 
+```text
 Table 17-2. utConfig Configuration Options 
 Option Description 
 utConfig.autocompile Configure autocompile feature 
@@ -14919,16 +14924,16 @@ utConfig.setreporter Configure the default Output Reporter
 utConfig.settester Configure whose configuration is used 
 utConfig.setuserprefix Configure the user prefix for output file names 
 utConfig.showfailuresonly Switch off the display for successful tests 
- 
+```
 You can set of the options shown here using a syntax similar to that shown for the setPrefix() 
 procedure that was demonstrated in the **Solution** to this recipe. For more information on using the 
 configurations listed in Table 17-2, please see the online documentation that can be found at: 
 http://utplsql.oracledeveloper.nl/. Along with configurable options, the utConfig package includes 
 some functions that can be called to retrieve information regarding the unit test configuration for the 
 database or for a particular schema. Table 17-3 contains a listing of the options that utConfig makes 
+
 available for obtaining information. 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-383 
+```text
 Table 17-3. utConfig Informational Options 
 Option Name Description 
 utConfig.autocompiling Returns autocompile flag value 
@@ -14947,11 +14952,11 @@ utConfig.showconfig Displays a schema configuration
 utConfig.showingfailuresonly Returns whether successful test results are displayed 
 utConfig.tester Returns the schema whose configuration is used 
 utConfig.userprefix Returns the user prefix for output files 
- 
+```
 The functions can be called just as if they were standard functions within your schema. Some, such 
 as the utConfig.showconfig procedure, require you to set serveroutput on in order to display the output. 
 The following excerpt from a SQL*Plus session shows a call to utConfig.showconfig. 
- 
+```sql
 SQL> set serveroutput on 
 SQL> exec utconfig.showconfig 
 ============================================================= 
@@ -14960,8 +14965,6 @@ Directory:
 Autcompile? 
 Manual test registration? 
 Prefix = 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-384 
 Default reporter     = 
 ----- File Output settings: 
 Output directory: 
@@ -14973,13 +14976,14 @@ File extension  =
 ============================================================= 
  
 PL/SQL procedure successfully completed. 
- 
+``` 
 The utConfig package contains a variety of configurable options that will allow you to adjust unit 
 testing according to your specific needs. Out of the box, the utPLSQL testing framework contains default 
 values for each of these options, so you may never need to touch utConfig, but the option is available if 
 you need it. Another nice feature is that you can set configurable options for a specific schema. Doing so 
 will allow different schemas in the database to act differently when performing unit testing.  
-17-9. Redirecting utPLSQL Test Results to a File 
+
+## 17-9. Redirecting utPLSQL Test Results to a File 
 **Problem** 
 You are interested in writing the results of a unit test to a file. 
 **Solution** 
@@ -14989,7 +14993,7 @@ have the output captured to the file. After you’ve run your tests, close the f
 configuration back to its default. In the following lines of code, all of the steps that are necessary for 
 redirecting test results to a file are exhibited. For example, suppose that the database has a directory that 
 has already been enabled for use with the database named FILE_SYSTEM. 
- 
+```
 SQL>  BEGIN 
   utconfig.setfiledir('FILE_SYSTEM'); 
   -- Causes output to be redirected to file system 
@@ -15002,19 +15006,17 @@ SQL>  BEGIN
 END; 
  
 PL/SQL procedure successfully completed. 
- 
+```
 When the code block in this example is executed, a file will be created within the directory 
 represented by FILE_SYSTEM. The unit test for CALC_QUARTER_HOUR will then be executed and the results 
 will be redirected to the newly created file. Lastly, the file will be closed and the output will be redirected 
 back to DBMS_OUTPUT. 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-385 
 **How It Works** 
 One of the configurable options of utPLSQL allows for the output of your unit tests to be redirected. The 
 choices for displaying unit test results include Output, File, and HTML. The standard Output option is 
 Output , which causes output to be displayed within the SQL*Plus environment using DBMS_OUTPUT. The 
 File option allows for a file to be created and unit test results to be written to that file. Lastly, the HTML 
-option allows for unit test results to be formatted into file in the format of an HTML table. In the **Solution** 
+option allows for unit test results to be formatted into file in the format of an HTML table. In the Solution
 to this recipe, the use of the File output reporter is demonstrated. 
 Prior to redirecting unit test output to a file, you must create a database directory using the CREATE 
 DIRECTORY statement with a privileged account. For more information about creating directories, please 
@@ -15022,17 +15024,17 @@ see the Oracle documentation that can be found at:
 http://download.oracle.com/docs/cd/E11882_01/server.112/e17118/statements_5007.htm#SQLRF01207. 
 Once you have created a database directory, you can use it to write the results of unit tests by setting the 
 file directory using the utConfig.setfiledir() procedure. This procedure accepts the name of the 
-database directory as a parameter. In the **Solution** to this recipe, the directory is named FILE_SYSTEM. To 
+database directory as a parameter. In the Solution to this recipe, the directory is named FILE_SYSTEM. To 
 redirect the unit test output from utPLSQL, you must use the utConfig.setreporter() procedure. This 
 procedure accepts the name of the reporter that you would like to use for displaying output. As you can 
-see from the **Solution** to this recipe, the File reporter is chosen to redirect the output to a file on the file 
+see from the Solution to this recipe, the File reporter is chosen to redirect the output to a file on the file 
 system. It is also possible to create a custom reporter configuration that you can pass to the 
 utConfig.setreporter() procedure. For more information about creating customized reporters, please 
 see the utPLSQL documentation that can be found at: 
 http://utplsql.sourceforge.net/Doc/reporter.html. 
 After the output has been redirected using utConfig.setreporter(), you can run as many tests as 
 you wish and all of the output will be directed to a file instead of to the SQL*Plus command prompt. In 
-the **Solution** to this recipe, the CALC_QUARTER_HOUR function is tested. Once you have finished running 
+the Solution to this recipe, the CALC_QUARTER_HOUR function is tested. Once you have finished running 
 your tests, you must close the output file in order to make it available for you to use. If you fail to close 
 the file, you will be unable to open it or use it because the database will maintain a lock on the file. To 
 close the file, use issue utfilereporter.close(). Lastly, I recommend redirecting unit test output to the 
@@ -15041,15 +15043,15 @@ a unit test will receive the functionality that he or she expects by default, as
 the screen. It is a good idea to set the default output at the beginning of all test suites just to ensure that 
 you know where the output will be directed. However, if you are the only person running unit tests, or if 
 you prefer to maintain the File reporter as your default, then omit the final call to 
-utConfig.setreporter() that is shown in this **Solution**. 
+utConfig.setreporter() that is shown in this Solution. 
 Many times it can be useful to have unit test results redirected to an output file rather than 
 displayed within the SQL*Plus environment. For instance, if you are running unit tests during off hours 
 and would like to see the output, then it would be helpful to have it recorded to a file that can be viewed 
 at a later time. Similarly, if you are running several unit tests, it may be easier to read through a file rather 
 than scrolling through SQL*Plus output. Whatever the requirement may be, utPLSQL makes it easy to 
 redirect unit test output to a file or another device by creating a custom reporter. 
-17-10. Automating Unit Tests for PL/SQL and Java Stored Procedures 
-Using Ant 
+
+## 17-10. Automating Unit Tests for PL/SQL and Java Stored Procedures Using Ant 
 **Problem** 
 You wish to automatically run your unit tests for PL/SQL code and Java stored procedures each day and 
 to write the results of the unit test to a file. 
@@ -15061,7 +15063,7 @@ build and compile any Java code that you will be using for your stored procedure
 Ant build script that will execute some SQL statements, automate your unit tests, and compile Java 
 source into a directory. For example, the following build.xml file is an example of such a build that can 
 be used to compile Java sources and execute unit tests on PL/SQL within a single Ant run. 
- 
+```html
 <project name="MyPLSQLProject" default="unitTest" basedir="."> 
     <description> 
         PLSQL Unit Test and Application Builder 
@@ -15106,12 +15108,11 @@ be used to compile Java sources and execute unit tests on PL/SQL within a single
     </sql> 
     
   </target> 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-387 
 </project> 
- 
+```
 This build script can be executed by issuing the ant command from within the terminal or 
 command prompt. The results will resemble the following output. 
+```java
 juneau$ ant 
 Buildfile: /Users/juneau/Documents/PLSQL_Recipes/sources/17/build.xml 
  
@@ -15133,37 +15134,36 @@ unitTest:
  
 BUILD SUCCESSFUL 
 Total time: 4 seconds 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-388 
+```
 **How It Works** 
 Automating unit tests can be very helpful, especially if you are working on a project where there may be 
 more than one developer contributing code. The Apache Ant build system is useful for automating 
 builds and unit tests for Java projects. However, it can also be used to perform a myriad of other tasks, 
-including issuing SQL statements, as seen in the **Solution** to this recipe. Ant provides an entire build and 
-unit test **Solution** that is easy to use. To set up a build, all you need to do is install Ant on your machine 
+including issuing SQL statements, as seen in the Solution to this recipe. Ant provides an entire build and 
+unit test Solution that is easy to use. To set up a build, all you need to do is install Ant on your machine 
 and then create a build.xml file that consists of targets that Ant will use to build the project. Once you 
 have created a build file, then simply open a command prompt or terminal and traverse into the 
 directory containing your build file. Once in the directory, issue the ant command and it will 
 automatically look for a file named build.xml that will provide Ant the sequence used for the build.  
 Ant uses simple logic to determine the order of sequence that will be used to execute the targets that 
-are listed within the build.xml file. In the **Solution** to this recipe, the build file contains three targets, 
-init, compile, and unitTest. Ant will start the build by executing the target listed within the <project> 
+are listed within the build.xml file. In the Solution to this recipe, the build file contains three targets, 
+init, compile, and unitTest. Ant will start the build by executing the target listed within the <--project--> 
 tag as the default. In this case, the default target is unitTest.  
  
-<project name="MyPLSQLProject" default="unitTest" basedir="."> 
+`<project name="MyPLSQLProject" default="unitTest" basedir="."> `
  
 The unitTest target contains a depends attribute, which lists the compile target. This tells Ant that 
 the compile target should be executed first because unitTest depends upon its outcome.  
- 
+```html
 <target name="unitTest" depends="compile" 
         description="Execute PLSQL Unit Tests" > 
- 
+```
 Consequently, the compile target depends upon the init target, so init will be executed before 
 compile.  
- 
+```html
 <target name="compile" depends="init" 
         description="compile the source " > 
- 
+```
 The order of target execution for the **Solution** to this recipe will be the init target first, followed by 
 the compile target, and lastly the unitTest target. The project tag also contains an attribute named 
 basedir. This attribute tells Ant where the build files should be located. In the **Solution** to this recipe, 
@@ -15172,46 +15172,44 @@ At the top of the build file, you can see that there is a <description> tag. Thi
 brief description of the tasks completed by the build file. There are also several <property> tags. These 
 tags are used to define the variables that will be used within the build file. Each <property> tag contains a 
 name attribute and either a value or location attribute.  
- 
+```html
   <property name="src" location="src"/> 
   <property name="build" location="build" value=”build”/> 
   <property name="user" value="myuser"/> 
   <property name="db_password" value="mypassword"/> 
   <property name="database.jdbc.url" value="jdbc:oracle:thin:@hostname:1521:database"/> 
- 
+```
 The properties that use a value attribute are used to assign values to the property name, whereas the 
 properties that contain location attributes are used to assign a location to the property name. Properties 
 can be referenced within the build file by using the following syntax: “${property_name}”. As you can see 
-from the **Solution** to this recipe, each target within the build file consists of a number of tasks in the form 
-of XML tags. The init target creates a timestamp by using the <tstamp/> tag, and it creates a directory 
- CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-389 
-using the <mkdir/> tag and passing the name of a directory to be created. In this case, the directory name 
-will be named the same as the value that is assigned to the <property> tag that is named build.  
- 
+from the Solution to this recipe, each target within the build file consists of a number of tasks in the form 
+of XML tags. The init target creates a timestamp by using the <--tstamp/> tag, and it creates a directory 
+using the <--mkdir/> tag and passing the name of a directory to be created. In this case, the directory name 
+will be named the same as the value that is assigned to the <--property> tag that is named build.  
+```html
 <target name="init"> 
     <!-- Create the time stamp --> 
     <tstamp/> 
     <mkdir dir="${build}"/> 
   </target> 
- 
+```
 The compile target is used to compile all of the Java sources contained in the project. All of the 
 sources should reside within a named directory that is located in the base directory of the Ant project. 
-The compile target contains a single task using the <javac> tag. This tag contains a src attribute that 
+The compile target contains a single task using the <--javac> tag. This tag contains a src attribute that 
 defines the location of the sources to be compiled, and a destdir attribute that tells Ant where to place 
 the resulting Java class files. An Ant project that builds a Java project may contain only this task, but can 
-build several hundred Java class files. In the **Solution** to this recipe, and for most Ant uses with PL/SQL 
+build several hundred Java class files. In the Solution to this recipe, and for most Ant uses with PL/SQL 
 projects, however, the project will probably contain no Java source files or only a few at most. If a project 
-contains no Java source files, then the target will be executed, but the <javac> task will do nothing since 
+contains no Java source files, then the target will be executed, but the <--javac> task will do nothing since 
 there are not any sources to be compiled. 
- 
+```html
 <target name="compile" depends="init" 
         description="compile the source " > 
     <!-- Compile the java code from ${src} into ${build} --> 
     <!-- This is where you place the code for your java stored procedures --> 
     <javac srcdir="${src}" destdir="${build}"/> 
   </target> 
- 
+```
 The most important target in the **Solution** to this recipe is the unitTest target. It consists of a single 
 task using the <sql> tag. The sole purpose of the <sql> task is to execute SQL within a designated 
 database. The <sql> tag contains a driver attribute that is used to list the JDBC driver for the target 
@@ -15220,7 +15218,7 @@ attribute for defining the database username and password, and a print attribute
 to print the result sets from the SQL statements. In the **Solution** to this recipe, the SQL that is required to 
 execute the unit tests is contained within the <sql> opening and closing tags. This causes the unit tests to 
 be executed as if you were issuing these statements at the SQL*Plus command prompt. 
- 
+```html
 <target name="unitTest" depends="compile" 
         description="Execute PLSQL Unit Tests" > 
     <sql 
@@ -15228,8 +15226,8 @@ be executed as if you were issuing these statements at the SQL*Plus command prom
      url = "${database.jdbc.url}" 
      userid = "${user}" 
      password = "${db_password}" 
-     print="true" 
-    > 
+     print="true" > 
+
       call utconfig.setfiledir('FILE_SYSTEM'); 
       call utconfig.setreporter('File'); 
       call utPLSQL.test('calc_quarter_hour'); 
@@ -15237,11 +15235,10 @@ be executed as if you were issuing these statements at the SQL*Plus command prom
       call utfilereporter.close(); 
       -- Returns output redirection to DBMS_OUTPUT 
       call utconfig.setreporter('Output'); 
-CHAPTER 17  UNIT TESTING WITH UTPLSQL 
-390 
     </sql> 
     
-  </target> 
+  </target>
+```
 To automate your Ant build, you will need to set up an operating system task that starts the Ant
 build. The task is very simple and needs to contain only very few lines. The following lines of code
 contain batch script for the Windows operating system that can be used to invoke the Ant build. This
