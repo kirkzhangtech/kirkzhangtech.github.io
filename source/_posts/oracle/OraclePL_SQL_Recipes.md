@@ -4827,7 +4827,8 @@ The TO_CHAR function works much like the other Oracle TO_ conversion functions i
 number value along with an optional format mask and nls language value. Table 6-3 describes the more 
 commonly used formatting mask characters for numbers. 
 Table 6-3. Common Formatting Mask Characters 
-···text
+
+```text
 Character Description 
 9 Represents a numeric character that displays only if a value is present 
 . Represents a decimal point 
@@ -4835,11 +4836,13 @@ Character Description
 $ Represents a dollar sign 
 0 Represents a numeric character that will always display, even if null 
 ```
-As you can see from the **Solution** to this recipe, the format mask of $999.00 is chosen. Why not use 
+
+As you can see from the Solution to this recipe, the format mask of $999.00 is chosen. Why not use 
 the mask of $999.99 for the conversion? By using the 0 instead of the 9, you ensure that the cents value 
 will always be present. Even if the cents value is zero, you will still get a .00 at the end of your string. 
 Essentially, the 0 character forces Oracle to pad with zeros rather than spaces. 
 You can also pad with zero characters to the left of the decimal. Here’s an example: 
+
 ```sql 
 select to_char(82,'0000099') from dual; 
 ```
@@ -5099,6 +5102,7 @@ as opposed to TO_NUMBER or TO_CHAR in most cases. The format for the CAST functi
 CAST(expression AS type_name) 
 You can use this function to convert between different datatypes. Table 6-5 lists the different to and
 from datatypes that the CAST function can handle. 
+
 ```text
 Table 6-5. CAST Function Converstion Table 
 CAST from Datatype To Datatype 
