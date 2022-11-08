@@ -1,0 +1,915 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n16. Accessing PL&#x2F;SQL from JDBCHTTP, Groovy, and JythonJava programs run on a virtual machine known as the Java virtual machine (JVM). A version of the JVM isavailable for most operating systems and is deployed on millions of servers, desktops, phones, and evenBlu-ray players throughout the world. Because of the widespread availability of the JVM, Java isconsidered a portable language: you can essentially write Java code once and run it just about anywhere,whether it’s on a Linux box, a Mac, Android phone, or a Windows desktop.The JVM has evolved over time, and Java is no longer the only language that can run on it. Therehave been many languages implemented in Java that provide different features for those who enjoydeveloping applications for the JVM. Each of these languages has its own syntax and constructs, andmany of them can be viable alternatives for developing scripts, desktop applications, or enterprise-levelweb applications. As such, this chapter not only covers the ins and outs of accessing PL&#x2F;SQL from Javaapplication code but also includes recipes for working with two popular dynamic languages that run onthe JVM: Jython and Groovy.This chapter is not intended to be an overall instruction set for using Java or any other language onthe JVM. It is meant for the purpose of demonstrating how to access PL&#x2F;SQL code from within theselanguages. The Java online community is outstanding, and a plethora of resources are available on theWeb for learning about Java or other languages on the JVM. For more detailed information, pleaseconsult those resources, because this chapter will only provide Solutions targeting PL&#x2F;SQL integration. \n16-1. Accessing a PL&#x2F;SQL Stored Procedure via JDBCProblemYou are writing a Java application that uses JDBC to access data, but you also want to call some PL&#x2F;SQLstored procedures from within your Java application.SolutionUse the JDBC API to connect to the database, and then execute prepareCall(), passing a string to it thatconsists of a PL&#x2F;SQL code block that calls the stored procedure. For example, consider a stand-aloneJava class that contains a method named increaseWage(). This method uses JDBC to obtain a databaseconnection, create a CallableStatement, and then invoke the PL&#x2F;SQL stored procedure that passes in therequired variables. \n\nimport java.sql.*; \nimport oracle.jdbc.*; \npublic class EmployeeFacade &#123; \n \n public void increaseWage() \n throws SQLException &#123; \n  int ret_code; \n  Connection conn &#x3D; null; \n  try &#123; \n    &#x2F;&#x2F;Load Oracle driver \n    DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver()); \n    &#x2F;&#x2F;Obtain a connection \n \n    conn &#x3D; DriverManager.getConnection(&quot;jdbc:oracle:thin:@hostname:port_number:mydb&quot;, \n                                                                              &quot;user&quot;, \n&quot;password&quot;); \n    int emp_id &#x3D; 199; \n    double increase_pct &#x3D; .02; \n    int upper_bound &#x3D; 10000; \n    CallableStatement pstmt &#x3D; \n    conn.prepareCall(&quot;begin increase_wage(?,?,?); end;&quot;); \n    pstmt.setInt(1, emp_id); \n    pstmt.setDouble(2, increase_pct); \n    pstmt.setInt(3, upper_bound); \n    pstmt.executeUpdate(); \n \n    pstmt.close(); \n    conn.commit(); \n    conn.close(); \n    System.out.println(&quot;Increase successful&quot;); \n  &#125; catch (SQLException e) &#123;ret_code &#x3D; e.getErrorCode(); \n    System.err.println(ret_code + e.getMessage()); conn.close();&#125; \n  &#125; \n \n  public static void main(String[] args)&#123; \n      EmployeeFacade facade &#x3D; new EmployeeFacade(); \n      try &#123; \n          facade.increaseWage(); \n      &#125; catch (SQLException e)&#123; \n          System.err.println(&quot;A database exception has occurred.&quot;); \n      &#125; \n  &#125; \n&#125;\nRunning this code within an integrated development environment such as NetBeans would result inthe following output: \nrun:Increase successfulBUILD SUCCESSFUL (total time: 4 seconds)The EmployeeFacade class contains a main() method that is used to initiate the execution of theincreaseWage() method. The increaseWage() method initializes three variables that are passed to theincrease_wage PL&#x2F;SQL stored procedure using a CallableStatement. \nHow It WorksIt is possible to invoke a PL&#x2F;SQL stored procedure from a JDBC call just as if you were issuing a call fromPL&#x2F;SQL. You can do so by passing a PL&#x2F;SQL code block that contains the procedure call as a string to theJDBC connection. In the Solution to the example we’ve chosen for this recipe, a Java class namedEmployeeFacade contains a method that makes a JDBC call to invoke a stored procedure. If you areunfamiliar with Java and database connectivity, you can see that using JDBC is very methodical. Thereare several steps that need to be taken in order to obtain a connection to the database, followed by thesteps to perform the database transaction and lastly to commit the changes and close all of the JDBCconstructs.Any Java work that is done using the JDBC API must include an exception handler for thejava.sql.SQLException. As the increaseWage() method demonstrates, the SQLException is handled usinga Java try-catch block. Prior to the try-catch block, a couple of variables are created that the rest of themethod will use. One of the variables is the java.sql.Connection, which is to be used to make aconnection to the database, execute the call, and then finally close the connection. In the next couple oflines, a try-catch block is started, and a connection is obtained to the Oracle Database using theDriverManager class. The getConnection() method accepts a JDBC URL pertaining to a database as wellas a user name and password. Note It is important to maintain a close watch on JDBC connections. They can be costly for performance, andonly a limited number of connections is usually available for use. For this reason, a connection should always beobtained, used, and then closed.If a connection is successfully made to the database, then a CallableStatement is created thatperforms all the work against the database. If you wanted to issue a query, then you would use aPreparedStatement instead because CallableStatements are most useful for making PL&#x2F;SQL calls. Astring containing a PL&#x2F;SQL code block is used to invoke the call to the PL&#x2F;SQL stored procedure. The callis a bit different from native PL&#x2F;SQL because it includes Java bind variables that represent theparameters that need to be passed into the procedure. A bind variable is represented by a question mark(?) character, and subsequent setter methods will be used to set values for each bind variable. After theCallableStatement’s prepareCall() method is invoked, variables are passed to the procedure using aseries of setXXX() methods on the CallableStatement. The set methods correlate with the type of datathat is being passed to the stored procedure, and they provide a positional parameter that maps thevariable to the bind variable position in the call. For instance, the first setInt(1, emp_id) methodcontains an integer variable, emp_id, and it will be passed to the bind variable in the first position withinthe call.After all the variables have been set, the executeUpdate() method is called in order to execute thecall to the procedure. If successful, program execution will continue. However, if unsuccessful for somereason, then a java.sql.SQLException will be thrown that will cause the execution of the Java program tobe passed to the catch block. Finally, if the transaction was a success, then the connection commits thetransaction, and the CallableStatement is closed, followed by the closing of the connection. You willnotice that the throws SQLException clause has been placed within the method declaration. When anyJava method contains a throws clause within the declaration, then you must code an exception handlerfor any Java code that calls the method. In this Solution, the throws clause has been put into place tohandle any exceptions that may be raised when closing the connection within the exception-handlingcatch block. For more information on Java exception handling, please see the online documentationavailable at http://download.oracle.com/javase/tutorial/essential/exceptions/handling.html.The JDBC API can be used to call PL&#x2F;SQL stored procedures by passing a PL&#x2F;SQL code block in theform of a Java String to a CallableStatement object. The majority of the code using JDBC is spentcreating and closing the database connections as well as the CallableStatements. If you are unfamiliarwith JDBC, then you can learn more about it at www.oracle.com/technetwork/java/overview-141217.html. It can be used for creating small Java programs or enterprise-level Java applications. TheJDBC API has been around since the early days of Java, so it is quite mature and allows you to access thedatabase and your PL&#x2F;SQL programs directly. \n16-2. Accessing a PL&#x2F;SQL Stored Function from JDBCProblemYou want to utilize a PL&#x2F;SQL function from a Java application that uses the JDBC API to connect to anOracle Database and returns a value to the Java application.SolutionUse the JDBC API and a CallableStatement to invoke the PL&#x2F;SQL function by passing a Java Stringcontaining the function call to the CallableStatement. The following example demonstrates a Javamethod that accepts a parameter of type double and then makes a JDBC call to the PL&#x2F;SQL functioncalc_quarter_hour using the parameter. It is assumed that this Java method is to be added into the classthat was created in Recipe 16-1. \npublic void calcQuarterHour(double hours) \n            throws SQLException &#123; \n        float returnValue; \n        int ret_code; \n        Connection conn &#x3D; null; \n        try &#123; \n            &#x2F;&#x2F;Load Oracle driver \n            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver()); \n            &#x2F;&#x2F;Obtain a connection \n \n            conn &#x3D; DriverManager.getConnection(&quot;jdbc:oracle:thin:@hostname:1521:mydb&quot;, \n                    &quot;user&quot;, &quot;password&quot;); \n \n            CallableStatement pstmt &#x3D; \n                    conn.prepareCall(&quot;&#123;? &#x3D; call calc_quarter_hour(?)&#125;&quot;); \n            \n            pstmt.registerOutParameter(1, java.sql.Types.FLOAT); \n            pstmt.setDouble(2, hours); \n            pstmt.execute(); \n            returnValue &#x3D; pstmt.getFloat(1); \n            pstmt.close(); \n            conn.commit(); \n            conn.close(); \n            System.out.println(&quot;The calculated value: &quot; + returnValue); \n        &#125; catch (SQLException e) &#123; \n            ret_code &#x3D; e.getErrorCode(); \n            System.err.println(ret_code + e.getMessage()); \n            conn.close(); \n        &#125; \n    &#125;\nUpdate the main method from the class that was created in Recipe 16-1 to the following code inorder to make a call to the new calcQuarterHour method. \npublic static void main(String[] args) &#123; \n        EmployeeFacade facade &#x3D; new EmployeeFacade(); \n        try &#123; \n            facade.calcQuarterHour(7.667); \n        &#125; catch (SQLException e) &#123; \n            System.err.println(&quot;A database exception has occurred.&quot;); \n        &#125; \n    &#125; \nRunning this code within an integrated development environment such as NetBeans would result inthe following output: \nrun: \nThe calculated value: 7.75 \nBUILD SUCCESSFUL (total time: 1 second) \nValues can be passed as parameters from Java to PL&#x2F;SQL, and in turn, PL&#x2F;SQL can pass returnvalues back to Java. This helps form a seamless integration between the two languages.How It WorksCalling a PL&#x2F;SQL function from a JDBC application is not very much different from using native PL&#x2F;SQL.The biggest difference is that you need to use the JDBC API to make the database call and to set andretrieve values from the database. The Solution to this recipe contains a Java method that accepts adouble value representing a number of hours. The method connects to the Oracle Database using theJDBC, calls the PL&#x2F;SQL function using a CallableStatement, and then returns the results.To make the connection, the database driver is first registered using theDriverManager.registerDriver() method and passing the appropriate driver for Oracle Database. Next,a connection is obtained using the DriverManager.getConnection() method by passing the URL for theOracle Database that will be used, along with the appropriate user name and password. In Recipe 16-1,obtaining JDBC connections is discussed in more detail. If you haven’t yet read Recipe 16-1 and areunfamiliar with JDBC, we recommend you read it for more information on this important aspect ofusing the JDBC API.Once a connection has been obtained, a CallableStatement is created by calling thejava.sql.Connection prepareCall() method and passing a Java String that contains the call to thePL&#x2F;SQL function. The function call is in the following format: \n&#123;? = call calc_quarter_hour(?)&#125; \nThe String is surrounded by curly braces ({}), and the call to the PL&#x2F;SQL function is preceded bythe ? &#x3D; characters. The question mark (?) character represents a bind variable in a Java preparedstatement.  Bind variables are used to represent the returning value as well as the parameter value thatwill be passed into the function. The first ? character represents the returning value, whereas the ?character within the parentheses correlates to the parameter being passed to the function. The PL&#x2F;SQLfunction is invoked using the call keyword followed by the function name.The next line of code registers the return value using the CallableStatementregisterOutParameter() method. This method accepts the bind variable position as its first argumentand accepts the datatype of the value as the second argument. In this example, the datatype isjava.sql.Types.FLOAT, which correlates to a PL&#x2F;SQL float type. Many different types are available withinjava.sql.Types, and if you are using a Java integrated development environment (IDE) that containscode completion, then you should see a list of all available types after you type the trailing dot whendeclaring java.sql.Type. Next, the parameter that will be passed into the PL&#x2F;SQL function is set bycalling the setDouble() method and passing the bind variable position along with the value. Lastly, theCallableStatement is executed by invoking the execute() method.If the function call is successful, then the return value of the function can be obtained by calling thegetFloat() method on the CallableStatement and passing the bind variable position. If you were callinga PL&#x2F;SQL function that had a different return type, then you would use the getter method that correlatesto the return type. This method will return the value of the call, so it should be assigned to a Javavariable. In the Solution, returnValue is the variable that is used to hold the value returned from thefunction call. Finally, the CallableStatement is closed, and the transaction is committed by calling thecommit() method on the java.sql.Connection.The entire method is enclosed within a Java exception-handling try-catch block. Code that iscontained within the try block may or may not throw an exception. If an exception is thrown, then it canbe caught by a subsequent catch block. For more information on Java exception handling, please see thedocumentation at http://download.oracle.com/javase/tutorial/essential/exceptions/handling.html.Interacting with PL&#x2F;SQL functions from within a Java application can be quite powerful. You willgain the most benefit if the function that you are calling is working with the data. Any application that isnot stored in the database will incur at least a minor performance hit when working with the databasebecause of connections and round-trips to and from the database server. If you have a PL&#x2F;SQL functionthat works with the database, then it can be more efficient to call the PL&#x2F;SQL function from your Javaapplication rather than reproducing that function in Java code. \n16-3.  Accessing PL&#x2F;SQL Web Procedures with HTTPProblemYou are developing a Java web application that uses an Oracle Database. You have already created aPL&#x2F;SQL web application that displays some particular data from your database that is generated from aninput identifier. You want to use the PL&#x2F;SQL web application to display that data by passing thenecessary input from the Java web application.SolutionWrite your PL&#x2F;SQL web program to accept parameter values within a URL. Pass the values from yourJava web application to the PL&#x2F;SQL application by embedding them within the URL that calls it. Whenthe URL is clicked, then it will redirect control to the PL&#x2F;SQL application, passing the parameters thatare required to display the correct data. Suppose, for example, that you are writing a Java webapplication that generates a list of employees on a web page. Suppose further that you have alreadywritten PL&#x2F;SQL web application that, given an employee_id, displays employee record details in abrowser. You want to combine that functionality with your Java program so that when you click one ofthe employees in the list generated by the Java web program, it passes the selected employee’s ID to thePL&#x2F;SQL web program. In turn, the PL&#x2F;SQL program will display the detail for that ticket. In the followingexample, the EMP_RPT package that was introduced in Recipe 14-4 is accessed via a Java Server Facespage. Note JSF is the Java standard for creation of server-side user interfaces. To learn more about this technology,please see the online documentation at www.oracle.com/technetwork/java/javaee/javaserverfaces-139869.html. \n&lt;?xml version='1.0' encoding='UTF-8' ?> \n&lt;!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"> \n&lt;html xmlns=\"http://www.w3.org/1999/xhtml\" \n      xmlns:ui=\"http://java.sun.com/jsf/facelets\" \n      xmlns:f=\"http://java.sun.com/jsf/core\" \n      xmlns:h=\"http://java.sun.com/jsf/html\"> \n \n    &lt;body> \n \n        &lt;ui:composition template=\"layout/my_layout.xhtml\"> \n \n            &lt;ui:define name=\"body\"> \n                &lt;f:view id=\"employeeView\"> \n                    &lt;h:form id=\"employeeResults\"> \n                        &lt;center> \n \n                            &lt;br/> \n                            &lt;h:messages id=\"messages\" \n                                        errorClass=\"error\" \n                                        infoClass=\"info\" /> \n                            &lt;br/> \n                            &lt;span class=\"sub_head_sub\"> \n                                Employee Listing \n                            &lt;/span> \n                            &lt;br/> \n                            &lt;br/> \n \n                            &lt;h:dataTable id=\"employeeList\" \n                                         rows=\"20\" \n                                         value=\"#&#123;employeeList&#125;\" \n                                         var=\"emp\"> \n                                &lt;f:facet name=\"header\"> \n                                    &lt;h:column > \n                                        &lt;h:outputText value=\"First Name\"/> \n                                    &lt;/h:column> \n                                    &lt;h:column > \n                                        &lt;h:outputText value=\"Last Name\"/> \n                                    &lt;/h:column> \n                                    &lt;h:column > \n                                        &lt;h:outputText value=\"Email\"/> \n                                    &lt;/h:column> \n                                &lt;/f:facet> \n \n                                &lt;h:column id=\"firstNameCol\"> \n                                    &lt;h:outputText id=\"firstName\" value=\"#&#123;emp.firstName&#125;\"/> \n                                &lt;/h:column> \n                                &lt;h:column id=\"lastNameCol\"> \n                                    &lt;h:outputText id=\"lastName\" value=\"#&#123;emp.lastName&#125;\"/> \n                                &lt;/h:column> \n \n                                &lt;h:column id=\"emailCol\"> \n                                    &lt;h:outputLink value=\"http://my-oracle-application-\nserver:7778/DAD/emp_rpt.rpt\" \n                                            target=\"_blank\"> \n                                        &lt;f:param name=\"emp_id\" value=\"#&#123;emp.employeeId&#125;\"/> \n                                        &lt;h:outputText id=\"email\" value=\"#&#123;emp.email&#125;\"/> \n                                    &lt;/h:outputLink> \n                                &lt;/h:column> \n \n \n                            &lt;/h:dataTable> \n \n \n \n                        &lt;/center> \n                    &lt;/h:form> \n \n                &lt;/f:view> \n \n            &lt;/ui:define> \n \n        &lt;/ui:composition> \n \n    &lt;/body> \n&lt;/html> \nThe JSF tags in this example would generate a web page that looks similar to Figure 16-1. However,it is important to note that JSF contains template functionality, so the look and feel of the user interfacecan be changed significantly if a different template were applied. CHAPTER 16  ACCESSING PL&#x2F;SQL FROM JDBC, HTTP, GROOVY, AND JYTHON353 \nFigure 16-1.  Employee listing JSF web page \nFor the sake of brevity, the Java code will not be displayed, because it is not essential for thisSolution. However, if you want to learn more about writing Java web applications utilizing the JavaServer Faces web framework, please see the online documentation available atwww.oracle.com/technetwork/java/javaee/javaserverfaces-139869.html.When you look at the JSF page output on your monitor, you’ll see that the EMAIL column values areblue. This signifies that they are links that will take you to another page when selected with the mouse.In this case, the link will redirect users to a PL&#x2F;SQL application that accepts the employee ID as inputand in turn displays a result. Figure 16-2 shows the output from the PL&#x2F;SQL web application when the e-mail user name SKING is selected from the JSF page. \nFigure 16-2.  PL&#x2F;SQL web application output \nHow It WorksDeveloping Java web applications and PL&#x2F;SQL web applications can be quite different. However,accessing one from the other can be quite easy and can create powerful Solutions. In this recipe, amashup consisting of a standard web URL passes data from a Java application to a PL&#x2F;SQL storedprocedure, and then the PL&#x2F;SQL stored procedure displays content via a web page.The PL&#x2F;SQL stored procedure in this recipe utilizes the built-in UTL_HTTP package to display content inHTML format via the Web. The procedure accepts one argument, an EMPLOYEE_ID. The given EMPLOYEE_IDfield is used to query the database, and the content that is retrieved is displayed. The procedure isaccessible from the Web because a Data Access Descriptor (DAD) has been created on the web server,which allows access to a particular schema’s web-accessible content. Using the DAD, a URLincorporating the host name, the DAD, and the procedure to be used can access the stored procedure.Please see Recipe 14-1 to learn more about creating DADs. For more details regarding the creation ofweb content using PL&#x2F;SQL, please refer to Chapter 14.The Java application Extensible Hypertext Markup Language (XHTML) page that is displayed in theSolution to this recipe creates a listing of employee names by querying the database using EJBtechnology. Enterprise Java Beans (EJB) is part of the Java Enterprise Edition stack that is used for objectrelational mapping of Java code and database entities. For more information regarding EJB technology,please refer to the documentation at www.oracle.com/technetwork/java/index-jsp-140203.html. The important code for this particular recipe is the web page code that resides within the JavaServer Faces XHTML page. The generated list of employee names is a list of URLs that contain the hostname of the Oracle Application Server, the DAD for the schema containing the PL&#x2F;SQL you want toaccess, and the name of the PL&#x2F;SQL stored procedure, which is EMP_RPT.RPT in this case. The URL alsocontains an embedded parameter that is passed to the stored procedure upon invocation. The followingcode shows an example of a URL that is generated by the Java application: \n&lt;a href=&quot;http://my-web-server:port/hr/EMP_RPT.RPT?emp_id=200&quot;&gt; The code that generates this URL is written in Java Server Faces using Facelets markup, as shownhere: \n&lt;h:outputLink value=\"http://my-oracle-application-server:port/DAD/emp_rpt.rpt\" \n                                            target=\"_blank\"> \n               &lt;f:param name=\"emp_id\" value=\"#&#123;emp.employeeId&#125;\"/> \n               &lt;h:outputText id=\"email\" value=\"#&#123;emp.email&#125;\"/> \n&lt;/h:outputLink> \nThe &amp;emp_id&#x3D;200 portion of the URL is the parameter name and value that is passed to theEMP_RPT.RPT procedure when called. In the case of the JSF markup, #{emp.employeeId} will pass thisvalue as a parameter to the URL. In turn, the EMP_RPT.RPT procedure queries the EMPLOYEES table for thegiven EMPLOYEE_ID and displays the record data. In a sense, the Java application performs a redirect tothe PL&#x2F;SQL stored procedure, as illustrated by Figure 16-3.  \nFigure 16-3. JSF to PL&#x2F;SQL web redirect Note Facelets is an open source web framework that is the default view handler technology for JSF.Any two languages that can be used to develop web applications can be used to create mashups in asimilar fashion. A regular HTML page can include links to any PL&#x2F;SQL stored procedure that has beendeployed and made available using a DAD. This is a simple technique that can be used to allowapplications to use data that resides in a remote database. \n16-4. Accessing PL&#x2F;SQL from JythonProblemYou are working with a Jython program and want to call some PL&#x2F;SQL stored procedures or functionsfrom it.Solution #1Use Jython’s zxJDBC API to obtain a connection to the Oracle Database, and then call the PL&#x2F;SQL storedprocedure passing parameters as required.  The following code is an example of a Jython script thatperforms these tasks: \nCHAPTER 16  ACCESSING PL&#x2F;SQL FROM JDBC, HTTP, GROOVY, AND JYTHON356from future import with_statementfrom com.ziclix.python.sql import zxJDBC \nSet up connection variablesjdbc_url &#x3D; “jdbc:oracle:thin:@host:1521:dbname”username &#x3D; “user”password &#x3D; “password”driver &#x3D; “oracle.jdbc.driver.OracleDriver” \nobtain a connection using the with-statmentwith zxJDBC.connect(jdbc_url, username, password, driver) as conn:    with conn:        with conn.cursor() as c:            c.callproc(‘increase_wage’,[199,.03,10000])            print ‘Procedure call complete’            conn.commit()This example does not display any real output; it only calls the INCREASE_WAGE procedure andperforms a commit. After the procedure is called, a line of text is printed to alert the user that theprocedure call is complete.Solution #2Use a Python web framework, such as Django, along with Jython to create a web application fordeployment to a Java application server. Use the selected web framework’s built-in syntax to invoke thestored procedure or function call.  \nDJANGODjango is a popular web framework that is used with the Python programming language. Django hasworked with Jython since the release of Jython 2.5. Django takes a model-view-controller approach toweb design, whereas all code is separated from web pages. The web pages use templating that makes iteasy to create dynamic and expressive web pages. Django uses an object-oriented approach to workingwith the database that is known as object relational mapping. For more information on the Djangoframework, please visit the Django web site at www.djangoproject.com/ and the Django-Jython projectthat is located at http://code.google.com/p/django-jython/. \nFor example, here’s how you might use the Django web framework to create a call to the PL&#x2F;SQLstored procedure CALC_QUARTER_HOUR that was demonstrated in Recipe 4-1. The following codedemonstrates an excerpt taken from a Django view to make a call to an Oracle PL&#x2F;SQL function: \nViews.pyfrom django.db import connection \ndef calc_hours(self, hours_in): \n        cursor &#x3D; connection.cursor() \n        ret &#x3D; cursor.callproc(&quot;CALC_QUARTER_HOUR&quot;, (hours_in))# calls PROCEDURE OR FUNCTION \n        cursor.close() \n        return ret \nThis view code only demonstrates a function written in Python or Jython that will perform the call tothe database and return a result.How It WorksThe Jython language is an incarnation of the Python language that has been implemented on the JVM.Using Jython provides a developer with all the corresponding syntax and language constructs that thePython language has to offer and allows them to be used to write applications running on the JVM.Furthermore, Jython applications have access to all the underlying libraries that the Java platform has tooffer, which is a tremendous asset to any developer. Jython is one of the first additional languagesdeveloped to run on the JVM. It has matured over the years, although it remains a bit behind its sisterlanguage Python in release number. Jython can be used for developing scripts, desktop applications, andenterprise-level web applications.Using the zxJDBC API to Solve the ProblemIn the first Solution to this recipe, Jython’s zxJDBC API is used to perform tasks against an OracleDatabase. zxJDBC is an extension of the Java JDBC API that allows Jython developers to program JDBCcalls in a Python-like syntax. Working with zxJDBC can be very efficient. It is similar to working withregular Java JDBC code, except the syntax makes development a bit easier since there are fewer lines ofcode to maintain. zxJDBC contains the function callproc() that can be used to make calls to PL&#x2F;SQLprocedures or functions. Once you have obtained a database connection, you allocate a cursor from theconnection and invoke that cursor’s callproc() function. The callproc() function accepts oneargument, which is the name of the PL&#x2F;SQL procedure to be called. The called procedure or function willreturn the results to the caller in a seamless manner. \nThe zxJDBC API is useful for writing stand-alone Jython applications or scripts. Many developersand database administrators use Jython to script their nightly jobs, allowing zxJDBC to invoke PL&#x2F;SQLfunctions and stored procedures. This is one alternative to using Oracle Scheduler for executingdatabase tasks, and it can allow for much more flexibility because all the libraries available for use on theJVM are at your disposal.Using Django to Solve the ProblemAlthough zxJDBC is a great way to work with the database, there are other techniques that can be usedfor creation of web content that accesses PL&#x2F;SQL. Many Jython users create web applications usingdifferent Python web frameworks. One such Python web framework is Django, and it can be used alongwith Jython to productively create web applications that run on the Java platform. The Djangoframework uses an object-oriented approach to work with the database. In other terms, Django providesan object-relational mapping Solution that allows developers to work with Python objects representingdatabase tables rather than working directly with SQL. \nDjango uses a model.py file to map a database table to a Python object. A views.py file is used toimplement separate views for the web site, and a urls.py file is used to contain the valid URL mappingsfor a Django application. In the Solution to this recipe, a Python function that would go into the views.pyfile is displayed. The purpose of this function is to make a connection to the database and invoke aPL&#x2F;SQL function call. The Django framework handles database connections for you by declaring someparameters for the database connection within a settings.py file for the project. As you can see from theexample, obtaining a connection is trivial because you merely import it from the django.db package. Thecode is similar to using zxJDBC for calling a PL&#x2F;SQL stored procedure or function. The cursor’scallProc() function is used to make the function call, and the syntax for performing that task is asfollows: \ncursor.callProc(function_or_procedure_name,(parameter_one, parameter_two, etc))\nThe function or procedure name should be a string value, and the parameters can passed as a tupleor listed one by one, separated by commas. If calling a PL&#x2F;SQL function, the callProc() function shouldbe assigned to a variable because there will be a return result. Lastly, the cursor should be closed in orderto release resources. Again, when using the Django framework connections to the database will behandled for you, so there is no need to worry about closing connections after a database call has beenmade. \nFor more information on using the Django web framework, please visit the project home page atwww.djangoproject.com. To use the Django web framework with Jython, you will also need to include thedjango-jython site package at http://code.google.com/p/django-jython/. \n16-5. Accessing PL&#x2F;SQL from GroovyProblemYou are writing a Groovy program and want to call some PL&#x2F;SQL stored procedures or functions from it.SolutionUse GroovySQL to establish a database connection, and make the call to the PL&#x2F;SQL stored program. Forexample, here’s how you would use of GroovySQL to connect to an Oracle Database and call a PL&#x2F;SQLfunction: \nimport groovy.sql.Sql \nimport oracle.jdbc.driver.OracleTypes \n \nSql sql &#x3D; Sql.newInstance(&quot;jdbc:oracle:thin:@hostname:1521:dbname&quot;, \n                                                  \n&quot;username&quot;,&quot;password&quot;,&quot;oracle.jdbc.driver.OracleDriver&quot;) \ndept_id &#x3D; 50 \n \nsql.call(&#39;&#123;? &#x3D; call calc_quarter_hour(?)&#125;&#39;, [Sql.DOUBLE, 6.35]) &#123; qtr_hour-&gt; \n  println qtr_hour \n&#125; \nShort and to the point, the Groovy script in this example connects to an Oracle Database, executes aPL&#x2F;SQL function call, returns a value, and prints the result. \nHow It WorksGroovy is a unique JVM language that is useful for developing productive and efficient applications. Itcan be used for developing a wide variety of applications, from scripts to enterprise-level webapplications. The syntax of the Groovy language is unlike that of other languages on the JVM because theGroovy compiler allows you to write Java code and it will be deemed as valid Groovy. However, Groovyalso has its own syntax that can be combined with Java syntax if you want to do so. Its flexibility allowsfor beginners to pick up the language as they go and allows advanced Groovy coders to write code inGroovy syntax that is magnitudes smaller than the amount of lines taken to write the same code in Java. \nIn the Solution to this example, the Groovy SQL API is used to connect to an Oracle Database andissue a PL&#x2F;SQL function call. The top of the script contains import statements. The imports in Groovywork in the same manner as Java imports. The groovy.sql.Sql import pulls all the Groovy SQLfunctionality into the script. The second import is used to pull in the Oracle driver.  \nThe database connection is made by using the Sql.newInstance method and passing the JDBC URLfor the database along with the user name, password, and database driver class. The actual PL&#x2F;SQLfunction call occurs with the Sql instance’s call() method, and the syntax is very similar to that of Java’sJDBC API, whereas you pass a string that is enclosed in curly braces in the following format. Thefollowing example demonstrates a call to the CALC_QUARTER_HOUR PL&#x2F;SQL function that was written inRecipe 4-1: \n&#123;? = call calc_quarter_hour(?)&#125; \nThe question mark characters (?) correlate to bind variables. The second argument that is passed tothe call() method is a list of parameters including the return type and value of the parameter that willbe passed to the PL&#x2F;SQL function. In this case, the PL&#x2F;SQL function’s return type isgroovy.sql.Sql.DOUBLE, and the value that will be passed to the function is 6.35. The code that followsthe call is some Groovy syntactic sugar and is otherwise known as a closure. By specifying curly braces({}) after the function call, you are telling Groovy to pass any return values to the variable containedwithin the braces. In this case, qtr_hour will contain the result from the PL&#x2F;SQL function call, and itprints the result upon return via use of the closure -&gt; notation and then specifying a print statementafterward. \nIf you have never seen Groovy code before, this syntax will seem a bit awkward. However, once youbecome used to the syntax, it will become a powerful asset to your tool box. It is easy to see that takingstandard Java JDBC implementations for accessing PL&#x2F;SQL and translating them into a differentlanguage will allow for the same PL&#x2F;SQL connectivity across most languages that run on the JVM. Formore information regarding the use of Groovy, Groovy SQL, or closures in Groovy, please see the onlinedocumentation at http://groovy.codehaus.org/Beginners+Tutorial. \n","dateCreated":"2022-11-08T23:23:17+08:00","dateModified":"2022-11-08T23:41:03+08:00","datePublished":"2022-11-08T23:23:17+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 16-Accessing PL&#x2F;SQL from JDBC">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:23:17.865Z">
+<meta property="article:modified_time" content="2022-11-08T15:41:03.765Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:23:17+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#16-Accessing-PL-x2F-SQL-from-JDBC"><span class="toc-text">16. Accessing PL&#x2F;SQL from JDBC</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#16-1-Accessing-a-PL-x2F-SQL-Stored-Procedure-via-JDBC"><span class="toc-text">16-1. Accessing a PL&#x2F;SQL Stored Procedure via JDBC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-2-Accessing-a-PL-x2F-SQL-Stored-Function-from-JDBC"><span class="toc-text">16-2. Accessing a PL&#x2F;SQL Stored Function from JDBC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-3-Accessing-PL-x2F-SQL-Web-Procedures-with-HTTP"><span class="toc-text">16-3.  Accessing PL&#x2F;SQL Web Procedures with HTTP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-4-Accessing-PL-x2F-SQL-from-Jython"><span class="toc-text">16-4. Accessing PL&#x2F;SQL from Jython</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-5-Accessing-PL-x2F-SQL-from-Groovy"><span class="toc-text">16-5. Accessing PL&#x2F;SQL from Groovy</span></a></li></ol></li></ol>
+
+<h1 id="16-Accessing-PL-x2F-SQL-from-JDBC"><a href="#16-Accessing-PL-x2F-SQL-from-JDBC" class="headerlink" title="16. Accessing PL&#x2F;SQL from JDBC"></a>16. Accessing PL&#x2F;SQL from JDBC</h1><p>HTTP, Groovy, and Jython<br>Java programs run on a virtual machine known as the Java virtual machine (JVM). A version of the JVM is<br>available for most operating systems and is deployed on millions of servers, desktops, phones, and even<br>Blu-ray players throughout the world. Because of the widespread availability of the JVM, Java is<br>considered a portable language: you can essentially write Java code once and run it just about anywhere,<br>whether it’s on a Linux box, a Mac, Android phone, or a Windows desktop.<br>The JVM has evolved over time, and Java is no longer the only language that can run on it. There<br>have been many languages implemented in Java that provide different features for those who enjoy<br>developing applications for the JVM. Each of these languages has its own syntax and constructs, and<br>many of them can be viable alternatives for developing scripts, desktop applications, or enterprise-level<br>web applications. As such, this chapter not only covers the ins and outs of accessing PL&#x2F;SQL from Java<br>application code but also includes recipes for working with two popular dynamic languages that run on<br>the JVM: Jython and Groovy.<br>This chapter is not intended to be an overall instruction set for using Java or any other language on<br>the JVM. It is meant for the purpose of demonstrating how to access PL&#x2F;SQL code from within these<br>languages. The Java online community is outstanding, and a plethora of resources are available on the<br>Web for learning about Java or other languages on the JVM. For more detailed information, please<br>consult those resources, because this chapter will only provide <strong>Solution</strong>s targeting PL&#x2F;SQL integration. </p>
+<h2 id="16-1-Accessing-a-PL-x2F-SQL-Stored-Procedure-via-JDBC"><a href="#16-1-Accessing-a-PL-x2F-SQL-Stored-Procedure-via-JDBC" class="headerlink" title="16-1. Accessing a PL&#x2F;SQL Stored Procedure via JDBC"></a>16-1. Accessing a PL&#x2F;SQL Stored Procedure via JDBC</h2><p><strong>Problem</strong><br>You are writing a Java application that uses JDBC to access data, but you also want to call some PL&#x2F;SQL<br>stored procedures from within your Java application.<br><strong>Solution</strong><br>Use the JDBC API to connect to the database, and then execute prepareCall(), passing a string to it that<br>consists of a PL&#x2F;SQL code block that calls the stored procedure. For example, consider a stand-alone<br>Java class that contains a method named increaseWage(). This method uses JDBC to obtain a database<br>connection, create a CallableStatement, and then invoke the PL&#x2F;SQL stored procedure that passes in the<br>required variables. </p>
+<pre class="language-java" data-language="java"><code class="language-java">
+import java.sql.*; 
+import oracle.jdbc.*; 
+public class EmployeeFacade &#123; 
+ 
+ public void increaseWage() 
+ throws SQLException &#123; 
+  int ret_code; 
+  Connection conn &#x3D; null; 
+  try &#123; 
+    &#x2F;&#x2F;Load Oracle driver 
+    DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver()); 
+    &#x2F;&#x2F;Obtain a connection 
+ 
+    conn &#x3D; DriverManager.getConnection(&quot;jdbc:oracle:thin:@hostname:port_number:mydb&quot;, 
+                                                                              &quot;user&quot;, 
+&quot;password&quot;); 
+    int emp_id &#x3D; 199; 
+    double increase_pct &#x3D; .02; 
+    int upper_bound &#x3D; 10000; 
+    CallableStatement pstmt &#x3D; 
+    conn.prepareCall(&quot;begin increase_wage(?,?,?); end;&quot;); 
+    pstmt.setInt(1, emp_id); 
+    pstmt.setDouble(2, increase_pct); 
+    pstmt.setInt(3, upper_bound); 
+    pstmt.executeUpdate(); 
+ 
+    pstmt.close(); 
+    conn.commit(); 
+    conn.close(); 
+    System.out.println(&quot;Increase successful&quot;); 
+  &#125; catch (SQLException e) &#123;ret_code &#x3D; e.getErrorCode(); 
+    System.err.println(ret_code + e.getMessage()); conn.close();&#125; 
+  &#125; 
+ 
+  public static void main(String[] args)&#123; 
+      EmployeeFacade facade &#x3D; new EmployeeFacade(); 
+      try &#123; 
+          facade.increaseWage(); 
+      &#125; catch (SQLException e)&#123; 
+          System.err.println(&quot;A database exception has occurred.&quot;); 
+      &#125; 
+  &#125; 
+&#125;</code></pre>
+<p>Running this code within an integrated development environment such as NetBeans would result in<br>the following output: </p>
+<p>run:<br>Increase successful<br>BUILD SUCCESSFUL (total time: 4 seconds)<br>The EmployeeFacade class contains a main() method that is used to initiate the execution of the<br>increaseWage() method. The increaseWage() method initializes three variables that are passed to the<br>increase_wage PL&#x2F;SQL stored procedure using a CallableStatement. </p>
+<p><strong>How It Works</strong><br>It is possible to invoke a PL&#x2F;SQL stored procedure from a JDBC call just as if you were issuing a call from<br>PL&#x2F;SQL. You can do so by passing a PL&#x2F;SQL code block that contains the procedure call as a string to the<br>JDBC connection. In the <strong>Solution</strong> to the example we’ve chosen for this recipe, a Java class named<br>EmployeeFacade contains a method that makes a JDBC call to invoke a stored procedure. If you are<br>unfamiliar with Java and database connectivity, you can see that using JDBC is very methodical. There<br>are several steps that need to be taken in order to obtain a connection to the database, followed by the<br>steps to perform the database transaction and lastly to commit the changes and close all of the JDBC<br>constructs.<br>Any Java work that is done using the JDBC API must include an exception handler for the<br>java.sql.SQLException. As the increaseWage() method demonstrates, the SQLException is handled using<br>a Java try-catch block. Prior to the try-catch block, a couple of variables are created that the rest of the<br>method will use. One of the variables is the java.sql.Connection, which is to be used to make a<br>connection to the database, execute the call, and then finally close the connection. In the next couple of<br>lines, a try-catch block is started, and a connection is obtained to the Oracle Database using the<br>DriverManager class. The getConnection() method accepts a JDBC URL pertaining to a database as well<br>as a user name and password.<br> Note It is important to maintain a close watch on JDBC connections. They can be costly for performance, and<br>only a limited number of connections is usually available for use. For this reason, a connection should always be<br>obtained, used, and then closed.<br>If a connection is successfully made to the database, then a CallableStatement is created that<br>performs all the work against the database. If you wanted to issue a query, then you would use a<br>PreparedStatement instead because CallableStatements are most useful for making PL&#x2F;SQL calls. A<br>string containing a PL&#x2F;SQL code block is used to invoke the call to the PL&#x2F;SQL stored procedure. The call<br>is a bit different from native PL&#x2F;SQL because it includes Java bind variables that represent the<br>parameters that need to be passed into the procedure. A bind variable is represented by a question mark<br>(?) character, and subsequent setter methods will be used to set values for each bind variable. After the<br>CallableStatement’s prepareCall() method is invoked, variables are passed to the procedure using a<br>series of setXXX() methods on the CallableStatement. The set methods correlate with the type of data<br>that is being passed to the stored procedure, and they provide a positional parameter that maps the<br>variable to the bind variable position in the call. For instance, the first setInt(1, emp_id) method<br>contains an integer variable, emp_id, and it will be passed to the bind variable in the first position within<br>the call.<br>After all the variables have been set, the executeUpdate() method is called in order to execute the<br>call to the procedure. If successful, program execution will continue. However, if unsuccessful for some<br>reason, then a java.sql.SQLException will be thrown that will cause the execution of the Java program to<br>be passed to the catch block. Finally, if the transaction was a success, then the connection commits the<br>transaction, and the CallableStatement is closed, followed by the closing of the connection. You will<br>notice that the throws SQLException clause has been placed within the method declaration. When any<br>Java method contains a throws clause within the declaration, then you must code an exception handler<br>for any Java code that calls the method. In this <strong>Solution</strong>, the throws clause has been put into place to<br>handle any exceptions that may be raised when closing the connection within the exception-handling<br>catch block. For more information on Java exception handling, please see the online documentation<br>available at <a target="_blank" rel="noopener" href="http://download.oracle.com/javase/tutorial/essential/exceptions/handling.html">http://download.oracle.com/javase/tutorial/essential/exceptions/handling.html</a>.<br>The JDBC API can be used to call PL&#x2F;SQL stored procedures by passing a PL&#x2F;SQL code block in the<br>form of a Java String to a CallableStatement object. The majority of the code using JDBC is spent<br>creating and closing the database connections as well as the CallableStatements. If you are unfamiliar<br>with JDBC, then you can learn more about it at <a target="_blank" rel="noopener" href="http://www.oracle.com/technetwork/java/overview-">www.oracle.com/technetwork/java/overview-</a><br>141217.html. It can be used for creating small Java programs or enterprise-level Java applications. The<br>JDBC API has been around since the early days of Java, so it is quite mature and allows you to access the<br>database and your PL&#x2F;SQL programs directly. </p>
+<h2 id="16-2-Accessing-a-PL-x2F-SQL-Stored-Function-from-JDBC"><a href="#16-2-Accessing-a-PL-x2F-SQL-Stored-Function-from-JDBC" class="headerlink" title="16-2. Accessing a PL&#x2F;SQL Stored Function from JDBC"></a>16-2. Accessing a PL&#x2F;SQL Stored Function from JDBC</h2><p><strong>Problem</strong><br>You want to utilize a PL&#x2F;SQL function from a Java application that uses the JDBC API to connect to an<br>Oracle Database and returns a value to the Java application.<br><strong>Solution</strong><br>Use the JDBC API and a CallableStatement to invoke the PL&#x2F;SQL function by passing a Java String<br>containing the function call to the CallableStatement. The following example demonstrates a Java<br>method that accepts a parameter of type double and then makes a JDBC call to the PL&#x2F;SQL function<br>calc_quarter_hour using the parameter. It is assumed that this Java method is to be added into the class<br>that was created in Recipe 16-1. </p>
+<pre class="language-java" data-language="java"><code class="language-java">public void calcQuarterHour(double hours) 
+            throws SQLException &#123; 
+        float returnValue; 
+        int ret_code; 
+        Connection conn &#x3D; null; 
+        try &#123; 
+            &#x2F;&#x2F;Load Oracle driver 
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver()); 
+            &#x2F;&#x2F;Obtain a connection 
+ 
+            conn &#x3D; DriverManager.getConnection(&quot;jdbc:oracle:thin:@hostname:1521:mydb&quot;, 
+                    &quot;user&quot;, &quot;password&quot;); 
+ 
+            CallableStatement pstmt &#x3D; 
+                    conn.prepareCall(&quot;&#123;? &#x3D; call calc_quarter_hour(?)&#125;&quot;); 
+            
+            pstmt.registerOutParameter(1, java.sql.Types.FLOAT); 
+            pstmt.setDouble(2, hours); 
+            pstmt.execute(); 
+            returnValue &#x3D; pstmt.getFloat(1); 
+            pstmt.close(); 
+            conn.commit(); 
+            conn.close(); 
+            System.out.println(&quot;The calculated value: &quot; + returnValue); 
+        &#125; catch (SQLException e) &#123; 
+            ret_code &#x3D; e.getErrorCode(); 
+            System.err.println(ret_code + e.getMessage()); 
+            conn.close(); 
+        &#125; 
+    &#125;</code></pre>
+<p>Update the main method from the class that was created in Recipe 16-1 to the following code in<br>order to make a call to the new calcQuarterHour method. </p>
+<pre class="language-java" data-language="java"><code class="language-java">public static void main(String[] args) &#123; 
+        EmployeeFacade facade &#x3D; new EmployeeFacade(); 
+        try &#123; 
+            facade.calcQuarterHour(7.667); 
+        &#125; catch (SQLException e) &#123; 
+            System.err.println(&quot;A database exception has occurred.&quot;); 
+        &#125; 
+    &#125; </code></pre>
+<p>Running this code within an integrated development environment such as NetBeans would result in<br>the following output: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">run: 
+The calculated value: 7.75 
+BUILD SUCCESSFUL (total time: 1 second) </code></pre>
+<p>Values can be passed as parameters from Java to PL&#x2F;SQL, and in turn, PL&#x2F;SQL can pass return<br>values back to Java. This helps form a seamless integration between the two languages.<br><strong>How It Works</strong><br>Calling a PL&#x2F;SQL function from a JDBC application is not very much different from using native PL&#x2F;SQL.<br>The biggest difference is that you need to use the JDBC API to make the database call and to set and<br>retrieve values from the database. The <strong>Solution</strong> to this recipe contains a Java method that accepts a<br>double value representing a number of hours. The method connects to the Oracle Database using the<br>JDBC, calls the PL&#x2F;SQL function using a CallableStatement, and then returns the results.<br>To make the connection, the database driver is first registered using the<br>DriverManager.registerDriver() method and passing the appropriate driver for Oracle Database. Next,<br>a connection is obtained using the DriverManager.getConnection() method by passing the URL for the<br>Oracle Database that will be used, along with the appropriate user name and password. In Recipe 16-1,<br>obtaining JDBC connections is discussed in more detail. If you haven’t yet read Recipe 16-1 and are<br>unfamiliar with JDBC, we recommend you read it for more information on this important aspect of<br>using the JDBC API.<br>Once a connection has been obtained, a CallableStatement is created by calling the<br>java.sql.Connection prepareCall() method and passing a Java String that contains the call to the<br>PL&#x2F;SQL function. The function call is in the following format: </p>
+<p><code>&#123;? = call calc_quarter_hour(?)&#125; </code></p>
+<p>The String is surrounded by curly braces ({}), and the call to the PL&#x2F;SQL function is preceded by<br>the ? &#x3D; characters. The question mark (?) character represents a bind variable in a Java prepared<br>statement.  Bind variables are used to represent the returning value as well as the parameter value that<br>will be passed into the function. The first ? character represents the returning value, whereas the ?<br>character within the parentheses correlates to the parameter being passed to the function. The PL&#x2F;SQL<br>function is invoked using the call keyword followed by the function name.<br>The next line of code registers the return value using the CallableStatement<br>registerOutParameter() method. This method accepts the bind variable position as its first argument<br>and accepts the datatype of the value as the second argument. In this example, the datatype is<br>java.sql.Types.FLOAT, which correlates to a PL&#x2F;SQL float type. Many different types are available within<br>java.sql.Types, and if you are using a Java integrated development environment (IDE) that contains<br>code completion, then you should see a list of all available types after you type the trailing dot when<br>declaring java.sql.Type. Next, the parameter that will be passed into the PL&#x2F;SQL function is set by<br>calling the setDouble() method and passing the bind variable position along with the value. Lastly, the<br>CallableStatement is executed by invoking the execute() method.<br>If the function call is successful, then the return value of the function can be obtained by calling the<br>getFloat() method on the CallableStatement and passing the bind variable position. If you were calling<br>a PL&#x2F;SQL function that had a different return type, then you would use the getter method that correlates<br>to the return type. This method will return the value of the call, so it should be assigned to a Java<br>variable. In the <strong>Solution</strong>, returnValue is the variable that is used to hold the value returned from the<br>function call. Finally, the CallableStatement is closed, and the transaction is committed by calling the<br>commit() method on the java.sql.Connection.<br>The entire method is enclosed within a Java exception-handling try-catch block. Code that is<br>contained within the try block may or may not throw an exception. If an exception is thrown, then it can<br>be caught by a subsequent catch block. For more information on Java exception handling, please see the<br>documentation at <a target="_blank" rel="noopener" href="http://download.oracle.com/javase/tutorial/essential/exceptions/handling.html">http://download.oracle.com/javase/tutorial/essential/exceptions/handling.html</a>.<br>Interacting with PL&#x2F;SQL functions from within a Java application can be quite powerful. You will<br>gain the most benefit if the function that you are calling is working with the data. Any application that is<br>not stored in the database will incur at least a minor performance hit when working with the database<br>because of connections and round-trips to and from the database server. If you have a PL&#x2F;SQL function<br>that works with the database, then it can be more efficient to call the PL&#x2F;SQL function from your Java<br>application rather than reproducing that function in Java code. </p>
+<h2 id="16-3-Accessing-PL-x2F-SQL-Web-Procedures-with-HTTP"><a href="#16-3-Accessing-PL-x2F-SQL-Web-Procedures-with-HTTP" class="headerlink" title="16-3.  Accessing PL&#x2F;SQL Web Procedures with HTTP"></a>16-3.  Accessing PL&#x2F;SQL Web Procedures with HTTP</h2><p><strong>Problem</strong><br>You are developing a Java web application that uses an Oracle Database. You have already created a<br>PL&#x2F;SQL web application that displays some particular data from your database that is generated from an<br>input identifier. You want to use the PL&#x2F;SQL web application to display that data by passing the<br>necessary input from the Java web application.<br><strong>Solution</strong><br>Write your PL&#x2F;SQL web program to accept parameter values within a URL. Pass the values from your<br>Java web application to the PL&#x2F;SQL application by embedding them within the URL that calls it. When<br>the URL is clicked, then it will redirect control to the PL&#x2F;SQL application, passing the parameters that<br>are required to display the correct data. Suppose, for example, that you are writing a Java web<br>application that generates a list of employees on a web page. Suppose further that you have already<br>written PL&#x2F;SQL web application that, given an employee_id, displays employee record details in a<br>browser. You want to combine that functionality with your Java program so that when you click one of<br>the employees in the list generated by the Java web program, it passes the selected employee’s ID to the<br>PL&#x2F;SQL web program. In turn, the PL&#x2F;SQL program will display the detail for that ticket. In the following<br>example, the EMP_RPT package that was introduced in Recipe 14-4 is accessed via a Java Server Faces<br>page.<br> Note JSF is the Java standard for creation of server-side user interfaces. To learn more about this technology,<br>please see the online documentation at <a target="_blank" rel="noopener" href="http://www.oracle.com/technetwork/java/javaee/javaserverfaces-">www.oracle.com/technetwork/java/javaee/javaserverfaces-</a><br>139869.html. </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token prolog">&lt;?xml version='1.0' encoding='UTF-8' ?></span> 
+<span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span> <span class="token name">PUBLIC</span> <span class="token string">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> 
+<span class="token string">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.w3.org/1999/xhtml<span class="token punctuation">"</span></span> 
+      <span class="token attr-name"><span class="token namespace">xmlns:</span>ui</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://java.sun.com/jsf/facelets<span class="token punctuation">"</span></span> 
+      <span class="token attr-name"><span class="token namespace">xmlns:</span>f</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://java.sun.com/jsf/core<span class="token punctuation">"</span></span> 
+      <span class="token attr-name"><span class="token namespace">xmlns:</span>h</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://java.sun.com/jsf/html<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+ 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span> 
+ 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">ui:</span>composition</span> <span class="token attr-name">template</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>layout/my_layout.xhtml<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+ 
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">ui:</span>define</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>body<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">f:</span>view</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>employeeView<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>form</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>employeeResults<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>center</span><span class="token punctuation">></span></span> 
+ 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span> 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>messages</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>messages<span class="token punctuation">"</span></span> 
+                                        <span class="token attr-name">errorClass</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>error<span class="token punctuation">"</span></span> 
+                                        <span class="token attr-name">infoClass</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>info<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span> 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span> 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>span</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sub_head_sub<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                                Employee Listing 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>span</span><span class="token punctuation">></span></span> 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span> 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span> 
+ 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>dataTable</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>employeeList<span class="token punctuation">"</span></span> 
+                                         <span class="token attr-name">rows</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>20<span class="token punctuation">"</span></span> 
+                                         <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#&#123;employeeList&#125;<span class="token punctuation">"</span></span> 
+                                         <span class="token attr-name">var</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>emp<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">f:</span>facet</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>header<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>column</span> <span class="token punctuation">></span></span> 
+                                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputText</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>First Name<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>column</span><span class="token punctuation">></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>column</span> <span class="token punctuation">></span></span> 
+                                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputText</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Last Name<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>column</span><span class="token punctuation">></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>column</span> <span class="token punctuation">></span></span> 
+                                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputText</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Email<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>column</span><span class="token punctuation">></span></span> 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">f:</span>facet</span><span class="token punctuation">></span></span> 
+ 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>column</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>firstNameCol<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputText</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>firstName<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#&#123;emp.firstName&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>column</span><span class="token punctuation">></span></span> 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>column</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>lastNameCol<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputText</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>lastName<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#&#123;emp.lastName&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>column</span><span class="token punctuation">></span></span> 
+ 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>column</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>emailCol<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputLink</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://my-oracle-application-
+server:7778/DAD/emp_rpt.rpt<span class="token punctuation">"</span></span> 
+                                            <span class="token attr-name">target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>_blank<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+                                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">f:</span>param</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>emp_id<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#&#123;emp.employeeId&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+                                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputText</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>email<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#&#123;emp.email&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+                                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>outputLink</span><span class="token punctuation">></span></span> 
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>column</span><span class="token punctuation">></span></span> 
+ 
+ 
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>dataTable</span><span class="token punctuation">></span></span> 
+ 
+ 
+ 
+                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>center</span><span class="token punctuation">></span></span> 
+                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>form</span><span class="token punctuation">></span></span> 
+ 
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">f:</span>view</span><span class="token punctuation">></span></span> 
+ 
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">ui:</span>define</span><span class="token punctuation">></span></span> 
+ 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">ui:</span>composition</span><span class="token punctuation">></span></span> 
+ 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span> </code></pre>
+<p>The JSF tags in this example would generate a web page that looks similar to Figure 16-1. However,<br>it is important to note that JSF contains template functionality, so the look and feel of the user interface<br>can be changed significantly if a different template were applied.<br> CHAPTER 16  ACCESSING PL&#x2F;SQL FROM JDBC, HTTP, GROOVY, AND JYTHON<br>353 </p>
+<p>Figure 16-1.  Employee listing JSF web page </p>
+<p>For the sake of brevity, the Java code will not be displayed, because it is not essential for this<br><strong>Solution</strong>. However, if you want to learn more about writing Java web applications utilizing the Java<br>Server Faces web framework, please see the online documentation available at<br><a target="_blank" rel="noopener" href="http://www.oracle.com/technetwork/java/javaee/javaserverfaces-139869.html">www.oracle.com/technetwork/java/javaee/javaserverfaces-139869.html</a>.<br>When you look at the JSF page output on your monitor, you’ll see that the EMAIL column values are<br>blue. This signifies that they are links that will take you to another page when selected with the mouse.<br>In this case, the link will redirect users to a PL&#x2F;SQL application that accepts the employee ID as input<br>and in turn displays a result. Figure 16-2 shows the output from the PL&#x2F;SQL web application when the e-<br>mail user name SKING is selected from the JSF page. </p>
+<p>Figure 16-2.  PL&#x2F;SQL web application output </p>
+<p><strong>How It Works</strong><br>Developing Java web applications and PL&#x2F;SQL web applications can be quite different. However,<br>accessing one from the other can be quite easy and can create powerful Solutions. In this recipe, a<br>mashup consisting of a standard web URL passes data from a Java application to a PL&#x2F;SQL stored<br>procedure, and then the PL&#x2F;SQL stored procedure displays content via a web page.<br>The PL&#x2F;SQL stored procedure in this recipe utilizes the built-in UTL_HTTP package to display content in<br>HTML format via the Web. The procedure accepts one argument, an EMPLOYEE_ID. The given EMPLOYEE_ID<br>field is used to query the database, and the content that is retrieved is displayed. The procedure is<br>accessible from the Web because a Data Access Descriptor (DAD) has been created on the web server,<br>which allows access to a particular schema’s web-accessible content. Using the DAD, a URL<br>incorporating the host name, the DAD, and the procedure to be used can access the stored procedure.<br>Please see Recipe 14-1 to learn more about creating DADs. For more details regarding the creation of<br>web content using PL&#x2F;SQL, please refer to Chapter 14.<br>The Java application Extensible Hypertext Markup Language (XHTML) page that is displayed in the<br>Solution to this recipe creates a listing of employee names by querying the database using EJB<br>technology. Enterprise Java Beans (EJB) is part of the Java Enterprise Edition stack that is used for object<br>relational mapping of Java code and database entities. For more information regarding EJB technology,<br>please refer to the documentation at <a target="_blank" rel="noopener" href="http://www.oracle.com/technetwork/java/index-jsp-140203.html">www.oracle.com/technetwork/java/index-jsp-140203.html</a>.<br> The important code for this particular recipe is the web page code that resides within the Java<br>Server Faces XHTML page. The generated list of employee names is a list of URLs that contain the host<br>name of the Oracle Application Server, the DAD for the schema containing the PL&#x2F;SQL you want to<br>access, and the name of the PL&#x2F;SQL stored procedure, which is EMP_RPT.RPT in this case. The URL also<br>contains an embedded parameter that is passed to the stored procedure upon invocation. The following<br>code shows an example of a URL that is generated by the Java application: </p>
+<p><code>&lt;a href=&quot;http://my-web-server:port/hr/EMP_RPT.RPT?emp_id=200&quot;&gt; </code><br>The code that generates this URL is written in Java Server Faces using Facelets markup, as shown<br>here: </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputLink</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://my-oracle-application-server:port/DAD/emp_rpt.rpt<span class="token punctuation">"</span></span> 
+                                            <span class="token attr-name">target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>_blank<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+               <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">f:</span>param</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>emp_id<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#&#123;emp.employeeId&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+               <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>outputText</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>email<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#&#123;emp.email&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>outputLink</span><span class="token punctuation">></span></span> </code></pre>
+<p>The &amp;emp_id&#x3D;200 portion of the URL is the parameter name and value that is passed to the<br>EMP_RPT.RPT procedure when called. In the case of the JSF markup, #{emp.employeeId} will pass this<br>value as a parameter to the URL. In turn, the EMP_RPT.RPT procedure queries the EMPLOYEES table for the<br>given EMPLOYEE_ID and displays the record data. In a sense, the Java application performs a redirect to<br>the PL&#x2F;SQL stored procedure, as illustrated by Figure 16-3.  </p>
+<p>Figure 16-3. JSF to PL&#x2F;SQL web redirect<br> Note Facelets is an open source web framework that is the default view handler technology for JSF.<br>Any two languages that can be used to develop web applications can be used to create mashups in a<br>similar fashion. A regular HTML page can include links to any PL&#x2F;SQL stored procedure that has been<br>deployed and made available using a DAD. This is a simple technique that can be used to allow<br>applications to use data that resides in a remote database. </p>
+<h2 id="16-4-Accessing-PL-x2F-SQL-from-Jython"><a href="#16-4-Accessing-PL-x2F-SQL-from-Jython" class="headerlink" title="16-4. Accessing PL&#x2F;SQL from Jython"></a>16-4. Accessing PL&#x2F;SQL from Jython</h2><p><strong>Problem</strong><br>You are working with a Jython program and want to call some PL&#x2F;SQL stored procedures or functions<br>from it.<br><strong>Solution</strong> #1<br>Use Jython’s zxJDBC API to obtain a connection to the Oracle Database, and then call the PL&#x2F;SQL stored<br>procedure passing parameters as required.  The following code is an example of a Jython script that<br>performs these tasks: </p>
+<p>CHAPTER 16  ACCESSING PL&#x2F;SQL FROM JDBC, HTTP, GROOVY, AND JYTHON<br>356<br>from <strong>future</strong> import with_statement<br>from com.ziclix.python.sql import zxJDBC </p>
+<p>Set up connection variables<br>jdbc_url &#x3D; “jdbc:oracle:thin:@host:1521:dbname”<br>username &#x3D; “user”<br>password &#x3D; “password”<br>driver &#x3D; “oracle.jdbc.driver.OracleDriver” </p>
+<p>obtain a connection using the with-statment<br>with zxJDBC.connect(jdbc_url, username, password, driver) as conn:<br>    with conn:<br>        with conn.cursor() as c:<br>            c.callproc(‘increase_wage’,[199,.03,10000])<br>            print ‘Procedure call complete’<br>            conn.commit()<br>This example does not display any real output; it only calls the INCREASE_WAGE procedure and<br>performs a commit. After the procedure is called, a line of text is printed to alert the user that the<br>procedure call is complete.<br><strong>Solution</strong> #2<br>Use a Python web framework, such as Django, along with Jython to create a web application for<br>deployment to a Java application server. Use the selected web framework’s built-in syntax to invoke the<br>stored procedure or function call.  </p>
+<p><code>DJANGO</code><br>Django is a popular web framework that is used with the Python programming language. Django has<br>worked with Jython since the release of Jython 2.5. Django takes a model-view-controller approach to<br>web design, whereas all code is separated from web pages. The web pages use templating that makes it<br>easy to create dynamic and expressive web pages. Django uses an object-oriented approach to working<br>with the database that is known as object relational mapping. For more information on the Django<br>framework, please visit the Django web site at <a target="_blank" rel="noopener" href="http://www.djangoproject.com/">www.djangoproject.com/</a> and the Django-Jython project<br>that is located at <a target="_blank" rel="noopener" href="http://code.google.com/p/django-jython/">http://code.google.com/p/django-jython/</a>. </p>
+<p>For example, here’s how you might use the Django web framework to create a call to the PL&#x2F;SQL<br>stored procedure CALC_QUARTER_HOUR that was demonstrated in Recipe 4-1. The following code<br>demonstrates an excerpt taken from a Django view to make a call to an Oracle PL&#x2F;SQL function: </p>
+<p><code>Views.py</code><br>from django.db import connection </p>
+<pre class="language-python" data-language="python"><code class="language-python">def calc_hours(self, hours_in): 
+        cursor &#x3D; connection.cursor() 
+        ret &#x3D; cursor.callproc(&quot;CALC_QUARTER_HOUR&quot;, (hours_in))# calls PROCEDURE OR FUNCTION 
+        cursor.close() 
+        return ret </code></pre>
+<p>This view code only demonstrates a function written in Python or Jython that will perform the call to<br>the database and return a result.<br><strong>How It Works</strong><br>The Jython language is an incarnation of the Python language that has been implemented on the JVM.<br>Using Jython provides a developer with all the corresponding syntax and language constructs that the<br>Python language has to offer and allows them to be used to write applications running on the JVM.<br>Furthermore, Jython applications have access to all the underlying libraries that the Java platform has to<br>offer, which is a tremendous asset to any developer. Jython is one of the first additional languages<br>developed to run on the JVM. It has matured over the years, although it remains a bit behind its sister<br>language Python in release number. Jython can be used for developing scripts, desktop applications, and<br>enterprise-level web applications.<br>Using the zxJDBC API to Solve the Problem<br>In the first Solution to this recipe, Jython’s zxJDBC API is used to perform tasks against an Oracle<br>Database. zxJDBC is an extension of the Java JDBC API that allows Jython developers to program JDBC<br>calls in a Python-like syntax. Working with zxJDBC can be very efficient. It is similar to working with<br>regular Java JDBC code, except the syntax makes development a bit easier since there are fewer lines of<br>code to maintain. zxJDBC contains the function callproc() that can be used to make calls to PL&#x2F;SQL<br>procedures or functions. Once you have obtained a database connection, you allocate a cursor from the<br>connection and invoke that cursor’s callproc() function. The callproc() function accepts one<br>argument, which is the name of the PL&#x2F;SQL procedure to be called. The called procedure or function will<br>return the results to the caller in a seamless manner. </p>
+<p>The zxJDBC API is useful for writing stand-alone Jython applications or scripts. Many developers<br>and database administrators use Jython to script their nightly jobs, allowing zxJDBC to invoke PL&#x2F;SQL<br>functions and stored procedures. This is one alternative to using Oracle Scheduler for executing<br>database tasks, and it can allow for much more flexibility because all the libraries available for use on the<br>JVM are at your disposal.<br>Using Django to Solve the Problem<br>Although zxJDBC is a great way to work with the database, there are other techniques that can be used<br>for creation of web content that accesses PL&#x2F;SQL. Many Jython users create web applications using<br>different Python web frameworks. One such Python web framework is Django, and it can be used along<br>with Jython to productively create web applications that run on the Java platform. The Django<br>framework uses an object-oriented approach to work with the database. In other terms, Django provides<br>an object-relational mapping Solution that allows developers to work with Python objects representing<br>database tables rather than working directly with SQL. </p>
+<p>Django uses a model.py file to map a database table to a Python object. A views.py file is used to<br>implement separate views for the web site, and a urls.py file is used to contain the valid URL mappings<br>for a Django application. In the Solution to this recipe, a Python function that would go into the views.py<br>file is displayed. The purpose of this function is to make a connection to the database and invoke a<br>PL&#x2F;SQL function call. The Django framework handles database connections for you by declaring some<br>parameters for the database connection within a settings.py file for the project. As you can see from the<br>example, obtaining a connection is trivial because you merely import it from the django.db package. The<br>code is similar to using zxJDBC for calling a PL&#x2F;SQL stored procedure or function. The cursor’s<br>callProc() function is used to make the function call, and the syntax for performing that task is as<br>follows: </p>
+<p><code>cursor.callProc(function_or_procedure_name,(parameter_one, parameter_two, etc))</code></p>
+<p>The function or procedure name should be a string value, and the parameters can passed as a tuple<br>or listed one by one, separated by commas. If calling a PL&#x2F;SQL function, the callProc() function should<br>be assigned to a variable because there will be a return result. Lastly, the cursor should be closed in order<br>to release resources. Again, when using the Django framework connections to the database will be<br>handled for you, so there is no need to worry about closing connections after a database call has been<br>made. </p>
+<p>For more information on using the Django web framework, please visit the project home page at<br><a target="_blank" rel="noopener" href="http://www.djangoproject.com/">www.djangoproject.com</a>. To use the Django web framework with Jython, you will also need to include the<br>django-jython site package at <a target="_blank" rel="noopener" href="http://code.google.com/p/django-jython/">http://code.google.com/p/django-jython/</a>. </p>
+<h2 id="16-5-Accessing-PL-x2F-SQL-from-Groovy"><a href="#16-5-Accessing-PL-x2F-SQL-from-Groovy" class="headerlink" title="16-5. Accessing PL&#x2F;SQL from Groovy"></a>16-5. Accessing PL&#x2F;SQL from Groovy</h2><p><strong>Problem</strong><br>You are writing a Groovy program and want to call some PL&#x2F;SQL stored procedures or functions from it.<br><strong>Solution</strong><br>Use GroovySQL to establish a database connection, and make the call to the PL&#x2F;SQL stored program. For<br>example, here’s how you would use of GroovySQL to connect to an Oracle Database and call a PL&#x2F;SQL<br>function: </p>
+<pre class="language-java" data-language="java"><code class="language-java">import groovy.sql.Sql 
+import oracle.jdbc.driver.OracleTypes 
+ 
+Sql sql &#x3D; Sql.newInstance(&quot;jdbc:oracle:thin:@hostname:1521:dbname&quot;, 
+                                                  
+&quot;username&quot;,&quot;password&quot;,&quot;oracle.jdbc.driver.OracleDriver&quot;) 
+dept_id &#x3D; 50 
+ 
+sql.call(&#39;&#123;? &#x3D; call calc_quarter_hour(?)&#125;&#39;, [Sql.DOUBLE, 6.35]) &#123; qtr_hour-&gt; 
+  println qtr_hour 
+&#125; </code></pre>
+<p>Short and to the point, the Groovy script in this example connects to an Oracle Database, executes a<br>PL&#x2F;SQL function call, returns a value, and prints the result. </p>
+<p><strong>How It Works</strong><br>Groovy is a unique JVM language that is useful for developing productive and efficient applications. It<br>can be used for developing a wide variety of applications, from scripts to enterprise-level web<br>applications. The syntax of the Groovy language is unlike that of other languages on the JVM because the<br>Groovy compiler allows you to write Java code and it will be deemed as valid Groovy. However, Groovy<br>also has its own syntax that can be combined with Java syntax if you want to do so. Its flexibility allows<br>for beginners to pick up the language as they go and allows advanced Groovy coders to write code in<br>Groovy syntax that is magnitudes smaller than the amount of lines taken to write the same code in Java. </p>
+<p>In the <strong>Solution</strong> to this example, the Groovy SQL API is used to connect to an Oracle Database and<br>issue a PL&#x2F;SQL function call. The top of the script contains import statements. The imports in Groovy<br>work in the same manner as Java imports. The groovy.sql.Sql import pulls all the Groovy SQL<br>functionality into the script. The second import is used to pull in the Oracle driver.  </p>
+<p>The database connection is made by using the Sql.newInstance method and passing the JDBC URL<br>for the database along with the user name, password, and database driver class. The actual PL&#x2F;SQL<br>function call occurs with the Sql instance’s call() method, and the syntax is very similar to that of Java’s<br>JDBC API, whereas you pass a string that is enclosed in curly braces in the following format. The<br>following example demonstrates a call to the CALC_QUARTER_HOUR PL&#x2F;SQL function that was written in<br>Recipe 4-1: </p>
+<p><code>&#123;? = call calc_quarter_hour(?)&#125; </code></p>
+<p>The question mark characters (?) correlate to bind variables. The second argument that is passed to<br>the call() method is a list of parameters including the return type and value of the parameter that will<br>be passed to the PL&#x2F;SQL function. In this case, the PL&#x2F;SQL function’s return type is<br>groovy.sql.Sql.DOUBLE, and the value that will be passed to the function is 6.35. The code that follows<br>the call is some Groovy syntactic sugar and is otherwise known as a closure. By specifying curly braces<br>({}) after the function call, you are telling Groovy to pass any return values to the variable contained<br>within the braces. In this case, qtr_hour will contain the result from the PL&#x2F;SQL function call, and it<br>prints the result upon return via use of the closure -&gt; notation and then specifying a print statement<br>afterward. </p>
+<p>If you have never seen Groovy code before, this syntax will seem a bit awkward. However, once you<br>become used to the syntax, it will become a powerful asset to your tool box. It is easy to see that taking<br>standard Java JDBC implementations for accessing PL&#x2F;SQL and translating them into a different<br>language will allow for the same PL&#x2F;SQL connectivity across most languages that run on the JVM. For<br>more information regarding the use of Groovy, Groovy SQL, or closures in Groovy, please see the online<br>documentation at <a target="_blank" rel="noopener" href="http://groovy.codehaus.org/Beginners+Tutorial">http://groovy.codehaus.org/Beginners+Tutorial</a>. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/"
+                    data-tooltip="Oracle PLSQL Recipes 17-Unit Testing With utPLSQL"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 17-Unit Testing With utPLSQL"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"
+                    data-tooltip="Oracle PLSQL Recipes 15-Java in the Database"
+                    aria-label="NEXT: Oracle PLSQL Recipes 15-Java in the Database"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/"
+                    data-tooltip="Oracle PLSQL Recipes 17-Unit Testing With utPLSQL"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 17-Unit Testing With utPLSQL"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"
+                    data-tooltip="Oracle PLSQL Recipes 15-Java in the Database"
+                    aria-label="NEXT: Oracle PLSQL Recipes 15-Java in the Database"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

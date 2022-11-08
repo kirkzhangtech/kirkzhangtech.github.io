@@ -1,0 +1,1394 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 09-Exceptions - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n9. ExceptionsExceptions are a fundamental part of any well-written program. They are used to display user-friendlyerror messages when an error is raised by an application, nondefault exception handling, andsometimes recovery so that an application can continue. Surely you have seen your fair share of ORA-XXXXX error messages. Although these messages are extremely useful to a developer for debugging andcorrecting issues, they are certainly foreign to the average application user and can be downright frightening to see.Imagine that you are working with a significant number of updates via an application form, and after you submit your 150th update, an Oracle error is displayed. Your first reaction would be of panic, hoping that you haven’t just lost all of the work you had completed thus far. By adding exception handling to an application, you can ensure that exceptions are handled in an orderly fashion so that no work is lost. You can also create a nicer error message to let the user know all changes have been savedup to this point so that sheer panic doesn’t set in when the exception is raised.Exceptions can also be raised as a means to provide informative detail regarding processes that are occurring within your application. They are not merely restricted to being used when Oracle encounters an issue. You can raise your own exceptions as well when certain circumstances are encountered in your application.Whatever the case may be, exception handling should be present in any production-quality application code. This chapter will cover some basics of how to use exception handling in your code. Along the way, you will learn some key tips on how exception handling can make your life easier. In the end, you should be fully armed to implement exception handling for your applications. \n9-1. Trapping an ExceptionProblemA procedure in your application has the potential to cause an exception to be raised. Rather than let theprogram exit and return control to the host machine, you want to perform some cleanup to ensure dataintegrity, as well as display an informative error message.SolutionWrite an exception handler for your procedure so that the exception can be caught and you can performtasks that need to be completed and provide a more descriptive message. The following procedure isused to obtain employee information based upon a primary key value or an e-mail address. Beginningwith the EXCEPTION keyword in the following example, an exception-handling block has been added tothe end of the procedure in order to handle any exceptions that may occur when no matching record isfound. \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS \n  emp_qry            VARCHAR2(500); \n  emp_first          employees.first_name%TYPE; \n  emp_last           employees.last_name%TYPE; \n  email              employees.email%TYPE; \n \n  valid_id_count     NUMBER :&#x3D; 0; \n  valid_flag         BOOLEAN :&#x3D; TRUE; \n  temp_emp_info      VARCHAR2(50); \n \nBEGIN \n  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n  IF emp_info LIKE &#39;%@%&#39; THEN \n    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); \n    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; \n  ELSE \n    SELECT COUNT(*) \n    INTO valid_id_count \n    FROM employees \n    WHERE employee_id &#x3D; emp_info; \n \n    IF valid_id_count &gt; 0 THEN \n        temp_emp_info :&#x3D; emp_info; \n        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; \n    ELSE \n        valid_flag :&#x3D; FALSE; \n    END IF; \n  END IF; \n \n  IF valid_flag &#x3D; TRUE THEN \n    EXECUTE IMMEDIATE emp_qry \n    INTO emp_first, emp_last, email \n    USING temp_emp_info; \n \n    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n  ELSE  \n    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n  END IF; \n \n  EXCEPTION \n    WHEN NO_DATA_FOUND THEN \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n    WHEN INVALID_NUMBER THEN \n      DBMS_OUTPUT.PUT_LINE(&#39;YOU MUST ENTER AN EMAIL ADDRESS INCLUDING &#39; || \n                         &#39;THE @ OR A POSITIVE INTEGER VALUE FOR THE &#39; || \n                         &#39;EMPLOYEE ID.&#39;); \nEND; \nHere are the results of calling the procedure with various arguments: \nSQL&gt; EXEC OBTAIN_EMP_DETAIL(000); \nTHE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD \n \nPL&#x2F;SQL procedure successfully completed. \n\nSQL&gt; EXEC OBTAIN_EMP_DETAIL(&#39;TEST&#39;); \nYOU MUST ENTER AN EMAIL ADDRESS INCLUDING THE @ OR A POSITIVE INTEGER VALUE FOR \nTHE EMPLOYEE ID. \n \nPL&#x2F;SQL procedure successfully completed. \n \nSQL&gt; EXEC OBTAIN_EMP_DETAIL(200);   \nJennifer Whalen - JWHALEN \n \nPL&#x2F;SQL procedure successfully completed. \n\nThis procedure is essentially the same as the one demonstrated in Recipe 8-1. The difference is thatwhen an exception is raised, the control will go into the exception block. At that time, the code you placewithin the exception block will determine the next step to take as opposed to simply raising an Oracleerror and returning control to the calling procedure, calling function, or host environment.How It WorksTo perform remedial actions when an exception is raised, you should always make sure to code anexception handler if there is any possibility that an exception may be thrown. The sole purpose of anexception handler is to catch exceptions when they are raised and handle the outcome in a controlledfashion. There are two different types of exceptions that can be raised by a PL&#x2F;SQL application:internally defined and user defined. Oracle Database has a defined set of internal exceptions that can bethrown by a PL&#x2F;SQL application. Those exceptions are known as internally defined. It is also possible todefine your own exceptions, which are known as user defined.An exception-handling block is structured like a CASE statement in that a series of exceptions is listedfollowed by a separate set of statements to be executed for each outcome. The standard format for anexception-handling block is as follows: \nEXCEPTION \n  WHEN name_of_exception THEN \n    -- One or more statements \nException blocks begin with the EXCEPTION keyword, followed by a series of WHEN..THEN clauses thatdescribe different possible exceptions along with the set of statements that should be executed if theexception is caught. The exception name can be one of the Oracle internally defined exceptions, or it canbe the name of an exception that has been declared within your code. To learn more about declaringexceptions, please see Recipe 9-3 in this chapter. In the Solution to this recipe, the internally definedNO_DATA_FOUND exception is raised if an unknown e-mail address is entered into the procedure becausethere will be no rows returned from the query. When the exception block encounters the WHEN clause thatcorresponds with NO_DATA_FOUND, the statements immediately following the THEN keyword are executed.In this case, an error message is printed using the DBMS_OUTPUT package. However, in a real-worldapplication, this is where you will place any cleanup or error handling that should be done to helpmaintain the integrity of the data accessed by your application.An exception block can contain any number of WHEN..THEN clauses, and therefore, any number ofexceptions can each contain their own set of handler statements. Even if a simple message was to bedisplayed, as is the case with the Solution to this recipe, a different and more descriptive error messagecan be coded for each different exception that may possibly be raised. This situation is reflected in thesecond exception handler contained within the Solution because it returns a different error messagethan the first.As mentioned previously, Oracle contains a number of internally defined exceptions. Table 9-1provides a list of the internally defined exceptions, along with a description of their usage.Table 9-1. Oracle Internal Exceptions \nException               Code Description \nACCESS_INTO_NULL        -6530 Values are assigned to an uninitialized object. \nCASE_NOT_FOUND          -6592 No matching choice is available within CASE statement, and no ELSE clause has been defined. \nCOLLECTION_IS_NULL      -6531 Program attempts to apply collection methods other than EXISTS to varray or a nested table that has not yet been initialized. \nCURSOR_ALREADY_OPEN     -6511 Program attempts to open a cursor that is already open. \nDUP_VAL_ON_INDEX        -1 Program attempts to store duplicate values in a unique index column. \nINVALID_CURSOR          -1001 Program attempts to use a cursor operation that is allowed. \nINVALID_NUMBER          -1722 Conversion of string into number is incorrect because of the string not being a number. \nLOGIN_DEINIED           -1017 Program attempts to log in to the database using an incorrect user name and&#x2F;or password. \nNO_DATA_FOUND           +100 SELECT statement returns no rows. \nNOT_LOGGED_ON           -1012 Program attempts to issue a database call without being connected to the database. \nPROGRAM_ERROR           -6501 Internal Problem exists. \nROWTYPE_MISMATCH        -6504 Cursor variables are incompatible. A host cursor variable must have a compatible return type that matches a PL&#x2F;SQL cursor variable. \nSELF_IS_NULL            -30625 Instance of object type is not initialized. \nSTORAGE_ERROR           -6500 PL&#x2F;SQL ran out of memory or was corrupted. \nSUBSCRIPT_BEYOND_COUNT  -6533  Program references nested table or varray element using an index number that goes beyond the number of elements within the object. \nSYS_INVALID_ROWID       -1410  Conversion of character string into ROWID fails because character string does not represent a valid row ID. \nTIMEOUT_ON_RESOURCE     -51  Oracle Database is waiting for resource, and timeout occurs. \nTOO_MANY_ROWS           -1422  Attempts to select more than one row using a SELECT INTO statement. \nVALUE_ERROR             -6502  Program attempts to perform an invalid arithmetic,conversion, or truncation operation. \nZERO_DIVIDE             -1476  Program attempts to divide a number by zero. \nAn exception handler’s scope corresponds to its enclosing code block. They have the same scope asa variable would have within a code block. If your code contains a nested code block, an exceptionhandler that is contained within the nested code block can only handle exceptions raised within thatcode block. The outer code block can contain an exception handler that will handle exceptions for boththe outer code block and the nested code block. If an exception is raised within the nested code blockand there is no corresponding handler for an exception that has been raised within the nested codeblock, then the exception is propagated to the outer code block to look for a corresponding handlerthere. If no handler is found, then runtime will be passed to the procedure or function that called it orthe host system, which is what you do not want to have occur. The following code demonstrates anexample of using an exception handler within a nested code block: \nDECLARE \n  CURSOR emp_cur IS \n  SELECT * \n  FROM EMPLOYEES; \n \n  emp_rec emp_cur%ROWTYPE; \nBEGIN \n  FOR emp_rec IN emp_cur LOOP \n    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || \n         emp_rec.last_name); \n    DECLARE \n      emp_dept  departments.department_name%TYPE; \n    BEGIN \n      SELECT department_name \n      INTO emp_dept \n      FROM departments \n      WHERE department_id &#x3D; emp_rec.department_id; \n      DBMS_OUTPUT.PUT_LINE(&#39;Department: &#39; || emp_dept); \n    EXCEPTION \n      WHEN NO_DATA_FOUND THEN \n        DBMS_OUTPUT.PUT_LINE(&#39;EXCEPTION IN INNER BLOCK&#39;); \n    END; \n  END LOOP; \nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n   DBMS_OUTPUT.PUT_LINE(&#39;EXCEPTION IN OUTER BLOCK&#39;); \nEND; \nMultiple exceptions can be listed within the same exception handler if you want to execute the sameset of statements when either of them is raised. You can do this within the WHEN clause by including twoor more exception names and placing the OR keyword between them. Using this technique, if either ofthe exceptions that are contained within the clause is raised, then the set of statements that follows willbe executed. Let’s take a look at an exception handler that contains two exceptions within the samehandler: \nEXCEPTION \n  WHEN NO_DATA_FOUND OR INVALID_EMAIL_ADDRESS THEN \n    --  statements to execute \n  WHEN OTHERS THEN \n    --  statements to execute \nEND;\n■ Note You cannot place the AND keyword in between exceptions because no two exceptions can be raised at thesame time.It is easy to include basic exception handling in your application. Code an exception-handling blockat the end of each code block that may raise an exception. It is pertinent that you test your applicationunder various conditions to try to predict which possible exceptions may be raised; each of thosepossibilities should be accounted for within the exception-handling block of your code. \n9-2. Catching Unknown ExceptionsProblemSome exceptions are being raised when executing one of your procedures and you want to ensure thatall unforeseen exceptions are handled using an exception handler.SolutionUse an exception handler, and specify OTHERS for the exception name to catch all the exceptions thathave not been caught by previous handlers. In the following example, the same code from Recipe 9-1has been modified to add an OTHERS exception handler: \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS \n  emp_qry                   VARCHAR2(500); \n  emp_first                 employees.first_name%TYPE; \n  emp_last                  employees.last_name%TYPE; \n  email                     employees.email%TYPE; \n \n  valid_id_count            NUMBER :&#x3D; 0; \n  valid_flag                BOOLEAN :&#x3D; TRUE; \n  temp_emp_info             VARCHAR2(50); \n \nBEGIN \n  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n  IF emp_info LIKE &#39;%@%&#39; THEN \n    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); \n    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; \n  ELSE \n    SELECT COUNT(*) \n    INTO valid_id_count \n    FROM employees \n    WHERE employee_id &#x3D; emp_info; \n \n    IF valid_id_count &gt; 0 THEN \n        temp_emp_info :&#x3D; emp_info; \n        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; \n    ELSE \n        valid_flag :&#x3D; FALSE; \n    END IF; \n  END IF; \n \n  IF valid_flag &#x3D; TRUE THEN \n    EXECUTE IMMEDIATE emp_qry \n    INTO emp_first, emp_last, email \n    USING temp_emp_info; \n \n    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n  ELSE  \n    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n  END IF; \n \n  EXCEPTION \n    WHEN NO_DATA_FOUND THEN \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n    WHEN OTHERS THEN \n      DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || \n                         &#39;TRY AGAIN&#39;); \nEND; \nIn this example, if an unexpected exception were to be raised, then the program control wouldtransfer to the statements immediately following the WHEN OTHERS THEN clause.■ Note In a real-world application, an exception should be manually reraised within the OTHERS handler. To learnmore about determining the exception that was raised, please see Recipe 9-4.How It WorksYou can use the OTHERS handler to catch all the exceptions that have not been previously handled by anynamed exception handler. It is a good idea to include an OTHERS handler with any exception handler sothat any unknown exceptions can be handled reasonably by your application. However, OTHERS shouldbe used only to assist developers in finding application bugs rather than as a catchall for any exception.The format for using the OTHERS handler is the same as it is with other named exceptions; the onlydifference is that it should be the last handler to be coded in the exception handler. The followingpseudocode depicts a typical exception handler that includes an OTHERS handler: \nEXCEPTION \n  WHEN named_exception1 THEN \n    -- perform statements \n  WHEN named_exception2 THEN \n    -- perform statements \n  WHEN OTHERS THEN \n    -- perform statements \n  WHEN TO USE THE OTHERS HANDLER \nIt is important to note that the OTHERS handler is not used to avoid handling expected exceptions properly.Each exception that may possibly be raised should be handled within its own exception-handling block.The OTHERS handler should be used only to catch those exceptions that are not expected. Most often, theOTHERS handler is used to catch application bugs in order to assist a developer in finding and resolvingissues.As stated, the OTHERS handler will catch any exception that has not yet been caught by anotherhandler. It is very important to code a separate handler for each type of named exception that mayoccur. However, if you have one set of statements to run for any type of exception that may occur, then itis reasonable to include only an OTHERS exception handler to catch exceptions that are unexpected. If nonamed exceptions are handled and an exception handler includes only an OTHERS handler, then thestatements within that handler will be executed whenever any exception occurs within an application. \n9-3. Creating and Raising Named Programmer-Defined ExceptionsProblemYou want to alert the users of your application when a specific event occurs. The event does not raise anOracle exception, but it is rather an application-specific exception. You want to associate this event witha custom exception so that it can be raised whenever the event occurs.  CHAPTER 9  EXCEPTIONS195SolutionDeclare a named user-defined exception, and associate it with the event for which you are interested inraising an exception. In the following example, a user-defined exception is declared and raised within acode block. When the exception is raised, the application control is passed to the statements containedwithin the exception handler for the named user exception. \nCREATE OR REPLACE PROCEDURE salary_increase(emp_id IN NUMBER, \n                                            pct_increase IN NUMBER) AS \n   \n  salary                employees.salary%TYPE; \n  max_salary            jobs.max_salary%TYPE; \n  INVALID_INCREASE      EXCEPTION; \n   \n   \nBEGIN \n \n  SELECT salary, max_salary \n  INTO salary, max_salary \n  FROM employees, jobs \n  WHERE employee_id &#x3D; emp_id \n  AND jobs.job_id &#x3D; employees.employee_id; \n \n   \n  IF (salary + (salary * pct_increase)) &lt;&#x3D; max_salary THEN \n    UPDATE employees \n    SET salary &#x3D; (salary + (salary * pct_increase)) \n    WHERE employee_id &#x3D; emp_id; \n     \n    DBMS_OUTPUT.PUT_LINE(&#39;SUCCESSFUL SALARY INCREASE FOR EMPLOYEE #: &#39; || \n          emp_id || \n          &#39;.  NEW SALARY &#x3D; &#39; || salary + (salary * pct_increase)); \n          \n  ELSE \n    RAISE INVALID_INCREASE; \n  END IF; \n   \n \n   \nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;UNSUCCESSFUL INCREASE, NO EMPLOYEE RECORD FOUND &#39; || \n                  &#39;FOR THE GIVEN ID&#39;); \n                   \n  WHEN INVALID_INCREASE THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;UNSUCCESSFUL INCREASE.  YOU CANNOT INCREASE THE &#39; || \n                  &#39;EMPLOYEE SALARY BY &#39; || pct_increase || \n                  &#39;PERCENT...PLEASE ENTER &#39; || \n                  &#39;A SMALLER INCREASE AMOUNT TO TRY AGAIN&#39;); \n \n \n  WHEN OTHERS THEN \nCHAPTER 9  EXCEPTIONS \n196 \n    DBMS_OUTPUT.PUT_LINE(&#39;UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS &#39;|| \n                  &#39;OCCURRED, &#39; || \n                  &#39;PLEASE TRY AGAIN OR CONTACT ADMINISTRATOR&#39; || pct_increase); \n \nEND; \nAs you can see from the code, the exception block can accept one or more handlers. The nameduser exception is declared within the declaration section of the procedure, and the exception can beraised anywhere within the containing block.■ Note In a real-world application, an exception should be manually raised within the OTHERS handler. To learnmore about determining the exception that was raised, please see Recipe 9-4.How It WorksA PL&#x2F;SQL application can contain any number of custom exceptions. When a developer declares theirown exception, it is known as a user-defined exception. A user-defined exception must be declaredwithin the declaration section of a package, function, procedure, or anonymous code block. To declarean exception, use the following: \nexception_name  EXCEPTION; \nYou can provide any name as long as it applies to the standard naming convention and is not thesame as an internally defined exception name. It is a coding convention to code exception names usinguppercase lettering, but lowercase would work as well since PL&#x2F;SQL is not a case-sensitive language.To raise your exception, type the RAISE keyword followed by the name of the exception that youwant to raise. When the code executes the RAISE statement, control is passed to the exception handlerthat best matches the exception that was named in the statement. If no handler exists for the exceptionthat was raised, then control will be passed to the OTHERS handler, if it exists. In the worst-case scenario,if there are not any exception handlers that match the name that was provided in the RAISE statementand there has not been an OTHERS handler coded, then control will be passed back to the enclosing block,the calling code, or the host environment.The RAISE statement can also be used in a couple of other ways. It is possible to raise an exceptionthat has been declared within another package. To do so, fully qualify the name of the exception byprefixing it with the package name. The RAISE statement can also be used stand-alone to reraise anexception.As seen in the Solution to this recipe, catching a named user exception is exactly the same ascatching an internally defined exception. Code the WHEN..THEN clause, naming the exception that youwant to catch. When the exception is raised, any statements contained within that particular exceptionhandler will be executed. \n9-4. Determining Which Error Occurred Inside the OTHERS HandlerProblemYour code is continually failing via an exception, and the OTHERS handler is being invoked. You need todetermine the exact cause of the exception so that it can be repaired.SolutionCode the OTHERS exception handler as indicated by Recipe 9-2, and use the SQLCODE andDBMS_UTILITY.FORMAT_ERROR_STACK functions to return the Oracle error code and message text for theexception that has been raised. The following example demonstrates the usage of these functions, alongwith the procedure that was used in Recipe 9-3, for obtaining the error code and message when theOTHERS handler is invoked. \nCREATE OR replace PROCEDURE salary_increase(emp_id       IN NUMBER,  \n                                            pct_increase IN NUMBER)  \nAS  \n  salary              employees.salary%TYPE;  \n  max_salary          jobs.max_salary%TYPE;  \n  invalid_increase    EXCEPTION;  \n  error_number        NUMBER;  \n  error_message       VARCHAR2(1500);  \nBEGIN  \n  SELECT salary,  \n         max_salary  \n  INTO   salary, max_salary  \n  FROM   employees,  \n         jobs  \n  WHERE  employee_id &#x3D; emp_id  \n         AND jobs.job_id &#x3D; employees.employee_id;  \n \n  IF ( salary + ( salary * pct_increase ) ) &lt;&#x3D; max_salary THEN  \n    UPDATE employees  \n    SET    salary &#x3D; ( salary + ( salary * pct_increase ) )  \n    WHERE  employee_id &#x3D; emp_id;  \n \n    dbms_output.Put_line(&#39;SUCCESSFUL SALARY INCREASE FOR EMPLOYEE #: &#39;  \n                         || emp_id  \n                         || &#39;.  NEW SALARY &#x3D; &#39;  \n                         || salary + ( salary * pct_increase ));  \n  ELSE  \n    RAISE invalid_increase;  \n  END IF;  \nEXCEPTION  \n  WHEN no_data_found THEN  \n    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE, NO EMPLOYEE RECORD FOUND &#39; \n                     || &#39;FOR THE &#39;  \n                     || &#39;GIVEN ID&#39;); WHEN invalid_increase THEN  \n    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  YOU CANNOT INCREASE THE &#39;  \n                     || &#39;EMPLOYEE &#39;  \n                     || &#39;SALARY BY &#39;  \n                     || pct_increase  \n                     || &#39; PERCENT...PLEASE ENTER &#39;  \n                     || &#39;A SMALLER INCREASE AMOUNT TO TRY AGAIN&#39;);  \nWHEN OTHERS THEN  \n           error_number :&#x3D; SQLCODE;  \n \n           error_message :&#x3D; DBMS_UTILITY.FORMAT_ERROR_STACK;  \n \n    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS &#39; \n                     || &#39;OCCURRED, &#39;  \n                     || &#39;PLEASE TRY AGAIN OR CONTACT ADMINISTRATOR&#39;  \n                     || &#39; Error #: &#39;  \n                     || error_number  \n                     || &#39; - &#39;  \n                     || error_message); \nEND;  \nWhen this procedure is executed, the following error will be returned: \nUNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS OCCURRED, PLEASE TRY AGAIN OR CONTACTADMINISTRATOR Error #: -1722 - ORA-01722: invalid number \nThis example intentionally raises an error in order to demonstrate the functionality of these utilities.A reference to the line number that raised the error may also be helpful. To learn more about writing anexception handler that returns line numbers, please see Recipe 9-9.How It WorksThe SQLCODE and DBMS_UTILITY.FORMAT_ERROR_STACK functions provide the means to determine whatcode and message had caused the last exception that was raised. The SQLCODE function will return theOracle error number for internal exceptions and +1 for a user-defined exception. TheDBMS_UTILITY.FORMAT_ERROR_STACK function will return the Oracle error message for any internalexception that is raised, and it will contain the text User-Defined Exception for any named userexception that is raised. A user-defined exception may receive a custom error number, as you will readabout in Recipe 9-9. In such cases, the SQLCODE function will return this custom error number if raised.To use these functions, you must assign them to a variable because they cannot be called outright.For instance, if you wanted to use the SQLCODE within a CASE statement, you would have to assign thefunction to a variable first. Once that has been done, you could use the variable that was assigned theSQLCODE in the statement.Oracle includes DBMS_UTILITY.FORMAT_ERROR_STACK, which can be used to return the error messageassociated with the current error. DBMS_UTILITY.FORMAT_ERROR_STACK can hold up to 1,899 characters, sothere is rarely a need to truncate the message it returns. SQLERRM is a similar function that can be used toreturn the error message, but it only allows messages up to 512 bytes to be displayed. Oftentimes,SQLERRM messages need to be truncated for display. Oracle recommends usingDBMS_UTILITY.FORMAT_ERROR_STACK over SQLERRM because this utility doesn’t have such a small messagelimitation.However, SQLERRM does have its place, because there are some benefits of using it. A handy feature ofSQLERRM is that you can pass an error number to it and retrieve the corresponding error message. Anyerror number that is passed to SQLERRM should be negative; otherwise, you will receive the message User-defined error. Table 9-2 displays the error number ranges and their corresponding messages usingSQLCODE and SQLERRM. \nTable 9-2. SQLCODE Return Codes and Meanings \nCode                          Description \nNegative Oracle Error Number  Internal Oracle exception \n0                             No exceptions raised \n+1                            User-defined exception \n+100                          NO_DATA_FOUND \n-20000 to -20999              User-defined error with PRAGMA EXCEPTION_INIT\n■ Note PRAGMA EXCEPTION_INIT is used to associate an Oracle error number with an exception name.If you choose to use SQLERRM, the code is not much different from usingDBMS_UTILITY.FORMAT_ERROR_STACK, but you will probably need to include some code to truncate theresult. The next example demonstrates the same example that was used in the Solution to this recipe, butit uses SQLERRM instead of DBMS_UTILITY.FORMAT_ERROR_STACK. \nCREATE OR replace PROCEDURE salary_increase(emp_id       IN NUMBER,  \n                                            pct_increase IN NUMBER)  \nAS  \n  salary             employees.salary%TYPE;  \n  max_salary         jobs.max_salary%TYPE;  \n  invalid_increase   EXCEPTION;  \n  error_number       NUMBER;  \n  error_message      VARCHAR2(1500);  \nBEGIN  \n  SELECT salary,  \n         max_salary  \n  INTO   salary, max_salary  \n  FROM   employees,  \n         jobs  \n  WHERE  employee_id &#x3D; emp_id  \n         AND jobs.job_id &#x3D; employees.employee_id;  \n \n  IF ( salary + ( salary * pct_increase ) ) &lt;&#x3D; max_salary THEN  \n    UPDATE employees  \n    SET    salary &#x3D; ( salary + ( salary * pct_increase ) )  \n    WHERE  employee_id &#x3D; emp_id;  \n \n    dbms_output.Put_line(&#39;SUCCESSFUL SALARY INCREASE FOR EMPLOYEE #: &#39;  \n                         || emp_id  \n                         || &#39;.  NEW SALARY &#x3D; &#39;  \n                         || salary + ( salary * pct_increase ));  \n  ELSE  \n    RAISE invalid_increase;  \n  END IF; \nEXCEPTION  \n  WHEN no_data_found THEN  \n    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE, NO EMPLOYEE RECORD FOUND &#39; \n                     || &#39;FOR THE &#39;  \n                     || &#39;GIVEN ID&#39;); WHEN invalid_increase THEN  \n    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  YOU CANNOT INCREASE THE &#39;  \n                     || &#39;EMPLOYEE &#39;  \n                     || &#39;SALARY BY &#39;  \n                     || pct_increase  \n                     || &#39; PERCENT...PLEASE ENTER &#39;  \n                     || &#39;A SMALLER INCREASE AMOUNT TO TRY AGAIN&#39;);\nWHEN OTHERS THEN  \n           error_number :&#x3D; SQLCODE;  \n           error_message :&#x3D; Substr(sqlerrm, 1, 150);  \ndbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS OCCURRED, &#39;  \n                     || &#39;PLEASE TRY AGAIN OR CONTACT ADMINISTRATOR&#39;  \n                     || &#39; Error #: &#39;  \n                     || error_number  \n                     || &#39; - &#39;  \n                     || error_message); \nEND;\nThere are some other tools that can be used to further diagnose which errors are being raised andeven to see the entire stack trace. These tools are further explained within Recipe 9-9. By combining thetechniques learned in this recipe with those you will learn about in Recipe 9-9, you are sure to have abetter chance of diagnosing your application issues. \n9-5. Raising User-Defined Exceptions Without an Exception HandlerProblemYour application includes some error handling that is specific to your application. For instance, youwant to ensure that the input value for a procedure is in the valid format to be an e-mail address. Ratherthan writing an exception handler for each user-defined exception, you want to simply raise theexception inline and provide an error number as well.SolutionThis scenario is perfect for using the RAISE_APPLICATION_ERROR procedure. Test the e-mail address that ispassed into the procedure to ensure that it follows certain criteria. If it does not contain a specificcharacteristic of a valid e-mail address, use the RAISE_APPLICATION_ERROR procedure to display anexception message to the user. Here’s an example: \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_email IN VARCHAR2) IS \n  emp_qry       VARCHAR2(500); \n  emp_first     employees.first_name%TYPE; \n  emp_last      employees.last_name%TYPE; \n  email         employees.email%TYPE; \n \n  valid_id_count        NUMBER :&#x3D; 0; \n  valid_flag            BOOLEAN :&#x3D; TRUE; \n  temp_emp_info         VARCHAR2(50); \n \n  BEGIN \n    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n    IF emp_email LIKE &#39;%@%&#39; THEN \n      temp_emp_info :&#x3D; substr(emp_email,0,instr(emp_email,&#39;@&#39;)-1); \n      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_email&#39;; \n    ELSIF emp_email NOT LIKE &#39;%.mycompany.com&#39; THEN \n      RAISE_APPLICATION_ERROR(-20001, &#39;Not a valid email address from &#39; || \n                            &#39;this company!&#39;); \n    ELSE \n      RAISE_APPLICATION_ERROR(-20002, &#39;Not a valid email address!&#39;); \n    END IF; \n   \n    IF valid_flag &#x3D; TRUE THEN \n      EXECUTE IMMEDIATE emp_qry \n      INTO emp_first, emp_last, email \n      USING temp_emp_info; \n   \n      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n    ELSE  \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n    END IF; \n \nEND; \nAs you can see, there is no exception handler in this example. When the conditions are met, anexception is raised inline via RAISE_APPLICATION_EXCEPTION.How It WorksThe RAISE_APPLICATION_EXCEPTION procedure can associate an error number with an error message. Theformat for calling the RAISE_APPLICATION_EXCEPTION procedure is as follows: \nRAISE_APPLICATION_EXCEPTION(exception_number,  \n                           exception_message[, retain_error_stack]); \nwhere exception_number is a number within the range of -20000 to -20999, and exception_message is astring of text that is equal to or less than 2KB in length. The optional retain_error_stack is a BOOLEANvalue that tells Oracle whether this exception should be added to the existing error stack or whether theerror stack should be wiped clean and this exception should be placed into it. By default, the value isFALSE, and all other exceptions are removed from the error stack, leaving this exception as the only onein the stack.When you invoke the procedure, the current block is halted immediately, and the exception israised. No further processing takes place within the current block, and control is passed to the programthat called the block or an enclosing block if the current block is nested. Therefore, if you need toperform any exception handling, then it needs to take place prior to callingRAISE_APPLICATION_EXCEPTION. There is no commit or rollback, so any updates or changes that have beenmade will be retained if you decide to issue a commit. Any OUT and IN OUT values, assuming you are in aprocedure or a function, will be reverted. This is important to keep in mind, because it will help youdetermine whether to use an exception handler or issue a call to RAISE_APPLICATION_ERROR.When calling RAISE_APPLICATION_EXCEPTION, you pass an error number along with an associatedexception message. Oracle sets aside the range of numbers from -20000 to -20999 for use by itscustomers for the purpose of declaring exceptions. Be sure to use a number within this range, or Oraclewill raise its own exception to let you know that you are out of line and using one of its proprietary errornumbers!■ Note There are some numbers within that range that are still used by Oracle-specific exceptions. Passing aTRUE value as the last argument in a call to RAISE_APPLICATION_EXCEPTION will retain any existing errors in theerror stack. Passing TRUE is a good idea for the purposes of debugging so that the stack trace can be used to helpfind the code that is raising the exception. Otherwise, the exception stack is cleared.One may choose to create a function or procedure that has the sole purpose of callingRAISE_APPLICATION_EXCEPTION to raise an exception and associate an error number with an exceptionmessage. This technique can become quite useful if you are interested in using a custom error numberfor your exceptions, but you still need to perform proper exception handling when errors occur. Youcould use the OTHERS exception handler to call the function or procedure that usesRAISE_APPLICATION_EXCEPTION, passing the error number and a proper exception message. \n9-6. Redirecting Control After an Exception Is RaisedProblemAfter an exception is raised within an application, usually the statements within the exception handlerare executed, and then control goes to the next statement in the calling program or outside the currentcode block. Rather than printing an error message and exiting your code block after an exception, youwant to perform some further activity. For instance, let’s say you are interested in logging the exceptionin a database table. You have a procedure for adding entries to the log table, and you want to make useof that procedure.SolutionInvoke the procedure from within the exception handler. When the exception is raised, program controlwill be passed to the appropriate handler. The handler itself can provide an exception message for theuser, but it will also call the procedure that is to be used for logging the exception in the database. Thefollowing example demonstrates this technique: \nCREATE OR REPLACE PROCEDURE log_error_messages(error_code  IN NUMBER, \n                                                message    IN VARCHAR2) AS \nPRAGMA AUTONOMOUS_TRANSACTION; \nBEGIN \n  DBMS_OUTPUT.PUT_LINE(message); \n  DBMS_OUTPUT.PUT_LINE(&#39;WRITING ERROR MESSAGE TO DATABASE&#39;); \nEND; \n \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS \n  emp_qry                 VARCHAR2(500); \n  emp_first                employees.first_name%TYPE; \n  emp_last                   employees.last_name%TYPE; \n  email                         employees.email%TYPE; \n \n  valid_id_count         NUMBER :&#x3D; 0; \n  valid_flag                  BOOLEAN :&#x3D; TRUE; \n  temp_emp_info       VARCHAR2(50); \n \n \n BEGIN \n    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n    IF emp_info LIKE &#39;%@%&#39; THEN \n      temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); \n      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; \n    ELSE \n      SELECT COUNT(*) \n      INTO valid_id_count \n      FROM employees \n      WHERE employee_id &#x3D; emp_info; \n   \n      IF valid_id_count &gt; 0 THEN \n          temp_emp_info :&#x3D; emp_info; \n          emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; \n      ELSE \n          valid_flag :&#x3D; FALSE; \n      END IF; \n    END IF; \n   \n    IF valid_flag &#x3D; TRUE THEN \n      EXECUTE IMMEDIATE emp_qry \n      INTO emp_first, emp_last, email \n      USING temp_emp_info; \n   \n      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n    ELSE  \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n    END IF; \n   \n    EXCEPTION \n      WHEN NO_DATA_FOUND THEN \n         \n        DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n        log_error_messages(SQLCODE, DBMS_UTILITY.FORMAT_ERROR_STACK); \n         \n      WHEN OTHERS THEN \n        DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || \n                           &#39;TRY AGAIN&#39;); \n        log_error_messages(SQLCODE, DBMS_UTILITY.FORMAT_ERROR_STACK); \n END; \nIn this scenario, the log_error_messages procedure would be called from within each of theexception handlers. Since it is an autonomous transaction, the log_error_messages procedure willexecute without affecting the calling procedure. This ensures that no issues will arise iflog_error_messages were to raise an exception. Control of the application would be passed to thisprocedure for the processing, and then the program would exit.How It WorksIt is possible to redirect control of your code after an exception has been raised using varioustechniques. After an exception is raised and control is redirected to the handler, the statements withinthe handler are executed, and then that program ends. If the code block that contains the exceptionhandler is contained within enclosing code block, control will be passed to the next statement within theenclosing control block. Otherwise, the program will exit after statements are executed.To execute a particular action or series of processes after an exception has been raised, it is a usefultechnique to call a stored procedure or function from within the exception handler. In the Solution tothis recipe, a logging procedure is called that will insert a row into the logging table after each exceptionis raised. This allows the program control to be passed to the procedure or function that is called, andwhen that body of code has completed execution, control is passed back to the exception handler. Thisis a very useful technique for logging exceptions but can also be used for various other tasks such assending an e-mail alert or performing some database cleanup. \n9-7. Raising Exceptions and Continuing ProcessingProblemThe application you are coding requires a series of INSERT, UPDATE, and DELETE statements to be called.You want to add proper exception handling to your code and also ensure that processing continues andall of the statements are executed even if an exception is raised.SolutionEnclose each statement within its own code block, and provide an exception handler for each of theblocks. When an exception is raised within one of the nested blocks, then control will be passed back tothe main code block, and execution will continue. This style of coding is displayed in the followingexample: \nCREATE OR REPLACE PROCEDURE delete_employee (in_emp_id   IN NUMBER) AS \n  BEGIN \n    -- ENTER INITIAL NESTED CODE BLOCK TO PERFORM DELETE \n    BEGIN \n        -- DELETE EMP \n    EXCEPTION \n      WHEN NO_DATA_FOUND THEN \n         -- perform statements \n    END; \n \n     -- ENTER SECOND NESTED CODE BLOCK TO PERFORM LOG ENTRY \n     BEGIN \n        -- LOG DELETION OF  EMP \n    EXCEPTION \n      WHEN NO_DATA_FOUND THEN \n         -- perform statements \n    END; \nEXCEPTION WHEN OTHERS THEN \n  -- perform statements \nEND; \nAs this code stands, no exception will go on to become an unhanded exception because theoutermost code block contains an exception handler using the OTHERS exception name. Every nestedcode block contains a handler, so every exception that is encountered in this application will be caught.How It WorksScope plays an important role when designing your application’s exception-handling system. Whendoing so, you should think of your application and determine whether portions of the code need to beexecuted regardless of any exception being raised. If this is the case, then you will need to provide properexception handling and still ensure that the essential code is executed each run.The scope of an exception pertains to the code block in which the exception is declared. Once anexception has been encountered, program control halts immediately and is passed to the exceptionhandler for the current block. If there is not an exception handler in the current code block or if nohandler matches the exception that was raised, then control passes to the calling program or outercontrol block. Control is immediately passed to the exception handler of that program. If no exceptionhandler exists or matches the exception being raised, then the execution of that block halts, and theexception is raised to the next calling program or outer code block, and so on.This pattern can be followed any number of times. That is why the technique used in the Solution tothis recipe works well. There is one main code block that embodies two nested code blocks. Each of theblocks contains essential statements that need to be run. If an exception is raised within the DELETEblock, then program control is passed back to its outer code block, and processing continues. In thiscase, both essential statements will always be executed, even if exceptions are raised. \n9-8. Associating Error Numbers with Exceptions That Have No NameProblemYou want to associate an error number to those errors that do not have predefined names.SolutionMake use of PRAGMA EXCEPTION_INIT to tell the compiler to associate an Oracle error number with anexception name. This will allow the use of an easy-to-identify name rather than an obscure errornumber when working with the exception. The example in this recipe shows how an error number canbe associated with an exception name and how the exception can later be raised. \nCREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, \n                                              hours   IN NUMBER DEFAULT 1) \nRETURN NUMBER AS \nBEGIN \n  RETURN salary&#x2F;hours; \nEND; \n \n \nDECLARE \n  DIVISOR_IS_ZERO  EXCEPTION; \n  PRAGMA EXCEPTION_INIT(DIVISOR_IS_ZERO, -1476); \n  per_hour      NUMBER; \nBEGIN \n  SELECT calculate_salary_hours(0,0) \n  INTO per_hour \n  FROM DUAL; \nEXCEPTION WHEN DIVISOR_IS_ZERO THEN \n  DBMS_OUTPUT.PUT_LINE(&#39;You cannot pass a zero for the number of hours&#39;); \nEND; \nThe exception declared within this example is associated with the ORA-01476 error code. When adivide-by-zero exception occurs, then the handler is executed.How It WorksPRAGMA EXCEPTION_INIT allows an error number to be associated with an error name. Thus, it provides aneasy way to handle those exceptions that are available only by default via an error number. It is mucheasier to identify an exception by name rather than by number, especially when you have been awayfrom the code base for some length of time.The PRAGMA EXCEPTION_INIT must be declared within the declaration section of your code. Theexception that is to be associated with the error number must be declared prior to the PRAGMAdeclaration. The format for using PRAGMA EXCEPTION_INIT is as follows: \nDECLARE \n  exception_name   EXCEPTION; \n  PRAGMA EXCEPTION_INIT(exception_name, &lt;&lt;exception_code&gt;&gt;); \nBEGIN \n  -- Perform statements \nEXCEPTION \n  WHEN exception_name THEN \n    -- Perform error handling \nEND; \nThe exception_name in this pseudocode refers to the name of the exception you are declaring. The&lt;&gt; is the number of the ORA-xxxxx error that you are associating with the exception. Inthe Solution to this recipe, ORA-01476 is associated with the exception. That exception in particulardenotes divisor is equal to zero. When this exception is raised, it is easier to identify the cause of theerror via the DIVISOR_IS_ZERO identifier than by the -01476 code.Whenever possible, it is essential to provide an easy means of identification for portions of code thatmay be difficult to understand. Exception numbers by themselves are not easily identifiable unless yousee the exception often enough. Even then, an exception handler with the number -01476 in it seemsobscure. In this case, it is always best to associate a more common name to the exception so that thecode can instantly have meaning to someone who is unfamiliar with the code or to you when you needto maintain the code for years to come.  \n9-9. Tracing an Exception to Its OriginProblemYour application continues to raise an exception that is being caught with the OTHERS handler. You’veused SQLCODE and DBMS_UTILITY.FORMAT_ERROR_STACK to help you find the cause of the exception but arestill unable to do so.SolutionUse the stack trace for the exception to trace the error back to its origination. In particular, useDBMS_UTILITY.FORMAT_ERROR_BACKTRACE and DBMS_UTILITY.FORMAT_CALL_TRACE to help you find the causeof the exception. The following Solution demonstrates the use of FORMAT_ERROR_BACKTRACE: \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS \n  emp_qry             VARCHAR2(500); \n  emp_first           employees.first_name%TYPE; \n  emp_last            employees.last_name%TYPE; \n  email               employees.email%TYPE; \n \n  valid_id_count      NUMBER :&#x3D; 0; \n  valid_flag          BOOLEAN :&#x3D; TRUE; \n  temp_emp_info       VARCHAR2(50); \n \n \n BEGIN \n    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n    IF emp_info LIKE &#39;%@%&#39; THEN \n      temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); \n      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; \n    ELSE \n      SELECT COUNT(*) \n      INTO valid_id_count \n      FROM employees \n      WHERE employee_id &#x3D; emp_info; \n   \n      IF valid_id_count &gt; 0 THEN \n          temp_emp_info :&#x3D; emp_info; \n          emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; \n      ELSE \n          valid_flag :&#x3D; FALSE; \n      END IF; \n    END IF; \n   \n    IF valid_flag &#x3D; TRUE THEN \n      EXECUTE IMMEDIATE emp_qry \n      INTO emp_first, emp_last, email \n      USING temp_emp_info; \n   \n      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n    ELSE  \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n    END IF; \n   \n    EXCEPTION \n      WHEN NO_DATA_FOUND THEN \n         \n        DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); \n         \n      WHEN OTHERS THEN \n        DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || \n                           &#39;TRY AGAIN&#39;); \n        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); \n END; \nHere are the results when calling within invalid argument information: \nSQL&gt; exec obtain_emp_detail(&#39;junea@&#39;); \nTHE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD \nORA-06512: at &quot;OBTAIN_EMP_DETAIL&quot;, line 32 \n \n \nPL&#x2F;SQL procedure successfully completed. \nAs you can see, the exact line number that caused the exception to be raised is displayed. This isespecially useful if you use a development environment that includes line numbering for your sourcecode. If not, then you can certainly count out the line numbers manually.Similarly, DBMS_UTILITY.FORMAT_CALL_STACK lists the object number, line, and object where the issuehad occurred. The following example uses the same procedure as the previous example, but this timeDBMS_UTILITY.FORMAT_CALL_STACK is used in the exception handler: \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS \n  emp_qry                VARCHAR2(500); \n  emp_first              employees.first_name%TYPE; \n  emp_last               employees.last_name%TYPE; \n  email                  employees.email%TYPE; \n \n  valid_id_count         NUMBER :&#x3D; 0; \n  valid_flag             BOOLEAN :&#x3D; TRUE; \n  temp_emp_info          VARCHAR2(50); \n \n \n BEGIN \n    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n    IF emp_info LIKE &#39;%@%&#39; THEN \n      temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); \n      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; \n    ELSE \n      SELECT COUNT(*) \n      INTO valid_id_count \n      FROM employees \n      WHERE employee_id &#x3D; emp_info; \n   \n      IF valid_id_count &gt; 0 THEN \n          temp_emp_info :&#x3D; emp_info; \n          emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; \n      ELSE \n          valid_flag :&#x3D; FALSE; \n      END IF; \n    END IF; \n   \n    IF valid_flag &#x3D; TRUE THEN \n      EXECUTE IMMEDIATE emp_qry \n      INTO emp_first, emp_last, email \n      USING temp_emp_info; \n   \n      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n    ELSE  \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n    END IF; \n   \n    EXCEPTION \n      WHEN NO_DATA_FOUND THEN \n         \n        DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_CALL_STACK); \n         \n      WHEN OTHERS THEN \n        DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || \n                           &#39;TRY AGAIN&#39;); \n        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_CALL_STACK); \n END;\nHere are the results when calling within invalid argument information:\nSQL&gt; exec obtain_emp_detail(&#39;june@&#39;); \nTHE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD\n----- PL&#x2F;SQL Call Stack ----- \n  object      line  object \n  handle    number \nname \n24DD3280     47  procedure OBTAIN_EMP_DETAIL\n273AA66C      1 \nanonymous block \nPL&#x2F;SQL procedure successfully completed.\nEach of the two utilities demonstrated in this Solution serves an explicit purpose—to assist you infinding the cause of exceptions in your applications.How It WorksOracle provides a few different utilities to help diagnose and repair issues with code. The utilitiesdiscussed in this recipe provide feedback regarding exceptions that have been raised within applicationcode. DBMS_UTILITY.FORMAT_ERROR_BACKTRACE is used to display the list of lines that goes back to the pointat which your application fails. This utility was added in Oracle Database 10g. Its ability to identify theexact line number where the code has failed can save the time of reading through each line to look forthe errors. Using this information along with the Oracle exception that is raised should give you enoughinsight to determine the exact cause of the Problem.The result from DBMS_UTILITY.FORMAT_ERROR_BACKTRACE can be assigned to a variable since it is afunction. Most likely a procedure will be used to log the exceptions so that they can be reviewed at a latertime. Such a procedure could accept the variable containing the result fromDBMS_UTILITY.FORMAT_ERROR_BACKTRACE as input.The DBMS_UTILITY.FORMAT_CALL_STACK function is used to print out a formatted string of theexecution call stack or the sequence of calls for your application. It displays the different objects used,along with line numbers from which calls were made. It can be very useful for pinpointing those errorsthat you are having trouble resolving. It can also be useful for obtaining information regarding theexecution order of your application. If you are unsure of exactly what order processes are being called,this function will give you that information.Using a combination of these utilities when debugging and developing your code is a good practice.You may find it useful to create helper functions that contain calls to these utilities so that you can easilylog all stack traces into a database table or a file for later viewing. These can be of utmost importancewhen debugging issues or evaluating application execution. \n9-10. Displaying PL&#x2F;SQL Compiler WarningsProblemYou are interested in making your code more robust by ensuring that no issues will crop up as time goesby and the code evolves. You want to have the PL&#x2F;SQL compiler alert you of possible issues with yourcode.SolutionUse PL&#x2F;SQL compile-time warnings to alert you of possible issues with your code. Enable warnings foryour current session by issuing the proper ALTER SESSION statements or by using the DBMS_WARNINGpackage to do so. This Solution will demonstrate each of these techniques to help you decide which willwork best for your debugging purposes.First let’s take a look at using ALTER SESSION to enable and configure warnings for yourenvironment. This technique can be very useful when you want to enable warnings for an entire session.The following example shows how to enable warnings and how to display them given a short code block: \nALTER SESSION SET PLSQL_WARNINGS &#x3D; &#39;ENABLE:ALL&#39;; \n \nCREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, \n                                                  hours   IN NUMBER DEFAULT 1) \nRETURN NUMBER AS \nBEGIN \n  RETURN salary&#x2F;hours; \nEND; \n \nSHOW ERRORS; \n \nHere are the results from running create or replace function with all warnings enabled: \n \nErrors for FUNCTION CALCULATE_SALARY_HOURS: \n \nLINE&#x2F;COL \n-------------------------------------------------------------------------------- \nERROR \n-------------------------------------------------------------------------------- \n1&#x2F;1\nPLW-05018: unit CALCULATE_SALARY_HOURS omitted optional AUTHID clause; default value DEFINER used \nNext, let’s look at the DBMS_WARNINGS package. Use of this technique is more helpful if you are using adevelopment environment such as PL&#x2F;SQL Developer that compiles your code for you. The following isan example of performing the same CREATE OR REPLACE FUNCTION as earlier, but this time usingDBMS_WARNINGS: \nSQL&gt; CALL DBMS_WARNING.SET_WARNING_SETTING_STRING(&#39;ENABLE:ALL&#39;,&#39;SESSION&#39;); \n \nCall completed. \n \nCHAPTER 9  EXCEPTIONS \n212 \nSQL&gt; CREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, \n                                                  hours   IN NUMBER DEFAULT 1) \nRETURN NUMBER AS \nBEGIN \n  RETURN salary&#x2F;hours; \nEND; \n&#x2F;  2    3    4    5    6    7   \n \nSP2-0806: Function created with compilation warnings \n \nSQL&gt; SHOW ERRORS; \nErrors for FUNCTION CALCULATE_SALARY_HOURS: \n \nLINE&#x2F;COL \n-------------------------------------------------------------------------------- \nERROR \n-------------------------------------------------------------------------------- \n1&#x2F;1\nPLW-05018: unit CALCULATE_SALARY_HOURS omitted optional AUTHID clause; default value DEFINER used \nBoth techniques provide similar results, but one can be set at the database level and the other canbe more useful for use in a development environment.How It WorksLearning about warnings against your code can help you solidify your code and repair it so that it canbecome more robust when it is used in a production environment. Although PL&#x2F;SQL warnings will notprevent the code from compiling and executing, they can certainly provide good insight to inform you ofplaces in your code that could possibly incur issues at a later time. As you have learned from the Solutionto this recipe, there are two techniques that can be used to enable warnings for your application. Thoseare the use of ALTER SESSION statements and the DBMS_WARNINGS package. Both are valid techniques forenabling and disabling warnings, but each has its own set of strong points and drawbacks.The PLSQL_WARNINGS compilation parameter must be used to enable or disable warnings within asession. By setting it, you can control the types of warnings that are displayed, along with how muchinformation is displayed and even how it is displayed. This parameter can be set using the ALTER SESSIONstatement. The format for setting this parameter using ALTER SESSION is as follows: \nALTER SESSION SET PLSQL_WARNINGS &#x3D; &quot;[ENABLE&#x2F;DISABLE:PARAMETER]&quot; \nThe PLSQL_WARNINGS compilation parameter accepts a number of different parameters that each tellthe compiler what types of warnings to display and what to ignore. There are three different categories ofwarnings that can be used. Table 9-3 shows the different types of warnings along with their descriptions. \nTable 9-3. Warning  Categories \nCategory                  Description \nPERFORMANCE               May hinder application performance \nINFORMATIONAL             May complicate application maintenance but contains no immediate issues \nSECURE                    May cause unexpected or incorrect results ALL Includes all the categories \nThe DBMS_WARNINGS package works in a similar fashion: it accepts the same arguments as thePLSQL_WARNINGS parameter. The difference is that you can control when the warnings are enabled ordisabled by placing the call to the package in locations that you choose. This does not matter muchwhen working via SQL*Plus, but if you are using a development environment such as Oracle SQLDeveloper, then DBMS_WARNINGS must be used. The format for calling this procedure is as follows: \nCALL DBMS_WARNING.SET_WARNING_SETTING_STRING(&#39;warning_category:value&#39;,&#39;scope&#39;); \nThe categories are the same as PLSQL_WARNINGS, as are the values of the categories. The scope determineswhether the warnings will be used for the duration of the session or for all sessions. There are variousother options that can be used with the DBMS_WARNINGS package. To learn more about these options,please see the Oracle Database 11g documentation. \n","dateCreated":"2022-11-08T23:18:24+08:00","dateModified":"2022-11-08T23:39:58+08:00","datePublished":"2022-11-08T23:18:24+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 09-Exceptions","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 09-Exceptions">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:18:24.035Z">
+<meta property="article:modified_time" content="2022-11-08T15:39:58.525Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 09-Exceptions
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:18:24+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#9-Exceptions"><span class="toc-text">9. Exceptions</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1-Trapping-an-Exception"><span class="toc-text">9-1. Trapping an Exception</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2-Catching-Unknown-Exceptions"><span class="toc-text">9-2. Catching Unknown Exceptions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-3-Creating-and-Raising-Named-Programmer-Defined-Exceptions"><span class="toc-text">9-3. Creating and Raising Named Programmer-Defined Exceptions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-4-Determining-Which-Error-Occurred-Inside-the-OTHERS-Handler"><span class="toc-text">9-4. Determining Which Error Occurred Inside the OTHERS Handler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-5-Raising-User-Defined-Exceptions-Without-an-Exception-Handler"><span class="toc-text">9-5. Raising User-Defined Exceptions Without an Exception Handler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-6-Redirecting-Control-After-an-Exception-Is-Raised"><span class="toc-text">9-6. Redirecting Control After an Exception Is Raised</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-7-Raising-Exceptions-and-Continuing-Processing"><span class="toc-text">9-7. Raising Exceptions and Continuing Processing</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-8-Associating-Error-Numbers-with-Exceptions-That-Have-No-Name"><span class="toc-text">9-8. Associating Error Numbers with Exceptions That Have No Name</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-9-Tracing-an-Exception-to-Its-Origin"><span class="toc-text">9-9. Tracing an Exception to Its Origin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-10-Displaying-PL-x2F-SQL-Compiler-Warnings"><span class="toc-text">9-10. Displaying PL&#x2F;SQL Compiler Warnings</span></a></li></ol></li></ol>
+
+<h1 id="9-Exceptions"><a href="#9-Exceptions" class="headerlink" title="9. Exceptions"></a>9. Exceptions</h1><p>Exceptions are a fundamental part of any well-written program. They are used to display user-friendly<br>error messages when an error is raised by an application, nondefault exception handling, and<br>sometimes recovery so that an application can continue. Surely you have seen your fair share of ORA-XXXXX error messages. Although these messages are extremely useful to a developer for debugging and<br>correcting issues, they are certainly foreign to the average application user and can be downright frightening to see.<br>Imagine that you are working with a significant number of updates via an application form, and after you submit your 150th update, an Oracle error is displayed. Your first reaction would be of panic, hoping that you haven’t just lost all of the work you had completed thus far. By adding exception handling to an application, you can ensure that exceptions are handled in an orderly fashion so that no work is lost. You can also create a nicer error message to let the user know all changes have been saved<br>up to this point so that sheer panic doesn’t set in when the exception is raised.<br>Exceptions can also be raised as a means to provide informative detail regarding processes that are occurring within your application. They are not merely restricted to being used when Oracle encounters an issue. You can raise your own exceptions as well when certain circumstances are encountered in your application.<br>Whatever the case may be, exception handling should be present in any production-quality application code. This chapter will cover some basics of how to use exception handling in your code. Along the way, you will learn some key tips on how exception handling can make your life easier. In the end, you should be fully armed to implement exception handling for your applications. </p>
+<h2 id="9-1-Trapping-an-Exception"><a href="#9-1-Trapping-an-Exception" class="headerlink" title="9-1. Trapping an Exception"></a>9-1. Trapping an Exception</h2><p><strong>Problem</strong><br>A procedure in your application has the potential to cause an exception to be raised. Rather than let the<br>program exit and return control to the host machine, you want to perform some cleanup to ensure data<br>integrity, as well as display an informative error message.<br><strong>Solution</strong><br>Write an exception handler for your procedure so that the exception can be caught and you can perform<br>tasks that need to be completed and provide a more descriptive message. The following procedure is<br>used to obtain employee information based upon a primary key value or an e-mail address. Beginning<br>with the EXCEPTION keyword in the following example, an exception-handling block has been added to<br>the end of the procedure in order to handle any exceptions that may occur when no matching record is<br>found. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
+  emp_qry            VARCHAR2(500); 
+  emp_first          employees.first_name%TYPE; 
+  emp_last           employees.last_name%TYPE; 
+  email              employees.email%TYPE; 
+ 
+  valid_id_count     NUMBER :&#x3D; 0; 
+  valid_flag         BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info      VARCHAR2(50); 
+ 
+BEGIN 
+  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+  IF emp_info LIKE &#39;%@%&#39; THEN 
+    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); 
+    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; 
+  ELSE 
+    SELECT COUNT(*) 
+    INTO valid_id_count 
+    FROM employees 
+    WHERE employee_id &#x3D; emp_info; 
+ 
+    IF valid_id_count &gt; 0 THEN 
+        temp_emp_info :&#x3D; emp_info; 
+        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; 
+    ELSE 
+        valid_flag :&#x3D; FALSE; 
+    END IF; 
+  END IF; 
+ 
+  IF valid_flag &#x3D; TRUE THEN 
+    EXECUTE IMMEDIATE emp_qry 
+    INTO emp_first, emp_last, email 
+    USING temp_emp_info; 
+ 
+    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+  ELSE  
+    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+  END IF; 
+ 
+  EXCEPTION 
+    WHEN NO_DATA_FOUND THEN 
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+    WHEN INVALID_NUMBER THEN 
+      DBMS_OUTPUT.PUT_LINE(&#39;YOU MUST ENTER AN EMAIL ADDRESS INCLUDING &#39; || 
+                         &#39;THE @ OR A POSITIVE INTEGER VALUE FOR THE &#39; || 
+                         &#39;EMPLOYEE ID.&#39;); 
+END; </code></pre>
+<p>Here are the results of calling the procedure with various arguments: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; EXEC OBTAIN_EMP_DETAIL(000); 
+THE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD 
+ 
+PL&#x2F;SQL procedure successfully completed. 
+
+SQL&gt; EXEC OBTAIN_EMP_DETAIL(&#39;TEST&#39;); 
+YOU MUST ENTER AN EMAIL ADDRESS INCLUDING THE @ OR A POSITIVE INTEGER VALUE FOR 
+THE EMPLOYEE ID. 
+ 
+PL&#x2F;SQL procedure successfully completed. 
+ 
+SQL&gt; EXEC OBTAIN_EMP_DETAIL(200);   
+Jennifer Whalen - JWHALEN 
+ 
+PL&#x2F;SQL procedure successfully completed. 
+</code></pre>
+<p>This procedure is essentially the same as the one demonstrated in Recipe 8-1. The difference is that<br>when an exception is raised, the control will go into the exception block. At that time, the code you place<br>within the exception block will determine the next step to take as opposed to simply raising an Oracle<br>error and returning control to the calling procedure, calling function, or host environment.<br><strong>How It Works</strong><br>To perform remedial actions when an exception is raised, you should always make sure to code an<br>exception handler if there is any possibility that an exception may be thrown. The sole purpose of an<br>exception handler is to catch exceptions when they are raised and handle the outcome in a controlled<br>fashion. There are two different types of exceptions that can be raised by a PL&#x2F;SQL application:<br>internally defined and user defined. Oracle Database has a defined set of internal exceptions that can be<br>thrown by a PL&#x2F;SQL application. Those exceptions are known as internally defined. It is also possible to<br>define your own exceptions, which are known as user defined.<br>An exception-handling block is structured like a CASE statement in that a series of exceptions is listed<br>followed by a separate set of statements to be executed for each outcome. The standard format for an<br>exception-handling block is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXCEPTION 
+  WHEN name_of_exception THEN 
+    -- One or more statements </code></pre>
+<p>Exception blocks begin with the EXCEPTION keyword, followed by a series of WHEN..THEN clauses that<br>describe different possible exceptions along with the set of statements that should be executed if the<br>exception is caught. The exception name can be one of the Oracle internally defined exceptions, or it can<br>be the name of an exception that has been declared within your code. To learn more about declaring<br>exceptions, please see Recipe 9-3 in this chapter. In the Solution to this recipe, the internally defined<br>NO_DATA_FOUND exception is raised if an unknown e-mail address is entered into the procedure because<br>there will be no rows returned from the query. When the exception block encounters the WHEN clause that<br>corresponds with NO_DATA_FOUND, the statements immediately following the THEN keyword are executed.<br>In this case, an error message is printed using the DBMS_OUTPUT package. However, in a real-world<br>application, this is where you will place any cleanup or error handling that should be done to help<br>maintain the integrity of the data accessed by your application.<br>An exception block can contain any number of WHEN..THEN clauses, and therefore, any number of<br>exceptions can each contain their own set of handler statements. Even if a simple message was to be<br>displayed, as is the case with the Solution to this recipe, a different and more descriptive error message<br>can be coded for each different exception that may possibly be raised. This situation is reflected in the<br>second exception handler contained within the Solution because it returns a different error message<br>than the first.<br>As mentioned previously, Oracle contains a number of internally defined exceptions. Table 9-1<br>provides a list of the internally defined exceptions, along with a description of their usage.<br>Table 9-1. Oracle Internal Exceptions </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">Exception               Code Description 
+ACCESS_INTO_NULL        -6530 Values are assigned to an uninitialized object. 
+CASE_NOT_FOUND          -6592 No matching choice is available within CASE statement, and no ELSE clause has been defined. 
+COLLECTION_IS_NULL      -6531 Program attempts to apply collection methods other than EXISTS to varray or a nested table that has not yet been initialized. 
+CURSOR_ALREADY_OPEN     -6511 Program attempts to open a cursor that is already open. 
+DUP_VAL_ON_INDEX        -1 Program attempts to store duplicate values in a unique index column. 
+INVALID_CURSOR          -1001 Program attempts to use a cursor operation that is allowed. 
+INVALID_NUMBER          -1722 Conversion of string into number is incorrect because of the string not being a number. 
+LOGIN_DEINIED           -1017 Program attempts to log in to the database using an incorrect user name and&#x2F;or password. 
+NO_DATA_FOUND           +100 SELECT statement returns no rows. 
+NOT_LOGGED_ON           -1012 Program attempts to issue a database call without being connected to the database. 
+PROGRAM_ERROR           -6501 Internal Problem exists. 
+ROWTYPE_MISMATCH        -6504 Cursor variables are incompatible. A host cursor variable must have a compatible return type that matches a PL&#x2F;SQL cursor variable. 
+SELF_IS_NULL            -30625 Instance of object type is not initialized. 
+STORAGE_ERROR           -6500 PL&#x2F;SQL ran out of memory or was corrupted. 
+SUBSCRIPT_BEYOND_COUNT  -6533  Program references nested table or varray element using an index number that goes beyond the number of elements within the object. 
+SYS_INVALID_ROWID       -1410  Conversion of character string into ROWID fails because character string does not represent a valid row ID. 
+TIMEOUT_ON_RESOURCE     -51  Oracle Database is waiting for resource, and timeout occurs. 
+TOO_MANY_ROWS           -1422  Attempts to select more than one row using a SELECT INTO statement. 
+VALUE_ERROR             -6502  Program attempts to perform an invalid arithmetic,conversion, or truncation operation. 
+ZERO_DIVIDE             -1476  Program attempts to divide a number by zero. </code></pre>
+<p>An exception handler’s scope corresponds to its enclosing code block. They have the same scope as<br>a variable would have within a code block. If your code contains a nested code block, an exception<br>handler that is contained within the nested code block can only handle exceptions raised within that<br>code block. The outer code block can contain an exception handler that will handle exceptions for both<br>the outer code block and the nested code block. If an exception is raised within the nested code block<br>and there is no corresponding handler for an exception that has been raised within the nested code<br>block, then the exception is propagated to the outer code block to look for a corresponding handler<br>there. If no handler is found, then runtime will be passed to the procedure or function that called it or<br>the host system, which is what you do not want to have occur. The following code demonstrates an<br>example of using an exception handler within a nested code block: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  CURSOR emp_cur IS 
+  SELECT * 
+  FROM EMPLOYEES; 
+ 
+  emp_rec emp_cur%ROWTYPE; 
+BEGIN 
+  FOR emp_rec IN emp_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || 
+         emp_rec.last_name); 
+    DECLARE 
+      emp_dept  departments.department_name%TYPE; 
+    BEGIN 
+      SELECT department_name 
+      INTO emp_dept 
+      FROM departments 
+      WHERE department_id &#x3D; emp_rec.department_id; 
+      DBMS_OUTPUT.PUT_LINE(&#39;Department: &#39; || emp_dept); 
+    EXCEPTION 
+      WHEN NO_DATA_FOUND THEN 
+        DBMS_OUTPUT.PUT_LINE(&#39;EXCEPTION IN INNER BLOCK&#39;); 
+    END; 
+  END LOOP; 
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+   DBMS_OUTPUT.PUT_LINE(&#39;EXCEPTION IN OUTER BLOCK&#39;); 
+END; </code></pre>
+<p>Multiple exceptions can be listed within the same exception handler if you want to execute the same<br>set of statements when either of them is raised. You can do this within the WHEN clause by including two<br>or more exception names and placing the OR keyword between them. Using this technique, if either of<br>the exceptions that are contained within the clause is raised, then the set of statements that follows will<br>be executed. Let’s take a look at an exception handler that contains two exceptions within the same<br>handler: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXCEPTION 
+  WHEN NO_DATA_FOUND OR INVALID_EMAIL_ADDRESS THEN 
+    --  statements to execute 
+  WHEN OTHERS THEN 
+    --  statements to execute 
+END;</code></pre>
+<p>■ Note You cannot place the AND keyword in between exceptions because no two exceptions can be raised at the<br>same time.<br>It is easy to include basic exception handling in your application. Code an exception-handling block<br>at the end of each code block that may raise an exception. It is pertinent that you test your application<br>under various conditions to try to predict which possible exceptions may be raised; each of those<br>possibilities should be accounted for within the exception-handling block of your code. </p>
+<h2 id="9-2-Catching-Unknown-Exceptions"><a href="#9-2-Catching-Unknown-Exceptions" class="headerlink" title="9-2. Catching Unknown Exceptions"></a>9-2. Catching Unknown Exceptions</h2><p><strong>Problem</strong><br>Some exceptions are being raised when executing one of your procedures and you want to ensure that<br>all unforeseen exceptions are handled using an exception handler.<br><strong>Solution</strong><br>Use an exception handler, and specify OTHERS for the exception name to catch all the exceptions that<br>have not been caught by previous handlers. In the following example, the same code from Recipe 9-1<br>has been modified to add an OTHERS exception handler: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
+  emp_qry                   VARCHAR2(500); 
+  emp_first                 employees.first_name%TYPE; 
+  emp_last                  employees.last_name%TYPE; 
+  email                     employees.email%TYPE; 
+ 
+  valid_id_count            NUMBER :&#x3D; 0; 
+  valid_flag                BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info             VARCHAR2(50); 
+ 
+BEGIN 
+  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+  IF emp_info LIKE &#39;%@%&#39; THEN 
+    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); 
+    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; 
+  ELSE 
+    SELECT COUNT(*) 
+    INTO valid_id_count 
+    FROM employees 
+    WHERE employee_id &#x3D; emp_info; 
+ 
+    IF valid_id_count &gt; 0 THEN 
+        temp_emp_info :&#x3D; emp_info; 
+        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; 
+    ELSE 
+        valid_flag :&#x3D; FALSE; 
+    END IF; 
+  END IF; 
+ 
+  IF valid_flag &#x3D; TRUE THEN 
+    EXECUTE IMMEDIATE emp_qry 
+    INTO emp_first, emp_last, email 
+    USING temp_emp_info; 
+ 
+    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+  ELSE  
+    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+  END IF; 
+ 
+  EXCEPTION 
+    WHEN NO_DATA_FOUND THEN 
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+    WHEN OTHERS THEN 
+      DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || 
+                         &#39;TRY AGAIN&#39;); 
+END; </code></pre>
+<p>In this example, if an unexpected exception were to be raised, then the program control would<br>transfer to the statements immediately following the WHEN OTHERS THEN clause.<br>■ Note In a real-world application, an exception should be manually reraised within the OTHERS handler. To learn<br>more about determining the exception that was raised, please see Recipe 9-4.<br><strong>How It Works</strong><br>You can use the OTHERS handler to catch all the exceptions that have not been previously handled by any<br>named exception handler. It is a good idea to include an OTHERS handler with any exception handler so<br>that any unknown exceptions can be handled reasonably by your application. However, OTHERS should<br>be used only to assist developers in finding application bugs rather than as a catchall for any exception.<br>The format for using the OTHERS handler is the same as it is with other named exceptions; the only<br>difference is that it should be the last handler to be coded in the exception handler. The following<br>pseudocode depicts a typical exception handler that includes an OTHERS handler: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXCEPTION 
+  WHEN named_exception1 THEN 
+    -- perform statements 
+  WHEN named_exception2 THEN 
+    -- perform statements 
+  WHEN OTHERS THEN 
+    -- perform statements 
+  WHEN TO USE THE OTHERS HANDLER </code></pre>
+<p>It is important to note that the OTHERS handler is not used to avoid handling expected exceptions properly.<br>Each exception that may possibly be raised should be handled within its own exception-handling block.<br>The OTHERS handler should be used only to catch those exceptions that are not expected. Most often, the<br>OTHERS handler is used to catch application bugs in order to assist a developer in finding and resolving<br>issues.<br>As stated, the OTHERS handler will catch any exception that has not yet been caught by another<br>handler. It is very important to code a separate handler for each type of named exception that may<br>occur. However, if you have one set of statements to run for any type of exception that may occur, then it<br>is reasonable to include only an OTHERS exception handler to catch exceptions that are unexpected. If no<br>named exceptions are handled and an exception handler includes only an OTHERS handler, then the<br>statements within that handler will be executed whenever any exception occurs within an application. </p>
+<h2 id="9-3-Creating-and-Raising-Named-Programmer-Defined-Exceptions"><a href="#9-3-Creating-and-Raising-Named-Programmer-Defined-Exceptions" class="headerlink" title="9-3. Creating and Raising Named Programmer-Defined Exceptions"></a>9-3. Creating and Raising Named Programmer-Defined Exceptions</h2><p><strong>Problem</strong><br>You want to alert the users of your application when a specific event occurs. The event does not raise an<br>Oracle exception, but it is rather an application-specific exception. You want to associate this event with<br>a custom exception so that it can be raised whenever the event occurs.<br>  CHAPTER 9  EXCEPTIONS<br>195<br><strong>Solution</strong><br>Declare a named user-defined exception, and associate it with the event for which you are interested in<br>raising an exception. In the following example, a user-defined exception is declared and raised within a<br>code block. When the exception is raised, the application control is passed to the statements contained<br>within the exception handler for the named user exception. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE salary_increase(emp_id IN NUMBER, 
+                                            pct_increase IN NUMBER) AS 
+   
+  salary                employees.salary%TYPE; 
+  max_salary            jobs.max_salary%TYPE; 
+  INVALID_INCREASE      EXCEPTION; 
+   
+   
+BEGIN 
+ 
+  SELECT salary, max_salary 
+  INTO salary, max_salary 
+  FROM employees, jobs 
+  WHERE employee_id &#x3D; emp_id 
+  AND jobs.job_id &#x3D; employees.employee_id; 
+ 
+   
+  IF (salary + (salary * pct_increase)) &lt;&#x3D; max_salary THEN 
+    UPDATE employees 
+    SET salary &#x3D; (salary + (salary * pct_increase)) 
+    WHERE employee_id &#x3D; emp_id; 
+     
+    DBMS_OUTPUT.PUT_LINE(&#39;SUCCESSFUL SALARY INCREASE FOR EMPLOYEE #: &#39; || 
+          emp_id || 
+          &#39;.  NEW SALARY &#x3D; &#39; || salary + (salary * pct_increase)); 
+          
+  ELSE 
+    RAISE INVALID_INCREASE; 
+  END IF; 
+   
+ 
+   
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;UNSUCCESSFUL INCREASE, NO EMPLOYEE RECORD FOUND &#39; || 
+                  &#39;FOR THE GIVEN ID&#39;); 
+                   
+  WHEN INVALID_INCREASE THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;UNSUCCESSFUL INCREASE.  YOU CANNOT INCREASE THE &#39; || 
+                  &#39;EMPLOYEE SALARY BY &#39; || pct_increase || 
+                  &#39;PERCENT...PLEASE ENTER &#39; || 
+                  &#39;A SMALLER INCREASE AMOUNT TO TRY AGAIN&#39;); 
+ 
+ 
+  WHEN OTHERS THEN 
+CHAPTER 9  EXCEPTIONS 
+196 
+    DBMS_OUTPUT.PUT_LINE(&#39;UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS &#39;|| 
+                  &#39;OCCURRED, &#39; || 
+                  &#39;PLEASE TRY AGAIN OR CONTACT ADMINISTRATOR&#39; || pct_increase); 
+ 
+END; </code></pre>
+<p>As you can see from the code, the exception block can accept one or more handlers. The named<br>user exception is declared within the declaration section of the procedure, and the exception can be<br>raised anywhere within the containing block.<br>■ Note In a real-world application, an exception should be manually raised within the OTHERS handler. To learn<br>more about determining the exception that was raised, please see Recipe 9-4.<br><strong>How It Works</strong><br>A PL&#x2F;SQL application can contain any number of custom exceptions. When a developer declares their<br>own exception, it is known as a user-defined exception. A user-defined exception must be declared<br>within the declaration section of a package, function, procedure, or anonymous code block. To declare<br>an exception, use the following: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">exception_name  EXCEPTION; </code></pre>
+<p>You can provide any name as long as it applies to the standard naming convention and is not the<br>same as an internally defined exception name. It is a coding convention to code exception names using<br>uppercase lettering, but lowercase would work as well since PL&#x2F;SQL is not a case-sensitive language.<br>To raise your exception, type the RAISE keyword followed by the name of the exception that you<br>want to raise. When the code executes the RAISE statement, control is passed to the exception handler<br>that best matches the exception that was named in the statement. If no handler exists for the exception<br>that was raised, then control will be passed to the OTHERS handler, if it exists. In the worst-case scenario,<br>if there are not any exception handlers that match the name that was provided in the RAISE statement<br>and there has not been an OTHERS handler coded, then control will be passed back to the enclosing block,<br>the calling code, or the host environment.<br>The RAISE statement can also be used in a couple of other ways. It is possible to raise an exception<br>that has been declared within another package. To do so, fully qualify the name of the exception by<br>prefixing it with the package name. The RAISE statement can also be used stand-alone to reraise an<br>exception.<br>As seen in the <strong>Solution</strong> to this recipe, catching a named user exception is exactly the same as<br>catching an internally defined exception. Code the WHEN..THEN clause, naming the exception that you<br>want to catch. When the exception is raised, any statements contained within that particular exception<br>handler will be executed. </p>
+<h2 id="9-4-Determining-Which-Error-Occurred-Inside-the-OTHERS-Handler"><a href="#9-4-Determining-Which-Error-Occurred-Inside-the-OTHERS-Handler" class="headerlink" title="9-4. Determining Which Error Occurred Inside the OTHERS Handler"></a>9-4. Determining Which Error Occurred Inside the OTHERS Handler</h2><p><strong>Problem</strong><br>Your code is continually failing via an exception, and the OTHERS handler is being invoked. You need to<br>determine the exact cause of the exception so that it can be repaired.<br><strong>Solution</strong><br>Code the OTHERS exception handler as indicated by Recipe 9-2, and use the SQLCODE and<br>DBMS_UTILITY.FORMAT_ERROR_STACK functions to return the Oracle error code and message text for the<br>exception that has been raised. The following example demonstrates the usage of these functions, along<br>with the procedure that was used in Recipe 9-3, for obtaining the error code and message when the<br>OTHERS handler is invoked. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR replace PROCEDURE salary_increase(emp_id       IN NUMBER,  
+                                            pct_increase IN NUMBER)  
+AS  
+  salary              employees.salary%TYPE;  
+  max_salary          jobs.max_salary%TYPE;  
+  invalid_increase    EXCEPTION;  
+  error_number        NUMBER;  
+  error_message       VARCHAR2(1500);  
+BEGIN  
+  SELECT salary,  
+         max_salary  
+  INTO   salary, max_salary  
+  FROM   employees,  
+         jobs  
+  WHERE  employee_id &#x3D; emp_id  
+         AND jobs.job_id &#x3D; employees.employee_id;  
+ 
+  IF ( salary + ( salary * pct_increase ) ) &lt;&#x3D; max_salary THEN  
+    UPDATE employees  
+    SET    salary &#x3D; ( salary + ( salary * pct_increase ) )  
+    WHERE  employee_id &#x3D; emp_id;  
+ 
+    dbms_output.Put_line(&#39;SUCCESSFUL SALARY INCREASE FOR EMPLOYEE #: &#39;  
+                         || emp_id  
+                         || &#39;.  NEW SALARY &#x3D; &#39;  
+                         || salary + ( salary * pct_increase ));  
+  ELSE  
+    RAISE invalid_increase;  
+  END IF;  
+EXCEPTION  
+  WHEN no_data_found THEN  
+    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE, NO EMPLOYEE RECORD FOUND &#39; 
+                     || &#39;FOR THE &#39;  
+                     || &#39;GIVEN ID&#39;); WHEN invalid_increase THEN  
+    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  YOU CANNOT INCREASE THE &#39;  
+                     || &#39;EMPLOYEE &#39;  
+                     || &#39;SALARY BY &#39;  
+                     || pct_increase  
+                     || &#39; PERCENT...PLEASE ENTER &#39;  
+                     || &#39;A SMALLER INCREASE AMOUNT TO TRY AGAIN&#39;);  
+WHEN OTHERS THEN  
+           error_number :&#x3D; SQLCODE;  
+ 
+           error_message :&#x3D; DBMS_UTILITY.FORMAT_ERROR_STACK;  
+ 
+    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS &#39; 
+                     || &#39;OCCURRED, &#39;  
+                     || &#39;PLEASE TRY AGAIN OR CONTACT ADMINISTRATOR&#39;  
+                     || &#39; Error #: &#39;  
+                     || error_number  
+                     || &#39; - &#39;  
+                     || error_message); 
+END;  </code></pre>
+<p>When this procedure is executed, the following error will be returned: </p>
+<p>UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS OCCURRED, PLEASE TRY AGAIN OR CONTACT<br>ADMINISTRATOR Error #: -1722 - ORA-01722: invalid number </p>
+<p>This example intentionally raises an error in order to demonstrate the functionality of these utilities.<br>A reference to the line number that raised the error may also be helpful. To learn more about writing an<br>exception handler that returns line numbers, please see Recipe 9-9.<br><strong>How It Works</strong><br>The SQLCODE and DBMS_UTILITY.FORMAT_ERROR_STACK functions provide the means to determine what<br>code and message had caused the last exception that was raised. The SQLCODE function will return the<br>Oracle error number for internal exceptions and +1 for a user-defined exception. The<br>DBMS_UTILITY.FORMAT_ERROR_STACK function will return the Oracle error message for any internal<br>exception that is raised, and it will contain the text User-Defined Exception for any named user<br>exception that is raised. A user-defined exception may receive a custom error number, as you will read<br>about in Recipe 9-9. In such cases, the SQLCODE function will return this custom error number if raised.<br>To use these functions, you must assign them to a variable because they cannot be called outright.<br>For instance, if you wanted to use the SQLCODE within a CASE statement, you would have to assign the<br>function to a variable first. Once that has been done, you could use the variable that was assigned the<br>SQLCODE in the statement.<br>Oracle includes DBMS_UTILITY.FORMAT_ERROR_STACK, which can be used to return the error message<br>associated with the current error. DBMS_UTILITY.FORMAT_ERROR_STACK can hold up to 1,899 characters, so<br>there is rarely a need to truncate the message it returns. SQLERRM is a similar function that can be used to<br>return the error message, but it only allows messages up to 512 bytes to be displayed. Oftentimes,<br>SQLERRM messages need to be truncated for display. Oracle recommends using<br>DBMS_UTILITY.FORMAT_ERROR_STACK over SQLERRM because this utility doesn’t have such a small message<br>limitation.<br>However, SQLERRM does have its place, because there are some benefits of using it. A handy feature of<br>SQLERRM is that you can pass an error number to it and retrieve the corresponding error message. Any<br>error number that is passed to SQLERRM should be negative; otherwise, you will receive the message User-<br>defined error. Table 9-2 displays the error number ranges and their corresponding messages using<br>SQLCODE and SQLERRM. </p>
+<pre class="language-text" data-language="text"><code class="language-text">Table 9-2. SQLCODE Return Codes and Meanings 
+Code                          Description 
+Negative Oracle Error Number  Internal Oracle exception 
+0                             No exceptions raised 
++1                            User-defined exception 
++100                          NO_DATA_FOUND 
+-20000 to -20999              User-defined error with PRAGMA EXCEPTION_INIT</code></pre>
+<p>■ Note PRAGMA EXCEPTION_INIT is used to associate an Oracle error number with an exception name.<br>If you choose to use SQLERRM, the code is not much different from using<br>DBMS_UTILITY.FORMAT_ERROR_STACK, but you will probably need to include some code to truncate the<br>result. The next example demonstrates the same example that was used in the <strong>Solution</strong> to this recipe, but<br>it uses SQLERRM instead of DBMS_UTILITY.FORMAT_ERROR_STACK. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR replace PROCEDURE salary_increase(emp_id       IN NUMBER,  
+                                            pct_increase IN NUMBER)  
+AS  
+  salary             employees.salary%TYPE;  
+  max_salary         jobs.max_salary%TYPE;  
+  invalid_increase   EXCEPTION;  
+  error_number       NUMBER;  
+  error_message      VARCHAR2(1500);  
+BEGIN  
+  SELECT salary,  
+         max_salary  
+  INTO   salary, max_salary  
+  FROM   employees,  
+         jobs  
+  WHERE  employee_id &#x3D; emp_id  
+         AND jobs.job_id &#x3D; employees.employee_id;  
+ 
+  IF ( salary + ( salary * pct_increase ) ) &lt;&#x3D; max_salary THEN  
+    UPDATE employees  
+    SET    salary &#x3D; ( salary + ( salary * pct_increase ) )  
+    WHERE  employee_id &#x3D; emp_id;  
+ 
+    dbms_output.Put_line(&#39;SUCCESSFUL SALARY INCREASE FOR EMPLOYEE #: &#39;  
+                         || emp_id  
+                         || &#39;.  NEW SALARY &#x3D; &#39;  
+                         || salary + ( salary * pct_increase ));  
+  ELSE  
+    RAISE invalid_increase;  
+  END IF; 
+EXCEPTION  
+  WHEN no_data_found THEN  
+    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE, NO EMPLOYEE RECORD FOUND &#39; 
+                     || &#39;FOR THE &#39;  
+                     || &#39;GIVEN ID&#39;); WHEN invalid_increase THEN  
+    dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  YOU CANNOT INCREASE THE &#39;  
+                     || &#39;EMPLOYEE &#39;  
+                     || &#39;SALARY BY &#39;  
+                     || pct_increase  
+                     || &#39; PERCENT...PLEASE ENTER &#39;  
+                     || &#39;A SMALLER INCREASE AMOUNT TO TRY AGAIN&#39;);
+WHEN OTHERS THEN  
+           error_number :&#x3D; SQLCODE;  
+           error_message :&#x3D; Substr(sqlerrm, 1, 150);  
+dbms_output.Put_line(&#39;UNSUCCESSFUL INCREASE.  AN UNKNOWN ERROR HAS OCCURRED, &#39;  
+                     || &#39;PLEASE TRY AGAIN OR CONTACT ADMINISTRATOR&#39;  
+                     || &#39; Error #: &#39;  
+                     || error_number  
+                     || &#39; - &#39;  
+                     || error_message); 
+END;</code></pre>
+<p>There are some other tools that can be used to further diagnose which errors are being raised and<br>even to see the entire stack trace. These tools are further explained within Recipe 9-9. By combining the<br>techniques learned in this recipe with those you will learn about in Recipe 9-9, you are sure to have a<br>better chance of diagnosing your application issues. </p>
+<h2 id="9-5-Raising-User-Defined-Exceptions-Without-an-Exception-Handler"><a href="#9-5-Raising-User-Defined-Exceptions-Without-an-Exception-Handler" class="headerlink" title="9-5. Raising User-Defined Exceptions Without an Exception Handler"></a>9-5. Raising User-Defined Exceptions Without an Exception Handler</h2><p><strong>Problem</strong><br>Your application includes some error handling that is specific to your application. For instance, you<br>want to ensure that the input value for a procedure is in the valid format to be an e-mail address. Rather<br>than writing an exception handler for each user-defined exception, you want to simply raise the<br>exception inline and provide an error number as well.<br><strong>Solution</strong><br>This scenario is perfect for using the RAISE_APPLICATION_ERROR procedure. Test the e-mail address that is<br>passed into the procedure to ensure that it follows certain criteria. If it does not contain a specific<br>characteristic of a valid e-mail address, use the RAISE_APPLICATION_ERROR procedure to display an<br>exception message to the user. Here’s an example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_email IN VARCHAR2) IS 
+  emp_qry       VARCHAR2(500); 
+  emp_first     employees.first_name%TYPE; 
+  emp_last      employees.last_name%TYPE; 
+  email         employees.email%TYPE; 
+ 
+  valid_id_count        NUMBER :&#x3D; 0; 
+  valid_flag            BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info         VARCHAR2(50); 
+ 
+  BEGIN 
+    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+    IF emp_email LIKE &#39;%@%&#39; THEN 
+      temp_emp_info :&#x3D; substr(emp_email,0,instr(emp_email,&#39;@&#39;)-1); 
+      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_email&#39;; 
+    ELSIF emp_email NOT LIKE &#39;%.mycompany.com&#39; THEN 
+      RAISE_APPLICATION_ERROR(-20001, &#39;Not a valid email address from &#39; || 
+                            &#39;this company!&#39;); 
+    ELSE 
+      RAISE_APPLICATION_ERROR(-20002, &#39;Not a valid email address!&#39;); 
+    END IF; 
+   
+    IF valid_flag &#x3D; TRUE THEN 
+      EXECUTE IMMEDIATE emp_qry 
+      INTO emp_first, emp_last, email 
+      USING temp_emp_info; 
+   
+      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+    ELSE  
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+    END IF; 
+ 
+END; </code></pre>
+<p>As you can see, there is no exception handler in this example. When the conditions are met, an<br>exception is raised inline via RAISE_APPLICATION_EXCEPTION.<br><strong>How It Works</strong><br>The RAISE_APPLICATION_EXCEPTION procedure can associate an error number with an error message. The<br>format for calling the RAISE_APPLICATION_EXCEPTION procedure is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">RAISE_APPLICATION_EXCEPTION(exception_number,  
+                           exception_message[, retain_error_stack]); </code></pre>
+<p>where exception_number is a number within the range of -20000 to -20999, and exception_message is a<br>string of text that is equal to or less than 2KB in length. The optional retain_error_stack is a BOOLEAN<br>value that tells Oracle whether this exception should be added to the existing error stack or whether the<br>error stack should be wiped clean and this exception should be placed into it. By default, the value is<br>FALSE, and all other exceptions are removed from the error stack, leaving this exception as the only one<br>in the stack.<br>When you invoke the procedure, the current block is halted immediately, and the exception is<br>raised. No further processing takes place within the current block, and control is passed to the program<br>that called the block or an enclosing block if the current block is nested. Therefore, if you need to<br>perform any exception handling, then it needs to take place prior to calling<br>RAISE_APPLICATION_EXCEPTION. There is no commit or rollback, so any updates or changes that have been<br>made will be retained if you decide to issue a commit. Any OUT and IN OUT values, assuming you are in a<br>procedure or a function, will be reverted. This is important to keep in mind, because it will help you<br>determine whether to use an exception handler or issue a call to RAISE_APPLICATION_ERROR.<br>When calling RAISE_APPLICATION_EXCEPTION, you pass an error number along with an associated<br>exception message. Oracle sets aside the range of numbers from -20000 to -20999 for use by its<br>customers for the purpose of declaring exceptions. Be sure to use a number within this range, or Oracle<br>will raise its own exception to let you know that you are out of line and using one of its proprietary error<br>numbers!<br>■ Note There are some numbers within that range that are still used by Oracle-specific exceptions. Passing a<br>TRUE value as the last argument in a call to RAISE_APPLICATION_EXCEPTION will retain any existing errors in the<br>error stack. Passing TRUE is a good idea for the purposes of debugging so that the stack trace can be used to help<br>find the code that is raising the exception. Otherwise, the exception stack is cleared.<br>One may choose to create a function or procedure that has the sole purpose of calling<br>RAISE_APPLICATION_EXCEPTION to raise an exception and associate an error number with an exception<br>message. This technique can become quite useful if you are interested in using a custom error number<br>for your exceptions, but you still need to perform proper exception handling when errors occur. You<br>could use the OTHERS exception handler to call the function or procedure that uses<br>RAISE_APPLICATION_EXCEPTION, passing the error number and a proper exception message. </p>
+<h2 id="9-6-Redirecting-Control-After-an-Exception-Is-Raised"><a href="#9-6-Redirecting-Control-After-an-Exception-Is-Raised" class="headerlink" title="9-6. Redirecting Control After an Exception Is Raised"></a>9-6. Redirecting Control After an Exception Is Raised</h2><p><strong>Problem</strong><br>After an exception is raised within an application, usually the statements within the exception handler<br>are executed, and then control goes to the next statement in the calling program or outside the current<br>code block. Rather than printing an error message and exiting your code block after an exception, you<br>want to perform some further activity. For instance, let’s say you are interested in logging the exception<br>in a database table. You have a procedure for adding entries to the log table, and you want to make use<br>of that procedure.<br><strong>Solution</strong><br>Invoke the procedure from within the exception handler. When the exception is raised, program control<br>will be passed to the appropriate handler. The handler itself can provide an exception message for the<br>user, but it will also call the procedure that is to be used for logging the exception in the database. The<br>following example demonstrates this technique: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE log_error_messages(error_code  IN NUMBER, 
+                                                message    IN VARCHAR2) AS 
+PRAGMA AUTONOMOUS_TRANSACTION; 
+BEGIN 
+  DBMS_OUTPUT.PUT_LINE(message); 
+  DBMS_OUTPUT.PUT_LINE(&#39;WRITING ERROR MESSAGE TO DATABASE&#39;); 
+END; 
+ 
+CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
+  emp_qry                 VARCHAR2(500); 
+  emp_first                employees.first_name%TYPE; 
+  emp_last                   employees.last_name%TYPE; 
+  email                         employees.email%TYPE; 
+ 
+  valid_id_count         NUMBER :&#x3D; 0; 
+  valid_flag                  BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info       VARCHAR2(50); 
+ 
+ 
+ BEGIN 
+    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+    IF emp_info LIKE &#39;%@%&#39; THEN 
+      temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); 
+      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; 
+    ELSE 
+      SELECT COUNT(*) 
+      INTO valid_id_count 
+      FROM employees 
+      WHERE employee_id &#x3D; emp_info; 
+   
+      IF valid_id_count &gt; 0 THEN 
+          temp_emp_info :&#x3D; emp_info; 
+          emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; 
+      ELSE 
+          valid_flag :&#x3D; FALSE; 
+      END IF; 
+    END IF; 
+   
+    IF valid_flag &#x3D; TRUE THEN 
+      EXECUTE IMMEDIATE emp_qry 
+      INTO emp_first, emp_last, email 
+      USING temp_emp_info; 
+   
+      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+    ELSE  
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+    END IF; 
+   
+    EXCEPTION 
+      WHEN NO_DATA_FOUND THEN 
+         
+        DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+        log_error_messages(SQLCODE, DBMS_UTILITY.FORMAT_ERROR_STACK); 
+         
+      WHEN OTHERS THEN 
+        DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || 
+                           &#39;TRY AGAIN&#39;); 
+        log_error_messages(SQLCODE, DBMS_UTILITY.FORMAT_ERROR_STACK); 
+ END; </code></pre>
+<p>In this scenario, the log_error_messages procedure would be called from within each of the<br>exception handlers. Since it is an autonomous transaction, the log_error_messages procedure will<br>execute without affecting the calling procedure. This ensures that no issues will arise if<br>log_error_messages were to raise an exception. Control of the application would be passed to this<br>procedure for the processing, and then the program would exit.<br><strong>How It Works</strong><br>It is possible to redirect control of your code after an exception has been raised using various<br>techniques. After an exception is raised and control is redirected to the handler, the statements within<br>the handler are executed, and then that program ends. If the code block that contains the exception<br>handler is contained within enclosing code block, control will be passed to the next statement within the<br>enclosing control block. Otherwise, the program will exit after statements are executed.<br>To execute a particular action or series of processes after an exception has been raised, it is a useful<br>technique to call a stored procedure or function from within the exception handler. In the <strong>Solution</strong> to<br>this recipe, a logging procedure is called that will insert a row into the logging table after each exception<br>is raised. This allows the program control to be passed to the procedure or function that is called, and<br>when that body of code has completed execution, control is passed back to the exception handler. This<br>is a very useful technique for logging exceptions but can also be used for various other tasks such as<br>sending an e-mail alert or performing some database cleanup. </p>
+<h2 id="9-7-Raising-Exceptions-and-Continuing-Processing"><a href="#9-7-Raising-Exceptions-and-Continuing-Processing" class="headerlink" title="9-7. Raising Exceptions and Continuing Processing"></a>9-7. Raising Exceptions and Continuing Processing</h2><p><strong>Problem</strong><br>The application you are coding requires a series of INSERT, UPDATE, and DELETE statements to be called.<br>You want to add proper exception handling to your code and also ensure that processing continues and<br>all of the statements are executed even if an exception is raised.<br><strong>Solution</strong><br>Enclose each statement within its own code block, and provide an exception handler for each of the<br>blocks. When an exception is raised within one of the nested blocks, then control will be passed back to<br>the main code block, and execution will continue. This style of coding is displayed in the following<br>example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE delete_employee (in_emp_id   IN NUMBER) AS 
+  BEGIN 
+    -- ENTER INITIAL NESTED CODE BLOCK TO PERFORM DELETE 
+    BEGIN 
+        -- DELETE EMP 
+    EXCEPTION 
+      WHEN NO_DATA_FOUND THEN 
+         -- perform statements 
+    END; 
+ 
+     -- ENTER SECOND NESTED CODE BLOCK TO PERFORM LOG ENTRY 
+     BEGIN 
+        -- LOG DELETION OF  EMP 
+    EXCEPTION 
+      WHEN NO_DATA_FOUND THEN 
+         -- perform statements 
+    END; 
+EXCEPTION WHEN OTHERS THEN 
+  -- perform statements 
+END; </code></pre>
+<p>As this code stands, no exception will go on to become an unhanded exception because the<br>outermost code block contains an exception handler using the OTHERS exception name. Every nested<br>code block contains a handler, so every exception that is encountered in this application will be caught.<br><strong>How It Works</strong><br>Scope plays an important role when designing your application’s exception-handling system. When<br>doing so, you should think of your application and determine whether portions of the code need to be<br>executed regardless of any exception being raised. If this is the case, then you will need to provide proper<br>exception handling and still ensure that the essential code is executed each run.<br>The scope of an exception pertains to the code block in which the exception is declared. Once an<br>exception has been encountered, program control halts immediately and is passed to the exception<br>handler for the current block. If there is not an exception handler in the current code block or if no<br>handler matches the exception that was raised, then control passes to the calling program or outer<br>control block. Control is immediately passed to the exception handler of that program. If no exception<br>handler exists or matches the exception being raised, then the execution of that block halts, and the<br>exception is raised to the next calling program or outer code block, and so on.<br>This pattern can be followed any number of times. That is why the technique used in the <strong>Solution</strong> to<br>this recipe works well. There is one main code block that embodies two nested code blocks. Each of the<br>blocks contains essential statements that need to be run. If an exception is raised within the DELETE<br>block, then program control is passed back to its outer code block, and processing continues. In this<br>case, both essential statements will always be executed, even if exceptions are raised. </p>
+<h2 id="9-8-Associating-Error-Numbers-with-Exceptions-That-Have-No-Name"><a href="#9-8-Associating-Error-Numbers-with-Exceptions-That-Have-No-Name" class="headerlink" title="9-8. Associating Error Numbers with Exceptions That Have No Name"></a>9-8. Associating Error Numbers with Exceptions That Have No Name</h2><p><strong>Problem</strong><br>You want to associate an error number to those errors that do not have predefined names.<br><strong>Solution</strong><br>Make use of PRAGMA EXCEPTION_INIT to tell the compiler to associate an Oracle error number with an<br>exception name. This will allow the use of an easy-to-identify name rather than an obscure error<br>number when working with the exception. The example in this recipe shows how an error number can<br>be associated with an exception name and how the exception can later be raised. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, 
+                                              hours   IN NUMBER DEFAULT 1) 
+RETURN NUMBER AS 
+BEGIN 
+  RETURN salary&#x2F;hours; 
+END; 
+ 
+ 
+DECLARE 
+  DIVISOR_IS_ZERO  EXCEPTION; 
+  PRAGMA EXCEPTION_INIT(DIVISOR_IS_ZERO, -1476); 
+  per_hour      NUMBER; 
+BEGIN 
+  SELECT calculate_salary_hours(0,0) 
+  INTO per_hour 
+  FROM DUAL; 
+EXCEPTION WHEN DIVISOR_IS_ZERO THEN 
+  DBMS_OUTPUT.PUT_LINE(&#39;You cannot pass a zero for the number of hours&#39;); 
+END; </code></pre>
+<p>The exception declared within this example is associated with the ORA-01476 error code. When a<br>divide-by-zero exception occurs, then the handler is executed.<br><strong>How It Works</strong><br>PRAGMA EXCEPTION_INIT allows an error number to be associated with an error name. Thus, it provides an<br>easy way to handle those exceptions that are available only by default via an error number. It is much<br>easier to identify an exception by name rather than by number, especially when you have been away<br>from the code base for some length of time.<br>The PRAGMA EXCEPTION_INIT must be declared within the declaration section of your code. The<br>exception that is to be associated with the error number must be declared prior to the PRAGMA<br>declaration. The format for using PRAGMA EXCEPTION_INIT is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  exception_name   EXCEPTION; 
+  PRAGMA EXCEPTION_INIT(exception_name, &lt;&lt;exception_code&gt;&gt;); 
+BEGIN 
+  -- Perform statements 
+EXCEPTION 
+  WHEN exception_name THEN 
+    -- Perform error handling 
+END; </code></pre>
+<p>The exception_name in this pseudocode refers to the name of the exception you are declaring. The<br>&lt;<exception_code>&gt; is the number of the ORA-xxxxx error that you are associating with the exception. In<br>the Solution to this recipe, ORA-01476 is associated with the exception. That exception in particular<br>denotes divisor is equal to zero. When this exception is raised, it is easier to identify the cause of the<br>error via the DIVISOR_IS_ZERO identifier than by the -01476 code.<br>Whenever possible, it is essential to provide an easy means of identification for portions of code that<br>may be difficult to understand. Exception numbers by themselves are not easily identifiable unless you<br>see the exception often enough. Even then, an exception handler with the number -01476 in it seems<br>obscure. In this case, it is always best to associate a more common name to the exception so that the<br>code can instantly have meaning to someone who is unfamiliar with the code or to you when you need<br>to maintain the code for years to come.  </p>
+<h2 id="9-9-Tracing-an-Exception-to-Its-Origin"><a href="#9-9-Tracing-an-Exception-to-Its-Origin" class="headerlink" title="9-9. Tracing an Exception to Its Origin"></a>9-9. Tracing an Exception to Its Origin</h2><p><strong>Problem</strong><br>Your application continues to raise an exception that is being caught with the OTHERS handler. You’ve<br>used SQLCODE and DBMS_UTILITY.FORMAT_ERROR_STACK to help you find the cause of the exception but are<br>still unable to do so.<br><strong>Solution</strong><br>Use the stack trace for the exception to trace the error back to its origination. In particular, use<br>DBMS_UTILITY.FORMAT_ERROR_BACKTRACE and DBMS_UTILITY.FORMAT_CALL_TRACE to help you find the cause<br>of the exception. The following <strong>Solution</strong> demonstrates the use of FORMAT_ERROR_BACKTRACE: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
+  emp_qry             VARCHAR2(500); 
+  emp_first           employees.first_name%TYPE; 
+  emp_last            employees.last_name%TYPE; 
+  email               employees.email%TYPE; 
+ 
+  valid_id_count      NUMBER :&#x3D; 0; 
+  valid_flag          BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info       VARCHAR2(50); 
+ 
+ 
+ BEGIN 
+    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+    IF emp_info LIKE &#39;%@%&#39; THEN 
+      temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); 
+      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; 
+    ELSE 
+      SELECT COUNT(*) 
+      INTO valid_id_count 
+      FROM employees 
+      WHERE employee_id &#x3D; emp_info; 
+   
+      IF valid_id_count &gt; 0 THEN 
+          temp_emp_info :&#x3D; emp_info; 
+          emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; 
+      ELSE 
+          valid_flag :&#x3D; FALSE; 
+      END IF; 
+    END IF; 
+   
+    IF valid_flag &#x3D; TRUE THEN 
+      EXECUTE IMMEDIATE emp_qry 
+      INTO emp_first, emp_last, email 
+      USING temp_emp_info; 
+   
+      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+    ELSE  
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+    END IF; 
+   
+    EXCEPTION 
+      WHEN NO_DATA_FOUND THEN 
+         
+        DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); 
+         
+      WHEN OTHERS THEN 
+        DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || 
+                           &#39;TRY AGAIN&#39;); 
+        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); 
+ END; </code></pre>
+<p>Here are the results when calling within invalid argument information: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec obtain_emp_detail(&#39;junea@&#39;); 
+THE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD 
+ORA-06512: at &quot;OBTAIN_EMP_DETAIL&quot;, line 32 
+ 
+ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p>As you can see, the exact line number that caused the exception to be raised is displayed. This is<br>especially useful if you use a development environment that includes line numbering for your source<br>code. If not, then you can certainly count out the line numbers manually.<br>Similarly, DBMS_UTILITY.FORMAT_CALL_STACK lists the object number, line, and object where the issue<br>had occurred. The following example uses the same procedure as the previous example, but this time<br>DBMS_UTILITY.FORMAT_CALL_STACK is used in the exception handler: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
+  emp_qry                VARCHAR2(500); 
+  emp_first              employees.first_name%TYPE; 
+  emp_last               employees.last_name%TYPE; 
+  email                  employees.email%TYPE; 
+ 
+  valid_id_count         NUMBER :&#x3D; 0; 
+  valid_flag             BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info          VARCHAR2(50); 
+ 
+ 
+ BEGIN 
+    emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+    IF emp_info LIKE &#39;%@%&#39; THEN 
+      temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); 
+      emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; 
+    ELSE 
+      SELECT COUNT(*) 
+      INTO valid_id_count 
+      FROM employees 
+      WHERE employee_id &#x3D; emp_info; 
+   
+      IF valid_id_count &gt; 0 THEN 
+          temp_emp_info :&#x3D; emp_info; 
+          emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; 
+      ELSE 
+          valid_flag :&#x3D; FALSE; 
+      END IF; 
+    END IF; 
+   
+    IF valid_flag &#x3D; TRUE THEN 
+      EXECUTE IMMEDIATE emp_qry 
+      INTO emp_first, emp_last, email 
+      USING temp_emp_info; 
+   
+      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+    ELSE  
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+    END IF; 
+   
+    EXCEPTION 
+      WHEN NO_DATA_FOUND THEN 
+         
+        DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                           &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_CALL_STACK); 
+         
+      WHEN OTHERS THEN 
+        DBMS_OUTPUT.PUT_LINE(&#39;AN UNEXPECTED ERROR HAS OCCURRED, PLEASE &#39; || 
+                           &#39;TRY AGAIN&#39;); 
+        DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_CALL_STACK); 
+ END;</code></pre>
+<p>Here are the results when calling within invalid argument information:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec obtain_emp_detail(&#39;june@&#39;); 
+THE INFORMATION YOU HAVE USED DOES NOT MATCH ANY EMPLOYEE RECORD
+----- PL&#x2F;SQL Call Stack ----- 
+  object      line  object 
+  handle    number 
+name 
+24DD3280     47  procedure OBTAIN_EMP_DETAIL
+273AA66C      1 
+anonymous block 
+PL&#x2F;SQL procedure successfully completed.</code></pre>
+<p>Each of the two utilities demonstrated in this Solution serves an explicit purpose—to assist you in<br>finding the cause of exceptions in your applications.<br><strong>How It Works</strong><br>Oracle provides a few different utilities to help diagnose and repair issues with code. The utilities<br>discussed in this recipe provide feedback regarding exceptions that have been raised within application<br>code. DBMS_UTILITY.FORMAT_ERROR_BACKTRACE is used to display the list of lines that goes back to the point<br>at which your application fails. This utility was added in Oracle Database 10g. Its ability to identify the<br>exact line number where the code has failed can save the time of reading through each line to look for<br>the errors. Using this information along with the Oracle exception that is raised should give you enough<br>insight to determine the exact cause of the Problem.<br>The result from DBMS_UTILITY.FORMAT_ERROR_BACKTRACE can be assigned to a variable since it is a<br>function. Most likely a procedure will be used to log the exceptions so that they can be reviewed at a later<br>time. Such a procedure could accept the variable containing the result from<br>DBMS_UTILITY.FORMAT_ERROR_BACKTRACE as input.<br>The DBMS_UTILITY.FORMAT_CALL_STACK function is used to print out a formatted string of the<br>execution call stack or the sequence of calls for your application. It displays the different objects used,<br>along with line numbers from which calls were made. It can be very useful for pinpointing those errors<br>that you are having trouble resolving. It can also be useful for obtaining information regarding the<br>execution order of your application. If you are unsure of exactly what order processes are being called,<br>this function will give you that information.<br>Using a combination of these utilities when debugging and developing your code is a good practice.<br>You may find it useful to create helper functions that contain calls to these utilities so that you can easily<br>log all stack traces into a database table or a file for later viewing. These can be of utmost importance<br>when debugging issues or evaluating application execution. </p>
+<h2 id="9-10-Displaying-PL-x2F-SQL-Compiler-Warnings"><a href="#9-10-Displaying-PL-x2F-SQL-Compiler-Warnings" class="headerlink" title="9-10. Displaying PL&#x2F;SQL Compiler Warnings"></a>9-10. Displaying PL&#x2F;SQL Compiler Warnings</h2><p><strong>Problem</strong><br>You are interested in making your code more robust by ensuring that no issues will crop up as time goes<br>by and the code evolves. You want to have the PL&#x2F;SQL compiler alert you of possible issues with your<br>code.<br><strong>Solution</strong><br>Use PL&#x2F;SQL compile-time warnings to alert you of possible issues with your code. Enable warnings for<br>your current session by issuing the proper ALTER SESSION statements or by using the DBMS_WARNING<br>package to do so. This <strong>Solution</strong> will demonstrate each of these techniques to help you decide which will<br>work best for your debugging purposes.<br>First let’s take a look at using ALTER SESSION to enable and configure warnings for your<br>environment. This technique can be very useful when you want to enable warnings for an entire session.<br>The following example shows how to enable warnings and how to display them given a short code block: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">ALTER SESSION SET PLSQL_WARNINGS &#x3D; &#39;ENABLE:ALL&#39;; 
+ 
+CREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, 
+                                                  hours   IN NUMBER DEFAULT 1) 
+RETURN NUMBER AS 
+BEGIN 
+  RETURN salary&#x2F;hours; 
+END; 
+ 
+SHOW ERRORS; 
+ 
+Here are the results from running create or replace function with all warnings enabled: 
+ 
+Errors for FUNCTION CALCULATE_SALARY_HOURS: 
+ 
+LINE&#x2F;COL 
+-------------------------------------------------------------------------------- 
+ERROR 
+-------------------------------------------------------------------------------- 
+1&#x2F;1</code></pre>
+<p>PLW-05018: unit CALCULATE_SALARY_HOURS omitted optional AUTHID clause;<br> default value DEFINER used </p>
+<p>Next, let’s look at the DBMS_WARNINGS package. Use of this technique is more helpful if you are using a<br>development environment such as PL&#x2F;SQL Developer that compiles your code for you. The following is<br>an example of performing the same CREATE OR REPLACE FUNCTION as earlier, but this time using<br>DBMS_WARNINGS: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; CALL DBMS_WARNING.SET_WARNING_SETTING_STRING(&#39;ENABLE:ALL&#39;,&#39;SESSION&#39;); 
+ 
+Call completed. 
+ 
+CHAPTER 9  EXCEPTIONS 
+212 
+SQL&gt; CREATE OR REPLACE FUNCTION calculate_salary_hours(salary  IN NUMBER, 
+                                                  hours   IN NUMBER DEFAULT 1) 
+RETURN NUMBER AS 
+BEGIN 
+  RETURN salary&#x2F;hours; 
+END; 
+&#x2F;  2    3    4    5    6    7   
+ 
+SP2-0806: Function created with compilation warnings 
+ 
+SQL&gt; SHOW ERRORS; 
+Errors for FUNCTION CALCULATE_SALARY_HOURS: 
+ 
+LINE&#x2F;COL 
+-------------------------------------------------------------------------------- 
+ERROR 
+-------------------------------------------------------------------------------- 
+1&#x2F;1</code></pre>
+<p>PLW-05018: unit CALCULATE_SALARY_HOURS omitted optional AUTHID clause; default v<br>alue DEFINER used </p>
+<p>Both techniques provide similar results, but one can be set at the database level and the other can<br>be more useful for use in a development environment.<br><strong>How It Works</strong><br>Learning about warnings against your code can help you solidify your code and repair it so that it can<br>become more robust when it is used in a production environment. Although PL&#x2F;SQL warnings will not<br>prevent the code from compiling and executing, they can certainly provide good insight to inform you of<br>places in your code that could possibly incur issues at a later time. As you have learned from the <strong>Solution</strong><br>to this recipe, there are two techniques that can be used to enable warnings for your application. Those<br>are the use of ALTER SESSION statements and the DBMS_WARNINGS package. Both are valid techniques for<br>enabling and disabling warnings, but each has its own set of strong points and drawbacks.<br>The PLSQL_WARNINGS compilation parameter must be used to enable or disable warnings within a<br>session. By setting it, you can control the types of warnings that are displayed, along with how much<br>information is displayed and even how it is displayed. This parameter can be set using the ALTER SESSION<br>statement. The format for setting this parameter using ALTER SESSION is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">ALTER SESSION SET PLSQL_WARNINGS &#x3D; &quot;[ENABLE&#x2F;DISABLE:PARAMETER]&quot; </code></pre>
+<p>The PLSQL_WARNINGS compilation parameter accepts a number of different parameters that each tell<br>the compiler what types of warnings to display and what to ignore. There are three different categories of<br>warnings that can be used. Table 9-3 shows the different types of warnings along with their descriptions. </p>
+<pre class="language-text" data-language="text"><code class="language-text">Table 9-3. Warning  Categories 
+Category                  Description 
+PERFORMANCE               May hinder application performance 
+INFORMATIONAL             May complicate application maintenance but contains no immediate issues 
+SECURE                    May cause unexpected or incorrect results ALL Includes all the categories </code></pre>
+<p>The DBMS_WARNINGS package works in a similar fashion: it accepts the same arguments as the<br>PLSQL_WARNINGS parameter. The difference is that you can control when the warnings are enabled or<br>disabled by placing the call to the package in locations that you choose. This does not matter much<br>when working via SQL*Plus, but if you are using a development environment such as Oracle SQL<br>Developer, then DBMS_WARNINGS must be used. The format for calling this procedure is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CALL DBMS_WARNING.SET_WARNING_SETTING_STRING(&#39;warning_category:value&#39;,&#39;scope&#39;); </code></pre>
+<p>The categories are the same as PLSQL_WARNINGS, as are the values of the categories. The scope determines<br>whether the warnings will be used for the duration of the session or for all sessions. There are various<br>other options that can be used with the DBMS_WARNINGS package. To learn more about these options,<br>please see the Oracle Database 11g documentation. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"
+                    data-tooltip="Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/"
+                    data-tooltip="Oracle PLSQL Recipes 08-Dynamic SQL"
+                    aria-label="NEXT: Oracle PLSQL Recipes 08-Dynamic SQL"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"
+                    data-tooltip="Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/"
+                    data-tooltip="Oracle PLSQL Recipes 08-Dynamic SQL"
+                    aria-label="NEXT: Oracle PLSQL Recipes 08-Dynamic SQL"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

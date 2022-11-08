@@ -1,0 +1,1509 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 04-Functions, Packages,and Procedures - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n4. Functions, Packages,and ProceduresPL&#x2F;SQL applications are composed of functions, procedures, and packages. Functions are PL&#x2F;SQLprograms that accept zero or more parameters and always return a result. Procedures are similar tofunctions, but they are not required to return a result. Packages are a combination of related functions,procedures, types, and variables. Each of these PL&#x2F;SQL components helps formulate the basis for smalland large applications alike. They differ from anonymous blocks that have been covered in previousrecipes because they are all named routines that are stored within the database. Together, they providethe advantage of reusable code that can be called from any schema in the database to which you’vegranted the appropriate access.Let’s say you have a few lines of code that perform some calculations on a number and return aresult. Will these calculations help you anywhere else? If so, then you should probably encapsulate thiscode in a function. Maybe you have a nightly script that you use as a batch job to load and execute.Perhaps this script can be turned into a stored procedure and Oracle Scheduler can kick it off each night.What about tasks that use more than one procedure or function? Can these be combined at all? APL&#x2F;SQL package would probably be a good choice in this case. After reading through the recipes in thischapter, you should be able to answer these questions at the drop of a hat.■ Note We mention job scheduling in our introduction to this chapter. However, we actually address that topic inChapter 11, which is an entire chapter dedicated to running PL&#x2F;SQL jobs, whether for application purposes or fordatabase maintenance. \n4-1. Creating a Stored FunctionProblemOne of your programs is using a few lines of code repeatedly for performing a calculation. Rather thanusing the same lines of code numerous times throughout your application, it makes more sense toencapsulate(美[ɪn’kæpsjə’let]vt.压缩;将…装入胶囊) the functionality into a common routine that can be called and reused time and time again.SolutionCreate a stored function to encapsulate your code, and save it into the database. Once stored in thedatabase, any user with execution privileges can invoke the function. Let’s take a look at a function togive you an idea of how they work.In this example, the function is used to round a given number to the nearest quarter. This functionworks well for accepting a decimal value for labor hours and rounding to the nearest quarter hour. \n-- at return part and no paramter name just a type\nCREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS  \n  CALCULATED_HOURS NUMBER :&#x3D; 0; \nBEGIN \n  \n   -- if HOURS is greater than one, then calculate the decimal portion \n   -- based upon quarterly hours  \n IF HOURS &gt; 1 THEN \n  -- calculate the modulus of the HOURS variable and compare it to • \n  -- fractional values \n    IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); \n    ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); \n    ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); \n    ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.75,1); \n    ELSE \n       CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n       \n    END IF; \n     \n  ELSE \n    -- if HOURS is less than one, then calculate the entire value• \n    -- based upon quarterly hours \n    IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN \n        CALCULATED_HOURS :&#x3D; .25; \n    ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN \n        CALCULATED_HOURS :&#x3D; .5; \n    ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN \n        CALCULATED_HOURS :&#x3D; .75; \n    ELSE \n        CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n    END IF; \n     \n  END IF; \n   \n  RETURN CALCULATED_HOURS; \n   \nEND CALC_QUARTER_HOUR; \nThis function accepts one value as input, a decimal value representing a number of hours worked.The function then checks to see whether the value is greater than one, and if so, it performs a series ofmanipulations to round the value to the nearest quarter hour. If the value is not greater than one, thenthe function rounds the given fraction to the nearest quarter.■ Note See Recipe 4-2 for an example showing the execution of this function. \nHow It WorksA function is a named body of code that is stored within the database and returns a value. Functions areoften used to encapsulate logic so that it can be reused. A function can accept zero or more parametersand always returns a value. A function is comprised of a header, an execution section containingstatements, and an optional exception block.For example, the header for our Solution function is as follows:  \nCREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS  \nThe OR REPLACE clause is optional, but in practice it is something you’ll most always want. SpecifyingOR REPLACE will replace a function that is already under the same name in the same schema. (A functionname must be unique within its schema.)Functions can take zero or more parameters, which can be any datatype including collections. Youwill learn more about collections in Chapter 10. Our example function takes one parameter, a NUMBERrepresenting some number of hours.The parameters that can be passed to a function can be declared in three different ways, namely, asIN, OUT, and IN OUT. The difference between these three declaration types is that parameters declared asIN are basically read-only, OUT parameters are write-only, and IN OUT parameters are read-write. Thevalue of an OUT parameter is initially NULL but can contain a value after the function has returned.Similarly, the value of an IN OUT can be modified within the function, but IN parameters cannot.■ Note Typically you want only IN parameters for a function. If you find yourself creating a function with OUT or INOUT parameters, then reconsider and think about creating a stored procedure instead. This is not a hard-and-fastrequirement, but it is generally good practice for a function to return only one value.The declaration section of the function begins directly after the header, and unlike the anonymousblock, you do not include the DECLARE keyword at the top of this section. Just like the anonymous block,the declaration section is where you will declare any variables, types, or cursors for your function. Ourdeclaration section defines a single variable: CALCULATED_HOURS NUMBER :&#x3D; 0; Following the declaration is the executable section, which is laid out exactly like that of ananonymous block. The only difference with a function is that it always includes a RETURN statement. Itcan return a value of any datatype as long as it is the same datatype specified in the RETURN clause of theheader.Following the return clause can be an optional EXCEPTION block to handle any errors that wereencountered in the function. The following example is the same function that was demonstrated in theSolution to this recipe, except that it has an added EXCEPTION block. \nCREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) \n RETURN NUMBER AS  \n  CALCULATED_HOURS NUMBER :&#x3D; 0; \nBEGIN \n  \n   -- if HOURS is greater than one, then calculate the decimal portion \n \n  -- based upon quarterly hours  \n IF HOURS &gt; 1 THEN \n  -- calculate the modulus of the HOURS variable and compare it to  \n \n  -- fractional values \n    IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); \n    ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); \n    ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); \n    ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.75,1); \n    ELSE \n       CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n       \n    END IF; \n     \n  ELSE \n    -- if HOURS is less than one, then calculate the entire value \n \n    -- based upon quarterly hours \n    IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN \n        CALCULATED_HOURS :&#x3D; .25; \n    ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN \n        CALCULATED_HOURS :&#x3D; .5; \n    ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN \n        CALCULATED_HOURS :&#x3D; .75; \n    ELSE \n        CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n    END IF; \n     \n  END IF; \n   \n  RETURN CALCULATED_HOURS; \n \nEXCEPTION \n  WHEN VALUE_ERROR THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;VALUE ERROR RAISED, TRY AGAIN&#39;); \n    RETURN -1; \n  WHEN OTHERS THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;UNK ERROR RAISED, TRY AGAIN&#39;); \n    RETURN -1; \nEND CALC_QUARTER_HOUR; \nAgain, don’t fret if you are unfamiliar with how to handle exceptions, because they will be discussedin detail later in the book. At this point, it is important to know that you have the ability to declareexceptions that can be caught by code so that your program can process abnormalities or errorsaccordingly.Functions are important not only for encapsulation but also for reuse. As a matter of fact, thefunction defined within the Solution uses other built-in PL&#x2F;SQL functions within them. There are entirelibraries that consist of functions that are helpful for performing various transactions. Functions are afundamental part of PL&#x2F;SQL programming, just as they are in any other language. It is up to you toensure that your database is stocked with plenty of useful functions that can be used in your current andfuture applications. \n4-2. Executing a Stored Function from a QueryProblemYou want to invoke a function from an SQL query. For example, you want to take the quarter-hourrounding function from Recipe 4-1 and invoke it on hourly values in a database table.SolutionWrite a query and invoke the function on values returned by the SELECT statement. In the following lines,the function that was written in the previous recipe will be called. The results of calling the function fromwithin a query are as follows: \nSQL&gt; select calc_quarter_hour(.17) from dual; \n \nCALC_QUARTER_HOUR(.17) \n---------------------- \n  .25 \n \nSQL&gt; select calc_quarter_hour(1.3) from dual; \n \nCALC_QUARTER_HOUR(1.3) \n---------------------- \n 1.25 \nHow It WorksThere are a few ways in which a function can be called, one of which is via a query. A function can beexecuted inline via a SELECT statement, as was the case with the Solution to this recipe. A function canalso be executed by assigning it to a variable within an anonymous block or another function&#x2F;procedure.Since all functions return a value, this works quite well. For instance, the following QTR_HOUR variable canbe assigned the value that is returned from the function: \nDECLARE \n  qtr_hour          NUMBER; \nBEGIN \n  qtr_hour :&#x3D; calc_quarter_hour(1.3); \n  DBMS_OUTPUT.PUT_LINE(qtr_hour); \nEND; \n \nYou can also execute a function as part of an expression. In the following statement, you can see \nthat TOTAL_HOURS is calculated by adding the bill total to the value returned from the function: \n \nDECLARE \n  total_hours           NUMBER; \n  hours                 NUMBER :&#x3D; 8; \nBEGIN \n  total_hours :&#x3D; hours + calc_quarter_hour(3.2); \n  DBMS_OUTPUT.PUT_LINE(total_hours); \nEND; \nThe way in which your program calls a function depends on its needs. If you need to simply returnsome results from the database and apply a function to each of the results, then use a query. You mayhave an application that needs to pass a value to a function and use the result at some later point, inwhich case assigning the function to a variable would be a good choice for this case. Whatever the casemay be, functions provide convenient calling mechanisms to cover most use cases. \n4-3. Optimizing a Function That Will Always Return the Same Result for a Given InputProblemYou want to create a function that will return the same result whenever a given input, or set of inputs, ispresented to it. You want the database to optimize based upon that deterministic nature.SolutionSpecify the DETERMINISTIC keyword when creating the function to indicate that the function will alwaysreturn the same result for a given input. For instance, you want to return a specific manager name basedupon a given manager ID. Furthermore, you want to optimize for the fact that any given input willalways return the same result. The following example demonstrates a function that does so by specifyingthe DETERMINISTIC keyword:  \nCREATE OR REPLACE FUNCTION manager_name(mgr_id IN NUMBER) \nRETURN VARCHAR2 \nDETERMINISTIC IS \n  first_name     employees.first_name%TYPE; \n  last_name      employees.last_name%TYPE; \nBEGIN \n  IF mgr_id IS NOT NULL THEN \n    SELECT first_name, last_name \n    INTO first_name, last_name \n    FROM EMPLOYEES \n    WHERE employee_id &#x3D; mgr_id; \n \n    RETURN first_name || &#39; &#39; || last_name; \n  ELSE \n    RETURN &#39;N&#x2F;A&#39;; \n  END IF; \nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n    RETURN &#39;N&#x2F;A&#39;; \nEND; \nThis function will return the manager name for a matching EMPLOYEE_ID. If there are no matches forthe EMPLOYEE_ID found, then N&#x2F;A will be returned.How It WorksA deterministic function is one that always returns the same resulting value as long as the parametersthat are passed in are the same. This type of function can be useful for improving performance. Thefunction will be executed only once for any given set of parameters. This means that if the sameparameters are passed to this function in subsequent calls, then the function will be bypassed and returnthe cached value from the last execution using those parameters. This can really help in cases wherecalculations are being performed and repeated calls to the function may take a toll on performance.The DETERMINISTIC clause is required in a couple of cases. In the event that you are calling a functionin an expression of a function-based index, you need to write the function as DETERMINISTIC, or you willreceive errors. Similarly, a function must be made DETERMINISTIC if it is being called in an expression of amaterialized view query or if the view is marked as ENABLE QUERY REWRITE or REFRESH FAST. \n4-4. Creating a Stored ProcedureProblem\nThere is a database task that you are performing on a regular basis. Rather than executing a script thatcontains lines of PL&#x2F;SQL code each time you execute the task, you want to store the code in the databaseso that you can simply execute the task by name or so that you can schedule it to execute routinely viaOracle Scheduler. \n■ Note See Chapter 11 for information on scheduling PL&#x2F;SQL jobs using Oracle Scheduler. \nSolutionPlace the code that is used to perform your task within a stored procedure. The following examplecreates a procedure named INCREASE_WAGE to update the employee table by giving a designatedemployee a pay increase. Of course, you will need to execute this procedure for each eligible employeein your department. Storing the code in a procedure makes the task easier to perform. \nCREATE OR REPLACE PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, \n                                           pct_increase IN NUMBER, \n                                           upper_bound IN NUMBER) AS \n  emp_count    NUMBER :&#x3D; 0; \n  emp_sal      employees.salary%TYPE; \n   \n  Results   VARCHAR2(50); \n  \nBEGIN \n    SELECT salary \n    INTO emp_sal \n    FROM employees \n    WHERE employee_id &#x3D; empno_in; \n     \n    IF emp_sal &lt; upper_bound \n    AND round(emp_sal + (emp_sal * pct_increase), 2) &lt; upper_bound THEN \n     \n        UPDATE employees \n        SET salary &#x3D; round(salary + (salary * pct_increase),2) \n        WHERE employee_id &#x3D; empno_in; \n         \n        results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; \n    ELSE \n        results :&#x3D; &#39;EMPLOYEE MAKES TOO MUCH, DECREASE RAISE PERCENTAGE&#39;; \n    END IF; \n     \n  DBMS_OUTPUT.PUT_LINE(results);\nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n    RAISE_APPLICATION_ERROR(-20001, &#39;No employee match for the given ID&#39;);\nEND; \nThe following are the results from executing the procedure for employee number 198. In the\nexample, the employee is being given a 3 percent increase and an upper bound of $5,000. \nBEGIN \n  increase_wage(198,.03,5000);\nEND; \nSUCCESSFUL INCREASEStatement processed. \nHow It WorksIn the example, the procedure accepts three parameters: the employee number, the percent of increasethey will receive, and an upper salary bound. You can then invoke the procedure by name, passing in therequired parameters.The procedure first searches the database for the provided employee number. If a record for thatemployee is found, then the employee record is queried for the current salary. If the salary is less thanthe upper bound and the resulting new salary will still be less than the upper bound, then the increasewill be applied via an UPDATE statement. If the employee is not found, then an alert message will bedisplayed. As you can see, this procedure can be called for any individual employee, and it will increasetheir wage accordingly as long as the increase stays within the bound.Stored procedures can be used to encapsulate functionality and store code in the database datadictionary. Much like a function, they can accept zero or more values as parameters, includingcollections. A stored procedure is structured in much the same way as a function in that it includes aheader, an executable section, and an optional exception-handling block. However, a procedure cannotinclude a RETURN clause in the header, and it does not return a value.For example, in the Solution to this recipe, the procedure contains the following header: \nCREATE OR REPLACE PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, \n                                           pct_increase IN NUMBER, \n                                           upper_bound IN NUMBER) AS \nThe header uses the OR REPLACE clause to indicate that this procedure should replace any procedurewith the same name that already exists. The procedure accepts three parameters, and although all ofthem are NUMBER type, any datatype can be accepted as a parameter. The declaration section comes afterthe header, and any cursors, variables, or exceptions that need to be declared should be taken care of inthat section. Next, the actual work that the procedure will do takes place between the BEGIN and ENDkeywords. Note that the header does not contain a RETURNS clause since procedures cannot return anyvalues.The advantage of using procedures is that code can be encapsulated into a callable named routinein the data dictionary and can be called by many users. To create a procedure in your schema, you musthave the CREATE PROCEDURE system privilege. You can create a stored procedure in another schema if youhave the CREATE ANY PROCEDURE system privilege. \n4-5. Executing a Stored ProcedureProblemYou want to execute a stored procedure from SQL*Plus. \nSolutionOpen SQL*Plus, and connect to the database schema that contains the procedure you are interested inexecuting. Execute the procedure by issuing the following command: \nEXEC procedure_name([param1, param2,...]); \n\nFor instance, to execute the procedure that was created in Recipe 4-3, you would issue the followingcommand:\nEXEC increase_wage(198, .03, 5000); \n\nThis would invoke the INCREASE_WAGE procedure, passing three parameters: EMPLOYEE_ID, apercentage of increase, and an upper salary bound.\nYou can also execute a stored procedure by creating a simple anonymous block that contains theprocedure call, as depicted(vt.描述,描画) in the following code:\nBEGIN \n  procedure_name([param1, param2,…]); \nEND; \n\nUsing this technique, invoking the stored procedure that was created in Recipe 4-3 would resemblethe following: \nBEGIN \n  increase_wage(198,.03,5000); \nEND; \n\nBoth techniques work equally well, but the latter would be better to use if you wanted to executemore than one procedure or follow up with more PL&#x2F;SQL statements. If you are running a singleprocedure from SQL*Plus, then using EXEC is certainly a good choice. \nHow It Works\nA stored procedure can be executed using the EXEC keyword. You can also type EXECUTE entirely. Both thelong and shortened versions will work.  \nIt is also possible to execute a procedure that is contained within other schemas, if the current userhas execute privileges on that procedure. In such a scenario, use dot notation to qualify the procedurename. Here’s an example: \nEXEC different_schema.increase_wage(emp_rec.employee_id, pct_increase, upper_bound); \n\n■ Note To learn more about privileges regarding stored programs, please take a look at Recipe 4-11.A procedure can also be invoked from within another procedure by simply typing the name andplacing the parameters inside parentheses, if there are any. For instance, the following lines of codedemonstrate calling a procedure from within another procedure. The procedure in this example invokesthe procedure that was shown in Recipe 4-3. \nCREATE OR REPLACE PROCEDURE grant_raises (pct_increase IN NUMBER, \n                                          upper_bound IN NUMBER) as \n  CURSOR emp_cur is \n  SELECT employee_id, first_name, last_name \n  FROM employees; \nBEGIN \n  -- loop through each record in the employees table \n  FOR emp_rec IN emp_cur LOOP\n      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name);\n      -- inside A invoke B procedure\n      increase_wage(emp_rec.employee_id, pct_increase, upper_bound); \n  END LOOP; \nEND;  \n\nThe procedure GRANT_RAISES applies an increase across the board to all employees. It loops throughall employee records, and the INCREASE_WAGE procedure is called with each iteration. The procedure iscalled without the use of the EXEC keyword since it is being invoked by another procedure rather thandirectly from the SQL*Plus command line.\nsummary\n\nexecute procedure by EXEC statement directly\nusing anonymous code block within procedure name\ninside A procedure invoke B procedure\n\n4-6. Creating Functions Within a Procedure or Code BlockProblem\nYou want to create some functions within a stored procedure. You want the functions to be local to theprocedure, available only from the procedure’s code block.\nSolutionCreate a stored procedure, and then create functions within the declaration section. The internalfunctions will accept parameters and return values just as an ordinary(adj.普通的,平凡) stored function would, except that the scope of the functions will be constrained to the outer code block or to the procedure. The procedurethat is demonstrated in this Solution embodies two functions. One of the functions is used to calculatethe federal tax for an employee paycheck, while the other calculates the state tax. \nCREATE OR REPLACE PROCEDURE calc_employee_paycheck(emp_id IN NUMBER) as \n  emp_rec          employees%ROWTYPE; \n  paycheck_total   NUMBER; \n \n-- function for state tax \n  FUNCTION calc_state (sal IN NUMBER)  \n    RETURN NUMBER IS \n  BEGIN \n    RETURN sal *  .08; \n  END; \n\n-- function for federal tax \n FUNCTION calc_federal (sal IN NUMBER)  \n    RETURN NUMBER IS \n  BEGIN \n    RETURN sal *  .12; \n  END; \n \nBEGIN \n  DBMS_OUTPUT.PUT_LINE(&#39;Calculating paycheck with taxes&#39;); \n  SELECT * \n  INTO emp_rec \n  FROM employees \n  WHERE employee_id &#x3D; emp_id; \n \n  paycheck_total :&#x3D; emp_rec.salary - calc_state(emp_rec.salary) - \n                    calc_federal(emp_rec.salary); \n \n DBMS_OUTPUT.PUT_LINE(&#39;The paycheck total for &#39; || emp_rec.last_name || \n    &#39; is &#39; || paycheck_total); \nCHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES \n74 \nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n    RAISE_APPLICATION_ERROR(-20001, \n    &#39;No matching employee for the given ID&#39;); \nEND;\n\nHow It Works\nFunctions and procedures too can be contained within other bodies of code. Creating a functionwithin a declaration section will make the function accessible to the block that contains it. Thedeclaration of the function is the same as when you are creating a stored function, with the exception ofthe CREATE OR REPLACE keywords. Any variables that are declared inside the function will be accessibleonly to that function, not to the containing object.Creating a function or procedure inside a PL&#x2F;SQL code block can be useful when you want to makea function that is only to be used by the containing object. However, if you find that the body of theembedded function may change frequently, then coding a separate stored function may prove to bemore efficient.\n4-7. Passing Parameters by NameProblem\nYou have a procedure in your database that accepts a large number of parameters. When calling theprocedure, you would rather not worry that the positioning of the parameters is correct. \nSolution\nRather than trying to pass all the parameters to the procedure in the correct order, you can pass them byname. The code in this Solution calls a procedure that accepts six parameters, and it passes theparameters by name rather than in order.Procedure Declaration: \nPROCEDURE process_emp_paycheck(EMP_ID IN NUMBER, \n   PAY_CODE IN NUMBER, \n   SICK_USED IN NUMBER, \n   VACATION_USED IN NUMBER, \n   FEDERAL_TAX IN NUMBER, \n   STATE_TAX IN NUMBER); \nProcedure Execution: \nEXEC process_emp_paycheck(EMP_ID&#x3D;&gt;10, \n   PAY_CODE&#x3D;&gt;10, \n   VACATION_USED&#x3D;&gt;8.0, \n   SICK_USED&#x3D;&gt;8.0, \n   STATE_TAX&#x3D;&gt;.06, \n   FEDERAL_TAX&#x3D;&gt;.08); \nAs you can see, by passing the parameters by name, they do not need to follow the same positionalordering as they do within the declaration of the procedure.\nHow It WorksTo pass a parameter by name, you list the parameter name followed by an arrow (consisting of an equalsign and a greater-than symbol) pointing to the value you are passing. The following pseudocode depictsthis technique:\nprocedure_name(parameter&#x3D;&gt;value); \n\nAlthough it can be more verbose to use named parameters, passing parameters by name can be veryhandy when there are several parameters to pass because you do not need to worry about passing themin the correct order. It is also helpful because it increases readability.Both procedures and functions can accept positional and named parameters. Neither notation issuperior to the other, so which one you choose to use is completely dependant upon the procedure orfunction that is currently being called. However, named parameters are a safe choice if trying tomaintain consistency with procedure calls throughout your application or your organization.Although not recommended, you can use both positional and named notation when passingparameters within the same call. When doing so, you need to place the parameters that you want to passusing positional notation first, followed by the parameters that you want to pass using named notation.The following execution illustrates using both positional and named notation while passing parametersto the PROCESS_EMP_PAYCHECK procedure: \nEXEC process_emp_paycheck(198, 10, 0, \n   SICK_USED&#x3D;&gt;4.0, \n   STATE_TAX&#x3D;&gt;.05, \n   FEDERAL_TAX&#x3D;&gt; .04); \n\nThis particular call passed both of the first parameters by position, those being EMP_ID and PAY_CODE.The last three parameters are passed by named notation. \nsummary :  \n\nif you specify parameter name , then would ignore order of you define parameter\n\n4-8. Setting Default Parameter ValuesProblemYou want to create a procedure that accepts several parameters. However, some of those parametersshould be made optional and contain default values.  \nSolutionYou can allow the procedure caller to omit the parameters if default values are declared for the variableswithin the procedure. The following example shows a procedure declaration that contains defaultvalues: \nPROCEDURE process_emp_paycheck(EMP_ID IN NUMBER, \n   PAY_CODE IN NUMBER, \n   SICK_USED IN NUMBER, \n   VACATION_USED IN NUMBER, \n   FEDERAL_TAX IN NUMBER DEFAULT .08,  -- could ignore value\n   STATE_TAX IN NUMBER DEFAULT .035);  -- could ignore value\n\nAnd here is an example execution: \nEXEC process_emp_paycheck(EMP_ID&#x3D;&gt;10, \n                           PAY_CODE&#x3D;&gt;10, \n                           VACATION_USED&#x3D;&gt;8.0, \n                           SICK_USED&#x3D;&gt;8.0); \n\nSince the procedure contains default values, the parameters can be omitted when the procedure iscalled. \nHow It WorksThe ability to provide a default value for a variable declaration is optional. To do so, you must providethe declaration of the variable with the keyword DEFAULT followed by the value, as shown in the Solutionto this recipe. If a default value is declared, then you needn’t specify a value for the parameter when thefunction or procedure is called. If you do specify a value for a parameter that has a default value, thespecified value overrides the default.\n4-9. Collecting Related Routines into a Single UnitProblemYou have a number of procedures and functions that formulate(vt.规划;用公式表示) an entire application when usedtogether. Rather than defining each subprogram individually, you prefer to combine all of them into asingle, logically related entity.  \nSolutionCreate a PL&#x2F;SQL package that in turn declares(vt.宣布,声明) and defines each of the procedures together as anorganized entity. You declare each of the subprograms in the package specification (otherwise known asa header) and define them in the package body.The following example shows the creation of a PL&#x2F;SQL package containing two procedures and avariable.\nFirst, you create the package specification: \nCREATE OR REPLACE PACKAGE process_employee_time IS  \n  total_employee_salary  NUMBER; -- global variable inside \n  PROCEDURE grant_raises(pct_increase IN NUMBER, \n                                              upper_bound IN NUMBER); \n  PROCEDURE increase_wage (empno_in IN NUMBER, \n                           pct_increase IN NUMBER, \n                           upper_bound IN NUMBER) ; \nEND; \nThe specification lists the procedures, functions, and variables that you want to be visible fromoutside the package. Think of the specification as the external interface to your package.Next, create the package body: \nCREATE OR REPLACE PACKAGE BODY process_employee_time IS \n\n  PROCEDURE grant_raises (pct_increase IN NUMBER, \n                          upper_bound IN NUMBER) as \n  CURSOR emp_cur is \n  SELECT employee_id, first_name, last_name \n  FROM employees; \nBEGIN\n  -- loop through each record in the employees table \n  FOR emp_rec IN emp_cur LOOP \n      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); \n      increase_wage(emp_rec.employee_id, pct_increase, upper_bound); \n  END LOOP; \nEND;  \n\n PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, \n                          pct_increase IN NUMBER, \n                          upper_bound IN NUMBER) AS \n  emp_count    NUMBER :&#x3D; 0; \n  emp_sal      employees.salary%TYPE; \n   \n  Results   VARCHAR2(50); \n   \nBEGIN \n \n  SELECT count(*) \n  INTO emp_count \n  FROM employees \n  WHERE employee_id &#x3D; empno_in; \n  \n  IF emp_count &gt; 0 THEN \n    -- IF EMPLOYEE FOUND, THEN OBTAIN RECORD \n    SELECT salary \n    INTO emp_sal \n    FROM employees \n    WHERE employee_id &#x3D; empno_in; \n     \n    IF emp_sal &lt; upper_bound AND round(emp_sal + (emp_sal * pct_increase), 2) &lt; \n upper_bound THEN \n     \n        UPDATE employees \n        SET salary &#x3D; round(salary + (salary * pct_increase),2) \n        WHERE employee_id &#x3D; empno_in; \n         \n        results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; \n    ELSE \n        results :&#x3D; &#39;EMPLOYEE MAKES TOO MUCH, DECREASE RAISE PERCENTAGE&#39;; \n    END IF; \n     \n  ELSE \n    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; \n  END IF; \n \n  DBMS_OUTPUT.PUT_LINE(results); \n \n  END; \nEND; \n\nThe package in this example declares a global variable and two procedures within the packagespecification. The package body then defines both of the procedures and assigns a value to the variablethat was declared in the specification. Procedures defined within the package body are defined in thesame manner as they would be if they were stand-alone procedures. The difference is that now these twoprocedures are contained in a single package entity and are therefore related to each other and canshare variables declared globally within the package. \nHow It WorksA PL&#x2F;SQL package can be useful for organizing code into a single construct. Usually the code consists ofa grouping of variables, types, cursors, functions, and procedures that perform actions that are logicallyrelated to one another. Packages consist of a specification and a body, both of which are storedseparately in the data dictionary. The specification contains the declarations for each of the variables,types, subprograms, and so on, that are defined in the package. The body contains the implementationsfor each of the subprograms and cursors that are included in the specification, and it can also includeimplementations for other functions and procedures that are not in the specification. You’ll learn moreabout this in other recipes.\nMost packages contain both a specification and a body, and in these cases the specification acts asthe interface to the constructs implemented within the body. The items that are included in thespecification are available to the public and can be used outside the package. Not all packages contain abody. If there are only declarations of variables or constants in the package, then there is no need for abody to implement anything. Other PL&#x2F;SQL objects outside the package can reference any variables thatare declared in the specification. In other words, declaring a variable within a PL&#x2F;SQL packagespecification essentially creates a global variable.\n■ Note Global variables should be used wisely(adv.明智地;聪明地). The use of global variables can complicate matters when trackingdown Problems or debugging your code. If global variables are used, then it can be hard to determine wherevalues have been set and where initialization of such variables occurs. Following the rules of encapsulation andusing local variables where possible can make your life easier.Procedures and functions defined within the package body may call each other, and they can bedefined in any order as long as they have been declared within the package specification. If any of theprocedures or functions have not been declared in the specification, then they must be defined in thepackage body prior to being called by any of the other procedures or functions.\nYou can change any implementations within a package body without recompiling the specification.This becomes very important when you have other objects in the database that depend on a particularpackage because it is probably not a good idea to change a package specification during normal businesshours when a package is in use by others. Doing so may result in unusable objects, and the packageusers could begin to see errors. However, if changes need to be made to the code within the packagebody, then you can change that code without affecting public-facing constructs of a package.Packages are one of the most important constructs that you can create in PL&#x2F;SQL. You will usepackages to combine common code objects for almost any significant application that you write. It ispossible to create entire applications without the use of a package, but doing so can create amaintenance nightmare because you will begin to see a pool of procedures and functions being createdwithin your database, and it will be difficult to remember which constructs are used for different tasks.Packages are especially handy when writing PL&#x2F;SQL web applications, and you will learn all about doingsummary:  \n\npackage differenates individual prodcdure is that pacakge could define global variable and shared each other\ncould including function not within specification\nthere are declarations of variables or constants, so no need to struct package body\n\n4-10. Writing Initialization Code for a PackageProblemYou want to execute some code each time a particular PL&#x2F;SQL package is instantiated in a session. \nSolutionCreate an initialization block for the package in question. By doing so, you will have the ability to executecode each time the package is initialized. The following example shows the same package that wasconstructed in Recipe 4-7. However, this time the package contains an initialization block. \nCREATE OR REPLACE PACKAGE BODY process_employee_time IS \n \n  PROCEDURE grant_raises (pct_increase IN NUMBER, \n                          upper_bound IN NUMBER) as \n  CURSOR emp_cur is \n  SELECT employee_id, first_name, last_name \n  FROM employees; \n  BEGIN \n  -- loop through each record in the employees table \n   FOR emp_rec IN emp_cur LOOP \n      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); \n      increase_wage(emp_rec.employee_id, pct_increase, upper_bound); \n   END LOOP; \n  END grant_raises;  \n \n \n  PROCEDURE increase_wage (empno_in IN NUMBER, \n                          pct_increase IN NUMBER, \n                          upper_bound IN NUMBER) AS \n  emp_count    NUMBER :&#x3D; 0; \n  emp_sal      employees.salary%TYPE; \n   \n  Results   VARCHAR2(50); \n   \n  BEGIN \n \n  SELECT count(*) \n  INTO emp_count \n  FROM employees \n  WHERE employee_id &#x3D; empno_in; \n  \n  IF emp_count &gt; 0 THEN \n    -- IF EMPLOYEE FOUND, THEN OBTAIN RECORD \n    SELECT salary \n    INTO emp_sal \n    FROM employees \n    WHERE employee_id &#x3D; empno_in; \n     \n    IF emp_sal &lt; upper_bound AND round(emp_sal + (emp_sal * pct_increase), 2) &lt; \n upper_bound THEN \n     \n        UPDATE employees \n        SET salary &#x3D; round(salary + (salary * pct_increase),2) \n        WHERE employee_id &#x3D; empno_in; \n         \n        results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; \n    ELSE \n        results :&#x3D; &#39;EMPLOYEE MAKES TOO MUCH, DECREASE RAISE PERCENTAGE&#39;; \n    END IF; \n     \n  ELSE \n    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; \n  END IF; \n  DBMS_OUTPUT.PUT_LINE(results); \n  END increase_wage; \n\nBEGIN\n  DBMS_OUTPUT.PUT_LINE(&#39;EXECUTING THE INITIALIZATION BLOCK&#39;);\nEND;\nThe initialization block in this example is the last code block within the package body. In this case,that block lies in the final three lines. \nHow It Works\nThe initialization block for the package in the Solution displays a line of text to indicate that theinitialization block has been executed. The initialization block will execute once per session, the firsttime the package is used in that session. If you were to create this package in your session and invokeone of its members, you would see the message print. Although an initialization message is not veryuseful, there are several good reasons to use an initialization block. One such reason is to perform aquery to obtain some data for the session. \nsummary:  \n\nmore like java construct function and golang init() function\ncode struct for initializationcreate or replace package XXXX () is\nBEGIN\n    DBMS_OUTPUT.PUT_LINE(&#39;EXECUTING THE INITIALIZATION BLOCK&#39;);\nEND;\n\n4-11. Granting the Ability to Create and Execute Stored ProgramsProblemYou want to grant someone the ability to create and execute stored programs. \nSolutionTo grant the ability for a user to create a procedure, function, or package, you must log in to the databasewith a privileged account and grant the CREATE PROCEDURE privilege to the user. Here’s an example: \nGRANT CREATE PROCEDURE TO user; \n\nSimilarly, to grant permissions for execution of a procedure, package, or function, you must log inwith a privileged account and grant the user EXECUTE permissions on a particular procedure, function, orpackage. Here’s an example: \nGRANT EXECUTE ON schema_name.program_name TO schema;\n\nHow It Works\nBefore a user can create stored code, the user must be given permission to do so. The Solution shows thestraightforward approach. The database administrator logs in and grants CREATE PROCEDURE to theschema owner. The schema owner can then log in and create stored code in their schema.A schema owner can always execute stored code in the schema. However, application users do notgenerally log in as schema owners because of the security risks inherent in doing so. Thus, you willcommonly be faced with the need to grant other users execute access on stored code. You do that bygranting EXECUTE privileges, as shown in the second Solution example.  \nsummary :  \n\nlet A account access B schema objects by execute GRANT EXECUTE ON schema_name.program_name TO schema;\n\n4-12. Executing Packaged Procedures and FunctionsProblemYou want to execute one of the procedures or functions contained within a package. \nSolutionUse the package_name.object_name notation to execute a particular code object within a package. Forinstance, the following block of code executes the GRANT_RAISES procedure that is contained within thePROCESS_EMPLOYEE_TIME package. \nBEGIN \n    process_employee_time.grant_raises(.03,4000); \nEND; \n\nThe previous code block executes the GRANT_RAISES function, passing .03 for the percentage ofincrease and 4000 for the upper bound. \n*How It WorksDot notation is used for accessing members of a package. Similar to other languages such as Java, dotnotation can be used to access any publically accessible member of the package. Any variable, function,or procedure that is contained in the package specification can be accessed using the dot notation.Therefore, if your package contained a constant variable within its specification that you wanted toaccess, it would be possible to do so from outside the package.For a schema to access and execute package members, it must have the appropriate permissions. Togrant EXECUTE permission on a package that you own, use the following syntax: \nGRANT EXECUTE ON package_name TO user_name; \n\nDot notation works from within other procedures or functions. It can also be used from theSQL*Plus command line using the EXEC command.■ Note In most cases, if a package is being used by another schema, then it is a good idea to create a publicsynonym for that package within the database. This will help decrease issues while attempting to reference thepackage and its programs from the different schema because you will not need to specify the schema name inorder to qualify the call. Please see Recipe 4-13 for more information regarding public synonyms.summary:  \n\na good way is to create synonyms\n\n4-13. Creating a Public Name for a Stored ProgramProblemYou want to allow for any schema to have the ability to reference a particular stored program that iscontained(adj.泰然自若的;从容的;被控制的) within your schema. For instance, the CALC_EMPLOYEE_PAYCHECK procedure should beexecutable for any of the administrative users of the database. You want these users to have the ability tosimply call the procedure rather than preceding the procedure name with the schema using the dotnotation. \nSolutionCreate a public synonym for the function, procedure, or package. This will allow any user that hasEXECUTE privileges on the stored program to call it without specifying the schema name first. Instead, theinvoker need only reference the synonym.In the following example, the user AdminUser does not have direct access to theCALC_EMPLOYEE_PAYCHECK procedure, so they must fully qualify the name of the package using the schemaname for which the procedure resides. \nSQL&gt; exec application_account.calc_employee_paycheck(200); \nCalculating paycheck with taxes \nThe paycheck total for Whalen is 5200.8 \n \nPL&#x2F;SQL procedure successfully completed. \n\nNext, the database administrator will create a public synonym for the procedure:\nSQL&gt; CREATE PUBLIC SYNONYM calc_employee_paycheck \n           FOR application_user.calc_employee_paycheck; \n\nNow any user with execute privileges on the procedure can invoke it without fully qualifying thename since a public synonym named CALC_EMPLOYEE_PAYCHECK has been created. This is demonstrated inthe next lines of code. Again, the user AdminUser is now logged into the system and executes theprocedure. \nSQL&gt; exec calc_employee_paycheck(206); \nCalculating paycheck with taxes \nThe paycheck total for Gietz is 6640.8 \n \nPL&#x2F;SQL procedure successfully completed. \n\nAs you can see, the procedure name no longer requires the schema name to fully qualify it beforebeing invoked. \nHow It WorksCreating public synonyms is a useful technique for allowing any user to have access to a stored piece ofcode without knowing which schema the code belongs to. Any user who has EXECUTE privileges on thecode can invoke it without fully qualifying the name. Instead, the invoker specifies the synonym name.An account must be granted the CREATE PUBLIC SYNONYM privilege in order to create a publicsynonym. It’s actually common for database administrators to take care of creating such synonyms.To create a synonym, execute the following statement, replacing the PUB_SYNONYM_NAME identifierwith the name of your choice and replacing SCHEMA.STORED_PROGRAM with the schema name and programthat you want to make publically accessible: \nCREATE PUBLIC SYNONYM pub_synonym_name FOR schema.stored_program; \n\nThe public synonym name does not have to be the same as the actual stored program name, but it isconventional to keep them the same, and it makes things consistent and the names easier to remember.If you begin to have synonym names that differ from the actual program names, then confusion willeventually set in.\n■ Note Creating a synonym does not give execute access. Creating a public synonym provides only a global namethat avoids the need for dot notation. Invokers of a procedure or function still must be granted EXECUTE access, asshown in Recipe 4-11. \nsummary:  \n\ngrant read&#x2F;write user access right to execute procedure without schema name\nif you want to setup w&#x2F;r account for schema account.\ncreate public synonym name for application account\ngrant execute&#x2F;select&#x2F;update … on package_name on write_user&#x2F;read_user\n\n\n\n4-14. Executing Package Programs in SequenceProblemYou have created a package that contains all the necessary procedures and functions for your program.Although you can invoke each of these subprograms individually using thepackage_name.subprogram_name notation, it would be beneficial to execute all of them at the same timeby issuing a single statement. \nSolutionCreate a driver procedure within your PL&#x2F;SQL package that will be used to initiate all the subprograms in turn, and run your entire program. In the following example, a procedure named driver is created insidea package, and it will invoke all the other package subprograms in turn:First, create the specification: \nCREATE OR REPLACE PACKAGE synchronize_data IS \n  PROCEDURE driver; \nEND; \nThen, create the body: \nCREATE OR REPLACE PACKAGE BODY synchronize_data IS \n  PROCEDURE query_remote_data IS \n    BEGIN \n      --statements go here \n      DBMS_OUTPUT.PUT_LINE(&#39;QUERYING REMOTE DATA&#39;); \n    END query_remote_data;  \n \n  PROCEDURE obtain_new_record_list IS \n    BEGIN \n      --statements go here \n      DBMS_OUTPUT.PUT_LINE(&#39;NEW RECORD LIST&#39;); \n    END obtain_new_record_list;  \n \n  PROCEDURE obtain_updated_record_list IS \n    BEGIN \n      --statements go here \n      DBMS_OUTPUT.PUT_LINE(&#39;UPDATED RECORD LIST&#39;); \n    END obtain_updated_record_list;  \n \n  PROCEDURE sync_local_data IS \n    BEGIN \n      --statements go here \n      DBMS_OUTPUT.PUT_LINE(&#39;SYNC LOCAL DATA&#39;); \n    END sync_local_data;  \n   \n  PROCEDURE driver IS \n  BEGIN \n    query_remote_data; \n    obtain_new_record_list; \n    obtain_updated_record_list; \n    sync_local_data; \n  END driver; \nEND synchronize_data; \n\nThe driver procedure initiates all the other procedures in the order that they should be executed. Toinitiate the packaged program, you now make a call to the driver procedure as follows: \nBEGIN \n   synchronize_data.driver; \nEND;\nOne statement invokes the driver procedure. That procedure in turn invokes the other proceduresin the proper sequence.  \nHow It WorksBy creating a single procedure that can be called in order to execute all the other subprograms in turn,you eliminate the potential for calling subprograms in the incorrect order. This will also allow you theconvenience of making one call as opposed to numerous calls each time you want to execute the task(s)involved. And, if you create the other subprograms as private procedures and functions, then youeliminate the risk of a developer invoking them out of order. That’s because you only make the driverprocedure public, and you know that the driver invokes in the correct sequence.Oftentimes, packages are used to hold all the database constructs that make up an entire process. Inthe Solution to this recipe, the package entails(vt.使需要.必需) a database synchronization process, and each procedurewithin performs a separate piece of the synchronization. When executed in the correct order, theprocedures together perform the complete synchronization task.One could just as easily create a script or manually invoke each package program separately just asthe driver procedure does in this case. However, you open the door to error when you write the logic ofinvoking the sequence of procedures from multiple places. Another important factor is that the drivercan also be used to perform any additional initialization that must be done prior to executing eachprocedure. Similarly, additional processing can be done in between each procedure call, such asprinting out the current status of the program. The driver procedure essentially provides another layerof abstraction that you can take advantage of. The package can be initialized using the default packageinitialization; then additional initialization or statements can be provided within the driver procedure,and the program caller doesn’t need to know about them.summary: \n\nAnother important factor is that the driver can also be used to perform any additional initialization that must be done prior to executing each procedure\nyou can take advantage of. The package can be initialized using the default package initialization\n\n4-15. Implementing a Failure FlagProblemYou want to create a boolean variable to determine whether one of the subprograms in the package hasgenerated an error. If an error has been generated by one of the subprograms, then the variable will beset to TRUE. This flag will be evaluated in the driver procedure to determine whether the updatesperformed by the package should be committed or rolled back. \nSolutionDeclare a global variable at the package level, and it will be accessible to all objects within. You can dothis by declaring the variable within the package body. The following package illustrates such a variable,where the variable has been declared within the package body so that it is available for all objects in thepackage only. \nCREATE OR REPLACE PACKAGE synchronize_data \nPROCEDURE driver; \nEND; \n \nCREATE OR REPLACE PACKAGE BODY synchronize_data IS \n  error_flag BOOLEAN :&#x3D; FALSE; \n \n  PROCEDURE query_remote_data is \n     Cursor remote_db_query is \n     SELECT * \n     FROM my_remote_data@remote_db; \n    \n     remote_db_rec employees%ROWTYPE; \n \n  BEGIN \n    OPEN remote_db_query; \n    LOOP \n      FETCH remote_db_query INTO remote_db_rec; \n      EXIT WHEN remote_db_query%NOTFOUND; \n    IF remote_db_query%NOTFOUND THEN \n      error_flag :&#x3D; TRUE; \n    ELSE \n      -- PERFORM PROCESSING \n      DBMS_OUTPUT.PUT_LINE(&#39;QUERY REMOTE DATA&#39;); \n    END IF; \n    END LOOP; \n    CLOSE remote_db_query; \n  END query_remote_data; \n \n  PROCEDURE obtain_new_record_list IS \n    BEGIN \n      --statements go here \n      DBMS_OUTPUT.PUT_LINE(&#39;NEW RECORD LIST&#39;); \n    END obtain_new_record_list;  \n \n  PROCEDURE obtain_updated_record_list IS \n    BEGIN \n      --statements go here \n      DBMS_OUTPUT.PUT_LINE(&#39;UPDATED RECORD LIST&#39;); \n    END obtain_updated_record_list;  \n \n  PROCEDURE sync_local_data IS \n    BEGIN \n      --statements go here \n      DBMS_OUTPUT.PUT_LINE(&#39;SYNC LOCAL DATA&#39;); \n    END sync_local_data;  \n \n \n  PROCEDURE driver IS \n  BEGIN \n    query_remote_data; \n    IF error_flag &#x3D; TRUE THEN \n      GOTO error_check; \n    END IF; \n     \n    obtain_new_record_list; \n    IF error_flag &#x3D; TRUE THEN \n      GOTO error_check; \n    END IF; \n \n    obtain_updated_record_list; \n    IF error_flag &#x3D; TRUE THEN \n      GOTO error_check; \n    END IF; \n \n    sync_local_data; \n \n    -- If any errors were found then roll back all updates \n    &lt;&lt;error_check&gt;&gt; \n    DBMS_OUTPUT.PUT_LINE(&#39;Checking transaction status&#39;); \n    IF error_flag &#x3D; TRUE THEN \n      ROLLBACK; \n      DBMS_OUTPUT.PUT_LINE(&#39;The transaction has been rolled back.&#39;); \n   ELSE \n      COMMIT; \n      DBMS_OUTPUT.PUT_LINE(&#39;The transaction has been processed.&#39;); \n    END IF; \n \n  END driver; \nEND;\nHow It WorksDeclaring variables in the package body outside any procedures or functions allows them to becomeaccessible to all subprograms within the package. If one or more of the subprograms changes such avariable’s value, then the changed value will be seen throughout the entire package.As depicted in the example, you can see that the variable is referenced several times throughout thepackage. If you had a requirement to make a variable global to all PL&#x2F;SQL objects outside the package aswell, then you can declare the variable within the package specification. As mentioned in Recipe 4-8,anything declared in the package specification is publically available to any PL&#x2F;SQL object outside aswell as within the package body. \n4-16. Forcing Data Access to Go Through PackagesProblemYou have defined all subprograms and packages for a particular application, and you want to allow otherusers to access these constructs and execute the program but not have access to any data tables directly. \nSolutionDefine all the packages, procedures, and functions for your program within a single schema that hasaccess to all the data. All user access should be made from separate schemas, and they should be grantedexecute privileges on the PL&#x2F;SQL objects but not access to the tables themselves.For instance, if you want to control access to a package named PROCESS_EMPLOYEE_TIME, that packagealong with all required tables, types, and sequences should be loaded into an application schema thathas the appropriate permissions required to access the data. For the purposes of this recipe, theapplication schema name is EMP.Next, create a role by which to manage the privileges needed to invoke the package’s proceduresand functions. Grant EXECUTE privileges to that role. Grant that role to application users.Your application users will now be able to execute the procedures and functions within the package.Those procedures and functions can in turn update the database tables in the package’s schema.However, users will not have direct access to those tables. All updates must flow through the package. \nHow It WorksTo control an application’s data, it is important to restrict access to the tables. The Solution in this recipeshows how to create a package in the same schema that contains the application tables. The packagethus has access to those tables. Users, however, do not have table-level access.After creating the package, you can grant EXECUTE access on the package to application users. Userscan then invoke packaged procedures and functions, and those procedures and functions in turn canmodify the data in the tables. However, users have no direct access to the tables.By forcing users to go through packaged procedures and functions, you limit users to using adefined interface that remains under your control. You now have some amount of freedom to modify theunderlying tables. So long as you do not change the package interface, you can make changes to theunderlying tables without disrupting the application. \nsummary:  \n\nbig, deep, comprehensive,topic to disuss\nallow you must through package to access tables\n\n4-17. Executing Stored Code Under Your Own Privilege SetProblemYou have loaded all of an application’s objects into a single application schema. However, you do notwant packages, procedures, and functions to execute as the schema owner. Instead, you want storedcode to execute with the privileges and access of the user who is invoking that code.SolutionUse invoker’s rights by providing the AUTHID property within the declaration of your program. If theAUTHID property is specified when defining a package, procedure, or function, then you have the abilityto specify whether the program should be invoked using the CURRENT_USER privileges or the DEFINERprivileges. In the case of this Solution, you would rather use the CURRENT_USER privileges to ensure thatthe user does not have the same level of access as the schema owner. The default is DEFINER.The following code shows how to create a procedure for changing a password, and it uses the AUTHIDproperty to ensure that the procedure will be run using the CURRENT_USER’s privilege set. This particularprocedure uses dynamic SQL to create a SQL statement. To learn more about using dynamic SQL, pleasesee Chapter 8.\nCREATE OR REPLACE PROCEDURE change_password(username IN VARCHAR2, \n                                                                                                                    \n                                          new_password IN VARCHAR2)\nAUTHID CURRENT_USER IS \n \nsql_stmt VARCHAR2(100); \n\nBEGIN \n    sql_stmt :&#x3D; &#39;ALTER USER &#39; ||  username || &#39; IDENTIFIED BY &#39; || new_password; \n    \n    EXECUTE IMMEDIATE sql_stmt; \nEND; \nWhen the user executes this procedure, it will be executed using their own set of permissions. Thiswill prevent them from changing anyone else’s password unless they have the ability to do so under theirallotted(v.分配;指派;拨给) permission set.  \nHow It WorksInvoker’s rights are a great way to secure your application if you are planning to limit access to theCURRENT_USER’s privilege set. To allow for invoker’s rights to be set into place, the AUTHID property mustbe used with the CURRENT_USER keyword in the definition of a stored PL&#x2F;SQL unit. This property affectsthe name reSolution and privilege set for that unit. You can find the value of the AUTHID property if youtake a look at the USER_PROCEDURES data dictionary view.Using the invoker’s rights methodology is a great way to protect a program as long as the usersaccess the program with their own database account. If each user within the database has their ownaccount, then they can be granted the required level of access via database roles. The AUTHID propertycan constrain the execution of code to the current user’s privilege set. Because of that, if a user does nothave the privileges that are required to execute a particular program, then they will not have access.Simply put, invoker’s rights are a good means of securing your code as long as the approach is usedcorrectly.\nsummary:  \n\nmust execute code by your access right\n\n4-18. Accepting Multiple Parameter Sets in One FunctionProblemYou want to give a function the ability to accept multiple parameter types instead of being constrainedto a particular datatype or number of parameters. For example, you want to create a single function thatcan accept either one or two parameters and that will perform a slightly(adv.些微地,轻微地) different action depending uponthe number of parameters you pass it.  \nSolutionUse overloading to create multiple functions that are named the same and perform similar functionalitybut accept a different number of parameters, different ordering of parameters, or parameters of differenttypes. In this recipe, you will see a function named squared that takes a number and returns its valuesquared. Similarly, there is another function also named squared that accepts two numbers instead ofone. This second function is the overloaded version of the original squared. Here is the code for the twofunctions: \n-- Returns the square of the number passed in \nCREATE OR REPLACE FUNCTION squared (in_num IN NUMBER) \nRETURN NUMBER AS \n  -- variables\nBEGIN \n  RETURN in_num * in_num; \nEND; \n -- Returns the squared sum of two numbers \nCREATE OR REPLACE FUNCTION squared (in_num IN NUMBER, \n                                    in_num_two IN NUMBER) \n    RETURN NUMBER AS \nBEGIN \n  RETURN (in_num + in_num_two) * (in_num + in_num_two);  \nEND; \n\nanother type \nCREATE OR REPLACE FUNCTION squared (in_num IN NUMBER, \n                                    in_num_two IN NUMBER\n                                    out_number_three out NUMBER) \n    RETURN NUMBER AS \nNOK   NUMBER;\n\nBEGIN \n  out_number_three :&#x3D; (in_num + in_num_two) * (in_num + in_num_two);  \n  RETURN NOK;  \nEND; \n\nYou can see that each of the previous functions accepts a different number of parameters, but theyboth perform similar tasks. This is a good illustration for using function overloading because someoneusing this function would expect a similar result to be returned whether calling the function with oneparameter or two. \nHow It WorksLike many other programming languages, PL&#x2F;SQL offers an overloading(重载) of functions. This makes itpossible to name more than one function by the same name but give each of them different parametertypes, different parameter ordering, or a different number of parameters. This is also known as changingthe function signature. A signature for a function consists of the object name and its parameter list. Byoverloading, you have the ability to allow more flexibility to those using the function. For instance, if youplace both of the squared functions into a package named MATH_API, then someone using this packagecan simply call the function passing whatever they require and still receive a usable result withoutactually knowing the implementation details.Using overloading to create multiple functions or procedures by the same name can becometroublesome if overused. Be careful that your package is not littered with too many overloadedprocedures or functions because maintenance on such a code base can become a nightmare.Overloading has its good use cases, but if it can be avoided by using technique that is easier to follow,then it is a good idea to go the simpler route. \n4-19. Listing the Functions, Procedures, and Packages in a SchemaProblemYour team has defined a number of functions, procedures, and packages within a schema. You want togenerate a listing of all functions, procedures, and packages at the end of each day to evaluateproductivity. \nSolutionUse the USER_OBJECTS table to return the program list and prefix packages, procedures, and functions forthe same program with the same first word to make them easier to find.This first example will return a list of all procedure names that reside within the EMP schema and thathave a name that is prefixed with EMPTIME: \nSELECT OBJECT_NAME \nFROM USER_OBJECTS \nWHERE OBJECT_TYPE &#x3D; &#39;PROCEDURE;\nWHERE OBJECT_NAME like &#39;EMPTIME%&#39;; \n\nThe next query will return a list of all function names that reside within the schema: \nSELECT OBJECT_NAME \nFROM USER_OBJECTS \nWHERE OBJECT_TYPE &#x3D; &#39;FUNCTION&#39;; \n\nLastly, the following query will return a listing of all package names that reside within the schema: \nSELECT OBJECT_NAME \nFROM USER_OBJECTS \nWHERE OBJECT_TYPE &#x3D; &#39;PACKAGE&#39;;\n\nget_DDL() \n\nHow It WorksOracle Database contains many views that contain data useful for application development. Using theUSER_OBJECTS table can be very handy when searching for objects within the database. By prefixing likeobjects with the same first word, it can make searching for a particular selection of objects rather easy.USER_OBJECTS provides the ability to find a certain object type by specifying the OBJECT_TYPE withinthe query. If no OBJECT_TYPE is specified, then all objects for the schema will be returned.\n4-20. Viewing Source Code for Stored ProgramsProblemYou want to retrieve the code for your stored functions, procedures, triggers, and packages. \nSolutionUse the DBMS_METADATA package to assist(vi.参加) you in fetching the information. In this case, you will use theDBMS_METADATA.GET_DDL procedure to obtain the code for a stored function. In the following code, theDBMS_METADATA package is used to return the DDL for the CALC_QUARTER_HOUR function: \nSELECT DBMS_METADATA.GET_DDL(&#39;FUNCTION&#39;,&#39;CALC_QUARTER_HOUR&#39;) FROM DUAL; \n\nThe query illustrated previously should produce results that are similar to the following as long asyou have the CALC_QUARTER_HOUR function loaded in your database: \nCREATE OR REPLACE FUNCTION &quot;MY_SCHEMA&quot;.&quot;CALC_QUARTER_HOUR&quot; (HOURS IN NUMBER) \nRETURN NUMBER AS \n   CALCULATED_HOURS NUMBER :&#x3D; 0; \nBEGIN \n   IF HOURS &gt; 1 THEN \n        IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN \n          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); \n        ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN \n          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); \n       ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN \n          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); \n       ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN \n          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.75,1); \n       ELSE \n          CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n       END IF; \n   ELSE \n       IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN \n         CALCULATED_HOURS :&#x3D; .25; \n       ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN \n         CALCULATED_HOURS :&#x3D; .5; \n       ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN \n         CALCULATED_HOURS :&#x3D; .75; \n       ELSE \n         CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n       END IF; \n   END IF; \n   RETURN CALCULATED_HOURS; \n END CALC_QUARTER_HOUR; \nThe GET_DDL function returns the code that can be used to re-create the procedure or function. Thiscan be a good way to debug code that you may not have authored and do not have on hand.■ Note The GET_DDL function will not format the code. Rather, it will be returned as a single string of text. Bydefault, the buffer will not be large enough to display all of the DDL. You can change the buffer size by issuing theSET LONG buffersize within SQL*Plus, substituting buffersize with a large integer value. \nHow It WorksYou can use the DBMS_METADATA package to retrieve various pieces of information from the database. TheSolution to this recipe demonstrated how to fetch the DDL for a function. There is an abundance ofinformation that can be obtained by using the DBMS_METADATA package, and GET_DDL barely scratches thesurface. \nThe GET_DDL function can return the code for each different type of object. To retrieve a the code foran object using GET_DDL, use the following syntax: \nSELECT DBMS_METADATA.GET_DDL(&#39;object_type&#39;,&#39;object_name&#39;, &#39;schema&#39;) FROM DUAL; \nThe OBJECT_TYPE can be the name of any database object type, including TABLE. For the purposes ofPL&#x2F;SQL code, the OBJECT_TYPE can be FUNCTION, PROCEDURE, PACKAGE, or TRIGGER. The SCHEMA parameter isoptional and does not have to be specified if the object resides within the caller’s schema.Using DBMS_METADATA, you can obtain complete database object definitions from the databasedictionary via the retrieval subprograms. To learn more about the DBMS_METADATA package and obtain alisting of available subprograms, please refer to the online Oracle documentation athttp://download.oracle.com/docs/cd/B28359_01/appdev.111/b28419/d_metada.htm#ARPLS640, whichgoes into detail regarding each of the subprogram functionalities. \nsummary:  \nIt has always been a huge pain to punch the DDL for tables, indexes and stored procedures into a flat file. Oracle now has a dbms_metadata package with a get_ddl function to copy DDL syntax out of the dictionary.\n\nWith all of the new storage clauses and advanced parameters, getting table and index definitions has always been a huge **Problem**.  Hence, prior to Oracle, the DBA was generally forced to keep the DDL source code in a special library.  This makes life difficult because the DBA is now forced to maintain and manage versions of tables and index DDL separately from the data dictionary.\n\nOracle, the DBA will be able to keep all table and index definitions inside the data dictionary (where they belong), and use the get_ddl function to punch-out a copy whenever they need to migrate the object.\n\nBelow we see that the get_ddl function is very simple to use, only requiring the object_type and the object_name as import parameter.  Also, make sure to set linesize to a large value, because get_ddl returns a CLOB datatype, and you want SQL*Plus to be able to display the result set.\n\nSet lines 90000\n\nSpool sales_table_ddl.sql\n\nSelect dbms_metadata.get_ddl('TABLE','SALES','schema') from dual;\n\nSpool off;\n\nIf you like Oracle tuning, you might enjoy my latest book \"Oracle Tuning: The Definitive Reference\" by Rampant TechPress.  It's only $41.95 (I don't think it is right to charge a fortune for books!) and you can buy it right now at this link:\n","dateCreated":"2022-11-08T23:14:31+08:00","dateModified":"2022-11-08T23:38:50+08:00","datePublished":"2022-11-08T23:14:31+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 04-Functions, Packages,and Procedures","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 04-Functions, Packages,and Procedures">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:14:31.345Z">
+<meta property="article:modified_time" content="2022-11-08T15:38:50.655Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 04-Functions, Packages,and Procedures
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:14:31+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#4-Functions-Packages-and-Procedures"><span class="toc-text">4. Functions, Packages,and Procedures</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-Creating-a-Stored-Function"><span class="toc-text">4-1. Creating a Stored Function</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-Executing-a-Stored-Function-from-a-Query"><span class="toc-text">4-2. Executing a Stored Function from a Query</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-Optimizing-a-Function-That-Will-Always-Return-the-Same-Result-for-a-Given-Input"><span class="toc-text">4-3. Optimizing a Function That Will Always Return the Same Result for a Given Input</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-Creating-a-Stored-Procedure"><span class="toc-text">4-4. Creating a Stored Procedure</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-Executing-a-Stored-Procedure"><span class="toc-text">4-5. Executing a Stored Procedure</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-Creating-Functions-Within-a-Procedure-or-Code-Block"><span class="toc-text">4-6. Creating Functions Within a Procedure or Code Block</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-7-Passing-Parameters-by-Name"><span class="toc-text">4-7. Passing Parameters by Name</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-8-Setting-Default-Parameter-Values"><span class="toc-text">4-8. Setting Default Parameter Values</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-9-Collecting-Related-Routines-into-a-Single-Unit"><span class="toc-text">4-9. Collecting Related Routines into a Single Unit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-10-Writing-Initialization-Code-for-a-Package"><span class="toc-text">4-10. Writing Initialization Code for a Package</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-11-Granting-the-Ability-to-Create-and-Execute-Stored-Programs"><span class="toc-text">4-11. Granting the Ability to Create and Execute Stored Programs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-12-Executing-Packaged-Procedures-and-Functions"><span class="toc-text">4-12. Executing Packaged Procedures and Functions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-13-Creating-a-Public-Name-for-a-Stored-Program"><span class="toc-text">4-13. Creating a Public Name for a Stored Program</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-14-Executing-Package-Programs-in-Sequence"><span class="toc-text">4-14. Executing Package Programs in Sequence</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-15-Implementing-a-Failure-Flag"><span class="toc-text">4-15. Implementing a Failure Flag</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-16-Forcing-Data-Access-to-Go-Through-Packages"><span class="toc-text">4-16. Forcing Data Access to Go Through Packages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-17-Executing-Stored-Code-Under-Your-Own-Privilege-Set"><span class="toc-text">4-17. Executing Stored Code Under Your Own Privilege Set</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-18-Accepting-Multiple-Parameter-Sets-in-One-Function"><span class="toc-text">4-18. Accepting Multiple Parameter Sets in One Function</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-19-Listing-the-Functions-Procedures-and-Packages-in-a-Schema"><span class="toc-text">4-19. Listing the Functions, Procedures, and Packages in a Schema</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-20-Viewing-Source-Code-for-Stored-Programs"><span class="toc-text">4-20. Viewing Source Code for Stored Programs</span></a></li></ol></li></ol>
+
+<h1 id="4-Functions-Packages-and-Procedures"><a href="#4-Functions-Packages-and-Procedures" class="headerlink" title="4. Functions, Packages,and Procedures"></a>4. Functions, Packages,and Procedures</h1><p>PL&#x2F;SQL applications are composed of functions, procedures, and packages. Functions are PL&#x2F;SQL<br>programs that accept zero or more parameters and always return a result. Procedures are similar to<br>functions, but they are not required to return a result. Packages are a combination of related functions,<br>procedures, types, and variables. Each of these PL&#x2F;SQL components helps formulate the basis for small<br>and large applications alike. They differ from anonymous blocks that have been covered in previous<br>recipes because they are all named routines that are stored within the database. Together, they provide<br>the advantage of reusable code that can be called from any schema in the database to which you’ve<br>granted the appropriate access.<br>Let’s say you have a few lines of code that perform some calculations on a number and return a<br>result. Will these calculations help you anywhere else? If so, then you should probably encapsulate this<br>code in a function. Maybe you have a nightly script that you use as a batch job to load and execute.<br>Perhaps this script can be turned into a stored procedure and Oracle Scheduler can kick it off each night.<br>What about tasks that use more than one procedure or function? Can these be combined at all? A<br>PL&#x2F;SQL package would probably be a good choice in this case. After reading through the recipes in this<br>chapter, you should be able to answer these questions at the drop of a hat.<br>■ Note We mention job scheduling in our introduction to this chapter. However, we actually address that topic in<br>Chapter 11, which is an entire chapter dedicated to running PL&#x2F;SQL jobs, whether for application purposes or for<br>database maintenance. </p>
+<h2 id="4-1-Creating-a-Stored-Function"><a href="#4-1-Creating-a-Stored-Function" class="headerlink" title="4-1. Creating a Stored Function"></a>4-1. Creating a Stored Function</h2><p><strong><strong>Problem</strong></strong><br>One of your programs is using a few lines of code repeatedly for performing a calculation. Rather than<br>using the same lines of code numerous times throughout your application, it makes more sense to<br>encapsulate(美[ɪn’kæpsjə’let]vt.压缩;将…装入胶囊) the functionality into a common routine that can be called and reused time and time again.<br><strong><strong>Solution</strong></strong><br>Create a stored function to encapsulate your code, and save it into the database. Once stored in the<br>database, any user with execution privileges can invoke the function. Let’s take a look at a function to<br>give you an idea of how they work.<br>In this example, the function is used to round a given number to the nearest quarter. This function<br>works well for accepting a decimal value for labor hours and rounding to the nearest quarter hour. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- at return part and no paramter name just a type
+CREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS  
+  CALCULATED_HOURS NUMBER :&#x3D; 0; 
+BEGIN 
+  
+   -- if HOURS is greater than one, then calculate the decimal portion 
+   -- based upon quarterly hours  
+ IF HOURS &gt; 1 THEN 
+  -- calculate the modulus of the HOURS variable and compare it to • 
+  -- fractional values 
+    IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); 
+    ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); 
+    ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); 
+    ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.75,1); 
+    ELSE 
+       CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+       
+    END IF; 
+     
+  ELSE 
+    -- if HOURS is less than one, then calculate the entire value• 
+    -- based upon quarterly hours 
+    IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN 
+        CALCULATED_HOURS :&#x3D; .25; 
+    ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN 
+        CALCULATED_HOURS :&#x3D; .5; 
+    ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN 
+        CALCULATED_HOURS :&#x3D; .75; 
+    ELSE 
+        CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+    END IF; 
+     
+  END IF; 
+   
+  RETURN CALCULATED_HOURS; 
+   
+END CALC_QUARTER_HOUR; </code></pre>
+<p>This function accepts one value as input, a decimal value representing a number of hours worked.<br>The function then checks to see whether the value is greater than one, and if so, it performs a series of<br>manipulations to round the value to the nearest quarter hour. If the value is not greater than one, then<br>the function rounds the given fraction to the nearest quarter.<br>■ Note See Recipe 4-2 for an example showing the execution of this function. </p>
+<p><strong><strong>How It Works</strong></strong><br>A function is a named body of code that is stored within the database and returns a value. Functions are<br>often used to encapsulate logic so that it can be reused. A function can accept zero or more parameters<br>and always returns a value. A function is comprised of a header, an execution section containing<br>statements, and an optional exception block.<br>For example, the header for our <strong>Solution</strong> function is as follows:  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS  </code></pre>
+<p>The OR REPLACE clause is optional, but in practice it is something you’ll most always want. Specifying<br>OR REPLACE will replace a function that is already under the same name in the same schema. (A function<br>name must be unique within its schema.)<br>Functions can take zero or more parameters, which can be any datatype including collections. You<br>will learn more about collections in Chapter 10. Our example function takes one parameter, a NUMBER<br>representing some number of hours.<br>The parameters that can be passed to a function can be declared in three different ways, namely, as<br>IN, OUT, and IN OUT. The difference between these three declaration types is that parameters declared as<br>IN are basically read-only, OUT parameters are write-only, and IN OUT parameters are read-write. The<br>value of an OUT parameter is initially NULL but can contain a value after the function has returned.<br>Similarly, the value of an IN OUT can be modified within the function, but IN parameters cannot.<br>■ Note Typically you want only IN parameters for a function. If you find yourself creating a function with OUT or IN<br>OUT parameters, then reconsider and think about creating a stored procedure instead. This is not a hard-and-fast<br>requirement, but it is generally good practice for a function to return only one value.<br>The declaration section of the function begins directly after the header, and unlike the anonymous<br>block, you do not include the DECLARE keyword at the top of this section. Just like the anonymous block,<br>the declaration section is where you will declare any variables, types, or cursors for your function. Our<br>declaration section defines a single variable:<br> <pre class="language-sql" data-language="sql"><code class="language-sql">CALCULATED_HOURS NUMBER :&#x3D; 0; </code></pre><br>Following the declaration is the executable section, which is laid out exactly like that of an<br>anonymous block. The only difference with a function is that it always includes a RETURN statement. It<br>can return a value of any datatype as long as it is the same datatype specified in the RETURN clause of the<br>header.<br>Following the return clause can be an optional EXCEPTION block to handle any errors that were<br>encountered in the function. The following example is the same function that was demonstrated in the<br><strong>Solution</strong> to this recipe, except that it has an added EXCEPTION block. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) 
+ RETURN NUMBER AS  
+  CALCULATED_HOURS NUMBER :&#x3D; 0; 
+BEGIN 
+  
+   -- if HOURS is greater than one, then calculate the decimal portion 
+ 
+  -- based upon quarterly hours  
+ IF HOURS &gt; 1 THEN 
+  -- calculate the modulus of the HOURS variable and compare it to  
+ 
+  -- fractional values 
+    IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); 
+    ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); 
+    ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); 
+    ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.75,1); 
+    ELSE 
+       CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+       
+    END IF; 
+     
+  ELSE 
+    -- if HOURS is less than one, then calculate the entire value 
+ 
+    -- based upon quarterly hours 
+    IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN 
+        CALCULATED_HOURS :&#x3D; .25; 
+    ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN 
+        CALCULATED_HOURS :&#x3D; .5; 
+    ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN 
+        CALCULATED_HOURS :&#x3D; .75; 
+    ELSE 
+        CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+    END IF; 
+     
+  END IF; 
+   
+  RETURN CALCULATED_HOURS; 
+ 
+EXCEPTION 
+  WHEN VALUE_ERROR THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;VALUE ERROR RAISED, TRY AGAIN&#39;); 
+    RETURN -1; 
+  WHEN OTHERS THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;UNK ERROR RAISED, TRY AGAIN&#39;); 
+    RETURN -1; 
+END CALC_QUARTER_HOUR; </code></pre>
+<p>Again, don’t fret if you are unfamiliar with how to handle exceptions, because they will be discussed<br>in detail later in the book. At this point, it is important to know that you have the ability to declare<br>exceptions that can be caught by code so that your program can process abnormalities or errors<br>accordingly.<br>Functions are important not only for encapsulation but also for reuse. As a matter of fact, the<br>function defined within the <strong>Solution</strong> uses other built-in PL&#x2F;SQL functions within them. There are entire<br>libraries that consist of functions that are helpful for performing various transactions. Functions are a<br>fundamental part of PL&#x2F;SQL programming, just as they are in any other language. It is up to you to<br>ensure that your database is stocked with plenty of useful functions that can be used in your current and<br>future applications. </p>
+<h2 id="4-2-Executing-a-Stored-Function-from-a-Query"><a href="#4-2-Executing-a-Stored-Function-from-a-Query" class="headerlink" title="4-2. Executing a Stored Function from a Query"></a>4-2. Executing a Stored Function from a Query</h2><p><strong><strong>Problem</strong></strong><br>You want to invoke a function from an SQL query. For example, you want to take the quarter-hour<br>rounding function from Recipe 4-1 and invoke it on hourly values in a database table.<br><strong><strong>Solution</strong></strong><br>Write a query and invoke the function on values returned by the SELECT statement. In the following lines,<br>the function that was written in the previous recipe will be called. The results of calling the function from<br>within a query are as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; select calc_quarter_hour(.17) from dual; 
+ 
+CALC_QUARTER_HOUR(.17) 
+---------------------- 
+  .25 
+ 
+SQL&gt; select calc_quarter_hour(1.3) from dual; 
+ 
+CALC_QUARTER_HOUR(1.3) 
+---------------------- 
+ 1.25 </code></pre>
+<p><strong><strong>How It Works</strong></strong><br>There are a few ways in which a function can be called, one of which is via a query. A function can be<br>executed inline via a SELECT statement, as was the case with the <strong>Solution</strong> to this recipe. A function can<br>also be executed by assigning it to a variable within an anonymous block or another function&#x2F;procedure.<br>Since all functions return a value, this works quite well. For instance, the following QTR_HOUR variable can<br>be assigned the value that is returned from the function: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  qtr_hour          NUMBER; 
+BEGIN 
+  qtr_hour :&#x3D; calc_quarter_hour(1.3); 
+  DBMS_OUTPUT.PUT_LINE(qtr_hour); 
+END; 
+ 
+You can also execute a function as part of an expression. In the following statement, you can see 
+that TOTAL_HOURS is calculated by adding the bill total to the value returned from the function: 
+ 
+DECLARE 
+  total_hours           NUMBER; 
+  hours                 NUMBER :&#x3D; 8; 
+BEGIN 
+  total_hours :&#x3D; hours + calc_quarter_hour(3.2); 
+  DBMS_OUTPUT.PUT_LINE(total_hours); 
+END; </code></pre>
+<p>The way in which your program calls a function depends on its needs. If you need to simply return<br>some results from the database and apply a function to each of the results, then use a query. You may<br>have an application that needs to pass a value to a function and use the result at some later point, in<br>which case assigning the function to a variable would be a good choice for this case. Whatever the case<br>may be, functions provide convenient calling mechanisms to cover most use cases. </p>
+<h2 id="4-3-Optimizing-a-Function-That-Will-Always-Return-the-Same-Result-for-a-Given-Input"><a href="#4-3-Optimizing-a-Function-That-Will-Always-Return-the-Same-Result-for-a-Given-Input" class="headerlink" title="4-3. Optimizing a Function That Will Always Return the Same Result for a Given Input"></a>4-3. Optimizing a Function That Will Always Return the Same Result for a Given Input</h2><p><strong><strong>Problem</strong></strong><br>You want to create a function that will return the same result whenever a given input, or set of inputs, is<br>presented to it. You want the database to optimize based upon that deterministic nature.<br><strong><strong>Solution</strong></strong><br>Specify the DETERMINISTIC keyword when creating the function to indicate that the function will always<br>return the same result for a given input. For instance, you want to return a specific manager name based<br>upon a given manager ID. Furthermore, you want to optimize for the fact that any given input will<br>always return the same result. The following example demonstrates a function that does so by specifying<br>the DETERMINISTIC keyword:  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION manager_name(mgr_id IN NUMBER) 
+RETURN VARCHAR2 
+DETERMINISTIC IS 
+  first_name     employees.first_name%TYPE; 
+  last_name      employees.last_name%TYPE; 
+BEGIN 
+  IF mgr_id IS NOT NULL THEN 
+    SELECT first_name, last_name 
+    INTO first_name, last_name 
+    FROM EMPLOYEES 
+    WHERE employee_id &#x3D; mgr_id; 
+ 
+    RETURN first_name || &#39; &#39; || last_name; 
+  ELSE 
+    RETURN &#39;N&#x2F;A&#39;; 
+  END IF; 
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+    RETURN &#39;N&#x2F;A&#39;; 
+END; </code></pre>
+<p>This function will return the manager name for a matching EMPLOYEE_ID. If there are no matches for<br>the EMPLOYEE_ID found, then N&#x2F;A will be returned.<br><strong><strong>How It Works</strong></strong><br>A deterministic function is one that always returns the same resulting value as long as the parameters<br>that are passed in are the same. This type of function can be useful for improving performance. The<br>function will be executed only once for any given set of parameters. This means that if the same<br>parameters are passed to this function in subsequent calls, then the function will be bypassed and return<br>the cached value from the last execution using those parameters. This can really help in cases where<br>calculations are being performed and repeated calls to the function may take a toll on performance.<br>The DETERMINISTIC clause is required in a couple of cases. In the event that you are calling a function<br>in an expression of a function-based index, you need to write the function as DETERMINISTIC, or you will<br>receive errors. Similarly, a function must be made DETERMINISTIC if it is being called in an expression of a<br>materialized view query or if the view is marked as ENABLE QUERY REWRITE or REFRESH FAST. </p>
+<h2 id="4-4-Creating-a-Stored-Procedure"><a href="#4-4-Creating-a-Stored-Procedure" class="headerlink" title="4-4. Creating a Stored Procedure"></a>4-4. Creating a Stored Procedure</h2><p><strong><strong>Problem</strong></strong></p>
+<p>There is a database task that you are performing on a regular basis. Rather than executing a script that<br>contains lines of PL&#x2F;SQL code each time you execute the task, you want to store the code in the database<br>so that you can simply execute the task by name or so that you can schedule it to execute routinely via<br>Oracle Scheduler. </p>
+<p>■ Note See Chapter 11 for information on scheduling PL&#x2F;SQL jobs using Oracle Scheduler. </p>
+<p><strong><strong>Solution</strong></strong><br>Place the code that is used to perform your task within a stored procedure. The following example<br>creates a procedure named INCREASE_WAGE to update the employee table by giving a designated<br>employee a pay increase. Of course, you will need to execute this procedure for each eligible employee<br>in your department. Storing the code in a procedure makes the task easier to perform. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
+                                           pct_increase IN NUMBER, 
+                                           upper_bound IN NUMBER) AS 
+  emp_count    NUMBER :&#x3D; 0; 
+  emp_sal      employees.salary%TYPE; 
+   
+  Results   VARCHAR2(50); 
+  
+BEGIN 
+    SELECT salary 
+    INTO emp_sal 
+    FROM employees 
+    WHERE employee_id &#x3D; empno_in; 
+     
+    IF emp_sal &lt; upper_bound 
+    AND round(emp_sal + (emp_sal * pct_increase), 2) &lt; upper_bound THEN 
+     
+        UPDATE employees 
+        SET salary &#x3D; round(salary + (salary * pct_increase),2) 
+        WHERE employee_id &#x3D; empno_in; 
+         
+        results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; 
+    ELSE 
+        results :&#x3D; &#39;EMPLOYEE MAKES TOO MUCH, DECREASE RAISE PERCENTAGE&#39;; 
+    END IF; 
+     
+  DBMS_OUTPUT.PUT_LINE(results);
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+    RAISE_APPLICATION_ERROR(-20001, &#39;No employee match for the given ID&#39;);
+END; 
+The following are the results from executing the procedure for employee number 198. In the
+example, the employee is being given a 3 percent increase and an upper bound of $5,000. 
+BEGIN 
+  increase_wage(198,.03,5000);
+END; </code></pre>
+<p>SUCCESSFUL INCREASE<br>Statement processed. </p>
+<p><strong><strong>How It Works</strong></strong><br>In the example, the procedure accepts three parameters: the employee number, the percent of increase<br>they will receive, and an upper salary bound. You can then invoke the procedure by name, passing in the<br>required parameters.<br>The procedure first searches the database for the provided employee number. If a record for that<br>employee is found, then the employee record is queried for the current salary. If the salary is less than<br>the upper bound and the resulting new salary will still be less than the upper bound, then the increase<br>will be applied via an UPDATE statement. If the employee is not found, then an alert message will be<br>displayed. As you can see, this procedure can be called for any individual employee, and it will increase<br>their wage accordingly as long as the increase stays within the bound.<br>Stored procedures can be used to encapsulate functionality and store code in the database data<br>dictionary. Much like a function, they can accept zero or more values as parameters, including<br>collections. A stored procedure is structured in much the same way as a function in that it includes a<br>header, an executable section, and an optional exception-handling block. However, a procedure cannot<br>include a RETURN clause in the header, and it does not return a value.<br>For example, in the <strong>Solution</strong> to this recipe, the procedure contains the following header: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
+                                           pct_increase IN NUMBER, 
+                                           upper_bound IN NUMBER) AS </code></pre>
+<p>The header uses the OR REPLACE clause to indicate that this procedure should replace any procedure<br>with the same name that already exists. The procedure accepts three parameters, and although all of<br>them are NUMBER type, any datatype can be accepted as a parameter. The declaration section comes after<br>the header, and any cursors, variables, or exceptions that need to be declared should be taken care of in<br>that section. Next, the actual work that the procedure will do takes place between the BEGIN and END<br>keywords. Note that the header does not contain a RETURNS clause since procedures cannot return any<br>values.<br>The advantage of using procedures is that code can be encapsulated into a callable named routine<br>in the data dictionary and can be called by many users. To create a procedure in your schema, you must<br>have the CREATE PROCEDURE system privilege. You can create a stored procedure in another schema if you<br>have the CREATE ANY PROCEDURE system privilege. </p>
+<h2 id="4-5-Executing-a-Stored-Procedure"><a href="#4-5-Executing-a-Stored-Procedure" class="headerlink" title="4-5. Executing a Stored Procedure"></a>4-5. Executing a Stored Procedure</h2><p><strong><strong>Problem</strong></strong><br>You want to execute a stored procedure from SQL*Plus. </p>
+<p><strong><strong>Solution</strong></strong><br>Open SQL*Plus, and connect to the database schema that contains the procedure you are interested in<br>executing. Execute the procedure by issuing the following command: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC procedure_name([param1, param2,...]); </code></pre>
+
+<p>For instance, to execute the procedure that was created in Recipe 4-3, you would issue the following<br>command:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC increase_wage(198, .03, 5000); </code></pre>
+
+<p>This would invoke the <code>INCREASE_WAGE</code> procedure, passing three parameters: EMPLOYEE_ID, a<br>percentage of increase, and an upper salary bound.</p>
+<p>You can also execute a stored procedure by creating a simple anonymous block that contains the<br>procedure call, as depicted(vt.描述,描画) in the following code:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN 
+  procedure_name([param1, param2,…]); 
+END; </code></pre>
+
+<p>Using this technique, invoking the stored procedure that was created in Recipe 4-3 would resemble<br>the following: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN 
+  increase_wage(198,.03,5000); 
+END; </code></pre>
+
+<p>Both techniques work equally well, but the latter would be better to use if you wanted to execute<br>more than one procedure or follow up with more PL&#x2F;SQL statements. If you are running a single<br>procedure from SQL*Plus, then using <code>EXEC</code> is certainly a good choice. </p>
+<p><strong><strong>How It Works</strong></strong></p>
+<p>A stored procedure can be executed using the <code>EXEC</code> keyword. You can also type <code>EXECUTE</code> entirely. Both the<br>long and shortened versions will work.  </p>
+<p>It is also possible to execute a procedure that is contained within other schemas, if the current user<br>has execute privileges on that procedure. In such a scenario, use dot notation to qualify the procedure<br>name. Here’s an example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC different_schema.increase_wage(emp_rec.employee_id, pct_increase, upper_bound); </code></pre>
+
+<p>■ Note To learn more about privileges regarding stored programs, please take a look at Recipe 4-11.<br>A procedure can also be invoked from within another procedure by simply typing the name and<br>placing the parameters inside parentheses, if there are any. For instance, the following lines of code<br>demonstrate calling a procedure from within another procedure. The procedure in this example invokes<br>the procedure that was shown in Recipe 4-3. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE grant_raises (pct_increase IN NUMBER, 
+                                          upper_bound IN NUMBER) as 
+  CURSOR emp_cur is 
+  SELECT employee_id, first_name, last_name 
+  FROM employees; 
+BEGIN 
+  -- loop through each record in the employees table 
+  FOR emp_rec IN emp_cur LOOP
+      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name);
+      -- inside A invoke B procedure
+      increase_wage(emp_rec.employee_id, pct_increase, upper_bound); 
+  END LOOP; 
+END;  </code></pre>
+
+<p>The procedure <code>GRANT_RAISES</code> applies an increase across the board to all employees. It loops through<br>all employee records, and the <code>INCREASE_WAGE</code> procedure is called with each iteration. The procedure is<br>called without the use of the <code>EXEC</code> keyword since it is being invoked by another procedure rather than<br>directly from the SQL*Plus command line.</p>
+<p><strong>summary</strong></p>
+<ol>
+<li>execute procedure by EXEC statement directly</li>
+<li>using anonymous code block within procedure name</li>
+<li>inside A procedure invoke B procedure</li>
+</ol>
+<h2 id="4-6-Creating-Functions-Within-a-Procedure-or-Code-Block"><a href="#4-6-Creating-Functions-Within-a-Procedure-or-Code-Block" class="headerlink" title="4-6. Creating Functions Within a Procedure or Code Block"></a>4-6. Creating Functions Within a Procedure or Code Block</h2><p><strong><strong>Problem</strong></strong></p>
+<p>You want to create some functions within a stored procedure. You want the functions to be local to the<br>procedure, available only from the procedure’s code block.</p>
+<p><strong><strong>Solution</strong></strong><br>Create a stored procedure, and then create functions within the declaration section. The internal<br>functions will accept parameters and return values just as an ordinary(adj.普通的,平凡) stored function would, except that the scope of the functions will be constrained to the outer code block or to the procedure. The procedure<br>that is demonstrated in this <strong>Solution</strong> embodies two functions. One of the functions is used to calculate<br>the federal tax for an employee paycheck, while the other calculates the state tax. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE calc_employee_paycheck(emp_id IN NUMBER) as 
+  emp_rec          employees%ROWTYPE; 
+  paycheck_total   NUMBER; 
+ 
+-- function for state tax 
+  FUNCTION calc_state (sal IN NUMBER)  
+    RETURN NUMBER IS 
+  BEGIN 
+    RETURN sal *  .08; 
+  END; 
+
+-- function for federal tax 
+ FUNCTION calc_federal (sal IN NUMBER)  
+    RETURN NUMBER IS 
+  BEGIN 
+    RETURN sal *  .12; 
+  END; 
+ 
+BEGIN 
+  DBMS_OUTPUT.PUT_LINE(&#39;Calculating paycheck with taxes&#39;); 
+  SELECT * 
+  INTO emp_rec 
+  FROM employees 
+  WHERE employee_id &#x3D; emp_id; 
+ 
+  paycheck_total :&#x3D; emp_rec.salary - calc_state(emp_rec.salary) - 
+                    calc_federal(emp_rec.salary); 
+ 
+ DBMS_OUTPUT.PUT_LINE(&#39;The paycheck total for &#39; || emp_rec.last_name || 
+    &#39; is &#39; || paycheck_total); 
+CHAPTER 4  FUNCTIONS, PACKAGES, AND PROCEDURES 
+74 
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+    RAISE_APPLICATION_ERROR(-20001, 
+    &#39;No matching employee for the given ID&#39;); 
+END;</code></pre>
+
+<p><strong><strong>How It Works</strong></strong></p>
+<p>Functions and procedures too can be contained within other bodies of code. Creating a function<br>within a declaration section will make the function accessible to the block that contains it. The<br>declaration of the function is the same as when you are creating a stored function, with the exception of<br>the <code>CREATE OR REPLACE</code> keywords. Any variables that are declared inside the function will be accessible<br>only to that function, not to the containing object.<br>Creating a function or procedure inside a PL&#x2F;SQL code block can be useful when you want to make<br>a function that is only to be used by the containing object. However, if you find that the body of the<br>embedded function may change frequently, then coding a separate stored function may prove to be<br>more efficient.</p>
+<h2 id="4-7-Passing-Parameters-by-Name"><a href="#4-7-Passing-Parameters-by-Name" class="headerlink" title="4-7. Passing Parameters by Name"></a>4-7. Passing Parameters by Name</h2><p><strong><strong>Problem</strong></strong></p>
+<p>You have a procedure in your database that accepts a large number of parameters. When calling the<br>procedure, you would rather not worry that the positioning of the parameters is correct. </p>
+<p><strong><strong>Solution</strong></strong></p>
+<p>Rather than trying to pass all the parameters to the procedure in the correct order, you can pass them by<br>name. The code in this <strong>Solution</strong> calls a procedure that accepts six parameters, and it passes the<br>parameters by name rather than in order.<br>Procedure Declaration: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">PROCEDURE process_emp_paycheck(EMP_ID IN NUMBER, 
+   PAY_CODE IN NUMBER, 
+   SICK_USED IN NUMBER, 
+   VACATION_USED IN NUMBER, 
+   FEDERAL_TAX IN NUMBER, 
+   STATE_TAX IN NUMBER); 
+Procedure Execution: 
+EXEC process_emp_paycheck(EMP_ID&#x3D;&gt;10, 
+   PAY_CODE&#x3D;&gt;10, 
+   VACATION_USED&#x3D;&gt;8.0, 
+   SICK_USED&#x3D;&gt;8.0, 
+   STATE_TAX&#x3D;&gt;.06, 
+   FEDERAL_TAX&#x3D;&gt;.08); </code></pre>
+<p>As you can see, by passing the parameters by name, they do not need to follow the same positional<br>ordering as they do within the declaration of the procedure.</p>
+<p><strong><strong>How It Works</strong></strong><br>To pass a parameter by name, you list the parameter name followed by an arrow (consisting of an equal<br>sign and a greater-than symbol) pointing to the value you are passing. The following pseudocode depicts<br>this technique:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">procedure_name(parameter&#x3D;&gt;value); </code></pre>
+
+<p>Although it can be more verbose to use named parameters, passing parameters by name can be very<br>handy when there are several parameters to pass because you do not need to worry about passing them<br>in the correct order. It is also helpful because it increases readability.<br>Both procedures and functions can accept positional and named parameters. Neither notation is<br>superior to the other, so which one you choose to use is completely dependant upon the procedure or<br>function that is currently being called. However, named parameters are a safe choice if trying to<br>maintain consistency with procedure calls throughout your application or your organization.<br>Although not recommended, you can use both positional and named notation when passing<br>parameters within the same call. When doing so, you need to place the parameters that you want to pass<br>using positional notation first, followed by the parameters that you want to pass using named notation.<br>The following execution illustrates using both positional and named notation while passing parameters<br>to the PROCESS_EMP_PAYCHECK procedure: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC process_emp_paycheck(198, 10, 0, 
+   SICK_USED&#x3D;&gt;4.0, 
+   STATE_TAX&#x3D;&gt;.05, 
+   FEDERAL_TAX&#x3D;&gt; .04); </code></pre>
+
+<p>This particular call passed both of the first parameters by position, those being EMP_ID and PAY_CODE.<br>The last three parameters are passed by named notation. </p>
+<p>summary :  </p>
+<ol>
+<li>if you specify parameter name , then would ignore order of you define parameter</li>
+</ol>
+<h2 id="4-8-Setting-Default-Parameter-Values"><a href="#4-8-Setting-Default-Parameter-Values" class="headerlink" title="4-8. Setting Default Parameter Values"></a>4-8. Setting Default Parameter Values</h2><p><strong><strong>Problem</strong></strong><br>You want to create a procedure that accepts several parameters. However, some of those parameters<br>should be made optional and contain default values.  </p>
+<p><strong><strong>Solution</strong></strong><br>You can allow the procedure caller to omit the parameters if default values are declared for the variables<br>within the procedure. The following example shows a procedure declaration that contains default<br>values: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">PROCEDURE process_emp_paycheck(EMP_ID IN NUMBER, 
+   PAY_CODE IN NUMBER, 
+   SICK_USED IN NUMBER, 
+   VACATION_USED IN NUMBER, 
+   FEDERAL_TAX IN NUMBER DEFAULT .08,  -- could ignore value
+   STATE_TAX IN NUMBER DEFAULT .035);  -- could ignore value</code></pre>
+
+<p>And here is an example execution: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC process_emp_paycheck(EMP_ID&#x3D;&gt;10, 
+                           PAY_CODE&#x3D;&gt;10, 
+                           VACATION_USED&#x3D;&gt;8.0, 
+                           SICK_USED&#x3D;&gt;8.0); </code></pre>
+
+<p>Since the procedure contains default values, the parameters can be omitted when the procedure is<br>called. </p>
+<p><strong><strong>How It Works</strong></strong><br>The ability to provide a default value for a variable declaration is optional. To do so, you must provide<br>the declaration of the variable with the keyword DEFAULT followed by the value, as shown in the <strong>Solution</strong><br>to this recipe. If a default value is declared, then you needn’t specify a value for the parameter when the<br>function or procedure is called. If you do specify a value for a parameter that has a default value, the<br>specified value overrides the default.</p>
+<h2 id="4-9-Collecting-Related-Routines-into-a-Single-Unit"><a href="#4-9-Collecting-Related-Routines-into-a-Single-Unit" class="headerlink" title="4-9. Collecting Related Routines into a Single Unit"></a>4-9. Collecting Related Routines into a Single Unit</h2><p><strong><strong>Problem</strong></strong><br>You have a number of procedures and functions that formulate(vt.规划;用公式表示) an entire application when used<br>together. Rather than defining each subprogram individually, you prefer to combine all of them into a<br>single, logically related entity.  </p>
+<p><strong><strong>Solution</strong></strong><br>Create a PL&#x2F;SQL package that in turn declares(vt.宣布,声明) and defines each of the procedures together as an<br>organized entity. You declare each of the subprograms in the package specification (otherwise known as<br>a header) and define them in the package body.<br>The following example shows the creation of a PL&#x2F;SQL package containing two procedures and a<br>variable.</p>
+<p>First, you create the package specification: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE process_employee_time IS  
+  total_employee_salary  NUMBER; -- global variable inside 
+  PROCEDURE grant_raises(pct_increase IN NUMBER, 
+                                              upper_bound IN NUMBER); 
+  PROCEDURE increase_wage (empno_in IN NUMBER, 
+                           pct_increase IN NUMBER, 
+                           upper_bound IN NUMBER) ; 
+END; </code></pre>
+<p>The specification lists the procedures, functions, and variables that you want to be visible from<br>outside the package. Think of the specification as the external interface to your package.<br>Next, create the package body: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY process_employee_time IS 
+
+  PROCEDURE grant_raises (pct_increase IN NUMBER, 
+                          upper_bound IN NUMBER) as 
+  CURSOR emp_cur is 
+  SELECT employee_id, first_name, last_name 
+  FROM employees; 
+BEGIN
+  -- loop through each record in the employees table 
+  FOR emp_rec IN emp_cur LOOP 
+      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); 
+      increase_wage(emp_rec.employee_id, pct_increase, upper_bound); 
+  END LOOP; 
+END;  
+
+ PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
+                          pct_increase IN NUMBER, 
+                          upper_bound IN NUMBER) AS 
+  emp_count    NUMBER :&#x3D; 0; 
+  emp_sal      employees.salary%TYPE; 
+   
+  Results   VARCHAR2(50); 
+   
+BEGIN 
+ 
+  SELECT count(*) 
+  INTO emp_count 
+  FROM employees 
+  WHERE employee_id &#x3D; empno_in; 
+  
+  IF emp_count &gt; 0 THEN 
+    -- IF EMPLOYEE FOUND, THEN OBTAIN RECORD 
+    SELECT salary 
+    INTO emp_sal 
+    FROM employees 
+    WHERE employee_id &#x3D; empno_in; 
+     
+    IF emp_sal &lt; upper_bound AND round(emp_sal + (emp_sal * pct_increase), 2) &lt; 
+ upper_bound THEN 
+     
+        UPDATE employees 
+        SET salary &#x3D; round(salary + (salary * pct_increase),2) 
+        WHERE employee_id &#x3D; empno_in; 
+         
+        results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; 
+    ELSE 
+        results :&#x3D; &#39;EMPLOYEE MAKES TOO MUCH, DECREASE RAISE PERCENTAGE&#39;; 
+    END IF; 
+     
+  ELSE 
+    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; 
+  END IF; 
+ 
+  DBMS_OUTPUT.PUT_LINE(results); 
+ 
+  END; 
+END; </code></pre>
+
+<p>The package in this example declares a global variable and two procedures within the package<br>specification. The package body then defines both of the procedures and assigns a value to the variable<br>that was declared in the specification. Procedures defined within the package body are defined in the<br>same manner as they would be if they were stand-alone procedures. The difference is that now these two<br>procedures are contained in a single package entity and are therefore related to each other and can<br>share variables declared globally within the package. </p>
+<p><strong><strong>How It Works</strong></strong><br>A PL&#x2F;SQL package can be useful for organizing code into a single construct. Usually the code consists of<br>a grouping of variables, types, cursors, functions, and procedures that perform actions that are logically<br>related to one another. Packages consist of a specification and a body, both of which are stored<br>separately in the data dictionary. The specification contains the declarations for each of the variables,<br>types, subprograms, and so on, that are defined in the package. The body contains the implementations<br>for each of the subprograms and cursors that are included in the specification, and it can also include<br>implementations for other functions and procedures that are not in the specification. You’ll learn more<br>about this in other recipes.</p>
+<p>Most packages contain both a specification and a body, and in these cases the specification acts as<br>the interface to the constructs implemented within the body. The items that are included in the<br>specification are available to the public and can be used outside the package. Not all packages contain a<br>body. If there are only declarations of variables or constants in the package, then there is no need for a<br>body to implement anything. Other PL&#x2F;SQL objects outside the package can reference any variables that<br>are declared in the specification. In other words, declaring a variable within a PL&#x2F;SQL package<br>specification essentially creates a global variable.</p>
+<p>■ Note Global variables should be used wisely(adv.明智地;聪明地). The use of global variables can complicate matters when tracking<br>down <strong>Problem</strong>s or debugging your code. If global variables are used, then it can be hard to determine where<br>values have been set and where initialization of such variables occurs. Following the rules of encapsulation and<br>using local variables where possible can make your life easier.<br>Procedures and functions defined within the package body may call each other, and they can be<br>defined in any order as long as they have been declared within the package specification. If any of the<br>procedures or functions have not been declared in the specification, then they must be defined in the<br>package body prior to being called by any of the other procedures or functions.</p>
+<p>You can change any implementations within a package body without recompiling the specification.<br>This becomes very important when you have other objects in the database that depend on a particular<br>package because it is probably not a good idea to change a package specification during normal business<br>hours when a package is in use by others. Doing so may result in unusable objects, and the package<br>users could begin to see errors. However, if changes need to be made to the code within the package<br>body, then you can change that code without affecting public-facing constructs of a package.<br>Packages are one of the most important constructs that you can create in PL&#x2F;SQL. You will use<br>packages to combine common code objects for almost any significant application that you write. It is<br>possible to create entire applications without the use of a package, but doing so can create a<br>maintenance nightmare because you will begin to see a pool of procedures and functions being created<br>within your database, and it will be difficult to remember which constructs are used for different tasks.<br>Packages are especially handy when writing PL&#x2F;SQL web applications, and you will learn all about doing<br>summary:  </p>
+<ol>
+<li>package differenates individual prodcdure is that pacakge could define global variable and shared each other</li>
+<li>could including function not within specification</li>
+<li>there are declarations of variables or constants, so no need to struct package body</li>
+</ol>
+<h2 id="4-10-Writing-Initialization-Code-for-a-Package"><a href="#4-10-Writing-Initialization-Code-for-a-Package" class="headerlink" title="4-10. Writing Initialization Code for a Package"></a>4-10. Writing Initialization Code for a Package</h2><p><strong><strong>Problem</strong></strong><br>You want to execute some code each time a particular PL&#x2F;SQL package is instantiated in a session. </p>
+<p><strong><strong>Solution</strong></strong><br>Create an initialization block for the package in question. By doing so, you will have the ability to execute<br>code each time the package is initialized. The following example shows the same package that was<br>constructed in Recipe 4-7. However, this time the package contains an initialization block. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY process_employee_time IS 
+ 
+  PROCEDURE grant_raises (pct_increase IN NUMBER, 
+                          upper_bound IN NUMBER) as 
+  CURSOR emp_cur is 
+  SELECT employee_id, first_name, last_name 
+  FROM employees; 
+  BEGIN 
+  -- loop through each record in the employees table 
+   FOR emp_rec IN emp_cur LOOP 
+      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); 
+      increase_wage(emp_rec.employee_id, pct_increase, upper_bound); 
+   END LOOP; 
+  END grant_raises;  
+ 
+ 
+  PROCEDURE increase_wage (empno_in IN NUMBER, 
+                          pct_increase IN NUMBER, 
+                          upper_bound IN NUMBER) AS 
+  emp_count    NUMBER :&#x3D; 0; 
+  emp_sal      employees.salary%TYPE; 
+   
+  Results   VARCHAR2(50); 
+   
+  BEGIN 
+ 
+  SELECT count(*) 
+  INTO emp_count 
+  FROM employees 
+  WHERE employee_id &#x3D; empno_in; 
+  
+  IF emp_count &gt; 0 THEN 
+    -- IF EMPLOYEE FOUND, THEN OBTAIN RECORD 
+    SELECT salary 
+    INTO emp_sal 
+    FROM employees 
+    WHERE employee_id &#x3D; empno_in; 
+     
+    IF emp_sal &lt; upper_bound AND round(emp_sal + (emp_sal * pct_increase), 2) &lt; 
+ upper_bound THEN 
+     
+        UPDATE employees 
+        SET salary &#x3D; round(salary + (salary * pct_increase),2) 
+        WHERE employee_id &#x3D; empno_in; 
+         
+        results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; 
+    ELSE 
+        results :&#x3D; &#39;EMPLOYEE MAKES TOO MUCH, DECREASE RAISE PERCENTAGE&#39;; 
+    END IF; 
+     
+  ELSE 
+    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; 
+  END IF; 
+  DBMS_OUTPUT.PUT_LINE(results); 
+  END increase_wage; 
+
+BEGIN
+  DBMS_OUTPUT.PUT_LINE(&#39;EXECUTING THE INITIALIZATION BLOCK&#39;);
+END;</code></pre>
+<p>The initialization block in this example is the last code block within the package body. In this case,<br>that block lies in the final three lines. </p>
+<p><strong><strong>How It Works</strong></strong></p>
+<p>The initialization block for the package in the <strong>Solution</strong> displays a line of text to indicate that the<br>initialization block has been executed. The initialization block will execute once per session, the first<br>time the package is used in that session. If you were to create this package in your session and invoke<br>one of its members, you would see the message print. Although an initialization message is not very<br>useful, there are several good reasons to use an initialization block. One such reason is to perform a<br>query to obtain some data for the session. </p>
+<p>summary:  </p>
+<ol>
+<li>more like java construct function and golang init() function</li>
+<li>code struct for initialization<pre class="language-sql" data-language="sql"><code class="language-sql">create or replace package XXXX () is
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(&#39;EXECUTING THE INITIALIZATION BLOCK&#39;);
+END;</code></pre></li>
+</ol>
+<h2 id="4-11-Granting-the-Ability-to-Create-and-Execute-Stored-Programs"><a href="#4-11-Granting-the-Ability-to-Create-and-Execute-Stored-Programs" class="headerlink" title="4-11. Granting the Ability to Create and Execute Stored Programs"></a>4-11. Granting the Ability to Create and Execute Stored Programs</h2><p><strong><strong>Problem</strong></strong><br>You want to grant someone the ability to create and execute stored programs. </p>
+<p><strong><strong>Solution</strong></strong><br>To grant the ability for a user to create a procedure, function, or package, you must log in to the database<br>with a privileged account and grant the CREATE PROCEDURE privilege to the user. Here’s an example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">GRANT CREATE PROCEDURE TO user; </code></pre>
+
+<p>Similarly, to grant permissions for execution of a procedure, package, or function, you must log in<br>with a privileged account and grant the user EXECUTE permissions on a particular procedure, function, or<br>package. Here’s an example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">GRANT EXECUTE ON schema_name.program_name TO schema;</code></pre>
+
+<p><strong><strong>How It Works</strong></strong></p>
+<p>Before a user can create stored code, the user must be given permission to do so. The <strong>Solution</strong> shows the<br>straightforward approach. The database administrator logs in and grants <code>CREATE PROCEDURE</code> to the<br>schema owner. The schema owner can then log in and create stored code in their schema.<br>A schema owner can always execute stored code in the schema. However, application users do not<br>generally log in as schema owners because of the security risks inherent in doing so. Thus, you will<br>commonly be faced with the need to grant other users execute access on stored code. You do that by<br>granting <code>EXECUTE</code> privileges, as shown in the second <strong>Solution</strong> example.  </p>
+<p>summary :  </p>
+<ol>
+<li>let A account access B schema objects by execute <code>GRANT EXECUTE ON schema_name.program_name TO schema;</code></li>
+</ol>
+<h2 id="4-12-Executing-Packaged-Procedures-and-Functions"><a href="#4-12-Executing-Packaged-Procedures-and-Functions" class="headerlink" title="4-12. Executing Packaged Procedures and Functions"></a>4-12. Executing Packaged Procedures and Functions</h2><p><strong><strong>Problem</strong></strong><br>You want to execute one of the procedures or functions contained within a package. </p>
+<p><strong><strong>Solution</strong></strong><br>Use the package_name.object_name notation to execute a particular code object within a package. For<br>instance, the following block of code executes the GRANT_RAISES procedure that is contained within the<br>PROCESS_EMPLOYEE_TIME package. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN 
+    process_employee_time.grant_raises(.03,4000); 
+END; </code></pre>
+
+<p>The previous code block executes the <code>GRANT_RAISES</code> function, passing <code>.03</code> for the percentage of<br>increase and 4000 for the upper bound. </p>
+<p>*<strong><strong>How It Works</strong></strong><br>Dot notation is used for accessing members of a package. Similar to other languages such as Java, dot<br>notation can be used to access any publically accessible member of the package. Any variable, function,<br>or procedure that is contained in the package specification can be accessed using the dot notation.<br>Therefore, if your package contained a constant variable within its specification that you wanted to<br>access, it would be possible to do so from outside the package.<br>For a schema to access and execute package members, it must have the appropriate permissions. To<br>grant EXECUTE permission on a package that you own, use the following syntax: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">GRANT EXECUTE ON package_name TO user_name; </code></pre>
+
+<p>Dot notation works from within other procedures or functions. It can also be used from the<br>SQL*Plus command line using the EXEC command.<br>■ Note In most cases, if a package is being used by another schema, then it is a good idea to create a public<br>synonym for that package within the database. This will help decrease issues while attempting to reference the<br>package and its programs from the different schema because you will not need to specify the schema name in<br>order to qualify the call. Please see Recipe 4-13 for more information regarding public synonyms.<br>summary:  </p>
+<ol>
+<li>a good way is to create synonyms</li>
+</ol>
+<h2 id="4-13-Creating-a-Public-Name-for-a-Stored-Program"><a href="#4-13-Creating-a-Public-Name-for-a-Stored-Program" class="headerlink" title="4-13. Creating a Public Name for a Stored Program"></a>4-13. Creating a Public Name for a Stored Program</h2><p><strong><strong>Problem</strong></strong><br>You want to allow for any schema to have the ability to reference a particular stored program that is<br>contained(adj.泰然自若的;从容的;被控制的) within your schema. For instance, the CALC_EMPLOYEE_PAYCHECK procedure should be<br>executable for any of the administrative users of the database. You want these users to have the ability to<br>simply call the procedure rather than preceding the procedure name with the schema using the dot<br>notation. </p>
+<p><strong><strong>Solution</strong></strong><br>Create a public synonym for the function, procedure, or package. This will allow any user that has<br>EXECUTE privileges on the stored program to call it without specifying the schema name first. Instead, the<br>invoker need only reference the synonym.<br>In the following example, the user AdminUser does not have direct access to the<br>CALC_EMPLOYEE_PAYCHECK procedure, so they must fully qualify the name of the package using the schema<br>name for which the procedure resides. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec application_account.calc_employee_paycheck(200); 
+Calculating paycheck with taxes 
+The paycheck total for Whalen is 5200.8 
+ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+
+<p>Next, the database administrator will create a public synonym for the procedure:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; CREATE PUBLIC SYNONYM calc_employee_paycheck 
+           FOR application_user.calc_employee_paycheck; </code></pre>
+
+<p>Now any user with execute privileges on the procedure can invoke it without fully qualifying the<br>name since a public synonym named CALC_EMPLOYEE_PAYCHECK has been created. This is demonstrated in<br>the next lines of code. Again, the user AdminUser is now logged into the system and executes the<br>procedure. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec calc_employee_paycheck(206); 
+Calculating paycheck with taxes 
+The paycheck total for Gietz is 6640.8 
+ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+
+<p>As you can see, the procedure name no longer requires the schema name to fully qualify it before<br>being invoked. </p>
+<p><strong><strong>How It Works</strong></strong><br>Creating public synonyms is a useful technique for allowing any user to have access to a stored piece of<br>code without knowing which schema the code belongs to. Any user who has EXECUTE privileges on the<br>code can invoke it without fully qualifying the name. Instead, the invoker specifies the synonym name.<br>An account must be granted the CREATE PUBLIC SYNONYM privilege in order to create a public<br>synonym. It’s actually common for database administrators to take care of creating such synonyms.<br>To create a synonym, execute the following statement, replacing the PUB_SYNONYM_NAME identifier<br>with the name of your choice and replacing SCHEMA.STORED_PROGRAM with the schema name and program<br>that you want to make publically accessible: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE PUBLIC SYNONYM pub_synonym_name FOR schema.stored_program; </code></pre>
+
+<p>The public synonym name does not have to be the same as the actual stored program name, but it is<br>conventional to keep them the same, and it makes things consistent and the names easier to remember.<br>If you begin to have synonym names that differ from the actual program names, then confusion will<br>eventually set in.</p>
+<p>■ Note Creating a synonym does not give execute access. Creating a public synonym provides only a global name<br>that avoids the need for dot notation. Invokers of a procedure or function still must be granted EXECUTE access, as<br>shown in Recipe 4-11. </p>
+<p>summary:  </p>
+<ol>
+<li>grant read&#x2F;write user access right to execute procedure without schema name</li>
+<li>if you want to setup w&#x2F;r account for schema account.<ol>
+<li>create public synonym name for application account</li>
+<li>grant execute&#x2F;select&#x2F;update … on package_name on write_user&#x2F;read_user</li>
+</ol>
+</li>
+</ol>
+<h2 id="4-14-Executing-Package-Programs-in-Sequence"><a href="#4-14-Executing-Package-Programs-in-Sequence" class="headerlink" title="4-14. Executing Package Programs in Sequence"></a>4-14. Executing Package Programs in Sequence</h2><p><strong><strong>Problem</strong></strong><br>You have created a package that contains all the necessary procedures and functions for your program.<br>Although you can invoke each of these subprograms individually using the<br><code>package_name.subprogram_name</code> notation, it would be beneficial to execute all of them at the same time<br>by issuing a single statement. </p>
+<p><strong><strong>Solution</strong></strong><br>Create a driver procedure within your PL&#x2F;SQL package that will be used to initiate all the subprograms in turn, and run your entire program. In the following example, a procedure named driver is created inside<br>a package, and it will invoke all the other package subprograms in turn:<br>First, create the specification: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE synchronize_data IS 
+  PROCEDURE driver; 
+END; </code></pre>
+<p>Then, create the body: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY synchronize_data IS 
+  PROCEDURE query_remote_data IS 
+    BEGIN 
+      --statements go here 
+      DBMS_OUTPUT.PUT_LINE(&#39;QUERYING REMOTE DATA&#39;); 
+    END query_remote_data;  
+ 
+  PROCEDURE obtain_new_record_list IS 
+    BEGIN 
+      --statements go here 
+      DBMS_OUTPUT.PUT_LINE(&#39;NEW RECORD LIST&#39;); 
+    END obtain_new_record_list;  
+ 
+  PROCEDURE obtain_updated_record_list IS 
+    BEGIN 
+      --statements go here 
+      DBMS_OUTPUT.PUT_LINE(&#39;UPDATED RECORD LIST&#39;); 
+    END obtain_updated_record_list;  
+ 
+  PROCEDURE sync_local_data IS 
+    BEGIN 
+      --statements go here 
+      DBMS_OUTPUT.PUT_LINE(&#39;SYNC LOCAL DATA&#39;); 
+    END sync_local_data;  
+   
+  PROCEDURE driver IS 
+  BEGIN 
+    query_remote_data; 
+    obtain_new_record_list; 
+    obtain_updated_record_list; 
+    sync_local_data; 
+  END driver; 
+END synchronize_data; </code></pre>
+
+<p>The driver procedure initiates all the other procedures in the order that they should be executed. To<br>initiate the packaged program, you now make a call to the driver procedure as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN 
+   synchronize_data.driver; 
+END;</code></pre>
+<p>One statement invokes the driver procedure. That procedure in turn invokes the other procedures<br>in the proper sequence.  </p>
+<p><strong><strong>How It Works</strong></strong><br>By creating a single procedure that can be called in order to execute all the other subprograms in turn,<br>you eliminate the potential for calling subprograms in the incorrect order. This will also allow you the<br>convenience of making one call as opposed to numerous calls each time you want to execute the task(s)<br>involved. And, if you create the other subprograms as private procedures and functions, then you<br>eliminate the risk of a developer invoking them out of order. That’s because you only make the driver<br>procedure public, and you know that the driver invokes in the correct sequence.<br>Oftentimes, packages are used to hold all the database constructs that make up an entire process. In<br>the <strong>Solution</strong> to this recipe, the package entails(vt.使需要.必需) a database synchronization process, and each procedure<br>within performs a separate piece of the synchronization. When executed in the correct order, the<br>procedures together perform the complete synchronization task.<br>One could just as easily create a script or manually invoke each package program separately just as<br>the driver procedure does in this case. However, you open the door to error when you write the logic of<br>invoking the sequence of procedures from multiple places. Another important factor is that the driver<br>can also be used to perform any additional initialization that must be done prior to executing each<br>procedure. Similarly, additional processing can be done in between each procedure call, such as<br>printing out the current status of the program. The driver procedure essentially provides another layer<br>of abstraction that you can take advantage of. The package can be initialized using the default package<br>initialization; then additional initialization or statements can be provided within the driver procedure,<br>and the program caller doesn’t need to know about them.<br>summary: </p>
+<ol>
+<li>Another important factor is that the driver can also be used to perform any additional initialization that must be done prior to executing each procedure</li>
+<li>you can take advantage of. The package can be initialized using the default package initialization</li>
+</ol>
+<h2 id="4-15-Implementing-a-Failure-Flag"><a href="#4-15-Implementing-a-Failure-Flag" class="headerlink" title="4-15. Implementing a Failure Flag"></a>4-15. Implementing a Failure Flag</h2><p><strong><strong>Problem</strong></strong><br>You want to create a boolean variable to determine whether one of the subprograms in the package has<br>generated an error. If an error has been generated by one of the subprograms, then the variable will be<br>set to TRUE. This flag will be evaluated in the driver procedure to determine whether the updates<br>performed by the package should be committed or rolled back. </p>
+<p><strong><strong>Solution</strong></strong><br>Declare a global variable at the package level, and it will be accessible to all objects within. You can do<br>this by declaring the variable within the package body. The following package illustrates such a variable,<br>where the variable has been declared within the package body so that it is available for all objects in the<br>package only. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE synchronize_data 
+PROCEDURE driver; 
+END; 
+ 
+CREATE OR REPLACE PACKAGE BODY synchronize_data IS 
+  error_flag BOOLEAN :&#x3D; FALSE; 
+ 
+  PROCEDURE query_remote_data is 
+     Cursor remote_db_query is 
+     SELECT * 
+     FROM my_remote_data@remote_db; 
+    
+     remote_db_rec employees%ROWTYPE; 
+ 
+  BEGIN 
+    OPEN remote_db_query; 
+    LOOP 
+      FETCH remote_db_query INTO remote_db_rec; 
+      EXIT WHEN remote_db_query%NOTFOUND; 
+    IF remote_db_query%NOTFOUND THEN 
+      error_flag :&#x3D; TRUE; 
+    ELSE 
+      -- PERFORM PROCESSING 
+      DBMS_OUTPUT.PUT_LINE(&#39;QUERY REMOTE DATA&#39;); 
+    END IF; 
+    END LOOP; 
+    CLOSE remote_db_query; 
+  END query_remote_data; 
+ 
+  PROCEDURE obtain_new_record_list IS 
+    BEGIN 
+      --statements go here 
+      DBMS_OUTPUT.PUT_LINE(&#39;NEW RECORD LIST&#39;); 
+    END obtain_new_record_list;  
+ 
+  PROCEDURE obtain_updated_record_list IS 
+    BEGIN 
+      --statements go here 
+      DBMS_OUTPUT.PUT_LINE(&#39;UPDATED RECORD LIST&#39;); 
+    END obtain_updated_record_list;  
+ 
+  PROCEDURE sync_local_data IS 
+    BEGIN 
+      --statements go here 
+      DBMS_OUTPUT.PUT_LINE(&#39;SYNC LOCAL DATA&#39;); 
+    END sync_local_data;  
+ 
+ 
+  PROCEDURE driver IS 
+  BEGIN 
+    query_remote_data; 
+    IF error_flag &#x3D; TRUE THEN 
+      GOTO error_check; 
+    END IF; 
+     
+    obtain_new_record_list; 
+    IF error_flag &#x3D; TRUE THEN 
+      GOTO error_check; 
+    END IF; 
+ 
+    obtain_updated_record_list; 
+    IF error_flag &#x3D; TRUE THEN 
+      GOTO error_check; 
+    END IF; 
+ 
+    sync_local_data; 
+ 
+    -- If any errors were found then roll back all updates 
+    &lt;&lt;error_check&gt;&gt; 
+    DBMS_OUTPUT.PUT_LINE(&#39;Checking transaction status&#39;); 
+    IF error_flag &#x3D; TRUE THEN 
+      ROLLBACK; 
+      DBMS_OUTPUT.PUT_LINE(&#39;The transaction has been rolled back.&#39;); 
+   ELSE 
+      COMMIT; 
+      DBMS_OUTPUT.PUT_LINE(&#39;The transaction has been processed.&#39;); 
+    END IF; 
+ 
+  END driver; 
+END;</code></pre>
+<p><strong><strong>How It Works</strong></strong><br>Declaring variables in the package body outside any procedures or functions allows them to become<br>accessible to all subprograms within the package. If one or more of the subprograms changes such a<br>variable’s value, then the changed value will be seen throughout the entire package.<br>As depicted in the example, you can see that the variable is referenced several times throughout the<br>package. If you had a requirement to make a variable global to all PL&#x2F;SQL objects outside the package as<br>well, then you can declare the variable within the package specification. As mentioned in Recipe 4-8,<br>anything declared in the package specification is publically available to any PL&#x2F;SQL object outside as<br>well as within the package body. </p>
+<h2 id="4-16-Forcing-Data-Access-to-Go-Through-Packages"><a href="#4-16-Forcing-Data-Access-to-Go-Through-Packages" class="headerlink" title="4-16. Forcing Data Access to Go Through Packages"></a>4-16. Forcing Data Access to Go Through Packages</h2><p><strong><strong>Problem</strong></strong><br>You have defined all subprograms and packages for a particular application, and you want to allow other<br>users to access these constructs and execute the program but not have access to any data tables directly. </p>
+<p><strong><strong>Solution</strong></strong><br>Define all the packages, procedures, and functions for your program within a single schema that has<br>access to all the data. All user access should be made from separate schemas, and they should be granted<br>execute privileges on the PL&#x2F;SQL objects but not access to the tables themselves.<br>For instance, if you want to control access to a package named PROCESS_EMPLOYEE_TIME, that package<br>along with all required tables, types, and sequences should be loaded into an application schema that<br>has the appropriate permissions required to access the data. For the purposes of this recipe, the<br>application schema name is EMP.<br>Next, create a role by which to manage the privileges needed to invoke the package’s procedures<br>and functions. Grant EXECUTE privileges to that role. Grant that role to application users.<br>Your application users will now be able to execute the procedures and functions within the package.<br>Those procedures and functions can in turn update the database tables in the package’s schema.<br>However, users will not have direct access to those tables. All updates must flow through the package. </p>
+<p><strong><strong>How It Works</strong></strong><br>To control an application’s data, it is important to restrict access to the tables. The <strong>Solution</strong> in this recipe<br>shows how to create a package in the same schema that contains the application tables. The package<br>thus has access to those tables. Users, however, do not have table-level access.<br>After creating the package, you can grant EXECUTE access on the package to application users. Users<br>can then invoke packaged procedures and functions, and those procedures and functions in turn can<br>modify the data in the tables. However, users have no direct access to the tables.<br>By forcing users to go through packaged procedures and functions, you limit users to using a<br>defined interface that remains under your control. You now have some amount of freedom to modify the<br>underlying tables. So long as you do not change the package interface, you can make changes to the<br>underlying tables without disrupting the application. </p>
+<p>summary:  </p>
+<ol>
+<li>big, deep, comprehensive,topic to disuss</li>
+<li>allow you must through package to access tables</li>
+</ol>
+<h2 id="4-17-Executing-Stored-Code-Under-Your-Own-Privilege-Set"><a href="#4-17-Executing-Stored-Code-Under-Your-Own-Privilege-Set" class="headerlink" title="4-17. Executing Stored Code Under Your Own Privilege Set"></a>4-17. Executing Stored Code Under Your Own Privilege Set</h2><p><strong><strong>Problem</strong></strong><br>You have loaded all of an application’s objects into a single application schema. However, you do not<br>want packages, procedures, and functions to execute as the schema owner. Instead, you want stored<br>code to execute with the privileges and access of the user who is invoking that code.<br><strong><strong>Solution</strong></strong><br>Use invoker’s rights by providing the <code>AUTHID</code> property within the declaration of your program. If the<br>AUTHID property is specified when defining a package, procedure, or function, then you have the ability<br>to specify whether the program should be invoked using the <code>CURRENT_USER</code> privileges or the <code>DEFINER</code><br>privileges. In the case of this <strong>Solution</strong>, you would rather use the CURRENT_USER privileges to ensure that<br>the user does not have the same level of access as the schema owner. The default is DEFINER.<br>The following code shows how to create a procedure for changing a password, and it uses the AUTHID<br>property to ensure that the procedure will be run using the CURRENT_USER’s privilege set. This particular<br>procedure uses dynamic SQL to create a SQL statement. To learn more about using dynamic SQL, please<br>see Chapter 8.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE change_password(username IN VARCHAR2, 
+                                                                                                                    
+                                          new_password IN VARCHAR2)
+AUTHID CURRENT_USER IS 
+ 
+sql_stmt VARCHAR2(100); 
+
+BEGIN 
+    sql_stmt :&#x3D; &#39;ALTER USER &#39; ||  username || &#39; IDENTIFIED BY &#39; || new_password; 
+    
+    EXECUTE IMMEDIATE sql_stmt; 
+END; </code></pre>
+<p>When the user executes this procedure, it will be executed using their own set of permissions. This<br>will prevent them from changing anyone else’s password unless they have the ability to do so under their<br>allotted(v.分配;指派;拨给) permission set.  </p>
+<p><strong><strong>How It Works</strong></strong><br>Invoker’s rights are a great way to secure your application if you are planning to limit access to the<br>CURRENT_USER’s privilege set. To allow for invoker’s rights to be set into place, the AUTHID property must<br>be used with the CURRENT_USER keyword in the definition of a stored PL&#x2F;SQL unit. This property affects<br>the name re<strong>Solution</strong> and privilege set for that unit. You can find the value of the AUTHID property if you<br>take a look at the USER_PROCEDURES data dictionary view.<br>Using the invoker’s rights methodology is a great way to protect a program as long as the users<br>access the program with their own database account. If each user within the database has their own<br>account, then they can be granted the required level of access via database roles. The AUTHID property<br>can constrain the execution of code to the current user’s privilege set. Because of that, if a user does not<br>have the privileges that are required to execute a particular program, then they will not have access.<br>Simply put, invoker’s rights are a good means of securing your code as long as the approach is used<br>correctly.</p>
+<p>summary:  </p>
+<ol>
+<li>must execute code by your access right</li>
+</ol>
+<h2 id="4-18-Accepting-Multiple-Parameter-Sets-in-One-Function"><a href="#4-18-Accepting-Multiple-Parameter-Sets-in-One-Function" class="headerlink" title="4-18. Accepting Multiple Parameter Sets in One Function"></a>4-18. Accepting Multiple Parameter Sets in One Function</h2><p><strong><strong>Problem</strong></strong><br>You want to give a function the ability to accept multiple parameter types instead of being constrained<br>to a particular datatype or number of parameters. For example, you want to create a single function that<br>can accept either one or two parameters and that will perform a slightly(adv.些微地,轻微地) different action depending upon<br>the number of parameters you pass it.  </p>
+<p><strong><strong>Solution</strong></strong><br>Use overloading to create multiple functions that are named the same and perform similar functionality<br>but accept a different number of parameters, different ordering of parameters, or parameters of different<br>types. In this recipe, you will see a function named squared that takes a number and returns its value<br>squared. Similarly, there is another function also named squared that accepts two numbers instead of<br>one. This second function is the overloaded version of the original squared. Here is the code for the two<br>functions: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- Returns the square of the number passed in 
+CREATE OR REPLACE FUNCTION squared (in_num IN NUMBER) 
+RETURN NUMBER AS 
+  -- variables
+BEGIN 
+  RETURN in_num * in_num; 
+END; </code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql"> -- Returns the squared sum of two numbers 
+CREATE OR REPLACE FUNCTION squared (in_num IN NUMBER, 
+                                    in_num_two IN NUMBER) 
+    RETURN NUMBER AS 
+BEGIN 
+  RETURN (in_num + in_num_two) * (in_num + in_num_two);  
+END; </code></pre>
+
+<p>another type </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION squared (in_num IN NUMBER, 
+                                    in_num_two IN NUMBER
+                                    out_number_three out NUMBER) 
+    RETURN NUMBER AS 
+NOK   NUMBER;
+
+BEGIN 
+  out_number_three :&#x3D; (in_num + in_num_two) * (in_num + in_num_two);  
+  RETURN NOK;  
+END; 
+</code></pre>
+<p>You can see that each of the previous functions accepts a different number of parameters, but they<br>both perform similar tasks. This is a good illustration for using function overloading because someone<br>using this function would expect a similar result to be returned whether calling the function with one<br>parameter or two. </p>
+<p><strong><strong>How It Works</strong></strong><br>Like many other programming languages, PL&#x2F;SQL offers an overloading(重载) of functions. This makes it<br>possible to name more than one function by the same name but give each of them different parameter<br>types, different parameter ordering, or a different number of parameters. This is also known as changing<br>the function signature. A signature for a function consists of the object name and its parameter list. By<br>overloading, you have the ability to allow more flexibility to those using the function. For instance, if you<br>place both of the squared functions into a package named MATH_API, then someone using this package<br>can simply call the function passing whatever they require and still receive a usable result without<br>actually knowing the implementation details.<br>Using overloading to create multiple functions or procedures by the same name can become<br>troublesome if overused. Be careful that your package is not littered with too many overloaded<br>procedures or functions because maintenance on such a code base can become a nightmare.<br>Overloading has its good use cases, but if it can be avoided by using technique that is easier to follow,<br>then it is a good idea to go the simpler route. </p>
+<h2 id="4-19-Listing-the-Functions-Procedures-and-Packages-in-a-Schema"><a href="#4-19-Listing-the-Functions-Procedures-and-Packages-in-a-Schema" class="headerlink" title="4-19. Listing the Functions, Procedures, and Packages in a Schema"></a>4-19. Listing the Functions, Procedures, and Packages in a Schema</h2><p><strong><strong>Problem</strong></strong><br>Your team has defined a number of functions, procedures, and packages within a schema. You want to<br>generate a listing of all functions, procedures, and packages at the end of each day to evaluate<br>productivity. </p>
+<p><strong><strong>Solution</strong></strong><br>Use the USER_OBJECTS table to return the program list and prefix packages, procedures, and functions for<br>the same program with the same first word to make them easier to find.<br>This first example will return a list of all procedure names that reside within the EMP schema and that<br>have a name that is prefixed with EMPTIME: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT OBJECT_NAME 
+FROM USER_OBJECTS 
+WHERE OBJECT_TYPE &#x3D; &#39;PROCEDURE;
+WHERE OBJECT_NAME like &#39;EMPTIME%&#39;; </code></pre>
+
+<p>The next query will return a list of all function names that reside within the schema: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT OBJECT_NAME 
+FROM USER_OBJECTS 
+WHERE OBJECT_TYPE &#x3D; &#39;FUNCTION&#39;; </code></pre>
+
+<p>Lastly, the following query will return a listing of all package names that reside within the schema: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT OBJECT_NAME 
+FROM USER_OBJECTS 
+WHERE OBJECT_TYPE &#x3D; &#39;PACKAGE&#39;;</code></pre>
+<blockquote>
+<p>get_DDL() </p>
+</blockquote>
+<p><strong><strong>How It Works</strong></strong><br>Oracle Database contains many views that contain data useful for application development. Using the<br>USER_OBJECTS table can be very handy when searching for objects within the database. By prefixing like<br>objects with the same first word, it can make searching for a particular selection of objects rather easy.<br>USER_OBJECTS provides the ability to find a certain object type by specifying the OBJECT_TYPE within<br>the query. If no OBJECT_TYPE is specified, then all objects for the schema will be returned.</p>
+<h2 id="4-20-Viewing-Source-Code-for-Stored-Programs"><a href="#4-20-Viewing-Source-Code-for-Stored-Programs" class="headerlink" title="4-20. Viewing Source Code for Stored Programs"></a>4-20. Viewing Source Code for Stored Programs</h2><p><strong><strong>Problem</strong></strong><br>You want to retrieve the code for your stored functions, procedures, triggers, and packages. </p>
+<p><strong><strong>Solution</strong></strong><br>Use the <code>DBMS_METADATA</code> package to assist(vi.参加) you in fetching the information. In this case, you will use the<br><code>DBMS_METADATA.GET_DDL</code> procedure to obtain the code for a stored function. In the following code, the<br>DBMS_METADATA package is used to return the DDL for the CALC_QUARTER_HOUR function: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT DBMS_METADATA.GET_DDL(&#39;FUNCTION&#39;,&#39;CALC_QUARTER_HOUR&#39;) FROM DUAL; </code></pre>
+
+<p>The query illustrated previously should produce results that are similar to the following as long as<br>you have the <code>CALC_QUARTER_HOUR</code> function loaded in your database: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION &quot;MY_SCHEMA&quot;.&quot;CALC_QUARTER_HOUR&quot; (HOURS IN NUMBER) 
+RETURN NUMBER AS 
+   CALCULATED_HOURS NUMBER :&#x3D; 0; 
+BEGIN 
+   IF HOURS &gt; 1 THEN 
+        IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN 
+          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); 
+        ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN 
+          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); 
+       ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN 
+          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); 
+       ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN 
+          CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.75,1); 
+       ELSE 
+          CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+       END IF; 
+   ELSE 
+       IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN 
+         CALCULATED_HOURS :&#x3D; .25; 
+       ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN 
+         CALCULATED_HOURS :&#x3D; .5; 
+       ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN 
+         CALCULATED_HOURS :&#x3D; .75; 
+       ELSE 
+         CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+       END IF; 
+   END IF; 
+   RETURN CALCULATED_HOURS; 
+ END CALC_QUARTER_HOUR; </code></pre>
+<p>The GET_DDL function returns the code that can be used to re-create the procedure or function. This<br>can be a good way to debug code that you may not have authored and do not have on hand.<br>■ Note The GET_DDL function will not format the code. Rather, it will be returned as a single string of text. By<br>default, the buffer will not be large enough to display all of the DDL. You can change the buffer size by issuing the<br>SET LONG buffersize within SQL*Plus, substituting buffersize with a large integer value. </p>
+<p><strong><strong>How It Works</strong></strong><br>You can use the DBMS_METADATA package to retrieve various pieces of information from the database. The<br><strong>Solution</strong> to this recipe demonstrated how to fetch the DDL for a function. There is an abundance of<br>information that can be obtained by using the DBMS_METADATA package, and <code>GET_DDL</code> barely scratches the<br>surface. </p>
+<p>The GET_DDL function can return the code for each different type of object. To retrieve a the code for<br>an object using GET_DDL, use the following syntax: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT DBMS_METADATA.GET_DDL(&#39;object_type&#39;,&#39;object_name&#39;, &#39;schema&#39;) FROM DUAL; </code></pre>
+<p>The OBJECT_TYPE can be the name of any database object type, including TABLE. For the purposes of<br>PL&#x2F;SQL code, the OBJECT_TYPE can be FUNCTION, PROCEDURE, PACKAGE, or TRIGGER. The SCHEMA parameter is<br>optional and does not have to be specified if the object resides within the caller’s schema.<br>Using DBMS_METADATA, you can obtain complete database object definitions from the database<br>dictionary via the retrieval subprograms. To learn more about the DBMS_METADATA package and obtain a<br>listing of available subprograms, please refer to the online Oracle documentation at<br><a target="_blank" rel="noopener" href="http://download.oracle.com/docs/cd/B28359_01/appdev.111/b28419/d_metada.htm#ARPLS640">http://download.oracle.com/docs/cd/B28359_01/appdev.111/b28419/d_metada.htm#ARPLS640</a>, which<br>goes into detail regarding each of the subprogram functionalities. </p>
+<p>summary:  </p>
+<pre class="language-text" data-language="text"><code class="language-text">It has always been a huge pain to punch the DDL for tables, indexes and stored procedures into a flat file. Oracle now has a dbms_metadata package with a get_ddl function to copy DDL syntax out of the dictionary.
+
+With all of the new storage clauses and advanced parameters, getting table and index definitions has always been a huge **Problem**.  Hence, prior to Oracle, the DBA was generally forced to keep the DDL source code in a special library.  This makes life difficult because the DBA is now forced to maintain and manage versions of tables and index DDL separately from the data dictionary.
+
+Oracle, the DBA will be able to keep all table and index definitions inside the data dictionary (where they belong), and use the get_ddl function to punch-out a copy whenever they need to migrate the object.
+
+Below we see that the get_ddl function is very simple to use, only requiring the object_type and the object_name as import parameter.  Also, make sure to set linesize to a large value, because get_ddl returns a CLOB datatype, and you want SQL*Plus to be able to display the result set.
+
+Set lines 90000
+
+Spool sales_table_ddl.sql
+
+Select dbms_metadata.get_ddl('TABLE','SALES','schema') from dual;
+
+Spool off;
+
+If you like Oracle tuning, you might enjoy my latest book "Oracle Tuning: The Definitive Reference" by Rampant TechPress.  It's only $41.95 (I don't think it is right to charge a fortune for books!) and you can buy it right now at this link:</code></pre>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_05/"
+                    data-tooltip="Oracle PLSQL Recipes 05-Triggers"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 05-Triggers"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/"
+                    data-tooltip="Oracle PLSQL Recipes 03-Looping and Logic"
+                    aria-label="NEXT: Oracle PLSQL Recipes 03-Looping and Logic"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_05/"
+                    data-tooltip="Oracle PLSQL Recipes 05-Triggers"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 05-Triggers"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/"
+                    data-tooltip="Oracle PLSQL Recipes 03-Looping and Logic"
+                    aria-label="NEXT: Oracle PLSQL Recipes 03-Looping and Logic"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

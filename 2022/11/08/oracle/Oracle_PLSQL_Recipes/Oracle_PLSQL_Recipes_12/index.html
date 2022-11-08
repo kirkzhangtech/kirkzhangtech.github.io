@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 12-Oracle SQL Developer - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n12. Oracle SQL DeveloperTools can be useful for increasing productivity while developing code. They oftentimes allow you to takeshortcuts when coding by providing templates to start from or by providing autocompletion as wordsare typed. A good development tool can also be useful by incorporating several different utilities andfunctions into one development environment. Oracle SQL Developer is no exception, because itprovides functionality for database administrators and PL&#x2F;SQL developers alike. Functionalities includecreating database tables, importing and exporting data, managing and administering multipledatabases, and using robust PL&#x2F;SQL development tools.Oracle SQL Developer is an enterprise-level development environment, and it would take an entirebook to document each of its features. Rather than attempting to cover each of the available options, thischapter will focus on developing and maintaining Oracle PL&#x2F;SQL code using the tool. Along the way, youwill learn how to configure database connections and obtain information from database objects. In theend, you should feel comfortable developing PL&#x2F;SQL applications using the Oracle SQL Developerenvironment. \n12-1. Creating Standard and Privileged Database ConnectionsProblemYou want to create a persistent connection to your database from within Oracle SQL Developer usingboth privileged and standard accounts so that you can work with your database.SolutionOpen Oracle SQL Developer, and select New from the File menu. This will open the Create a Newwindow. Select the Database Connection option, and click OK. A New&#x2F;Select Database Connectionwindow opens, which has a list of existing database connections on the left side and an input form forcreating a new connection on the right side, as shown in Figure 12-1. \nFigure 12-1. Creating a database connectionIf you are creating a standard connection, choose the Basic connection type. If you are creating aprivileged connection as SYS, then choose the SYSDBA connection type. Once you have created aconnection, then you will be able to connect to the database via the user for which you have made aconnection and browse the objects belonging to that user’s schema.How It WorksBefore you can begin working with PL&#x2F;SQL code in Oracle SQL Developer, you must create a databaseconnection. Once created, this connection will remain in the database list that is located on the left sideof the Oracle SQL Developer environment. During the process of creating the connection, you can eitherselect the box to allow the password to be cached or keep it deselected so that you will be prompted toauthenticate each time you want to use the connection. From a security standpoint, it is advised that youleave the box unchecked so that you are prompted to authenticate for each use.Once the connection has been successfully established and you are authenticated, the world ofOracle SQL Developer is opened up, and you have a plethora of options available. At this point, you havethe ability to browse through all the database tables, views, stored programs, and other objects that areavailable to the user account that you used to initiate the connection to the database by simply using thetree menu located within the left pane of the environment. Figure 12-2 shows a sample of what you willsee when your database connection has been established. \nFigure 12-2. Database connection in the navigator Note If you plan to develop PL&#x2F;SQL code for system events such as an AFTER LOGON trigger, you should create aseparate connection for the privileged user using SYSDBA. This will allow you to traverse the privileged databaseobjects.As mentioned in the introduction to this chapter, you will learn how to use those features providedby Oracle SQL Developer that are useful for PL&#x2F;SQL application development. This does not mean theother features offered by the environment are not useful, but it would take an entire book to cover eachfeature that Oracle SQL Developer has to offer. Indeed, there are entire books on the topic. This bookstrives to provide you with the education and concepts that you will need to know to develop completeand robust PL&#x2F;SQL applications using Oracle SQL Developer. \n12-2. Obtaining Information About TablesProblemYou are interested in learning more about a particular database table. You also want to look at systemtriggers and other privileged PL&#x2F;SQL objects.SolutionUse the Oracle SQL Developer navigator to select the table that you want to view information about, asdemonstrated in Figure 12-3.  \nFigure 12-3. Viewing table informationThe editor window will then populate with a tab that consists of a worksheet and several subtabs.Each of these tabs provides different information about the table you are inspecting. Figure 12-4 showsthe Columns tab of the Table Editor.Figure 12-4. Table EditorHow It WorksOracle SQL Developer provides an excellent means for examining table metadata. When a table isselected within the database connection navigator, a worksheet becomes available that includes detailedinformation pertaining to the table characteristics and data. The first tab, which is labeled Columns,includes information about the table columns and each of their datatypes. This is most likely the tab thatyou will spend the most time in. It includes toolbar buttons that allow you to perform editing on thetable and to refresh the table view in the editor, and it even includes an extensive table manipulationmenu labeled Action that is a database administrator’s dream come true.Next, the Data tab provides a live view of the data that exists within the table. It also includes toolbarbuttons for inserting and deleting rows. This tab resembles a spreadsheet, and it allows differentcolumns to be edited and then committed to the database. For a PL&#x2F;SQL developer, it is most useful forediting data within a table that is being used for application debugging or testing purposes.The Triggers tab will be useful to PL&#x2F;SQL developers because it displays a selectable list of all tabletriggers. You can also create new triggers from the tab. Figure 12-5 shows the Triggers tab. \nFigure 12-5. Triggers tab of editorWhen a trigger is selected on the Triggers tab, its DDL is displayed in a panel on the bottom half ofthe window. The green arrow button will allow the trigger to be executed, and the refresh specifies aninterval of time. You will learn more about trigger development in Recipe 12-11.Oracle SQL Developer provides very useful information regarding database tables for PL&#x2F;SQLdevelopers. It also provides convenient access for trigger development and manipulation. \n12-3. Enabling Output to Be DisplayedProblemYou want to display the results of DBMS_OUTPUT within Oracle SQL Developer.SolutionEnable DBMS_OUTPUT for your connection via the Dbms Output pane. This pane resides on the lower-rightside of the IDE. Do so by selecting the green plus icon within the pane and then choosing the desiredconnection from the resulting dialog box. Figure 12-6 shows the connection dialog box. After selectingthe desired connection and then clicking the OK button, you will be prompted for a password for theconnection if you are not already connected. Once a successful password has been entered, thenDBMS_OUTPUT will be enabled for the specified connection. \nFigure 12-6. Select Connection dialog boxAfter enabling the DBMS_OUTPUT option, you will be able to see the output from DBMS_OUTPUT withinOracle SQL Developer. This can be very useful, especially for testing purposes.How It WorksThe easiest way to enable SERVEROUTPUT for a particular database connection is to enable DBMS_OUTPUTfrom within the Dbms Output window. Doing so will enable output to be displayed within the panewhen the code is executed.Note For more information on the DBMS_OUTPUT package, please see Recipe 1-6.Selecting the Dbms Output option from the View menu will open the DBMS_OUTPUT pane. This panegives you several options that include the ability to save the script output, change the buffer size, andeven print the output. To enable SERVEROUTPUT via the pane, you must select the green plus symbol andchoose a database connection. You will see the correct script output if you run the script again afterenabling DBMS_OUTPUT via one of the two options we have discussed. Figure 12-7 shows the Dbms Outputpane. \nFigure 12-7. Dbms Output paneOnce a connection has been established using the Dbms Output pane, all DBMS_OUTPUT code that isexecuted against that connection will be displayed within the pane. It is possible to have more than oneconnection established within the pane, and in this case different tabs can be used to select theconnection of your choice. \n12-4. Writing and Executing PL&#x2F;SQLProblemYou want to use Oracle SQL Developer to execute an anonymous block of code.SolutionEstablish a connection to the database of your choice, and the SQL worksheet will automatically open.Once the worksheet has opened, you can type the code directly into it. For the purposes of this recipe,type or copy&#x2F;paste the following anonymous block into a SQL worksheet: \nDECLARE \n  CURSOR emp_cur IS \n  SELECT * FROM employees; \n   \n  emp_rec emp_cur%ROWTYPE; \nBEGIN \n  FOR emp_rec IN emp_cur LOOP \n    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); \n  END LOOP; \nEND; \nFigure 12-8 shows the Oracle SQL Developer worksheet after this anonymous block has beenwritten into it. \nFigure 12-8. Oracle SQL Developer worksheet with PL&#x2F;SQL anonymous blockHow It WorksBy default, when you establish a connection within Oracle SQL Developer, a SQL worksheet for thatconnection is opened. This worksheet can be used to create anonymous code blocks, run SQLstatements, and create PL&#x2F;SQL code objects. The SQL worksheet is analogous to the SQLPlus commandprompt, although it does not allow all the same commands that are available using SQLPlus.If you want to open more than one SQL worksheet or a new worksheet for a connection, this can bedone in various ways. You can right-click (Ctrl+click) the database connection of your choice and thenselect Open SQL Worksheet from the menu. Another way to open a new worksheet is to use the SQLWorksheet option within the Tools menu. This will allow you to specify the connection of your choice toopen a worksheet against.As you type, you will notice that the worksheet will place all Oracle keywords into a different color.This helps distinguish between keywords and defined variables or stored programs. By default, thekeywords are placed into a bold blue text, but this color can be adjusted within the user Preferenceswindow that can be accessed from the Tools drop-down menu. Similarly, any text placed within singlequotes will appear in a different color. By default, this is also blue, except it is not bold.Besides the syntax coloring, there are some other features of the SQL worksheet that can help makeyour programming life easier. Oracle SQL Developer will provide autocompletion for some SQL andPL&#x2F;SQL statements. For instance, if you enter a package name and type a dot, all the package memberswill be displayed in the drop-down list. You can also press Ctrl+spacebar to manually activate theautocomplete drop-down list. After the drop-down list appears, you can use the arrow keys to choosethe option you want to use and then hit the Tab key. Oracle SQL Developer provides similarautocompletion for table and column names and even SQL statement GROUP BY and ORDER BY clauses.Take a look at Figure 12-9 to see the autocomplete feature in action. \nFigure 12-9. Autocomplete drop-down listAnother feature that helps productivity is to use Oracle SQL Developer snippets. To learn moreabout snippets, please see Recipe 12-7. Within the SQL worksheet toolbar, there is a group of buttonsthat can be used to help increase programmer productivity. The group of buttons at the far-right side ofthe toolbar contains a button for making highlighted words uppercase, lowercase, and initial-cap. Thebutton that has an eraser on it can be used to quickly clear the SQL worksheet. There is also button thatcan be used to display the SQL History panel. This SQL History panel opens along the bottom of theOracle SQL Developer environment, and it contains all the SQL that has been entered into theworksheet. Double-clicking any line of the history will automatically add that SQL to the currentworksheet. Figure 12-10 shows the SQL History window. \nFigure 12-10. SQL History windowTo execute the SQL or PL&#x2F;SQL that is contained within the script, you can use the first two toolbaricons. The first icon in the toolbar (as shown in Figure 12-8) is a green arrow will execute the code that isin the worksheet and display the result in a separate pane. The second icon in the toolbar (as shown inFigure 12-8) that resembles a piece of paper with a green arrow in front will execute the code within theworksheet and then display the output in a pane that can be saved as script output. Note It is possible to have more than one SQL statement or PL&#x2F;SQL block within the SQL worksheet at the sametime. In doing so, only the highlighted code will be executed when the green arrow button is selected. If all thecode is selected, then a separate output pane will appear for the output of each block or statement. However, ifthe Script icon (paper with green arrow) is selected, then all the highlighted code will have its output displayed inthe resulting script output pane.Other toolbar options within the SQL worksheet include the ability to COMMIT or ROLLBACK changesthat are made, run an explain plan on the current code, or set up autotrace. The SQL worksheet is likeSQL*Plus with many additional features. It provides the power of many tools in one easy-to-useenvironment. \n12-5. Creating and Executing a ScriptProblemYou are interested in creating a PL&#x2F;SQL script using Oracle SQL Developer that will run against yourdatabase. Once it has been created, you want to save it and then execute it.SolutionEstablish a connection to the database for which you want to create a script. By default, the SQLworksheet for the selected database will open. To create a script, choose New from the File menu orselect the first icon on the left side of the toolbar that resembles a piece of paper with a plus sign. Next,select the SQL File option from the Create a New window. When the Create SQL File window opens, typein a file name for your script, and choose a directory in which to store it. For the purposes of thisdemonstration, choose the file name select_employees, browse and choose the desired storage location,and click OK. At this point, a new tab opens in the Oracle SQL Developer editor. This tab represents theSQL file you have just created. Type the following script into the editor for demonstration purposes: \nDECLARE \n  CURSOR emp_cur IS \n  SELECT * FROM employees; \n  emp_rec emp_cur%ROWTYPE; \nBEGIN \n  FOR emp_rec IN emp_cur LOOP \n    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); \n  END LOOP; \nEND; \nAfter the script has been typed into the editor, your Oracle SQL Developer editor should resemblethat shown in Figure 12-11. Save your script by clicking the Save icon that looks like a disk, or chooseSave from the File menu. \nFigure 12-11. Typing a script into the SQL editorTo execute the script, click the Run Script icon that is the second icon from the left above the editor,or press the F5 function key. You will be prompted to select a database connection. At this point, you canchoose an existing connection, create a new connection, or edit an existing connection. Choose thedatabase connection that coincides with the schema for this book. Once you select the connection, thescript will execute against the database, and you will see another pane appear in the lower half of theOracle SQL Developer window. This is the Script Output pane, and you should see a message that states“anonymous block completed.”The editor should now look like Figure 12-12. \nFigure 12-12. Anonymous block completedHow It WorksIn the Solution to this recipe, you learned how to create and execute a script using Oracle SQLDeveloper. As you were typing the script, you may have noticed that the text being typed is color-coded.Oracle SQL Developer places PL&#x2F;SQL and SQL keywords into a different color text that can be chosenfrom within the preferences window, which is located within the Tools menu. The default color forkeywords is blue.When the script is executed, it prompts for a database connection to use. Once that connection hasbeen selected and established, then the script is run against the database. The script may not display anyuseful results by default, unless the SERVEROUTPUT has been enabled via the Dbms Output pane. To learnmore about enabling DBMS_OUTPUT, please see Recipe 12-3.When you select the Save option, the script is written to disk to a file having the name you specifiedearlier. To execute a saved script, open the File menu, and then select the Open option. A dialog box willopen that allows you to browse your file system for the script that you want to open. Once you havefound the script and opened it, a new tab is opened, and the script is loaded into that tab along with allthe options of an ordinary SQL worksheet (see Figure 12-13). \nFigure 12-13. Loaded script \n12-6. Accepting User Input for Substitution VariablesProblemYou want to create a PL&#x2F;SQL application that accepts user input from the keyboard. To test the input,you want to have Oracle SQL Developer prompt you for input.SolutionUse an ampersand in front of a text string just like in SQLPlus. Assign the resulting user variable to aPL&#x2F;SQL variable, or use the value inline.How It WorksJust as SQLPlus treats the ampersand as a token to denote user input, Oracle SQL Developer does thesame. When an ampersand is encountered, Oracle SQL Developer will display a pop-up box to promptthe user for the input. For example, type or copy and paste the following code into the SQL worksheet,and then select the Run Statement toolbar button. \nDECLARE \n    email     VARCHAR2(25); \nBEGIN \n  SELECT   email \n  INTO  email \n  FROM employees \n  WHERE employee_id &#x3D; &amp;emp_id; \n \n  DBMS_OUTPUT.PUT_LINE(&#39;Email Address for ID: &#39; || email); \nEXCEPTION  \n  WHEN OTHERS THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;An unknown error has occured, please try again.&#39;); \nEND; \nWhen the code is executed, you will be prompted to provide a value for the emp_id variable. Aseparate dialog box that looks like the one shown in Figure 12-14 is displayed. \nFigure 12-14. Entering substitution variableIf the value being accepted from the user is a string, then the ampersand-variable must be placedwithin single quotes. For example, &amp;last_name would be used to prompt for user entry of a string value. \n12-7. Saving Pieces of Code for Quick AccessProblemYou want to save a portion of code so that it can be made easily reusable by other PL&#x2F;SQL programs.  Tip This recipe also works for frequently used bits of SQL.SolutionUse the Snippets window to create the reusable piece of code and use it for access at a later time.How It WorksThe Snippets window can be accessed by selecting the View menu and then choosing the Snippetsoption. The Snippets window will open as a pane on the far-right side of the Oracle SQL Developerenvironment. The pane consists of a toolbar that includes a button used for creating a new snippet and abutton for editing an existing snippet. There is also a drop-down menu that consists of several menuoptions that organize each of the snippets into a different category. Figure 12-15 shows the Snippetspane. \nFigure 12-15. SnippetsThe snippet is used by dragging its text onto a SQL worksheet or script. Once dragged onto theworksheet, the actual code is displayed in a template fashion. In some cases, you will need to change abit of the text to make it usable, but the reusable code that is provided by the snippet can greatly reducedevelopment time.You can add your own snippet by selecting the icon that resembles a piece of paper with a plus signon it from the Snippets panel. This opens the Save Snippet window (as shown in Figure 12-16) that givesyou the option of using one of the existing categories or typing a new one. You can also type a name andtooltip for the snippet. The name of the snippet will appear in the Snippets panel after it has been saved.The text of the snippet itself will be placed into the worksheet once you drag the name of your snippet toa worksheet or script.Figure 12-16. Save Snippet paneThe Edit Snippet icon (the one with the pencil through it) brings up another window that allows youto choose an existing snippet to edit, create a new snippet, or delete a snippet. Only those snippets thatyou have created are available for editing. Figure 12-17 displays the Edit Snippets window. \nFigure 12-17. Edit Snippets windowThe snippets are actually saved within an XML file named UserSnippets.xml. This file is located inyour user sqldeveloper directory. This file can be transported to another machine and placed into thesqldeveloper directory so that the snippets can be made available in more than one place. This can beuseful if you have a group of developers who may want to share snippets. The ability to copy theUserSnippets.xml file into other user sqldeveloper directories and make the snippets available to otherusers can certainly be advantageous.Snippets can be useful for saving the time of typing a SQL or PL&#x2F;SQL construct. They can also bebeneficial if you do not remember the exact syntax of a particular piece of code. They provide quickaccess to template-based Solutions.\n12-8. Creating a FunctionProblemYou want to create a function using Oracle SQL Developer.SolutionYou can manually create the function by typing the code into the SQL worksheet for the databaseconnection for which you want to create. You can also use the Create Function Wizard within OracleSQL Developer to provide some assistance throughout the function creation process. There are a coupleof different ways to invoke the Create Function Wizard. If you go to the File menu and select New, theCreate a New window opens, and Function is one of the available options. You can also reach the samemenu by selecting the New toolbar button. Both of these paths will lead you to the same windowbecause after clicking OK, the Create PL&#x2F;SQL Function window will appear (Figure 12-18).  \nFigure 12-18. Create PL&#x2F;SQL Function windowA final way to invoke this same window is to establish a database connection and then expand theconnection navigator to list all subfolders and then right-click the Functions subfolder. One of theavailable options after doing so will be New Function.How It WorksIf using the SQL worksheet to create a function, you will need to type the code for creating your functioninto the editor and then click the Run button to compile and save the object. If any errors areencountered while compiling, they will appear in the Messages window along with the line number thatthey occurred on. The SQL worksheet works very well for those who are well accustomed to creatingfunctions. The Create Function Wizard may be the best choice for creating a function or those who liketo write less code. Note Using the Connections pane, you are able to browse both valid and invalid objects. An object may becomeinvalid if it is not compilable, becomes stale, or because of issues with other dependencies.Once within the Create PL&#x2F;SQL Function window, you will be able to name the function and specifyany parameters that will need to be used. The first parameter in the list is already defined by default, andit represents the function’s return value. You can change the return type by selecting from the list ofdatatype options within the Type column of the parameter listing.To add a new parameter, click the plus symbol on the right side of the window, and a new line willbe added to the parameter-listing table. You can then populate the name of the parameter, select adatatype and mode, and designate a default value if one should exist. After all parameters have beendeclared, click the OK button to continue.The function editor window will open, and it will contain the code that needs to be used for creationof the function that you have defined. All that is left to code will be any declarations and then the actualfunction code. The editor window contains a toolbar of options along with several tabs that can be usedto find out more information about a function once it has been created (Figure 12-19). \nFigure 12-19. The Function Editor windowThe remaining function declarations and code should be typed into the editor, and whencompleted, the Save toolbar button or menu option can be used to compile and save the function intothe database. If there are compilation errors upon saving, the errors will be displayed in a Compiler – Logwindow along with the line number on which the error occurred. By clicking the error in the window,your cursor will be placed on the line of code that needs to be repaired. Figure 12-20 shows the Compiler– Log window including a reference to an error in the code. \nFigure 12-20. Compilation errors in Function EditorOnce you have successfully compiled and saved the function into the database, it can be executedfor testing purposes using the green arrow icon within the Function Editor window. When you executethe function, the Run PL&#x2F;SQL window will be displayed. If you defined any parameters for the function,you can supply values for them within the PL&#x2F;SQL Block portion of the window. You can then click OK toexecute the function using the value(s) you have defined within the window, and the results will bedisplayed in the Run Log window. The Run PL&#x2F;SQL window can also be used to save your test case to afile or restore a test case from disk. The test case incorporates all the text that is contained within thePL&#x2F;SQL block portion of the Run PL&#x2F;SQL window. This window is displayed in Figure 12-21. \nFigure 12-21. Run PL&#x2F;SQL windowYou can use the database navigator to display the functions contained within a particular databaseconnection. If you highlight a particular trigger and right-click it, then a menu containing several optionswill be displayed. This is shown in Figure 12-22. \nFigure 12-22. Using the navigator with functionsThe options provided can be used for administering or editing the selected function. The Editoption will open the Function Editor, and it will contain the code for the selected function. If the selectedfunction is not compiled successfully, then you can make changes to it and choose the Compile option  CHAPTER 12  ORACLE SQL DEVELOPER265within the right-click contextual menu to recompile the code. Similarly, the menu can be used to invokethe profiler, debug, or administer privileges for the function. \n12-9. Creating a Stored ProcedureProblemYou want to create a stored procedure using Oracle SQL Developer.SolutionYou can manually create a stored procedure by typing the code for creating your procedure into a SQL worksheetand executing it. You can also use the Create Procedure Wizard. To start the wizard, go to the File menu andselect the New option. Once the Create a New dialog box opens (Figure 12-23), select Procedure. \nFigure 12-23. Create a New dialog boxOnce you click OK, you will be prompted to select a database connection. Doing so will open theCreate PL&#x2F;SQL Procedure Wizard. Alternatively, you can connect to the database of your choice andthen expand the navigator so that all the objects within the database are available. Right-click theProcedures submenu, and select New Procedure, as shown in Figure 12-24. \nFigure 12-24. Right-click the Procedures submenu within a designated database connection.eCHAPTER 12  ORACLE SQL DEVELOPER266How It WorksYou can use the Create a New Wizard or SQL worksheet to create a new stored procedure. The wizard isbest suited for those who are new to PL&#x2F;SQL or not very familiar with the overall syntax for creating astored procedure. To use the wizard, select the File menu followed by the New option. At this point, youwill be presented with the Create a New window that allows several options for creating new databaseobjects or code. Select the Procedure option, and click OK. Oracle SQL Developer will now prompt youto select a database connection for which you will create the stored procedure. Select the connection ofyour choice, and click OK. The Create PL&#x2F;SQL Procedure window will open, and it will resemble Figure12-25. \nFigure 12-25. Create PL&#x2F;SQL Procedure windowThe Create PL&#x2F;SQL Procedure window provides a window that can be used to create a procedure.You can select a schema and name the procedure. There is a check box that allows you to create yourcode using all lowercase if you want. Using the green plus symbol on the right side of the window, youcan add a row of text to the Parameters window. By default, the parameter will be named PARAM1, and itwill be given a datatype of VARCHAR2 with a mode of IN. All of these options can be changed, including thename. You can add zero or more parameters to the list, and you can rearrange their order by selecting aparameter from the list and using the arrow buttons on the right side of the window. You can select theDDL tab to see the actual code for creating the stored procedure, along with all the parameters you havedefined. When finished, you can optionally choose to save your code to disk using the Save button andthen click OK to create the procedure.Once you have completed and saved the Create PL&#x2F;SQL Procedure form, the code is transferred to aSQL worksheet that is a procedure editor that contains buttons and tabs for working with the storedprocedure, as shown in Figure 12-26. \nFigure 12-26. Stored Procedure WizardThe worksheet contains six tabs that can be used to find out more information about the storedprocedure that it contains. This information includes the grants that have been made on the procedure.Other information includes dependencies, references, details, and profiles. You can add code to theprocedure by typing into the editor. The editor will perform autocompletion where appropriate, andsnippets can be dragged into the editor.Next, copy the following procedure into the editor for testing purposes: \nCREATE OR REPLACE PROCEDURE INCREASE_WAGE \n( \n  EMPNO_IN IN NUMBER, \n PCT_INCREASE IN NUMBER   \n) AS  \n  emp_count    NUMBER :&#x3D; 0; \n  Results   VARCHAR2(50); \nBEGIN \n \n  SELECT count(*) \n  INTO EMP_COUNT \n  FROM EMPLOYEES \n  WHERE employee_id &#x3D; empno_in; \n  \n  IF emp_count &gt; 0 THEN \n    UPDATE EMP \n    SET salary &#x3D; salary + (salary * PCT_INCREASE) \n    WHERE employee_id &#x3D; empno_in; \n    Results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; \n  ELSE \n    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; \n  END IF; \n \n  DBMS_OUTPUT.PUT_LINE(RESULTS); \nEND; \nOnce the procedure has been coded, select the Save option from the File menu, or click the Saveicon that contains an image of a disk. This will compile and store the procedure into the database. Youcan alternatively use the Gears button to compile and save, which will produce the same results. If anycompilation errors are found, they will be displayed in a pane below the editor along with the linenumber on which the error was found (Figure 12-27). \nFigure 12-27. Compilation errorsIf you double-click the error message, the cursor will be placed into the line of code that containsthe error. In this case, you can see that the EMP table does not exist. Replace it with EMPLOYEES, and thenclick the Save button again. The procedure should now be successfully compiled and saved into thedatabase. If you select the Refresh icon above the navigator, the new procedure will appear within thelist of procedures for the database connection.To execute the procedure, right-click it within the navigator, and choose the Run option; this willcause the Run PL&#x2F;SQL window to open. This window is shown in Figure 12-28. \nFigure 12-28. Run PL&#x2F;SQL procedure windowAt this point, you have the option to save the file to disk or open another SQL file. If you want to testthe procedure, then you can assign some values to the parameters within this window. Assign the valuesdirectly within the code that is listed in the PL&#x2F;SQL Block section of the Run PL&#x2F;SQL window. When youclick OK, then the procedure will be executed. The results of the execution will be displayed in the logpane that is located below the editor pane.  \n12-10. Creating a Package Header and BodyProblemYou want to create a package and store it into the database using Oracle SQL Developer.SolutionUse the Create Package Wizard, or type the PL&#x2F;SQL package code into a SQL worksheet. To start thewizard, go to the File menu, and select the New option. Once the Create a New dialog box opens, selectPackage, as shown in Figure 12-29. \nFigure 12-29. Creating a new packageOnce you click OK, you will be prompted to select a database connection. This will open the CreatePL&#x2F;SQL Package Wizard. Alternatively, you can connect to the database of your choice and then expandthe navigator so that all the objects within the database are available. Right-click (Ctrl+click) thePackages submenu and select New Package.How It WorksCreating a new package with Oracle SQL Developer is much the same as creating other code objectsusing this tool. You can develop using the manual technique of writing all code using the SQL worksheet,or you can use the creation wizards that are provided by the tool. You can type the example code into aSQL worksheet for your data connection and click the Run Statement toolbar button to compile and savethe package into the database. You can also issue a Save As and save the code to a file on yourworkstation when writing code using the SQL worksheet.Alternatively, the wizard is useful for quickly creating the standard code for a package, and you canuse the editor to add the details that are specific to your package. Once you have opened the NewPackage Wizard, you will be prompted to enter a package name. For the purposes of this recipe, enterthe name PROCESS_EMPLOYEE_TIME, and click OK. If there is an existing object that has the same name,then you will be alerted via a red pop-up message (Figure 12-30). \nFigure 12-30. Naming the PL&#x2F;SQL package using creation wizard Note If you want to enter all code in lowercase for readability within the tool, you can select the check boxbefore clicking OK once the package has been named.  PL&#x2F;SQL is not a case-sensitive language, so case does notaffect code execution.After proceeding, the package editor is opened, and it contains some standard package creationcode using the name that you placed into the wizard. As you can see from Figure 12-31, the packageeditor contains several tabs, along with a search bar and Run, Debug, Compile, and Profile buttons.Enter the following example code into the text box on the Code tab: \nCREATE OR REPLACE PACKAGE process_employee_time IS \n  total_employee_salary              NUMBER; \n  PROCEDURE grant_raises(pct_increase IN NUMBER); \n  PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, \n                           Pct_increase IN NUMBER) ;\nEND;\nFigure 12-31. Package editor windowClick the Save button to compile and store the package into the database. Once this has beencompleted, then the package header should be successfully stored in the database. Next, a package bodywill need to be added in order to make the package functional. This can be done by expanding thePackage subfolder within the navigator. Once expanded, select the package for which you want to createa body. Right-click the selected package, and select the Create Body option (Figure 12-32).Figure 12-32. Creating a package bodyNext, the standard package body creation code will be added to an editor much like the SQLworksheet. You can now edit this code accordingly to ensure that it performs the correct actions. Typethe following package body into the editor, and then click the Save button to compile and store thepackage body: \nCREATE OR REPLACE PACKAGE BODY process_employee_time AS \n  PROCEDURE grant_raises ( \n    pct_increase IN NUMBER) as \n      CURSOR emp_cur is \n      SELECT employee_id \n      FROM employees; \n    BEGIN \n      FOR emp_rec IN emp_cur LOOP \n        increase_wage(emp_rec.employee_id, pct_increase); \n      END LOOP; \n      DBMS_OUTPUT.PUT_LINE(&#39;All employees have received the salary increase&#39;); \n  END grant_raises; \n \n PROCEDURE increase_wage ( \n  empno_in IN NUMBER, \n  Pct_increase IN NUMBER) as \n  Emp_count    NUMBER :&#x3D; 0; \n  Results   VARCHAR2(50); \nBEGIN \n  SELECT count(*) \n  INTO emp_count \n  FROM employees \n  WHERE employee_id &#x3D; empno_in; \n  \n  IF emp_count &gt; 0 THEN \n    UPDATE employees \n    SET salary &#x3D; salary + (salary * pct_increase) \n    WHERE employee_id &#x3D; empno_in; \n  \n    SELECT salary \n    INTO total_employee_salary \n    FROM employees \n    WHERE employee_id &#x3D; empno_in; \n \n    Results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; \n  ELSE \n    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; \n  END IF; \n  DBMS_OUTPUT.PUT_LINE(results); \n   \n END increase_wage; \nEND process_employee_time; \nIf any compilation errors are encountered, an error window will be displayed providing the linenumber and specific error message that needs to be addressed. After any compile errors are repaired, thepackage body will be successfully created. You can then use the navigator to expand the package nameand see the package body listed within it. Right-clicking the package body in the navigator offers someoptions such as Edit, Run, Compile, Profile, and Debug. You will learn more about debugging in Recipe12-12. The Edit option will open the package body editor if it is not already open. The Run option willopen the Run PL&#x2F;SQL window, which allows you to select a procedure or function to execute from thechosen package (Figure 12-33). \nFigure 12-33. Running the PL&#x2F;SQL packageOnce a function or procedure is chosen from the Run PL&#x2F;SQL window, it is executed using thevalues that are assigned to the variables within the PL&#x2F;SQL Block panel of the window (this code isautomatically generated by SQL*Developer). These values can be changed prior to running the packageby editing the code that is displayed within the panel. This window also provides the opportunity to savethe code to a file or load code from an existing file.Oracle SQL Developer makes developing PL&#x2F;SQL packages easy. All the tools that are needed tosuccessfully create, edit, and manage packages are available within the environment. Whether you are abeginner or seasoned expert, these tools will make package development and maintenance a breeze. \n12-11. Creating a TriggerProblemYou need to create a DML database trigger that validates data prior to inserting it into a table, and youwant to use Oracle SQL Developer to do so. For instance, you want to create a trigger that will validate ane-mail address prior to inserting a row into the EMPLOYEES table.SolutionUse the Create Trigger Wizard, type the PL&#x2F;SQL trigger code into a SQL worksheet, or use the triggeroptions that are available from the database table worksheet. To start the wizard, go to the File menuand select the New option. Once the Create a New dialog box opens, select Trigger. This will open theCreate Trigger window, as shown in Figure 12-34. \nFigure 12-34. Creating a new triggerThe Create Trigger window simplifies the process of creating a trigger because it provides all theessential details that are required up front. Once the information has been completed, the trigger codecan be developed using the trigger editor window.How It WorksAs with all the other code creation techniques available in Oracle SQL Developer, there are variousdifferent ways to create a trigger. Using the SQL worksheet for a database connection is the best way tomanually create a trigger. To do so, you will need to open the SQL worksheet, type the trigger creationcode, and click the Run toolbar button to compile and save the code. The many wizards that areavailable for trigger creation can greatly simplify the process, especially if you are new to PL&#x2F;SQL or rustyon the details of trigger creation.As mentioned in the Solution to the recipe, the Create Trigger window allows you to specify all thedetails for creating a trigger. You choose the type of trigger by selecting one of the options available fromthe drop-down menu. Different options become available in the window depending upon the type oftrigger you choose to create. By default, a table trigger is chosen. Using that option, you can select thetable from another drop-down list and choose whether the trigger should be executed on INSERT, UPDATE,or DELETE from the specified table. The wizard allows you to specify your own variable names forrepresenting old and new table values. The timing for trigger execution is determined by selectingBefore, Statement Level, After, or Row Level and specifying an optional WHEN clause. You can even specifywhether the trigger is to be executed based upon a specific column.If you attempt to enter a trigger name that matches an existing object in the database within thespecified schema, you will receive an error message, as shown in Figure 12-35. \nFigure 12-35. Create Trigger window–—object already existsAfter finishing with the Create Trigger Wizard and clicking the OK button, the initial trigger creationcode will be displayed in an editor (Figure 12-36). \nFigure 12-36. Trigger EditorType the following code into the editor, and hit the Save button to compile the code and save it intothe database: \nTRIGGER CHECK_EMAIL_ADDRESS \nBEFORE INSERT ON employees \nFOR EACH ROW \nBEGIN \n  IF NOT INSTR(:new.email,&#39;@&#39;) &gt; 0 THEN \n    RAISE_APPLICATION_ERROR(-20001, &#39;INVALID EMAIL ADDRESS&#39;); \n  END IF; \nEND; \nThe Save button will automatically compile the code, and the output will appear in the Messagespane below the editor, as shown in Figure 12-37. \nFigure 12-37. Messages logAfter the trigger has been successfully compiled and stored into the database, it can be highlightedin the navigator, and right-clicking it will reveal several options (Figure 12-38). \nFigure 12-38. Trigger optionsThese options help allow easy access for dropping, disabling, or enabling the trigger. Choosing theEdit option from this submenu will open the trigger in the editor window to allow for codemodifications.Using the Create Trigger Wizard in Oracle SQL Developer can greatly reduce the time it takes tocreate a database trigger. By selecting the appropriate options within the wizard, you will be left withonly the trigger functionality to code.  \n12-12. Debugging Stored CodeProblemOne of your stored procedures contains logical errors, and you want to use Oracle SQL Developer to helpyou find the cause.SolutionA few different options are available for debugging stored code within Oracle SQL Developer. Theenvironment includes a complete debugger that provides the ability to set breakpoints within the codeand modify variable values at runtime to investigate a Problem with your code. There are several ways toinvoke the debugger for a particular piece of code. When a code object is opened within the editor, thetoolbar will contain a red “bug” icon that can be used to invoke the debugger (Figure 12-39).  \nFigure 12-39. Debugger iconThe right-click contextual menu within the navigator also contains a Debug option for proceduresand packages (Figure 12-40). \nFigure 12-40. Debugger option in NavigatorHow It WorksUsing the debugger is a great way to find issues with your code. The debugger enables the application tohalt processing at the designated breakpoints so that you can inspect the current values of variables andstep through each line of code so that issues can be pinpointed. Debugging PL&#x2F;SQL programs is amultistep process that consists of first setting breakpoints in code, followed by compiling the code fordebug, and lastly running the actual debugger. To use the debugger, the user who is running thedebugger must be granted some database permissions. The user must be granted the DEBUG ANYPROCEDURE privilege to have debug capabilities on any procedure or DEBUG  to allowdebugging capabilities on a single procedure. The DEBUG CONNECT SESSION privilege must also be grantedin order to allow access to the debugging session.After a user has been granted the proper permissions for debugging, the next step is to place abreakpoint (or several) into the code that will be debugged. For the purposes of this recipe, theINCREASE_WAGE procedure will be loaded into the procedure editor, and a breakpoint will be set byplacing the mouse cursor on the left margin of the editor window next to the line of code that you wantthe debugger to pause execution at. Once the cursor is in the desired location, click in the left margin toplace the breakpoint. Figure 12-41 shows a breakpoint that has been placed at the beginning of a SELECTstatement within the INCREASE_WAGE procedure. \nFigure 12-41. Setting a breakpointAfter one or more breakpoints have been placed, the code needs to be compiled for debug. To do so,use the icon in the editor toolbar for compiling, and select the Compile for Debug option. Once the codehas been compiled for debug, its icon in the navigator will adopt a green bug to indicate that it is readyfor debugging (Figure 12-42). \nFigure 12-42. Code ready for debugNext, the debugger can be started by selecting the debug icon within the editor or by right-clickingthe code within the navigator and selecting the Debug option. If the user who is debugging the codedoes not have appropriate permissions to debug, then error messages such as those shown in Figure 12-43 will be displayed. \nFigure 12-43. User not granted necessary permissionsAssuming that the user has the correct permissions to debug, the Debug PL&#x2F;SQL window will bedisplayed. This window provides information about the code that is being debugged including the targetname, the parameters, and a PL&#x2F;SQL block that will be executed in order to debug the code. The codethat is contained within the PL&#x2F;SQL block portion of the screen can be modified so that the parametersbeing passed into the code (if any) can be set to the values you choose (Figure 12-44). In Figure 12-44,the values have been set to an EMPNO_IN value of 10 and a PCT_INCREASE value of .03. \nFigure 12-44. Debug PL&#x2F;SQL windowOnce the Debug PL&#x2F;SQL window has been completed with the desired values, click OK to begin thedebugger. This will cause Oracle SQL Developer to issue the DBMS_DEBUG_JDWP.CONNECT_TCP (hostname,port) command and start the debugging session. The debugger will start, and it will provide a number ofdifferent options, allowing you to step through the code one line at a time and see what the variablevalues are at any given point in time. You will see three tabs on the debugger: Data, Smart Data, andWatches. The Data tab is used for watching all the variables and their values as you walk through yourcode using the debugger. The Smart Data tab will keep track of only those variables that are part of thecurrent piece of code that is being executed. You can set watches to determine which variables that youwould like to keep track of. The inspector can be used to see the values within those variables you arewatching. You are also given the very powerful ability to modify the values at runtime as the code isexecuting. This provides the capability of determining how code will react to different values that arepassed into it.The Oracle SQL Developer debugger is a useful tool and provides an intuitive user interface over theDBMS_DEBUG_JDWP utility. Although this recipe covers only the basics to get you started, if you spend timeusing each feature of the debugger, then you will learn more powerful ways to help you maintain anddebug issues found in your code. \n12-13. Compiling Code Within the NavigatorProblemYou want to compile some PL&#x2F;SQL code within Oracle SQL Developer. In this Solution, the navigationmenu of your Oracle SQL Developer environment contains code that has a red X on it. This means thecode needs to be compiled or that it contains an error.SolutionSelect the code that needs to be compiled, and right-click (Ctrl+click) it. A menu will be displayed thatlists several options. Select the Compile option from that menu (Figure 12-45). \nFigure 12-45. Compile optionHow It WorksThe Oracle SQL Developer navigation menu is very handy for quickly glancing at the code that adatabase contains. All the code that is successfully loaded into the database will contain a green checkmark, whereas any code that has a compilation error will contain a red X label. Sometimes code needs tosimply be recompiled in order to validate it and make it usable once again. This is most often the caseafter a database has just recently been migrated or updated. This can also occur if a particular piece ofcode depends upon another piece of code that has recently been modified, although Oracle Database11gR2 includes fine-grained dependencies that help alleviate this issue. Another event that may causecode to require recompilation is if an object that the code references such as a table or view has beenchanged. Whatever the case, Oracle SQL Developer makes it easy to recompile code by right-clicking itwithin the navigator and selecting Compile from the pop-up menu. Note Oracle Database 11g introduced the idea of fine-grained dependencies. This allows PL&#x2F;SQL objects toremain valid even if an object that they depend upon has changed, as long as the changes do not affect thePL&#x2F;SQL object. For instance, if a column has been removed from a table and object A depends upon that table butnot the specific column that was removed, then object A will remain valid.Once the compile task has been completed, a message will be displayed within the Messages panel tonote whether the compilation was successful. If there were any issues encountered, they will be listed,each on a separate line, within the Messages window. The messages will contain the error code, as wellas the line number that caused the exception to be raised. Double-clicking each error message will takeyou directly to the line of code that raised the exception so that you can begin working on repairs. \n","dateCreated":"2022-11-08T23:20:47+08:00","dateModified":"2022-11-08T23:40:29+08:00","datePublished":"2022-11-08T23:20:47+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 12-Oracle SQL Developer","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 12-Oracle SQL Developer">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:20:47.485Z">
+<meta property="article:modified_time" content="2022-11-08T15:40:29.905Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 12-Oracle SQL Developer
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:20:47+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#12-Oracle-SQL-Developer"><span class="toc-text">12. Oracle SQL Developer</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#12-1-Creating-Standard-and-Privileged-Database-Connections"><span class="toc-text">12-1. Creating Standard and Privileged Database Connections</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-2-Obtaining-Information-About-Tables"><span class="toc-text">12-2. Obtaining Information About Tables</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-3-Enabling-Output-to-Be-Displayed"><span class="toc-text">12-3. Enabling Output to Be Displayed</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-4-Writing-and-Executing-PL-x2F-SQL"><span class="toc-text">12-4. Writing and Executing PL&#x2F;SQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-5-Creating-and-Executing-a-Script"><span class="toc-text">12-5. Creating and Executing a Script</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-6-Accepting-User-Input-for-Substitution-Variables"><span class="toc-text">12-6. Accepting User Input for Substitution Variables</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-7-Saving-Pieces-of-Code-for-Quick-Access"><span class="toc-text">12-7. Saving Pieces of Code for Quick Access</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-8-Creating-a-Function"><span class="toc-text">12-8. Creating a Function</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-9-Creating-a-Stored-Procedure"><span class="toc-text">12-9. Creating a Stored Procedure</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-10-Creating-a-Package-Header-and-Body"><span class="toc-text">12-10. Creating a Package Header and Body</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-11-Creating-a-Trigger"><span class="toc-text">12-11. Creating a Trigger</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-12-Debugging-Stored-Code"><span class="toc-text">12-12. Debugging Stored Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-13-Compiling-Code-Within-the-Navigator"><span class="toc-text">12-13. Compiling Code Within the Navigator</span></a></li></ol></li></ol>
+
+<h1 id="12-Oracle-SQL-Developer"><a href="#12-Oracle-SQL-Developer" class="headerlink" title="12. Oracle SQL Developer"></a>12. Oracle SQL Developer</h1><p>Tools can be useful for increasing productivity while developing code. They oftentimes allow you to take<br>shortcuts when coding by providing templates to start from or by providing autocompletion as words<br>are typed. A good development tool can also be useful by incorporating several different utilities and<br>functions into one development environment. Oracle SQL Developer is no exception, because it<br>provides functionality for database administrators and PL&#x2F;SQL developers alike. Functionalities include<br>creating database tables, importing and exporting data, managing and administering multiple<br>databases, and using robust PL&#x2F;SQL development tools.<br>Oracle SQL Developer is an enterprise-level development environment, and it would take an entire<br>book to document each of its features. Rather than attempting to cover each of the available options, this<br>chapter will focus on developing and maintaining Oracle PL&#x2F;SQL code using the tool. Along the way, you<br>will learn how to configure database connections and obtain information from database objects. In the<br>end, you should feel comfortable developing PL&#x2F;SQL applications using the Oracle SQL Developer<br>environment. </p>
+<h2 id="12-1-Creating-Standard-and-Privileged-Database-Connections"><a href="#12-1-Creating-Standard-and-Privileged-Database-Connections" class="headerlink" title="12-1. Creating Standard and Privileged Database Connections"></a>12-1. Creating Standard and Privileged Database Connections</h2><p><strong>Problem</strong><br>You want to create a persistent connection to your database from within Oracle SQL Developer using<br>both privileged and standard accounts so that you can work with your database.<br><strong>Solution</strong><br>Open Oracle SQL Developer, and select New from the File menu. This will open the Create a New<br>window. Select the Database Connection option, and click OK. A New&#x2F;Select Database Connection<br>window opens, which has a list of existing database connections on the left side and an input form for<br>creating a new connection on the right side, as shown in Figure 12-1. </p>
+<p>Figure 12-1. Creating a database connection<br>If you are creating a standard connection, choose the Basic connection type. If you are creating a<br>privileged connection as SYS, then choose the SYSDBA connection type. Once you have created a<br>connection, then you will be able to connect to the database via the user for which you have made a<br>connection and browse the objects belonging to that user’s schema.<br><strong>How It Works</strong><br>Before you can begin working with PL&#x2F;SQL code in Oracle SQL Developer, you must create a database<br>connection. Once created, this connection will remain in the database list that is located on the left side<br>of the Oracle SQL Developer environment. During the process of creating the connection, you can either<br>select the box to allow the password to be cached or keep it deselected so that you will be prompted to<br>authenticate each time you want to use the connection. From a security standpoint, it is advised that you<br>leave the box unchecked so that you are prompted to authenticate for each use.<br>Once the connection has been successfully established and you are authenticated, the world of<br>Oracle SQL Developer is opened up, and you have a plethora of options available. At this point, you have<br>the ability to browse through all the database tables, views, stored programs, and other objects that are<br>available to the user account that you used to initiate the connection to the database by simply using the<br>tree menu located within the left pane of the environment. Figure 12-2 shows a sample of what you will<br>see when your database connection has been established. </p>
+<p>Figure 12-2. Database connection in the navigator<br> Note If you plan to develop PL&#x2F;SQL code for system events such as an AFTER LOGON trigger, you should create a<br>separate connection for the privileged user using SYSDBA. This will allow you to traverse the privileged database<br>objects.<br>As mentioned in the introduction to this chapter, you will learn how to use those features provided<br>by Oracle SQL Developer that are useful for PL&#x2F;SQL application development. This does not mean the<br>other features offered by the environment are not useful, but it would take an entire book to cover each<br>feature that Oracle SQL Developer has to offer. Indeed, there are entire books on the topic. This book<br>strives to provide you with the education and concepts that you will need to know to develop complete<br>and robust PL&#x2F;SQL applications using Oracle SQL Developer. </p>
+<h2 id="12-2-Obtaining-Information-About-Tables"><a href="#12-2-Obtaining-Information-About-Tables" class="headerlink" title="12-2. Obtaining Information About Tables"></a>12-2. Obtaining Information About Tables</h2><p><strong>Problem</strong><br>You are interested in learning more about a particular database table. You also want to look at system<br>triggers and other privileged PL&#x2F;SQL objects.<br><strong>Solution</strong><br>Use the Oracle SQL Developer navigator to select the table that you want to view information about, as<br>demonstrated in Figure 12-3.  </p>
+<p>Figure 12-3. Viewing table information<br>The editor window will then populate with a tab that consists of a worksheet and several subtabs.<br>Each of these tabs provides different information about the table you are inspecting. Figure 12-4 shows<br>the Columns tab of the Table Editor.<br>Figure 12-4. Table Editor<br><strong>How It Works</strong><br>Oracle SQL Developer provides an excellent means for examining table metadata. When a table is<br>selected within the database connection navigator, a worksheet becomes available that includes detailed<br>information pertaining to the table characteristics and data. The first tab, which is labeled Columns,<br>includes information about the table columns and each of their datatypes. This is most likely the tab that<br>you will spend the most time in. It includes toolbar buttons that allow you to perform editing on the<br>table and to refresh the table view in the editor, and it even includes an extensive table manipulation<br>menu labeled Action that is a database administrator’s dream come true.<br>Next, the Data tab provides a live view of the data that exists within the table. It also includes toolbar<br>buttons for inserting and deleting rows. This tab resembles a spreadsheet, and it allows different<br>columns to be edited and then committed to the database. For a PL&#x2F;SQL developer, it is most useful for<br>editing data within a table that is being used for application debugging or testing purposes.<br>The Triggers tab will be useful to PL&#x2F;SQL developers because it displays a selectable list of all table<br>triggers. You can also create new triggers from the tab. Figure 12-5 shows the Triggers tab. </p>
+<p>Figure 12-5. Triggers tab of editor<br>When a trigger is selected on the Triggers tab, its DDL is displayed in a panel on the bottom half of<br>the window. The green arrow button will allow the trigger to be executed, and the refresh specifies an<br>interval of time. You will learn more about trigger development in Recipe 12-11.<br>Oracle SQL Developer provides very useful information regarding database tables for PL&#x2F;SQL<br>developers. It also provides convenient access for trigger development and manipulation. </p>
+<h2 id="12-3-Enabling-Output-to-Be-Displayed"><a href="#12-3-Enabling-Output-to-Be-Displayed" class="headerlink" title="12-3. Enabling Output to Be Displayed"></a>12-3. Enabling Output to Be Displayed</h2><p><strong>Problem</strong><br>You want to display the results of DBMS_OUTPUT within Oracle SQL Developer.<br><strong>Solution</strong><br>Enable DBMS_OUTPUT for your connection via the Dbms Output pane. This pane resides on the lower-right<br>side of the IDE. Do so by selecting the green plus icon within the pane and then choosing the desired<br>connection from the resulting dialog box. Figure 12-6 shows the connection dialog box. After selecting<br>the desired connection and then clicking the OK button, you will be prompted for a password for the<br>connection if you are not already connected. Once a successful password has been entered, then<br>DBMS_OUTPUT will be enabled for the specified connection. </p>
+<p>Figure 12-6. Select Connection dialog box<br>After enabling the DBMS_OUTPUT option, you will be able to see the output from DBMS_OUTPUT within<br>Oracle SQL Developer. This can be very useful, especially for testing purposes.<br><strong>How It Works</strong><br>The easiest way to enable SERVEROUTPUT for a particular database connection is to enable DBMS_OUTPUT<br>from within the Dbms Output window. Doing so will enable output to be displayed within the pane<br>when the code is executed.<br>Note For more information on the DBMS_OUTPUT package, please see Recipe 1-6.<br>Selecting the Dbms Output option from the View menu will open the DBMS_OUTPUT pane. This pane<br>gives you several options that include the ability to save the script output, change the buffer size, and<br>even print the output. To enable SERVEROUTPUT via the pane, you must select the green plus symbol and<br>choose a database connection. You will see the correct script output if you run the script again after<br>enabling DBMS_OUTPUT via one of the two options we have discussed. Figure 12-7 shows the Dbms Output<br>pane. </p>
+<p>Figure 12-7. Dbms Output pane<br>Once a connection has been established using the Dbms Output pane, all DBMS_OUTPUT code that is<br>executed against that connection will be displayed within the pane. It is possible to have more than one<br>connection established within the pane, and in this case different tabs can be used to select the<br>connection of your choice. </p>
+<h2 id="12-4-Writing-and-Executing-PL-x2F-SQL"><a href="#12-4-Writing-and-Executing-PL-x2F-SQL" class="headerlink" title="12-4. Writing and Executing PL&#x2F;SQL"></a>12-4. Writing and Executing PL&#x2F;SQL</h2><p><strong>Problem</strong><br>You want to use Oracle SQL Developer to execute an anonymous block of code.<br><strong>Solution</strong><br>Establish a connection to the database of your choice, and the SQL worksheet will automatically open.<br>Once the worksheet has opened, you can type the code directly into it. For the purposes of this recipe,<br>type or copy&#x2F;paste the following anonymous block into a SQL worksheet: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  CURSOR emp_cur IS 
+  SELECT * FROM employees; 
+   
+  emp_rec emp_cur%ROWTYPE; 
+BEGIN 
+  FOR emp_rec IN emp_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); 
+  END LOOP; 
+END; </code></pre>
+<p>Figure 12-8 shows the Oracle SQL Developer worksheet after this anonymous block has been<br>written into it. </p>
+<p>Figure 12-8. Oracle SQL Developer worksheet with PL&#x2F;SQL anonymous block<br><strong>How It Works</strong><br>By default, when you establish a connection within Oracle SQL Developer, a SQL worksheet for that<br>connection is opened. This worksheet can be used to create anonymous code blocks, run SQL<br>statements, and create PL&#x2F;SQL code objects. The SQL worksheet is analogous to the SQL<em>Plus command<br>prompt, although it does not allow all the same commands that are available using SQL</em>Plus.<br>If you want to open more than one SQL worksheet or a new worksheet for a connection, this can be<br>done in various ways. You can right-click (Ctrl+click) the database connection of your choice and then<br>select Open SQL Worksheet from the menu. Another way to open a new worksheet is to use the SQL<br>Worksheet option within the Tools menu. This will allow you to specify the connection of your choice to<br>open a worksheet against.<br>As you type, you will notice that the worksheet will place all Oracle keywords into a different color.<br>This helps distinguish between keywords and defined variables or stored programs. By default, the<br>keywords are placed into a bold blue text, but this color can be adjusted within the user Preferences<br>window that can be accessed from the Tools drop-down menu. Similarly, any text placed within single<br>quotes will appear in a different color. By default, this is also blue, except it is not bold.<br>Besides the syntax coloring, there are some other features of the SQL worksheet that can help make<br>your programming life easier. Oracle SQL Developer will provide autocompletion for some SQL and<br>PL&#x2F;SQL statements. For instance, if you enter a package name and type a dot, all the package members<br>will be displayed in the drop-down list. You can also press Ctrl+spacebar to manually activate the<br>autocomplete drop-down list. After the drop-down list appears, you can use the arrow keys to choose<br>the option you want to use and then hit the Tab key. Oracle SQL Developer provides similar<br>autocompletion for table and column names and even SQL statement GROUP BY and ORDER BY clauses.<br>Take a look at Figure 12-9 to see the autocomplete feature in action. </p>
+<p>Figure 12-9. Autocomplete drop-down list<br>Another feature that helps productivity is to use Oracle SQL Developer snippets. To learn more<br>about snippets, please see Recipe 12-7. Within the SQL worksheet toolbar, there is a group of buttons<br>that can be used to help increase programmer productivity. The group of buttons at the far-right side of<br>the toolbar contains a button for making highlighted words uppercase, lowercase, and initial-cap. The<br>button that has an eraser on it can be used to quickly clear the SQL worksheet. There is also button that<br>can be used to display the SQL History panel. This SQL History panel opens along the bottom of the<br>Oracle SQL Developer environment, and it contains all the SQL that has been entered into the<br>worksheet. Double-clicking any line of the history will automatically add that SQL to the current<br>worksheet. Figure 12-10 shows the SQL History window. </p>
+<p>Figure 12-10. SQL History window<br>To execute the SQL or PL&#x2F;SQL that is contained within the script, you can use the first two toolbar<br>icons. The first icon in the toolbar (as shown in Figure 12-8) is a green arrow will execute the code that is<br>in the worksheet and display the result in a separate pane. The second icon in the toolbar (as shown in<br>Figure 12-8) that resembles a piece of paper with a green arrow in front will execute the code within the<br>worksheet and then display the output in a pane that can be saved as script output.<br> Note It is possible to have more than one SQL statement or PL&#x2F;SQL block within the SQL worksheet at the same<br>time. In doing so, only the highlighted code will be executed when the green arrow button is selected. If all the<br>code is selected, then a separate output pane will appear for the output of each block or statement. However, if<br>the Script icon (paper with green arrow) is selected, then all the highlighted code will have its output displayed in<br>the resulting script output pane.<br>Other toolbar options within the SQL worksheet include the ability to COMMIT or ROLLBACK changes<br>that are made, run an explain plan on the current code, or set up autotrace. The SQL worksheet is like<br>SQL*Plus with many additional features. It provides the power of many tools in one easy-to-use<br>environment. </p>
+<h2 id="12-5-Creating-and-Executing-a-Script"><a href="#12-5-Creating-and-Executing-a-Script" class="headerlink" title="12-5. Creating and Executing a Script"></a>12-5. Creating and Executing a Script</h2><p><strong>Problem</strong><br>You are interested in creating a PL&#x2F;SQL script using Oracle SQL Developer that will run against your<br>database. Once it has been created, you want to save it and then execute it.<br><strong>Solution</strong><br>Establish a connection to the database for which you want to create a script. By default, the SQL<br>worksheet for the selected database will open. To create a script, choose New from the File menu or<br>select the first icon on the left side of the toolbar that resembles a piece of paper with a plus sign. Next,<br>select the SQL File option from the Create a New window. When the Create SQL File window opens, type<br>in a file name for your script, and choose a directory in which to store it. For the purposes of this<br>demonstration, choose the file name select_employees, browse and choose the desired storage location,<br>and click OK. At this point, a new tab opens in the Oracle SQL Developer editor. This tab represents the<br>SQL file you have just created. Type the following script into the editor for demonstration purposes: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  CURSOR emp_cur IS 
+  SELECT * FROM employees; 
+  emp_rec emp_cur%ROWTYPE; 
+BEGIN 
+  FOR emp_rec IN emp_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name); 
+  END LOOP; 
+END; </code></pre>
+<p>After the script has been typed into the editor, your Oracle SQL Developer editor should resemble<br>that shown in Figure 12-11. Save your script by clicking the Save icon that looks like a disk, or choose<br>Save from the File menu. </p>
+<p>Figure 12-11. Typing a script into the SQL editor<br>To execute the script, click the Run Script icon that is the second icon from the left above the editor,<br>or press the F5 function key. You will be prompted to select a database connection. At this point, you can<br>choose an existing connection, create a new connection, or edit an existing connection. Choose the<br>database connection that coincides with the schema for this book. Once you select the connection, the<br>script will execute against the database, and you will see another pane appear in the lower half of the<br>Oracle SQL Developer window. This is the Script Output pane, and you should see a message that states<br>“anonymous block completed.”The editor should now look like Figure 12-12. </p>
+<p>Figure 12-12. Anonymous block completed<br><strong>How It Works</strong><br>In the <strong>Solution</strong> to this recipe, you learned how to create and execute a script using Oracle SQL<br>Developer. As you were typing the script, you may have noticed that the text being typed is color-coded.<br>Oracle SQL Developer places PL&#x2F;SQL and SQL keywords into a different color text that can be chosen<br>from within the preferences window, which is located within the Tools menu. The default color for<br>keywords is blue.<br>When the script is executed, it prompts for a database connection to use. Once that connection has<br>been selected and established, then the script is run against the database. The script may not display any<br>useful results by default, unless the SERVEROUTPUT has been enabled via the Dbms Output pane. To learn<br>more about enabling DBMS_OUTPUT, please see Recipe 12-3.<br>When you select the Save option, the script is written to disk to a file having the name you specified<br>earlier. To execute a saved script, open the File menu, and then select the Open option. A dialog box will<br>open that allows you to browse your file system for the script that you want to open. Once you have<br>found the script and opened it, a new tab is opened, and the script is loaded into that tab along with all<br>the options of an ordinary SQL worksheet (see Figure 12-13). </p>
+<p>Figure 12-13. Loaded script </p>
+<h2 id="12-6-Accepting-User-Input-for-Substitution-Variables"><a href="#12-6-Accepting-User-Input-for-Substitution-Variables" class="headerlink" title="12-6. Accepting User Input for Substitution Variables"></a>12-6. Accepting User Input for Substitution Variables</h2><p><strong>Problem</strong><br>You want to create a PL&#x2F;SQL application that accepts user input from the keyboard. To test the input,<br>you want to have Oracle SQL Developer prompt you for input.<br><strong>Solution</strong><br>Use an ampersand in front of a text string just like in SQL<em>Plus. Assign the resulting user variable to a<br>PL&#x2F;SQL variable, or use the value inline.<br><strong>How It Works</strong><br>Just as SQL</em>Plus treats the ampersand as a token to denote user input, Oracle SQL Developer does the<br>same. When an ampersand is encountered, Oracle SQL Developer will display a pop-up box to prompt<br>the user for the input. For example, type or copy and paste the following code into the SQL worksheet,<br>and then select the Run Statement toolbar button. </p>
+<pre class="language-none"><code class="language-none">DECLARE 
+    email     VARCHAR2(25); 
+BEGIN 
+  SELECT   email 
+  INTO  email 
+  FROM employees 
+  WHERE employee_id &#x3D; &amp;emp_id; 
+ 
+  DBMS_OUTPUT.PUT_LINE(&#39;Email Address for ID: &#39; || email); 
+EXCEPTION  
+  WHEN OTHERS THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;An unknown error has occured, please try again.&#39;); 
+END; </code></pre>
+<p>When the code is executed, you will be prompted to provide a value for the emp_id variable. A<br>separate dialog box that looks like the one shown in Figure 12-14 is displayed. </p>
+<p>Figure 12-14. Entering substitution variable<br>If the value being accepted from the user is a string, then the ampersand-variable must be placed<br>within single quotes. For example, &amp;last_name would be used to prompt for user entry of a string value. </p>
+<h2 id="12-7-Saving-Pieces-of-Code-for-Quick-Access"><a href="#12-7-Saving-Pieces-of-Code-for-Quick-Access" class="headerlink" title="12-7. Saving Pieces of Code for Quick Access"></a>12-7. Saving Pieces of Code for Quick Access</h2><p><strong>Problem</strong><br>You want to save a portion of code so that it can be made easily reusable by other PL&#x2F;SQL programs.<br>  Tip This recipe also works for frequently used bits of SQL.<br><strong>Solution</strong><br>Use the Snippets window to create the reusable piece of code and use it for access at a later time.<br><strong>How It Works</strong><br>The Snippets window can be accessed by selecting the View menu and then choosing the Snippets<br>option. The Snippets window will open as a pane on the far-right side of the Oracle SQL Developer<br>environment. The pane consists of a toolbar that includes a button used for creating a new snippet and a<br>button for editing an existing snippet. There is also a drop-down menu that consists of several menu<br>options that organize each of the snippets into a different category. Figure 12-15 shows the Snippets<br>pane. </p>
+<p>Figure 12-15. Snippets<br>The snippet is used by dragging its text onto a SQL worksheet or script. Once dragged onto the<br>worksheet, the actual code is displayed in a template fashion. In some cases, you will need to change a<br>bit of the text to make it usable, but the reusable code that is provided by the snippet can greatly reduce<br>development time.<br>You can add your own snippet by selecting the icon that resembles a piece of paper with a plus sign<br>on it from the Snippets panel. This opens the Save Snippet window (as shown in Figure 12-16) that gives<br>you the option of using one of the existing categories or typing a new one. You can also type a name and<br>tooltip for the snippet. The name of the snippet will appear in the Snippets panel after it has been saved.<br>The text of the snippet itself will be placed into the worksheet once you drag the name of your snippet to<br>a worksheet or script.<br>Figure 12-16. Save Snippet pane<br>The Edit Snippet icon (the one with the pencil through it) brings up another window that allows you<br>to choose an existing snippet to edit, create a new snippet, or delete a snippet. Only those snippets that<br>you have created are available for editing. Figure 12-17 displays the Edit Snippets window. </p>
+<p>Figure 12-17. Edit Snippets window<br>The snippets are actually saved within an XML file named UserSnippets.xml. This file is located in<br>your user sqldeveloper directory. This file can be transported to another machine and placed into the<br>sqldeveloper directory so that the snippets can be made available in more than one place. This can be<br>useful if you have a group of developers who may want to share snippets. The ability to copy the<br>UserSnippets.xml file into other user sqldeveloper directories and make the snippets available to other<br>users can certainly be advantageous.<br>Snippets can be useful for saving the time of typing a SQL or PL&#x2F;SQL construct. They can also be<br>beneficial if you do not remember the exact syntax of a particular piece of code. They provide quick<br>access to template-based <strong>Solution</strong>s.</p>
+<h2 id="12-8-Creating-a-Function"><a href="#12-8-Creating-a-Function" class="headerlink" title="12-8. Creating a Function"></a>12-8. Creating a Function</h2><p><strong>Problem</strong><br>You want to create a function using Oracle SQL Developer.<br><strong>Solution</strong><br>You can manually create the function by typing the code into the SQL worksheet for the database<br>connection for which you want to create. You can also use the Create Function Wizard within Oracle<br>SQL Developer to provide some assistance throughout the function creation process. There are a couple<br>of different ways to invoke the Create Function Wizard. If you go to the File menu and select New, the<br>Create a New window opens, and Function is one of the available options. You can also reach the same<br>menu by selecting the New toolbar button. Both of these paths will lead you to the same window<br>because after clicking OK, the Create PL&#x2F;SQL Function window will appear (Figure 12-18).  </p>
+<p>Figure 12-18. Create PL&#x2F;SQL Function window<br>A final way to invoke this same window is to establish a database connection and then expand the<br>connection navigator to list all subfolders and then right-click the Functions subfolder. One of the<br>available options after doing so will be New Function.<br><strong>How It Works</strong><br>If using the SQL worksheet to create a function, you will need to type the code for creating your function<br>into the editor and then click the Run button to compile and save the object. If any errors are<br>encountered while compiling, they will appear in the Messages window along with the line number that<br>they occurred on. The SQL worksheet works very well for those who are well accustomed to creating<br>functions. The Create Function Wizard may be the best choice for creating a function or those who like<br>to write less code.<br> Note Using the Connections pane, you are able to browse both valid and invalid objects. An object may become<br>invalid if it is not compilable, becomes stale, or because of issues with other dependencies.<br>Once within the Create PL&#x2F;SQL Function window, you will be able to name the function and specify<br>any parameters that will need to be used. The first parameter in the list is already defined by default, and<br>it represents the function’s return value. You can change the return type by selecting from the list of<br>datatype options within the Type column of the parameter listing.<br>To add a new parameter, click the plus symbol on the right side of the window, and a new line will<br>be added to the parameter-listing table. You can then populate the name of the parameter, select a<br>datatype and mode, and designate a default value if one should exist. After all parameters have been<br>declared, click the OK button to continue.<br>The function editor window will open, and it will contain the code that needs to be used for creation<br>of the function that you have defined. All that is left to code will be any declarations and then the actual<br>function code. The editor window contains a toolbar of options along with several tabs that can be used<br>to find out more information about a function once it has been created (Figure 12-19). </p>
+<p>Figure 12-19. The Function Editor window<br>The remaining function declarations and code should be typed into the editor, and when<br>completed, the Save toolbar button or menu option can be used to compile and save the function into<br>the database. If there are compilation errors upon saving, the errors will be displayed in a Compiler – Log<br>window along with the line number on which the error occurred. By clicking the error in the window,<br>your cursor will be placed on the line of code that needs to be repaired. Figure 12-20 shows the Compiler<br>– Log window including a reference to an error in the code. </p>
+<p>Figure 12-20. Compilation errors in Function Editor<br>Once you have successfully compiled and saved the function into the database, it can be executed<br>for testing purposes using the green arrow icon within the Function Editor window. When you execute<br>the function, the Run PL&#x2F;SQL window will be displayed. If you defined any parameters for the function,<br>you can supply values for them within the PL&#x2F;SQL Block portion of the window. You can then click OK to<br>execute the function using the value(s) you have defined within the window, and the results will be<br>displayed in the Run Log window. The Run PL&#x2F;SQL window can also be used to save your test case to a<br>file or restore a test case from disk. The test case incorporates all the text that is contained within the<br>PL&#x2F;SQL block portion of the Run PL&#x2F;SQL window. This window is displayed in Figure 12-21. </p>
+<p>Figure 12-21. Run PL&#x2F;SQL window<br>You can use the database navigator to display the functions contained within a particular database<br>connection. If you highlight a particular trigger and right-click it, then a menu containing several options<br>will be displayed. This is shown in Figure 12-22. </p>
+<p>Figure 12-22. Using the navigator with functions<br>The options provided can be used for administering or editing the selected function. The Edit<br>option will open the Function Editor, and it will contain the code for the selected function. If the selected<br>function is not compiled successfully, then you can make changes to it and choose the Compile option<br>  CHAPTER 12  ORACLE SQL DEVELOPER<br>265<br>within the right-click contextual menu to recompile the code. Similarly, the menu can be used to invoke<br>the profiler, debug, or administer privileges for the function. </p>
+<h2 id="12-9-Creating-a-Stored-Procedure"><a href="#12-9-Creating-a-Stored-Procedure" class="headerlink" title="12-9. Creating a Stored Procedure"></a>12-9. Creating a Stored Procedure</h2><p><strong>Problem</strong><br>You want to create a stored procedure using Oracle SQL Developer.<br><strong>Solution</strong><br>You can manually create a stored procedure by typing the code for creating your procedure into a SQL worksheet<br>and executing it. You can also use the Create Procedure Wizard. To start the wizard, go to the File menu and<br>select the New option. Once the Create a New dialog box opens (Figure 12-23), select Procedure. </p>
+<p>Figure 12-23. Create a New dialog box<br>Once you click OK, you will be prompted to select a database connection. Doing so will open the<br>Create PL&#x2F;SQL Procedure Wizard. Alternatively, you can connect to the database of your choice and<br>then expand the navigator so that all the objects within the database are available. Right-click the<br>Procedures submenu, and select New Procedure, as shown in Figure 12-24. </p>
+<p>Figure 12-24. Right-click the Procedures submenu within a designated database connection.<br>e<br>CHAPTER 12  ORACLE SQL DEVELOPER<br>266<br><strong>How It Works</strong><br>You can use the Create a New Wizard or SQL worksheet to create a new stored procedure. The wizard is<br>best suited for those who are new to PL&#x2F;SQL or not very familiar with the overall syntax for creating a<br>stored procedure. To use the wizard, select the File menu followed by the New option. At this point, you<br>will be presented with the Create a New window that allows several options for creating new database<br>objects or code. Select the Procedure option, and click OK. Oracle SQL Developer will now prompt you<br>to select a database connection for which you will create the stored procedure. Select the connection of<br>your choice, and click OK. The Create PL&#x2F;SQL Procedure window will open, and it will resemble Figure<br>12-25. </p>
+<p>Figure 12-25. Create PL&#x2F;SQL Procedure window<br>The Create PL&#x2F;SQL Procedure window provides a window that can be used to create a procedure.<br>You can select a schema and name the procedure. There is a check box that allows you to create your<br>code using all lowercase if you want. Using the green plus symbol on the right side of the window, you<br>can add a row of text to the Parameters window. By default, the parameter will be named PARAM1, and it<br>will be given a datatype of VARCHAR2 with a mode of IN. All of these options can be changed, including the<br>name. You can add zero or more parameters to the list, and you can rearrange their order by selecting a<br>parameter from the list and using the arrow buttons on the right side of the window. You can select the<br>DDL tab to see the actual code for creating the stored procedure, along with all the parameters you have<br>defined. When finished, you can optionally choose to save your code to disk using the Save button and<br>then click OK to create the procedure.<br>Once you have completed and saved the Create PL&#x2F;SQL Procedure form, the code is transferred to a<br>SQL worksheet that is a procedure editor that contains buttons and tabs for working with the stored<br>procedure, as shown in Figure 12-26. </p>
+<p>Figure 12-26. Stored Procedure Wizard<br>The worksheet contains six tabs that can be used to find out more information about the stored<br>procedure that it contains. This information includes the grants that have been made on the procedure.<br>Other information includes dependencies, references, details, and profiles. You can add code to the<br>procedure by typing into the editor. The editor will perform autocompletion where appropriate, and<br>snippets can be dragged into the editor.<br>Next, copy the following procedure into the editor for testing purposes: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE INCREASE_WAGE 
+( 
+  EMPNO_IN IN NUMBER, 
+ PCT_INCREASE IN NUMBER   
+) AS  
+  emp_count    NUMBER :&#x3D; 0; 
+  Results   VARCHAR2(50); 
+BEGIN 
+ 
+  SELECT count(*) 
+  INTO EMP_COUNT 
+  FROM EMPLOYEES 
+  WHERE employee_id &#x3D; empno_in; 
+  
+  IF emp_count &gt; 0 THEN 
+    UPDATE EMP 
+    SET salary &#x3D; salary + (salary * PCT_INCREASE) 
+    WHERE employee_id &#x3D; empno_in; 
+    Results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; 
+  ELSE 
+    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; 
+  END IF; 
+ 
+  DBMS_OUTPUT.PUT_LINE(RESULTS); 
+END; </code></pre>
+<p>Once the procedure has been coded, select the Save option from the File menu, or click the Save<br>icon that contains an image of a disk. This will compile and store the procedure into the database. You<br>can alternatively use the Gears button to compile and save, which will produce the same results. If any<br>compilation errors are found, they will be displayed in a pane below the editor along with the line<br>number on which the error was found (Figure 12-27). </p>
+<p>Figure 12-27. Compilation errors<br>If you double-click the error message, the cursor will be placed into the line of code that contains<br>the error. In this case, you can see that the EMP table does not exist. Replace it with EMPLOYEES, and then<br>click the Save button again. The procedure should now be successfully compiled and saved into the<br>database. If you select the Refresh icon above the navigator, the new procedure will appear within the<br>list of procedures for the database connection.<br>To execute the procedure, right-click it within the navigator, and choose the Run option; this will<br>cause the Run PL&#x2F;SQL window to open. This window is shown in Figure 12-28. </p>
+<p>Figure 12-28. Run PL&#x2F;SQL procedure window<br>At this point, you have the option to save the file to disk or open another SQL file. If you want to test<br>the procedure, then you can assign some values to the parameters within this window. Assign the values<br>directly within the code that is listed in the PL&#x2F;SQL Block section of the Run PL&#x2F;SQL window. When you<br>click OK, then the procedure will be executed. The results of the execution will be displayed in the log<br>pane that is located below the editor pane.  </p>
+<h2 id="12-10-Creating-a-Package-Header-and-Body"><a href="#12-10-Creating-a-Package-Header-and-Body" class="headerlink" title="12-10. Creating a Package Header and Body"></a>12-10. Creating a Package Header and Body</h2><p><strong>Problem</strong><br>You want to create a package and store it into the database using Oracle SQL Developer.<br><strong>Solution</strong><br>Use the Create Package Wizard, or type the PL&#x2F;SQL package code into a SQL worksheet. To start the<br>wizard, go to the File menu, and select the New option. Once the Create a New dialog box opens, select<br>Package, as shown in Figure 12-29. </p>
+<p>Figure 12-29. Creating a new package<br>Once you click OK, you will be prompted to select a database connection. This will open the Create<br>PL&#x2F;SQL Package Wizard. Alternatively, you can connect to the database of your choice and then expand<br>the navigator so that all the objects within the database are available. Right-click (Ctrl+click) the<br>Packages submenu and select New Package.<br><strong>How It Works</strong><br>Creating a new package with Oracle SQL Developer is much the same as creating other code objects<br>using this tool. You can develop using the manual technique of writing all code using the SQL worksheet,<br>or you can use the creation wizards that are provided by the tool. You can type the example code into a<br>SQL worksheet for your data connection and click the Run Statement toolbar button to compile and save<br>the package into the database. You can also issue a Save As and save the code to a file on your<br>workstation when writing code using the SQL worksheet.<br>Alternatively, the wizard is useful for quickly creating the standard code for a package, and you can<br>use the editor to add the details that are specific to your package. Once you have opened the New<br>Package Wizard, you will be prompted to enter a package name. For the purposes of this recipe, enter<br>the name PROCESS_EMPLOYEE_TIME, and click OK. If there is an existing object that has the same name,<br>then you will be alerted via a red pop-up message (Figure 12-30). </p>
+<p>Figure 12-30. Naming the PL&#x2F;SQL package using creation wizard<br> Note If you want to enter all code in lowercase for readability within the tool, you can select the check box<br>before clicking OK once the package has been named.  PL&#x2F;SQL is not a case-sensitive language, so case does not<br>affect code execution.<br>After proceeding, the package editor is opened, and it contains some standard package creation<br>code using the name that you placed into the wizard. As you can see from Figure 12-31, the package<br>editor contains several tabs, along with a search bar and Run, Debug, Compile, and Profile buttons.<br>Enter the following example code into the text box on the Code tab: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE process_employee_time IS 
+  total_employee_salary              NUMBER; 
+  PROCEDURE grant_raises(pct_increase IN NUMBER); 
+  PROCEDURE INCREASE_WAGE (empno_in IN NUMBER, 
+                           Pct_increase IN NUMBER) ;
+END;</code></pre>
+<p>Figure 12-31. Package editor window<br>Click the Save button to compile and store the package into the database. Once this has been<br>completed, then the package header should be successfully stored in the database. Next, a package body<br>will need to be added in order to make the package functional. This can be done by expanding the<br>Package subfolder within the navigator. Once expanded, select the package for which you want to create<br>a body. Right-click the selected package, and select the Create Body option (Figure 12-32).<br>Figure 12-32. Creating a package body<br>Next, the standard package body creation code will be added to an editor much like the SQL<br>worksheet. You can now edit this code accordingly to ensure that it performs the correct actions. Type<br>the following package body into the editor, and then click the Save button to compile and store the<br>package body: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY process_employee_time AS 
+  PROCEDURE grant_raises ( 
+    pct_increase IN NUMBER) as 
+      CURSOR emp_cur is 
+      SELECT employee_id 
+      FROM employees; 
+    BEGIN 
+      FOR emp_rec IN emp_cur LOOP 
+        increase_wage(emp_rec.employee_id, pct_increase); 
+      END LOOP; 
+      DBMS_OUTPUT.PUT_LINE(&#39;All employees have received the salary increase&#39;); 
+  END grant_raises; 
+ 
+ PROCEDURE increase_wage ( 
+  empno_in IN NUMBER, 
+  Pct_increase IN NUMBER) as 
+  Emp_count    NUMBER :&#x3D; 0; 
+  Results   VARCHAR2(50); 
+BEGIN 
+  SELECT count(*) 
+  INTO emp_count 
+  FROM employees 
+  WHERE employee_id &#x3D; empno_in; 
+  
+  IF emp_count &gt; 0 THEN 
+    UPDATE employees 
+    SET salary &#x3D; salary + (salary * pct_increase) 
+    WHERE employee_id &#x3D; empno_in; 
+  
+    SELECT salary 
+    INTO total_employee_salary 
+    FROM employees 
+    WHERE employee_id &#x3D; empno_in; 
+ 
+    Results :&#x3D; &#39;SUCCESSFUL INCREASE&#39;; 
+  ELSE 
+    Results :&#x3D; &#39;NO EMPLOYEE FOUND&#39;; 
+  END IF; 
+  DBMS_OUTPUT.PUT_LINE(results); 
+   
+ END increase_wage; 
+END process_employee_time; </code></pre>
+<p>If any compilation errors are encountered, an error window will be displayed providing the line<br>number and specific error message that needs to be addressed. After any compile errors are repaired, the<br>package body will be successfully created. You can then use the navigator to expand the package name<br>and see the package body listed within it. Right-clicking the package body in the navigator offers some<br>options such as Edit, Run, Compile, Profile, and Debug. You will learn more about debugging in Recipe<br>12-12. The Edit option will open the package body editor if it is not already open. The Run option will<br>open the Run PL&#x2F;SQL window, which allows you to select a procedure or function to execute from the<br>chosen package (Figure 12-33). </p>
+<p>Figure 12-33. Running the PL&#x2F;SQL package<br>Once a function or procedure is chosen from the Run PL&#x2F;SQL window, it is executed using the<br>values that are assigned to the variables within the PL&#x2F;SQL Block panel of the window (this code is<br>automatically generated by SQL*Developer). These values can be changed prior to running the package<br>by editing the code that is displayed within the panel. This window also provides the opportunity to save<br>the code to a file or load code from an existing file.<br>Oracle SQL Developer makes developing PL&#x2F;SQL packages easy. All the tools that are needed to<br>successfully create, edit, and manage packages are available within the environment. Whether you are a<br>beginner or seasoned expert, these tools will make package development and maintenance a breeze. </p>
+<h2 id="12-11-Creating-a-Trigger"><a href="#12-11-Creating-a-Trigger" class="headerlink" title="12-11. Creating a Trigger"></a>12-11. Creating a Trigger</h2><p><strong>Problem</strong><br>You need to create a DML database trigger that validates data prior to inserting it into a table, and you<br>want to use Oracle SQL Developer to do so. For instance, you want to create a trigger that will validate an<br>e-mail address prior to inserting a row into the EMPLOYEES table.<br><strong>Solution</strong><br>Use the Create Trigger Wizard, type the PL&#x2F;SQL trigger code into a SQL worksheet, or use the trigger<br>options that are available from the database table worksheet. To start the wizard, go to the File menu<br>and select the New option. Once the Create a New dialog box opens, select Trigger. This will open the<br>Create Trigger window, as shown in Figure 12-34. </p>
+<p>Figure 12-34. Creating a new trigger<br>The Create Trigger window simplifies the process of creating a trigger because it provides all the<br>essential details that are required up front. Once the information has been completed, the trigger code<br>can be developed using the trigger editor window.<br><strong>How It Works</strong><br>As with all the other code creation techniques available in Oracle SQL Developer, there are various<br>different ways to create a trigger. Using the SQL worksheet for a database connection is the best way to<br>manually create a trigger. To do so, you will need to open the SQL worksheet, type the trigger creation<br>code, and click the Run toolbar button to compile and save the code. The many wizards that are<br>available for trigger creation can greatly simplify the process, especially if you are new to PL&#x2F;SQL or rusty<br>on the details of trigger creation.<br>As mentioned in the <strong>Solution</strong> to the recipe, the Create Trigger window allows you to specify all the<br>details for creating a trigger. You choose the type of trigger by selecting one of the options available from<br>the drop-down menu. Different options become available in the window depending upon the type of<br>trigger you choose to create. By default, a table trigger is chosen. Using that option, you can select the<br>table from another drop-down list and choose whether the trigger should be executed on INSERT, UPDATE,<br>or DELETE from the specified table. The wizard allows you to specify your own variable names for<br>representing old and new table values. The timing for trigger execution is determined by selecting<br>Before, Statement Level, After, or Row Level and specifying an optional WHEN clause. You can even specify<br>whether the trigger is to be executed based upon a specific column.<br>If you attempt to enter a trigger name that matches an existing object in the database within the<br>specified schema, you will receive an error message, as shown in Figure 12-35. </p>
+<p>Figure 12-35. Create Trigger window–—object already exists<br>After finishing with the Create Trigger Wizard and clicking the OK button, the initial trigger creation<br>code will be displayed in an editor (Figure 12-36). </p>
+<p>Figure 12-36. Trigger Editor<br>Type the following code into the editor, and hit the Save button to compile the code and save it into<br>the database: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">TRIGGER CHECK_EMAIL_ADDRESS 
+BEFORE INSERT ON employees 
+FOR EACH ROW 
+BEGIN 
+  IF NOT INSTR(:new.email,&#39;@&#39;) &gt; 0 THEN 
+    RAISE_APPLICATION_ERROR(-20001, &#39;INVALID EMAIL ADDRESS&#39;); 
+  END IF; 
+END; </code></pre>
+<p>The Save button will automatically compile the code, and the output will appear in the Messages<br>pane below the editor, as shown in Figure 12-37. </p>
+<p>Figure 12-37. Messages log<br>After the trigger has been successfully compiled and stored into the database, it can be highlighted<br>in the navigator, and right-clicking it will reveal several options (Figure 12-38). </p>
+<p>Figure 12-38. Trigger options<br>These options help allow easy access for dropping, disabling, or enabling the trigger. Choosing the<br>Edit option from this submenu will open the trigger in the editor window to allow for code<br>modifications.<br>Using the Create Trigger Wizard in Oracle SQL Developer can greatly reduce the time it takes to<br>create a database trigger. By selecting the appropriate options within the wizard, you will be left with<br>only the trigger functionality to code.  </p>
+<h2 id="12-12-Debugging-Stored-Code"><a href="#12-12-Debugging-Stored-Code" class="headerlink" title="12-12. Debugging Stored Code"></a>12-12. Debugging Stored Code</h2><p><strong>Problem</strong><br>One of your stored procedures contains logical errors, and you want to use Oracle SQL Developer to help<br>you find the cause.<br><strong>Solution</strong><br>A few different options are available for debugging stored code within Oracle SQL Developer. The<br>environment includes a complete debugger that provides the ability to set breakpoints within the code<br>and modify variable values at runtime to investigate a <strong>Problem</strong> with your code. There are several ways to<br>invoke the debugger for a particular piece of code. When a code object is opened within the editor, the<br>toolbar will contain a red “bug” icon that can be used to invoke the debugger (Figure 12-39).  </p>
+<p>Figure 12-39. Debugger icon<br>The right-click contextual menu within the navigator also contains a Debug option for procedures<br>and packages (Figure 12-40). </p>
+<p>Figure 12-40. Debugger option in Navigator<br><strong>How It Works</strong><br>Using the debugger is a great way to find issues with your code. The debugger enables the application to<br>halt processing at the designated breakpoints so that you can inspect the current values of variables and<br>step through each line of code so that issues can be pinpointed. Debugging PL&#x2F;SQL programs is a<br>multistep process that consists of first setting breakpoints in code, followed by compiling the code for<br>debug, and lastly running the actual debugger. To use the debugger, the user who is running the<br>debugger must be granted some database permissions. The user must be granted the DEBUG ANY<br>PROCEDURE privilege to have debug capabilities on any procedure or DEBUG <procedure name> to allow<br>debugging capabilities on a single procedure. The DEBUG CONNECT SESSION privilege must also be granted<br>in order to allow access to the debugging session.<br>After a user has been granted the proper permissions for debugging, the next step is to place a<br>breakpoint (or several) into the code that will be debugged. For the purposes of this recipe, the<br>INCREASE_WAGE procedure will be loaded into the procedure editor, and a breakpoint will be set by<br>placing the mouse cursor on the left margin of the editor window next to the line of code that you want<br>the debugger to pause execution at. Once the cursor is in the desired location, click in the left margin to<br>place the breakpoint. Figure 12-41 shows a breakpoint that has been placed at the beginning of a SELECT<br>statement within the INCREASE_WAGE procedure. </p>
+<p>Figure 12-41. Setting a breakpoint<br>After one or more breakpoints have been placed, the code needs to be compiled for debug. To do so,<br>use the icon in the editor toolbar for compiling, and select the Compile for Debug option. Once the code<br>has been compiled for debug, its icon in the navigator will adopt a green bug to indicate that it is ready<br>for debugging (Figure 12-42). </p>
+<p>Figure 12-42. Code ready for debug<br>Next, the debugger can be started by selecting the debug icon within the editor or by right-clicking<br>the code within the navigator and selecting the Debug option. If the user who is debugging the code<br>does not have appropriate permissions to debug, then error messages such as those shown in Figure 12-<br>43 will be displayed. </p>
+<p>Figure 12-43. User not granted necessary permissions<br>Assuming that the user has the correct permissions to debug, the Debug PL&#x2F;SQL window will be<br>displayed. This window provides information about the code that is being debugged including the target<br>name, the parameters, and a PL&#x2F;SQL block that will be executed in order to debug the code. The code<br>that is contained within the PL&#x2F;SQL block portion of the screen can be modified so that the parameters<br>being passed into the code (if any) can be set to the values you choose (Figure 12-44). In Figure 12-44,<br>the values have been set to an EMPNO_IN value of 10 and a PCT_INCREASE value of .03. </p>
+<p>Figure 12-44. Debug PL&#x2F;SQL window<br>Once the Debug PL&#x2F;SQL window has been completed with the desired values, click OK to begin the<br>debugger. This will cause Oracle SQL Developer to issue the DBMS_DEBUG_JDWP.CONNECT_TCP (hostname,<br>port) command and start the debugging session. The debugger will start, and it will provide a number of<br>different options, allowing you to step through the code one line at a time and see what the variable<br>values are at any given point in time. You will see three tabs on the debugger: Data, Smart Data, and<br>Watches. The Data tab is used for watching all the variables and their values as you walk through your<br>code using the debugger. The Smart Data tab will keep track of only those variables that are part of the<br>current piece of code that is being executed. You can set watches to determine which variables that you<br>would like to keep track of. The inspector can be used to see the values within those variables you are<br>watching. You are also given the very powerful ability to modify the values at runtime as the code is<br>executing. This provides the capability of determining how code will react to different values that are<br>passed into it.<br>The Oracle SQL Developer debugger is a useful tool and provides an intuitive user interface over the<br>DBMS_DEBUG_JDWP utility. Although this recipe covers only the basics to get you started, if you spend time<br>using each feature of the debugger, then you will learn more powerful ways to help you maintain and<br>debug issues found in your code. </p>
+<h2 id="12-13-Compiling-Code-Within-the-Navigator"><a href="#12-13-Compiling-Code-Within-the-Navigator" class="headerlink" title="12-13. Compiling Code Within the Navigator"></a>12-13. Compiling Code Within the Navigator</h2><p><strong>Problem</strong><br>You want to compile some PL&#x2F;SQL code within Oracle SQL Developer. In this <strong>Solution</strong>, the navigation<br>menu of your Oracle SQL Developer environment contains code that has a red X on it. This means the<br>code needs to be compiled or that it contains an error.<br><strong>Solution</strong><br>Select the code that needs to be compiled, and right-click (Ctrl+click) it. A menu will be displayed that<br>lists several options. Select the Compile option from that menu (Figure 12-45). </p>
+<p>Figure 12-45. Compile option<br><strong>How It Works</strong><br>The Oracle SQL Developer navigation menu is very handy for quickly glancing at the code that a<br>database contains. All the code that is successfully loaded into the database will contain a green check<br>mark, whereas any code that has a compilation error will contain a red X label. Sometimes code needs to<br>simply be recompiled in order to validate it and make it usable once again. This is most often the case<br>after a database has just recently been migrated or updated. This can also occur if a particular piece of<br>code depends upon another piece of code that has recently been modified, although Oracle Database<br>11gR2 includes fine-grained dependencies that help alleviate this issue. Another event that may cause<br>code to require recompilation is if an object that the code references such as a table or view has been<br>changed. Whatever the case, Oracle SQL Developer makes it easy to recompile code by right-clicking it<br>within the navigator and selecting Compile from the pop-up menu.<br> Note Oracle Database 11g introduced the idea of fine-grained dependencies. This allows PL&#x2F;SQL objects to<br>remain valid even if an object that they depend upon has changed, as long as the changes do not affect the<br>PL&#x2F;SQL object. For instance, if a column has been removed from a table and object A depends upon that table but<br>not the specific column that was removed, then object A will remain valid.<br>Once the compile task has been completed, a message will be displayed within the Messages panel to<br>note whether the compilation was successful. If there were any issues encountered, they will be listed,<br>each on a separate line, within the Messages window. The messages will contain the error code, as well<br>as the line number that caused the exception to be raised. Double-clicking each error message will take<br>you directly to the line of code that raised the exception so that you can begin working on repairs. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"
+                    data-tooltip="Oracle PLSQL Recipes 13-Analyzing and Improving"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 13-Analyzing and Improving"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"
+                    data-tooltip="Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                    aria-label="NEXT: Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"
+                    data-tooltip="Oracle PLSQL Recipes 13-Analyzing and Improving"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 13-Analyzing and Improving"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"
+                    data-tooltip="Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                    aria-label="NEXT: Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

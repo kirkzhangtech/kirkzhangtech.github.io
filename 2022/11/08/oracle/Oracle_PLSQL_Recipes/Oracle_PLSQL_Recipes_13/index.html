@@ -1,0 +1,894 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 13-Analyzing and Improving - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n13. Analyzing and ImprovingPerformance This chapter introduces several methods to help you analyze your code to improve its performance interms of runtime or memory usage. Many recipes use the DBMS_PROFILE package, which is supplied byOracle, to help in the analysis. It is a useful tool for identifying which lines of code consume the mostexecution time. \n13-1. Installing DBMS_PROFILERProblemYou want to analyze and diagnose your code to find bottlenecks and areas where excess execution timeis being spent, but the DBMS_PROFILER package is not installed.SolutionInstall the DBMS_PROFILER packages, and then create the tables and the Oracle sequence object they needin order to run. Once installed, you can use the DBMS_PROFILER package to help diagnose applicationperformance issues.Installing the PackagesTo install the DBMS_PROFILER packages, follow these steps:The packages are owned by the SYS account; therefore, it requires DBA loginaccess. Start by opening a SQL Plus connect with the connect sys command. Ifthe operation is successful, the system will respond with the message \n“Connected.”connect sys&#x2F;sys_pwd as sysdbaConnected.Once connected, run the profload.sql script that can be found within theRDBMS&#x2F;ADMIN directory contained in your Oracle Database home. The systemwill respond with a series of messages like those shown next. \n@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;profload.sql \nYou should see the following output after executing the script: \nPackage created.Grant succeeded.Synonym created.Library created.Package body created.Testing for correct installationSYS.DBMS_PROFILER successfully loaded.PL&#x2F;SQL procedure successfully completed.Finally, enter the grant execute command to ensure that all schemas within thedatabase have access to the DBMS_PROFILER package.grant execute on DBMS_PROFILER to PUBLIC;Grant succeeded.Creating the Profiler Tables and Sequence ObjectCreate the tables and Oracle sequence object you need for the profiler to run. Log into the account thatwants to use the profiler, and enter the following. The system will respond as follows: \n@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;proftab.sqlHow It WorksThe first step creates the packages and makes them available for public access. The second creates therequired tables in the schema that wants to use the profiler. There are alternatives to this installationmethod based on needs and preferences.The DBA may, for example, want to grant execution privileges to specific users instead of everyone.Step 2 must be repeated for every user who wants to use the profiling tools. An alternative is for the DBAto create public synonyms for the tables and sequence created, thereby having only one copy of theprofiler table, in which case the Solution changes as in the following example. In the following recipe,replace [Oracle_Home] with the exact path used to install the database software on your system. \nconnect sys&#x2F;sys_pwd as sysdba@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;profload.sqlgrant execute on DBMS_PROFILER to USER1, USER2, USER3;@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;proftab.sql \nCREATE PUBLIC SYNONYM plsql_profiler_data FOR plsql_profiler_data;CREATE PUBLIC SYNONYM plsql_profiler_units FOR plsql_profiler_units;CREATE PUBLIC SYNONYM plsql_profiler_runs FOR plsql_profiler_runs;CREATE PUBLIC SYNONYM plsql_profiler_runnumber FOR plsql_profiler_runnumber; \n13-2. Identifying BottlenecksProblemYou notice that a PL&#x2F;SQL program is running slowly, and you need to identify what sections of the codeare causing it to perform poorly.SolutionUse the DBMS_PROFILER routines to analyze the code and find potential bottlenecks. In the followingexample, the profiler is used to collect statistics on a run of a program, and then a query displays thestatistics.  \nEXEC DBMS_PROFILER.START_PROFILER (&#39;Test1&#39;, &#39;Testing One&#39;); \nEXEC sync_hr_data;    -- the procedure identifed has having a bottleneck \nEXEC DBMS_PROFILER.FLUSH_DATA; \nEXEC DBMS_PROFILER.STOP_PROFILER; \nNow that the profile data is collected, you can query the underlying tables to see the results of theanalysis: \nCOL line# FORMAT 999COL hundredth FORMAT a6 \nSELECT    d.line#, \n          to_char (d.total_time&#x2F;10000000, &#39;999.00&#39;) hundredth, \n          s.text \nFROM    user_source      s, \n        plsql_profiler_data  d, \n        plsql_profiler_units u, \n        plsql_profiler_runs  r \nWHERE  r.run_comment     &#x3D; &#39;Test1&#39; -- run_comment matches the text in START_PROFILER \nAND    u.runid           &#x3D; r.runid \nAND    u.unit_owner      &#x3D; r.run_owner \nAND    d.runid           &#x3D; r.runid \nAND    d.unit_number     &#x3D; u.unit_number \nAND    s.name            &#x3D; u.unit_name \nAND    s.line            &#x3D; d.line# \nORDER BY d.line#; \n\nHere are the results of the previous query: \n 1     .00 PROCEDURE sync_hr_data AS 3     .00 CURSOR    driver is 4   11.58 SELECT    * 5     .00 FROM      employees@hr_data; 9    2.25    FOR recs IN driver LOOP10    1.64       UPDATE      employees15     .01 END sync_hr_data; \nHere is the complete source code for the sync_hr_data procedure: \nCREATE OR REPLACE PROCEDURE sync_hr_data AS \n \nCURSOR    driver IS \nSELECT    * \nFROM      employees@hr_data; \n \nBEGIN \n \n   FOR recs IN driver LOOP \n      UPDATE employees \n      SET    first_name  &#x3D; recs.first_name \n      WHERE  employee_id &#x3D; recs.employee_id; \n   END LOOP; \n \nEND sync_hr_data;\nHow It WorksThere are four steps necessary to collect statistics on a running procedure: \n\nCall the DBMS_PROFILER.START_PROFILER routine to begin the process ofcollecting statistics. The two parameters allow you to give the run a name anda comment. Unique names are not required, but that will make it easier toquery the results later. \nExecute the program you suspect has bottleneck issues; in this example, werun the sync_hr_data program.  \nExecute DBMS_PROFILER.FLUSH_DATA to write the data collected to the profilertables.  \nCall the DBMS_PROFILER.STOP_PROFILER routine to, as the name implies, stop thecollection of statistics.The query joins the profiler data with the source code lines to display executable lines and theexecution time, in hundredths of a second. The raw data stores time in nanoseconds. The query resultsshow three lines of code with actual execution time.The SELECT statement from the program unit in question, in which Oracle must establish a remoteconnection via a database link, consumes the majority of the execution time. The remainder of the timeis consumed by the FOR statement, which fetches each record from the remote database connection, andthe UPDATE statement, which writes the data to the local database.Selecting records in the loop and then updating them causes the program to switch context betweenPL&#x2F;SQL and the database engine. Each iteration of the LOOP causes this switch to occur. In this example,there were 107 employee records updated. The next recipe shows you how to improve the performanceof this procedure.\n\n13-3. Speeding Up Read&#x2F;Write LoopsProblemYou have identified a loop that reads and writes large batches of data. You want to speed it up.SolutionUse a BULK COLLECT statement to fetch the target data records, and then use a FORALL loop to update thelocal database. For example, suppose you want to speed up the sync_hr_data procedure demonstratedin Chapter 11: \nCREATE OR REPLACE PROCEDURE sync_hr_data AS \n \nCURSOR    driver IS \nSELECT    * \nFROM      employees@hr_data; \n \nTYPE    recs_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; \nrecs    recs_type; \n \nBEGIN \n \n   OPEN driver; \n   FETCH driver BULK COLLECT INTO recs; \n   CLOSE driver; \n \n   FORALL i IN 1..recs.COUNT \n      UPDATE    employees \n      SET       first_name    &#x3D; recs(i).first_name \n      WHERE     employee_id &#x3D; recs(i).employee_id; \n \nEND sync_hr_data; \nRun the profiler procedures to collect additional statistics: \nEXEC DBMS_PROFILER.START_PROFILER (&#39;Test2&#39;, &#39;Testing Two&#39;); \nEXEC sync_hr_data; \nEXEC DBMS_PROFILER.FLUSH_DATA; \nEXEC DBMS_PROFILER.STOP_PROFILER; \nQuery the underlying tables to see the results of the analysis: \nCOL line# FORMAT 999 \nCOL hundreth FORMAT A6 \n\nSELECT    d.line#, \n          TO_CHAR (d.total_time&#x2F;10000000, &#39;999.00&#39;) hundreths, \n          s.text \nFROM    user_source             s, \n        plsql_profiler_data     d, \n        plsql_profiler_units    u, \n        plsql_profiler_runs     r \nWHERE    r.run_comment     &#x3D; &#39;Test2&#39; \nAND      u.runid           &#x3D; r.runid \nAND      u.unit_owner      &#x3D; r.run_owner \nAND      d.runid           &#x3D; r.runid \nAND      d.unit_number     &#x3D; u.unit_number \nAND      s.name            &#x3D; u.unit_name \nAND      s.line            &#x3D; d.line# \nORDER BY d.line#; \n 1     .00 PROCEDURE sync_hr_data AS 3     .00 CURSOR    driver is 4   11.54 SELECT    * 5     .00 FROM      employees@hr_data;12     .00    OPEN driver;13    1.61    FETCH driver BULK COLLECT INTO recs;14     .01    CLOSE driver;16    1.15    FORALL i IN 1..recs.COUNT21     .00 END sync_hr_data;How It WorksThe procedure is updated from the previous recipe to use a BULK COLLECT statement to gather the datainto a collection. The update statement uses the FORALL command to pass the entire collection of data tothe Oracle engine for processing rather than updating one row at a time. BULK COLLECT and FORALL loopspass the entire dataset of the collections to the database engine for processing, unlike the loop in recipe \n13-2, where each iteration passes only one record at a time from the collection to the database. Theconstant switching back and forth between PL&#x2F;SQL and the database engine creates unnecessaryoverhead.Perform the following steps to collect statistics on the update procedure: \n\nRun the DBMS_PROFILER.START_PROFILER routine to begin the process ofcollecting statistics. You use the two parameters of the routine to give the run aname and to post a comment. Unique names are not required, but doing sowill make it easier to query the results later. \nRun the sync_hr_data program to collect statistics. \nRun the DBMS_PROFILER.FLUSH_DATA procedure to write the data collected to thetables. \nRun the DBMS_PROFILER.STOP_PROFILER routine to, as the name implies, stopthe collection of statistics.The query joins the profiler data, using the run name of Test2, with the source code lines to displayexecutable lines and the execution time, in hundredths of a second. The raw data stores time innanoseconds. The query results show three lines of code with actual execution time.Comparing these results with the previous recipe, we note a 28 percent improvement, 2.25 to 1.61,in fetching the records via the BULK COLLECT statement, and a 30 percent improvement, 1.64 to 1.15, inthe writing of the records via the FORALL statements. This improvement is realized while processing only107 records. Greater gains can be realized with larger data sets, especially when selecting records via aremote database link as there are fewer context switches between PL&#x2F;SQL and the Oracle engine.\n\n13-4. Passing Large or Complex Collections as OUT ParametersProblemYou have a procedure or function that accepts one or more large or complex collections that are also OUTparameters, and you need a more efficient method to pass these variables.SolutionPass the parameters to your procedure or function by reference using the NOCOPY option on theprocedure or function declaration. \nCREATE OR REPLACE PACKAGE no_copy_test AS \n \n   TYPE rec_type IS TABLE OF all_objects%ROWTYPE INDEX BY BINARY_INTEGER; \n   PROCEDURE test; \n \nEND no_copy_test; \n&#x2F; \nshow error \nCREATE OR REPLACE PACKAGE BODY no_copy_test AS \n \nPROCEDURE proc1 (rec_list IN OUT rec_type) IS \nBEGIN \n   FOR i IN 1..rec_list.COUNT LOOP \n      rec_list(i) :&#x3D; rec_list(i); \n   END LOOP; \nEND; \n\nPROCEDURE proc2 (rec_list IN OUT NOCOPY  rec_type) IS \nBEGIN \n   FOR i IN 1..rec_list.COUNT LOOP \n      rec_list(i) :&#x3D; rec_list(i); \n   END LOOP; \nEND; \n \nPROCEDURE test IS \n \nCURSOR  driver IS \nSELECT  * \nFROM    all_objects; \n \nrecs        rec_type; \nrec_count   integer; \n \nBEGIN \n \n   OPEN driver; \n   FETCH DRIVER BULK COLLECT INTO recs; \n   CLOSE driver; \n \n   rec_count :&#x3D; recs.COUNT; \n \n   DBMS_OUTPUT.PUT_LINE (systimestamp); \n   proc1 (recs); -- parameter passed by value \n   DBMS_OUTPUT.PUT_LINE (systimestamp); \n   proc2 (recs); -- paramter passed by reference \n   DBMS_OUTPUT.PUT_LINE (systimestamp); \nEND test; \n \nEND no_copy_test; \n&#x2F;\nset serverout on  -- Enable output from DBMS_OUTPUT statements \nEXEC no_copy_test.test; \nRunning the procedure produced the following output: \n03-NOV-10 05.05.14.865000000 PM -05:0003-NOV-10 05.05.14.880000000 PM -05:0003-NOV-10 05.05.14.880000000 PM -05:00How It WorksThe recipe utilizes the NOCOPY feature within PL&#x2F;SQL. It begins by defining two procedures within the testpackage. The first procedure, PROC1, accepts a collection of records using the default parameter-passingmethod, which is by VALUE. The second procedure, PROC2, is an exact copy of PROC1; however, itsparameter is passed using the NOCOPY option. In PROC1, the parameter is passed in by VALUE, which meansa copy of the entire collection is created in the REC_LIST variable within PROC1. In PROC2, the parameterdata is passed by REFERENCE. Passing a parameter by reference does not copy the data; rather, it uses theexisting data structure passed to it by the calling program. This method is more efficient for very largecollections in both running time and in memory usage.The output from the test shows the first procedure, which passed its parameter by VALUE took longerto run than the second procedure, which passed its parameter by REFERENCE. In this example, theUSER_OBJECTS table was used as the data for the parameter, which retrieved only 6,570 records. Largerperformance gains can be realized with more records and more complex data structures. \n13-5. Optimizing Computationally Intensive CodeProblemYou have computationally intensive code that you want to optimize to decrease its running time.SolutionRecompile the package, procedure, or function in native mode using the NATIVE setting: \nALTER PACKAGE my_package COMPILE BODY PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS;ALTER PROCEDURE my_procedure COMPILE PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS;ALTER FUNCTION my_function COMPILE PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS; \nHere is an example of a computationally intensive procedure. It uses the factorial function fromRecipe 17-4. \nCREATE OR REPLACE PROCEDURE factorial_test as \n \nfact    NUMBER; \n \nBEGIN \n \n   FOR i IN 1..100 LOOP \n      fact :&#x3D; factorial(33); \n   END LOOP; \n \nEND factorial_test; \n \n  -- enable display of execution time \nSET TIMING ON \n \n  -- run the test \nEXEC factorial_test \n \nPL&#x2F;SQL procedure successfully completed. \nElapsed: 00:00:01.18 \nNow, recompile the code using the NATIVE option and rerun the test, noting any change in runningtime: \nALTER PROCEDURE factorial_test COMPILE PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS; \n \nEXEC factorial_test \n \nPL&#x2F;SQL procedure successfully completed. \nElapsed: 00:00:00.42 \nHow It WorksThe ALTER. . .COMPILE command invokes the compiler on the named object. The syntax differs slightlywhen recompiling a PACKAGE body in that the BODY clause follows the COMPILE statement. ThePLSQL_CODE_TYPE&#x3D;NATIVE clause compiles the code in NATIVE format, which runs faster than interpretedcode. The REUSE SETTINGS clause ensures the code will be recompiled in the same mode if it laterbecomes invalid and requires automatic recompilation.Native mode realizes the most benefit from computational intensive code; it has little effect on DMLstatements (in other words, SELECT, INSERT, UPDATE, and DELETE). In the previous example, the factorialfunction is called repeatedly to simulate a computationally intensive procedure. When the procedure iscompiled in the default, interpretive method, it completes its run in 1.18 seconds. When compiled inNATIVE mode, it completes in 0.42 seconds. This is a 64 percent improvement in running time! \n13-6. Improving Initial Execution Running TimeProblemYou have a procedure that you run frequently, and you want to improve its overall running time byminimizing its startup time.SolutionUse the DBMS_SHAPRED_POOL.KEEP procedure to keep a permanent copy of your code in the sharedmemory pool. For example, the following statement pins the procedure my_large_procedure in thedatabase’s shared memory pool: \nDBMS_SHARED_POOL.KEEP ( \n   Name &#x3D;&gt; &#39;my_large_procedure&#39;,  \n   flag &#x3D;&gt; &#39;P&#39;); \nHow It WorksThe DBMS_SHARED_POOL.KEEP procedure permanently keeps your code in the shared memory pool. Bydefault, when PL&#x2F;SQL code is executed, Oracle must first read the entire block of code into memory if itisn’t already there from a previous execution. As additional procedures are executed, less recently usedcode in the shared memory pool begins to age. If there isn’t sufficient free space in the shared memorypool, older code is removed to make room.If large procedures are run frequently and are aging out of the shared memory pool, then pinningthe procedure in the shared memory pool can improve performance by removing the overheadnecessary to reload the procedure again and again.The first parameter of the DBMS_SHARED_POOL.KEEP procedure is the name of the object you want topin in the shared memory pool. The second parameter identifies the object type of the first parameter.The most commonly used values for FLAG are as follows:•P: The default, which specifies the object is a package, procedure, or function•T: Specifies the object is a trigger•Q: Specifies the object is a sequenceYou must have execute privileges on the DBMS_SHARED_POOL package to pin your code. An account withSYSDBA privileges must grant execute on DBMS_SHARED_POOL to your schema or to public. \n","dateCreated":"2022-11-08T23:21:14+08:00","dateModified":"2022-11-08T23:40:38+08:00","datePublished":"2022-11-08T23:21:14+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 13-Analyzing and Improving","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 13-Analyzing and Improving">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:21:14.575Z">
+<meta property="article:modified_time" content="2022-11-08T15:40:38.045Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 13-Analyzing and Improving
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:21:14+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#13-Analyzing-and-Improving"><span class="toc-text">13. Analyzing and Improving</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#13-1-Installing-DBMS-PROFILER"><span class="toc-text">13-1. Installing DBMS_PROFILER</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-2-Identifying-Bottlenecks"><span class="toc-text">13-2. Identifying Bottlenecks</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-3-Speeding-Up-Read-x2F-Write-Loops"><span class="toc-text">13-3. Speeding Up Read&#x2F;Write Loops</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-2-where-each-iteration-passes-only-one-record-at-a-time-from-the-collection-to-the-database-The"><span class="toc-text">13-2, where each iteration passes only one record at a time from the collection to the database. The</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-4-Passing-Large-or-Complex-Collections-as-OUT-Parameters"><span class="toc-text">13-4. Passing Large or Complex Collections as OUT Parameters</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-5-Optimizing-Computationally-Intensive-Code"><span class="toc-text">13-5. Optimizing Computationally Intensive Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-6-Improving-Initial-Execution-Running-Time"><span class="toc-text">13-6. Improving Initial Execution Running Time</span></a></li></ol></li></ol>
+
+<h1 id="13-Analyzing-and-Improving"><a href="#13-Analyzing-and-Improving" class="headerlink" title="13. Analyzing and Improving"></a>13. Analyzing and Improving</h1><p>Performance This chapter introduces several methods to help you analyze your code to improve its performance in<br>terms of runtime or memory usage. Many recipes use the DBMS_PROFILE package, which is supplied by<br>Oracle, to help in the analysis. It is a useful tool for identifying which lines of code consume the most<br>execution time. </p>
+<h2 id="13-1-Installing-DBMS-PROFILER"><a href="#13-1-Installing-DBMS-PROFILER" class="headerlink" title="13-1. Installing DBMS_PROFILER"></a>13-1. Installing DBMS_PROFILER</h2><p><strong>Problem</strong><br>You want to analyze and diagnose your code to find bottlenecks and areas where excess execution time<br>is being spent, but the DBMS_PROFILER package is not installed.<br><strong>Solution</strong><br>Install the DBMS_PROFILER packages, and then create the tables and the Oracle sequence object they need<br>in order to run. Once installed, you can use the DBMS_PROFILER package to help diagnose application<br>performance issues.<br>Installing the Packages<br>To install the DBMS_PROFILER packages, follow these steps:<br>The packages are owned by the SYS account; therefore, it requires DBA login<br>access. Start by opening a SQL Plus connect with the connect sys command. If<br>the operation is successful, the system will respond with the message </p>
+<p>“Connected.”<br>connect sys&#x2F;sys_pwd as sysdba<br>Connected.<br>Once connected, run the profload.sql script that can be found within the<br>RDBMS&#x2F;ADMIN directory contained in your Oracle Database home. The system<br>will respond with a series of messages like those shown next. </p>
+<pre class="language-none"><code class="language-none">@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;profload.sql </code></pre>
+<p>You should see the following output after executing the script: </p>
+<p>Package created.<br>Grant succeeded.<br>Synonym created.<br>Library created.<br>Package body created.<br>Testing for correct installation<br>SYS.DBMS_PROFILER successfully loaded.<br>PL&#x2F;SQL procedure successfully completed.<br>Finally, enter the grant execute command to ensure that all schemas within the<br>database have access to the DBMS_PROFILER package.<br>grant execute on DBMS_PROFILER to PUBLIC;<br>Grant succeeded.<br>Creating the Profiler Tables and Sequence Object<br>Create the tables and Oracle sequence object you need for the profiler to run. Log into the account that<br>wants to use the profiler, and enter the following. The system will respond as follows: </p>
+<p>@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;proftab.sql<br><strong>How It Works</strong><br>The first step creates the packages and makes them available for public access. The second creates the<br>required tables in the schema that wants to use the profiler. There are alternatives to this installation<br>method based on needs and preferences.<br>The DBA may, for example, want to grant execution privileges to specific users instead of everyone.<br>Step 2 must be repeated for every user who wants to use the profiling tools. An alternative is for the DBA<br>to create public synonyms for the tables and sequence created, thereby having only one copy of the<br>profiler table, in which case the <strong>Solution</strong> changes as in the following example. In the following recipe,<br>replace [Oracle_Home] with the exact path used to install the database software on your system. </p>
+<p>connect sys&#x2F;sys_pwd as sysdba<br>@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;profload.sql<br>grant execute on DBMS_PROFILER to USER1, USER2, USER3;<br>@[Oracle_Home]&#x2F;RDBMS&#x2F;ADMIN&#x2F;proftab.sql </p>
+<p>CREATE PUBLIC SYNONYM plsql_profiler_data FOR plsql_profiler_data;<br>CREATE PUBLIC SYNONYM plsql_profiler_units FOR plsql_profiler_units;<br>CREATE PUBLIC SYNONYM plsql_profiler_runs FOR plsql_profiler_runs;<br>CREATE PUBLIC SYNONYM plsql_profiler_runnumber FOR plsql_profiler_runnumber; </p>
+<h2 id="13-2-Identifying-Bottlenecks"><a href="#13-2-Identifying-Bottlenecks" class="headerlink" title="13-2. Identifying Bottlenecks"></a>13-2. Identifying Bottlenecks</h2><p><strong>Problem</strong><br>You notice that a PL&#x2F;SQL program is running slowly, and you need to identify what sections of the code<br>are causing it to perform poorly.<br><strong>Solution</strong><br>Use the DBMS_PROFILER routines to analyze the code and find potential bottlenecks. In the following<br>example, the profiler is used to collect statistics on a run of a program, and then a query displays the<br>statistics.  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC DBMS_PROFILER.START_PROFILER (&#39;Test1&#39;, &#39;Testing One&#39;); 
+EXEC sync_hr_data;    -- the procedure identifed has having a bottleneck 
+EXEC DBMS_PROFILER.FLUSH_DATA; 
+EXEC DBMS_PROFILER.STOP_PROFILER; </code></pre>
+<p>Now that the profile data is collected, you can query the underlying tables to see the results of the<br>analysis: </p>
+<p>COL line# FORMAT 999<br>COL hundredth FORMAT a6 </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT    d.line#, 
+          to_char (d.total_time&#x2F;10000000, &#39;999.00&#39;) hundredth, 
+          s.text 
+FROM    user_source      s, 
+        plsql_profiler_data  d, 
+        plsql_profiler_units u, 
+        plsql_profiler_runs  r 
+WHERE  r.run_comment     &#x3D; &#39;Test1&#39; -- run_comment matches the text in START_PROFILER 
+AND    u.runid           &#x3D; r.runid 
+AND    u.unit_owner      &#x3D; r.run_owner 
+AND    d.runid           &#x3D; r.runid 
+AND    d.unit_number     &#x3D; u.unit_number 
+AND    s.name            &#x3D; u.unit_name 
+AND    s.line            &#x3D; d.line# 
+ORDER BY d.line#; </code></pre>
+
+<p>Here are the results of the previous query: </p>
+<p> 1     .00 PROCEDURE sync_hr_data AS<br> 3     .00 CURSOR    driver is<br> 4   11.58 SELECT    *<br> 5     .00 FROM      employees@hr_data;<br> 9    2.25    FOR recs IN driver LOOP<br>10    1.64       UPDATE      employees<br>15     .01 END sync_hr_data; </p>
+<p>Here is the complete source code for the sync_hr_data procedure: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE sync_hr_data AS 
+ 
+CURSOR    driver IS 
+SELECT    * 
+FROM      employees@hr_data; 
+ 
+BEGIN 
+ 
+   FOR recs IN driver LOOP 
+      UPDATE employees 
+      SET    first_name  &#x3D; recs.first_name 
+      WHERE  employee_id &#x3D; recs.employee_id; 
+   END LOOP; 
+ 
+END sync_hr_data;</code></pre>
+<p><strong>How It Works</strong><br>There are four steps necessary to collect statistics on a running procedure: </p>
+<ol>
+<li>Call the DBMS_PROFILER.START_PROFILER routine to begin the process of<br>collecting statistics. The two parameters allow you to give the run a name and<br>a comment. Unique names are not required, but that will make it easier to<br>query the results later. </li>
+<li>Execute the program you suspect has bottleneck issues; in this example, we<br>run the sync_hr_data program.  </li>
+<li>Execute DBMS_PROFILER.FLUSH_DATA to write the data collected to the profiler<br>tables.  </li>
+<li>Call the DBMS_PROFILER.STOP_PROFILER routine to, as the name implies, stop the<br>collection of statistics.<br>The query joins the profiler data with the source code lines to display executable lines and the<br>execution time, in hundredths of a second. The raw data stores time in nanoseconds. The query results<br>show three lines of code with actual execution time.<br>The SELECT statement from the program unit in question, in which Oracle must establish a remote<br>connection via a database link, consumes the majority of the execution time. The remainder of the time<br>is consumed by the FOR statement, which fetches each record from the remote database connection, and<br>the UPDATE statement, which writes the data to the local database.<br>Selecting records in the loop and then updating them causes the program to switch context between<br>PL&#x2F;SQL and the database engine. Each iteration of the LOOP causes this switch to occur. In this example,<br>there were 107 employee records updated. The next recipe shows you how to improve the performance<br>of this procedure.</li>
+</ol>
+<h2 id="13-3-Speeding-Up-Read-x2F-Write-Loops"><a href="#13-3-Speeding-Up-Read-x2F-Write-Loops" class="headerlink" title="13-3. Speeding Up Read&#x2F;Write Loops"></a>13-3. Speeding Up Read&#x2F;Write Loops</h2><p><strong>Problem</strong><br>You have identified a loop that reads and writes large batches of data. You want to speed it up.<br><strong>Solution</strong><br>Use a BULK COLLECT statement to fetch the target data records, and then use a FORALL loop to update the<br>local database. For example, suppose you want to speed up the sync_hr_data procedure demonstrated<br>in Chapter 11: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE sync_hr_data AS 
+ 
+CURSOR    driver IS 
+SELECT    * 
+FROM      employees@hr_data; 
+ 
+TYPE    recs_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; 
+recs    recs_type; 
+ 
+BEGIN 
+ 
+   OPEN driver; 
+   FETCH driver BULK COLLECT INTO recs; 
+   CLOSE driver; 
+ 
+   FORALL i IN 1..recs.COUNT 
+      UPDATE    employees 
+      SET       first_name    &#x3D; recs(i).first_name 
+      WHERE     employee_id &#x3D; recs(i).employee_id; 
+ 
+END sync_hr_data; </code></pre>
+<p>Run the profiler procedures to collect additional statistics: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC DBMS_PROFILER.START_PROFILER (&#39;Test2&#39;, &#39;Testing Two&#39;); 
+EXEC sync_hr_data; 
+EXEC DBMS_PROFILER.FLUSH_DATA; 
+EXEC DBMS_PROFILER.STOP_PROFILER; </code></pre>
+<p>Query the underlying tables to see the results of the analysis: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">COL line# FORMAT 999 
+COL hundreth FORMAT A6 
+
+SELECT    d.line#, 
+          TO_CHAR (d.total_time&#x2F;10000000, &#39;999.00&#39;) hundreths, 
+          s.text 
+FROM    user_source             s, 
+        plsql_profiler_data     d, 
+        plsql_profiler_units    u, 
+        plsql_profiler_runs     r 
+WHERE    r.run_comment     &#x3D; &#39;Test2&#39; 
+AND      u.runid           &#x3D; r.runid 
+AND      u.unit_owner      &#x3D; r.run_owner 
+AND      d.runid           &#x3D; r.runid 
+AND      d.unit_number     &#x3D; u.unit_number 
+AND      s.name            &#x3D; u.unit_name 
+AND      s.line            &#x3D; d.line# 
+ORDER BY d.line#; </code></pre>
+<p> 1     .00 PROCEDURE sync_hr_data AS<br> 3     .00 CURSOR    driver is<br> 4   11.54 SELECT    *<br> 5     .00 FROM      employees@hr_data;<br>12     .00    OPEN driver;<br>13    1.61    FETCH driver BULK COLLECT INTO recs;<br>14     .01    CLOSE driver;<br>16    1.15    FORALL i IN 1..recs.COUNT<br>21     .00 END sync_hr_data;<br><strong>How It Works</strong><br>The procedure is updated from the previous recipe to use a BULK COLLECT statement to gather the data<br>into a collection. The update statement uses the FORALL command to pass the entire collection of data to<br>the Oracle engine for processing rather than updating one row at a time. BULK COLLECT and FORALL loops<br>pass the entire dataset of the collections to the database engine for processing, unlike the loop in recipe </p>
+<h2 id="13-2-where-each-iteration-passes-only-one-record-at-a-time-from-the-collection-to-the-database-The"><a href="#13-2-where-each-iteration-passes-only-one-record-at-a-time-from-the-collection-to-the-database-The" class="headerlink" title="13-2, where each iteration passes only one record at a time from the collection to the database. The"></a>13-2, where each iteration passes only one record at a time from the collection to the database. The</h2><p>constant switching back and forth between PL&#x2F;SQL and the database engine creates unnecessary<br>overhead.<br>Perform the following steps to collect statistics on the update procedure: </p>
+<ol>
+<li>Run the DBMS_PROFILER.START_PROFILER routine to begin the process of<br>collecting statistics. You use the two parameters of the routine to give the run a<br>name and to post a comment. Unique names are not required, but doing so<br>will make it easier to query the results later. </li>
+<li>Run the sync_hr_data program to collect statistics. </li>
+<li>Run the DBMS_PROFILER.FLUSH_DATA procedure to write the data collected to the<br>tables. </li>
+<li>Run the DBMS_PROFILER.STOP_PROFILER routine to, as the name implies, stop<br>the collection of statistics.<br>The query joins the profiler data, using the run name of Test2, with the source code lines to display<br>executable lines and the execution time, in hundredths of a second. The raw data stores time in<br>nanoseconds. The query results show three lines of code with actual execution time.<br>Comparing these results with the previous recipe, we note a 28 percent improvement, 2.25 to 1.61,<br>in fetching the records via the BULK COLLECT statement, and a 30 percent improvement, 1.64 to 1.15, in<br>the writing of the records via the FORALL statements. This improvement is realized while processing only<br>107 records. Greater gains can be realized with larger data sets, especially when selecting records via a<br>remote database link as there are fewer context switches between PL&#x2F;SQL and the Oracle engine.</li>
+</ol>
+<h2 id="13-4-Passing-Large-or-Complex-Collections-as-OUT-Parameters"><a href="#13-4-Passing-Large-or-Complex-Collections-as-OUT-Parameters" class="headerlink" title="13-4. Passing Large or Complex Collections as OUT Parameters"></a>13-4. Passing Large or Complex Collections as OUT Parameters</h2><p><strong>Problem</strong><br>You have a procedure or function that accepts one or more large or complex collections that are also OUT<br>parameters, and you need a more efficient method to pass these variables.<br><strong>Solution</strong><br>Pass the parameters to your procedure or function by reference using the NOCOPY option on the<br>procedure or function declaration. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE no_copy_test AS 
+ 
+   TYPE rec_type IS TABLE OF all_objects%ROWTYPE INDEX BY BINARY_INTEGER; 
+   PROCEDURE test; 
+ 
+END no_copy_test; 
+&#x2F; </code></pre>
+<p>show error </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY no_copy_test AS 
+ 
+PROCEDURE proc1 (rec_list IN OUT rec_type) IS 
+BEGIN 
+   FOR i IN 1..rec_list.COUNT LOOP 
+      rec_list(i) :&#x3D; rec_list(i); 
+   END LOOP; 
+END; 
+
+PROCEDURE proc2 (rec_list IN OUT NOCOPY  rec_type) IS 
+BEGIN 
+   FOR i IN 1..rec_list.COUNT LOOP 
+      rec_list(i) :&#x3D; rec_list(i); 
+   END LOOP; 
+END; 
+ 
+PROCEDURE test IS 
+ 
+CURSOR  driver IS 
+SELECT  * 
+FROM    all_objects; 
+ 
+recs        rec_type; 
+rec_count   integer; 
+ 
+BEGIN 
+ 
+   OPEN driver; 
+   FETCH DRIVER BULK COLLECT INTO recs; 
+   CLOSE driver; 
+ 
+   rec_count :&#x3D; recs.COUNT; 
+ 
+   DBMS_OUTPUT.PUT_LINE (systimestamp); 
+   proc1 (recs); -- parameter passed by value 
+   DBMS_OUTPUT.PUT_LINE (systimestamp); 
+   proc2 (recs); -- paramter passed by reference 
+   DBMS_OUTPUT.PUT_LINE (systimestamp); 
+END test; 
+ 
+END no_copy_test; 
+&#x2F;</code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">set serverout on  -- Enable output from DBMS_OUTPUT statements 
+EXEC no_copy_test.test; </code></pre>
+<p>Running the procedure produced the following output: </p>
+<p>03-NOV-10 05.05.14.865000000 PM -05:00<br>03-NOV-10 05.05.14.880000000 PM -05:00<br>03-NOV-10 05.05.14.880000000 PM -05:00<br><strong>How It Works</strong><br>The recipe utilizes the NOCOPY feature within PL&#x2F;SQL. It begins by defining two procedures within the test<br>package. The first procedure, PROC1, accepts a collection of records using the default parameter-passing<br>method, which is by VALUE. The second procedure, PROC2, is an exact copy of PROC1; however, its<br>parameter is passed using the NOCOPY option. In PROC1, the parameter is passed in by VALUE, which means<br>a copy of the entire collection is created in the REC_LIST variable within PROC1. In PROC2, the parameter<br>data is passed by REFERENCE. Passing a parameter by reference does not copy the data; rather, it uses the<br>existing data structure passed to it by the calling program. This method is more efficient for very large<br>collections in both running time and in memory usage.<br>The output from the test shows the first procedure, which passed its parameter by VALUE took longer<br>to run than the second procedure, which passed its parameter by REFERENCE. In this example, the<br>USER_OBJECTS table was used as the data for the parameter, which retrieved only 6,570 records. Larger<br>performance gains can be realized with more records and more complex data structures. </p>
+<h2 id="13-5-Optimizing-Computationally-Intensive-Code"><a href="#13-5-Optimizing-Computationally-Intensive-Code" class="headerlink" title="13-5. Optimizing Computationally Intensive Code"></a>13-5. Optimizing Computationally Intensive Code</h2><p><strong>Problem</strong><br>You have computationally intensive code that you want to optimize to decrease its running time.<br><strong>Solution</strong><br>Recompile the package, procedure, or function in native mode using the NATIVE setting: </p>
+<p>ALTER PACKAGE my_package COMPILE BODY PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS;<br>ALTER PROCEDURE my_procedure COMPILE PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS;<br>ALTER FUNCTION my_function COMPILE PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS; </p>
+<p>Here is an example of a computationally intensive procedure. It uses the factorial function from<br>Recipe 17-4. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE factorial_test as 
+ 
+fact    NUMBER; 
+ 
+BEGIN 
+ 
+   FOR i IN 1..100 LOOP 
+      fact :&#x3D; factorial(33); 
+   END LOOP; 
+ 
+END factorial_test; 
+ 
+  -- enable display of execution time 
+SET TIMING ON 
+ 
+  -- run the test 
+EXEC factorial_test 
+ 
+PL&#x2F;SQL procedure successfully completed. 
+Elapsed: 00:00:01.18 </code></pre>
+<p>Now, recompile the code using the NATIVE option and rerun the test, noting any change in running<br>time: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">ALTER PROCEDURE factorial_test COMPILE PLSQL_CODE_TYPE&#x3D;NATIVE REUSE SETTINGS; 
+ 
+EXEC factorial_test 
+ 
+PL&#x2F;SQL procedure successfully completed. 
+Elapsed: 00:00:00.42 </code></pre>
+<p><strong>How It Works</strong><br>The ALTER. . .COMPILE command invokes the compiler on the named object. The syntax differs slightly<br>when recompiling a PACKAGE body in that the BODY clause follows the COMPILE statement. The<br>PLSQL_CODE_TYPE&#x3D;NATIVE clause compiles the code in NATIVE format, which runs faster than interpreted<br>code. The REUSE SETTINGS clause ensures the code will be recompiled in the same mode if it later<br>becomes invalid and requires automatic recompilation.<br>Native mode realizes the most benefit from computational intensive code; it has little effect on DML<br>statements (in other words, SELECT, INSERT, UPDATE, and DELETE). In the previous example, the factorial<br>function is called repeatedly to simulate a computationally intensive procedure. When the procedure is<br>compiled in the default, interpretive method, it completes its run in 1.18 seconds. When compiled in<br>NATIVE mode, it completes in 0.42 seconds. This is a 64 percent improvement in running time! </p>
+<h2 id="13-6-Improving-Initial-Execution-Running-Time"><a href="#13-6-Improving-Initial-Execution-Running-Time" class="headerlink" title="13-6. Improving Initial Execution Running Time"></a>13-6. Improving Initial Execution Running Time</h2><p><strong>Problem</strong><br>You have a procedure that you run frequently, and you want to improve its overall running time by<br>minimizing its startup time.<br><strong>Solution</strong><br>Use the DBMS_SHAPRED_POOL.KEEP procedure to keep a permanent copy of your code in the shared<br>memory pool. For example, the following statement pins the procedure my_large_procedure in the<br>database’s shared memory pool: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DBMS_SHARED_POOL.KEEP ( 
+   Name &#x3D;&gt; &#39;my_large_procedure&#39;,  
+   flag &#x3D;&gt; &#39;P&#39;); </code></pre>
+<p><strong>How It Works</strong><br>The DBMS_SHARED_POOL.KEEP procedure permanently keeps your code in the shared memory pool. By<br>default, when PL&#x2F;SQL code is executed, Oracle must first read the entire block of code into memory if it<br>isn’t already there from a previous execution. As additional procedures are executed, less recently used<br>code in the shared memory pool begins to age. If there isn’t sufficient free space in the shared memory<br>pool, older code is removed to make room.<br>If large procedures are run frequently and are aging out of the shared memory pool, then pinning<br>the procedure in the shared memory pool can improve performance by removing the overhead<br>necessary to reload the procedure again and again.<br>The first parameter of the DBMS_SHARED_POOL.KEEP procedure is the name of the object you want to<br>pin in the shared memory pool. The second parameter identifies the object type of the first parameter.<br>The most commonly used values for FLAG are as follows:<br>•P: The default, which specifies the object is a package, procedure, or function<br>•T: Specifies the object is a trigger<br>•Q: Specifies the object is a sequence<br>You must have execute privileges on the DBMS_SHARED_POOL package to pin your code. An account with<br>SYSDBA privileges must grant execute on DBMS_SHARED_POOL to your schema or to public. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"
+                    data-tooltip="Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"
+                    data-tooltip="Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                    aria-label="NEXT: Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"
+                    data-tooltip="Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"
+                    data-tooltip="Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                    aria-label="NEXT: Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

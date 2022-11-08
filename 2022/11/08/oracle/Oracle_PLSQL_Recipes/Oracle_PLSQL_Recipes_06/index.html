@@ -1,0 +1,983 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 06-Type Conversion - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n6.Type ConversionType conversion takes place in almost every PL&#x2F;SQL program. It is important to know how to convertfrom one datatype to another so that your applications can contain more versatility. Not only aredatatype conversions important to developers, but they can also be a godsend to databaseadministrators. Type conversion can occur when moving data around from one table to another. It isalso very common when obtaining data from input forms and performing calculations upon it.Whatever your use may be, this chapter will get you headed into the right direction with a handful ofuseful recipes. If your application works with dates or numbers, you will most likely find this chapteruseful. There are two forms of datatype conversion: explicit conversion and implicit conversion. Explicitdatatype conversion is what you will learn about in the following recipes. Using explicit conversion, youtell Oracle how you want types to be converted. Implicit conversion is automatically performed byOracle. There are many datatypes that can be converted using implicit type conversion. However, it isnot recommended that you rely on implicit conversion, because you never know exactly how Oracle willconvert something. The recipes in this chapter will show you more reliable explicit conversiontechniques that will give you the ability to convert types in such a way that your application will be rocksolid. \n6-1. Converting a String to a NumberProblemYou need to convert some strings into numbers. For instance, your application contains several stringsthat are entered via a user input screen. These strings need to be converted into numbers so that theycan be used to perform calculations.SolutionUse the TO_NUMBER function to explicitly convert the VARCHAR2 field into a NUMBER. The following examplesdemonstrate the use of TO_NUMBER by showing how to convert some currency values taken from the userinterface into numbers for storage in the database.The first example demonstrates the conversion of a variable with a datatype of VARCHAR2 into aNUMBER: \nDECLARE \n  in_dollars              VARCHAR2(10) :&#x3D; &amp;dollars; \n  dollars_formatted  NUMBER; \nBEGIN \n  -- Assume that IN_DOLLARS is the user input in VARCHAR2 format \n  dollars_formatted :&#x3D; TO_NUMBER(in_dollars, &#39;9G999D99&#39;); \n  DBMS_OUTPUT.PUT_LINE(dollars_formatted); \nEND; \nThe TO_NUMBER function returns a number from a VARCHAR2 format. The previous exampledemonstrates the typical usage of this function. \nHow It WorksThe TO_NUMBER function provides an explicit way to convert strings into NUMBER format in PL&#x2F;SQL.Although most string to NUMBER conversion is implicit via Oracle Database, it is always a best practice toexplicitly use the TO_NUMBER function to ensure that your code will not break at some point in the future.The format for using the function is as follows:TO_NUMBER(expression [, format [, &#39;nls&#39; ] ])The expression can be a value of type BINARY_DOUBLE, CHAR, VARCHAR2, NCHAR, or NVARCHAR2. Theoptional format is a mask that can be used to help format the expression value into a number. The maskis a string of characters that represents the format of the string value that is contained in the expressionvalue. Table 6-1 shows the most commonly used format mask characters:Table 6-1. Common Formatting Mask Characters\n\n\n\nCharacter\nDescription\n\n\n\n9\nRepresents a numeric character\n\n\nD\nRepresents a decimal point\n\n\nG\nRepresents a comma\n\n\nAlthough the use of a formatting mask is optional, it is a good idea to include it if you know theformat of the string. Doing so will help Oracle convert your value into a number more accurately(美[ˈækjərətli],adv.精确地,准确地). Lastly,you can use the optional nls settings to set the NLS_LANGUAGE that is to be used to convert the string, theNLS_CURRENCY, or any of the other NLS session parameters. Use of the nls parameter is not very common.■ Note For a complete listing of available session NLS parameters, issue the following query: \nSELECT * FROM NLS_SESSION_PARAMETERS.\nIt is also possible to convert strings into numbers using the CAST function. However, for direct stringto number conversion, the TO_NUMBER function is the best tool for the job since it is straightforward andeasy to maintain. For more information on the CAST function, please take a look at Recipe 6-5. \n6-2. Converting a String to a DateProblemYou need to convert some strings into DATE types. Let’s say you have a requirement to insert date typesinto a database table column from one of your applications. The user is allowed to enter a date usingyour application’s web page, but it is in a string format after the user submits the page. You need toconvert this date from a string to a date type. \nSolutionUse the TO_DATE function to convert the string values into the DATE type. This will allow your applicationto accept the date string in any format and convert it to a DATE type for you. The next example shows howto use the TO_DATE function: \nmy_val      DATE :&#x3D; TO_DATE(&#39;06&#x2F;12&#x2F;2010&#39;,&#39;MM&#x2F;DD&#x2F;YYYY&#39;); \n\nYou can convert the string through assignment, as shown in the preceding example, or directlywithin a query, as shown in the next example: \nSELECT TO_DATE(&#39;December 31, 2010&#39;, &#39;Month DD, YYYY&#39;) FROM DUAL; \nAs you can see, it is possible to convert multiple string formats into DATE types. \nHow It WorksThe TO_DATE function is arguably the most widely used conversion function in Oracle. Whether you areusing the function to convert dates for proper formatting within a SQL query or you are accepting andconverting user input, this function is extremely helpful for getting your data into the Oracle DATEformat. The syntax for using this function is as follows: \nTO_DATE(expression[, format[,’nls’]]) \n\nThe syntax is much like that of the other Oracle conversion functions in that it accepts a requiredexpression or string and two optional parameters. The optional format is used to specify the format ofthe string and to assist Oracle in converting the value into a DATE type. Table 6-2 shows many of the morecommon characters that can be used to specify the date format. See the Oracle SQL Reference for acomplete list of formatting characters.Table 6-2. Date Formatting Characters \nCharacter Description \n\nMM        Represents the numeric month. \nMON       Represents an abbreviated month name. \nMONTH     Represents the entire month name. \nDD        Represents the numeric day of the month. \nDY        Abbreviation representing the day of the week. \nYY        Represents the two-digit year. \nYYYY      Represents the four-digit year. \nRR        Represents the rounded two-digit year. The year is rounded in the range 1950 to 2049 to assist with two-digit years such as 10. A two-digit year less than 50 will result in a four-digit year such as 2010. \nAM or PM  Represents the meridian indicator. \nHH        Represents the hour of the day in 12-hour time format. \nHH24      Represents the hour of the day in 24-hour time format. \nMI        Represents the minutes in time. \nSS        Represents the seconds in time. \nThe standard, or default, date format in Oracle is DD-MON-YY, though your database administratordoes have the ability to change that default format. If you want to convert a string that is in the defaultformat into a DATE type, then the mask is not required. The following example demonstrates thiscapability: \nTO_DATE(&#39;27-MAY-10&#39;); \n\nOn the contrary, if you want to convert a string that is in a format that is different from the standard,then you must make use of a mask. The Solution to this recipe depicts this type of behavior. Dates arealso in care of time in Oracle, so if you want to display the time in your date, then it is possible to do sousing the proper format mask. The following conversion will include both the date and the time:\nTO_DATE(&#39;05&#x2F;25&#x2F;2010 07:35AM&#39;,&#39;MM&#x2F;DD&#x2F;YYYY HH:MIAM&#39;)\n\nThe TO_DATE conversion function is most often used when inserting or updating data. If you have atable column that has a DATE type, then you cannot place a string into that column unless it is in thestandard date format. To get the data from an entry screen into the database, the TO_DATE function isusually used to convert the string into a date while the value is being inserted or updated.It is also possible to convert strings to dates using the CAST function. For more information on theuse of the CAST function, please see Recipe 6-5.\n6-3. Converting a Number to a StringProblemYou need to alter some numbers into a currency format for display. Given a set of numbers, yourapplication will perform a calculation and then convert the outcome into currency format, which will bea string type.\nSolution\nUse the TO_CHAR conversion function to obtain a nicely formatted currency string. The following codeblock accepts a number, performs a calculation, and then converts the number to a string:\nCREATE OR REPLACE FUNCTION CALCULATE_BILL(bill_amount IN NUMBER) \n RETURN VARCHAR2 AS \n  tax                     NUMBER  :&#x3D; .12; \n  tip                     NUMBER  :&#x3D; .2; \n  total_bill              NUMBER  :&#x3D; 0; \nBEGIN \n  total_bill :&#x3D; bill_amount + (bill_amount * tax); \n  total_bill :&#x3D; total_bill + (total_bill * tip); \n  return to_char(total_bill, &#39;$999.00&#39;); \nEND; \n\nWhen a bill amount is passed to the CALCULATE_BILL function, a nicely formatted dollar amount willbe returned. If you were to pass 24.75 to the function, it would return $33.26.How It WorksThe TO_CHAR function works much like the other Oracle TO_ conversion functions in that it accepts anumber value along with an optional format mask and nls language value. Table 6-3 describes the morecommonly used formatting mask characters for numbers.Table 6-3. Common Formatting Mask Characters \nCharacter Description \n9 Represents a numeric character that displays only if a value is present \n. Represents a decimal point \n, Represents a comma \n$ Represents a dollar sign \n0 Represents a numeric character that will always display, even if null \n\nAs you can see from the Solution to this recipe, the format mask of $999.00 is chosen. Why not usethe mask of $999.99 for the conversion? By using the 0 instead of the 9, you ensure that the cents valuewill always be present. Even if the cents value is zero, you will still get a .00 at the end of your string.Essentially, the 0 character forces Oracle to pad with zeros rather than spaces.You can also pad with zero characters to the left of the decimal. Here’s an example: \nselect to_char(82,&#39;0000099&#39;) from dual; \nThat results in the following: 0000082\nIt is also possible to convert numbers to strings using the CAST function, although TO_CHAR makes forcode that is easier to read and maintain. For more information on the use of the CAST function, pleasesee recipe 6-5. \n6-4. Converting a Date to a StringProblemYou want to convert a date into a nicely formatted string value. For example, you are converting a legacyapplication from another database vendor into a web-based Oracle application. A few of the fields on theweb form are dates. The users of the application expect to see the dates in a specific format, so you needthe dates to be formatted in a particular manner for display.SolutionUse the TO_CHAR function using the date masks. The TO_CHAR function offers many formatting options forreturning a string from a DATE value. The following function accepts an EMPLOYEE_ID value and returns arepresentation of the HIRE_DATE spelled out. \nCREATE OR REPLACE PROCEDURE obtain_emp_hire_date(emp_id IN NUMBER) \n AS \n emp_hire_date    employees.hire_date%TYPE; \n emp_first        employees.first_name%TYPE; \n emp_last         employees.last_name%TYPE; \nBEGIN \n  SELECT hire_date, first_name, last_name \n  INTO emp_hire_date, emp_first, emp_last \n  FROM employees \n  WHERE employee_id &#x3D; emp_id; \n \n  DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; was hired on: &#39; || TO_CHAR(emp_hire_date, &#39;DAY MONTH DDTH YYYY&#39;)); \nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;No employee found for the given ID&#39;); \nEND; \nIf you pass the employee ID of 200 to this function, then it will return a result in the followingformat: Jennifer Whalen was hired on: THURSDAY   SEPTEMBER 17TH 1987 \nPL&#x2F;SQL procedure successfully completed. \nHow It Works\nAs shown in the previous recipe, the TO_CHAR function accepts a NUMBER or DATE value and returns a nicelyformatted string. Using the many formatting masks that are available, you can return a string-basedrepresentation in a number of ways. As demonstrated in the Solutions to this recipe and the previousone, the TO_CHAR function works a bit differently than the other conversion functions because theformatting mask is used to help produce the final string. Other conversion functions use the formattingmask to represent the format of the string you are passing in. In other words, TO_CHAR produces theformatted strings, whereas the other conversion functions accept them and produce a differentdatatype.\nTable 6-4 lists some of the most commonly used characters for converting dates into strings.Table 6-4. Date Formatting Mask Characters \nCharacters Description \nYYYY Represents the four-digit year \nYEAR Represents the spelled-out year \nYYY Represents the last three digits of the year \nYY Represents the last two digits of the year \nY Represents the last digit of the year \nIYY Represents the last three digits of the ISO year \nIY Represents the last two digits of the ISO year \nI Represents the last digit of the ISO year \nQ Represents the quarter of the year \nMM Represents the month of the year \nMON Represents the abbreviated month name \nMONTH Represents the spelled-out month name padded with blanks \nRM Represents the Roman numeral month \nWW Represents the week of the year \nW Represents the week of the month \nIW Represents the ISO week of the year \nD Represents the day of the week \nDAY Represents the name of the day \nDD Represents the day of the month \nDDD Represents the day of the year \nDY Represents the abbreviated name of the day \nJ Represents the Julian day \nHH Represents the hour of the day (1–12) \nHH12 Represents the hour of the day (1–12); same as HH \nHH24 Represents the hour of the day (0–23) \nMI Represents the minute of the hour (0–59) \nSS Represents the second (0–59) \nSSSSS Represents the seconds past midnight (0–86399) \nFF Represents the fractional seconds \n\nThere are several formatting options, as you can see. It is best to spend some time with each of thedifferent combinations to decide upon which one works best for your Solution.PL&#x2F;SQL can make date formatting easy, because it is possible to create your own function thatreturns a date formatted per your application’s requirements. Sometimes it is difficult to remember allthe different formatting options that are available for dates. It can also be quite painful to reference atable such as Table 6-4 each time you want to format a date string. You can instead create your ownconversion function to support just the formats that you use, and no others. Such a function greatlyreduces the possibility for error, thus enhancing consistency in how your application formats dates.The function in the following example accepts two parameters: the date to be converted and a stringthat specifies the output format. The second argument is limited to only four, easy-to-remember values:LONG, SHORT, STD, and DASH. \n– Returns a date string formatted per the style– that is passed into it.  The possible style strings– are as follows:–   LONG &#x3D;&gt; The spelled out date–   SHORT &#x3D;&gt; The abbreviated date–   STD or blank &#x3D;&gt; The standard date format mm&#x2F;dd&#x2F;yyyy–   DASH &#x3D;&gt; The standard format with dashes mm-dd-yyyy \nCREATE OR REPLACE FUNCTION FORMAT_DATE(in_date IN DATE, \n                                       style IN VARCHAR2) \n RETURN VARCHAR2 AS \n formatted_date    VARCHAR2(100); \nBEGIN \n  CASE style \n    WHEN &#39;LONG&#39; THEN  \n        formatted_date :&#x3D; TO_CHAR(in_date, &#39;DAY MONTH DDTH YYYY&#39;); \n    WHEN &#39;SHORT&#39; THEN \n        formatted_date :&#x3D; TO_CHAR(in_date, &#39;DY MON DDTH YYYY&#39;); \n    WHEN &#39;DASH&#39; THEN \n        formatted_date :&#x3D; TO_CHAR(in_date, &#39;MM-DD-YYYY&#39;); \n    ELSE \n        formatted_date :&#x3D; TO_CHAR(in_date, &#39;MM&#x2F;DD&#x2F;YYYY&#39;); \n  END CASE; \n  RETURN formatted_date; \nEND; \n\nThis function is nice because you only need to remember a short string that is used to represent thedate format that you’d like to return.It is also possible to convert dates to strings using the CAST function. For more information on theuse of the CAST function, please see Recipe 6-5. \n6-5. Converting Strings to TimestampsProblemYou are working with a series of strings. You want to convert them into timestamps. \nSolutionUse the TO_TIMESTAMP function to convert the strings into timestamps. In this example, a trigger iscreated that will log an INSERT into the JOBS table. The logging table consists of two columns. The firstcolumn is used to store the date of the transaction, and it is of type TIMESTAMP WITH LOCAL TIME ZONE.The second column is used to contain a DESCRIPTION of type VARCHAR2. The trigger that performs thelogging needs to combine a sysdate and a time zone value into a string prior to converting it into aTIMESTAMP.First, let’s create the table that will be used to log the changes on the JOBS table: \nCREATE TABLE time_log  \n(job_time              TIMESTAMP WITH LOCAL TIME ZONE, \n description           VARCHAR2(2000)); \nNext, a simple function is created that will return the time zone for a given city code. The functionwill return time zones for Chicago, Orlando, or San Jose because these are the different cities where ourimaginary industry has offices. \nCREATE OR REPLACE FUNCTION find_tz (city IN VARCHAR2)  \nRETURN NUMBER IS \n  tz          NUMBER :&#x3D; 0; \nBEGIN \n  IF city &#x3D; &#39;CHI&#39; THEN \n    tz :&#x3D; -5; \n  ELSIF city &#x3D; &#39;ORD&#39; THEN \n    tz :&#x3D; -4; \n  ELSIF city &#x3D; &#39;SJ&#39; THEN \n    tz :&#x3D; -7; \n  END IF; \n  RETURN tz; \nEND; \nThe last piece of code is the trigger that performs the INSERT on the logging table. This triggerperforms a conversion of a string to a TIMESTAMP using the TO_TIMESTAMP_TZ function. \nCREATE OR REPLACE TRIGGER log_job_history \nAFTER INSERT ON jobs \nFOR EACH ROW \nDECLARE \n  my_ts  VARCHAR2(25) :&#x3D; to_char(sysdate, &#39;YYYY-MM-DD HH:MI:SS&#39;); \nBEGIN \n  my_ts :&#x3D; my_ts || &#39; &#39; || find_tz(&#39;CHI&#39;); \n   \n  INSERT INTO time_log values( \n    TO_TIMESTAMP_TZ(my_ts, &#39;YYYY-MM-DD HH:MI:SS TZH:TZM&#39;), \n    &#39;INSERT&#39; \n  ); \n \nEND; \nIn this example, the trigger is hard-coded to assume a Chicago entry, but in reality this informationwould have been obtained from the user’s session. However, since that code is out of scope for thisrecipe, the hard-coded city does the trick.How It WorksSimilar to other Oracle conversion functions, the TO_TIMESTAMP_TZ and TO_TIMESTAMP functions accepttwo arguments. The first argument is a string value containing a date value in text form. The secondargument is a format model that is used to coerce the given string value into the TIMESTAMP or TIMESTAMPWITH LOCAL TIME ZONE datatype. The TO_TIMESTAMP_TZ conversion will accept and convert a time zonealong with the TIMESTAMP, whereas the TO_TIMESTAMP function will not account for a time zone.The format model is very similar to that of the TO_CHAR and TO_DATE functions. The format model willdiffer depending upon the format of the date that you want to convert. In the Solution to this recipe, theformat included a standard Oracle date along with a time zone. For a complete listing of all possibleformat model characters, please refer to the Oracle SQL Reference manual. \n6-6. Writing ANSI-Compliant ConversionsProblemYou want to convert strings to dates using an ANSI-compliant methodology.SolutionUse the CAST function, because it is ANSI-compliant. In this example, a procedure is written that willselect each of the rows within the JOB_HISTORY table that fall within a specified date range. The dates willbe converted into strings, and other information will be appended to the converted dates. Thisprocedure will produce a simple report to display the JOB_HISTORY. \nCREATE OR REPLACE PROCEDURE job_history_rpt(in_start_date IN DATE, \n                                            in_end_date IN DATE) AS \n  CURSOR job_history_cur IS \n  SELECT CAST(hist.start_date AS VARCHAR2(12)) || &#39; - &#39; || \n         CAST(hist.end_date AS VARCHAR2(12)) || &#39;: &#39; || \n         emp.first_name || &#39; &#39; || emp.last_name || &#39; - &#39; || \n         job_title || &#39; &#39; || department_name as details \n  FROM jobs jobs, \n       job_history hist, \n       employees emp, \n       departments dept \n  WHERE hist.start_date &gt;&#x3D; in_start_date \n  AND hist.end_date &lt;&#x3D; in_end_date \n  AND jobs.job_id &#x3D; hist.job_id \n  AND emp.employee_id &#x3D; hist.employee_id \n  AND dept.department_id &#x3D; hist.department_id; \n \n \n  job_history_rec     job_history_cur%ROWTYPE; \n \nBEGIN \n  DBMS_OUTPUT.PUT_LINE(&#39;JOB HISTORY REPORT FOR &#39; || \n    in_start_date || &#39; to &#39; || in_end_date);  \n  FOR job_history_rec IN job_history_cur LOOP \n    DBMS_OUTPUT.PUT_LINE(job_history_rec.details); \n  END LOOP; \nEND; \nGiven the start date of September 1, 1989, the resulting output from this procedure will resemble thefollowing: \nSQL&gt; exec job_history_rpt(to_date(&#39;01-SEP-1989&#39;,&#39;DD-MON-YYYY&#39;),sysdate); \nJOB HISTORY REPORT FOR 01-SEP-89 to 01-SEP-10 \n13-JAN-93 - 24-JUL-98: Lex De Haan - Programmer IT \n21-SEP-89 - 27-OCT-93: Neena Kochhar - Public Accountant Accounting \n28-OCT-93 - 15-MAR-97: Neena Kochhar - Accounting Manager Accounting \n17-FEB-96 - 19-DEC-99: Michael Hartstein - Marketing Representative Marketing \n24-MAR-98 - 31-DEC-98: Jonathon Taylor - Sales Representative Sales\n01-JAN-99 - 31-DEC-99: Jonathon Taylor - Sales Manager Sales\n01-JUL-94 - 31-DEC-98: Jennifer Whalen - Public Accountant Executive \nPL&#x2F;SQL procedure successfully completed.\n\nHow It WorksThe CAST function can be used to easily convert datatypes. However, there is no real benefit to using CASTas opposed to TO_NUMBER or TO_CHAR in most cases. The format for the CAST function is as follows:CAST(expression AS type_name)You can use this function to convert between different datatypes. Table 6-5 lists the different to andfrom datatypes that the CAST function can handle. \nTable 6-5. CAST Function Converstion Table \nCAST from Datatype To Datatype \nCHAR, VARCHAR2 CHAR, VARCHAR2\nNUMBER\nDATETIME/INTERVAL\nRAW \nROWID, UROWID \nNUMBER CHAR, VARCHAR2\nNUMBER \nNCHAR, NVARCHAR2 \nDATETIME/INTERVAL CHAR, VARCHAR2\nDATETIME/INTERVAL\nNCHAR, NVARCHAR2 \nRAW CHAR, VARCHAR2\nRAW \nNCHAR, NVARCHAR2 \nROWID, UROWID CHAR, VARCHAR2\nROWID, UROWID\nNCHAR, NVARCHAR2 \nNCHAR, NVARCHAR2 NCHAR, NVARCHAR2\n\nThe CAST function offers advantages to the TO_ conversion functions in some cases. For instance, ifyou are attempting to write SQL that is 100 percent ANSI-compliant, then you should use the CASTfunction because the Oracle conversion functions are not compliant. However, PL&#x2F;SQL itself is notANSI-compliant, so the CAST function offers no advantages while writing PL&#x2F;SQL code.The following are a few more examples of using the CAST function: \n-- Convert date to VARCHAR2 \nSELECT CAST(&#39;05-MAY-2010&#39; AS VARCHAR2(15)) FROM DUAL; \n \n-- Convert string to NUMBER \nSELECT CAST(&#39;1024&#39; AS NUMBER) FROM DUAL; \n \n-- Convert string to ROWID \nSELECT CAST(&#39;AAYyVSADsAAAAFLAAA&#39; AS ROWID) FROM DUAL; \nIf you prefer to have more control over your conversions, the Oracle TO_ conversion functions arethe way to go. They allow you to provide a format mask to control the conversion formatting. \n6-7. Implicitly Converting Between PLS_INTEGER and NUMBERProblemYou want to convert a number to PLS_INTEGER datatype so that calculations can be performed. \nSolutionIn this case, allow Oracle to do the footwork and implicitly convert between the two datatypes. In thefollowing example, the function accepts a NUMBER, converts it to PLS_INTEGER, and performs a calculationreturning the result. The function converts to PLS_INTEGER in order to gain a performance boost. \nCREATE OR REPLACE FUNCTION mass_energy_calc (mass IN NUMBER, \n                                             energy IN NUMBER) \nRETURN PLS_INTEGER IS \n  new_mass    PLS_INTEGER :&#x3D; mass; \n  new_energy  PLS_INTEGER :&#x3D; energy; \nBEGIN \n  RETURN ((new_mass * new_energy) * (new_mass * new_energy)); \nEXCEPTION \n  WHEN OTHERS THEN \n    RETURN -1; \nEND; \n\nThe function will accept NUMBER values, automatically convert them into PLS_INTEGER, and return aPLS_INTEGER type.\nHow It WorksImplicit conversion occurs when Oracle automatically converts from one datatype to another. Oraclewill implicitly convert some datatypes but not others. As per the Solution to this recipe, one of thedatatypes that supports implicit conversion is PLS_INTEGER. As a matter of fact, PLS_INTEGER cannot beconverted using the TO_NUMBER function; so in this case, implicit is the best way to convert a PLS_INTEGERdatatype to anything else. However, if there is a way to explicitly convert the datatype from one toanother, then that is the recommended approach. You cannot be certain of the results when Oracle isautomatically converting for you; explicit conversion allows you to have more control.The PLS_INTEGER datatype can be advantageous over using a NUMBER in some cases. For instance, aPLS_INTEGER has performance advantages when compared to a NUMBER for doing calculations becausethey use machine arithmetic as opposed to library arithmetic. Additionally, the PLS_INTEGER datatyperequires less storage than its counterparts. In the Solution to this recipe, the function takes advantage ofthe faster calculation speed that is possible using PLS_INTEGER. \n","dateCreated":"2022-11-08T23:16:30+08:00","dateModified":"2022-11-08T23:39:25+08:00","datePublished":"2022-11-08T23:16:30+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 06-Type Conversion","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_06/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_06/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 06-Type Conversion">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_06/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:16:30.385Z">
+<meta property="article:modified_time" content="2022-11-08T15:39:25.605Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 06-Type Conversion
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:16:30+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#6-Type-Conversion"><span class="toc-text">6.Type Conversion</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1-Converting-a-String-to-a-Number"><span class="toc-text">6-1. Converting a String to a Number</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2-Converting-a-String-to-a-Date"><span class="toc-text">6-2. Converting a String to a Date</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3-Converting-a-Number-to-a-String"><span class="toc-text">6-3. Converting a Number to a String</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-4-Converting-a-Date-to-a-String"><span class="toc-text">6-4. Converting a Date to a String</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-5-Converting-Strings-to-Timestamps"><span class="toc-text">6-5. Converting Strings to Timestamps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-6-Writing-ANSI-Compliant-Conversions"><span class="toc-text">6-6. Writing ANSI-Compliant Conversions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-7-Implicitly-Converting-Between-PLS-INTEGER-and-NUMBER"><span class="toc-text">6-7. Implicitly Converting Between PLS_INTEGER and NUMBER</span></a></li></ol></li></ol>
+
+<h1 id="6-Type-Conversion"><a href="#6-Type-Conversion" class="headerlink" title="6.Type Conversion"></a>6.Type Conversion</h1><p>Type conversion takes place in almost every PL&#x2F;SQL program. It is important to know how to convert<br>from one datatype to another so that your applications can contain more versatility. Not only are<br>datatype conversions important to developers, but they can also be a godsend to database<br>administrators. Type conversion can occur when moving data around from one table to another. It is<br>also very common when obtaining data from input forms and performing calculations upon it.<br>Whatever your use may be, this chapter will get you headed into the right direction with a handful of<br>useful recipes. If your application works with dates or numbers, you will most likely find this chapter<br>useful. There are two forms of datatype conversion: explicit conversion and implicit conversion. Explicit<br>datatype conversion is what you will learn about in the following recipes. Using explicit conversion, you<br>tell Oracle how you want types to be converted. Implicit conversion is automatically performed by<br>Oracle. There are many datatypes that can be converted using implicit type conversion. However, it is<br>not recommended that you rely on implicit conversion, because you never know exactly how Oracle will<br>convert something. The recipes in this chapter will show you more reliable explicit conversion<br>techniques that will give you the ability to convert types in such a way that your application will be rock<br>solid. </p>
+<h2 id="6-1-Converting-a-String-to-a-Number"><a href="#6-1-Converting-a-String-to-a-Number" class="headerlink" title="6-1. Converting a String to a Number"></a>6-1. Converting a String to a Number</h2><p><strong>Problem</strong><br>You need to convert some strings into numbers. For instance, your application contains several strings<br>that are entered via a user input screen. These strings need to be converted into numbers so that they<br>can be used to perform calculations.<br><strong>Solution</strong><br>Use the TO_NUMBER function to explicitly convert the VARCHAR2 field into a NUMBER. The following examples<br>demonstrate the use of TO_NUMBER by showing how to convert some currency values taken from the user<br>interface into numbers for storage in the database.<br>The first example demonstrates the conversion of a variable with a datatype of VARCHAR2 into a<br>NUMBER: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  in_dollars              VARCHAR2(10) :&#x3D; &amp;dollars; 
+  dollars_formatted  NUMBER; 
+BEGIN 
+  -- Assume that IN_DOLLARS is the user input in VARCHAR2 format 
+  dollars_formatted :&#x3D; TO_NUMBER(in_dollars, &#39;9G999D99&#39;); 
+  DBMS_OUTPUT.PUT_LINE(dollars_formatted); 
+END; </code></pre>
+<p>The TO_NUMBER function returns a number from a VARCHAR2 format. The previous example<br>demonstrates the typical usage of this function. </p>
+<p><strong><strong>How It Works</strong></strong><br>The TO_NUMBER function provides an explicit way to convert strings into NUMBER format in PL&#x2F;SQL.<br>Although most string to NUMBER conversion is implicit via Oracle Database, it is always a best practice to<br>explicitly use the TO_NUMBER function to ensure that your code will not break at some point in the future.<br>The format for using the function is as follows:<br><code>TO_NUMBER(expression [, format [, &#39;nls&#39; ] ])</code><br>The expression can be a value of type <code>BINARY_DOUBLE</code>, <code>CHAR</code>, <code>VARCHAR2</code>, <code>NCHAR</code>, or <code>NVARCHAR2</code>. The<br>optional format is a mask that can be used to help format the expression value into a number. The mask<br>is a string of characters that represents the format of the string value that is contained in the expression<br>value. Table 6-1 shows the most commonly used format mask characters:<br>Table 6-1. Common Formatting Mask Characters</p>
+<table>
+<thead>
+<tr>
+<th>Character</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>9</td>
+<td>Represents a numeric character</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Represents a decimal point</td>
+</tr>
+<tr>
+<td>G</td>
+<td>Represents a comma</td>
+</tr>
+</tbody></table>
+<p>Although the use of a formatting mask is optional, it is a good idea to include it if you know the<br>format of the string. Doing so will help Oracle convert your value into a number more accurately(美[ˈækjərətli],adv.精确地,准确地). Lastly,<br>you can use the optional <code>nls</code> settings to set the <code>NLS_LANGUAGE</code> that is to be used to convert the string, the<br>NLS_CURRENCY, or any of the other NLS session parameters. Use of the nls parameter is not very common.<br>■ Note For a complete listing of available session NLS parameters, issue the following query: </p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">SELECT * FROM NLS_SESSION_PARAMETERS.</code></pre>
+<p>It is also possible to convert strings into numbers using the <code>CAST</code> function. However, <strong>for direct string<br>to number conversion, the TO_NUMBER function is the best tool for the job since it is straightforward and<br>easy to maintain</strong>. For more information on the CAST function, please take a look at Recipe 6-5. </p>
+<h2 id="6-2-Converting-a-String-to-a-Date"><a href="#6-2-Converting-a-String-to-a-Date" class="headerlink" title="6-2. Converting a String to a Date"></a>6-2. Converting a String to a Date</h2><p><strong><strong>Problem</strong></strong><br>You need to convert some strings into DATE types. Let’s say you have a requirement to insert date types<br>into a database table column from one of your applications. The user is allowed to enter a date using<br>your application’s web page, but it is in a string format after the user submits the page. You need to<br>convert this date from a string to a date type. </p>
+<p><strong><strong>Solution</strong></strong><br>Use the <code>TO_DATE</code> function to convert the string values into the DATE type. This will allow your application<br>to accept the date string in any format and convert it to a DATE type for you. The next example shows how<br>to use the TO_DATE function: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">my_val      DATE :&#x3D; TO_DATE(&#39;06&#x2F;12&#x2F;2010&#39;,&#39;MM&#x2F;DD&#x2F;YYYY&#39;); </code></pre>
+
+<p>You can convert the string through assignment, as shown in the preceding example, or directly<br>within a query, as shown in the next example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT TO_DATE(&#39;December 31, 2010&#39;, &#39;Month DD, YYYY&#39;) FROM DUAL; </code></pre>
+<p>As you can see, it is possible to convert multiple string formats into DATE types. </p>
+<p><strong><strong>How It Works</strong></strong><br>The <code>TO_DATE</code> function is arguably the most widely used conversion function in Oracle. Whether you are<br>using the function to convert dates for proper formatting within a SQL query or you are accepting and<br>converting user input, this function is extremely helpful for getting your data into the Oracle DATE<br>format. The syntax for using this function is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">TO_DATE(expression[, format[,’nls’]]) </code></pre>
+
+<p>The syntax is much like that of the other Oracle conversion functions in that it accepts a required<br>expression or string and two optional parameters. The optional format is used to specify the format of<br>the string and to assist Oracle in converting the value into a DATE type. Table 6-2 shows many of the more<br>common characters that can be used to specify the date format. See the Oracle SQL Reference for a<br>complete list of formatting characters.<br>Table 6-2. Date Formatting Characters </p>
+<pre class="language-text" data-language="text"><code class="language-text">Character Description 
+
+MM        Represents the numeric month. 
+MON       Represents an abbreviated month name. 
+MONTH     Represents the entire month name. 
+DD        Represents the numeric day of the month. 
+DY        Abbreviation representing the day of the week. 
+YY        Represents the two-digit year. 
+YYYY      Represents the four-digit year. 
+RR        Represents the rounded two-digit year. The year is rounded in the range 1950 to 2049 to assist with two-digit years such as 10. A two-digit year less than 50 will result in a four-digit year such as 2010. 
+AM or PM  Represents the meridian indicator. 
+HH        Represents the hour of the day in 12-hour time format. 
+HH24      Represents the hour of the day in 24-hour time format. 
+MI        Represents the minutes in time. 
+SS        Represents the seconds in time. </code></pre>
+<p>The standard, or default, date format in Oracle is <code>DD-MON-YY</code>, though your database administrator<br>does have the ability to change that default format. If you want to convert a string that is in the default<br>format into a DATE type, then the mask is not required. The following example demonstrates this<br>capability: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">TO_DATE(&#39;27-MAY-10&#39;); </code></pre>
+
+<p>On the contrary, if you want to convert a string that is in a format that is different from the standard,<br>then you must make use of a mask. The <strong>Solution</strong> to this recipe depicts this type of behavior. Dates are<br>also in care of time in Oracle, so if you want to display the time in your date, then it is possible to do so<br>using the proper format mask. The following conversion will include both the date and the time:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">TO_DATE(&#39;05&#x2F;25&#x2F;2010 07:35AM&#39;,&#39;MM&#x2F;DD&#x2F;YYYY HH:MIAM&#39;)</code></pre>
+
+<p>The TO_DATE conversion function is most often used when inserting or updating data. If you have a<br>table column that has a DATE type, then you cannot place a string into that column unless it is in the<br>standard date format. To get the data from an entry screen into the database, the TO_DATE function is<br>usually used to convert the string into a date while the value is being inserted or updated.<br>It is also possible to convert strings to dates using the CAST function. For more information on the<br>use of the CAST function, please see Recipe 6-5.</p>
+<h2 id="6-3-Converting-a-Number-to-a-String"><a href="#6-3-Converting-a-Number-to-a-String" class="headerlink" title="6-3. Converting a Number to a String"></a>6-3. Converting a Number to a String</h2><p><strong><strong>Problem</strong></strong><br>You need to alter some numbers into a currency format for display. Given a set of numbers, your<br>application will perform a calculation and then convert the outcome into currency format, which will be<br>a string type.</p>
+<p><strong><strong>Solution</strong></strong></p>
+<p>Use the TO_CHAR conversion function to obtain a nicely formatted currency string. The following code<br>block accepts a number, performs a calculation, and then converts the number to a string:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION CALCULATE_BILL(bill_amount IN NUMBER) 
+ RETURN VARCHAR2 AS 
+  tax                     NUMBER  :&#x3D; .12; 
+  tip                     NUMBER  :&#x3D; .2; 
+  total_bill              NUMBER  :&#x3D; 0; 
+BEGIN 
+  total_bill :&#x3D; bill_amount + (bill_amount * tax); 
+  total_bill :&#x3D; total_bill + (total_bill * tip); 
+  return to_char(total_bill, &#39;$999.00&#39;); 
+END; </code></pre>
+
+<p>When a bill amount is passed to the CALCULATE_BILL function, a nicely formatted dollar amount will<br>be returned. If you were to pass 24.75 to the function, it would return $33.26.<br><strong><strong>How It Works</strong></strong><br>The TO_CHAR function works much like the other Oracle TO_ conversion functions in that it accepts a<br>number value along with an optional format mask and nls language value. Table 6-3 describes the more<br>commonly used formatting mask characters for numbers.<br>Table 6-3. Common Formatting Mask Characters </p>
+<pre class="language-text" data-language="text"><code class="language-text">Character Description 
+9 Represents a numeric character that displays only if a value is present 
+. Represents a decimal point 
+, Represents a comma 
+$ Represents a dollar sign 
+0 Represents a numeric character that will always display, even if null </code></pre>
+
+<p>As you can see from the Solution to this recipe, the format mask of $999.00 is chosen. Why not use<br>the mask of $999.99 for the conversion? By using the 0 instead of the 9, you ensure that the cents value<br>will always be present. Even if the cents value is zero, you will still get a .00 at the end of your string.<br>Essentially, the 0 character forces Oracle to pad with zeros rather than spaces.<br>You can also pad with zero characters to the left of the decimal. Here’s an example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">select to_char(82,&#39;0000099&#39;) from dual; </code></pre>
+<p>That results in the following: 0000082</p>
+<p>It is also possible to convert numbers to strings using the CAST function, although TO_CHAR makes for<br>code that is easier to read and maintain. For more information on the use of the CAST function, please<br>see recipe 6-5. </p>
+<h2 id="6-4-Converting-a-Date-to-a-String"><a href="#6-4-Converting-a-Date-to-a-String" class="headerlink" title="6-4. Converting a Date to a String"></a>6-4. Converting a Date to a String</h2><p><strong><strong>Problem</strong></strong><br>You want to convert a date into a nicely formatted string value. For example, you are converting a legacy<br>application from another database vendor into a web-based Oracle application. A few of the fields on the<br>web form are dates. The users of the application expect to see the dates in a specific format, so you need<br>the dates to be formatted in a particular manner for display.<br><strong><strong>Solution</strong></strong><br>Use the TO_CHAR function using the date masks. The TO_CHAR function offers many formatting options for<br>returning a string from a DATE value. The following function accepts an EMPLOYEE_ID value and returns a<br>representation of the HIRE_DATE spelled out. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_hire_date(emp_id IN NUMBER) 
+ AS 
+ emp_hire_date    employees.hire_date%TYPE; 
+ emp_first        employees.first_name%TYPE; 
+ emp_last         employees.last_name%TYPE; 
+BEGIN 
+  SELECT hire_date, first_name, last_name 
+  INTO emp_hire_date, emp_first, emp_last 
+  FROM employees 
+  WHERE employee_id &#x3D; emp_id; 
+ 
+  DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; was hired on: &#39; || TO_CHAR(emp_hire_date, &#39;DAY MONTH DDTH YYYY&#39;)); 
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;No employee found for the given ID&#39;); 
+END; </code></pre>
+<p>If you pass the employee ID of 200 to this function, then it will return a result in the following<br>format: Jennifer Whalen was hired on: THURSDAY   SEPTEMBER 17TH 1987 </p>
+<p>PL&#x2F;SQL procedure successfully completed. </p>
+<p><strong><strong>How It Works</strong></strong></p>
+<p>As shown in the previous recipe, the TO_CHAR function accepts a NUMBER or DATE value and returns a nicely<br>formatted string. Using the many formatting masks that are available, you can return a string-based<br>representation in a number of ways. As demonstrated in the <strong>Solution</strong>s to this recipe and the previous<br>one, the TO_CHAR function works a bit differently than the other conversion functions because the<br>formatting mask is used to help produce the final string. Other conversion functions use the formatting<br>mask to represent the format of the string you are passing in. In other words, TO_CHAR produces the<br>formatted strings, whereas the other conversion functions accept them and produce a different<br>datatype.</p>
+<p>Table 6-4 lists some of the most commonly used characters for converting dates into strings.<br>Table 6-4. Date Formatting Mask Characters </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">Characters Description 
+YYYY Represents the four-digit year 
+YEAR Represents the spelled-out year 
+YYY Represents the last three digits of the year 
+YY Represents the last two digits of the year 
+Y Represents the last digit of the year 
+IYY Represents the last three digits of the ISO year 
+IY Represents the last two digits of the ISO year 
+I Represents the last digit of the ISO year 
+Q Represents the quarter of the year 
+MM Represents the month of the year 
+MON Represents the abbreviated month name 
+MONTH Represents the spelled-out month name padded with blanks 
+RM Represents the Roman numeral month 
+WW Represents the week of the year 
+W Represents the week of the month 
+IW Represents the ISO week of the year 
+D Represents the day of the week 
+DAY Represents the name of the day 
+DD Represents the day of the month 
+DDD Represents the day of the year 
+DY Represents the abbreviated name of the day 
+J Represents the Julian day 
+HH Represents the hour of the day (1–12) 
+HH12 Represents the hour of the day (1–12); same as HH 
+HH24 Represents the hour of the day (0–23) 
+MI Represents the minute of the hour (0–59) 
+SS Represents the second (0–59) 
+SSSSS Represents the seconds past midnight (0–86399) 
+FF Represents the fractional seconds </code></pre>
+
+<p>There are several formatting options, as you can see. It is best to spend some time with each of the<br>different combinations to decide upon which one works best for your <strong>Solution</strong>.<br>PL&#x2F;SQL can make date formatting easy, because it is possible to create your own function that<br>returns a date formatted per your application’s requirements. Sometimes it is difficult to remember all<br>the different formatting options that are available for dates. It can also be quite painful to reference a<br>table such as Table 6-4 each time you want to format a date string. You can instead create your own<br>conversion function to support just the formats that you use, and no others. Such a function greatly<br>reduces the possibility for error, thus enhancing consistency in how your application formats dates.<br>The function in the following example accepts two parameters: the date to be converted and a string<br>that specifies the output format. The second argument is limited to only four, easy-to-remember values:<br>LONG, SHORT, STD, and DASH. </p>
+<p>– Returns a date string formatted per the style<br>– that is passed into it.  The possible style strings<br>– are as follows:<br>–   LONG &#x3D;&gt; The spelled out date<br>–   SHORT &#x3D;&gt; The abbreviated date<br>–   STD or blank &#x3D;&gt; The standard date format mm&#x2F;dd&#x2F;yyyy<br>–   DASH &#x3D;&gt; The standard format with dashes mm-dd-yyyy </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION FORMAT_DATE(in_date IN DATE, 
+                                       style IN VARCHAR2) 
+ RETURN VARCHAR2 AS 
+ formatted_date    VARCHAR2(100); 
+BEGIN 
+  CASE style 
+    WHEN &#39;LONG&#39; THEN  
+        formatted_date :&#x3D; TO_CHAR(in_date, &#39;DAY MONTH DDTH YYYY&#39;); 
+    WHEN &#39;SHORT&#39; THEN 
+        formatted_date :&#x3D; TO_CHAR(in_date, &#39;DY MON DDTH YYYY&#39;); 
+    WHEN &#39;DASH&#39; THEN 
+        formatted_date :&#x3D; TO_CHAR(in_date, &#39;MM-DD-YYYY&#39;); 
+    ELSE 
+        formatted_date :&#x3D; TO_CHAR(in_date, &#39;MM&#x2F;DD&#x2F;YYYY&#39;); 
+  END CASE; 
+  RETURN formatted_date; 
+END; </code></pre>
+
+<p>This function is nice because you only need to remember a short string that is used to represent the<br>date format that you’d like to return.<br>It is also possible to convert dates to strings using the CAST function. For more information on the<br>use of the CAST function, please see Recipe 6-5. </p>
+<h2 id="6-5-Converting-Strings-to-Timestamps"><a href="#6-5-Converting-Strings-to-Timestamps" class="headerlink" title="6-5. Converting Strings to Timestamps"></a>6-5. Converting Strings to Timestamps</h2><p><strong><strong>Problem</strong></strong><br>You are working with a series of strings. You want to convert them into timestamps. </p>
+<p><strong><strong>Solution</strong></strong><br>Use the TO_TIMESTAMP function to convert the strings into timestamps. In this example, a trigger is<br>created that will log an INSERT into the JOBS table. The logging table consists of two columns. The first<br>column is used to store the date of the transaction, and it is of type TIMESTAMP WITH LOCAL TIME ZONE.<br>The second column is used to contain a DESCRIPTION of type VARCHAR2. The trigger that performs the<br>logging needs to combine a sysdate and a time zone value into a string prior to converting it into a<br>TIMESTAMP.<br>First, let’s create the table that will be used to log the changes on the JOBS table: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE TABLE time_log  
+(job_time              TIMESTAMP WITH LOCAL TIME ZONE, 
+ description           VARCHAR2(2000)); </code></pre>
+<p>Next, a simple function is created that will return the time zone for a given city code. The function<br>will return time zones for Chicago, Orlando, or San Jose because these are the different cities where our<br>imaginary industry has offices. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION find_tz (city IN VARCHAR2)  
+RETURN NUMBER IS 
+  tz          NUMBER :&#x3D; 0; 
+BEGIN 
+  IF city &#x3D; &#39;CHI&#39; THEN 
+    tz :&#x3D; -5; 
+  ELSIF city &#x3D; &#39;ORD&#39; THEN 
+    tz :&#x3D; -4; 
+  ELSIF city &#x3D; &#39;SJ&#39; THEN 
+    tz :&#x3D; -7; 
+  END IF; 
+  RETURN tz; 
+END; </code></pre>
+<p>The last piece of code is the trigger that performs the INSERT on the logging table. This trigger<br>performs a conversion of a string to a TIMESTAMP using the TO_TIMESTAMP_TZ function. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE TRIGGER log_job_history 
+AFTER INSERT ON jobs 
+FOR EACH ROW 
+DECLARE 
+  my_ts  VARCHAR2(25) :&#x3D; to_char(sysdate, &#39;YYYY-MM-DD HH:MI:SS&#39;); 
+BEGIN 
+  my_ts :&#x3D; my_ts || &#39; &#39; || find_tz(&#39;CHI&#39;); 
+   
+  INSERT INTO time_log values( 
+    TO_TIMESTAMP_TZ(my_ts, &#39;YYYY-MM-DD HH:MI:SS TZH:TZM&#39;), 
+    &#39;INSERT&#39; 
+  ); 
+ 
+END; </code></pre>
+<p>In this example, the trigger is hard-coded to assume a Chicago entry, but in reality this information<br>would have been obtained from the user’s session. However, since that code is out of scope for this<br>recipe, the hard-coded city does the trick.<br><strong><strong>How It Works</strong></strong><br>Similar to other Oracle conversion functions, the TO_TIMESTAMP_TZ and TO_TIMESTAMP functions accept<br>two arguments. The first argument is a string value containing a date value in text form. The second<br>argument is a format model that is used to coerce the given string value into the TIMESTAMP or TIMESTAMP<br>WITH LOCAL TIME ZONE datatype. The TO_TIMESTAMP_TZ conversion will accept and convert a time zone<br>along with the TIMESTAMP, whereas the TO_TIMESTAMP function will not account for a time zone.<br>The format model is very similar to that of the TO_CHAR and TO_DATE functions. The format model will<br>differ depending upon the format of the date that you want to convert. In the <strong>Solution</strong> to this recipe, the<br>format included a standard Oracle date along with a time zone. For a complete listing of all possible<br>format model characters, please refer to the Oracle SQL Reference manual. </p>
+<h2 id="6-6-Writing-ANSI-Compliant-Conversions"><a href="#6-6-Writing-ANSI-Compliant-Conversions" class="headerlink" title="6-6. Writing ANSI-Compliant Conversions"></a>6-6. Writing ANSI-Compliant Conversions</h2><p><strong>Problem</strong><br>You want to convert strings to dates using an ANSI-compliant methodology.<br><strong>Solution</strong><br>Use the CAST function, because it is ANSI-compliant. In this example, a procedure is written that will<br>select each of the rows within the JOB_HISTORY table that fall within a specified date range. The dates will<br>be converted into strings, and other information will be appended to the converted dates. This<br>procedure will produce a simple report to display the JOB_HISTORY. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE job_history_rpt(in_start_date IN DATE, 
+                                            in_end_date IN DATE) AS 
+  CURSOR job_history_cur IS 
+  SELECT CAST(hist.start_date AS VARCHAR2(12)) || &#39; - &#39; || 
+         CAST(hist.end_date AS VARCHAR2(12)) || &#39;: &#39; || 
+         emp.first_name || &#39; &#39; || emp.last_name || &#39; - &#39; || 
+         job_title || &#39; &#39; || department_name as details 
+  FROM jobs jobs, 
+       job_history hist, 
+       employees emp, 
+       departments dept 
+  WHERE hist.start_date &gt;&#x3D; in_start_date 
+  AND hist.end_date &lt;&#x3D; in_end_date 
+  AND jobs.job_id &#x3D; hist.job_id 
+  AND emp.employee_id &#x3D; hist.employee_id 
+  AND dept.department_id &#x3D; hist.department_id; 
+ 
+ 
+  job_history_rec     job_history_cur%ROWTYPE; 
+ 
+BEGIN 
+  DBMS_OUTPUT.PUT_LINE(&#39;JOB HISTORY REPORT FOR &#39; || 
+    in_start_date || &#39; to &#39; || in_end_date);  
+  FOR job_history_rec IN job_history_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE(job_history_rec.details); 
+  END LOOP; 
+END; </code></pre>
+<p>Given the start date of September 1, 1989, the resulting output from this procedure will resemble the<br>following: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec job_history_rpt(to_date(&#39;01-SEP-1989&#39;,&#39;DD-MON-YYYY&#39;),sysdate); 
+JOB HISTORY REPORT FOR 01-SEP-89 to 01-SEP-10 
+13-JAN-93 - 24-JUL-98: Lex De Haan - Programmer IT 
+21-SEP-89 - 27-OCT-93: Neena Kochhar - Public Accountant Accounting 
+28-OCT-93 - 15-MAR-97: Neena Kochhar - Accounting Manager Accounting 
+17-FEB-96 - 19-DEC-99: Michael Hartstein - Marketing Representative Marketing 
+24-MAR-98 - 31-DEC-98: Jonathon Taylor - Sales Representative Sales
+01-JAN-99 - 31-DEC-99: Jonathon Taylor - Sales Manager Sales
+01-JUL-94 - 31-DEC-98: Jennifer Whalen - Public Accountant Executive 
+PL&#x2F;SQL procedure successfully completed.</code></pre>
+
+<p><strong><strong>How It Works</strong></strong><br>The CAST function can be used to easily convert datatypes. However, there is no real benefit to using CAST<br>as opposed to TO_NUMBER or TO_CHAR in most cases. The format for the CAST function is as follows:<br>CAST(expression AS type_name)<br>You can use this function to convert between different datatypes. Table 6-5 lists the different to and<br>from datatypes that the CAST function can handle. </p>
+<pre class="language-text" data-language="text"><code class="language-text">Table 6-5. CAST Function Converstion Table 
+CAST from Datatype To Datatype 
+CHAR, VARCHAR2 CHAR, VARCHAR2
+NUMBER
+DATETIME/INTERVAL
+RAW 
+ROWID, UROWID 
+NUMBER CHAR, VARCHAR2
+NUMBER 
+NCHAR, NVARCHAR2 
+DATETIME/INTERVAL CHAR, VARCHAR2
+DATETIME/INTERVAL
+NCHAR, NVARCHAR2 
+RAW CHAR, VARCHAR2
+RAW 
+NCHAR, NVARCHAR2 
+ROWID, UROWID CHAR, VARCHAR2
+ROWID, UROWID
+NCHAR, NVARCHAR2 
+NCHAR, NVARCHAR2 NCHAR, NVARCHAR2</code></pre>
+
+<p>The CAST function offers advantages to the TO_ conversion functions in some cases. For instance, if<br>you are attempting to write SQL that is 100 percent ANSI-compliant, then you should use the CAST<br>function because the Oracle conversion functions are not compliant. However, PL&#x2F;SQL itself is not<br>ANSI-compliant, so the CAST function offers no advantages while writing PL&#x2F;SQL code.<br>The following are a few more examples of using the CAST function: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- Convert date to VARCHAR2 
+SELECT CAST(&#39;05-MAY-2010&#39; AS VARCHAR2(15)) FROM DUAL; 
+ 
+-- Convert string to NUMBER 
+SELECT CAST(&#39;1024&#39; AS NUMBER) FROM DUAL; 
+ 
+-- Convert string to ROWID 
+SELECT CAST(&#39;AAYyVSADsAAAAFLAAA&#39; AS ROWID) FROM DUAL; </code></pre>
+<p>If you prefer to have more control over your conversions, the Oracle TO_ conversion functions are<br>the way to go. They allow you to provide a format mask to control the conversion formatting. </p>
+<h2 id="6-7-Implicitly-Converting-Between-PLS-INTEGER-and-NUMBER"><a href="#6-7-Implicitly-Converting-Between-PLS-INTEGER-and-NUMBER" class="headerlink" title="6-7. Implicitly Converting Between PLS_INTEGER and NUMBER"></a>6-7. Implicitly Converting Between PLS_INTEGER and NUMBER</h2><p><strong><strong>Problem</strong></strong><br>You want to convert a number to PLS_INTEGER datatype so that calculations can be performed. </p>
+<p><strong><strong>Solution</strong></strong><br>In this case, allow Oracle to do the footwork and implicitly convert between the two datatypes. In the<br>following example, the function accepts a NUMBER, converts it to PLS_INTEGER, and performs a calculation<br>returning the result. The function converts to PLS_INTEGER in order to gain a performance boost. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION mass_energy_calc (mass IN NUMBER, 
+                                             energy IN NUMBER) 
+RETURN PLS_INTEGER IS 
+  new_mass    PLS_INTEGER :&#x3D; mass; 
+  new_energy  PLS_INTEGER :&#x3D; energy; 
+BEGIN 
+  RETURN ((new_mass * new_energy) * (new_mass * new_energy)); 
+EXCEPTION 
+  WHEN OTHERS THEN 
+    RETURN -1; 
+END; </code></pre>
+
+<p>The function will accept NUMBER values, automatically convert them into PLS_INTEGER, and return a<br>PLS_INTEGER type.</p>
+<p><strong><strong>How It Works</strong></strong><br>Implicit conversion occurs when Oracle automatically converts from one datatype to another. Oracle<br>will implicitly convert some datatypes but not others. As per the <strong>Solution</strong> to this recipe, one of the<br>datatypes that supports implicit conversion is PLS_INTEGER. As a matter of fact, PLS_INTEGER cannot be<br>converted using the TO_NUMBER function; so in this case, implicit is the best way to convert a PLS_INTEGER<br>datatype to anything else. However, if there is a way to explicitly convert the datatype from one to<br>another, then that is the recommended approach. You cannot be certain of the results when Oracle is<br>automatically converting for you; explicit conversion allows you to have more control.<br>The PLS_INTEGER datatype can be advantageous over using a NUMBER in some cases. For instance, a<br>PLS_INTEGER has performance advantages when compared to a NUMBER for doing calculations because<br>they use machine arithmetic as opposed to library arithmetic. Additionally, the PLS_INTEGER datatype<br>requires less storage than its counterparts. In the <strong>Solution</strong> to this recipe, the function takes advantage of<br>the faster calculation speed that is possible using PLS_INTEGER. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_07/"
+                    data-tooltip="Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_05/"
+                    data-tooltip="Oracle PLSQL Recipes 05-Triggers"
+                    aria-label="NEXT: Oracle PLSQL Recipes 05-Triggers"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_06/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_07/"
+                    data-tooltip="Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_05/"
+                    data-tooltip="Oracle PLSQL Recipes 05-Triggers"
+                    aria-label="NEXT: Oracle PLSQL Recipes 05-Triggers"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_06/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_06/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_06/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

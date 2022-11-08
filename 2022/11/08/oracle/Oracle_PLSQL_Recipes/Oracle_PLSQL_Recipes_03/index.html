@@ -1,0 +1,1060 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 03-Looping and Logic - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n\n3. Looping and Logic3.1. Choosing When to Execute CodeProblemYour code contains a condition, and you are interested in executing code to perform specific actions if the condition evaluates to TRUE, FALSE, or NULL.SolutionUse an IF-THEN statement to evaluate an expression (or condition) and determine which code to executeas a result. The following example depicts a very simple IF-THEN statement that evaluates one variable to see whether it contains a larger value than another variable. If so, then the statements contained within the IF-THEN statement are executed; otherwise, they are ignored. \nDECLARE \n value_one NUMBER :&#x3D; &amp;value_one; \n value_two NUMBER :&#x3D; &amp;value_two; \nBEGIN \n IF value_one &gt; value_two THEN \n DBMS_OUTPUT.PUT_LINE(&#39;value_one is greater than value_two&#39;); \n END IF; \nEND; \nAs you can see from the example, if value_one is greater than value_two, a line of output will be printed stating so. Otherwise, the IF statement is bypassed, and processing continues.How It WorksAs shown in the Solution, the general format for the IF-THEN statement is as follows:\nIF condition THEN\n Statements to be executed \n …\nEND IF; \nThe IF-THEN statement is one of the most frequently used conditional statements. If a given condition evaluates to TRUE, then the code contained within the IF-THEN statement is executed. If the condition evaluates to FALSE or NULL, then the statement is exited. However, it is possible to incorporate(vt.包含,吸收) a different set of statements if the condition is not satisfied. Please see Recipe 3-2 for an example. Any number of IF-THEN statements can be nested within one another. The statements within the IF-THEN will be executed if the condition that is specified evaluates to TRUE.\n3-2. Choosing Between Two Mutually Exclusive ConditionsProblemYou have two conditions that are mutually(美 [‘mjutʃuəli]adv.互相地,互助) exclusive. You want to execute one set of statements if thefirst condition evaluates to TRUE. Otherwise, if the first condition is FALSE or NULL, then execute a differentset of statements.SolutionUse an IF-ELSE statement to evaluate the condition and execute the statements that correspond to it ifthe condition evaluates to TRUE. In the following example, a given employee ID is used to query theEMPLOYEES table. If that employee exists, then the employee record will be retrieved. If not found, then amessage will be displayed stating that no match was found. \nDECLARE \n employee employees%ROWTYPE; \n emp_count number :&#x3D; 0; \nBEGIN \n SELECT count(*) \n INTO emp_count \n FROM employees \n WHERE employee_id &#x3D; 100; \n IF emp_count &gt; 0 THEN \n SELECT * \n INTO employee \n FROM employees \n WHERE employee_id &#x3D; 100; \n IF employee.manager_id IS NOT NULL THEN \n DBMS_OUTPUT.PUT_LINE(employee.first_name || &#39; &#39; || employee.last_name || \n &#39; has an assigned manager.&#39;); \n ELSE \n DBMS_OUTPUT.PUT_LINE(employee.first_name || &#39; &#39; || employee.last_name || \n &#39; does not have an assigned manager.&#39;); \nEND IF; \n ELSE \n DBMS_OUTPUT.PUT_LINE(&#39;The given employee ID does not match any records, &#39;|| \n &#39; please try again&#39;); \n END IF; \nEXCEPTION \n WHEN NO_DATA_FOUND THEN \n DBMS_OUTPUT.PUT_LINE(&#39;Try another employee ID.&#39;); \nEND; \nIn the real world, the employee ID would not be hard-coded into the example. However, this example provides a good scenario for evaluating mutually exclusive conditions and also nesting IF statements.How It WorksThe IF-ELSE statement syntax is basically the same as the IF-THEN syntax, except that a different set ofstatements is executed in the ELSE clause when the condition evaluates to FALSE or NULL. Therefore, if thefirst condition is FALSE or NULL, then the control automatically drops down into the statements containedwithin the ELSE clause and executes them.\n3.3. Evaluating Multiple Mutually Exclusive ConditionsProblemYour application has multiple conditions to evaluate, and each of them is mutually exclusive. If one ofthe conditions evaluates to FALSE, you’d like to evaluate the next one. You want that process to continueuntil there are no more conditions.Two Solutions are possible: one using IF and the other using CASE.\nSolution #1Use an IF-ELSIF-ELSE statement to perform an evaluation of all mutually exclusive conditions. The following example is a SQL*Plus script that queries how many countries are in a specified region.\nIf the region that is typed as input when the following example executes matches any of the regions specified by the conditions in the IF statement, then subsequent statements are executed. However, a default message is displayed if the input does not match any region.\nDECLARE\n Region regions.region_name%TYPE :&#x3D; &#39;&amp;region&#39;; \n country_count number :&#x3D; 0; \nBEGIN \n IF upper(region) &#x3D; &#39;EUROPE&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 1; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Europe region.&#39;); \n ELSIF upper(region) &#x3D; &#39;AMERICAS&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 2; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || \n &#39;the Americas region.&#39;); \n ELSIF upper(region) &#x3D; &#39;ASIA&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 3; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || \n &#39;the Asia region.&#39;); \n ELSIF upper(region) &#x3D; &#39;MIDDLE EAST AND AFRICA&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 4; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || \n &#39;the Middle East and Africa region.&#39;); \n ELSE \n DBMS_OUTPUT.PUT_LINE(&#39;You have entered an invaid region, please try again&#39;); \n END IF; \nEND; \nSolution #2You can use the searched CASE statement to evaluate a boolean expression to determine which statements to execute among multiple, mutually exclusive conditions. The next example is a SQL*Plus script that performs the same tasks as Solution #1 but this time using a searched CASE statement:\nDECLARE\n region regions.region_name%TYPE :&#x3D; &#39;&amp;region&#39;; \n country_count number :&#x3D; 0; \nBEGIN \n CASE \n WHEN upper(region) &#x3D; &#39;EUROPE&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 1; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || \n &#39;the Europe region.&#39;); \n WHEN upper(region) &#x3D; &#39;AMERICAS&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 2; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || \n &#39;the Americas region.&#39;); \n WHEN upper(region) &#x3D; &#39;ASIA&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 3; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || \n &#39;the Asia region.&#39;); \n WHEN upper(region) &#x3D; &#39;MIDDLE EAST AND AFRICA&#39; THEN \n SELECT count(*) \n INTO country_count \n FROM countries \n WHERE region_id &#x3D; 4; \n DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || \n &#39;the Middle East and Africa region.&#39;); \n ELSE \n DBMS_OUTPUT.PUT_LINE(&#39;You have entered an invaid region, please try again&#39;); \n END CASE; \nEND; \n\nHow It WorksIF-ELSIF-ELSE can be used to evaluate any number of conditions. It functions such that if the firstcondition in the IF-ELSIF-ELSE statement evaluates to TRUE, then the statements within its block areexecuted, and all others are bypassed. Similarly, if the first condition evaluates to FALSE and the secondcondition evaluates to TRUE, then the second condition’s statements will be executed, others will beignored, and so on.\nCASE\n WHEN &lt;&lt;boolean_expression&gt;&gt; THEN &lt;&lt;statements&gt;&gt; \n[ELSE statements]; \n\n\n3.4 Driving from an Expression Having Multiple OutcomesProblemYou have a single expression that yields multiple outcomes. You are interested in evaluating the expression and performing a different set of statements depending upon the outcome.SolutionUse a CASE statement to evaluate your expression, and decide which set of statements to execute depending upon the outcome. In the following example, a SQL*Plus script accepts a region entry, which is being evaluated to determine the set of statements to be executed. Based upon the value of the region, the corresponding set of statements is executed, and once those statements have been executed, then the control is passed to the statement immediately following the CASE statement. \nDECLARE \n region regions.region_name%TYPE :&#x3D; &#39;&amp;region&#39;; \n country_count number :&#x3D; 0; \nBEGIN \n CASE upper(region) \n WHEN &#39;EUROPE&#39; THEN \n    SELECT count(*) \n    INTO country_count \n    FROM countries \n    WHERE region_id &#x3D; 1; \n    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Europe region.&#39;); \n WHEN &#39;AMERICAS&#39; THEN \n    SELECT count(*) \n    INTO country_count \n    FROM countries \n    WHERE region_id &#x3D; 2; \n    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; ||&#39;the Americas region.&#39;); \n WHEN &#39;ASIA&#39; THEN \n    SELECT count(*) \n    INTO country_count \n    FROM countries \n    WHERE region_id &#x3D; 3; \n    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Asia region.&#39;); \n WHEN &#39;MIDDLE EAST AND AFRICA&#39; THEN \n    SELECT count(*) \n    INTO country_count \n    FROM countries \n    WHERE region_id &#x3D; 4; \n    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Middle East and Africa region.&#39;); \n ELSE \n    DBMS_OUTPUT.PUT_LINE(&#39;You have entered an invaid region, please try again&#39;); \n END CASE; \nEND; \n\n\nHow It WorksThere are two different types of CASE statements that can be used—those being the searched CASE and the simple CASE statement. The Solution to this recipe demonstrates the simple CASE. For an example of a searched CASE statement, please see Recipe 3-3.\nThe simple CASE statement begins with the keyword CASE followed by a single expression called a selector. The selector is evaluated one time, and it can evaluate to any PL&#x2F;SQL type other than BLOB, BFILE, an object type, a record, or a collection type. The selector is followed by a series of WHEN clauses. The WHEN clauses are evaluated sequentially to determine whether the value of the selector equals the result from any of the WHEN clause expressions. If a match is found, then the corresponding WHEN clause is executed.\nThe CASE statement can include any number of WHEN clauses, and much like an IF statement, it can be followed with a trailing ELSE clause that will be executed if none of the WHEN expressions matches. If the ELSE clause is omitted, a predefined exception will be raised if the CASE statement does not match any of the WHEN clauses. The END CASE keywords end the statement.\n3.5. Looping Until a Specified Condition Is MetProblemYou want to loop through a set of statements until a specified condition evaluates to true.SolutionUse a simple LOOP statement along with an EXIT clause to define a condition that will end the iteration.The following example shows a simple LOOP that will print out each employee with a department_id equalto 90:\nDECLARE\nCURSOR emp_cur IS\nSELECT *\nFROM employees\nWHERE department_id &#x3D; 90;\nemp_rec employees%ROWTYPE;\n\nBEGIN\nOPEN emp_cur;\nLOOP\n  FETCH emp_cur into emp_rec;\n  IF emp_cur%FOUND THEN\n    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name ||&#39;-&#39;|| emp_rec.email);\n  ELSE\n    EXIT;\n  END IF;\nEND LOOP;\nCLOSE emp_cur;\nEND;\n\n\nAs you can see from the example, the cursor is opened prior to the start of the loop. Inside the loop,the cursor is fetched into emp_rec, and emp_rec is evaluated to see whether it contains anything using thecursor %FOUND attribute. If emp_cur%FOUND is FALSE, then the loop is exited using the EXIT keyword.How It WorksThe simple LOOP structure is very easy to use for generating a loop in your code. The LOOP keyword is usedto start the loop, and the END LOOP keywords are used to terminate it. Every simple loop must contain anEXIT or GOTO statement; otherwise, the loop will become infinite and run indefinitely.You can use a couple of different styles for the EXIT. When used alone, the EXIT keyword causes aloop to be terminated immediately, and control is passed to the first statement following the loop. Youcan use the EXIT-WHEN statement to terminate the loop based upon the evaluation of a condition after theWHEN statement. If the condition evaluates to TRUE, then the loop is terminated; otherwise, it willcontinue.The following example shows the same LOOP as the example in the Solution, but instead of using anIF statement to evaluate the content of emp_rec, the EXIT-WHEN statement is used:\nDECLARE\nCURSOR emp_cur IS\nSELECT *\nFROM employees\nWHERE department_id &#x3D; 90;\nemp_rec employees%ROWTYPE;\nBEGIN\nOPEN emp_cur;\n LOOP \n FETCH emp_cur into emp_rec; \n EXIT WHEN emp_cur%NOTFOUND; \n      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name || &#39;-&#39; || emp_rec.email); \n END LOOP; \n CLOSE emp_cur; \nEND; \nYou can use a loop to iterate over any number of things including cursors or collections of data. Asyou will see in some of the coming recipes, different forms of loops work better in differentcircumstances. \n3.6. Iterating Cursor Results Until All Rows Have Been ReturnedProblemYou have created a cursor and retrieved a number of rows from the database. As a result, you want toloop through the results and do some processing on them.SolutionUse a standard FOR loop to iterate through the records. Within each iteration of the loop, process thecurrent record. The following code shows the use of a FOR loop to iterate through the records retrievedfrom the cursor and display each employee name and e-mail. Each iteration of the loop returns anemployee with the job_id of ‘ST_MAN’, and the loop will continue to execute until the cursor has beenexhausted.\nDECLARE \n CURSOR emp_cur IS \n SELECT * \n FROM employees \n WHERE job_id &#x3D; &#39;ST_MAN&#39;; \n emp_rec employees%ROWTYPE; \nBEGIN \n FOR emp_rec IN emp_cur LOOP \n DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name || \n &#39; - &#39; || emp_rec.email); \n END LOOP; \nEND; \n\nHere are the results:Matthew Weiss - MWEISSAdam Fripp - AFRIPPPayam Kaufling - PKAUFLINShanta Vollman - SVOLLMANKevin Mourgos - KMOURGOSPL&#x2F;SQL procedure successfully completed\nAs you can see, the employee records that meet the specified criteria are displayed.\n3.7. Iterating Until a Condition Evaluates to FALSEProblemYou want to iterate over a series of statements until a specified condition no longer evaluates to TRUE.SolutionUse a WHILE statement to test the condition, and execute the series of statements if the conditionevaluates to TRUE; otherwise, skip the statements completely. The following example shows a WHILEstatement evaluating the current value of a variable and looping through until the value of the variablereaches ten. Within the loop, this variable is being multiplied by two and printing out its current value.\nDECLARE \n myValue NUMBER :&#x3D; 1; \nBEGIN \nWHILE myValue &lt; 10 LOOP \n DBMS_OUTPUT.PUT_LINE(&#39;The current value is: &#39; || myValue); \n myValue :&#x3D; myValue * 2; \n END LOOP;\nEND;\n\nHere are the results:The current value is: 1The current value is: 2The current value is: 4The current value is: 8PL&#x2F;SQL procedure successfully completed.The important thing to note in this example is that the value of myValue is increased with eachiteration of the loop as to eventually meet the condition specified in the WHILE loop.\nHow It WorksThe WHILE loop tests a condition at the top of the loop, and if it evaluates to TRUE, then the statements within the loop are executed, and control is returned to the start of the loop where the condition is tested again. If the condition does not evaluate to TRUE, the loop is bypassed, and control goes to the next statement after the END LOOP. If the condition never fails, then an infinite loop is formed, so it is important to ensure that the condition will eventually evaluate to FALSE. It is important to note that the statements in the loop will never be executed if the condition evaluates to FALSE during the first pass. This situation is different from the simple loop that alwaysiterates at least once because the EXIT condition is usually evaluated elsewhere in the loop. To ensure that a WHILE loop is always executed at least one time, you must ensure that the condition evaluates to TRUE at least once. One way to do this is to use a flag variable that is evaluated with each iteration of the loop. Set the flag equal to FALSE prior to starting the loop, and then set it to TRUE when a certain condition is met inside the loop. The following pseudocode depicts such a Solution:\nBEGIN \n flag &#x3D; FALSE; \n WHILE flag &#x3D; TRUE LOOP \nPerform statements \n flag &#x3D; Boolean expression; \n END LOOP; \nEND; \nAs mentioned previously, the boolean expression that is assigned to the flag in this case musteventually evaluate to FALSE; otherwise, an infinite loop will occur.\n3.8.Bypassing the Current Loop IterationProblemIf a specified conditional statement evaluates to TRUE, you want to terminate the current loop iteration ofthe loop early and start the next iteration immediately.SolutionUse a CONTINUE statement along with a condition to end the current iteration. In the following example, a loop is used to iterate through the records in the employees table. The primary reason for the loop is to print out a list of employees who receive a salary greater than 15,000. If an employee does not receive more than 15,000, then nothing is printed out, and the loop continues to the next iteration.\nDECLARE \n    CURSOR emp_cur is \n    SELECT * \n    FROM employees; \n    emp_rec emp_cur%ROWTYPE; \nBEGIN \n    DBMS_OUTPUT.PUT_LINE(&#39;Employees with salary &gt; 15000: &#39;); \nOPEN emp_cur;\n LOOP \n FETCH emp_cur INTO emp_rec; \n EXIT WHEN emp_cur%NOTFOUND; \n IF emp_rec.salary &lt; 15000 THEN \n CONTINUE;\n ELSE \n    DBMS_OUTPUT.PUT_LINE(&#39;Employee: &#39; || emp_rec.first_name || &#39; &#39; || emp_rec.last_name); \n END IF; \n END LOOP; \n CLOSE emp_cur; \nEND; \n\nHere are some sample results:Employees with salary &gt; 15000:Employee: Steven KingEmployee: Neena KochharEmployee: Lex De HaanPL&#x2F;SQL procedure successfully completed.How It WorksYou can use the CONTINUE statement in any loop to unconditionally halt execution of the current iterationof the loop and move to the next. As shown in the Solution, the CONTINUE statement is usuallyencompassed within some conditional statement so that it is invoked only when that certain conditionis met. \nYou can use the CONTINUE statement along with a label in order to jump to a specified point in theprogram. Rather than merely using CONTINUE to bypass the current loop iteration, specifying a label willallow you to resume programming in an outer loop. For more information regarding the use of theCONTINUE statement along with labels in nested loops, please see Recipe 3-13.As an alternative to specifying CONTINUE from within an IF statement, you can choose to write aCONTINUE WHEN statement. For example, the following two approaches yield identical results: \n IF team_rec.total_points &lt; 10 THEN \n CONTINUE; \nor \n CONTINUE WHEN rec.total_points &lt; 10; \n\nUsing the CONTINUE WHEN format, the loop will stop its current iteration if the condition in the WHENclause is met. Otherwise, the iteration will ignore the statement altogether.\n3.9. Iterating a Fixed Number of TimesProblemYou are interested in executing the contents of a loop a specified number of times. For example, you areinterested in executing a loop ten times, and you need to number each line of output in the range by thecurrent loop index.SolutionWrite a FOR loop. Use a variable to store the current index of the loop while looping through a range ofnumbers from one to ten in ascending order. The following lines of code will iterate ten times through aloop and print out the current index in each pass:\nBEGIN \n FOR idx IN 1..10 LOOP \n DBMS_OUTPUT.PUT_LINE(&#39;The current index is: &#39; || idx); \n END LOOP; \nEND;\nHere is the result: \nThe current index is: 1 \nThe current index is: 2 \nThe current index is: 3 \nThe current index is: 4 \nThe current index is: 5 \nThe current index is: 6 \nThe current index is: 7 \nThe current index is: 8 \nThe current index is: 9\nThe current index is: 10\nPL&#x2F;SQL procedure successfully completed.How It WorksThe FOR loop will increment by one through the given range for each iteration until it reaches the end.The loop is opened using the keyword FOR, followed by a variable that will be used as the index for theloop. Following the index variable is the IN keyword, which is used to signify that the index variableshould increment one by one through the given range, which is listed after the IN keyword. The loop isterminated using the END LOOP keywords.Each statement contained within the loop is executed once for each iteration of the loop. The indexvariable can be used within the loop, but it cannot be changed. As shown in the Solution, you may usethe index for printing purposes, and it is oftentimes used in calculations as well.The REVERSE keyword should be placed directly after the IN keyword and before the range that youspecify. The REVERSE keyword has no effect when working with cursors. If you need to iterate throughcursor results in a specific order, then specify an ORDER BY clause in your SELECT statement. \n3.11 Iterating in Increments Other Than One3-11. Iterating in Increments Other Than OneProblemRather than iterating through a range of numbers one at a time, you want to increment by some othervalue. For example, you might want to increment through even values such as 2, 4, 6, and so forth.SolutionMultiply the loop index by two (or by whatever other multiplier you need) to achieve the effect ofincrementing through all even numbers. As you can see in the following example, an even number isalways generated when the index is multiplied by two: \nBEGIN \n FOR idx IN 1..5 LOOP \n DBMS_OUTPUT.PUT_LINE(&#39;The current index is: &#39; || idx*2); \n END LOOP; \nEND;\nHere is the result:The current index is: 2The current index is: 4The current index is: 6The current index is: 8The current index is: 10PL&#x2F;SQL procedure successfully completed.How It WorksUnlike some other languages, PL&#x2F;SQL does not include a STEP clause that can be used while looping. Towork around that limitation, you will need to write your own stepping algorithm. In the Solution to thisrecipe, you can see that the algorithm was quite easy; you simply multiply the index by two to achievethe desired result. In this Solution, assigning the range of 1..5 as the index produces the effect of iteratingthrough all even numbers from 2..10 when the current index is multiplied by two.Using similar techniques, you can increment through ranges of numbers in various intervals.However, sometimes this can become troublesome if you are attempting to step by anything other thaneven numbers. You can see an example of this in the next recipe.\n3.12. Stepping Through a Loop Based on Odd-Numbered IncrementsProblemRather than iterating through a range of numbers by even increments, you prefer to loop through therange using odd increments.SolutionUse the built-in MOD function to determine whether the current index is odd. If it is odd, then print outthe value; otherwise, continue to the next iteration. The following example shows how to implement thisSolution:\nBEGIN \n FOR idx IN 1..10 LOOP \n IF MOD(idx,2) !&#x3D; 0 THEN \n DBMS_OUTPUT.PUT_LINE(&#39;The current index is: &#39; || idx); \n END IF; \n END LOOP; \nEND; \n\nResults:The current index is: 1The current index is: 3The current index is: 5The current index is: 7The current index is: 9PL&#x2F;SQL procedure successfully completed.How It WorksThe Solution depicts one possible workaround for a STEP replacement. Using the MOD function todetermine whether a number is odd works quite well. The MOD function, otherwise known as the modulusfunction, is used to return the remainder from the division of the two numbers that are passed into thefunction. Therefore, this function is useful for determining even or odd numbers. In this case, if anyvalue is returned from MOD, then the number is assumed to be odd, and the statements within the IFstatement will be executed.Such a technique may be useful in the case of iterating through a collection of data such as a table. Ifyou want to grab every other record from the collection, then performing a stepping Solution such as thisor the Solution from Recipe 3-11 will allow you to achieve the desired result. You could easily use theresulting index from this technique as the index for a collection.\n3.13. Exiting an Outer Loop PrematurelyProblemYour code contains a nested loop, and you want the inner loop to have the ability to exit from both loopsand stop iteration completely.SolutionUse loop labels for both loops and then reference either loop within an EXIT statement by following theEXIT keyword with a loop label. The following example prints out a series of numbers. During eachiteration, the inner loop will increment until it reaches an odd number. At that point, it will pass controlto the outer loop again. The outer loop will be exited when the index for the inner loop is greater than orequal to the number ten. \nBEGIN \n &lt;&lt;outer&gt;&gt; for idx1 in 1 .. 10 loop \n &lt;&lt;inner&gt;&gt; for idx2 in 1 .. 10 loop \n dbms_output.put(idx2); \n exit inner when idx2 &gt; idx1 * 2; \n exit outer when idx2 &#x3D; 10; \n END LOOP; \n DBMS_OUTPUT.NEW_LINE; \n END LOOP; \n DBMS_OUTPUT.NEW_LINE; \nEND;\nResults:12312345123456712345678912345678910PL&#x2F;SQL procedure successfully completed.How It WorksAny loop in PL&#x2F;SQL can be labeled using a similar style to labels for code blocks. The label can be anyvalid identifier surrounded by angle brackets before the loop, and optionally the identifier can be placedat the end after the END LOOP clause. The result of such a labeling mechanism is that you will have adistinct start and end to the loops and more control over loop execution.In the Solution to this recipe, the label helps identify the outer loop so that it can be terminated withthe EXIT clause. Without a label, the EXIT will terminate the innermost FOR loop. However, the label canalso be used to help identify the loop’s index. In the Solution, this is not necessary because the outer loopindex was named differently than the inner loop index. If both indexes were named the same, then youcould use the loop label along with the index name to fully qualify the index. The following exampledemonstrates this technique:\nBEGIN\n&lt;&lt;outer&gt;&gt; FOR idx IN 1 .. 10 LOOP\n&lt;&lt;inner&gt;&gt; FOR idx IN 1 .. 10 LOOP\n  DBMS_OUTPUT.PUT(inner.idx);\nEXIT inner WHEN inner.idx &gt; outer.idx * 2;\nEXIT outer WHEN inner.idx &#x3D; 10;\nEND LOOP;\n  DBMS_OUTPUT.NEW_LINE;\nEND LOOP;\n  DBMS_OUTPUT.NEW_LINE;\nEND;\n\nThis code will display the same results as the example given in the Solution to this recipe. The onlydifference is that in this example the index name is the same in both the inner and outer loops. Analternative technique to end the current iteration of an inner loop is to use the CONTINUE statement. ACONTINUE statement can reference the label of a loop that is within the same scope. Therefore, an innerloop can exit its current iteration and proceed to an outer loop, as the following example demonstrates:\n\nBEGIN\n&lt;&lt;outer&gt;&gt; for idx1 in 1 .. 10 loop\n&lt;&lt;inner&gt;&gt; for idx2 in 1 .. 10 loop\ndbms_output.put(idx2);\nexit inner when idx2 &gt; idx1 * 2;\nexit outer when idx2 &#x3D; 10;\nEND LOOP;\nCONTINUE outer;\nEND LOOP;\nDBMS_OUTPUT.NEW_LINE;\nEND;\nIn this example, the same code that is used in the Solution to this recipe is rewritten to incorporate aCONTINUE statement. This statement is used to move control of execution back to the outer loop. Whenthe CONTINUE statement is reached, execution of the current loop is immediately halted, and processingcontinues to the loop designated by the label.\n3.14. Jumping to a Designated Location in CodeProblemYou want your code to stop executing and jump to a different, designated location.SolutionUse a GOTO statement along with a label name to cause code execution to jump into the position wherethe label is located.The following example shows the GOTO statement in action. The user is prompted to enter a numericvalue, and that value is then evaluated to determine whether it is greater than ten. In either case, amessage is printed, and then the code jumps to the end_msg label. If the number entered is a negativenumber, then the code jumps to the bad_input label where an error message is printed.\nDECLARE\n in_number number :&#x3D; 0; \nBEGIN \n in_number :&#x3D; &#39;&amp;input_number&#39;; \n IF in_number &gt; 10 THEN \n DBMS_OUTPUT.PUT_LINE(&#39;The number you entered is greater than ten&#39;); \n GOTO end_msg; \n ELSIF in_number &lt;&#x3D; 10 and in_number &gt; 0 THEN \n DBMS_OUTPUT.PUT_LINE(&#39;The number you entered is less than or equal to ten&#39;); \n GOTO end_msg; \n ELSE \n -- Entered a negative number \n GOTO bad_input; \n END IF; \n &lt;&lt; bad_input &gt;&gt; \n DBMS_OUTPUT.PUT_LINE(&#39;Invalid input. No negatives allowed.&#39;); \n &lt;&lt; end_msg &gt;&gt; \n DBMS_OUTPUT.PUT_LINE(&#39;Thank you for playing..&#39;); \nEND; \nHow It WorksThe GOTO statement is used to branch code unconditionally. Code can be branched to any label withinthe same scope as the GOTO. In the Solution, the GOTO statement causes the code to branch to a parentcode block. You could just as easily branch to a loop within the current or outer block. However, youcannot branch to a label within a subblock, IF statement, or LOOP. \nYou should use this statement sparingly because arbitrary branching makes code difficult to read. Useconditional statements to branch whenever possible, because that’s why they were put into thelanguage. As you can see from the Solution, the same code could have been written printing the “Invalidnumber” message within the ELSE clause. There are usually better alternatives to using GOTO.\n","dateCreated":"2022-11-08T23:13:36+08:00","dateModified":"2022-11-08T23:38:40+08:00","datePublished":"2022-11-08T23:13:36+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 03-Looping and Logic","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 03-Looping and Logic">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:13:36.105Z">
+<meta property="article:modified_time" content="2022-11-08T15:38:40.495Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 03-Looping and Logic
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:13:36+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#3-Looping-and-Logic"><span class="toc-text">3. Looping and Logic</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-Choosing-When-to-Execute-Code"><span class="toc-text">3.1. Choosing When to Execute Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-Choosing-Between-Two-Mutually-Exclusive-Conditions"><span class="toc-text">3-2. Choosing Between Two Mutually Exclusive Conditions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-Evaluating-Multiple-Mutually-Exclusive-Conditions"><span class="toc-text">3.3. Evaluating Multiple Mutually Exclusive Conditions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-Driving-from-an-Expression-Having-Multiple-Outcomes"><span class="toc-text">3.4 Driving from an Expression Having Multiple Outcomes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-Looping-Until-a-Specified-Condition-Is-Met"><span class="toc-text">3.5. Looping Until a Specified Condition Is Met</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-6-Iterating-Cursor-Results-Until-All-Rows-Have-Been-Returned"><span class="toc-text">3.6. Iterating Cursor Results Until All Rows Have Been Returned</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-7-Iterating-Until-a-Condition-Evaluates-to-FALSE"><span class="toc-text">3.7. Iterating Until a Condition Evaluates to FALSE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-8-Bypassing-the-Current-Loop-Iteration"><span class="toc-text">3.8.Bypassing the Current Loop Iteration</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-9-Iterating-a-Fixed-Number-of-Times"><span class="toc-text">3.9. Iterating a Fixed Number of Times</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-11-Iterating-in-Increments-Other-Than-One"><span class="toc-text">3.11 Iterating in Increments Other Than One</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-12-Stepping-Through-a-Loop-Based-on-Odd-Numbered-Increments"><span class="toc-text">3.12. Stepping Through a Loop Based on Odd-Numbered Increments</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-13-Exiting-an-Outer-Loop-Prematurely"><span class="toc-text">3.13. Exiting an Outer Loop Prematurely</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-14-Jumping-to-a-Designated-Location-in-Code"><span class="toc-text">3.14. Jumping to a Designated Location in Code</span></a></li></ol></li></ol>
+
+
+<h1 id="3-Looping-and-Logic"><a href="#3-Looping-and-Logic" class="headerlink" title="3. Looping and Logic"></a>3. Looping and Logic</h1><h2 id="3-1-Choosing-When-to-Execute-Code"><a href="#3-1-Choosing-When-to-Execute-Code" class="headerlink" title="3.1. Choosing When to Execute Code"></a>3.1. Choosing When to Execute Code</h2><p><strong><strong>Problem</strong></strong><br>Your code contains a condition, and you are interested in executing code to perform specific actions if the condition evaluates to <code>TRUE</code>, <code>FALSE</code>, or <code>NULL</code>.<br><strong><strong>Solution</strong></strong><br>Use an <code>IF-THEN</code> statement to evaluate an expression (or condition) and determine which code to execute<br>as a result. The following example depicts a very simple <code>IF-THEN</code> statement that evaluates one variable to see whether it contains a larger value than another variable. If so, then the statements contained within the <code>IF-THEN</code> statement are executed; otherwise, they are ignored. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ value_one NUMBER :&#x3D; &amp;value_one; 
+ value_two NUMBER :&#x3D; &amp;value_two; 
+BEGIN 
+ IF value_one &gt; value_two THEN 
+ DBMS_OUTPUT.PUT_LINE(&#39;value_one is greater than value_two&#39;); 
+ END IF; 
+END; </code></pre>
+<p>As you can see from the example, if value_one is greater than value_two, a line of output will be printed stating so. Otherwise, the IF statement is bypassed, and processing continues.<br><strong><strong>How It Works</strong></strong><br>As shown in the <strong>Solution</strong>, the general format for the IF-THEN statement is as follows:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">IF condition THEN
+ Statements to be executed 
+ …
+END IF; </code></pre>
+<p>The <code>IF-THEN</code> statement is one of the most frequently used conditional statements. If a given condition evaluates to <code>TRUE</code>, then the code contained within the IF-THEN statement is executed. If the condition evaluates to FALSE or NULL, then the statement is exited. However, it is possible to incorporate(vt.包含,吸收) a different set of statements if the condition is not satisfied. Please see Recipe 3-2 for an example. Any number of <code>IF-THEN</code> statements can be nested within one another. The statements within the <code>IF-THEN</code> will be executed if the condition that is specified evaluates to <code>TRUE</code>.</p>
+<h2 id="3-2-Choosing-Between-Two-Mutually-Exclusive-Conditions"><a href="#3-2-Choosing-Between-Two-Mutually-Exclusive-Conditions" class="headerlink" title="3-2. Choosing Between Two Mutually Exclusive Conditions"></a>3-2. Choosing Between Two Mutually Exclusive Conditions</h2><p><strong><strong>Problem</strong></strong><br>You have two conditions that are mutually(美 [‘mjutʃuəli]adv.互相地,互助) exclusive. You want to execute one set of statements if the<br>first condition evaluates to TRUE. Otherwise, if the first condition is FALSE or NULL, then execute a different<br>set of statements.<br><strong><strong>Solution</strong></strong><br>Use an IF-ELSE statement to evaluate the condition and execute the statements that correspond to it if<br>the condition evaluates to TRUE. In the following example, a given employee ID is used to query the<br>EMPLOYEES table. If that employee exists, then the employee record will be retrieved. If not found, then a<br>message will be displayed stating that no match was found. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ employee employees%ROWTYPE; 
+ emp_count number :&#x3D; 0; 
+BEGIN 
+ SELECT count(*) 
+ INTO emp_count 
+ FROM employees 
+ WHERE employee_id &#x3D; 100; 
+ IF emp_count &gt; 0 THEN 
+ SELECT * 
+ INTO employee 
+ FROM employees 
+ WHERE employee_id &#x3D; 100; 
+ IF employee.manager_id IS NOT NULL THEN 
+ DBMS_OUTPUT.PUT_LINE(employee.first_name || &#39; &#39; || employee.last_name || 
+ &#39; has an assigned manager.&#39;); 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE(employee.first_name || &#39; &#39; || employee.last_name || 
+ &#39; does not have an assigned manager.&#39;); 
+END IF; 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE(&#39;The given employee ID does not match any records, &#39;|| 
+ &#39; please try again&#39;); 
+ END IF; 
+EXCEPTION 
+ WHEN NO_DATA_FOUND THEN 
+ DBMS_OUTPUT.PUT_LINE(&#39;Try another employee ID.&#39;); 
+END; </code></pre>
+<p>In the real world, the employee ID would not be hard-coded into the example. However, this example provides a good scenario for evaluating mutually exclusive conditions and also nesting IF statements.<br><strong><strong>How It Works</strong></strong><br>The <code>IF-ELSE</code> statement syntax is basically the same as the <code>IF-THEN</code> syntax, except that a different set of<br>statements is executed in the ELSE clause when the condition evaluates to FALSE or NULL. Therefore, if the<br>first condition is FALSE or NULL, then the control automatically drops down into the statements contained<br>within the ELSE clause and executes them.</p>
+<h2 id="3-3-Evaluating-Multiple-Mutually-Exclusive-Conditions"><a href="#3-3-Evaluating-Multiple-Mutually-Exclusive-Conditions" class="headerlink" title="3.3. Evaluating Multiple Mutually Exclusive Conditions"></a>3.3. Evaluating Multiple Mutually Exclusive Conditions</h2><p><strong><strong>Problem</strong></strong><br>Your application has multiple conditions to evaluate, and each of them is mutually exclusive. If one of<br>the conditions evaluates to FALSE, you’d like to evaluate the next one. You want that process to continue<br>until there are no more conditions.<br>Two <strong>Solution</strong>s are possible: one using IF and the other using <code>CASE</code>.</p>
+<p><strong><strong>Solution</strong> #1</strong><br>Use an <code>IF-ELSIF-ELSE</code> statement to perform an evaluation of all mutually exclusive conditions. The following example is a SQL*Plus script that queries how many countries are in a specified region.</p>
+<p>If the region that is typed as input when the following example executes matches any of the regions specified by the conditions in the IF statement, then subsequent statements are executed. However, a default message is displayed if the input does not match any region.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ Region regions.region_name%TYPE :&#x3D; &#39;&amp;region&#39;; 
+ country_count number :&#x3D; 0; 
+BEGIN 
+ IF upper(region) &#x3D; &#39;EUROPE&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 1; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Europe region.&#39;); 
+ ELSIF upper(region) &#x3D; &#39;AMERICAS&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 2; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || 
+ &#39;the Americas region.&#39;); 
+ ELSIF upper(region) &#x3D; &#39;ASIA&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 3; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || 
+ &#39;the Asia region.&#39;); 
+ ELSIF upper(region) &#x3D; &#39;MIDDLE EAST AND AFRICA&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 4; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || 
+ &#39;the Middle East and Africa region.&#39;); 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE(&#39;You have entered an invaid region, please try again&#39;); 
+ END IF; 
+END; </code></pre>
+<p><strong><strong>Solution</strong> #2</strong><br>You can use the searched <code>CASE</code> statement to evaluate a boolean expression to determine which statements to execute among multiple, mutually exclusive conditions. The next example is a SQL*Plus script that performs the same tasks as <strong><strong>Solution</strong> #1</strong> but this time using a searched <code>CASE</code> statement:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ region regions.region_name%TYPE :&#x3D; &#39;&amp;region&#39;; 
+ country_count number :&#x3D; 0; 
+BEGIN 
+ CASE 
+ WHEN upper(region) &#x3D; &#39;EUROPE&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 1; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || 
+ &#39;the Europe region.&#39;); 
+ WHEN upper(region) &#x3D; &#39;AMERICAS&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 2; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || 
+ &#39;the Americas region.&#39;); 
+ WHEN upper(region) &#x3D; &#39;ASIA&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 3; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || 
+ &#39;the Asia region.&#39;); 
+ WHEN upper(region) &#x3D; &#39;MIDDLE EAST AND AFRICA&#39; THEN 
+ SELECT count(*) 
+ INTO country_count 
+ FROM countries 
+ WHERE region_id &#x3D; 4; 
+ DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || 
+ &#39;the Middle East and Africa region.&#39;); 
+ ELSE 
+ DBMS_OUTPUT.PUT_LINE(&#39;You have entered an invaid region, please try again&#39;); 
+ END CASE; 
+END; 
+</code></pre>
+<p><strong><strong>How It Works</strong></strong><br>IF-ELSIF-ELSE can be used to evaluate any number of conditions. It functions such that if the first<br>condition in the IF-ELSIF-ELSE statement evaluates to TRUE, then the statements within its block are<br>executed, and all others are bypassed. Similarly, if the first condition evaluates to FALSE and the second<br>condition evaluates to TRUE, then the second condition’s statements will be executed, others will be<br>ignored, and so on.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CASE
+ WHEN &lt;&lt;boolean_expression&gt;&gt; THEN &lt;&lt;statements&gt;&gt; 
+[ELSE statements]; </code></pre>
+
+
+<h2 id="3-4-Driving-from-an-Expression-Having-Multiple-Outcomes"><a href="#3-4-Driving-from-an-Expression-Having-Multiple-Outcomes" class="headerlink" title="3.4 Driving from an Expression Having Multiple Outcomes"></a>3.4 Driving from an Expression Having Multiple Outcomes</h2><p><strong><strong>Problem</strong></strong><br>You have a single expression that yields multiple outcomes. You are interested in evaluating the expression and performing a different set of statements depending upon the outcome.<br><strong><strong>Solution</strong></strong><br>Use a CASE statement to evaluate your expression, and decide which set of statements to execute depending upon the outcome. In the following example, a SQL*Plus script accepts a region entry, which is being evaluated to determine the set of statements to be executed. Based upon the value of the region, the corresponding set of statements is executed, and once those statements have been executed, then the control is passed to the statement immediately following the CASE statement. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ region regions.region_name%TYPE :&#x3D; &#39;&amp;region&#39;; 
+ country_count number :&#x3D; 0; 
+BEGIN 
+ CASE upper(region) 
+ WHEN &#39;EUROPE&#39; THEN 
+    SELECT count(*) 
+    INTO country_count 
+    FROM countries 
+    WHERE region_id &#x3D; 1; 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Europe region.&#39;); 
+ WHEN &#39;AMERICAS&#39; THEN 
+    SELECT count(*) 
+    INTO country_count 
+    FROM countries 
+    WHERE region_id &#x3D; 2; 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; ||&#39;the Americas region.&#39;); 
+ WHEN &#39;ASIA&#39; THEN 
+    SELECT count(*) 
+    INTO country_count 
+    FROM countries 
+    WHERE region_id &#x3D; 3; 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Asia region.&#39;); 
+ WHEN &#39;MIDDLE EAST AND AFRICA&#39; THEN 
+    SELECT count(*) 
+    INTO country_count 
+    FROM countries 
+    WHERE region_id &#x3D; 4; 
+    DBMS_OUTPUT.PUT_LINE(&#39;There are &#39; || country_count || &#39; countries in &#39; || &#39;the Middle East and Africa region.&#39;); 
+ ELSE 
+    DBMS_OUTPUT.PUT_LINE(&#39;You have entered an invaid region, please try again&#39;); 
+ END CASE; 
+END; 
+</code></pre>
+
+<p><strong><strong>How It Works</strong></strong><br>There are two different types of CASE statements that can be used—those being the searched CASE and the simple CASE statement. The <strong>Solution</strong> to this recipe demonstrates the simple CASE. For an example of a searched CASE statement, please see Recipe 3-3.</p>
+<p>The simple CASE statement begins with the keyword CASE followed by a single expression called a selector. The selector is evaluated one time, and it can evaluate to any PL&#x2F;SQL type other than BLOB, BFILE, an object type, a record, or a collection type. The selector is followed by a series of WHEN clauses. The WHEN clauses are evaluated sequentially to determine whether the value of the selector equals the result from any of the WHEN clause expressions. If a match is found, then the corresponding WHEN clause is executed.</p>
+<p>The CASE statement can include any number of WHEN clauses, and much like an IF statement, it can be followed with a trailing ELSE clause that will be executed if none of the WHEN expressions matches. If the ELSE clause is omitted, a predefined exception will be raised if the CASE statement does not match any of the WHEN clauses. The END CASE keywords end the statement.</p>
+<h2 id="3-5-Looping-Until-a-Specified-Condition-Is-Met"><a href="#3-5-Looping-Until-a-Specified-Condition-Is-Met" class="headerlink" title="3.5. Looping Until a Specified Condition Is Met"></a>3.5. Looping Until a Specified Condition Is Met</h2><p><strong><strong>Problem</strong></strong><br>You want to loop through a set of statements until a specified condition evaluates to true.<br><strong><strong>Solution</strong></strong><br>Use a simple <code>LOOP</code> statement along with an <code>EXIT</code> clause to define a condition that will end the iteration.<br>The following example shows a simple LOOP that will print out each employee with a department_id equal<br>to 90:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+CURSOR emp_cur IS
+SELECT *
+FROM employees
+WHERE department_id &#x3D; 90;
+emp_rec employees%ROWTYPE;
+
+BEGIN
+OPEN emp_cur;
+LOOP
+  FETCH emp_cur into emp_rec;
+  IF emp_cur%FOUND THEN
+    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name ||&#39;-&#39;|| emp_rec.email);
+  ELSE
+    EXIT;
+  END IF;
+END LOOP;
+CLOSE emp_cur;
+END;
+</code></pre>
+
+<p>As you can see from the example, the cursor is opened prior to the start of the loop. Inside the loop,<br>the cursor is fetched into emp_rec, and emp_rec is evaluated to see whether it contains anything using the<br>cursor %FOUND attribute. If emp_cur%FOUND is FALSE, then the loop is exited using the EXIT keyword.<br><strong><strong>How It Works</strong></strong><br>The simple LOOP structure is very easy to use for generating a loop in your code. The LOOP keyword is used<br>to start the loop, and the END LOOP keywords are used to terminate it. Every simple loop must contain an<br>EXIT or GOTO statement; otherwise, the loop will become infinite and run indefinitely.<br>You can use a couple of different styles for the EXIT. When used alone, the EXIT keyword causes a<br>loop to be terminated immediately, and control is passed to the first statement following the loop. You<br>can use the EXIT-WHEN statement to terminate the loop based upon the evaluation of a condition after the<br>WHEN statement. If the condition evaluates to TRUE, then the loop is terminated; otherwise, it will<br>continue.<br>The following example shows the same LOOP as the example in the <strong>Solution</strong>, but instead of using an<br>IF statement to evaluate the content of emp_rec, the <code>EXIT-WHEN</code> statement is used:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+CURSOR emp_cur IS
+SELECT *
+FROM employees
+WHERE department_id &#x3D; 90;
+emp_rec employees%ROWTYPE;
+BEGIN
+OPEN emp_cur;
+ LOOP 
+ FETCH emp_cur into emp_rec; 
+ EXIT WHEN emp_cur%NOTFOUND; 
+      DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name || &#39;-&#39; || emp_rec.email); 
+ END LOOP; 
+ CLOSE emp_cur; 
+END; </code></pre>
+<p>You can use a loop to iterate over any number of things including cursors or collections of data. As<br>you will see in some of the coming recipes, different forms of loops work better in different<br>circumstances. </p>
+<h2 id="3-6-Iterating-Cursor-Results-Until-All-Rows-Have-Been-Returned"><a href="#3-6-Iterating-Cursor-Results-Until-All-Rows-Have-Been-Returned" class="headerlink" title="3.6. Iterating Cursor Results Until All Rows Have Been Returned"></a>3.6. Iterating Cursor Results Until All Rows Have Been Returned</h2><p><strong><strong>Problem</strong></strong><br>You have created a cursor and retrieved a number of rows from the database. As a result, you want to<br>loop through the results and do some processing on them.<br><strong><strong>Solution</strong></strong><br>Use a standard FOR loop to iterate through the records. Within each iteration of the loop, process the<br>current record. The following code shows the use of a FOR loop to iterate through the records retrieved<br>from the cursor and display each employee name and e-mail. Each iteration of the loop returns an<br>employee with the job_id of ‘ST_MAN’, and the loop will continue to execute until the cursor has been<br>exhausted.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ CURSOR emp_cur IS 
+ SELECT * 
+ FROM employees 
+ WHERE job_id &#x3D; &#39;ST_MAN&#39;; 
+ emp_rec employees%ROWTYPE; 
+BEGIN 
+ FOR emp_rec IN emp_cur LOOP 
+ DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name || 
+ &#39; - &#39; || emp_rec.email); 
+ END LOOP; 
+END; </code></pre>
+
+<p>Here are the results:<br>Matthew Weiss - MWEISS<br>Adam Fripp - AFRIPP<br>Payam Kaufling - PKAUFLIN<br>Shanta Vollman - SVOLLMAN<br>Kevin Mourgos - KMOURGOS<br>PL&#x2F;SQL procedure successfully completed</p>
+<p>As you can see, the employee records that meet the specified criteria are displayed.</p>
+<h2 id="3-7-Iterating-Until-a-Condition-Evaluates-to-FALSE"><a href="#3-7-Iterating-Until-a-Condition-Evaluates-to-FALSE" class="headerlink" title="3.7. Iterating Until a Condition Evaluates to FALSE"></a>3.7. Iterating Until a Condition Evaluates to FALSE</h2><p><strong><strong>Problem</strong></strong><br>You want to iterate over a series of statements until a specified condition no longer evaluates to TRUE.<br><strong><strong>Solution</strong></strong><br>Use a WHILE statement to test the condition, and execute the series of statements if the condition<br>evaluates to TRUE; otherwise, skip the statements completely. The following example shows a WHILE<br>statement evaluating the current value of a variable and looping through until the value of the variable<br>reaches ten. Within the loop, this variable is being multiplied by two and printing out its current value.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ myValue NUMBER :&#x3D; 1; 
+BEGIN 
+WHILE myValue &lt; 10 LOOP 
+ DBMS_OUTPUT.PUT_LINE(&#39;The current value is: &#39; || myValue); 
+ myValue :&#x3D; myValue * 2; 
+ END LOOP;
+END;</code></pre>
+
+<p>Here are the results:<br>The current value is: 1<br>The current value is: 2<br>The current value is: 4<br>The current value is: 8<br>PL&#x2F;SQL procedure successfully completed.<br>The important thing to note in this example is that the value of myValue is increased with each<br>iteration of the loop as to eventually meet the condition specified in the <code>WHILE</code> loop.</p>
+<p><strong><strong>How It Works</strong></strong><br>The WHILE loop tests a condition at the top of the loop, and if it evaluates to TRUE, then the statements within the loop are executed, and control is returned to the start of the loop where the condition is tested again. If the condition does not evaluate to TRUE, the loop is bypassed, and control goes to the next statement after the END LOOP. If the condition never fails, then an infinite loop is formed, so it is important to ensure that the condition will eventually evaluate to FALSE. It is important to note that the statements in the loop will never be executed if the condition evaluates to FALSE during the first pass. This situation is different from the simple loop that always<br>iterates at least once because the EXIT condition is usually evaluated elsewhere in the loop. To ensure that a WHILE loop is always executed at least one time, you must ensure that the condition evaluates to TRUE at least once. One way to do this is to use a flag variable that is evaluated with each iteration of the loop. Set the flag equal to FALSE prior to starting the loop, and then set it to TRUE when a certain condition is met inside the loop. The following pseudocode depicts such a <strong>Solution</strong>:</p>
+<pre class="language-none"><code class="language-none">BEGIN 
+ flag &#x3D; FALSE; 
+ WHILE flag &#x3D; TRUE LOOP 
+Perform statements 
+ flag &#x3D; Boolean expression; 
+ END LOOP; 
+END; </code></pre>
+<p>As mentioned previously, the boolean expression that is assigned to the flag in this case must<br>eventually evaluate to FALSE; otherwise, an infinite loop will occur.</p>
+<h2 id="3-8-Bypassing-the-Current-Loop-Iteration"><a href="#3-8-Bypassing-the-Current-Loop-Iteration" class="headerlink" title="3.8.Bypassing the Current Loop Iteration"></a>3.8.Bypassing the Current Loop Iteration</h2><p><strong><strong>Problem</strong></strong><br>If a specified conditional statement evaluates to TRUE, you want to terminate the current loop iteration of<br>the loop early and start the next iteration immediately.<br><strong><strong>Solution</strong></strong><br>Use a CONTINUE statement along with a condition to end the current iteration. In the following example, a loop is used to iterate through the records in the employees table. The primary reason for the loop is to print out a list of employees who receive a salary greater than 15,000. If an employee does not receive more than 15,000, then nothing is printed out, and the loop continues to the next iteration.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+    CURSOR emp_cur is 
+    SELECT * 
+    FROM employees; 
+    emp_rec emp_cur%ROWTYPE; 
+BEGIN 
+    DBMS_OUTPUT.PUT_LINE(&#39;Employees with salary &gt; 15000: &#39;); 
+OPEN emp_cur;
+ LOOP 
+ FETCH emp_cur INTO emp_rec; 
+ EXIT WHEN emp_cur%NOTFOUND; 
+ IF emp_rec.salary &lt; 15000 THEN 
+ CONTINUE;
+ ELSE 
+    DBMS_OUTPUT.PUT_LINE(&#39;Employee: &#39; || emp_rec.first_name || &#39; &#39; || emp_rec.last_name); 
+ END IF; 
+ END LOOP; 
+ CLOSE emp_cur; 
+END; </code></pre>
+
+<p>Here are some sample results:<br>Employees with salary &gt; 15000:<br>Employee: Steven King<br>Employee: Neena Kochhar<br>Employee: Lex De Haan<br>PL&#x2F;SQL procedure successfully completed.<br><strong><strong>How It Works</strong></strong><br>You can use the CONTINUE statement in any loop to unconditionally halt execution of the current iteration<br>of the loop and move to the next. As shown in the <strong>Solution</strong>, the CONTINUE statement is usually<br>encompassed within some conditional statement so that it is invoked only when that certain condition<br>is met. </p>
+<p>You can use the CONTINUE statement along with a label in order to jump to a specified point in the<br>program. Rather than merely using CONTINUE to bypass the current loop iteration, specifying a label will<br>allow you to resume programming in an outer loop. For more information regarding the use of the<br>CONTINUE statement along with labels in nested loops, please see Recipe 3-13.<br>As an alternative to specifying CONTINUE from within an IF statement, you can choose to write a<br>CONTINUE WHEN statement. For example, the following two approaches yield identical results: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"> IF team_rec.total_points &lt; 10 THEN 
+ CONTINUE; 
+or 
+ CONTINUE WHEN rec.total_points &lt; 10; </code></pre>
+
+<p>Using the <code>CONTINUE WHEN</code> format, the loop will stop its current iteration if the condition in the WHEN<br>clause is met. Otherwise, the iteration will ignore the statement altogether.</p>
+<h2 id="3-9-Iterating-a-Fixed-Number-of-Times"><a href="#3-9-Iterating-a-Fixed-Number-of-Times" class="headerlink" title="3.9. Iterating a Fixed Number of Times"></a>3.9. Iterating a Fixed Number of Times</h2><p><strong><strong>Problem</strong></strong><br>You are interested in executing the contents of a loop a specified number of times. For example, you are<br>interested in executing a loop ten times, and you need to number each line of output in the range by the<br>current loop index.<br><strong><strong>Solution</strong></strong><br>Write a FOR loop. Use a variable to store the current index of the loop while looping through a range of<br>numbers from one to ten in ascending order. The following lines of code will iterate ten times through a<br>loop and print out the current index in each pass:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN 
+ FOR idx IN 1..10 LOOP 
+ DBMS_OUTPUT.PUT_LINE(&#39;The current index is: &#39; || idx); 
+ END LOOP; 
+END;</code></pre>
+<pre class="language-none"><code class="language-none">Here is the result: 
+The current index is: 1 
+The current index is: 2 
+The current index is: 3 
+The current index is: 4 
+The current index is: 5 
+The current index is: 6 
+The current index is: 7 
+The current index is: 8 
+The current index is: 9
+The current index is: 10</code></pre>
+<p>PL&#x2F;SQL procedure successfully completed.<br><strong><strong>How It Works</strong></strong><br>The FOR loop will increment by one through the given range for each iteration until it reaches the end.<br>The loop is opened using the keyword FOR, followed by a variable that will be used as the index for the<br>loop. Following the index variable is the IN keyword, which is used to signify that the index variable<br>should increment one by one through the given range, which is listed after the IN keyword. The loop is<br>terminated using the END LOOP keywords.<br>Each statement contained within the loop is executed once for each iteration of the loop. The index<br>variable can be used within the loop, but it cannot be changed. As shown in the <strong>Solution</strong>, you may use<br>the index for printing purposes, and it is oftentimes used in calculations as well.<br>The REVERSE keyword should be placed directly after the IN keyword and before the range that you<br>specify. The REVERSE keyword has no effect when working with cursors. If you need to iterate through<br>cursor results in a specific order, then specify an ORDER BY clause in your SELECT statement. </p>
+<h2 id="3-11-Iterating-in-Increments-Other-Than-One"><a href="#3-11-Iterating-in-Increments-Other-Than-One" class="headerlink" title="3.11 Iterating in Increments Other Than One"></a>3.11 Iterating in Increments Other Than One</h2><p>3-11. Iterating in Increments Other Than One<br><strong><strong>Problem</strong></strong><br>Rather than iterating through a range of numbers one at a time, you want to increment by some other<br>value. For example, you might want to increment through even values such as 2, 4, 6, and so forth.<br><strong><strong>Solution</strong></strong><br>Multiply the loop index by two (or by whatever other multiplier you need) to achieve the effect of<br>incrementing through all even numbers. As you can see in the following example, an even number is<br>always generated when the index is multiplied by two: </p>
+<pre class="language-none"><code class="language-none">BEGIN 
+ FOR idx IN 1..5 LOOP 
+ DBMS_OUTPUT.PUT_LINE(&#39;The current index is: &#39; || idx*2); 
+ END LOOP; 
+END;</code></pre>
+<p>Here is the result:<br>The current index is: 2<br>The current index is: 4<br>The current index is: 6<br>The current index is: 8<br>The current index is: 10<br>PL&#x2F;SQL procedure successfully completed.<br><strong><strong>How It Works</strong></strong><br>Unlike some other languages, PL&#x2F;SQL does not include a STEP clause that can be used while looping. To<br>work around that limitation, you will need to write your own stepping algorithm. In the <strong>Solution</strong> to this<br>recipe, you can see that the algorithm was quite easy; you simply multiply the index by two to achieve<br>the desired result. In this <strong>Solution</strong>, assigning the range of 1..5 as the index produces the effect of iterating<br>through all even numbers from 2..10 when the current index is multiplied by two.<br>Using similar techniques, you can increment through ranges of numbers in various intervals.<br>However, sometimes this can become troublesome if you are attempting to step by anything other than<br>even numbers. You can see an example of this in the next recipe.</p>
+<h2 id="3-12-Stepping-Through-a-Loop-Based-on-Odd-Numbered-Increments"><a href="#3-12-Stepping-Through-a-Loop-Based-on-Odd-Numbered-Increments" class="headerlink" title="3.12. Stepping Through a Loop Based on Odd-Numbered Increments"></a>3.12. Stepping Through a Loop Based on Odd-Numbered Increments</h2><p><strong><strong>Problem</strong></strong><br>Rather than iterating through a range of numbers by even increments, you prefer to loop through the<br>range using odd increments.<br><strong><strong>Solution</strong></strong><br>Use the built-in MOD function to determine whether the current index is odd. If it is odd, then print out<br>the value; otherwise, continue to the next iteration. The following example shows how to implement this<br><strong>Solution</strong>:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN 
+ FOR idx IN 1..10 LOOP 
+ IF MOD(idx,2) !&#x3D; 0 THEN 
+ DBMS_OUTPUT.PUT_LINE(&#39;The current index is: &#39; || idx); 
+ END IF; 
+ END LOOP; 
+END; </code></pre>
+
+<p>Results:<br>The current index is: 1<br>The current index is: 3<br>The current index is: 5<br>The current index is: 7<br>The current index is: 9<br>PL&#x2F;SQL procedure successfully completed.<br><strong><strong>How It Works</strong></strong><br>The <strong>Solution</strong> depicts one possible workaround for a STEP replacement. Using the MOD function to<br>determine whether a number is odd works quite well. The MOD function, otherwise known as the modulus<br>function, is used to return the remainder from the division of the two numbers that are passed into the<br>function. Therefore, this function is useful for determining even or odd numbers. In this case, if any<br>value is returned from MOD, then the number is assumed to be odd, and the statements within the IF<br>statement will be executed.<br>Such a technique may be useful in the case of iterating through a collection of data such as a table. If<br>you want to grab every other record from the collection, then performing a stepping <strong>Solution</strong> such as this<br>or the <strong>Solution</strong> from Recipe 3-11 will allow you to achieve the desired result. You could easily use the<br>resulting index from this technique as the index for a collection.</p>
+<h2 id="3-13-Exiting-an-Outer-Loop-Prematurely"><a href="#3-13-Exiting-an-Outer-Loop-Prematurely" class="headerlink" title="3.13. Exiting an Outer Loop Prematurely"></a>3.13. Exiting an Outer Loop Prematurely</h2><p><strong><strong>Problem</strong></strong><br>Your code contains a nested loop, and you want the inner loop to have the ability to exit from both loops<br>and stop iteration completely.<br><strong><strong>Solution</strong></strong><br>Use loop labels for both loops and then reference either loop within an EXIT statement by following the<br>EXIT keyword with a loop label. The following example prints out a series of numbers. During each<br>iteration, the inner loop will increment until it reaches an odd number. At that point, it will pass control<br>to the outer loop again. The outer loop will be exited when the index for the inner loop is greater than or<br>equal to the number ten. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN 
+ &lt;&lt;outer&gt;&gt; for idx1 in 1 .. 10 loop 
+ &lt;&lt;inner&gt;&gt; for idx2 in 1 .. 10 loop 
+ dbms_output.put(idx2); 
+ exit inner when idx2 &gt; idx1 * 2; 
+ exit outer when idx2 &#x3D; 10; 
+ END LOOP; 
+ DBMS_OUTPUT.NEW_LINE; 
+ END LOOP; 
+ DBMS_OUTPUT.NEW_LINE; 
+END;</code></pre>
+<p>Results:<br>123<br>12345<br>1234567<br>123456789<br>12345678910<br>PL&#x2F;SQL procedure successfully completed.<br><strong><strong>How It Works</strong></strong><br>Any loop in PL&#x2F;SQL can be labeled using a similar style to labels for code blocks. The label can be any<br>valid identifier surrounded by angle brackets before the loop, and optionally the identifier can be placed<br>at the end after the END LOOP clause. The result of such a labeling mechanism is that you will have a<br>distinct start and end to the loops and more control over loop execution.<br>In the <strong>Solution</strong> to this recipe, the label helps identify the outer loop so that it can be terminated with<br>the EXIT clause. Without a label, the EXIT will terminate the innermost FOR loop. However, the label can<br>also be used to help identify the loop’s index. In the <strong>Solution</strong>, this is not necessary because the outer loop<br>index was named differently than the inner loop index. If both indexes were named the same, then you<br>could use the loop label along with the index name to fully qualify the index. The following example<br>demonstrates this technique:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">BEGIN
+&lt;&lt;outer&gt;&gt; FOR idx IN 1 .. 10 LOOP
+&lt;&lt;inner&gt;&gt; FOR idx IN 1 .. 10 LOOP
+  DBMS_OUTPUT.PUT(inner.idx);
+EXIT inner WHEN inner.idx &gt; outer.idx * 2;
+EXIT outer WHEN inner.idx &#x3D; 10;
+END LOOP;
+  DBMS_OUTPUT.NEW_LINE;
+END LOOP;
+  DBMS_OUTPUT.NEW_LINE;
+END;</code></pre>
+
+<p>This code will display the same results as the example given in the <strong>Solution</strong> to this recipe. The only<br>difference is that in this example the index name is the same in both the inner and outer loops. An<br>alternative technique to end the current iteration of an inner loop is to use the CONTINUE statement. A<br>CONTINUE statement can reference the label of a loop that is within the same scope. Therefore, an inner<br>loop can exit its current iteration and proceed to an outer loop, as the following example demonstrates:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">
+BEGIN
+&lt;&lt;outer&gt;&gt; for idx1 in 1 .. 10 loop
+&lt;&lt;inner&gt;&gt; for idx2 in 1 .. 10 loop
+dbms_output.put(idx2);
+exit inner when idx2 &gt; idx1 * 2;
+exit outer when idx2 &#x3D; 10;
+END LOOP;
+CONTINUE outer;
+END LOOP;
+DBMS_OUTPUT.NEW_LINE;
+END;</code></pre>
+<p>In this example, the same code that is used in the <strong>Solution</strong> to this recipe is rewritten to incorporate a<br>CONTINUE statement. This statement is used to move control of execution back to the outer loop. When<br>the CONTINUE statement is reached, execution of the current loop is immediately halted, and processing<br>continues to the loop designated by the label.</p>
+<h2 id="3-14-Jumping-to-a-Designated-Location-in-Code"><a href="#3-14-Jumping-to-a-Designated-Location-in-Code" class="headerlink" title="3.14. Jumping to a Designated Location in Code"></a>3.14. Jumping to a Designated Location in Code</h2><p><strong><strong>Problem</strong></strong><br>You want your code to stop executing and jump to a different, designated location.<br><strong><strong>Solution</strong></strong><br>Use a GOTO statement along with a label name to cause code execution to jump into the position where<br>the label is located.<br>The following example shows the GOTO statement in action. The user is prompted to enter a numeric<br>value, and that value is then evaluated to determine whether it is greater than ten. In either case, a<br>message is printed, and then the code jumps to the end_msg label. If the number entered is a negative<br>number, then the code jumps to the bad_input label where an error message is printed.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE
+ in_number number :&#x3D; 0; 
+BEGIN 
+ in_number :&#x3D; &#39;&amp;input_number&#39;; 
+ IF in_number &gt; 10 THEN 
+ DBMS_OUTPUT.PUT_LINE(&#39;The number you entered is greater than ten&#39;); 
+ GOTO end_msg; 
+ ELSIF in_number &lt;&#x3D; 10 and in_number &gt; 0 THEN 
+ DBMS_OUTPUT.PUT_LINE(&#39;The number you entered is less than or equal to ten&#39;); 
+ GOTO end_msg; 
+ ELSE 
+ -- Entered a negative number 
+ GOTO bad_input; 
+ END IF; 
+ &lt;&lt; bad_input &gt;&gt; 
+ DBMS_OUTPUT.PUT_LINE(&#39;Invalid input. No negatives allowed.&#39;); 
+ &lt;&lt; end_msg &gt;&gt; 
+ DBMS_OUTPUT.PUT_LINE(&#39;Thank you for playing..&#39;); 
+END; </code></pre>
+<p><strong><strong>How It Works</strong></strong><br>The GOTO statement is used to branch code unconditionally. Code can be branched to any label within<br>the same scope as the GOTO. In the <strong>Solution</strong>, the GOTO statement causes the code to branch to a parent<br>code block. You could just as easily branch to a loop within the current or outer block. However, you<br>cannot branch to a label within a subblock, IF statement, or LOOP. </p>
+<p>You should use this statement sparingly because arbitrary branching makes code difficult to read. Use<br>conditional statements to branch whenever possible, because that’s why they were put into the<br>language. As you can see from the <strong>Solution</strong>, the same code could have been written printing the “Invalid<br>number” message within the ELSE clause. There are usually better alternatives to using GOTO.</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/"
+                    data-tooltip="Oracle PLSQL Recipes 04-Functions, Packages,and Procedures"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 04-Functions, Packages,and Procedures"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_02/"
+                    data-tooltip="Oracle PLSQL Recipes 02-基础sql"
+                    aria-label="NEXT: Oracle PLSQL Recipes 02-基础sql"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_04/"
+                    data-tooltip="Oracle PLSQL Recipes 04-Functions, Packages,and Procedures"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 04-Functions, Packages,and Procedures"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_02/"
+                    data-tooltip="Oracle PLSQL Recipes 02-基础sql"
+                    aria-label="NEXT: Oracle PLSQL Recipes 02-基础sql"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_03/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

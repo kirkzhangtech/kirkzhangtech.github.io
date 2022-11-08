@@ -1,0 +1,1338 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 14-Using PL/SQL on the Web - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n\n14. Using PL&#x2F;SQL on the WebOracle’s Application Server provides a powerful gateway that exposes your PL&#x2F;SQL procedures to webbrowsers. The gateway is defined using a Data Access Descriptor (DAD) that runs PL&#x2F;SQL code as eitherthe user defined in the DAD or as the user running the web application.Oracle provides a PL&#x2F;SQL Web Toolkit, which is a set of procedures and functions that generateHTML tags. In addition to making your code easier to read and manage, the toolkit sends the HTMLcode through Apache directly to the client web browser.The following recipes teach you how to write PL&#x2F;SQL procedures that produce interactive webpages. These recipes can be combined to create Solutions for complex business applications. \n14-1. Running a PL&#x2F;SQL Procedure on the WebProblemYou’d like to make your PL&#x2F;SQL procedures accessible to users in a web browser via the OracleApplication Server.SolutionTo run a PL&#x2F;SQL procedure on the Web, you must first configure a Data Access Descriptor (DAD) withinthe Oracle Application Server to define the connection information required between mod_plsql withinthe Oracle Application Server and the Oracle database that holds the PL&#x2F;SQL procedures you wish torun. In this example the mod_plsql configuration file dads.conf (located in [Oracle_Home]\\Apache\\modplsql\\conf) is edited to define the DAD. \n&lt;Location &#x2F;DAD_NAME&gt; \n    SetHandler pls_handler \n    Order deny,allow \n    Deny from all \n    Allow from localhost node1.mycompany.com node2.mycompany.com \n    AllowOverride None \n \n    PlsqlDatabaseUsername ORACLE_SCHEMA_NAME \n    PlsqlDatabasePassword PASSWORD \n    PlsqlDatabaseConnectString TNS_ENTRY \n    PlsqlSessionStateManagement StatelessWithResetPackageState \n    PlsqlMaxRequestsPerSession 1000 \n    PlsqlFetchBufferSize 128 \n    PlsqlCGIEnvironmentList QUERY_STRING \n    PlsqlErrorStyle DebugStyle \n&lt;&#x2F;Location&gt; \nYou may repeat the  data for additional DADs as required; perhaps one DAD for everymajor application. You must restart the Oracle Application Server for changes to the DAD configurationfile to take effect.How It WorksTo verify that your DAD is configured properly and will run your PL&#x2F;SQL code, log into the Oracledatabase defined in your DAD. The Oracle database account is defined in the PlsqlDatabaseUsername,PlsqlDatabasePassword and PlsqlDatabaseConnectString statements. Next, compile the following testprocedure. \ncreate or replace procedure test as \nbegin \n   htp.p (&#39;Hello World!&#39;); \nend; \nFinally, point your web browser to http://node_name/DAD_NAME/test. Where node_name is thename of the machine where the Oracle Application Server is installed and DAD_NAME is the name assignedyour DAD in the  tag within the mod_plsql configuration file and test is the name of thePL&#x2F;SQL procedure create for this test. Your browser should respond with the text “Hello World!”The  tag within the dads.conf file defines the equivalent of a virtual directory withinApache. When a request reaches the Oracle iAS Apache web server containing the location name definedin the DAD, the PL&#x2F;SQL package or procedure specified in the remaining portion of the URL is executed.For example, if the URL is http://node.my_company.com/plsqlcgi/employee.rpt, plsqlcgi is theDAD_NAME, then employee is the package name and rpt is the procedure name. Calls to the PLSQL WebToolkit within the employee.rpt procedure send output directly to the client’s web browser.The SetHandler directive invokes mod_plsql within Apache to handle requests for the virtual pathdefined by the  tag. This directive is required to run PL&#x2F;SQL packages and proceduresthrough the Apache web server.The next three directives restrict access to the virtual path to the nodes specified on the Allow fromline. To allow access from any web browser in the world, replace these three directives with the followingtwo.• Order allow,deny• Allow from allThe PlsqlDatabase directives define the connection information mod_plsql needs to log into thedatabase. If the PlsqlDatabasePassword directive is supplied, Apache will automatically log into thedatabase when requests from web clients are processed. The TNS_ENTRY is used to complete the logininformation. If the PlsqlDatabasePassword directive is omitted, the Web browser prompts the user for ausername and password. The username entered by the user must exist in the database specified by theTNS_ENTRY name and the user must have execute privileges to the requested procedure. The proceduremust be accessible to the ORACLE_SCHEMA_NAME specified in PlsqlDatabaseUsername. In other words, theschema must own the procedure or, if owned by another schema, it must have execute privileges to theprocedure. \n14-2. Creating a Common Set of HTML Page Generation ProceduresProblemEvery web page you generate with a PL&#x2F;SQL procedure requires a common HTML tag to start andanother to finish every web page, and you do not wish to repeat the code to add those tags in everyprocedure you write for the Web.SolutionCreate a package that contains calls to the PL&#x2F;SQL Web Toolkit procedures that produce the HTML codenecessary to properly display a well-formed,1 HTML web page. In this example a package is created withtwo procedures, one to generate the HTML tags required to start a page and one to generate the closingHTML tags to finish a page. \nCREATE OR REPLACE PACKAGE common AS \n \n   PROCEDURE header (title VARCHAR2); \n   PROCEDURE footer; \n \nEND common; \nCREATE OR REPLACE PACKAGE BODY common AS \n \nPROCEDURE header (title VARCHAR2) IS \n \nBEGIN \n \n   htp.p (&#39;&lt;!DOCTYPE HTML PUBLIC &quot;-&#x2F;&#x2F;W3C&#x2F;&#x2F;DTD HTML 4.0 Transitional&#x2F;&#x2F;EN&quot; &#39; || \n          &#39;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;TR&#x2F;REC-html40&#x2F;loose.dtd&quot;&gt;&#39;); \n   htp.htmlOpen; \n   htp.headOpen; \n   htp.meta (&#39;Content-Type&#39;, null, &#39;text&#x2F;html;&#39; || \n              owa_util.get_cgi_env(&#39;REQUEST_IANA_CHARSET&#39;) ); \n   htp.meta (&#39;Pragma&#39;, null, &#39;no-cache&#39;); \n   htp.Title (title); \n   htp.headClose; \n   htp.bodyOpen; \n   htp.header (2, title); \n \nEND HEADER; \n\nPROCEDURE footer IS \n \nBEGIN \n                                                \n1 A well-formed HTML web page conforms to the standards defined by The World Wide Web Consortium \n(W3C). You can validate your HTML web pages at http:&#x2F;&#x2F;validator.w3.org&#x2F;. \n\n-- This is a great place to add legal disclaimers, about us, contact us, etc. links \n   htp.hr;  -- horizontal line \n   htp.anchor (&#39;http:&#x2F;&#x2F;www.mynode.com&#x2F;legal_statement.html&#39;, &#39;Disclaimer&#39;); \n   htp.anchor (&#39;http:&#x2F;&#x2F;www.mynode.com&#x2F;About.html&#39;, &#39;About Us&#39;); \n   htp.bodyClose; \n   htp.htmlClose; \n \nEND footer; \n \nEND common; \n\nHow It WorksRecipe 14-1 includes a test procedure to verify the DAD is setup correctly; however the test proceduredoes not produce a well-formed HTML page. Here is the updated example from Recipe 14-1, this timewith calls to the common header and footer procedures. \ncreate or replace procedure test as \nbegin \n   common.header (&#39;Test Page&#39;); \n   htp.p (&#39;Hello World!&#39;); \n   common.footer; \nend; \n\nThis procedure, when called from a web browser, produces the following HTML code. \n&lt;!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/ \nTR/REC-html40/loose.dtd\"> \n&lt;HTML> \n&lt;HEAD> \n&lt;META HTTP-EQUIV=\"Content-Type\" NAME=\"\" CONTENT=\"text/html;WINDOWS-1252\"> \n&lt;META HTTP-EQUIV=\"Pragma\" NAME=\"\" CONTENT=\"no-cache\"> \n&lt;TITLE>Test Page&lt;/TITLE> \n&lt;BODY> \n&lt;H2>Test Page&lt;/H2> \nHello World! \n&lt;/BODY> \n&lt;/HTML> \nThe header routine generates the necessary opening HTML code to properly display a web page. Itbegins by setting the document type, then sending the opening  and  tags. It sets thecontent-type to the character set defined in the Apache environment variable, which is retrieved using acall to the PL&#x2F;SQL Web Toolkit’s owa_util.get_cgi_env routine. The Pragma  tag tells the browsernot to store the page’s content in its internal cache. This is useful when the PL&#x2F;SQL routine returns time-sensitive data because the users need to see real-time data. The remaining code sets the title in the user’sbrowser, opens the  tag and displays the title on the user’s web browser.The footer routine closes the  and  tags. As stated in the code’s comments, this is agood place to include any legal disclaimers or other useful text or links required for every web pagegenerated.Oftentimes when creating an application, you will create several procedures that will make use ofthe same code. You could copy the code throughout your procedures, but it is more efficient and safer towrite once and use in many different places. The creation of a common codebase that is accessible toeach PL&#x2F;SQL object within a schema can be quite an effective Solution for storing such code. \n14-3 Creating an Input FormProblemYou require a web page that accepts and processes data entered by users. The data should be collectedon the opening page and processed (stored in a table, used to update rows in a table, etc.) when the userclicks the Submit button.SolutionCreate a package using the Oracle PL&#x2F;SQL Web Toolkit to display a data entry form and process theresults. In this example a simple data entry form is created to collect employee information and send theuser’s input to a second procedure for processing.■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe. \nCREATE OR REPLACE PACKAGE input_form AS \n \n   null_array OWA_UTIL.IDENT_ARR; \n \n   PROCEDURE html; \n   PROCEDURE submit (emp_id     VARCHAR2, \n                     gender     VARCHAR2 DEFAULT NULL, \n                     options    OWA_UTIL.IDENT_ARR DEFAULT null_array, \n                     comments   varchar2); \n \nEND input_form; \nCREATE OR REPLACE PACKAGE BODY input_form AS \n \nPROCEDURE html IS \n \ntype    options_type is varray(3) of varchar2(50); \noptions options_type :&#x3D; options_type (&#39;I will attend the Team Meeting&#39;, \n                        &#39;I will attend the social event&#39;, \n                        &#39;I will attend the company tour&#39;); \n \nBEGIN \n \n   common.header (&#39;Input Form&#39;); \n   htp.formOpen (&#39;input_form.submit&#39;, &#39;POST&#39;); \n \n   htp.p (&#39;Employee ID: &#39;); \nCHAPTER 14  USING PL&#x2F;SQL ON THE WEB \n296 \n   htp.formText (&#39;emp_id&#39;, 9, 9); \n   htp.br; \n \n   htp.p (&#39;Gender: &#39;); \n   htp.formRadio (&#39;gender&#39;, &#39;M&#39;); \n   htp.p (&#39;Male&#39;); \n   htp.formRadio (&#39;gender&#39;, &#39;F&#39;); \n   htp.p (&#39;Female&#39;); \n   htp.br; \n \n   FOR i IN 1..10 LOOP \n      htp.formCheckBox (&#39;options&#39;, i); \n      htp.p (options(i)); \n      htp.br; \n   END LOOP; \n   htp.br; \n \n   htp.p (&#39;COMMENTS: &#39;); \n   htp.formTextArea (&#39;comments&#39;, 5, 50); \n   htp.br; \n \n   htp.formSubmit; \n   htp.formClose; \n   common.footer; \n \nEND html; \n \nPROCEDURE submit (emp_id     VARCHAR2, \n                  gender     VARCHAR2 DEFAULT NULL, \n                  options    OWA_UTIL.IDENT_ARR DEFAULT null_array, \n                  comments   varchar2) is \n \nBEGIN \n \n   common.header (&#39;Input Results&#39;); \n   htp.bold (&#39;You entered the following...&#39;); \n   htp.br; \n \n   htp.p (&#39;Employee ID: &#39; || emp_id); \n   htp.br; \n   htp.p (&#39;Gender: &#39; || gender); \n   htp.br; \n   htp.p (&#39;Comments: &#39; || comments); \n   htp.br; \n \n   htp.bold (&#39;Options Selected...&#39;); \n   htp.br; \n   FOR i IN 1..options.COUNT LOOP \n      htp.p (options(i)); \n      htp.br; \n   END LOOP; \n \n  CHAPTER 14  USING PL&#x2F;SQL ON THE WEB \n297 \n   common.footer; \n  \nEND submit; \n \nEND input_form;\n\nHow It WorksAccess the web page using a link with an HTML anchor URL of http://node.mycompany.com/DAD_NAME/input_form.html.■ Note See Recipe 14-1 to define the DAD_NAME.The input_form package specification defines an empty collection named null_array as the typeOWA_UTIL.IDENT_ARR. It is used as the default value in the event the web form is submitted withoutchecking at least one of the check boxes. Without the default value for the input parameter options, thecall to input_form.submit will not work and returns an error to the user if no boxes are checked.■ Note See Recipe 14-9 for more information on viewing errors.The two procedures, html and submit, exposed in the package specification, are required to makethem visible to the PL&#x2F;SQL module within the Apache web server. It is important to note that it is notpossible to call procedures via a URL if they are not defined in the package specification.The html procedure generates the data entry form shown in Figure 14-1. It begins with a call toheader common procedure, which generates the opening HTML tags. The htp.formOpen call generatesthe  tag with the destination of the submit button to the submit procedure within the input_formpackage.The htp.p procedure call sends the data passed to it directly to the client’s web browser, thisprocedure should not be confused with the htp.para, which produces the  tag. The htp.br call sendsthe  tag to the client’s web browser.The remainder of the procedure generates several form elements that accept user input. Thehtp.formText call generates a simple text box that accepts nine bytes. The htp.formRadio routine is calledtwice with the same variable name in the first parameter. This defines the variable gender with one oftwo possible values, M or F. The call to htp.formCheckBox within the FOR…LOOP generates the checkboxes,each having a unique value returned if checked by the user. Only the values checked are sent in acollection to the submit routine. The call to htp.formTextArea creates a multi-line, text box 50 characterswide and 5 lines deep. See Table 14-1 for a list of common PL&#x2F;SQL Web Toolkit procedures that generateHTML form tags.The procedure ends with a calls to htp.formSubmit and htp.formClose, which generate the form’ssubmit button and the closing  tag. When the user clicks the submit button, the client’s webbrowser sends the data entered into the form to the submit routine within the input_form package. \nFigure 14-1. Form generated by the input_form.html procedureTable 14-1. Common form procedures in the PL&#x2F;SQL Web Toolkit \nToolkit Procedure HTML Tag \nhtp.formCheckbox &lt;INPUT TYPE=\"CHECKBOX\"> \nhtp.formClose &lt;/FORM> \nhtp.formHidden &lt;INPUT TYPE=\"HIDDEN\"> \nhtp.formImage &lt;IPUT TYPE=\"IMAGE\"> \nhtp.formOpen &lt;FORM> \nhtp.formPassword &lt;INPUT TYPE=\"PASSWORD\"> \nhtp.formRadio &lt;INPUT TYPE=\"RADIO\"> \nhtp.formReset &lt;INPUT TYPE=\"RESET\"> \nhtp.formSelectClose &lt;/SELECT> \nhtp.formSelectOpen &lt;SELECT> \nhtp.formSelectOption &lt;OPTION> \nhtp.formSubmit &lt;INPUT TYPE=\"SUBMIT\"> \nToolkit Procedure  HTML Tag \nhtp.formText &lt;INPUT TYPE=\"TEXT\"> \nhtp.formTextarea &lt;TEXTAREA>&lt;/TEXTAREA> \nhtp.formTextareaClose &lt;/TEXTAREA> \nhtp.formTextareaOpen &lt;TEXTAREA> \n\n14-4. Creating a Web–based Report Using PL&#x2F;SQL ProceduresProblemYou need to generate a web page report that displays the results of a database query.SolutionCreate a package with two procedures, one to accept a user’s input, and another to query the databaseand display the results. Suppose, for example, that you need a report that displays information for anemployee whose employee ID has been entered by an authorized user. This recipe uses the employeetable in the HR schema.■ Note When defining packages that contain procedures you wish to access via web browsers, you must includeeach procedure you wish to access in the package specification.  \n■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe. \nCREATE OR REPLACE PACKAGE emp_rpt AS \n \n   PROCEDURE html; \n   PROCEDURE rpt (emp_id VARCHAR2); \n \nEND emp_rpt; \n\nCREATE OR REPLACE PACKAGE BODY emp_rpt AS \n \nPROCEDURE html IS \n \nBEGIN \n \n   common.header (&#39;Employee Report&#39;); \n   htp.formOpen (&#39;emp_rpt.rpt&#39;, &#39;POST&#39;); \n   htp.p (&#39;Employee ID:&#39;); \n   htp.formText (&#39;emp_id&#39;, 6, 6); \n   htp.formSubmit; \n   htp.formClose; \n   common.footer;  -- See recipe 14-2 for the common package. \nEND html; \nPROCEDURE show_row (label VARCHAR2, value VARCHAR2) IS \nBEGIN \n   htp.tableRowOpen (&#39;LEFT&#39;, &#39;TOP&#39;); \n   htp.tableHeader (label, &#39;RIGHT&#39;); \n   htp.tableData (value); \n   htp.tableRowClose; \nEND show_row; \nPROCEDURE rpt (emp_id VARCHAR2) IS \nCURSOR  driver IS \nSELECT  * \nFROM    employees \nWHERE   employee_id &#x3D; emp_id; \nrec             driver%ROWTYPE;\nrec_found       BOOLEAN; \nBEGIN \n   common.header (&#39;Employee Report&#39;); \n  \n   OPEN driver; \n   FETCH driver INTO rec; \n   rec_found :&#x3D; driver%FOUND; \n   CLOSE driver; \n   IF rec_found THEN \n      htp.tableOpen; \n      show_row (&#39;Employee ID&#39;, rec.employee_id); \n      show_row (&#39;First Name&#39;, rec.first_name); \n      show_row (&#39;Last Name&#39;, rec.last_name); \n      show_row (&#39;Email&#39;, rec.email); \n      show_row (&#39;Phone&#39;, rec.phone_number); \n      show_row (&#39;Hire Date&#39;, rec.hire_date); \n      show_row (&#39;Salary&#39;, rec.salary); \n      show_row (&#39;Commission %&#39;, rec.commission_pct); \n      htp.tableClose; \n   ELSE \n      htp.header (3, &#39;No such employee ID &#39; || emp_id); \n   END IF; \n \n   common.footer; -- See recipe 14-2 for the common package. \n \nEXCEPTION \n   WHEN OTHERS THEN \n   htp.header (3, &#39;Invalid employee ID. Click your browser&#39;&#39;s back button and try again.&#39;); \n   common.footer; \n \nEND rpt; \n \nEND emp_rpt; \n\nHow It WorksUsers access the web page using the URL http://node.mycompany.com/DAD_NAME/emp_rpt.html.■ Note See Recipe 14-1 for more on how to define the DAD_NAME.The package specification is defined with two procedures, html and rpt. Exposing these proceduresin the specification is required to make the PL&#x2F;SQL procedures available within Apache.Next, the package body is defined. The html procedure generates the data entry form. It generatesthe opening HTML code by calling the common.header routine defined in recipe 14-2. Next, it calls thehtp.formOpen to set the form’s action, which is to run the PL&#x2F;SQL procedure emp_rpt.rpt, when the userclicks the submit button and to send the form data in a POST method, as opposed to GET. A simpleprompt and a text box follows to allow the user to enter an employee ID. A call to form.submit,form.close and common.footer complete the HTML code.The show_row procedure is a handy subroutine to output one table row with two data cells. Itdisplays data on the client’s browser in a formatted table, making it more visually appealing.The rpt procedure accepts the user’s input in the emp_id parameter and uses it to query theemployee record. The common.header routine generates the opening HTML code. The cursor is openedand the data is fetched into the rec data structure. The rec_found variable stores the flag that identifies ifa record was fetched. It needs to be referenced after the fetch and before the close. If a record is found,the employee data is displayed in a two-column table, shown in Figure 14-2, otherwise a message is sentto the user that the employee ID is not valid.The exception is necessary to trap the error generated if the user enters a non-numeric employeeID. Another option is to validate the user’s input prior to using it in the cursor query.■ Note See recipe 14-10 for an example of validating user input. \nFigure 14-2. Results from entering employee ID 200 on the previous data entry screen14-5. Displaying Data from TablesProblemYou wish to provide the results from an SQL SELECT statement to the users via a web browser.SolutionUse the Oracle PL&#x2F;SQL Web Toolkit to SELECT and display data. The owa_util.tablePrint procedureaccepts any table name for the ctable parameter. When this procedure is compiled in a schema with aDAD it can be accessed via the Web. This example displays information similar to the describe featurewithin SQL*Plus.■ Note See Recipe 14-1 to define a DAD and direct your browser to run your procedure.  \n■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe.  \nCREATE OR REPLACE PROCEDURE descr_emp IS \n \nBEGIN \n \n   common.header (&#39;The Employees Table&#39;); \n \n   IF owa_util.tablePrint ( \n             ctable&#x3D;&gt;&#39;user_tab_columns&#39;, \n        cattributes&#x3D;&gt;&#39;BORDER&#39;, \n  CHAPTER 14  USING PL&#x2F;SQL ON THE WEB \n303 \n           ccolumns&#x3D;&gt;&#39;column_name, data_type, data_length, data_precision, nullable&#39;, \n           cclauses&#x3D;&gt;&#39;WHERE table_name&#x3D;&#39;&#39;EMPLOYEES&#39;&#39; ORDER BY column_id&#39;) then \n      NULL; \n   END IF; \n \n   common.footer; \n \nEND descr_emp; \n\nHow It WorksUsers access the web page using the URL http://node.mycompany.com/DAD_NAME/emp_rpt.html. Thedescr_emp procedure calls the owa_util.tablePrint procedure, which is included in the PL&#x2F;SQL WebToolkit. The ctable parameter defines the table the owa_util.tablePrint procedure accesses to read thedata. The cattribributes parameter accepts options for the HTML  tag. The ccolumns parameterallows you to specify which columns to select from the named table. If no columns are specified, thenthe procedure shows all columns. The cclauses parameter allows you to add a where clause and&#x2F;or anorder by statement. If no where clause is specified, all rows are returned. The output is shown in Figure14-3. \nFigure 14-3. Results of the descr_emp procedure \n14-6. Creating a Web Form Dropdown List from a Database QueryProblemYour web form requires a dropdown list whose elements are drawn from a database table.SolutionUse the htp.formSelectOpen, htp.formSelectOption and htp.formSelectClose procedures in the PL&#x2F;SQLWeb Toolkit to generate the required HTML tags. For example, suppose you need to use the HR schemato create a dropdown list of job titles from the JOBS table. Here’s how you’d do it. \ncreate or replace procedure job_list as \n \ncursor  driver is \nselect  job_id, job_title \nfrom    jobs \norder by job_title; \n \nbegin \n \n   common.header (&#39;Job Title&#39;); \n   htp.formSelectOpen (&#39;id&#39;, &#39;Job Title: &#39;); \n   htp.formSelectOption (&#39;&#39;, &#39;SELECTED&#39;); \n \n   for rec in driver LOOP \n      htp.formSelectOption (rec.job_title, cattributes&#x3D;&gt;&#39;VALUE&#x3D;&quot;&#39; || rec.job_id || &#39;&quot;&#39;); \n   end LOOP; \n \n   htp.formSelectClose; \n   common.footer; \n \nend job_list; \nThis procedure produces the following web page.Figure 14-4. Dropdown list created by job_list procedureHow It WorksThe htp.formSelectOpen procedure generates the HTML , which defines thedropdown list in the web browser. In addition the procedure uses the second parameter as the promptfor the dropdown list. In this example the prompt is Job Title:.The call to htp.formSelectOption procedure defines the elements of the dropdown list. The firstparameter is the text displayed in the list and the second parameter preselects the element in the listwhen it is first displayed. In this example the first call to the htp.formSelectOption procedure defines thedefault selected element in the list to an empty value.The subsequent calls to htp.formSelectOption that appear in the cursor for loop define theremaining elements in the dropdown list using the data selected from the JOBS table. The cattributesparameter is used to change the default value returned by the web browser when the element is selectedfrom the list.The call to htp.formSelectClose generates the  HTML tag to close the dropdown list.Dropdown lists usually appear within the  tags to accept user input and process that input on asubsequent page.■ Note See Recipe 14-3 for more information on creating an input form. \n14-7. Creating a Sortable Web ReportProblemYou need a report that displays data that is sorted by a field the user selects.SolutionCreate a package that prompts the user for a sort field, then generates the sorted output using the sortfield parameter in the ORDER BY section of the SELECT statement. In this example the user is prompted toselect a sort option on the EMPLOYEEs table. The options are to sort by last name, hire date, salary, oremployee ID.■ Note See Recipe 14-1 to define a DAD and direct your browser to run your procedure.  \n■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe.  \nCREATE OR REPLACE PACKAGE sorted AS \n \n   PROCEDURE html; \n   PROCEDURE rpt (sort_order VARCHAR2); \n \nEND sorted; \n\nCREATE OR REPLACE PACKAGE BODY sorted AS \n \nPROCEDURE html IS \n \nBEGIN \n \n   common.header (&#39;Sorted Report&#39;); \n   htp.formOpen (&#39;sorted.rpt&#39;, &#39;POST&#39;); \n   htp.formSelectOpen (&#39;sort_order&#39;, &#39;Select a Sort Order: &#39;); \n   htp.formSelectOption (&#39;Last Name&#39;); \n   htp.formSelectOption (&#39;Hire Date&#39;); \n   htp.formSelectOption (&#39;Salary&#39;); \n   htp.formSelectOption (&#39;Employee ID&#39;); \n   htp.formSelectClose; \n   htp.formSubmit; \n   htp.formClose; \n   common.footer;  \nEND html; \n \nPROCEDURE rpt (sort_order VARCHAR2) IS \n \nCURSOR  driver IS \nSELECT  * \nFROM    employees \nORDER BY DECODE (sort_order, \n                &#39;Last Name&#39;,   last_name, \n                &#39;Hire Date&#39;,   TO_CHAR (hire_date, &#39;YYYYMMDD&#39;), \n                &#39;Salary&#39;,      TO_CHAR (salary, &#39;00000&#39;), \n                &#39;Employee ID&#39;, TO_CHAR (employee_id, &#39;00000&#39;) ); \n \nBEGIN \n \n   common.header (&#39;Sorted Report by &#39;||sort_order); -- See recipe 14-2. \n   htp.tableOpen (&#39;BORDER&#39;); \n   htp.tableRowOpen (&#39;LEFT&#39;, &#39;BOTTOM&#39;); \n   htp.tableHeader (&#39;Name&#39;); \n   htp.tableHeader (&#39;Hired&#39;); \n   htp.tableHeader (&#39;Salary&#39;); \n   htp.tableHeader (&#39;ID&#39;); \n   htp.tableRowClose; \n \n   FOR rec IN driver LOOP \n      htp.tableRowOpen (&#39;LEFT&#39;, &#39;TOP&#39;); \n      htp.tableData (rec.last_name); \n      htp.tableData (rec.hire_date); \n      htp.tableData (rec.salary); \n      htp.tableData (rec.employee_id); \n      htp.tableRowClose; \n   END LOOP; \n \n   htp.tableClose; \n   common.footer; \n \nEND rpt; \n \nEND sorted; \n\nHow It WorksUsers access the web page using the URL http://node.mycompany.com/DAD_NAME/sorted.html.■ Note See Recipe 14-1 for more on how to to define the DAD_NAME.The package specification is defined by exposing two procedures, html and rpt. You must definethese procedures in the specification to make the PL&#x2F;SQL procedures available within Apache.Next, the package body is defined. The html procedure generates the data entry form. It generatesthe opening HTML code by calling the common.header routine defined in Recipe 14-2. Next, it calls thehtp.formOpen to set the form’s action when the user clicks the Submit button. The calls tohtp.formSelectOpen, htp.formSelectOption and htp.formSelectClose procedures create the dropdownlist for the user to select a sort order.■ Note See Recipe 14-6 for more information on how to create dropdown lists.A call to form.submit, form.close and common.footer complete the necessary HTML code. The formgenerated is shown in Figure 14-5.The rpt procedure accepts the sort_order parameter, which is used in the cursor to dynamicallydetermine the sort order on the EMPLOYEES table. The order by option in the select statement uses thedecode function to return the proper string needed for ordering based on the user’s input.The first set of parameters sent to the decode function, namely the first_name field, defines the datatype returned by the decode function. This is important to note as the remaining data types returnedfrom the decode function will be converted to strings to match the first_name. It is necessary to convertthe numeric and date fields to strings that sort properly. For example, if the default date string format isdd-Mon-yy, then the hire dates will sort by the day of the month first, then by the month’s abbreviationand year. The desired sort order is year, month, then day. \nFigure 14-5. Initial data entry screen showing the sort options \n14-8. Passing Data Between Web PagesProblemYou have a multi-page data entry form in which the final page requires data entered on pages thatprecede it. You need to pass the data gathered on previous pages to the current page.SolutionPass the name&#x2F;value pairs from previous pages using the htp.formHidden procedure in the PL&#x2F;SQL WebToolkit. In this recipe each parameter is passed to the next form using hidden HTML elements. \nCREATE OR REPLACE PACKAGE multi AS \n \n   PROCEDURE page1; \n   PROCEDURE page2 (var1 varchar2); \n   PROCEDURE page3 (var1 varchar2, var2 varchar2); \n   PROCEDURE process (var1 varchar2, var2 varchar2, var3 varchar2); \n \nEND multi; \n \nCREATE OR REPLACE PACKAGE BODY multi AS \n \nPROCEDURE page1 IS \n \nbegin \n \n   htp.formOpen (&#39;multi.page2&#39;, &#39;POST&#39;); \n   htp.p (&#39;Enter First Value:&#39;); \n   htp.formText (&#39;var1&#39;, 10, 10); \n   htp.formSubmit; \n   htp.formClose; \n \nEND page1; \n \nPROCEDURE page2 (var1 VARCHAR2) IS \n \nbegin \n \n   htp.formOpen (&#39;multi.page3&#39;, &#39;POST&#39;); \n   htp.formHidden (&#39;var1&#39;, var1); \n   htp.p (&#39;Enter Second Value:&#39;); \n   htp.formText (&#39;var2&#39;, 10, 10); \n   htp.formSubmit; \n   htp.formClose; \n \nEND page2; \n \nPROCEDURE page3 (var1 VARCHAR2, var2 VARCHAR2) IS \n \nbegin \n \n   htp.formOpen (&#39;multi.process&#39;, &#39;POST&#39;); \n   htp.formHidden (&#39;var1&#39;, var1); \n   htp.formHidden (&#39;var2&#39;, var2); \n   htp.p (&#39;Enter Third Value:&#39;); \n   htp.formText (&#39;var3&#39;, 10, 10); \n   htp.formSubmit; \n   htp.formClose; \n \nEND page3; \n \nPROCEDURE process (var1 varchar2, var2 varchar2, var3 varchar2) is \n \nBEGIN \n \n  htp.p (&#39;The three variables entered are...&#39;); \n  htp.br; \n \n  htp.p (&#39;1&#x3D;&#39; || var1); \n  htp.br; \n  htp.p (&#39;2&#x3D;&#39; || var2); \n  htp.br; \n  htp.p (&#39;3&#x3D;&#39; || var3); \n \nEND process; \n \nEND multi; \nHow It WorksUsers access the web page using the URL http://node.mycompany.com/DAD_NAME/multi.page1.■ Note See Recipe 14.1 to define the DAD_NAME.The page1 procedure within the mulit package prompts the user for an input value, which is passedto procedure page2 as its parameter, var1. The htp.formHidden call in the page2 procedure produces anHTML &lt;&gt;INPUT&lt;&gt; tag of type HIDDEN. In this recipe it produces the following HTML code in the client’s webbrowser: &lt;&gt;INPUT TYPE&#x3D;”hidden” NAME&#x3D;”var1” VALUE&#x3D;”xxx”&lt;&gt;, where xxx is the text the user entered on thefirst page of this multi-part form.The page2 procedure then accepts more user input into the form variable var2, which is passed topage3 along with var1 collected on the first input page. The third page accepts the final user input andpasses it to the process procedure, where final processing occurs. \n14-9. Viewing Errors for Debugging Web AppsProblemYou have a PL&#x2F;SQL package or procedure called from a web client that generates errors and you need toview the error message.SolutionChoose one of the following two Solutions, depending on your circumstances.Solution #1If the package is in use in a production environment, then check the output of the Apache error log file.The log file location is defined in the httpd.conf configuration file. The default log file location is[oracle_home]\\Apache\\Apache\\logs directory. Open the log file and search for the errors generated witha timestamp that corresponds to the approximate time the error was generated.Solution #2If the application is in development or running in a non-production environment, change the defaulterror style within the DAD used to produce the web page that failed. The error style is defined in theDADS.CONF file located in [oracle_homme]\\Apache\\modplsql\\conf. Set the PlsqlErrorStyle to DebugStyle.■ Note See recipe 14-1 for more information on defining DADs.How It WorksSolution #1The PL&#x2F;SQL module within Apache logs all errors, complete with timestamps. New errors are written tothe end of the error log. This Solution is recommended for production environments where the displayof Apache environment variables may pose security issues.Here’s an example of an error message written to the error log. In this example, a procedure wascalled from the Web but was missing required parameters. \n[error] [client 127.0.0.1] mod_plsql: /DAD_NAME/class_sched.list HTTP-404 \nclass_sched.list: SIGNATURE (parameter names) MISMATCHVARIABLES IN FORM NOT IN PROCEDURE:NON-DEFAULT VARIABLES IN PROCEDURE NOT IN FORM: THIS_ID, THIS_ID_TYPESolution #2Setting the PlsqlErrorStyle to DebugStyle causes Apache to display all PL&#x2F;SQL error messages on theclient’s web browser when the PL&#x2F;SQL routine fails. It displays the same error messages normally foundin the Apache log file plus a list of all Apache environment variables and their values. This Solution isrecommended for non-production environments where errors are more likely to occur duringdevelopment and testing. It has the advantage of immediate, onscreen feedback for developers andtesters. \nThe following is an example of an error message written to the web browser. \nclass_sched.list: SIGNATURE (parameter names) MISMATCH \nVARIABLES IN FORM NOT IN PROCEDURE:  \nNON-DEFAULT VARIABLES IN PROCEDURE NOT IN FORM: THIS_ID, THIS_ID_TYPE \n \n  DAD name: default \n  PROCEDURE  : class_sched.list \n  URL        : http:&#x2F;&#x2F;node.mycomp.com&#x2F;DAD_NAME&#x2F;class_sched.list \n  PARAMETERS : \n  &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; \n \n  ENVIRONMENT: \n  &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; \n    PLSQL_GATEWAY&#x3D;WebDb \n    GATEWAY_IVERSION&#x3D;3 \n        &lt;&lt; snip &gt;&gt; \n14-10. Generating JavaScript via PL&#x2F;SQLProblemYour procedure requires JavaScript but you do not have access to the Oracle application server to storethe script file to make it accessible from Apache.SolutionUse the Oracle PL&#x2F;SQLWeb Toolkit to output JavaScript within your PL&#x2F;SQL procedure. There are twosteps to define and enable a JavaScript within your PL&#x2F;SQL procedure.First, define the JavaScript source on the web page that requires access to yourJavaScript routine using the HTML tag &gt;SCRIPT&lt;.Define a PL&#x2F;SQL procedure to match the name of the &lt;&gt;SCRIPT&lt;&gt; tag’s source(src)property.In the following example the html procedure defines the &lt;&gt;SCRIPT&lt;&gt; tag with the source set toempID.js and the js procedure generates the JavaScript code. \nCREATE OR REPLACE PACKAGE empID IS \n \n   PROCEDURE html; \n   PROCEdURE js; \n \nEND empID; \n \nCREATE OR REPLACE PACKAGE BODY empID IS \n \nPROCEDURE html is \n \nBEGIN \n \n   common.header (&#39;Employee Report&#39;); -- See recipe 14-2 for the common package. \n   htp.p (&#39;&lt;SCRIPT LANGUAGE&#x3D;&quot;JavaScript&quot; SRC&#x3D;&quot;&#39;                 || \n                owa_util.get_cgi_env (&#39;REQUEST_PROTOCOL&#39;)       || &#39;:&#x2F;&#x2F;&#39;        || \n                owa_util.get_cgi_env (&#39;HTTP_HOST&#39;)              || \n                owa_util.get_cgi_env (&#39;SCRIPT_NAME&#39;)            || &#39;&#x2F;empID.js&quot;&gt;&lt;&#x2F;SCRIPT&gt;&#39;); \n \n   htp.formOpen (&#39;emp_rpt.rpt&#39;, &#39;POST&#39;); -- See recipe 14-4 for the emp_rpt pacakge. \n   htp.p (&#39;Employee ID:&#39;); \n   htp.formText (&#39;emp_id&#39;, 6, 6, cattributes&#x3D;&gt;&#39;onChange&#x3D;&quot;validateNumber(this.value);&quot;&#39;); \n \n   htp.formSubmit; \n   htp.formClose; \n   common.footer; -- See recipe 14-2 for the common package. \n \n \nEND html; \n \nPROCEDURE js is \n \nBEGIN \n \n   htp.p (&#39; \n \nfunction validateNumber (theNumber) &#123; \n \n   if ( isNaN (theNumber) ) &#123; \n      alert (&quot;You must enter a number for the Employee ID&quot;); \n      return false; &#125; \n \n   return true; \n \n  CHAPTER 14  USING PL&#x2F;SQL ON THE WEB \n313 \n&#125;&#39;); \n \nEND js; \n \nEND empID; \nHow It WorksBegin by creating the package specification for empID, which exposes the html and js procedures. Nextcreate the package body with two procedures, html and js.The html procedure generates the opening HTML code with a call to common.header. Next, theprocedure generates a &lt;–SCRIPT–&gt; tag that identifies the location of the JavaScript to include in the user’sbrowser. The &lt;–SCRIPT–&gt; tag of this form is one of the few HTML tags not predefined in the PL&#x2F;SQL WebToolkit.The &lt;–SCRIPT–&gt; tag takes advantage of the owa_util package, which is also part of the PL&#x2F;SQL WebToolkit, to dynamically generate the web address of the JavaScript using the settings of the Apacheenvironment values. This method avoids your having to hard-code the URL of the script into theprocedure and allows it to run in any environment—development, integration, production, etc. The URLgenerated references the JavaScript package defined later in the package body.Next, the html procedure generates the &lt;–FORM–&gt; tag with emp_rpt.rpt as its target. When the userclicks the Submit button the form will call the PL&#x2F;SQL procedure emp_rpt.rpt defined in Recipe 14-4. Itwill not call a procedure within the empID package.The htp.formText routine contains an extra parameter to include the JavaScript necessary to runwhen the user changes the value in the emp_id field. Nearly every procedure in the htp package includesthe cattributes parameter, which provides for any additional option needed within the tag that is notalready defined in the existing parameters. Figure 14-6 shows the data entry form with a non-numericemployee ID; in this example the letter “o” was used instead of a zero. JavaScript pops up the errormessage shown.The js procedure consists of a simple print statement that contains the entire contents of theJavaScript code. JavaScript allows either single or double quotes for character strings. Using doublequotes in the JavaScript code avoids conflicts with the single quote requirements of PL&#x2F;SQL. \nFigure 14-6. Error message generated by JavaScript when a non-numeric employee ID is entered \n14-11. Generating XML OutputProblemYou need to provide XML data for PL&#x2F;SQL or other consumers of data from your Oracle database.SolutionUse Oracle’s built-in DBMS_XMLGEN package to extract data from the database in standard XML format andthen output the data through the Apache web server. In this example a generic procedure builds andoutputs XML formatted data based on the SQL query statement passed to it. This procedure can be usedin any application that requires XML output extracted from database tables. \nCREATE OR REPLACE PROCEDURE gen_xml (sql_stmt VARCHAR2) IS \n \nstring          VARCHAR2(4000); \nipos            INTEGER; \noffset          INTEGER; \nn               INTEGER :&#x3D; 1; \n \nqryctx          dbms_xmlgen.ctxhandle; \nresult          CLOB; \n \nBEGIN \n \n   qryctx :&#x3D; dbms_xmlgen.newcontext (sql_stmt); \n   result :&#x3D; dbms_xmlgen.getxml (qryctx); \n   dbms_xmlgen.closecontext (qryctx); \n \n   owa_util.mime_header (&#39;text&#x2F;xml&#39;, true); \n   LOOP \n      EXIT WHEN result IS NULL; \n      ipos :&#x3D; dbms_lob.instr (result, CHR(10), 1, n); \n      EXIT WHEN ipos &#x3D; 0; \n \n      string :&#x3D; dbms_lob.substr (result, ipos-offset, offset); \n      htp.p (string); \n \n      offset    :&#x3D; ipos + 1; \n      n         :&#x3D; n + 1; \n   END LOOP; \n \n   IF result IS NULL THEN \n      htp.p (&#39;&lt;ROWSET&gt;&#39;); \n      htp.p (&#39;&lt;&#x2F;ROWSET&gt;&#39;); \n   END IF; \n \nEND gen_xml; \n\nHow It WorksThe newcontext procedure in the dbms_xmlgen package executes the query passed to it in the firstparameter. The getxml procedure returns the data in XML format. Each row of data from the selectstatement is enclosed in the XML tags &lt;–ROW–&gt;. Each field in the row is enclosed by its attribute (field)name in the database. For example, the employee ID is enclosed in the XML tag &lt;–EMPLOYEE_ID–&gt;.The owa_util.mime_header is called to output the proper string to the client’s browser, indicating thecontent of the web page is in standard XML format. At this point it is sufficient to simply output the XMLdata returned by the call to xmlgen with an htp.p statement. However, this approach works only if thelength in bytes of the XML data does not exceed the maximum allowed by the htp.p procedure, which is32k. The LOOP breaks apart the XML data into smaller segments at each line break, CHR(10), insuring nocall to htp.p exceeds the maximum length.The final IF statement returns an empty XML tag set if the result of the query returns no rows.Without the empty tag set your Ajax call will fail because the Ajax call to parse the data from the XMLstructure requires the &lt;–ROWSET–&gt; tags.Here is an example of the XML output produced from Recipe 14-12. Only the first two data rowsretrieved are displayed. \n&lt;ROWSET> \n &lt;ROW> \n  &lt;EMPLOYEE_ID>101&lt;/EMPLOYEE_ID> \n  &lt;LAST_NAME>Kochhar&lt;/LAST_NAME> \n &lt;/ROW> \n &lt;ROW> \n  &lt;EMPLOYEE_ID>102&lt;/EMPLOYEE_ID> \n  &lt;LAST_NAME>De Haan&lt;/LAST_NAME> \n &lt;/ROW> \n&lt;/ROWSET> \n\n14-12. Creating an Input Form with AJAXProblemYou need a web application that can interactively retrieve data based on partial data entered by the user.The data must be retrieved before the user clicks the Submit button to process the page.SolutionUse JavaScript and Ajax to dynamically retrieve data as the user enters data into the web form. Thisrecipe uses the EMPLOYEES table in the HR schema.The data entry screen is built with all managers in a single dropdown list, which includes a call to aJavaScript procedure that invokes Ajax to retrieve subordinate data. Once the user selects a manager, theemployee dropdown list populates with the manager’s subordinates. The subordinates’ dropdown list isdefined with an ID, which is required by JavaScript to access the list and load the manager’ssubordinates.The package contains the procedure xml, which is required to produce the XML data required by theAjax call. The PL&#x2F;SQL procedure ajax.xml is called by the web browser within the AjaxMgr.js procedure. \nCREATE OR REPLACE PACKAGE ajax IS \n \n   PROCEDURE html; \n   PROCEDURE xml (ID INTEGER); \n \nEND ajax; \n \nCREATE OR REPLACE PACKAGE BODY ajax IS \n \nPROCEDURE html is \n \nCURSOR  driver IS \nSELECT  employee_id, last_name \nFROM    employees \nWHERE   employee_id in \n(       SELECT  DISTINCT manager_id \n        FROM    employees) \nORDER BY last_name; \n \nBEGIN \n \n   common.header (&#39;Manager&#x2F;Employee Example&#39;); -- See recipe 14-2 for the common package. \n   htp.p (&#39;&lt;SCRIPT LANGUAGE&#x3D;&quot;JavaScript&quot; SRC&#x3D;&quot;&#39;         || \n                owa_util.get_cgi_env (&#39;REQUEST_PROTOCOL&#39;)       || &#39;:&#x2F;&#x2F;&#39;        || \n                owa_util.get_cgi_env (&#39;HTTP_HOST&#39;)              || \n                                &#39;&#x2F;js&#x2F;AjaxMgr.js&quot;&gt;&lt;&#x2F;SCRIPT&gt;&#39;); \n \n   htp.formOpen (&#39;#&#39;, &#39;POST&#39;); \n   htp.p (&#39;Select a Manager:&#39;); \n   htp.formSelectOpen (&#39;mgr&#39;, cattributes&#x3D;&gt;&#39;onChange&#x3D;&quot;loadEmployees(this.value);&quot;&#39;); \n   htp.formSelectOption (&#39;&#39;, &#39;SELECTED&#39;); \n \n   FOR rec IN driver LOOP \n      htp.formSelectOption (rec.last_name, cattributes&#x3D;&gt;&#39;VALUE&#x3D;&quot;&#39;||rec.employee_id||&#39;&quot;&#39;); \n   END LOOP; \n \n   htp.formSelectClose; \n   htp.br; \n \n   htp.p (&#39;Select a Subordinate:&#39;); \n   htp.formSelectOpen (&#39;emp&#39;, cattributes&#x3D;&gt;&#39;ID&#x3D;&quot;emp_list&quot;&#39;); \n   htp.formSelectClose; \n   htp.br; \n \n   htp.formSubmit; \n   htp.formClose; \n   common.footer; \n \nEND html; \n \nPROCEDURE xml (ID INTEGER) IS \n \nBEGIN \n \n-- see recipe 14-11 for more information on the gen_xml procedure. \n   gen_xml (&#39;SELECT employee_id, last_name &#39;    || \n           &#39;FROM employees &#39;                    || \n           &#39;WHERE manager_id &#x3D; &#39; || ID          || \n           &#39; ORDER by 1&#39;); \n \nEND xml; \n \nEND ajax;\nHow It WorksThe recipe begins by defining the package specification with two packages, html and xml. The htmlpackage generates the HTML data entry form and the xml procedure generates the XML data required bythe call to Ajax.The html procedure generates the opening HTML code with a call to common.header. Next, theprocedure generates a &lt;–SCRIPT–&gt; tag that identifies the location of the JavaScript to include in the user’sbrowser. The &lt;–SCRIPT–&gt; tag of this form is one of the few HTML tags not pre-defined in the PL&#x2F;SQL WebToolkit.The &lt;–SCRIPT–&gt; tag takes advantage of the owa_util package, which is also part of the PL&#x2F;SQL WebToolkit. It dynamically generates the web address of the JavaScript based on Apache environmentvalues. This method avoids hard-coding the URL into the procedure and allows it to run in anyenvironment—development, integration, production, etc.■ Note The JavaScript, AjaxMgr.js, is included in the media but not reproduced here.An HTML form is opened with two dropdown lists defined. The first list is populated with the namesof all managers from the employees table. The second dropdown list is intentionally left empty. It will bepopulated at runtime when the user selects a manager from the first dropdown list. Figure 14-7 showsthe initial data entry screen generated by the html procedure, prior to the user selecting a manager fromthe manager’s dropdown list.The manager’s dropdown list, mgr, is created using the htp.formSelectOpen procedure with anadditional parameter to define the JavaScript to execute when the selected item in the list changes. Achange to the manager’s dropdown list invokes the JavaScript procedure loadEmployees, which wasdefined earlier in the &lt;–SCRIPT–&gt; tag.The employee’s dropdown list, emp, is also created using the htp.formSelectOpen procedure with anadditional parameter to define the ID name of the object in the Web browser’s DOM2. This ID is requiredby the JavaScript to dynamically rebuild the employee dropdown list if the value in the managerdropdown list changes. Figure 14-8 shows the data entry form after a Manager is selected by the user.Note the Subordinate list is now populated. \n2 A DOM (Document Object Model) “is a cross-platform and language-independent convention forrepresenting and interacting with objects in HTML, XHTML and XML documents.” – Wikipedia.The xml procedure calls the gen_xml procedure, created in Recipe 14-11, to generate the datarequired to populate the employee dropdown list via the Ajax call. The gen_xml procedure is generic inthat it only requires the select statement need to produce the XML output. \nFigure 14-7. Manager dropdown list with empty subordinate dropdown list \nFigure 14-8. Subordinate list after being populated by Ajax \n","dateCreated":"2022-11-08T23:21:42+08:00","dateModified":"2022-11-08T23:40:46+08:00","datePublished":"2022-11-08T23:21:42+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 14-Using PL/SQL on the Web","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 14-Using PL&#x2F;SQL on the Web">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:21:42.105Z">
+<meta property="article:modified_time" content="2022-11-08T15:40:46.085Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 14-Using PL/SQL on the Web
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:21:42+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#14-Using-PL-x2F-SQL-on-the-Web"><span class="toc-text">14. Using PL&#x2F;SQL on the Web</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#14-1-Running-a-PL-x2F-SQL-Procedure-on-the-Web"><span class="toc-text">14-1. Running a PL&#x2F;SQL Procedure on the Web</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-2-Creating-a-Common-Set-of-HTML-Page-Generation-Procedures"><span class="toc-text">14-2. Creating a Common Set of HTML Page Generation Procedures</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-3-Creating-an-Input-Form"><span class="toc-text">14-3 Creating an Input Form</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-4-Creating-a-Web%E2%80%93based-Report-Using-PL-x2F-SQL-Procedures"><span class="toc-text">14-4. Creating a Web–based Report Using PL&#x2F;SQL Procedures</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-6-Creating-a-Web-Form-Dropdown-List-from-a-Database-Query"><span class="toc-text">14-6. Creating a Web Form Dropdown List from a Database Query</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-7-Creating-a-Sortable-Web-Report"><span class="toc-text">14-7. Creating a Sortable Web Report</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-8-Passing-Data-Between-Web-Pages"><span class="toc-text">14-8. Passing Data Between Web Pages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-9-Viewing-Errors-for-Debugging-Web-Apps"><span class="toc-text">14-9. Viewing Errors for Debugging Web Apps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-10-Generating-JavaScript-via-PL-x2F-SQL"><span class="toc-text">14-10. Generating JavaScript via PL&#x2F;SQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-11-Generating-XML-Output"><span class="toc-text">14-11. Generating XML Output</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-12-Creating-an-Input-Form-with-AJAX"><span class="toc-text">14-12. Creating an Input Form with AJAX</span></a></li></ol></li></ol>
+
+
+<h1 id="14-Using-PL-x2F-SQL-on-the-Web"><a href="#14-Using-PL-x2F-SQL-on-the-Web" class="headerlink" title="14. Using PL&#x2F;SQL on the Web"></a>14. Using PL&#x2F;SQL on the Web</h1><p>Oracle’s Application Server provides a powerful gateway that exposes your PL&#x2F;SQL procedures to web<br>browsers. The gateway is defined using a Data Access Descriptor (DAD) that runs PL&#x2F;SQL code as either<br>the user defined in the DAD or as the user running the web application.<br>Oracle provides a PL&#x2F;SQL Web Toolkit, which is a set of procedures and functions that generate<br>HTML tags. In addition to making your code easier to read and manage, the toolkit sends the HTML<br>code through Apache directly to the client web browser.<br>The following recipes teach you how to write PL&#x2F;SQL procedures that produce interactive web<br>pages. These recipes can be combined to create <strong>Solution</strong>s for complex business applications. </p>
+<h2 id="14-1-Running-a-PL-x2F-SQL-Procedure-on-the-Web"><a href="#14-1-Running-a-PL-x2F-SQL-Procedure-on-the-Web" class="headerlink" title="14-1. Running a PL&#x2F;SQL Procedure on the Web"></a>14-1. Running a PL&#x2F;SQL Procedure on the Web</h2><p><strong>Problem</strong><br>You’d like to make your PL&#x2F;SQL procedures accessible to users in a web browser via the Oracle<br>Application Server.<br><strong>Solution</strong><br>To run a PL&#x2F;SQL procedure on the Web, you must first configure a Data Access Descriptor (DAD) within<br>the Oracle Application Server to define the connection information required between mod_plsql within<br>the Oracle Application Server and the Oracle database that holds the PL&#x2F;SQL procedures you wish to<br>run. In this example the mod_plsql configuration file dads.conf (located in [Oracle_Home]\Apache\<br>modplsql\conf) is edited to define the DAD. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">&lt;Location &#x2F;DAD_NAME&gt; 
+    SetHandler pls_handler 
+    Order deny,allow 
+    Deny from all 
+    Allow from localhost node1.mycompany.com node2.mycompany.com 
+    AllowOverride None 
+ 
+    PlsqlDatabaseUsername ORACLE_SCHEMA_NAME 
+    PlsqlDatabasePassword PASSWORD 
+    PlsqlDatabaseConnectString TNS_ENTRY 
+    PlsqlSessionStateManagement StatelessWithResetPackageState 
+    PlsqlMaxRequestsPerSession 1000 
+    PlsqlFetchBufferSize 128 
+    PlsqlCGIEnvironmentList QUERY_STRING 
+    PlsqlErrorStyle DebugStyle 
+&lt;&#x2F;Location&gt; </code></pre>
+<p>You may repeat the <Location> data for additional DADs as required; perhaps one DAD for every<br>major application. You must restart the Oracle Application Server for changes to the DAD configuration<br>file to take effect.<br><strong>How It Works</strong><br>To verify that your DAD is configured properly and will run your PL&#x2F;SQL code, log into the Oracle<br>database defined in your DAD. The Oracle database account is defined in the PlsqlDatabaseUsername,<br>PlsqlDatabasePassword and PlsqlDatabaseConnectString statements. Next, compile the following test<br>procedure. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">create or replace procedure test as 
+begin 
+   htp.p (&#39;Hello World!&#39;); 
+end; </code></pre>
+<p>Finally, point your web browser to <a target="_blank" rel="noopener" href="http://node_name/DAD_NAME/test">http://node_name/DAD_NAME/test</a>. Where node_name is the<br>name of the machine where the Oracle Application Server is installed and DAD_NAME is the name assigned<br>your DAD in the <Location> tag within the mod_plsql configuration file and test is the name of the<br>PL&#x2F;SQL procedure create for this test. Your browser should respond with the text “Hello World!”<br>The <Location> tag within the dads.conf file defines the equivalent of a virtual directory within<br>Apache. When a request reaches the Oracle iAS Apache web server containing the location name defined<br>in the DAD, the PL&#x2F;SQL package or procedure specified in the remaining portion of the URL is executed.<br>For example, if the URL is <a target="_blank" rel="noopener" href="http://node.my_company.com/plsqlcgi/employee.rpt">http://node.my_company.com/plsqlcgi/employee.rpt</a>, plsqlcgi is the<br>DAD_NAME, then employee is the package name and rpt is the procedure name. Calls to the PLSQL Web<br>Toolkit within the employee.rpt procedure send output directly to the client’s web browser.<br>The SetHandler directive invokes mod_plsql within Apache to handle requests for the virtual path<br>defined by the <Location> tag. This directive is required to run PL&#x2F;SQL packages and procedures<br>through the Apache web server.<br>The next three directives restrict access to the virtual path to the nodes specified on the Allow from<br>line. To allow access from any web browser in the world, replace these three directives with the following<br>two.<br>• Order allow,deny<br>• Allow from all<br>The PlsqlDatabase directives define the connection information mod_plsql needs to log into the<br>database. If the PlsqlDatabasePassword directive is supplied, Apache will automatically log into the<br>database when requests from web clients are processed. The TNS_ENTRY is used to complete the login<br>information. If the PlsqlDatabasePassword directive is omitted, the Web browser prompts the user for a<br>username and password. The username entered by the user must exist in the database specified by the<br>TNS_ENTRY name and the user must have execute privileges to the requested procedure. The procedure<br>must be accessible to the ORACLE_SCHEMA_NAME specified in PlsqlDatabaseUsername. In other words, the<br>schema must own the procedure or, if owned by another schema, it must have execute privileges to the<br>procedure. </p>
+<h2 id="14-2-Creating-a-Common-Set-of-HTML-Page-Generation-Procedures"><a href="#14-2-Creating-a-Common-Set-of-HTML-Page-Generation-Procedures" class="headerlink" title="14-2. Creating a Common Set of HTML Page Generation Procedures"></a>14-2. Creating a Common Set of HTML Page Generation Procedures</h2><p><strong>Problem</strong><br>Every web page you generate with a PL&#x2F;SQL procedure requires a common HTML tag to start and<br>another to finish every web page, and you do not wish to repeat the code to add those tags in every<br>procedure you write for the Web.<br><strong>Solution</strong><br>Create a package that contains calls to the PL&#x2F;SQL Web Toolkit procedures that produce the HTML code<br>necessary to properly display a well-formed,1 HTML web page. In this example a package is created with<br>two procedures, one to generate the HTML tags required to start a page and one to generate the closing<br>HTML tags to finish a page. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE common AS 
+ 
+   PROCEDURE header (title VARCHAR2); 
+   PROCEDURE footer; 
+ 
+END common; </code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY common AS 
+ 
+PROCEDURE header (title VARCHAR2) IS 
+ 
+BEGIN 
+ 
+   htp.p (&#39;&lt;!DOCTYPE HTML PUBLIC &quot;-&#x2F;&#x2F;W3C&#x2F;&#x2F;DTD HTML 4.0 Transitional&#x2F;&#x2F;EN&quot; &#39; || 
+          &#39;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;TR&#x2F;REC-html40&#x2F;loose.dtd&quot;&gt;&#39;); 
+   htp.htmlOpen; 
+   htp.headOpen; 
+   htp.meta (&#39;Content-Type&#39;, null, &#39;text&#x2F;html;&#39; || 
+              owa_util.get_cgi_env(&#39;REQUEST_IANA_CHARSET&#39;) ); 
+   htp.meta (&#39;Pragma&#39;, null, &#39;no-cache&#39;); 
+   htp.Title (title); 
+   htp.headClose; 
+   htp.bodyOpen; 
+   htp.header (2, title); 
+ 
+END HEADER; 
+
+PROCEDURE footer IS 
+ 
+BEGIN 
+                                                
+1 A well-formed HTML web page conforms to the standards defined by The World Wide Web Consortium 
+(W3C). You can validate your HTML web pages at http:&#x2F;&#x2F;validator.w3.org&#x2F;. 
+
+-- This is a great place to add legal disclaimers, about us, contact us, etc. links 
+   htp.hr;  -- horizontal line 
+   htp.anchor (&#39;http:&#x2F;&#x2F;www.mynode.com&#x2F;legal_statement.html&#39;, &#39;Disclaimer&#39;); 
+   htp.anchor (&#39;http:&#x2F;&#x2F;www.mynode.com&#x2F;About.html&#39;, &#39;About Us&#39;); 
+   htp.bodyClose; 
+   htp.htmlClose; 
+ 
+END footer; 
+ 
+END common; </code></pre>
+
+<p><strong>How It Works</strong><br>Recipe 14-1 includes a test procedure to verify the DAD is setup correctly; however the test procedure<br>does not produce a well-formed HTML page. Here is the updated example from Recipe 14-1, this time<br>with calls to the common header and footer procedures. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">create or replace procedure test as 
+begin 
+   common.header (&#39;Test Page&#39;); 
+   htp.p (&#39;Hello World!&#39;); 
+   common.footer; 
+end; </code></pre>
+
+<p>This procedure, when called from a web browser, produces the following HTML code. </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">HTML</span> <span class="token name">PUBLIC</span> <span class="token string">"-//W3C//DTD HTML 4.0 Transitional//EN"</span> <span class="token string">"http://www.w3.org/ 
+TR/REC-html40/loose.dtd"</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>HTML</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>HEAD</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>META</span> <span class="token attr-name">HTTP-EQUIV</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Content-Type<span class="token punctuation">"</span></span> <span class="token attr-name">NAME</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token punctuation">"</span></span> <span class="token attr-name">CONTENT</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/html;WINDOWS-1252<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>META</span> <span class="token attr-name">HTTP-EQUIV</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Pragma<span class="token punctuation">"</span></span> <span class="token attr-name">NAME</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token punctuation">"</span></span> <span class="token attr-name">CONTENT</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>no-cache<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>TITLE</span><span class="token punctuation">></span></span>Test Page<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>TITLE</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>BODY</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>H2</span><span class="token punctuation">></span></span>Test Page<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>H2</span><span class="token punctuation">></span></span> 
+Hello World! 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>BODY</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>HTML</span><span class="token punctuation">></span></span> </code></pre>
+<p>The header routine generates the necessary opening HTML code to properly display a web page. It<br>begins by setting the document type, then sending the opening <HTML> and <HEAD> tags. It sets the<br>content-type to the character set defined in the Apache environment variable, which is retrieved using a<br>call to the PL&#x2F;SQL Web Toolkit’s owa_util.get_cgi_env routine. The Pragma <META> tag tells the browser<br>not to store the page’s content in its internal cache. This is useful when the PL&#x2F;SQL routine returns time-<br>sensitive data because the users need to see real-time data. The remaining code sets the title in the user’s<br>browser, opens the <BODY> tag and displays the title on the user’s web browser.<br>The footer routine closes the <BODY> and <HTML> tags. As stated in the code’s comments, this is a<br>good place to include any legal disclaimers or other useful text or links required for every web page<br>generated.<br>Oftentimes when creating an application, you will create several procedures that will make use of<br>the same code. You could copy the code throughout your procedures, but it is more efficient and safer to<br>write once and use in many different places. The creation of a common codebase that is accessible to<br>each PL&#x2F;SQL object within a schema can be quite an effective <strong>Solution</strong> for storing such code. </p>
+<h2 id="14-3-Creating-an-Input-Form"><a href="#14-3-Creating-an-Input-Form" class="headerlink" title="14-3 Creating an Input Form"></a>14-3 Creating an Input Form</h2><p><strong>Problem</strong><br>You require a web page that accepts and processes data entered by users. The data should be collected<br>on the opening page and processed (stored in a table, used to update rows in a table, etc.) when the user<br>clicks the Submit button.<br><strong>Solution</strong><br>Create a package using the Oracle PL&#x2F;SQL Web Toolkit to display a data entry form and process the<br>results. In this example a simple data entry form is created to collect employee information and send the<br>user’s input to a second procedure for processing.<br>■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE input_form AS 
+ 
+   null_array OWA_UTIL.IDENT_ARR; 
+ 
+   PROCEDURE html; 
+   PROCEDURE submit (emp_id     VARCHAR2, 
+                     gender     VARCHAR2 DEFAULT NULL, 
+                     options    OWA_UTIL.IDENT_ARR DEFAULT null_array, 
+                     comments   varchar2); 
+ 
+END input_form; </code></pre>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY input_form AS 
+ 
+PROCEDURE html IS 
+ 
+type    options_type is varray(3) of varchar2(50); 
+options options_type :&#x3D; options_type (&#39;I will attend the Team Meeting&#39;, 
+                        &#39;I will attend the social event&#39;, 
+                        &#39;I will attend the company tour&#39;); 
+ 
+BEGIN 
+ 
+   common.header (&#39;Input Form&#39;); 
+   htp.formOpen (&#39;input_form.submit&#39;, &#39;POST&#39;); 
+ 
+   htp.p (&#39;Employee ID: &#39;); 
+CHAPTER 14  USING PL&#x2F;SQL ON THE WEB 
+296 
+   htp.formText (&#39;emp_id&#39;, 9, 9); 
+   htp.br; 
+ 
+   htp.p (&#39;Gender: &#39;); 
+   htp.formRadio (&#39;gender&#39;, &#39;M&#39;); 
+   htp.p (&#39;Male&#39;); 
+   htp.formRadio (&#39;gender&#39;, &#39;F&#39;); 
+   htp.p (&#39;Female&#39;); 
+   htp.br; 
+ 
+   FOR i IN 1..10 LOOP 
+      htp.formCheckBox (&#39;options&#39;, i); 
+      htp.p (options(i)); 
+      htp.br; 
+   END LOOP; 
+   htp.br; 
+ 
+   htp.p (&#39;COMMENTS: &#39;); 
+   htp.formTextArea (&#39;comments&#39;, 5, 50); 
+   htp.br; 
+ 
+   htp.formSubmit; 
+   htp.formClose; 
+   common.footer; 
+ 
+END html; 
+ 
+PROCEDURE submit (emp_id     VARCHAR2, 
+                  gender     VARCHAR2 DEFAULT NULL, 
+                  options    OWA_UTIL.IDENT_ARR DEFAULT null_array, 
+                  comments   varchar2) is 
+ 
+BEGIN 
+ 
+   common.header (&#39;Input Results&#39;); 
+   htp.bold (&#39;You entered the following...&#39;); 
+   htp.br; 
+ 
+   htp.p (&#39;Employee ID: &#39; || emp_id); 
+   htp.br; 
+   htp.p (&#39;Gender: &#39; || gender); 
+   htp.br; 
+   htp.p (&#39;Comments: &#39; || comments); 
+   htp.br; 
+ 
+   htp.bold (&#39;Options Selected...&#39;); 
+   htp.br; 
+   FOR i IN 1..options.COUNT LOOP 
+      htp.p (options(i)); 
+      htp.br; 
+   END LOOP; 
+ 
+  CHAPTER 14  USING PL&#x2F;SQL ON THE WEB 
+297 
+   common.footer; 
+  
+END submit; 
+ 
+END input_form;</code></pre>
+
+<p><strong>How It Works</strong><br>Access the web page using a link with an HTML anchor URL of <a target="_blank" rel="noopener" href="http://node.mycompany.com/DAD_NAME/">http://node.mycompany.com/DAD_NAME/</a><br>input_form.html.<br>■ Note See Recipe 14-1 to define the DAD_NAME.<br>The input_form package specification defines an empty collection named null_array as the type<br>OWA_UTIL.IDENT_ARR. It is used as the default value in the event the web form is submitted without<br>checking at least one of the check boxes. Without the default value for the input parameter options, the<br>call to input_form.submit will not work and returns an error to the user if no boxes are checked.<br>■ Note See Recipe 14-9 for more information on viewing errors.<br>The two procedures, html and submit, exposed in the package specification, are required to make<br>them visible to the PL&#x2F;SQL module within the Apache web server. It is important to note that it is not<br>possible to call procedures via a URL if they are not defined in the package specification.<br>The html procedure generates the data entry form shown in Figure 14-1. It begins with a call to<br>header common procedure, which generates the opening HTML tags. The htp.formOpen call generates<br>the <FORM> tag with the destination of the submit button to the submit procedure within the input_form<br>package.<br>The htp.p procedure call sends the data passed to it directly to the client’s web browser, this<br>procedure should not be confused with the htp.para, which produces the <P> tag. The htp.br call sends<br>the <BR> tag to the client’s web browser.<br>The remainder of the procedure generates several form elements that accept user input. The<br>htp.formText call generates a simple text box that accepts nine bytes. The htp.formRadio routine is called<br>twice with the same variable name in the first parameter. This defines the variable gender with one of<br>two possible values, M or F. The call to htp.formCheckBox within the FOR…LOOP generates the checkboxes,<br>each having a unique value returned if checked by the user. Only the values checked are sent in a<br>collection to the submit routine. The call to htp.formTextArea creates a multi-line, text box 50 characters<br>wide and 5 lines deep. See Table 14-1 for a list of common PL&#x2F;SQL Web Toolkit procedures that generate<br>HTML form tags.<br>The procedure ends with a calls to htp.formSubmit and htp.formClose, which generate the form’s<br>submit button and the closing </FORM> tag. When the user clicks the submit button, the client’s web<br>browser sends the data entered into the form to the submit routine within the input_form package. </p>
+<p>Figure 14-1. Form generated by the input_form.html procedure<br>Table 14-1. Common form procedures in the PL&#x2F;SQL Web Toolkit </p>
+<pre class="language-text" data-language="text"><code class="language-text">Toolkit Procedure HTML Tag 
+htp.formCheckbox &lt;INPUT TYPE="CHECKBOX"> 
+htp.formClose &lt;/FORM> 
+htp.formHidden &lt;INPUT TYPE="HIDDEN"> 
+htp.formImage &lt;IPUT TYPE="IMAGE"> 
+htp.formOpen &lt;FORM> 
+htp.formPassword &lt;INPUT TYPE="PASSWORD"> 
+htp.formRadio &lt;INPUT TYPE="RADIO"> 
+htp.formReset &lt;INPUT TYPE="RESET"> 
+htp.formSelectClose &lt;/SELECT> 
+htp.formSelectOpen &lt;SELECT> 
+htp.formSelectOption &lt;OPTION> 
+htp.formSubmit &lt;INPUT TYPE="SUBMIT"> 
+Toolkit Procedure  HTML Tag 
+htp.formText &lt;INPUT TYPE="TEXT"> 
+htp.formTextarea &lt;TEXTAREA>&lt;/TEXTAREA> 
+htp.formTextareaClose &lt;/TEXTAREA> 
+htp.formTextareaOpen &lt;TEXTAREA> </code></pre>
+
+<h2 id="14-4-Creating-a-Web–based-Report-Using-PL-x2F-SQL-Procedures"><a href="#14-4-Creating-a-Web–based-Report-Using-PL-x2F-SQL-Procedures" class="headerlink" title="14-4. Creating a Web–based Report Using PL&#x2F;SQL Procedures"></a>14-4. Creating a Web–based Report Using PL&#x2F;SQL Procedures</h2><p><strong>Problem</strong><br>You need to generate a web page report that displays the results of a database query.<br><strong>Solution</strong><br>Create a package with two procedures, one to accept a user’s input, and another to query the database<br>and display the results. Suppose, for example, that you need a report that displays information for an<br>employee whose employee ID has been entered by an authorized user. This recipe uses the employee<br>table in the HR schema.<br>■ Note When defining packages that contain procedures you wish to access via web browsers, you must include<br>each procedure you wish to access in the package specification.  </p>
+<p>■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE emp_rpt AS 
+ 
+   PROCEDURE html; 
+   PROCEDURE rpt (emp_id VARCHAR2); 
+ 
+END emp_rpt; 
+
+CREATE OR REPLACE PACKAGE BODY emp_rpt AS 
+ 
+PROCEDURE html IS 
+ 
+BEGIN 
+ 
+   common.header (&#39;Employee Report&#39;); 
+   htp.formOpen (&#39;emp_rpt.rpt&#39;, &#39;POST&#39;); 
+   htp.p (&#39;Employee ID:&#39;); 
+   htp.formText (&#39;emp_id&#39;, 6, 6); 
+   htp.formSubmit; 
+   htp.formClose; 
+   common.footer;  -- See recipe 14-2 for the common package. 
+END html; 
+PROCEDURE show_row (label VARCHAR2, value VARCHAR2) IS 
+BEGIN 
+   htp.tableRowOpen (&#39;LEFT&#39;, &#39;TOP&#39;); 
+   htp.tableHeader (label, &#39;RIGHT&#39;); 
+   htp.tableData (value); 
+   htp.tableRowClose; 
+END show_row; 
+PROCEDURE rpt (emp_id VARCHAR2) IS 
+CURSOR  driver IS 
+SELECT  * 
+FROM    employees 
+WHERE   employee_id &#x3D; emp_id; 
+rec             driver%ROWTYPE;
+rec_found       BOOLEAN; 
+BEGIN 
+   common.header (&#39;Employee Report&#39;); 
+  
+   OPEN driver; 
+   FETCH driver INTO rec; 
+   rec_found :&#x3D; driver%FOUND; 
+   CLOSE driver; 
+   IF rec_found THEN 
+      htp.tableOpen; 
+      show_row (&#39;Employee ID&#39;, rec.employee_id); 
+      show_row (&#39;First Name&#39;, rec.first_name); 
+      show_row (&#39;Last Name&#39;, rec.last_name); 
+      show_row (&#39;Email&#39;, rec.email); 
+      show_row (&#39;Phone&#39;, rec.phone_number); 
+      show_row (&#39;Hire Date&#39;, rec.hire_date); 
+      show_row (&#39;Salary&#39;, rec.salary); 
+      show_row (&#39;Commission %&#39;, rec.commission_pct); 
+      htp.tableClose; 
+   ELSE 
+      htp.header (3, &#39;No such employee ID &#39; || emp_id); 
+   END IF; 
+ 
+   common.footer; -- See recipe 14-2 for the common package. 
+ 
+EXCEPTION 
+   WHEN OTHERS THEN 
+   htp.header (3, &#39;Invalid employee ID. Click your browser&#39;&#39;s back button and try again.&#39;); 
+   common.footer; 
+ 
+END rpt; 
+ 
+END emp_rpt; </code></pre>
+
+<p><strong>How It Works</strong><br>Users access the web page using the URL <a target="_blank" rel="noopener" href="http://node.mycompany.com/DAD_NAME/emp_rpt.html">http://node.mycompany.com/DAD_NAME/emp_rpt.html</a>.<br>■ Note See Recipe 14-1 for more on how to define the DAD_NAME.<br>The package specification is defined with two procedures, html and rpt. Exposing these procedures<br>in the specification is required to make the PL&#x2F;SQL procedures available within Apache.<br>Next, the package body is defined. The html procedure generates the data entry form. It generates<br>the opening HTML code by calling the common.header routine defined in recipe 14-2. Next, it calls the<br>htp.formOpen to set the form’s action, which is to run the PL&#x2F;SQL procedure emp_rpt.rpt, when the user<br>clicks the submit button and to send the form data in a POST method, as opposed to GET. A simple<br>prompt and a text box follows to allow the user to enter an employee ID. A call to form.submit,<br>form.close and common.footer complete the HTML code.<br>The show_row procedure is a handy subroutine to output one table row with two data cells. It<br>displays data on the client’s browser in a formatted table, making it more visually appealing.<br>The rpt procedure accepts the user’s input in the emp_id parameter and uses it to query the<br>employee record. The common.header routine generates the opening HTML code. The cursor is opened<br>and the data is fetched into the rec data structure. The rec_found variable stores the flag that identifies if<br>a record was fetched. It needs to be referenced after the fetch and before the close. If a record is found,<br>the employee data is displayed in a two-column table, shown in Figure 14-2, otherwise a message is sent<br>to the user that the employee ID is not valid.<br>The exception is necessary to trap the error generated if the user enters a non-numeric employee<br>ID. Another option is to validate the user’s input prior to using it in the cursor query.<br>■ Note See recipe 14-10 for an example of validating user input. </p>
+<p>Figure 14-2. Results from entering employee ID 200 on the previous data entry screen<br>14-5. Displaying Data from Tables<br><strong>Problem</strong><br>You wish to provide the results from an SQL SELECT statement to the users via a web browser.<br><strong>Solution</strong><br>Use the Oracle PL&#x2F;SQL Web Toolkit to SELECT and display data. The owa_util.tablePrint procedure<br>accepts any table name for the ctable parameter. When this procedure is compiled in a schema with a<br>DAD it can be accessed via the Web. This example displays information similar to the describe feature<br>within SQL*Plus.<br>■ Note See Recipe 14-1 to define a DAD and direct your browser to run your procedure.  </p>
+<p>■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe.  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE descr_emp IS 
+ 
+BEGIN 
+ 
+   common.header (&#39;The Employees Table&#39;); 
+ 
+   IF owa_util.tablePrint ( 
+             ctable&#x3D;&gt;&#39;user_tab_columns&#39;, 
+        cattributes&#x3D;&gt;&#39;BORDER&#39;, 
+  CHAPTER 14  USING PL&#x2F;SQL ON THE WEB 
+303 
+           ccolumns&#x3D;&gt;&#39;column_name, data_type, data_length, data_precision, nullable&#39;, 
+           cclauses&#x3D;&gt;&#39;WHERE table_name&#x3D;&#39;&#39;EMPLOYEES&#39;&#39; ORDER BY column_id&#39;) then 
+      NULL; 
+   END IF; 
+ 
+   common.footer; 
+ 
+END descr_emp; </code></pre>
+
+<p><strong>How It Works</strong><br>Users access the web page using the URL <a target="_blank" rel="noopener" href="http://node.mycompany.com/DAD_NAME/emp_rpt.html">http://node.mycompany.com/DAD_NAME/emp_rpt.html</a>. The<br>descr_emp procedure calls the owa_util.tablePrint procedure, which is included in the PL&#x2F;SQL Web<br>Toolkit. The ctable parameter defines the table the owa_util.tablePrint procedure accesses to read the<br>data. The cattribributes parameter accepts options for the HTML <TABLE> tag. The ccolumns parameter<br>allows you to specify which columns to select from the named table. If no columns are specified, then<br>the procedure shows all columns. The cclauses parameter allows you to add a where clause and&#x2F;or an<br>order by statement. If no where clause is specified, all rows are returned. The output is shown in Figure<br>14-3. </p>
+<p>Figure 14-3. Results of the descr_emp procedure </p>
+<h2 id="14-6-Creating-a-Web-Form-Dropdown-List-from-a-Database-Query"><a href="#14-6-Creating-a-Web-Form-Dropdown-List-from-a-Database-Query" class="headerlink" title="14-6. Creating a Web Form Dropdown List from a Database Query"></a>14-6. Creating a Web Form Dropdown List from a Database Query</h2><p><strong>Problem</strong><br>Your web form requires a dropdown list whose elements are drawn from a database table.<br><strong>Solution</strong><br>Use the htp.formSelectOpen, htp.formSelectOption and htp.formSelectClose procedures in the PL&#x2F;SQL<br>Web Toolkit to generate the required HTML tags. For example, suppose you need to use the HR schema<br>to create a dropdown list of job titles from the JOBS table. Here’s how you’d do it. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">create or replace procedure job_list as 
+ 
+cursor  driver is 
+select  job_id, job_title 
+from    jobs 
+order by job_title; 
+ 
+begin 
+ 
+   common.header (&#39;Job Title&#39;); 
+   htp.formSelectOpen (&#39;id&#39;, &#39;Job Title: &#39;); 
+   htp.formSelectOption (&#39;&#39;, &#39;SELECTED&#39;); 
+ 
+   for rec in driver LOOP 
+      htp.formSelectOption (rec.job_title, cattributes&#x3D;&gt;&#39;VALUE&#x3D;&quot;&#39; || rec.job_id || &#39;&quot;&#39;); 
+   end LOOP; 
+ 
+   htp.formSelectClose; 
+   common.footer; 
+ 
+end job_list; </code></pre>
+<p>This procedure produces the following web page.<br>Figure 14-4. Dropdown list created by job_list procedure<br><strong>How It Works</strong><br>The htp.formSelectOpen procedure generates the HTML <SELECT NAME="id">, which defines the<br>dropdown list in the web browser. In addition the procedure uses the second parameter as the prompt<br>for the dropdown list. In this example the prompt is Job Title:.<br>The call to htp.formSelectOption procedure defines the elements of the dropdown list. The first<br>parameter is the text displayed in the list and the second parameter preselects the element in the list<br>when it is first displayed. In this example the first call to the htp.formSelectOption procedure defines the<br>default selected element in the list to an empty value.<br>The subsequent calls to htp.formSelectOption that appear in the cursor for loop define the<br>remaining elements in the dropdown list using the data selected from the JOBS table. The cattributes<br>parameter is used to change the default value returned by the web browser when the element is selected<br>from the list.<br>The call to htp.formSelectClose generates the </SELECT> HTML tag to close the dropdown list.<br>Dropdown lists usually appear within the <FORM> tags to accept user input and process that input on a<br>subsequent page.<br>■ Note See Recipe 14-3 for more information on creating an input form. </p>
+<h2 id="14-7-Creating-a-Sortable-Web-Report"><a href="#14-7-Creating-a-Sortable-Web-Report" class="headerlink" title="14-7. Creating a Sortable Web Report"></a>14-7. Creating a Sortable Web Report</h2><p><strong>Problem</strong><br>You need a report that displays data that is sorted by a field the user selects.<br><strong>Solution</strong><br>Create a package that prompts the user for a sort field, then generates the sorted output using the sort<br>field parameter in the ORDER BY section of the SELECT statement. In this example the user is prompted to<br>select a sort option on the EMPLOYEEs table. The options are to sort by last name, hire date, salary, or<br>employee ID.<br>■ Note See Recipe 14-1 to define a DAD and direct your browser to run your procedure.  </p>
+<p>■ Note See Recipe 14-2 for more information on the common package, which is used in this recipe.  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE sorted AS 
+ 
+   PROCEDURE html; 
+   PROCEDURE rpt (sort_order VARCHAR2); 
+ 
+END sorted; 
+
+CREATE OR REPLACE PACKAGE BODY sorted AS 
+ 
+PROCEDURE html IS 
+ 
+BEGIN 
+ 
+   common.header (&#39;Sorted Report&#39;); 
+   htp.formOpen (&#39;sorted.rpt&#39;, &#39;POST&#39;); 
+   htp.formSelectOpen (&#39;sort_order&#39;, &#39;Select a Sort Order: &#39;); 
+   htp.formSelectOption (&#39;Last Name&#39;); 
+   htp.formSelectOption (&#39;Hire Date&#39;); 
+   htp.formSelectOption (&#39;Salary&#39;); 
+   htp.formSelectOption (&#39;Employee ID&#39;); 
+   htp.formSelectClose; 
+   htp.formSubmit; 
+   htp.formClose; 
+   common.footer;  
+END html; 
+ 
+PROCEDURE rpt (sort_order VARCHAR2) IS 
+ 
+CURSOR  driver IS 
+SELECT  * 
+FROM    employees 
+ORDER BY DECODE (sort_order, 
+                &#39;Last Name&#39;,   last_name, 
+                &#39;Hire Date&#39;,   TO_CHAR (hire_date, &#39;YYYYMMDD&#39;), 
+                &#39;Salary&#39;,      TO_CHAR (salary, &#39;00000&#39;), 
+                &#39;Employee ID&#39;, TO_CHAR (employee_id, &#39;00000&#39;) ); 
+ 
+BEGIN 
+ 
+   common.header (&#39;Sorted Report by &#39;||sort_order); -- See recipe 14-2. 
+   htp.tableOpen (&#39;BORDER&#39;); 
+   htp.tableRowOpen (&#39;LEFT&#39;, &#39;BOTTOM&#39;); 
+   htp.tableHeader (&#39;Name&#39;); 
+   htp.tableHeader (&#39;Hired&#39;); 
+   htp.tableHeader (&#39;Salary&#39;); 
+   htp.tableHeader (&#39;ID&#39;); 
+   htp.tableRowClose; 
+ 
+   FOR rec IN driver LOOP 
+      htp.tableRowOpen (&#39;LEFT&#39;, &#39;TOP&#39;); 
+      htp.tableData (rec.last_name); 
+      htp.tableData (rec.hire_date); 
+      htp.tableData (rec.salary); 
+      htp.tableData (rec.employee_id); 
+      htp.tableRowClose; 
+   END LOOP; 
+ 
+   htp.tableClose; 
+   common.footer; 
+ 
+END rpt; 
+ 
+END sorted; </code></pre>
+
+<p><strong>How It Works</strong><br>Users access the web page using the URL <a target="_blank" rel="noopener" href="http://node.mycompany.com/DAD_NAME/sorted.html">http://node.mycompany.com/DAD_NAME/sorted.html</a>.<br>■ Note See Recipe 14-1 for more on how to to define the DAD_NAME.<br>The package specification is defined by exposing two procedures, html and rpt. You must define<br>these procedures in the specification to make the PL&#x2F;SQL procedures available within Apache.<br>Next, the package body is defined. The html procedure generates the data entry form. It generates<br>the opening HTML code by calling the common.header routine defined in Recipe 14-2. Next, it calls the<br>htp.formOpen to set the form’s action when the user clicks the Submit button. The calls to<br>htp.formSelectOpen, htp.formSelectOption and htp.formSelectClose procedures create the dropdown<br>list for the user to select a sort order.<br>■ Note See Recipe 14-6 for more information on how to create dropdown lists.<br>A call to form.submit, form.close and common.footer complete the necessary HTML code. The form<br>generated is shown in Figure 14-5.<br>The rpt procedure accepts the sort_order parameter, which is used in the cursor to dynamically<br>determine the sort order on the EMPLOYEES table. The order by option in the select statement uses the<br>decode function to return the proper string needed for ordering based on the user’s input.<br>The first set of parameters sent to the decode function, namely the first_name field, defines the data<br>type returned by the decode function. This is important to note as the remaining data types returned<br>from the decode function will be converted to strings to match the first_name. It is necessary to convert<br>the numeric and date fields to strings that sort properly. For example, if the default date string format is<br>dd-Mon-yy, then the hire dates will sort by the day of the month first, then by the month’s abbreviation<br>and year. The desired sort order is year, month, then day. </p>
+<p>Figure 14-5. Initial data entry screen showing the sort options </p>
+<h2 id="14-8-Passing-Data-Between-Web-Pages"><a href="#14-8-Passing-Data-Between-Web-Pages" class="headerlink" title="14-8. Passing Data Between Web Pages"></a>14-8. Passing Data Between Web Pages</h2><p><strong>Problem</strong><br>You have a multi-page data entry form in which the final page requires data entered on pages that<br>precede it. You need to pass the data gathered on previous pages to the current page.<br><strong>Solution</strong><br>Pass the name&#x2F;value pairs from previous pages using the htp.formHidden procedure in the PL&#x2F;SQL Web<br>Toolkit. In this recipe each parameter is passed to the next form using hidden HTML elements. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE multi AS 
+ 
+   PROCEDURE page1; 
+   PROCEDURE page2 (var1 varchar2); 
+   PROCEDURE page3 (var1 varchar2, var2 varchar2); 
+   PROCEDURE process (var1 varchar2, var2 varchar2, var3 varchar2); 
+ 
+END multi; 
+ 
+CREATE OR REPLACE PACKAGE BODY multi AS 
+ 
+PROCEDURE page1 IS 
+ 
+begin 
+ 
+   htp.formOpen (&#39;multi.page2&#39;, &#39;POST&#39;); 
+   htp.p (&#39;Enter First Value:&#39;); 
+   htp.formText (&#39;var1&#39;, 10, 10); 
+   htp.formSubmit; 
+   htp.formClose; 
+ 
+END page1; 
+ 
+PROCEDURE page2 (var1 VARCHAR2) IS 
+ 
+begin 
+ 
+   htp.formOpen (&#39;multi.page3&#39;, &#39;POST&#39;); 
+   htp.formHidden (&#39;var1&#39;, var1); 
+   htp.p (&#39;Enter Second Value:&#39;); 
+   htp.formText (&#39;var2&#39;, 10, 10); 
+   htp.formSubmit; 
+   htp.formClose; 
+ 
+END page2; 
+ 
+PROCEDURE page3 (var1 VARCHAR2, var2 VARCHAR2) IS 
+ 
+begin 
+ 
+   htp.formOpen (&#39;multi.process&#39;, &#39;POST&#39;); 
+   htp.formHidden (&#39;var1&#39;, var1); 
+   htp.formHidden (&#39;var2&#39;, var2); 
+   htp.p (&#39;Enter Third Value:&#39;); 
+   htp.formText (&#39;var3&#39;, 10, 10); 
+   htp.formSubmit; 
+   htp.formClose; 
+ 
+END page3; 
+ 
+PROCEDURE process (var1 varchar2, var2 varchar2, var3 varchar2) is 
+ 
+BEGIN 
+ 
+  htp.p (&#39;The three variables entered are...&#39;); 
+  htp.br; 
+ 
+  htp.p (&#39;1&#x3D;&#39; || var1); 
+  htp.br; 
+  htp.p (&#39;2&#x3D;&#39; || var2); 
+  htp.br; 
+  htp.p (&#39;3&#x3D;&#39; || var3); 
+ 
+END process; 
+ 
+END multi; </code></pre>
+<p><strong>How It Works</strong><br>Users access the web page using the URL <a target="_blank" rel="noopener" href="http://node.mycompany.com/DAD_NAME/multi.page1">http://node.mycompany.com/DAD_NAME/multi.page1</a>.<br>■ Note See Recipe 14.1 to define the DAD_NAME.<br>The page1 procedure within the mulit package prompts the user for an input value, which is passed<br>to procedure page2 as its parameter, var1. The htp.formHidden call in the page2 procedure produces an<br>HTML &lt;&gt;INPUT&lt;&gt; tag of type HIDDEN. In this recipe it produces the following HTML code in the client’s web<br>browser: &lt;&gt;INPUT TYPE&#x3D;”hidden” NAME&#x3D;”var1” VALUE&#x3D;”xxx”&lt;&gt;, where xxx is the text the user entered on the<br>first page of this multi-part form.<br>The page2 procedure then accepts more user input into the form variable var2, which is passed to<br>page3 along with var1 collected on the first input page. The third page accepts the final user input and<br>passes it to the process procedure, where final processing occurs. </p>
+<h2 id="14-9-Viewing-Errors-for-Debugging-Web-Apps"><a href="#14-9-Viewing-Errors-for-Debugging-Web-Apps" class="headerlink" title="14-9. Viewing Errors for Debugging Web Apps"></a>14-9. Viewing Errors for Debugging Web Apps</h2><p><strong>Problem</strong><br>You have a PL&#x2F;SQL package or procedure called from a web client that generates errors and you need to<br>view the error message.<br><strong>Solution</strong><br>Choose one of the following two <strong>Solution</strong>s, depending on your circumstances.<br><strong>Solution</strong> #1<br>If the package is in use in a production environment, then check the output of the Apache error log file.<br>The log file location is defined in the httpd.conf configuration file. The default log file location is<br><code>[oracle_home]\Apache\Apache\logs directory</code>. Open the log file and search for the errors generated with<br>a timestamp that corresponds to the approximate time the error was generated.<br><strong>Solution</strong> #2<br>If the application is in development or running in a non-production environment, change the default<br>error style within the DAD used to produce the web page that failed. The error style is defined in the<br>DADS.CONF file located in <code>[oracle_homme]\Apache\modplsql\conf</code>. Set the PlsqlErrorStyle to DebugStyle.<br>■ Note See recipe 14-1 for more information on defining DADs.<br><strong>How It Works</strong><br><strong>Solution</strong> #1<br>The PL&#x2F;SQL module within Apache logs all errors, complete with timestamps. New errors are written to<br>the end of the error log. This Solution is recommended for production environments where the display<br>of Apache environment variables may pose security issues.<br>Here’s an example of an error message written to the error log. In this example, a procedure was<br>called from the Web but was missing required parameters. </p>
+<p><code>[error] [client 127.0.0.1] mod_plsql: /DAD_NAME/class_sched.list HTTP-404 </code></p>
+<p>class_sched.list: SIGNATURE (parameter names) MISMATCH<br>VARIABLES IN FORM NOT IN PROCEDURE:<br>NON-DEFAULT VARIABLES IN PROCEDURE NOT IN FORM: THIS_ID, THIS_ID_TYPE<br><strong>Solution</strong> #2<br>Setting the PlsqlErrorStyle to DebugStyle causes Apache to display all PL&#x2F;SQL error messages on the<br>client’s web browser when the PL&#x2F;SQL routine fails. It displays the same error messages normally found<br>in the Apache log file plus a list of all Apache environment variables and their values. This <strong>Solution</strong> is<br>recommended for non-production environments where errors are more likely to occur during<br>development and testing. It has the advantage of immediate, onscreen feedback for developers and<br>testers. </p>
+<p>The following is an example of an error message written to the web browser. </p>
+<pre class="language-none"><code class="language-none">class_sched.list: SIGNATURE (parameter names) MISMATCH 
+VARIABLES IN FORM NOT IN PROCEDURE:  
+NON-DEFAULT VARIABLES IN PROCEDURE NOT IN FORM: THIS_ID, THIS_ID_TYPE 
+ 
+  DAD name: default 
+  PROCEDURE  : class_sched.list 
+  URL        : http:&#x2F;&#x2F;node.mycomp.com&#x2F;DAD_NAME&#x2F;class_sched.list 
+  PARAMETERS : 
+  &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; 
+ 
+  ENVIRONMENT: 
+  &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; 
+    PLSQL_GATEWAY&#x3D;WebDb 
+    GATEWAY_IVERSION&#x3D;3 
+        &lt;&lt; snip &gt;&gt; </code></pre>
+<h2 id="14-10-Generating-JavaScript-via-PL-x2F-SQL"><a href="#14-10-Generating-JavaScript-via-PL-x2F-SQL" class="headerlink" title="14-10. Generating JavaScript via PL&#x2F;SQL"></a>14-10. Generating JavaScript via PL&#x2F;SQL</h2><p><strong>Problem</strong><br>Your procedure requires JavaScript but you do not have access to the Oracle application server to store<br>the script file to make it accessible from Apache.<br><strong>Solution</strong><br>Use the Oracle PL&#x2F;SQLWeb Toolkit to output JavaScript within your PL&#x2F;SQL procedure. There are two<br>steps to define and enable a JavaScript within your PL&#x2F;SQL procedure.<br>First, define the JavaScript source on the web page that requires access to your<br>JavaScript routine using the HTML tag &gt;SCRIPT&lt;.<br>Define a PL&#x2F;SQL procedure to match the name of the &lt;&gt;SCRIPT&lt;&gt; tag’s source(src)<br>property.<br>In the following example the html procedure defines the &lt;&gt;SCRIPT&lt;&gt; tag with the source set to<br>empID.js and the js procedure generates the JavaScript code. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE empID IS 
+ 
+   PROCEDURE html; 
+   PROCEdURE js; 
+ 
+END empID; 
+ 
+CREATE OR REPLACE PACKAGE BODY empID IS 
+ 
+PROCEDURE html is 
+ 
+BEGIN 
+ 
+   common.header (&#39;Employee Report&#39;); -- See recipe 14-2 for the common package. 
+   htp.p (&#39;&lt;SCRIPT LANGUAGE&#x3D;&quot;JavaScript&quot; SRC&#x3D;&quot;&#39;                 || 
+                owa_util.get_cgi_env (&#39;REQUEST_PROTOCOL&#39;)       || &#39;:&#x2F;&#x2F;&#39;        || 
+                owa_util.get_cgi_env (&#39;HTTP_HOST&#39;)              || 
+                owa_util.get_cgi_env (&#39;SCRIPT_NAME&#39;)            || &#39;&#x2F;empID.js&quot;&gt;&lt;&#x2F;SCRIPT&gt;&#39;); 
+ 
+   htp.formOpen (&#39;emp_rpt.rpt&#39;, &#39;POST&#39;); -- See recipe 14-4 for the emp_rpt pacakge. 
+   htp.p (&#39;Employee ID:&#39;); 
+   htp.formText (&#39;emp_id&#39;, 6, 6, cattributes&#x3D;&gt;&#39;onChange&#x3D;&quot;validateNumber(this.value);&quot;&#39;); 
+ 
+   htp.formSubmit; 
+   htp.formClose; 
+   common.footer; -- See recipe 14-2 for the common package. 
+ 
+ 
+END html; 
+ 
+PROCEDURE js is 
+ 
+BEGIN 
+ 
+   htp.p (&#39; 
+ 
+function validateNumber (theNumber) &#123; 
+ 
+   if ( isNaN (theNumber) ) &#123; 
+      alert (&quot;You must enter a number for the Employee ID&quot;); 
+      return false; &#125; 
+ 
+   return true; 
+ 
+  CHAPTER 14  USING PL&#x2F;SQL ON THE WEB 
+313 
+&#125;&#39;); 
+ 
+END js; 
+ 
+END empID; </code></pre>
+<p><strong>How It Works</strong><br>Begin by creating the package specification for empID, which exposes the html and js procedures. Next<br>create the package body with two procedures, html and js.<br>The html procedure generates the opening HTML code with a call to common.header. Next, the<br>procedure generates a &lt;–SCRIPT–&gt; tag that identifies the location of the JavaScript to include in the user’s<br>browser. The &lt;–SCRIPT–&gt; tag of this form is one of the few HTML tags not predefined in the PL&#x2F;SQL Web<br>Toolkit.<br>The &lt;–SCRIPT–&gt; tag takes advantage of the owa_util package, which is also part of the PL&#x2F;SQL Web<br>Toolkit, to dynamically generate the web address of the JavaScript using the settings of the Apache<br>environment values. This method avoids your having to hard-code the URL of the script into the<br>procedure and allows it to run in any environment—development, integration, production, etc. The URL<br>generated references the JavaScript package defined later in the package body.<br>Next, the html procedure generates the &lt;–FORM–&gt; tag with emp_rpt.rpt as its target. When the user<br>clicks the Submit button the form will call the PL&#x2F;SQL procedure emp_rpt.rpt defined in Recipe 14-4. It<br>will not call a procedure within the empID package.<br>The htp.formText routine contains an extra parameter to include the JavaScript necessary to run<br>when the user changes the value in the emp_id field. Nearly every procedure in the htp package includes<br>the cattributes parameter, which provides for any additional option needed within the tag that is not<br>already defined in the existing parameters. Figure 14-6 shows the data entry form with a non-numeric<br>employee ID; in this example the letter “o” was used instead of a zero. JavaScript pops up the error<br>message shown.<br>The js procedure consists of a simple print statement that contains the entire contents of the<br>JavaScript code. JavaScript allows either single or double quotes for character strings. Using double<br>quotes in the JavaScript code avoids conflicts with the single quote requirements of PL&#x2F;SQL. </p>
+<p>Figure 14-6. Error message generated by JavaScript when a non-numeric employee ID is entered </p>
+<h2 id="14-11-Generating-XML-Output"><a href="#14-11-Generating-XML-Output" class="headerlink" title="14-11. Generating XML Output"></a>14-11. Generating XML Output</h2><p><strong>Problem</strong><br>You need to provide XML data for PL&#x2F;SQL or other consumers of data from your Oracle database.<br><strong>Solution</strong><br>Use Oracle’s built-in DBMS_XMLGEN package to extract data from the database in standard XML format and<br>then output the data through the Apache web server. In this example a generic procedure builds and<br>outputs XML formatted data based on the SQL query statement passed to it. This procedure can be used<br>in any application that requires XML output extracted from database tables. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE gen_xml (sql_stmt VARCHAR2) IS 
+ 
+string          VARCHAR2(4000); 
+ipos            INTEGER; 
+offset          INTEGER; 
+n               INTEGER :&#x3D; 1; 
+ 
+qryctx          dbms_xmlgen.ctxhandle; 
+result          CLOB; 
+ 
+BEGIN 
+ 
+   qryctx :&#x3D; dbms_xmlgen.newcontext (sql_stmt); 
+   result :&#x3D; dbms_xmlgen.getxml (qryctx); 
+   dbms_xmlgen.closecontext (qryctx); 
+ 
+   owa_util.mime_header (&#39;text&#x2F;xml&#39;, true); 
+   LOOP 
+      EXIT WHEN result IS NULL; 
+      ipos :&#x3D; dbms_lob.instr (result, CHR(10), 1, n); 
+      EXIT WHEN ipos &#x3D; 0; 
+ 
+      string :&#x3D; dbms_lob.substr (result, ipos-offset, offset); 
+      htp.p (string); 
+ 
+      offset    :&#x3D; ipos + 1; 
+      n         :&#x3D; n + 1; 
+   END LOOP; 
+ 
+   IF result IS NULL THEN 
+      htp.p (&#39;&lt;ROWSET&gt;&#39;); 
+      htp.p (&#39;&lt;&#x2F;ROWSET&gt;&#39;); 
+   END IF; 
+ 
+END gen_xml; </code></pre>
+
+<p><strong>How It Works</strong><br>The newcontext procedure in the dbms_xmlgen package executes the query passed to it in the first<br>parameter. The getxml procedure returns the data in XML format. Each row of data from the select<br>statement is enclosed in the XML tags &lt;–ROW–&gt;. Each field in the row is enclosed by its attribute (field)<br>name in the database. For example, the employee ID is enclosed in the XML tag &lt;–EMPLOYEE_ID–&gt;.<br>The owa_util.mime_header is called to output the proper string to the client’s browser, indicating the<br>content of the web page is in standard XML format. At this point it is sufficient to simply output the XML<br>data returned by the call to xmlgen with an htp.p statement. However, this approach works only if the<br>length in bytes of the XML data does not exceed the maximum allowed by the htp.p procedure, which is<br>32k. The LOOP breaks apart the XML data into smaller segments at each line break, CHR(10), insuring no<br>call to htp.p exceeds the maximum length.<br>The final IF statement returns an empty XML tag set if the result of the query returns no rows.<br>Without the empty tag set your Ajax call will fail because the Ajax call to parse the data from the XML<br>structure requires the &lt;–ROWSET–&gt; tags.<br>Here is an example of the XML output produced from Recipe 14-12. Only the first two data rows<br>retrieved are displayed. </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ROWSET</span><span class="token punctuation">></span></span> 
+ <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ROW</span><span class="token punctuation">></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>EMPLOYEE_ID</span><span class="token punctuation">></span></span>101<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>EMPLOYEE_ID</span><span class="token punctuation">></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>LAST_NAME</span><span class="token punctuation">></span></span>Kochhar<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>LAST_NAME</span><span class="token punctuation">></span></span> 
+ <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ROW</span><span class="token punctuation">></span></span> 
+ <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ROW</span><span class="token punctuation">></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>EMPLOYEE_ID</span><span class="token punctuation">></span></span>102<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>EMPLOYEE_ID</span><span class="token punctuation">></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>LAST_NAME</span><span class="token punctuation">></span></span>De Haan<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>LAST_NAME</span><span class="token punctuation">></span></span> 
+ <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ROW</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ROWSET</span><span class="token punctuation">></span></span> </code></pre>
+
+<h2 id="14-12-Creating-an-Input-Form-with-AJAX"><a href="#14-12-Creating-an-Input-Form-with-AJAX" class="headerlink" title="14-12. Creating an Input Form with AJAX"></a>14-12. Creating an Input Form with AJAX</h2><p><strong>Problem</strong><br>You need a web application that can interactively retrieve data based on partial data entered by the user.<br>The data must be retrieved before the user clicks the Submit button to process the page.<br><strong>Solution</strong><br>Use JavaScript and Ajax to dynamically retrieve data as the user enters data into the web form. This<br>recipe uses the EMPLOYEES table in the HR schema.<br>The data entry screen is built with all managers in a single dropdown list, which includes a call to a<br>JavaScript procedure that invokes Ajax to retrieve subordinate data. Once the user selects a manager, the<br>employee dropdown list populates with the manager’s subordinates. The subordinates’ dropdown list is<br>defined with an ID, which is required by JavaScript to access the list and load the manager’s<br>subordinates.<br>The package contains the procedure xml, which is required to produce the XML data required by the<br>Ajax call. The PL&#x2F;SQL procedure ajax.xml is called by the web browser within the AjaxMgr.js procedure. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE ajax IS 
+ 
+   PROCEDURE html; 
+   PROCEDURE xml (ID INTEGER); 
+ 
+END ajax; 
+ 
+CREATE OR REPLACE PACKAGE BODY ajax IS 
+ 
+PROCEDURE html is 
+ 
+CURSOR  driver IS 
+SELECT  employee_id, last_name 
+FROM    employees 
+WHERE   employee_id in 
+(       SELECT  DISTINCT manager_id 
+        FROM    employees) 
+ORDER BY last_name; 
+ 
+BEGIN 
+ 
+   common.header (&#39;Manager&#x2F;Employee Example&#39;); -- See recipe 14-2 for the common package. 
+   htp.p (&#39;&lt;SCRIPT LANGUAGE&#x3D;&quot;JavaScript&quot; SRC&#x3D;&quot;&#39;         || 
+                owa_util.get_cgi_env (&#39;REQUEST_PROTOCOL&#39;)       || &#39;:&#x2F;&#x2F;&#39;        || 
+                owa_util.get_cgi_env (&#39;HTTP_HOST&#39;)              || 
+                                &#39;&#x2F;js&#x2F;AjaxMgr.js&quot;&gt;&lt;&#x2F;SCRIPT&gt;&#39;); 
+ 
+   htp.formOpen (&#39;#&#39;, &#39;POST&#39;); 
+   htp.p (&#39;Select a Manager:&#39;); 
+   htp.formSelectOpen (&#39;mgr&#39;, cattributes&#x3D;&gt;&#39;onChange&#x3D;&quot;loadEmployees(this.value);&quot;&#39;); 
+   htp.formSelectOption (&#39;&#39;, &#39;SELECTED&#39;); 
+ 
+   FOR rec IN driver LOOP 
+      htp.formSelectOption (rec.last_name, cattributes&#x3D;&gt;&#39;VALUE&#x3D;&quot;&#39;||rec.employee_id||&#39;&quot;&#39;); 
+   END LOOP; 
+ 
+   htp.formSelectClose; 
+   htp.br; 
+ 
+   htp.p (&#39;Select a Subordinate:&#39;); 
+   htp.formSelectOpen (&#39;emp&#39;, cattributes&#x3D;&gt;&#39;ID&#x3D;&quot;emp_list&quot;&#39;); 
+   htp.formSelectClose; 
+   htp.br; 
+ 
+   htp.formSubmit; 
+   htp.formClose; 
+   common.footer; 
+ 
+END html; 
+ 
+PROCEDURE xml (ID INTEGER) IS 
+ 
+BEGIN 
+ 
+-- see recipe 14-11 for more information on the gen_xml procedure. 
+   gen_xml (&#39;SELECT employee_id, last_name &#39;    || 
+           &#39;FROM employees &#39;                    || 
+           &#39;WHERE manager_id &#x3D; &#39; || ID          || 
+           &#39; ORDER by 1&#39;); 
+ 
+END xml; 
+ 
+END ajax;</code></pre>
+<p><strong>How It Works</strong><br>The recipe begins by defining the package specification with two packages, html and xml. The html<br>package generates the HTML data entry form and the xml procedure generates the XML data required by<br>the call to Ajax.<br>The html procedure generates the opening HTML code with a call to common.header. Next, the<br>procedure generates a &lt;–SCRIPT–&gt; tag that identifies the location of the JavaScript to include in the user’s<br>browser. The &lt;–SCRIPT–&gt; tag of this form is one of the few HTML tags not pre-defined in the PL&#x2F;SQL Web<br>Toolkit.<br>The &lt;–SCRIPT–&gt; tag takes advantage of the owa_util package, which is also part of the PL&#x2F;SQL Web<br>Toolkit. It dynamically generates the web address of the JavaScript based on Apache environment<br>values. This method avoids hard-coding the URL into the procedure and allows it to run in any<br>environment—development, integration, production, etc.<br>■ Note The JavaScript, AjaxMgr.js, is included in the media but not reproduced here.<br>An HTML form is opened with two dropdown lists defined. The first list is populated with the names<br>of all managers from the employees table. The second dropdown list is intentionally left empty. It will be<br>populated at runtime when the user selects a manager from the first dropdown list. Figure 14-7 shows<br>the initial data entry screen generated by the html procedure, prior to the user selecting a manager from<br>the manager’s dropdown list.<br>The manager’s dropdown list, mgr, is created using the htp.formSelectOpen procedure with an<br>additional parameter to define the JavaScript to execute when the selected item in the list changes. A<br>change to the manager’s dropdown list invokes the JavaScript procedure loadEmployees, which was<br>defined earlier in the &lt;–SCRIPT–&gt; tag.<br>The employee’s dropdown list, emp, is also created using the htp.formSelectOpen procedure with an<br>additional parameter to define the ID name of the object in the Web browser’s DOM2. This ID is required<br>by the JavaScript to dynamically rebuild the employee dropdown list if the value in the manager<br>dropdown list changes. Figure 14-8 shows the data entry form after a Manager is selected by the user.<br>Note the Subordinate list is now populated. </p>
+<p>2 A DOM (Document Object Model) “is a cross-platform and language-independent convention for<br>representing and interacting with objects in HTML, XHTML and XML documents.” – Wikipedia.<br>The xml procedure calls the gen_xml procedure, created in Recipe 14-11, to generate the data<br>required to populate the employee dropdown list via the Ajax call. The gen_xml procedure is generic in<br>that it only requires the select statement need to produce the XML output. </p>
+<p>Figure 14-7. Manager dropdown list with empty subordinate dropdown list </p>
+<p>Figure 14-8. Subordinate list after being populated by Ajax </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"
+                    data-tooltip="Oracle PLSQL Recipes 15-Java in the Database"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 15-Java in the Database"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"
+                    data-tooltip="Oracle PLSQL Recipes 13-Analyzing and Improving"
+                    aria-label="NEXT: Oracle PLSQL Recipes 13-Analyzing and Improving"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"
+                    data-tooltip="Oracle PLSQL Recipes 15-Java in the Database"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 15-Java in the Database"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_13/"
+                    data-tooltip="Oracle PLSQL Recipes 13-Analyzing and Improving"
+                    aria-label="NEXT: Oracle PLSQL Recipes 13-Analyzing and Improving"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

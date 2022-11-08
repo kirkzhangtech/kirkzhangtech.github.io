@@ -1,0 +1,1547 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 08-Dynamic SQL - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n\n8. Dynamic SQLOracle provides dynamic SQL as a means for generating DML or DDL at runtime. It can be useful whenthe full text of a SQL statement or query is not known until application runtime. Dynamic SQL can helpovercome some of the limitations of static SQL, such as generating a full SQL query based upon someuser-provided information or inserting into a specific table depending upon a user action within yourapplication. Simply put, the ability to use dynamic SQL within PL&#x2F;SQL applications provides a level offlexibility that is not attainable with the use of static SQL alone.Oracle allows dynamic SQL to be generated in two different ways: native dynamic SQL and throughthe use of the DBMS_SQL package. Each strategy has its own benefits as well as drawbacks. In comparison,native dynamic SQL is easier to use, it supports user-defined types, and it performs better than DBMS_SQL.On the other hand, DBMS_SQL supports some features that are not currently supported in native dynamicSQL such as the use of the SQL*Plus DESCRIBE command and the reuse of SQL statements. Each of thesemethodologies will be compared under various use cases within this chapter. By the end of the chapter,you should know what advantages each approach has to offer and which should be used in certaincircumstances. \n8-1. Executing a Single Row Query That Is Unknown at Compile TimeProblemYou need to query the database for a single row of data matched by the primary key value. However, youare unsure of what columns will need to be returned at runtime. \nSolution #1Use a native dynamic query to retrieve the columns of data that are determined by your application atruntime. After you determine what columns need to be returned, create a string that contains the SQLthat is needed to query the database. The following example demonstrates the concept of creating adynamic SQL query and then using native dynamic SQL to retrieve the single row that is returned. \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS \n  emp_qry                VARCHAR2(500); \n  emp_first              employees.first_name%TYPE; \n  emp_last               employees.last_name%TYPE; \n  email                  employees.email%TYPE; \n \n  valid_id_count         NUMBER :&#x3D; 0; \n  valid_flag             BOOLEAN :&#x3D; TRUE; \n  temp_emp_info          VARCHAR2(50); \n \nBEGIN \n  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n  IF emp_info LIKE &#39;%@%&#39; THEN \n    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); \n    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; \n  ELSE \n    SELECT COUNT(*) \n    INTO valid_id_count \n    FROM employees \n    WHERE employee_id &#x3D; emp_info; \n \n    IF valid_id_count &gt; 0 THEN \n        temp_emp_info :&#x3D; emp_info; \n        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; \n    ELSE \n        valid_flag :&#x3D; FALSE; \n    END IF; \n  END IF; \n \n  IF valid_flag &#x3D; TRUE THEN \n    EXECUTE IMMEDIATE emp_qry \n    INTO emp_first, emp_last, email \n    USING temp_emp_info; \n \n    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n  ELSE  \n    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE SPECIFIED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n  END IF; \nEND; \nAt runtime, the procedure creates a SQL query based upon the criteria that are passed into theprocedure by the invoking program. That query is then executed using the EXECUTE IMMEDIATE statementalong with the argument that will be substituted into the query WHERE clause.Solution #2Use the DBMS_SQL package to create a query based upon criteria that are specified at runtime. Theexample in this Solution will query the employee table and retrieve data based upon the parameter thathas been passed into the procedure. The procedure will accept either a primary key ID or an employee e-mail address. The SQL statement that will be used to query the database will be determined at runtimebased upon what type of argument is used. \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS \n  emp_qry                  VARCHAR2(500); \n  emp_first                employees.first_name%TYPE :&#x3D; NULL; \n  emp_last                 employees.last_name%TYPE :&#x3D; NULL; \n  email                    employees.email%TYPE :&#x3D; NULL; \n \n  valid_id_count           NUMBER :&#x3D; 0; \n  valid_flag               BOOLEAN :&#x3D; TRUE; \n  temp_emp_info          VARCHAR2(50); \n \n  cursor_name            INTEGER; \n  row_ct                 INTEGER; \n \nBEGIN \n   \n  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; \n  IF emp_info LIKE &#39;%@%&#39; THEN \n    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); \n    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; \n  ELSE \n    SELECT COUNT(*) \n    INTO valid_id_count \n    FROM employees \n    WHERE employee_id &#x3D; emp_info; \n \n    IF valid_id_count &gt; 0 THEN \n        temp_emp_info :&#x3D; emp_info; \n        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :emp_info&#39;; \n    ELSE \n        valid_flag :&#x3D; FALSE; \n    END IF; \n  END IF; \n \n  IF valid_flag &#x3D; TRUE THEN \n    cursor_name :&#x3D; DBMS_SQL.OPEN_CURSOR; \n    DBMS_SQL.PARSE(cursor_name, emp_qry, DBMS_SQL.NATIVE); \n    DBMS_SQL.BIND_VARIABLE(cursor_name, &#39;:emp_info&#39;, temp_emp_info); \n    DBMS_SQL.DEFINE_COLUMN(cursor_name, 1, emp_first, 20); \n    DBMS_SQL.DEFINE_COLUMN(cursor_name, 2, emp_last, 25); \n    DBMS_SQL.DEFINE_COLUMN(cursor_name, 3, email, 25); \n    row_ct :&#x3D; DBMS_SQL.EXECUTE(cursor_name); \n  IF DBMS_SQL.FETCH_ROWS(cursor_name) &gt; 0 THEN \n      DBMS_SQL.COLUMN_VALUE (cursor_name, 1, emp_first); \n      DBMS_SQL.COLUMN_VALUE (cursor_name, 2, emp_last); \n      DBMS_SQL.COLUMN_VALUE (cursor_name, 3, email); \n      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n      \n  END IF; \n     \n  ELSE  \n    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE SPECIFIED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n  END IF; \n  DBMS_SQL.CLOSE_CURSOR(cursor_name); \n  EXCEPTION \n    WHEN OTHERS THEN \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE SPECIFIED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); \n \nEND; \n\nHow It Works #1Native dynamic SQL allows you to form a string of SQL text and then execute it via the EXECUTEIMMEDIATE statement. This is very useful when the columns, table names, or WHERE clause text is notknown at runtime. The program can build the SQL string as it needs to, and then the EXECUTE IMMEDIATEstatement will execute it. The format for the EXECUTE IMMEDIATE statement is as follows: \nEXECUTE IMMEDIATE sql_string \n[INTO variable_name1[, variable_name2, . . .] \nUSING variable_name1[, variable_name2, . . .]]; \nThe EXECUTE IMMEDIATE statement requires only one parameter, which is a SQL string to execute.The remainder of the statement is optional. The INTO clause lists all the variables that a SQL query wouldreturn values into. The variables should be listed in the same order within the SQL string as they arelisted within the INTO clause. The USING clause lists all the variables that will be bound to the SQL stringat runtime. Bind variables are arguably one of the most valuable features of the PL&#x2F;SQL language. Eachvariable listed in the USING clause is bound to a bind variable within the SQL string. The order in whichthe variables are listed in the USING clause is the same order in which they will be bound within thestring. Take a look at the following example that uses two bind variables: \nEXECUTE IMMEDIATE &#39;select email from employees &#39; || \n                                       &#39;where last_name &#x3D;:last &#39; || \n                                       &#39;and first_name &#x3D; :first&#39; \nINTO v_email \nUSING v_last, v_first; \nIn the example query, the variables contained within the USING clause are bound in order to the bindvariables within the SQL string. Bind variables are the cornerstone to developing robust, secure, andwell-performing software.How It Works #2The DBMS_SQL package can also be used to perform the same task. Each of the different techniques, nativedynamic SQL and DBMS_SQL, have their advantages and disadvantages. The major difference between theuse of DBMS_SQL and native dynamic SQL is how the dynamic SQL string is executed. In this example,DBMS_SQL package functions are used to process the SQL rather than EXECUTE IMMEDIATE. As you can see,the code is quite a bit lengthier than using EXECUTE IMMEDIATE, and it essentially returns the sameinformation. In this case, DBMS_SQL is certainly not the best choice. DBMS_SQL can become useful insituations where you do not know the SELECT list until runtime or when you are unsure of whichvariables must be bound to a SELECT or DML statement. On the other hand, you must use nativedynamic SQL if you intend to use the cursor variable attributes %FOUND, %NOTFOUND, %ISOPEN, or %ROWCOUNTwhen working with your cursor.■ Note Native dynamic SQL was introduced in Oracle 9i, because DBMS_SQL was overly complex for many of theroutine tasks that programmers perform. We consider use of native dynamic SQL as the technique of choice forworking with dynamic SQL. Use DBMS_SQL only when you have a specific need to do so. \n8-2. Executing a Multiple Row Query That Is Unknown at CompileProblemYour application requires a database table to be queried, but the filters for the WHERE clause are notknown until runtime. You have no idea how many rows will be returned by the query.Solution #1Create a native dynamic query using a SQL string that will be built at application runtime. Declare thequery using REF CURSOR, execute it by issuing an OPEN statement, and loop through the records using astandard loop, fetching the fields within each iteration of the loop. This technique is illustrated via thecode in the following example: \nDECLARE \n  emp_qry                 VARCHAR2(500); \n  TYPE                    cur_type IS REF CURSOR; \n  cur                     cur_type; \n  emp_first               employees.first_name%TYPE; \n  emp_last                employees.last_name%TYPE; \n  email                   employees.email%TYPE; \n \n  dept_id                 employees.department_id%TYPE :&#x3D; &amp;department_id; \n \nBEGIN \n  -- DEPARTMENT_ID WILL NOT UNIQUELY DEFINE ANY ONE EMPLOYEE \n \n  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39; || \n             &#39; WHERE DEPARTMENT_ID &#x3D; :id&#39;; \n \n  OPEN cur FOR emp_qry USING dept_id; \n  LOOP \n    FETCH cur INTO emp_first, emp_last, email; \n   EXIT WHEN cur%NOTFOUND; \n    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n  END LOOP; \n  CLOSE cur; \nEND; \nThis example accepts a DEPARTMENT_ID as input, and it uses a bind variable to substitute the valuewithin the SQL string. Although the actual SQL string in this example does not require the use of adynamic query, it is a useful example to demonstrate the technique.Solution #2This same procedure can also be performed using the DBMS_SQL package. Although the native dynamicSQL Solution is easier to understand and implement, the DBMS_SQL alternative offers some differentoptions that are not available when using the native method. The following example is a sample of aprocedure that performs the same functionality as Solution #1 of this recipe. However, the procedure inthe following example uses the DBMS_SQL package to parse and execute the dynamic query rather thannative dynamic SQL. \nCREATE OR REPLACE PROCEDURE obtain_emp_detail(dept_id IN NUMBER) IS \n  emp_qry                 VARCHAR2(500); \n  emp_first               employees.first_name%TYPE :&#x3D; NULL; \n  emp_last                employees.last_name%TYPE :&#x3D; NULL; \n  email                   employees.email%TYPE :&#x3D; NULL; \n  cursor_name             INTEGER; \n  row_ct                  INTEGER; \nBEGIN \n   \n emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39; || \n             &#39; WHERE DEPARTMENT_ID &#x3D; :id&#39;; \n    cursor_name :&#x3D; DBMS_SQL.OPEN_CURSOR; \n    DBMS_SQL.PARSE(cursor_name, emp_qry, DBMS_SQL.NATIVE); \n    DBMS_SQL.BIND_VARIABLE(cursor_name, &#39;:id&#39;, dept_id); \n    DBMS_SQL.DEFINE_COLUMN(cursor_name, 1, emp_first, 20); \n    DBMS_SQL.DEFINE_COLUMN(cursor_name, 2, emp_last, 25); \n    DBMS_SQL.DEFINE_COLUMN(cursor_name, 3, email, 25); \n    row_ct :&#x3D; DBMS_SQL.EXECUTE(cursor_name); \n    LOOP \n    IF DBMS_SQL.FETCH_ROWS(cursor_name) &gt; 0 THEN \n      DBMS_SQL.COLUMN_VALUE (cursor_name, 1, emp_first); \n      DBMS_SQL.COLUMN_VALUE (cursor_name, 2, emp_last); \n      DBMS_SQL.COLUMN_VALUE (cursor_name, 3, email); \n     DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); \n    ELSE \n      EXIT; \n    END IF; \n    END LOOP; \n    \nDBMS_SQL.CLOSE_CURSOR(cursor_name);\nEXCEPTION \n    WHEN OTHERS THEN \n      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || \n                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;);\nEND;\n\nHow It WorksThe use of native dynamic SQL in this Solution is more or less equivalent to that which was performed inthe previous recipe. The largest difference lies in the use of the REF CURSOR as opposed to the EXECUTEIMMEDIATE statement. The REF CURSOR is used to create a cursor using a dynamic SQL string.Cursor variables can be either weakly typed or strongly typed. The cursor variable demonstrated inthe Solution to this example of a weakly typed REF CURSOR, since the SQL string is not known untilruntime. A strongly typed cursor variable must be known at runtime. In this sense, a strongly typedcursor variable is very similar to a regular cursor.The REF CURSOR type must be declared first, and then the actual cursor variable that will be used inyour code should be declared using the REF CURSOR as its type. Next you have the OPEN statement. To tellOracle what SQL to use for the cursor, the OPEN statement should include a FOR clause indicating the SQLstring that the cursor should use. If there are any variables to bind into the query, the optional USINGclause should follow at the end of the OPEN statement.The subsequent cursor loop should work with the REF CURSOR in the same manner that you woulduse with regular cursor variables. Always FETCH the current record or its contents into a local record orseparate local variables. Next, perform the tasks that need to be completed. Lastly, ensure that youinclude an EXIT statement to indicate that the loop should be terminated after the last record has beenprocessed. The final step in the process is to close the cursor. After the cursor has been closed, it can beassigned a new SQL string since you are working with weakly typed REF CURSORs.As you can see, the example of using DBMS_SQL in Solution #2 of this recipe as opposed to theexample in Recipe 8-1 differs only because of the addition of a LOOP construct. Instead of displaying onlyone value, this example will loop through all the records that are returned from the query, and the loopwill exit when there are no remaining rows in the result. The example in Recipe 8-1 could entail the sameloop construct as the one shown in Solution #2 of this recipe, but it is only expected to return one rowsince the query is based upon a primary and unique key value.The choice for using DBMS_SQL as opposed to native dynamic SQL (NDS) depends on what you aretrying to achieve. DBMS_SQL will allow you to use a SQL string that is greater than 32KB in size, whereasnative dynamic SQL will not. However, there are other options for creating large SQL text strings andparsing them with native dynamic SQL. Please see Recipe 8-11 for more details. \n8-3. Writing a Dynamic INSERT StatementProblemYour application must insert data into a table, but you don’t know until runtime which columns you willinsert. For example, you are writing a procedure that will be used for saving records into the EMPLOYEEStable. However, the exact content to be saved is not known until runtime because the person who iscalling the procedure can decide whether they are including a DEPARTMENT_ID. If a DEPARTMENT_ID isincluded, then the department will be included in the INSERT.SolutionCreate a string at runtime that will contain the INSERT statement text to be executed. Use bind variablesto substitute the values that are to be inserted into the database table. The following procedure acceptsuser input for entry of a new employee record. Bind variables are used to substitute those values into theSQL. \nCREATE OR REPLACE PROCEDURE new_employee (   first     IN VARCHAR2, \n                                             last      IN VARCHAR2, \n                                             email     IN VARCHAR2, \n                                             phone     IN VARCHAR2, \n                                             hired     IN DATE, \n                                             job       IN VARCHAR2, \n                                             dept      IN NUMBER DEFAULT 0) AS \n                                             v_sql     VARCHAR2(1000); \nBEGIN \n  IF dept !&#x3D; 0 THEN \n    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || \n                   &#39;employee_id, first_name, last_name, email, &#39; || \n                   &#39;phone_number, hire_date, job_id, department_id) &#39; || \n                   &#39;VALUES( &#39; || \n                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || \n                   &#39;:job_id, :dept)&#39;; \n \n    EXECUTE IMMEDIATE v_sql \n    USING employees_seq.nextval, first, last, email, phone, hired, job, dept; \n \n  ELSE \n    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || \n                   &#39;employee_id, first_name, last_name, email, &#39; || \n                   &#39;phone_number, hire_date, job_id) &#39; || \n                   &#39;VALUES( &#39; || \n                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || \n                   &#39;:job_id)&#39;; \n \n    EXECUTE IMMEDIATE v_sql \n    USING employees_seq.nextval, first, last, email, phone, hired, job; \n \n  END IF; \n \n  DBMS_OUTPUT.PUT_LINE(&#39;The employee has been successfully entered&#39;); \nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;YOU MUST SUPPLY A VALUE FOR DEPARTMENT&#39;); \n  WHEN TOO_MANY_ROWS THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;EMPLOYEE_ID ALREADY EXISTS&#39;); \nEND; \nIf the data entry clerk includes a department ID number for the employee when executing theNEW_EMPLOYEE procedure, then the INSERT statement will differ slightly than it would if no department IDwere provided. The basic native dynamic SQL in this example does not differ much from those examplesdemonstrated in Recipe 8-1 or Recipe 8-2 of this chapter.Solution #2The DBMS_SQL API can also be used to execute dynamic INSERT statements. Although dynamic DML is notusually performed with DBMS_SQL very often, it can still be useful in some circumstances. The followingexample performs the same task as Solution #1 to this recipe. However, it has been rewritten to useDBMS_SQL instead of native dynamic SQL. \nCREATE OR REPLACE PROCEDURE new_employee(first      IN VARCHAR2, \n                                         last       IN VARCHAR2, \n                                         email      IN VARCHAR2, \n                                         phone      IN VARCHAR2, \n                                         hired      IN DATE, \n                                         job        IN VARCHAR2, \n                                         dept       IN NUMBER DEFAULT 0)  \nAS \n  v_sql    VARCHAR2(1000); \n \n  cursor_var            NUMBER :&#x3D; DBMS_SQL.OPEN_CURSOR; \n  rows_compelete NUMBER :&#x3D; 0; \n  next_emp              NUMBER :&#x3D; employee_seq.nextval; \nBEGIN \n   \n \n  IF dept !&#x3D; 0 THEN \n    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || \n                   &#39;employee_id, first_name, last_name, email, &#39; || \n                   &#39;phone_number, hire_date, job_id, department_id) &#39; || \n                   &#39;VALUES( &#39; || \n                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || \n                   &#39;:job_id, :dept)&#39;; \n \n     \n  ELSE \n    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || \n                   &#39;employee_id, first_name, last_name, email, &#39; || \n                   &#39;phone_number, hire_date, job_id) &#39; || \n                   &#39;VALUES( &#39; || \n                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || \n                   &#39;:job_id)&#39;; \n  END IF; \n  DBMS_SQL.PARSE(cursor_var, v_sql, DBMS_SQL.NATIVE); \n  DBMS_SQL.BIND_VARIABLE(cursor_var, 1, &#39;:id&#39;, next_emp); \n  DBMS_SQL.BIND_VARIABLE(cursor_var, 2, &#39;:first&#39;, first); \n  DBMS_SQL.BIND_VARIABLE(cursor_var, 3, &#39;:last&#39;, last); \n  DBMS_SQL.BIND_VARIABLE(cursor_var, 4, &#39;:email&#39;, email); \n  DBMS_SQL.BIND_VARIABLE(cursor_var, 5, &#39;:phone&#39;, phone); \n  DBMS_SQL.BIND_VARIABLE(cursor_var, 6, &#39;:hired&#39;); \n  DBMS_SQL.BIND_VARIABLE(cursor_var, 7, &#39;:job&#39;, job); \n  IF dept !&#x3D; 0 then \n    DBMS_SQL.BIND_VARIABLE(cursor_var, 8, &#39;:dept&#39;, dept); \n  END IF; \n  rows_complete :&#x3D; DBMS_SQL.EXECUTE(cursor_var); \n  DBMS_SQL.CLOSE_CURSOR(cursor_var); \n  DBMS_OUTPUT.PUT_LINE(&#39;The employee has been successfully entered&#39;); \nEND;\n\nHow It WorksUsing native dynamic SQL, creating an INSERT statement is almost identical to working with a querystring. As a matter of fact, the only difference is that you will not be making use of the INTO clause withinthe EXECUTE IMMEDIATE statement. Standard PL&#x2F;SQL can be used to create the SQL statement string inorder to process an INSERT statement that contains column names, table names, or WHERE clause valuesthat are not known until runtime.■ Note If your SQL string contains any SQL that requires the use of single quotes, double up on the quotes.Placing a single quote immediately after another signals the parser to place a single quote into the string that youare creating. Similarly to SQL queries using dynamic SQL, you should use bind variables to substitute values intothe SQL statement string where needed. As a refresher, bind variables are used within SQL queries orstatements to act as placeholders for values that are to be substituted at runtime. A bind variable beginswith a colon and is then followed by the variable name. The EXECUTE IMMEDIATE statement implementsthe USING clause to list variables that contain values that will be substituted into the bind variables atruntime. The order in which the variables are listed in the USING clause must concur with the positioningof the bind variables within the SQL. The following is an example of an EXECUTE IMMEDIATE statement tobe used with a SQL statement such as an INSERT: \nEXECUTE IMMEDIATE sql_statement_string \n[USING variable1, variable2, etc]; \nIt is usually a good idea to include an EXCEPTION block at the end of any code block. This is especiallytrue when working with dynamic queries or statements. An Oracle error will be raised if the INSERTstatement within the SQL string is invalid. If an EXCEPTION block were added to catch OTHERS, then youcould provide a well-written error message that describes the exact issue at hand. In most cases, users ofyour application would prefer to see such a nice summary message rather than a cryptic Oracle errormessage.It is a good rule of thumb to maintain consistency throughout your application code. If you prefer touse native dynamic SQL, then try to use it in all cases where dynamic SQL is a requirement. Likewise,DBMS_SQL should be used throughout if you plan to make use of it instead. There are certain situationswhen you may want to mix the two techniques in order to obtain information or use features that are notavailable with one or the other. In Recipe 8-13, you will learn more about using both techniques withinthe same block of PL&#x2F;SQL code. \n8-4. Writing a Dynamic Update StatementProblemYour application needs to execute an update statement, and you are not sure of the columns to beupdated until runtime. For example, your application will modify employee records. You would like toconstruct an update statement that contains only the columns that have updated values.SolutionUse native dynamic SQL to execute a SQL statement string that you prepare at application runtime. Theprocedure in this example accepts employee record values as input. In this scenario, an application formallows user entry for many of the fields that are contained within the EMPLOYEES table so that a particularemployee record can be updated. The values that are changed on the form should be included in theUPDATE statement. The procedure queries the employee record and checks to see which values have beenupdated. Only the updated values are included in the text of the SQL string that is used for the update. \nCREATE OR REPLACE PROCEDURE update_employees(id   IN employees.employee_id%TYPE, \n                                            first IN employees.first_name%TYPE, \n                                            last  IN employees.last_name%TYPE, \n                                            email IN employees.email%TYPE, \n                                            phone IN employees.phone_number%TYPE, \n                                            job   IN employees.job_id%TYPE, \n                                            salary IN employees.salary%TYPE, \n                                            commission_pct IN employees.commission_pct%TYPE, \n                                            manager_id IN employees.manager_id%TYPE, \n                                            department_id IN employees.department_id%TYPE) \n AS\n  emp_upd_rec   employees%ROWTYPE; \n  sql_string    VARCHAR2(1000); \n  set_count     NUMBER :&#x3D; 0; \nBEGIN \n  SELECT * \n  INTO emp_upd_rec \n  FROM employees \n  WHERE employee_id &#x3D; id; \n  sql_string :&#x3D; &#39;UPDATE EMPLOYEES SET &#39;; \n   \n  IF first !&#x3D; emp_upd_rec.first_name THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, FIRST_NAME &#x3D;&#39; || first || &#39;&#39;&#39;&#39;; \n    ELSE \n      sql_string :&#x3D; sql_string || &#39; FIRST_NAME &#x3D;&#39; || first || &#39;&#39;&#39;&#39;; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  IF last !&#x3D; emp_upd_rec.last_name THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, LAST_NAME &#x3D;&#39;&#39;&#39; || last || &#39;&#39;&#39;&#39;; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; LAST_NAME &#x3D;&#39;&#39;&#39; ||  last || &#39;&#39;&#39;&#39;; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  IF upper(email) !&#x3D; emp_upd_rec.email THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, EMAIL &#x3D;&#39;&#39;&#39; || upper(email) || &#39;&#39;&#39;&#39;; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; EMAIL &#x3D;&#39;&#39;&#39; || upper(email) || &#39;&#39;&#39;&#39;; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  IF upper(phone) !&#x3D; emp_upd_rec.phone_number THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, PHONE_NUMBER &#x3D;&#39;&#39;&#39; || \n        upper(phone) || &#39;&#39;&#39;&#39;; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; PHONE_NUMBER &#x3D;&#39;&#39;&#39; || \n        upper(phone) || &#39;&#39;&#39;&#39;; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  IF job !&#x3D; emp_upd_rec.job_id THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, JOB_ID &#x3D;&#39;&#39;&#39; || job || &#39;&#39;&#39;&#39;; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; JOB_ID &#x3D;&#39;&#39;&#39; || job || &#39;&#39;&#39;&#39;; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  IF salary !&#x3D; emp_upd_rec.salary THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, SALARY &#x3D;&#39; || salary; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; SALARY &#x3D;&#39; || salary; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  IF commission_pct !&#x3D; emp_upd_rec.commission_pct THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, COMMISSION_PCT &#x3D;&#39; || \n               commission_pct; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; COMMISSION_PCT &#x3D;&#39; || \n               commission_pct; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  IF manager_id !&#x3D; emp_upd_rec.manager_id THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, MANAGER_ID &#x3D;&#39; || \n        manager_id; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; MANAGER_ID &#x3D;&#39; || \n        manager_id; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n   IF department_id !&#x3D; emp_upd_rec.department_id THEN \n    IF set_count &gt; 0 THEN \n      sql_string :&#x3D; sql_string ||&#39;, DEPARTMENT_ID &#x3D;&#39; || \n        department_id; \n    ELSE \n      sql_string :&#x3D; sql_string ||&#39; DEPARTMENT_ID &#x3D;&#39; || \n        department_id; \n      set_count :&#x3D; set_count + 1; \n    END IF; \n  END IF; \n   \n  sql_string :&#x3D; sql_string || &#39; WHERE employee_id &#x3D; &#39; || id; \n      \n  IF set_count &gt; 0 THEN \n    EXECUTE IMMEDIATE sql_string; \n  ELSE \n    DBMS_OUTPUT.PUT_LINE(&#39;No update needed, &#39; || \n        &#39;all fields match original values&#39;); \n  END IF; \n \nEXCEPTION \n  WHEN NO_DATA_FOUND THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;No matching employee found&#39;); \n  WHEN OTHERS THEN \n    DBMS_OUTPUT.PUT_LINE(&#39;Data entry error has occurred, &#39; || \n                &#39;please check values and try again&#39; || sql_string); \nEND; \nExecution and Results: \nSQL&gt; exec update_employees(187, \n&#39;Anthony&#39;, \n&#39;Cabrio&#39;, \n&#39;ACABRIO&#39;, \n&#39;650.509.4876&#39;, \n &#39;SH_CLERK&#39; \n,6501, \n.08, \n121, \n50); \nNo update needed, all fields match original valuesAs mentioned previously, this procedure accepts input from a user data entry form. The inputpertains to an existing employee’s database record. The values accepted as input are compared againstthose that already exist in the database, and if they are different, then they are added into the SQL UPDATEstatement that is dynamically created. This code could be simplified by creating a separate function totake care of comparing values and building the SQL string, but this procedure gives you a good idea ofhow dynamic SQL can be used to EXECUTE an UPDATE statement. \nHow It WorksDynamic SQL statement execution is straightforward when using native dynamic SQL. The procedure inthe Solution to this recipe creates a SQL string based upon certain criteria, after which it is executed withthe use of the EXECUTE IMMEDIATE statement.The EXECUTE IMMEDIATE statement works the same way for most DML statements. If you read Recipe8-3 on creating and running a dynamic INSERT statement, then you can see that executing an UPDATEstatement works in the same manner.Any values that need to be substituted into the SQL string should be coded as bind variables. Formore information regarding bind variables, please refer to Recipe 8-3. The format for executing anUPDATE statement with the EXECUTE IMMEDIATE statement is as follows: \nEXECUTE IMMEDIATE update_statement_string \n[USING variable1, variable2, etc]; \nJust as with the execution of the INSERT statement in Recipe 8-3, the EXECUTE IMMEDIATE statementrequires the use of the USING clause only if there are variables that need to be substituted into the SQLstatement at runtime.■ Note If you are able to write a static SQL UPDATE statement for your application, then do so. Use of dynamic SQLwill incur a small performance penalty.The DBMS_SQL package can also be used to work with dynamic SQL updates. However, this techniqueis not used very much since the introduction of native dynamic SQL in Oracle 9i. For an example of usingthe DBMS_SQL package with DML statements, please refer to Recipe 8-3. Although the example in Recipe8-3 demonstrates an INSERT statement, an UPDATE statement is processed the same way; only the SQLstring needs to be changed. \n8-5. Writing a Dynamic Delete StatementProblemYou need to create a procedure that will delete rows from a table. However, the exact SQL for deletingthe rows is not known until runtime. For instance, you need create a procedure to delete an employeefrom the EMPLOYEES table, but rather than limit the procedure to accepting only employee ID numbersfor employee identification, you also want to accept an e-mail address. The procedure will determinewhether an e-mail address or an ID has been passed and will construct the appropriate DELETEstatement.SolutionUse native dynamic SQL to process a string that is dynamically created based upon values that arepassed into the procedure. In the following example, a procedure is created that will build a dynamicSQL string to delete an employee record. The DELETE statement syntax may vary depending upon whattype of value is passed into the procedure. Valid entries include EMPLOYEE_ID values or EMAIL values. \nCREATE OR REPLACE PROCEDURE delete_employee(emp_value IN VARCHAR2) AS \n \n  is_number         NUMBER :&#x3D; 0; \n  valid_flag        BOOLEAN :&#x3D; FALSE; \n  sql_stmt          VARCHAR2(1000); \n  emp_count         NUMBER :&#x3D; 0; \nBEGIN \n  sql_stmt :&#x3D; &#39;DELETE FROM EMPLOYEES &#39;; \n \n  -- DETERMINE IF emp_value IS NUMERIC, IF SO THEN QUERY \n  -- DATABASE TO FIND OCCURRENCES OF MATCHING EMPLOYEE_ID \n  IF LENGTH(TRIM(TRANSLATE(emp_value, &#39; +-.0123456789&#39;, &#39; &#39;))) IS NULL THEN \n    SELECT COUNT(*) \n    INTO emp_count \n    FROM EMPLOYEES \n    WHERE EMPLOYEE_ID &#x3D; emp_value; \n \n    IF emp_count &gt; 0 THEN \n      sql_stmt :&#x3D; sql_stmt || &#39;WHERE EMPLOYEE_ID &#x3D; :emp_val&#39;; \n      valid_flag :&#x3D; TRUE; \n    END IF; \n  ELSE \n    SELECT COUNT(*) \n    INTO emp_count \n    FROM EMPLOYEES \n    WHERE EMAIL &#x3D; upper(emp_value); \n \n    IF emp_count &gt; 0 THEN \n      sql_stmt :&#x3D; sql_stmt || &#39;WHERE EMAIL &#x3D; :emp_val&#39;; \n      valid_flag :&#x3D; TRUE; \n    ELSE  \n      valid_flag :&#x3D; FALSE; \n    END IF; \n  END IF; \n \n  IF valid_flag &#x3D; TRUE THEN \n \n    EXECUTE IMMEDIATE sql_stmt \n    USING emp_value; \n \n    DBMS_OUTPUT.PUT_LINE(&#39;Employee has been deleted&#39;); \n  ELSE \n    DBMS_OUTPUT.PUT_LINE(&#39;No matching employee found, please try again&#39;); \n  END IF; \n \nEND; \nThe procedure can be called by passing in either an EMPLOYEE_ID value or an EMAIL value. If amatching employee record is found, then it will be deleted from the database table.How It WorksDynamic SQL can be used to execute DELETE statements as well. In the Solution to this recipe, a dynamicSQL string is built that will remove an employee entry that contains a matching EMPLOYEE_ID or EMAILvalue that is passed into the procedure as a parameter. The parameter is checked to find out whether it isa numeric or alphanumeric value by using a combination of the LENGTH, TRIM, and TRANSLATE functions. Ifit is numeric, then it is assumed to be an EMPLOYEE_ID value, and the database is queried to see whetherthere are any matches. If the parameter is found to be alphanumeric, then it is assumed to be an EMAILvalue, and the database is queried to see whether there are any matches. If matches are found in eithercase, then a dynamic SQL string is built to DELETE the matching record from the database.In this example, native dynamic SQL is used to perform the database operation. The DBMS_SQLpackage can also be used to perform this task using the same techniques that were demonstrated inRecipe 8-3. \n8-6. Returning Data from a Dynamic Query into a RecordProblemYou are writing a block of code that will need to use dynamic SQL to execute a query because the exactSQL string is not known until runtime. The query needs to return the entire contents of the table row sothat all columns of data can be used. You want to return the columns into a record variable.SolutionCreate a native dynamic SQL query to accommodate the SQL string that is unknown until runtime. FETCHthe data using BULK COLLECT into a table of records. Our Solution example shows rows from the jobs tablebeing fetched into records, after which the individual record columns of data can be worked with. Thefollowing code block demonstrates this technique: \nCREATE OR REPLACE PROCEDURE obtain_job_info(min_sal  NUMBER DEFAULT 0, \nmax_sal  NUMBER DEFAULT 0)\nAS \n  sql_text      VARCHAR2(1000); \n  TYPE job_tab IS TABLE OF jobs%ROWTYPE; \n  job_list      job_tab; \n  job_elem      jobs%ROWTYPE; \n  max_sal_temp  NUMBER; \n  filter_flag   BOOLEAN :&#x3D; FALSE; \n  cursor_var    NUMBER; \n  TYPE          cur_type IS REF CURSOR; \n  cur           cur_type;\nBEGIN \n  sql_text :&#x3D; &#39;SELECT * &#39; || \n              &#39;FROM JOBS WHERE &#39; || \n              &#39;min_salary &gt;&#x3D; :min_sal &#39; || \n              &#39;and max_salary &lt;&#x3D; :max_sal&#39;; \n   \n  IF max_sal &#x3D; 0 THEN \n    SELECT max(max_salary) \n    INTO max_sal_temp \n    FROM JOBS; \n  ELSE \n    max_sal_temp :&#x3D; max_sal; \n  END IF; \n \n  OPEN cur FOR sql_text USING min_sal, max_sal_temp; \n  FETCH cur BULK COLLECT INTO job_list; \n  CLOSE cur; \n \n  FOR i IN job_list.FIRST .. job_list.LAST LOOP \n    DBMS_OUTPUT.PUT_LINE(job_list(i).job_id || &#39; - &#39; || job_list(i).job_title); \n  END LOOP; \n \nEND; \nAs the salaries are obtained from the user input, they are used to determine how the bind variableswill be populated within the query. The SQL is then executed, and the results are traversed. Each recordis fetched and returned into a PL&#x2F;SQL table of job records using BULK_COLLECT, and then in turn, eachrecord is used to process the results. In this example, the data is simply printed out usingDBMS_OUTPUT.PUT_LINE, but any number of tasks could be completed with the data.How It WorksDynamic SQL can be processed in a number of ways. In this Solution, a record type is created by usingthe %ROWTYPE attribute of the table that is being queried. In this case, the %ROWTYPE attribute of the JOBStable is being used as a record. The data that is returned from performing a SELECT * on the JOBS tablewill be stored within that record, and then it will be processed accordingly. The record is created usingthe following syntax: \nrecord_name     table_name%ROWTYPE; \nUsing this format, the record_name is any name of your choice that complies with PL&#x2F;SQL’s namingconventions. The table_name is the name of the table from which you will be gathering the data for eachcolumn, and the %ROWTYPE attribute is a special table attribute that creates a record type.To process each record, create a REF CURSOR using the dynamic SQL string and perform a BULKCOLLECT to fetch each row of data into a record in the table of JOBS records. The BULK COLLECT will load allof the resulting records at once into a PL&#x2F;SQL collection object. Once all the data has been retrieved intoan object, it can be processed accordingly. The BULK COLLECT is much more efficient than fetching eachrow from the table one-by-one using a LOOP construct. \n8-7. Executing a Dynamic Block of PL&#x2F;SQLProblemYou want to execute a specific stored procedure based upon events that occur within your application.Therefore, you need to provide the ability for your application to execute procedures that are unknownuntil runtime. In short, you want to execute PL&#x2F;SQL in the same dynamic manner as SQL. \nSolution #1Native dynamic SQL can be used to create and execute a block of code at runtime. This strategy can beused to create a dynamic block of code that executes a given procedure when an event occurs. In thisexample, a procedure is created that accepts an event identifier. An event handler within the applicationcan call upon this procedure passing an event identifier, and subsequently a procedure that can bedetermined via the identifier will be invoked. \n-- Create first Procedure \nCREATE OR REPLACE PROCEDURE TEST_PROCEDURE1 AS \nBEGIN \n  DBMS_OUTPUT.PUT_LINE(&#39;YOU HAVE EXECUTED PROCEDURE 1…&#39;); \nEND; \n \n-- Create Second Procedure \nCREATE OR REPLACE PROCEDURE TEST_PROCEDURE2 AS \nBEGIN \n  DBMS_OUTPUT.PUT_LINE(&#39;YOU HAVE EXECUTED PROCEDURE 2…&#39;); \nEND; \n \n-- Create Event Handling Procedure \nCREATE OR REPLACE PROCEDURE run_test(test_id  IN NUMBER DEFAULT 1) AS \n  sql_text  VARCHAR2(200); \nBEGIN \n  sql_text :&#x3D; &#39;BEGIN &#39; || \n              &#39;  TEST_PROCEDURE&#39; || test_id || &#39;; &#39; || \n              &#39;END;&#39;; \n \n  EXECUTE IMMEDIATE sql_text; \n \nEND; \nWhen an event handler passes a given event number to this procedure, it dynamically creates a codeblock that is used to execute that procedure, passing the parameters the procedure needs. This Solutionprovides the ultimate flexibility for creating an event handler within your applications. \nSolution #2DBMS_SQL can also be used to execute the same dynamic code. The following example demonstrates howthis is done. \nCREATE OR REPLACE PROCEDURE run_test(test_id  IN NUMBER DEFAULT 1) AS \n  sql_text  VARCHAR2(200); \n  cursor_var   NUMBER :&#x3D; DBMS_SQL.OPEN_CURSOR; \n  rows       NUMBER; \nBEGIN \n  sql_text :&#x3D; &#39;BEGIN &#39; || \n              &#39;  TEST_PROCEDURE&#39; || test_id || &#39;; &#39; || \n              &#39;END;&#39;; \n \n  DBMS_SQL.PARSE(cursor_var, sql_text, DBMS_SQL.NATIVE); \n  rows :&#x3D; DBMS_SQL.EXECUTE(cursor_var); \n  DBMS_SQL.CLOSE_CURSOR(cursor_var); \n \nEND;\n\nHow It WorksNative dynamic SQL allows processing of a SQL statement via the EXECUTE IMMEDIATE statement. Thiscan be used to the advantage of the application and provide the ability to create dynamic blocks ofexecutable code. By doing so, you can create an application that allows more flexibility, which can helpensure that your code is more easily manageable.In the Solution to this recipe, an unknown procedure name along with its parameters isconcatenated into a SQL string that forms a code block. This code block is then executed using theEXECUTE IMMEDIATE statement.Using native dynamic SQL, the array of parameters has to be manually processed to create the SQLstring and assign each of the array values to the USING clause of the EXECUTE IMMEDIATE statement. Thistechnique works quite well, but there is a different way to implement the same procedure.As far as comparing native dynamic SQL and DBMS_SQL for dynamic code block execution, whichcode is better? That is up to you to decide. If you are using native dynamic SQL for all other dynamic SQLprocessing within your application, then it is probably a good idea to stick with it instead of mixing bothtechniques. However, if you are working with some legacy code that perhaps includes a mixture of bothDBMS_SQL and native dynamic SQL, then you may prefer to write a dynamic code block using DBMS_SQLjust to save some time and processing. \n8-8. Creating a Table at RuntimeProblemYour application needs to have the ability to create tables based upon user input. The user has the abilityto add additional attributes to some of your application forms, and when this is done, a new attributetable needs to be created to hold the information.SolutionCreate a table at runtime using native dynamic SQL. Write a procedure that accepts a table name as anargument and then creates a SQL string including the DDL that is required for creating that table. Thetable structure will be hard-coded since the structure for an attribute table will always be the samewithin your application. The code that follows demonstrates this technique by creating a procedurenamed CREATE_ATTR_TABLE that dynamically creates attribute tables. \nCREATE OR REPLACE PROCEDURE create_attr_table(table_name      VARCHAR2) AS \n  BEGIN \n    EXECUTE IMMEDIATE &#39;CREATE TABLE &#39; || table_name || \n                                           &#39;(ATTRIBUTE_ID     NUMBER PRIMARY KEY, \n                                             ATTRIBUTE_NAME   VARCHAR2(150) NOT NULL, \n                                             ATTRIBUTE_VALUE  VARCHAR2(150))&#39;; \n  END create_attr_table; \nThis procedure is invoked by the application whenever a user determines that additional attributesare required for a particular application form. That form will then have its own attribute table created,and the user can then provide additional fields&#x2F;attributes to customize the form as needed.How It WorksDynamic SQL can be used to create database objects at runtime. In this recipe, it is used to create tables.Native dynamic SQL is used in this example, and the EXECUTE IMMEDIATE statement performs the work.When creating a table at runtime, generate a string that contains the necessary SQL to create the object.Once that task has been completed, issue the EXECUTE IMMEDIATE statement passing the generated SQLstring. The format to use along with the EXECUTE IMMEDIATE statement to create objects is as follows: \nEXECUTE IMMEDIATE SQL_string; \nThe SQL_string in this example is a dynamically created string that will create an object. In the caseof creating objects, the USING clause is not used because you cannot use bind variables for substitutingobject names or attributes such as column names.■ Please use care when concatenating user input variables with SQL text because the technique poses a securityconcern. Specifically, you open the door to the much-dreaded SQL injection attack. Refer to Recipe 8-14 for moredetails and for information on protecting yourself. \n8-9. Altering a Table at RuntimeProblemYour application provides the ability to add attributes to forms in order to store additional information.You need to provide users with the ability to make those attribute fields larger or smaller based upontheir needs. \nSolutionCreate a procedure that will provide the ability to alter tables at runtime using native dynamic SQL. Theprocedure in this Solution will accept two parameters, those being the table name to be altered and thecolumn name along with new type declaration. The procedure assembles a SQL string using thearguments provided by the user and then executes it using native dynamic SQL. The following codedemonstrates this Solution: \nCREATE OR REPLACE PROCEDURE modify_table(tab_name    VARCHAR2, \n                                         tab_info    VARCHAR2) AS \n                                         sql_text    VARCHAR2(1000); \nBEGIN \n  sql_text :&#x3D; &#39;ALTER TABLE &#39; || tab_name ||  \n              &#39; MODIFY &#39; || tab_info; \n  DBMS_OUTPUT.PUT_LINE(sql_text); \n  CHAPTER 8  DYNAMIC SQL \n175 \n  EXECUTE IMMEDIATE sql_text; \n  DBMS_OUTPUT.PUT_LINE(&#39;Table successfully altered…&#39;); \nEXCEPTION \n  WHEN OTHERS THEN \n    DBMS_OUTPUT.PUT_LINE(‘An error has occurred, table not modified’); \nEND; \nThe procedure determines whether the user-defined data is valid. If so, then the EXECUTE IMMEDIATEstatement executes the SQL string that was formed. Otherwise, the user will see an alert displayed.How It WorksSimilar to creating objects at runtime, Oracle provides the ability to alter objects using dynamic SQL.The same technique is used for constructing the SQL string as when creating an object, and that string iseventually executed via the EXECUTE IMMEDIATE statement. The EXECUTE IMMEDIATE statement for alteringa table at runtime uses no clause, because it is not possible to use bind variables with an ALTER TABLEstatement. If you try to pass in bind variable values, then you will receive an Oracle error.The following format should be used when issuing the EXECUTE IMMEDIATE statement for SQL textcontaining an ALTER TABLE statement: \nEXECUTE IMMEDIATE alter_table_sql_string; \nThe most important thing to remember when issuing a DDL statement using dynamic SQL is thatyou will need to concatenate all the strings and variables in order to formulate the final SQL string thatwill be executed. Bind variables will not work for substituting table names or column names&#x2F;attributes.  \n8-10. Finding All Tables That Include a Specific Column ValueProblemYou are required to update all instances of a particular data column value across multiple tables withinyour database.SolutionSearch all user tables for the particular column you are interested in finding. Create a cursor that will beused to loop through all the results and execute a subsequent UPDATE statement in each iteration of theloop. The UPDATE statement will update all matching column values for the table that is current for thatiteration of the cursor.The following example shows how this technique can be performed. The procedure will be used tochange a manager ID when a department or job position changes management.  \nCREATE OR REPLACE PROCEDURE change_manager(current_manager_id NUMBER, \n \nnew_manager_id  NUMBER) \nAS \n \ncursor manager_tab_cur is \nselect table_name \nfrom user_tab_columns \nwhere column_name &#x3D; &#39;MANAGER_ID&#39; \nand table_name not in (select view_name from user_views); \n \nrec_count            number :&#x3D; 0; \nref_count            number :&#x3D; 0; \n \nBEGIN \n \n   -- Print out the tables which will be updated \n \n   DBMS_OUTPUT.PUT_LINE(&#39;Tables referencing the selected MANAGER ID#:&#39; || \n current_manager_id); \n \n   FOR manager_rec IN manager_tab_cur LOOP \n      EXECUTE IMMEDIATE &#39;select count(*) total &#39; || \n                        &#39;from &#39; || manager_rec.table_name || \n                        &#39; where manager_id &#x3D; :manager_id_num&#39; \n      INTO rec_count \n      USING current_manager_id; \n \n      if rec_count &gt; 0 then \n                   DBMS_OUTPUT.PUT_LINE(manager_rec.table_name || &#39;: &#39; || rec_count); \n                   ref_count :&#x3D; ref_count + 1; \n      end if; \n \n      rec_count :&#x3D; 0; \n \n   END LOOP; \n \n   if ref_count &gt; 0 then \n      DBMS_OUTPUT.PUT_LINE(&#39;Manager is referenced in &#39; || ref_count || &#39; tables.&#39;); \n      DBMS_OUTPUT.PUT_LINE(&#39;...Now Changing the Manager Identifier...&#39;); \n   end if; \n \n   -- Perform the actual table updates \n \n   FOR manager_rec IN manager_tab_cur LOOP \n      EXECUTE IMMEDIATE &#39;select count(*) total &#39; || \n                                                  &#39;from &#39; || manager_rec.table_name || \n                                                  &#39; where manager_id &#x3D; :manager_id_num&#39; \n      INTO rec_count \n      USING current_manager_id; \n \n      if rec_count &gt; 0 then \n \n         EXECUTE IMMEDIATE &#39;update &#39; || manager_rec.table_name || &#39; &#39; || \n                                                     &#39;set manager_id &#x3D; :new_manager_id &#39; || \n                                                     &#39;where manager_id &#x3D; :old_manager_id&#39; \n         USING new_manager_id, current_manager_id; \n \n      end if; \n \n      rec_count :&#x3D; 0; \n \n   END LOOP; \n \n   -- Print out the tables which still reference the manager number. \n \n   FOR manager_rec IN manager_tab_cur LOOP \n      EXECUTE IMMEDIATE &#39;select count(*) total &#39; || \n                        &#39;from &#39; || manager_rec.table_name || \n                        &#39; where manager_id &#x3D; :manager_id&#39; \n      INTO rec_count \n      USING current_manager_id; \n \n      if rec_count &gt; 0 then \n                   DBMS_OUTPUT.PUT_LINE(manager_rec.table_name || &#39;: &#39; || rec_count); \n                   ref_count :&#x3D; ref_count + 1; \n      end if; \n \n      rec_count :&#x3D; 0; \n \n   END LOOP; \n \n   if ref_count &gt; 0 then \n      DBMS_OUTPUT.PUT_LINE(&#39;Manager #: &#39; || current_manager_id  \n                           || &#39; is now referenced in &#39; || \n                       ref_count || &#39; tables.&#39;); \n      DBMS_OUTPUT.PUT_LINE(&#39;...There should be no tables listed above...&#39;); \n   end if; \n \nend; \nSince MANAGER_ID depends upon a corresponding MANAGER_ID within the DEPARTMENTS table, you mustfirst ensure that the MANAGER_ID that you want to change to is designated to a department within thattable. In the following scenario, a manager is added to a department that does not have a manager.Afterward, the manager with ID of 205 is swapped for the newly populated manager. \nSQL&gt; update departments \n  2  set manager_id &#x3D; 241 \n  3  where department_id &#x3D; 270; \n \n1 row updated. \n\nSQL&gt; exec change_manager(205, 241); \nTables referencing the selected MANAGER ID#:205 \nDEPARTMENTS: 1 \nEMP: 1 \nEMPLOYEES: 1 \nManager is referenced in 3 tables. \n...Now Changing the Manager Identifier... \nManager #: 205 is now referenced in 3 tables. \n...There should be no tables listed above... \nPL&#x2F;SQL procedure successfully completed. \n■ Note If you attempt to swap a manager with one that is not associated with a department, then you will receivea foreign key error. This same concept holds true in the real world—ensure that constraints are reviewed beforeapplying this technique.If management decides to change a manager for a particular department, then this procedure willbe called. The caller will pass in the old manager’s ID number and the new manager’s ID number. Thisprocedure will then query all tables within the current schema for a matching current manager ID andupdate it to reflect the new ID number. \nHow It WorksTo determine all instances of a specific column or database field, you must search all database tables forthat column name. Of course, this assumes that the database was created using the same name for thesame column in each different table. If columns containing the same data are named differently acrosstables, then this recipe’s technique will not work.■ Note Although most relational databases are set up with efficiency in mind and only populate data for a specificfield value into one database table column, there are some legacy databases that still use the same fields acrossmore than one table.As the Solution to this recipe entails, assume that a column name is coded into the procedure, andall tables will then be searched to find out whether that column exists. You can perform the search usingthe built-in USER_TAB_COLUMNS data dictionary view. This view is comprised of column information for allthe tables within a particular schema. Querying any Oracle view that is prefixed with USER_ indicates thatthe view pertains to data contained within the current user’s schema only. Querying theUSER_TAB_COLUMNS view allows a table name and column name to be specified. In this case, since youneed to find all tables that contain a specific column, query the USER_TAB_COLUMNS view to return allinstances of TABLE_NAME where COLUMN_NAME is equal to the name that is passed into the procedure. Thisquery should be defined as a cursor variable so that it can be parsed via a FOR loop in the code block.■ Warning Be sure to exclude views from this process, or you may receive an error from attempting to update avalue that is contained within a view if it is not an updatable view.Now that the cursor is ready to parse all table names that contain a matching column, it is time toloop through the cursor and query each table that contains that column for a matching value. A userpasses two values into the procedure: current manager ID and new manager ID. In the Solution to thisrecipe, each table that contains a matching column is queried so that you can see how many matcheswere found prior to the updates taking place. A counter is used to tally the number of matches foundthroughout the tables. Next, looping through the cursor again performs the actual updates. This time,the tables are each queried to find matches again, but when a match is found, then that table will beupdated so that the value is changed from the old value to the new value.Lastly, the cursor is parsed again, and each table is queried to find existing matches once again. Thislast loop is done for consistency and to ensure that all matches have been found and updated to thecurrent value. If any matches are found during this last loop, then all changes should be rolled back, andthe changes should be manually processed instead.This procedure can be updated to work with any column value change that may be needed. Thecode can also be shortened significantly if you do not want to perform verifications prior to and afterperforming an update.  \n8-11 Storing Dynamic SQL in Large ObjectsProblemThe SQL code that you need to assemble at runtime is likely to exceed the 32KB limit that is bound toVARCHAR2 types. You need to be able to store dynamic SQL text in a type that will allow more for a largeamount of text.Solution #1Declare a CLOB variable, and store your SQL string within it. After the CLOB has been created, execute theSQL. This can be done using either native dynamic SQL or the DBMS_SQL package. For the example,assume that a block of text is being read from an external file, and it will be passed to a procedure to beprocessed. That text will be the SQL string that will be dynamically processed within the procedure.Since the external text file can be virtually any size, this text must be read into a CLOB data type and thenpassed to the procedure in this example for processing. The following procedure processes the CLOB asdynamic SQL.The first example demonstrates the parsing and execution of a dynamic SQL statement that hasbeen stored in a CLOB using the DBMS_SQL package. Note that this procedure does not return any value, soit is not meant for issuing queries but rather for executing code. \nCREATE OR REPLACE PROCEDURE execute_clob(sql_text CLOB) AS \n  sql_string    CLOB; \n  cur_var       BINARY_INTEGER; \n  ret_var       INTEGER; \n  return_value  VARCHAR2(100); \nBEGIN \n  sql_string :&#x3D; sql_text; \n  cur_var :&#x3D; DBMS_SQL.OPEN_CURSOR; \n  DBMS_SQL.PARSE(cur_var, sql_string, DBMS_SQL.NATIVE); \n  ret_var :&#x3D; DBMS_SQL.EXECUTE(cur_var); \n  DBMS_SQL.CLOSE_CURSOR(cur_var); \nEND; \nSolution #2The second example is the same procedure written to use native dynamic SQL. You will notice that thecode is a bit shorter, and there is less work that needs to be done in order to complete the sametransaction.\nCREATE OR REPLACE PROCEDURE execute_clob_nds(sql_text    IN CLOB) AS \n  sql_string    CLOB; \nBEGIN \n  sql_string :&#x3D; sql_text; \n  EXECUTE IMMEDIATE sql_string;\nEND;\nAs noted previously, the native dynamic SQL is easier to follow and takes less code to implement.For the sake of maintaining a current code base, use of native dynamic SQL would be encouraged.However, DBMS_SQL is still available and offers different options as mentioned in the first recipes in thischapter.How It WorksOracle added some new features for working with dynamic SQL into the Oracle Database 11g release.Providing the ability to store dynamic SQL into a CLOB is certainly a useful addition. Prior to OracleDatabase 11g, the only way to dynamically process a string that was larger than 32KB was to concatenatetwo VARCHAR types that were at or near 32KB in size. The largest string that could be processed by nativedynamic SQL was 64KB. With the release of Oracle Database 11g, the CLOB (character large object) can beused in such cases, mitigating the need to concatenate two different variables to form the complete SQL.Using DBMS_SQL and its PARSE function, SQL that is stored within a CLOB can be easily processed. Thefollowing lines of code are the lines from the first Solution that read and process the CLOB: \ncur_var :&#x3D; DBMS_SQL.OPEN_CURSOR;\nDBMS_SQL.PARSE(cur_var, v_sql, DBMS_SQL.NATIVE);\nret_var :&#x3D; DBMS_SQL.EXECUTE(cur_var);\nDBMS_SQL.CLOSE_CURSOR(cur_var); \nThe first line opens a new cursor using DBMS_SQL.OPEN_CURSOR. It assigns an integer to the cur_varvariable, which is then passed to the DBMS_SQL.PARSE procedure. DBMS_SQL.PARSE also accepts the SQLCLOB and a constant DBMS_SQL.NATIVE that helps discern the dialect that should be used to process theSQL. The dialect is also referred to as the language_flag, and it is used to determine how Oracle willprocess the SQL statement. Possible values include V6 for version 6 behavior, V7 for Oracle database 7behavior, and NATIVE to specify normal behavior for the database to which the program is connected.After the SQL has been parsed, it can be executed using the DBMS_SQL.EXECUTE function. This functionwill accept the cursor variable as input and execute the SQL. A code of 0 is returned if the SQL isexecuted successfully. Lastly, remember to close the cursor using DBMS_SQL.CLOSE_CURSOR and passingthe cursor variable to it.The example in Solution #2 of this recipe demonstrates the use of native dynamic SQL for executionof dynamic SQL text that is stored within a CLOB. Essentially no differences exist between the execution ofSQL text stored in a VARCHAR data type as opposed to SQL text stored within a CLOB for native dynamicSQL. The code is short and precise, and it is easy to read. \n8-12. Passing NULL Values to Dynamic SQLProblemYou want to pass a NULL value to a dynamic query that you are using. For example, you want to query theEMPLOYEES table for all records that have a NULL MANAGER_ID value. \nSolutionCreate an uninitialized variable, and place it into the USING clause. In this example, a dynamic query iswritten and executed using native dynamic SQL. The dynamic query will retrieve all employees who donot currently have a manager assigned to their record. To retrieve the records that are required, theWHERE clause needs to filter the selection so that only records containing a NULL MANAGER_ID value arereturned. \nDECLARE \n  TYPE cur_type IS REF CURSOR; \n  cur                cur_type; \n  null_value         CHAR(1); \n  sql_string         VARCHAR2(150); \n  emp_rec            employees%ROWTYPE; \nBEGIN \n  sql_string :&#x3D; &#39;SELECT * &#39; || \n                    &#39;FROM EMPLOYEES &#39; || \n                    &#39;WHERE MANAGER_ID IS :null_val&#39;; \n \n  OPEN cur FOR sql_string USING null_value; \n  LOOP \n    FETCH cur INTO emp_rec; \n    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name ||  \n                                                        &#39; - &#39; || emp_rec.email); \n    EXIT WHEN cur%NOTFOUND; \n  END LOOP; \n  CLOSE cur; \n END; \nIn this Solution, the bind variable :null_val has an uninitialized variable value substituted in itsplace. This will cause the query to evaluate the bind variable as a NULL value. All records that residewithin the EMPLOYEES table and do not have a MANAGER_ID assigned to them should be printed by theDBMS_OUTPUT package. \nHow It WorksIt is not possible to simply pass a NULL value using native dynamic SQL. At least, you cannot pass a NULLas a literal. However, oftentimes it is useful to initialize a bind variable to null.An uninitialized variable in PL&#x2F;SQL inherently has the value of NULL. Hence, if you do not initialize avariable, then it will contain a NULL value. Passing an uninitialized variable via the EXECUTE IMMEDIATEstatement will have the same effect as substituting a NULL value for a bind variable. \n8-13. Switching Between DBMS_SQL and Native Dynamic SQLProblemYour consulting company is currently migrating all its applications from using DBMS_SQL to nativedynamic SQL. To help ensure that the migration can be done piecemeal, you want to provide the abilityto switch between the two different techniques so that legacy code can coexist with the newer nativedynamic SQL. \nSolutionWhen you need both the DBMS_SQL package and native dynamic SQL, you can switch between them usingthe DBMS_SQL.TO_REFCURSOR and DBMS_SQL.TO_CURSOR_NUMBER APIs. The DBMS_SQL.TO_REFCURSOR APIprovides the ability to execute dynamic SQL using the DBMS_SQL package and then convert the DBMS_SQLcursor to a REF CURSOR. The DBMS_SQL.TO_CURSOR_NUMBER API allows for executing dynamic SQL via a REFCURSOR and then converting to DBMS_SQL for data retrieval.The following example illustrates the usage of DBMS_SQL.TO_REFCURSOR. In the example, a simpledynamic query is being executed using DBMS_SQL, and the cursor is then being converted to a REF CURSOR. \nDECLARE \n  sql_string           CLOB; \n  cur_var              BINARY_INTEGER :&#x3D; DBMS_SQL.OPEN_CURSOR; \n  ref_cur              SYS_REFCURSOR; \n  return_value         BINARY_INTEGER; \n  cur_rec              jobs%ROWTYPE; \n  salary               NUMBER :&#x3D; &amp;salary; \nBEGIN \n  -- Formulate query \n  sql_string :&#x3D; &#39;SELECT * FROM JOBS &#39; || \n                      &#39;WHERE MAX_SALARY &gt;&#x3D; :sal&#39;; \n  -- Parse SQL \n  DBMS_SQL.PARSE(cur_var, sql_string, DBMS_SQL.NATIVE); \n \n  -- Bind variable(s) \n  DBMS_SQL.BIND_VARIABLE(cur_var, &#39;sal&#39;, salary); \n   \n  -- Execute query and convert to REF CURSOR \n \n  return_value :&#x3D; DBMS_SQL.EXECUTE(cur_var); \n  ref_cur :&#x3D; DBMS_SQL.TO_REFCURSOR(cur_var); \n  DBMS_OUTPUT.PUT_LINE(&#39;Jobs that have a maximum salary over &#39; || salary); \n  LOOP \n    FETCH ref_cur INTO cur_rec; \n    DBMS_OUTPUT.PUT_LINE(cur_rec.job_id || &#39; - &#39; || cur_rec.job_title); \n    EXIT WHEN ref_cur%NOTFOUND; \n  END LOOP; \n \n  CLOSE ref_cur; \n \nEND; \nThe example prompts for the entry of a maximum salary via the :sal bind variable and the SQL*Plus&amp;salary substitution variable. The DBMS_SQL API then binds the maximum salary that was entered to thedynamic SQL string and executes the query to find all jobs that have a maximum salary greater than theamount that was entered. Once the query is executed, the cursor is converted to a REF CURSOR using theDBMS_SQL.TO_REFCURSOR API. Native dynamic SQL is then used to process the results of the query. As youcan see, the native dynamic SQL is much easier to read and process. The advantage of converting to aREF CURSOR is to have the ability to easily process code using native dynamic SQL but still have some ofthe advantages of using DBMS_SQL for querying the data. For instance, if the number of bind variables wasunknown until runtime, then DBMS_SQL would be required.A similar technique can be used if DBMS_SQL is required to process the results of a query. TheDBMS_SQL.TO_CURSOR_NUMBER API provides the ability to convert a cursor from a REF CURSOR to DBMS_SQL.The following example shows the same query on the JOBS table, but this time native dynamic SQL is usedto set up the query and execute it, and DBMS_SQL is used to describe the table structure. One of the nicefeatures of the DBMS_SQL API is that it is possible to describe the columns of a query that will be returned. \nDECLARE \n  sql_string         CLOB; \n  ref_cur            SYS_REFCURSOR; \n  cursor_var         BINARY_INTEGER; \n  cols_var           BINARY_INTEGER; \n  desc_var           DBMS_SQL.DESC_TAB; \n  v_job_id           NUMBER; \n  v_job_title        VARCHAR2(25); \n  salary             NUMBER(6) :&#x3D; &amp;salary; \n  return_val         NUMBER; \n \nBEGIN \n  -- Formulate query \n  sql_string :&#x3D; &#39;SELECT * FROM JOBS &#39; || \n                          &#39;WHERE MAX_SALARY &gt;&#x3D; :sal&#39;; \n  -- Open REF CURSOR \n  OPEN ref_cur FOR sql_string USING salary; \n   \n  cursor_var :&#x3D; DBMS_SQL.TO_CURSOR_NUMBER(ref_cur); \n  DBMS_SQL.DESCRIBE_COLUMNS(cursor_var, cols_var, desc_var); \n  DBMS_SQL.CLOSE_CURSOR(cursor_var); \n   \n  FOR x IN 1 .. cols_var LOOP \n    DBMS_OUTPUT.PUT_LINE(desc_var(x).col_name || &#39; - &#39; || \n                           CASE desc_var(x).col_type \n                                      WHEN 1 THEN &#39;VARCHAR2&#39; \n                                      WHEN 2 THEN &#39;NUMBER&#39; \n                           ELSE &#39;OTHER&#39; \n                           END); \n  END LOOP; \nEND; \nEach of these techniques has their place within the world of PL&#x2F;SQL programming. Using this typeof conversion is especially useful for enabling your application to use the features DBMS_SQL has to offerwithout compromising the ease and structure of native dynamic SQL. \nHow It WorksOracle Database 11g added some new capabilities to dynamic SQL. One of those new features is theability to convert between native dynamic SQL and DBMS_SQL. DBMS_SQL provides some functionality thatis not offered by the newer and easier native dynamic SQL API. Now that Oracle Database 11g providesthe ability to make use of native dynamic SQL but still gain the advantages of using DBMS_SQL, Oracledynamic SQL is much more complete.The DBMS_SQL.TO_REFCURSOR API is used to convert SQL that is using DBMS_SQL into a REF CURSOR,which allows you to work with the resulting records using native dynamic SQL. To convert SQL to a REFCURSOR, you will use DBMS_SQL to parse the SQL, bind any variables, and finally to execute it. Afterward,you call DBMS_SQL.TO_REFCURSOR and pass the original DBMS_SQL cursor as an argument. This will return aREF CURSOR that can be used to work with the results from the query. The statement that performs theconversion contains DBMS_SQL.EXECUTE. The EXECUTE function accepts a DBMS_SQL cursor as an argument.As a result, a REF CURSOR is returned, and it can be used to work with the results from the dynamic query.Conversely, DBMS_SQL.TO_CURSOR_NUMBER can be used to convert a REF CURSOR into a DBMS_SQL cursor.You may choose to do this in order to use some additional functionality that DBMS_SQL has to offer suchas the ability to DESCRIBE an object (DESCRIBE is a SQL*Plus feature). As you can see in the secondexample, native dynamic SQL is used to open the REF CURSOR and bind the variable to the SQL. Once thishas been completed, the cursor is converted to DBMS_SQL using DBMS_SQL.TO_CURSOR_NUMBER and passingthe REF CURSOR. After this conversion is complete, you can utilize the DBMS_SQL API to work with theresulting cursor.\n8-14. Guarding Against SQL Injection AttacksProblemTo provide the best security for your application, you want to ensure that your dynamic SQL statementsare unable to be altered as a result of data entered from an application form. \nSolutionTake care to provide security against SQL injection attacks by validating user input prior and using it inyour dynamic SQL statements or queries. The easiest way to ensure that there are no maliciousinjections into your SQL is to make use of bind variables.The following code is an example of a PL&#x2F;SQL procedure that is vulnerable to SQL injection becauseit concatenates a variable that is populated with user input and does not properly validate the inputprior: \nCREATE OR REPLACE PROCEDURE check_password(username IN VARCHAR2) AS \n  sql_stmt    VARCHAR2(1000); \n  password    VARCHAR2(30); \nBEGIN \n sql_stmt :&#x3D; &#39;SELECT password &#39; || \n                       &#39;FROM user_records &#39; || \n                       &#39;WHERE username &#x3D; &#39;&#39;&#39; || username || &#39;&#39;&#39;; \n  EXECUTE sql_stmt \n  INTO password; \n \n  -- PROCESS PASSWORD \nEND; \n  CHAPTER 8  DYNAMIC SQL \n185 \n \nTo properly code this example to guard against SQL injection, use bind variables. The following is \nthe same procedure that has been rewritten to make it invulnerable to SQL injection: \n \nCREATE OR REPLACE PROCEDURE check_password(username IN VARCHAR2) AS \n  sql_stmt    VARCHAR2(1000); \n  password    VARCHAR2(30); \nBEGIN \n  sql_stmt :&#x3D; &#39;SELECT password &#39; || \n              &#39;FROM user_records &#39; || \n              &#39;WHERE username &#x3D; :username&#39;; \n \n  EXECUTE sql_stmt \n  INTO password \n  USING username; \n \n  -- PROCESS PASSWORD \nEND; \nMaking just a couple of minor changes can significantly increase the security against SQL injectionattacks.** How It Works**SQL injection attacks can occur when data that is accepted as input from an application form isconcatenated into dynamic SQL queries or statements without proper validation. SQL injection is a formof malicious database attack that is caused by a user placing some code or escape characters into a formfield so that the underlying application SQL query or statement becomes affected in an undesirablemanner. In the Solution to this recipe, all passwords stored in the USER_RECORDS table could becompromised if a malicious user were to place a line of text similar to the following into the form fieldfor the USERNAME: \n‘WHATEVER ‘’ OR username is NOT NULL–’ \nThe strange-looking text that you see here can cause major issues because it essentially changes thequery to read as follows: \nSELECT password \nFROM user_records \nWHERE username &#x3D; &#39;WHATEVER &#39; OR username is NOT NULL; \nBind variables can be used to guard against SQL injection attacks, because their contents are notinterpreted at all by Oracle. The value of a bind variable is never parsed as part of the string containingthe SQL query or statement to be executed. Thus, the use of bind variables provides absolute protectionagainst SQL injection attacks.Another way to safeguard your code against SQL injection attacks is to validate user input to ensurethat it is not malicious. Only valid input should be used within a statement or query.There are ways to validate user input depending upon the type of input you are receiving. Forinstance, to verify the integrity of user input, you can use regular expressions. If you are expecting toreceive an e-mail address from a user input field, then the value that is passed into your code should beverified to ensure that it is in proper format of an e-mail address. Here’s an example: \nIF owa_pattern.match(email_variable,&#39;^\\w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\\w&#123;1,&#125;&#39; || \n           &#39;[.,0-9,a-z,A-Z,_]\\w&#123;1,&#125;&#39;|| \n           &#39;@\\w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\\&#39; || \n           &#39;w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\\w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\\w&#123;1,&#125;$&#39;) then \n  -- Perform valid transaction \nELSE \n  -- Raise an error message \nIt is imperative that you do not allow users of your applications to see the Oracle error codes that arereturned by an error. Use proper exception handling (covered in Chapter 9) to ensure that you arecatching any possible exceptions and returning a vaguely descriptive error message to the user. It is notwise to allow Oracle errors or detailed error messages to be displayed because they will most likelyprovide a malicious user with valuable information for attacking your database.Using bind variables, validating user input, and displaying user-friendly and appropriate errormessages can help ensure that your database is not attacked. It is never an enjoyable experience toexplain to your users that all usernames and passwords were compromised. Time is much better spentsecuring your code than going back to clean up after a malicious attack. \n","dateCreated":"2022-11-08T23:17:43+08:00","dateModified":"2022-11-08T23:39:46+08:00","datePublished":"2022-11-08T23:17:43+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 08-Dynamic SQL","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 08-Dynamic SQL">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:17:43.315Z">
+<meta property="article:modified_time" content="2022-11-08T15:39:46.655Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 08-Dynamic SQL
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:17:43+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#8-Dynamic-SQL"><span class="toc-text">8. Dynamic SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1-Executing-a-Single-Row-Query-That-Is-Unknown-at-Compile-Time"><span class="toc-text">8-1. Executing a Single Row Query That Is Unknown at Compile Time</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2-Executing-a-Multiple-Row-Query-That-Is-Unknown-at-Compile"><span class="toc-text">8-2. Executing a Multiple Row Query That Is Unknown at Compile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3-Writing-a-Dynamic-INSERT-Statement"><span class="toc-text">8-3. Writing a Dynamic INSERT Statement</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-4-Writing-a-Dynamic-Update-Statement"><span class="toc-text">8-4. Writing a Dynamic Update Statement</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-5-Writing-a-Dynamic-Delete-Statement"><span class="toc-text">8-5. Writing a Dynamic Delete Statement</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-6-Returning-Data-from-a-Dynamic-Query-into-a-Record"><span class="toc-text">8-6. Returning Data from a Dynamic Query into a Record</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-7-Executing-a-Dynamic-Block-of-PL-x2F-SQL"><span class="toc-text">8-7. Executing a Dynamic Block of PL&#x2F;SQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-8-Creating-a-Table-at-Runtime"><span class="toc-text">8-8. Creating a Table at Runtime</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-9-Altering-a-Table-at-Runtime"><span class="toc-text">8-9. Altering a Table at Runtime</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-10-Finding-All-Tables-That-Include-a-Specific-Column-Value"><span class="toc-text">8-10. Finding All Tables That Include a Specific Column Value</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-11-Storing-Dynamic-SQL-in-Large-Objects"><span class="toc-text">8-11 Storing Dynamic SQL in Large Objects</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-12-Passing-NULL-Values-to-Dynamic-SQL"><span class="toc-text">8-12. Passing NULL Values to Dynamic SQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-13-Switching-Between-DBMS-SQL-and-Native-Dynamic-SQL"><span class="toc-text">8-13. Switching Between DBMS_SQL and Native Dynamic SQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-14-Guarding-Against-SQL-Injection-Attacks"><span class="toc-text">8-14. Guarding Against SQL Injection Attacks</span></a></li></ol></li></ol>
+
+
+<h1 id="8-Dynamic-SQL"><a href="#8-Dynamic-SQL" class="headerlink" title="8. Dynamic SQL"></a>8. Dynamic SQL</h1><p>Oracle provides dynamic SQL as a means for generating DML or DDL at runtime. It can be useful when<br>the full text of a SQL statement or query is not known until application runtime. Dynamic SQL can help<br>overcome some of the limitations of static SQL, such as generating a full SQL query based upon some<br>user-provided information or inserting into a specific table depending upon a user action within your<br>application. Simply put, the ability to use dynamic SQL within PL&#x2F;SQL applications provides a level of<br>flexibility that is not attainable with the use of static SQL alone.<br>Oracle allows dynamic SQL to be generated in two different ways: native dynamic SQL and through<br>the use of the DBMS_SQL package. Each strategy has its own benefits as well as drawbacks. In comparison,<br>native dynamic SQL is easier to use, it supports user-defined types, and it performs better than DBMS_SQL.<br>On the other hand, DBMS_SQL supports some features that are not currently supported in native dynamic<br>SQL such as the use of the SQL*Plus DESCRIBE command and the reuse of SQL statements. Each of these<br>methodologies will be compared under various use cases within this chapter. By the end of the chapter,<br>you should know what advantages each approach has to offer and which should be used in certain<br>circumstances. </p>
+<h2 id="8-1-Executing-a-Single-Row-Query-That-Is-Unknown-at-Compile-Time"><a href="#8-1-Executing-a-Single-Row-Query-That-Is-Unknown-at-Compile-Time" class="headerlink" title="8-1. Executing a Single Row Query That Is Unknown at Compile Time"></a>8-1. Executing a Single Row Query That Is Unknown at Compile Time</h2><p><strong><strong>Problem</strong></strong><br>You need to query the database for a single row of data matched by the primary key value. However, you<br>are unsure of what columns will need to be returned at runtime. </p>
+<p><strong><strong>Solution</strong> #1</strong><br>Use a native dynamic query to retrieve the columns of data that are determined by your application at<br>runtime. After you determine what columns need to be returned, create a string that contains the SQL<br>that is needed to query the database. The following example demonstrates the concept of creating a<br>dynamic SQL query and then using native dynamic SQL to retrieve the single row that is returned. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
+  emp_qry                VARCHAR2(500); 
+  emp_first              employees.first_name%TYPE; 
+  emp_last               employees.last_name%TYPE; 
+  email                  employees.email%TYPE; 
+ 
+  valid_id_count         NUMBER :&#x3D; 0; 
+  valid_flag             BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info          VARCHAR2(50); 
+ 
+BEGIN 
+  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+  IF emp_info LIKE &#39;%@%&#39; THEN 
+    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); 
+    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; 
+  ELSE 
+    SELECT COUNT(*) 
+    INTO valid_id_count 
+    FROM employees 
+    WHERE employee_id &#x3D; emp_info; 
+ 
+    IF valid_id_count &gt; 0 THEN 
+        temp_emp_info :&#x3D; emp_info; 
+        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :id&#39;; 
+    ELSE 
+        valid_flag :&#x3D; FALSE; 
+    END IF; 
+  END IF; 
+ 
+  IF valid_flag &#x3D; TRUE THEN 
+    EXECUTE IMMEDIATE emp_qry 
+    INTO emp_first, emp_last, email 
+    USING temp_emp_info; 
+ 
+    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+  ELSE  
+    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE SPECIFIED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+  END IF; 
+END; </code></pre>
+<p>At runtime, the procedure creates a SQL query based upon the criteria that are passed into the<br>procedure by the invoking program. That query is then executed using the EXECUTE IMMEDIATE statement<br>along with the argument that will be substituted into the query WHERE clause.<br><strong><strong>Solution</strong> #2</strong><br>Use the DBMS_SQL package to create a query based upon criteria that are specified at runtime. The<br>example in this <strong>Solution</strong> will query the employee table and retrieve data based upon the parameter that<br>has been passed into the procedure. The procedure will accept either a primary key ID or an employee e-<br>mail address. The SQL statement that will be used to query the database will be determined at runtime<br>based upon what type of argument is used. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(emp_info IN VARCHAR2) IS 
+  emp_qry                  VARCHAR2(500); 
+  emp_first                employees.first_name%TYPE :&#x3D; NULL; 
+  emp_last                 employees.last_name%TYPE :&#x3D; NULL; 
+  email                    employees.email%TYPE :&#x3D; NULL; 
+ 
+  valid_id_count           NUMBER :&#x3D; 0; 
+  valid_flag               BOOLEAN :&#x3D; TRUE; 
+  temp_emp_info          VARCHAR2(50); 
+ 
+  cursor_name            INTEGER; 
+  row_ct                 INTEGER; 
+ 
+BEGIN 
+   
+  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39;; 
+  IF emp_info LIKE &#39;%@%&#39; THEN 
+    temp_emp_info :&#x3D; substr(emp_info,0,instr(emp_info,&#39;@&#39;)-1); 
+    emp_qry :&#x3D; emp_qry || &#39;WHERE EMAIL &#x3D; :emp_info&#39;; 
+  ELSE 
+    SELECT COUNT(*) 
+    INTO valid_id_count 
+    FROM employees 
+    WHERE employee_id &#x3D; emp_info; 
+ 
+    IF valid_id_count &gt; 0 THEN 
+        temp_emp_info :&#x3D; emp_info; 
+        emp_qry :&#x3D; emp_qry || &#39;WHERE EMPLOYEE_ID &#x3D; :emp_info&#39;; 
+    ELSE 
+        valid_flag :&#x3D; FALSE; 
+    END IF; 
+  END IF; 
+ 
+  IF valid_flag &#x3D; TRUE THEN 
+    cursor_name :&#x3D; DBMS_SQL.OPEN_CURSOR; 
+    DBMS_SQL.PARSE(cursor_name, emp_qry, DBMS_SQL.NATIVE); 
+    DBMS_SQL.BIND_VARIABLE(cursor_name, &#39;:emp_info&#39;, temp_emp_info); 
+    DBMS_SQL.DEFINE_COLUMN(cursor_name, 1, emp_first, 20); 
+    DBMS_SQL.DEFINE_COLUMN(cursor_name, 2, emp_last, 25); 
+    DBMS_SQL.DEFINE_COLUMN(cursor_name, 3, email, 25); 
+    row_ct :&#x3D; DBMS_SQL.EXECUTE(cursor_name); 
+  IF DBMS_SQL.FETCH_ROWS(cursor_name) &gt; 0 THEN 
+      DBMS_SQL.COLUMN_VALUE (cursor_name, 1, emp_first); 
+      DBMS_SQL.COLUMN_VALUE (cursor_name, 2, emp_last); 
+      DBMS_SQL.COLUMN_VALUE (cursor_name, 3, email); 
+      DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+      
+  END IF; 
+     
+  ELSE  
+    DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE SPECIFIED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+  END IF; 
+  DBMS_SQL.CLOSE_CURSOR(cursor_name); 
+  EXCEPTION 
+    WHEN OTHERS THEN 
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE SPECIFIED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;); 
+ 
+END; </code></pre>
+
+<p><strong><strong>How It Works</strong> #1</strong><br>Native dynamic SQL allows you to form a string of SQL text and then execute it via the EXECUTE<br>IMMEDIATE statement. This is very useful when the columns, table names, or WHERE clause text is not<br>known at runtime. The program can build the SQL string as it needs to, and then the EXECUTE IMMEDIATE<br>statement will execute it. The format for the EXECUTE IMMEDIATE statement is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXECUTE IMMEDIATE sql_string 
+[INTO variable_name1[, variable_name2, . . .] 
+USING variable_name1[, variable_name2, . . .]]; </code></pre>
+<p>The EXECUTE IMMEDIATE statement requires only one parameter, which is a SQL string to execute.<br>The remainder of the statement is optional. The INTO clause lists all the variables that a SQL query would<br>return values into. The variables should be listed in the same order within the SQL string as they are<br>listed within the INTO clause. The USING clause lists all the variables that will be bound to the SQL string<br>at runtime. Bind variables are arguably one of the most valuable features of the PL&#x2F;SQL language. Each<br>variable listed in the USING clause is bound to a bind variable within the SQL string. The order in which<br>the variables are listed in the USING clause is the same order in which they will be bound within the<br>string. Take a look at the following example that uses two bind variables: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXECUTE IMMEDIATE &#39;select email from employees &#39; || 
+                                       &#39;where last_name &#x3D;:last &#39; || 
+                                       &#39;and first_name &#x3D; :first&#39; 
+INTO v_email 
+USING v_last, v_first; </code></pre>
+<p>In the example query, the variables contained within the USING clause are bound in order to the bind<br>variables within the SQL string. Bind variables are the cornerstone to developing robust, secure, and<br>well-performing software.<br><strong><strong>How It Works</strong> #2</strong><br>The DBMS_SQL package can also be used to perform the same task. Each of the different techniques, native<br>dynamic SQL and DBMS_SQL, have their advantages and disadvantages. The major difference between the<br>use of DBMS_SQL and native dynamic SQL is how the dynamic SQL string is executed. In this example,<br>DBMS_SQL package functions are used to process the SQL rather than EXECUTE IMMEDIATE. As you can see,<br>the code is quite a bit lengthier than using EXECUTE IMMEDIATE, and it essentially returns the same<br>information. In this case, DBMS_SQL is certainly not the best choice. DBMS_SQL can become useful in<br>situations where you do not know the SELECT list until runtime or when you are unsure of which<br>variables must be bound to a SELECT or DML statement. On the other hand, you must use native<br>dynamic SQL if you intend to use the cursor variable attributes %FOUND, %NOTFOUND, %ISOPEN, or %ROWCOUNT<br>when working with your cursor.<br>■ Note Native dynamic SQL was introduced in Oracle 9i, because DBMS_SQL was overly complex for many of the<br>routine tasks that programmers perform. We consider use of native dynamic SQL as the technique of choice for<br>working with dynamic SQL. Use DBMS_SQL only when you have a specific need to do so. </p>
+<h2 id="8-2-Executing-a-Multiple-Row-Query-That-Is-Unknown-at-Compile"><a href="#8-2-Executing-a-Multiple-Row-Query-That-Is-Unknown-at-Compile" class="headerlink" title="8-2. Executing a Multiple Row Query That Is Unknown at Compile"></a>8-2. Executing a Multiple Row Query That Is Unknown at Compile</h2><p><strong><strong>Problem</strong></strong><br>Your application requires a database table to be queried, but the filters for the WHERE clause are not<br>known until runtime. You have no idea how many rows will be returned by the query.<br><strong><strong>Solution</strong> #1</strong><br>Create a native dynamic query using a SQL string that will be built at application runtime. Declare the<br>query using REF CURSOR, execute it by issuing an OPEN statement, and loop through the records using a<br>standard loop, fetching the fields within each iteration of the loop. This technique is illustrated via the<br>code in the following example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  emp_qry                 VARCHAR2(500); 
+  TYPE                    cur_type IS REF CURSOR; 
+  cur                     cur_type; 
+  emp_first               employees.first_name%TYPE; 
+  emp_last                employees.last_name%TYPE; 
+  email                   employees.email%TYPE; 
+ 
+  dept_id                 employees.department_id%TYPE :&#x3D; &amp;department_id; 
+ 
+BEGIN 
+  -- DEPARTMENT_ID WILL NOT UNIQUELY DEFINE ANY ONE EMPLOYEE 
+ 
+  emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39; || 
+             &#39; WHERE DEPARTMENT_ID &#x3D; :id&#39;; 
+ 
+  OPEN cur FOR emp_qry USING dept_id; 
+  LOOP 
+    FETCH cur INTO emp_first, emp_last, email; 
+   EXIT WHEN cur%NOTFOUND; 
+    DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+  END LOOP; 
+  CLOSE cur; 
+END; </code></pre>
+<p>This example accepts a DEPARTMENT_ID as input, and it uses a bind variable to substitute the value<br>within the SQL string. Although the actual SQL string in this example does not require the use of a<br>dynamic query, it is a useful example to demonstrate the technique.<br><strong><strong>Solution</strong> #2</strong><br>This same procedure can also be performed using the DBMS_SQL package. Although the native dynamic<br>SQL <strong>Solution</strong> is easier to understand and implement, the DBMS_SQL alternative offers some different<br>options that are not available when using the native method. The following example is a sample of a<br>procedure that performs the same functionality as <strong>Solution</strong> #1 of this recipe. However, the procedure in<br>the following example uses the DBMS_SQL package to parse and execute the dynamic query rather than<br>native dynamic SQL. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_emp_detail(dept_id IN NUMBER) IS 
+  emp_qry                 VARCHAR2(500); 
+  emp_first               employees.first_name%TYPE :&#x3D; NULL; 
+  emp_last                employees.last_name%TYPE :&#x3D; NULL; 
+  email                   employees.email%TYPE :&#x3D; NULL; 
+  cursor_name             INTEGER; 
+  row_ct                  INTEGER; 
+BEGIN 
+   
+ emp_qry :&#x3D; &#39;SELECT FIRST_NAME, LAST_NAME, EMAIL FROM EMPLOYEES &#39; || 
+             &#39; WHERE DEPARTMENT_ID &#x3D; :id&#39;; 
+    cursor_name :&#x3D; DBMS_SQL.OPEN_CURSOR; 
+    DBMS_SQL.PARSE(cursor_name, emp_qry, DBMS_SQL.NATIVE); 
+    DBMS_SQL.BIND_VARIABLE(cursor_name, &#39;:id&#39;, dept_id); 
+    DBMS_SQL.DEFINE_COLUMN(cursor_name, 1, emp_first, 20); 
+    DBMS_SQL.DEFINE_COLUMN(cursor_name, 2, emp_last, 25); 
+    DBMS_SQL.DEFINE_COLUMN(cursor_name, 3, email, 25); 
+    row_ct :&#x3D; DBMS_SQL.EXECUTE(cursor_name); 
+    LOOP 
+    IF DBMS_SQL.FETCH_ROWS(cursor_name) &gt; 0 THEN 
+      DBMS_SQL.COLUMN_VALUE (cursor_name, 1, emp_first); 
+      DBMS_SQL.COLUMN_VALUE (cursor_name, 2, emp_last); 
+      DBMS_SQL.COLUMN_VALUE (cursor_name, 3, email); 
+     DBMS_OUTPUT.PUT_LINE(emp_first || &#39; &#39; || emp_last || &#39; - &#39; || email); 
+    ELSE 
+      EXIT; 
+    END IF; 
+    END LOOP; 
+    
+DBMS_SQL.CLOSE_CURSOR(cursor_name);
+EXCEPTION 
+    WHEN OTHERS THEN 
+      DBMS_OUTPUT.PUT_LINE(&#39;THE INFORMATION YOU HAVE USED DOES &#39; || 
+                         &#39;NOT MATCH ANY EMPLOYEE RECORD&#39;);
+END;</code></pre>
+
+<p><strong><strong>How It Works</strong></strong><br>The use of native dynamic SQL in this <strong>Solution</strong> is more or less equivalent to that which was performed in<br>the previous recipe. The largest difference lies in the use of the REF CURSOR as opposed to the EXECUTE<br>IMMEDIATE statement. The REF CURSOR is used to create a cursor using a dynamic SQL string.<br>Cursor variables can be either weakly typed or strongly typed. The cursor variable demonstrated in<br>the <strong>Solution</strong> to this example of a weakly typed REF CURSOR, since the SQL string is not known until<br>runtime. A strongly typed cursor variable must be known at runtime. In this sense, a strongly typed<br>cursor variable is very similar to a regular cursor.<br>The REF CURSOR type must be declared first, and then the actual cursor variable that will be used in<br>your code should be declared using the REF CURSOR as its type. Next you have the OPEN statement. To tell<br>Oracle what SQL to use for the cursor, the OPEN statement should include a FOR clause indicating the SQL<br>string that the cursor should use. If there are any variables to bind into the query, the optional USING<br>clause should follow at the end of the OPEN statement.<br>The subsequent cursor loop should work with the REF CURSOR in the same manner that you would<br>use with regular cursor variables. Always FETCH the current record or its contents into a local record or<br>separate local variables. Next, perform the tasks that need to be completed. Lastly, ensure that you<br>include an EXIT statement to indicate that the loop should be terminated after the last record has been<br>processed. The final step in the process is to close the cursor. After the cursor has been closed, it can be<br>assigned a new SQL string since you are working with weakly typed REF CURSORs.<br>As you can see, the example of using DBMS_SQL in <strong>Solution</strong> #2 of this recipe as opposed to the<br>example in Recipe 8-1 differs only because of the addition of a LOOP construct. Instead of displaying only<br>one value, this example will loop through all the records that are returned from the query, and the loop<br>will exit when there are no remaining rows in the result. The example in Recipe 8-1 could entail the same<br>loop construct as the one shown in <strong>Solution</strong> #2 of this recipe, but it is only expected to return one row<br>since the query is based upon a primary and unique key value.<br>The choice for using DBMS_SQL as opposed to native dynamic SQL (NDS) depends on what you are<br>trying to achieve. DBMS_SQL will allow you to use a SQL string that is greater than 32KB in size, whereas<br>native dynamic SQL will not. However, there are other options for creating large SQL text strings and<br>parsing them with native dynamic SQL. Please see Recipe 8-11 for more details. </p>
+<h2 id="8-3-Writing-a-Dynamic-INSERT-Statement"><a href="#8-3-Writing-a-Dynamic-INSERT-Statement" class="headerlink" title="8-3. Writing a Dynamic INSERT Statement"></a>8-3. Writing a Dynamic INSERT Statement</h2><p><strong><strong>Problem</strong></strong><br>Your application must insert data into a table, but you don’t know until runtime which columns you will<br>insert. For example, you are writing a procedure that will be used for saving records into the EMPLOYEES<br>table. However, the exact content to be saved is not known until runtime because the person who is<br>calling the procedure can decide whether they are including a DEPARTMENT_ID. If a DEPARTMENT_ID is<br>included, then the department will be included in the INSERT.<br><strong><strong>Solution</strong></strong><br>Create a string at runtime that will contain the INSERT statement text to be executed. Use bind variables<br>to substitute the values that are to be inserted into the database table. The following procedure accepts<br>user input for entry of a new employee record. Bind variables are used to substitute those values into the<br>SQL. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE new_employee (   first     IN VARCHAR2, 
+                                             last      IN VARCHAR2, 
+                                             email     IN VARCHAR2, 
+                                             phone     IN VARCHAR2, 
+                                             hired     IN DATE, 
+                                             job       IN VARCHAR2, 
+                                             dept      IN NUMBER DEFAULT 0) AS 
+                                             v_sql     VARCHAR2(1000); 
+BEGIN 
+  IF dept !&#x3D; 0 THEN 
+    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || 
+                   &#39;employee_id, first_name, last_name, email, &#39; || 
+                   &#39;phone_number, hire_date, job_id, department_id) &#39; || 
+                   &#39;VALUES( &#39; || 
+                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || 
+                   &#39;:job_id, :dept)&#39;; 
+ 
+    EXECUTE IMMEDIATE v_sql 
+    USING employees_seq.nextval, first, last, email, phone, hired, job, dept; 
+ 
+  ELSE 
+    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || 
+                   &#39;employee_id, first_name, last_name, email, &#39; || 
+                   &#39;phone_number, hire_date, job_id) &#39; || 
+                   &#39;VALUES( &#39; || 
+                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || 
+                   &#39;:job_id)&#39;; 
+ 
+    EXECUTE IMMEDIATE v_sql 
+    USING employees_seq.nextval, first, last, email, phone, hired, job; 
+ 
+  END IF; 
+ 
+  DBMS_OUTPUT.PUT_LINE(&#39;The employee has been successfully entered&#39;); 
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;YOU MUST SUPPLY A VALUE FOR DEPARTMENT&#39;); 
+  WHEN TOO_MANY_ROWS THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;EMPLOYEE_ID ALREADY EXISTS&#39;); 
+END; </code></pre>
+<p>If the data entry clerk includes a department ID number for the employee when executing the<br>NEW_EMPLOYEE procedure, then the INSERT statement will differ slightly than it would if no department ID<br>were provided. The basic native dynamic SQL in this example does not differ much from those examples<br>demonstrated in Recipe 8-1 or Recipe 8-2 of this chapter.<br><strong><strong>Solution</strong> #2</strong><br>The DBMS_SQL API can also be used to execute dynamic INSERT statements. Although dynamic DML is not<br>usually performed with DBMS_SQL very often, it can still be useful in some circumstances. The following<br>example performs the same task as <strong>Solution</strong> #1 to this recipe. However, it has been rewritten to use<br>DBMS_SQL instead of native dynamic SQL. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE new_employee(first      IN VARCHAR2, 
+                                         last       IN VARCHAR2, 
+                                         email      IN VARCHAR2, 
+                                         phone      IN VARCHAR2, 
+                                         hired      IN DATE, 
+                                         job        IN VARCHAR2, 
+                                         dept       IN NUMBER DEFAULT 0)  
+AS 
+  v_sql    VARCHAR2(1000); 
+ 
+  cursor_var            NUMBER :&#x3D; DBMS_SQL.OPEN_CURSOR; 
+  rows_compelete NUMBER :&#x3D; 0; 
+  next_emp              NUMBER :&#x3D; employee_seq.nextval; 
+BEGIN 
+   
+ 
+  IF dept !&#x3D; 0 THEN 
+    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || 
+                   &#39;employee_id, first_name, last_name, email, &#39; || 
+                   &#39;phone_number, hire_date, job_id, department_id) &#39; || 
+                   &#39;VALUES( &#39; || 
+                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || 
+                   &#39;:job_id, :dept)&#39;; 
+ 
+     
+  ELSE 
+    v_sql :&#x3D; &#39;INSERT INTO EMPLOYEES ( &#39; || 
+                   &#39;employee_id, first_name, last_name, email, &#39; || 
+                   &#39;phone_number, hire_date, job_id) &#39; || 
+                   &#39;VALUES( &#39; || 
+                   &#39;:id, :first, :last, :email, :phone, :hired, &#39; || 
+                   &#39;:job_id)&#39;; 
+  END IF; 
+  DBMS_SQL.PARSE(cursor_var, v_sql, DBMS_SQL.NATIVE); 
+  DBMS_SQL.BIND_VARIABLE(cursor_var, 1, &#39;:id&#39;, next_emp); 
+  DBMS_SQL.BIND_VARIABLE(cursor_var, 2, &#39;:first&#39;, first); 
+  DBMS_SQL.BIND_VARIABLE(cursor_var, 3, &#39;:last&#39;, last); 
+  DBMS_SQL.BIND_VARIABLE(cursor_var, 4, &#39;:email&#39;, email); 
+  DBMS_SQL.BIND_VARIABLE(cursor_var, 5, &#39;:phone&#39;, phone); 
+  DBMS_SQL.BIND_VARIABLE(cursor_var, 6, &#39;:hired&#39;); 
+  DBMS_SQL.BIND_VARIABLE(cursor_var, 7, &#39;:job&#39;, job); 
+  IF dept !&#x3D; 0 then 
+    DBMS_SQL.BIND_VARIABLE(cursor_var, 8, &#39;:dept&#39;, dept); 
+  END IF; 
+  rows_complete :&#x3D; DBMS_SQL.EXECUTE(cursor_var); 
+  DBMS_SQL.CLOSE_CURSOR(cursor_var); 
+  DBMS_OUTPUT.PUT_LINE(&#39;The employee has been successfully entered&#39;); 
+END;</code></pre>
+
+<p><strong><strong>How It Works</strong></strong><br>Using native dynamic SQL, creating an INSERT statement is almost identical to working with a query<br>string. As a matter of fact, the only difference is that you will not be making use of the INTO clause within<br>the EXECUTE IMMEDIATE statement. Standard PL&#x2F;SQL can be used to create the SQL statement string in<br>order to process an INSERT statement that contains column names, table names, or WHERE clause values<br>that are not known until runtime.<br>■ Note If your SQL string contains any SQL that requires the use of single quotes, double up on the quotes.<br>Placing a single quote immediately after another signals the parser to place a single quote into the string that you<br>are creating. Similarly to SQL queries using dynamic SQL, you should use bind variables to substitute values into<br>the SQL statement string where needed. As a refresher, bind variables are used within SQL queries or<br>statements to act as placeholders for values that are to be substituted at runtime. A bind variable begins<br>with a colon and is then followed by the variable name. The EXECUTE IMMEDIATE statement implements<br>the USING clause to list variables that contain values that will be substituted into the bind variables at<br>runtime. The order in which the variables are listed in the USING clause must concur with the positioning<br>of the bind variables within the SQL. The following is an example of an EXECUTE IMMEDIATE statement to<br>be used with a SQL statement such as an INSERT: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXECUTE IMMEDIATE sql_statement_string 
+[USING variable1, variable2, etc]; </code></pre>
+<p>It is usually a good idea to include an EXCEPTION block at the end of any code block. This is especially<br>true when working with dynamic queries or statements. An Oracle error will be raised if the INSERT<br>statement within the SQL string is invalid. If an EXCEPTION block were added to catch OTHERS, then you<br>could provide a well-written error message that describes the exact issue at hand. In most cases, users of<br>your application would prefer to see such a nice summary message rather than a cryptic Oracle error<br>message.<br>It is a good rule of thumb to maintain consistency throughout your application code. If you prefer to<br>use native dynamic SQL, then try to use it in all cases where dynamic SQL is a requirement. Likewise,<br>DBMS_SQL should be used throughout if you plan to make use of it instead. There are certain situations<br>when you may want to mix the two techniques in order to obtain information or use features that are not<br>available with one or the other. In Recipe 8-13, you will learn more about using both techniques within<br>the same block of PL&#x2F;SQL code. </p>
+<h2 id="8-4-Writing-a-Dynamic-Update-Statement"><a href="#8-4-Writing-a-Dynamic-Update-Statement" class="headerlink" title="8-4. Writing a Dynamic Update Statement"></a>8-4. Writing a Dynamic Update Statement</h2><p><strong><strong>Problem</strong></strong><br>Your application needs to execute an update statement, and you are not sure of the columns to be<br>updated until runtime. For example, your application will modify employee records. You would like to<br>construct an update statement that contains only the columns that have updated values.<br><strong><strong>Solution</strong></strong><br>Use native dynamic SQL to execute a SQL statement string that you prepare at application runtime. The<br>procedure in this example accepts employee record values as input. In this scenario, an application form<br>allows user entry for many of the fields that are contained within the EMPLOYEES table so that a particular<br>employee record can be updated. The values that are changed on the form should be included in the<br>UPDATE statement. The procedure queries the employee record and checks to see which values have been<br>updated. Only the updated values are included in the text of the SQL string that is used for the update. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE update_employees(id   IN employees.employee_id%TYPE, 
+                                            first IN employees.first_name%TYPE, 
+                                            last  IN employees.last_name%TYPE, 
+                                            email IN employees.email%TYPE, 
+                                            phone IN employees.phone_number%TYPE, 
+                                            job   IN employees.job_id%TYPE, 
+                                            salary IN employees.salary%TYPE, 
+                                            commission_pct IN employees.commission_pct%TYPE, 
+                                            manager_id IN employees.manager_id%TYPE, 
+                                            department_id IN employees.department_id%TYPE) 
+ AS
+  emp_upd_rec   employees%ROWTYPE; 
+  sql_string    VARCHAR2(1000); 
+  set_count     NUMBER :&#x3D; 0; 
+BEGIN 
+  SELECT * 
+  INTO emp_upd_rec 
+  FROM employees 
+  WHERE employee_id &#x3D; id; 
+  sql_string :&#x3D; &#39;UPDATE EMPLOYEES SET &#39;; 
+   
+  IF first !&#x3D; emp_upd_rec.first_name THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, FIRST_NAME &#x3D;&#39; || first || &#39;&#39;&#39;&#39;; 
+    ELSE 
+      sql_string :&#x3D; sql_string || &#39; FIRST_NAME &#x3D;&#39; || first || &#39;&#39;&#39;&#39;; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  IF last !&#x3D; emp_upd_rec.last_name THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, LAST_NAME &#x3D;&#39;&#39;&#39; || last || &#39;&#39;&#39;&#39;; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; LAST_NAME &#x3D;&#39;&#39;&#39; ||  last || &#39;&#39;&#39;&#39;; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  IF upper(email) !&#x3D; emp_upd_rec.email THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, EMAIL &#x3D;&#39;&#39;&#39; || upper(email) || &#39;&#39;&#39;&#39;; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; EMAIL &#x3D;&#39;&#39;&#39; || upper(email) || &#39;&#39;&#39;&#39;; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  IF upper(phone) !&#x3D; emp_upd_rec.phone_number THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, PHONE_NUMBER &#x3D;&#39;&#39;&#39; || 
+        upper(phone) || &#39;&#39;&#39;&#39;; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; PHONE_NUMBER &#x3D;&#39;&#39;&#39; || 
+        upper(phone) || &#39;&#39;&#39;&#39;; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  IF job !&#x3D; emp_upd_rec.job_id THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, JOB_ID &#x3D;&#39;&#39;&#39; || job || &#39;&#39;&#39;&#39;; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; JOB_ID &#x3D;&#39;&#39;&#39; || job || &#39;&#39;&#39;&#39;; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  IF salary !&#x3D; emp_upd_rec.salary THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, SALARY &#x3D;&#39; || salary; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; SALARY &#x3D;&#39; || salary; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  IF commission_pct !&#x3D; emp_upd_rec.commission_pct THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, COMMISSION_PCT &#x3D;&#39; || 
+               commission_pct; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; COMMISSION_PCT &#x3D;&#39; || 
+               commission_pct; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  IF manager_id !&#x3D; emp_upd_rec.manager_id THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, MANAGER_ID &#x3D;&#39; || 
+        manager_id; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; MANAGER_ID &#x3D;&#39; || 
+        manager_id; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+   IF department_id !&#x3D; emp_upd_rec.department_id THEN 
+    IF set_count &gt; 0 THEN 
+      sql_string :&#x3D; sql_string ||&#39;, DEPARTMENT_ID &#x3D;&#39; || 
+        department_id; 
+    ELSE 
+      sql_string :&#x3D; sql_string ||&#39; DEPARTMENT_ID &#x3D;&#39; || 
+        department_id; 
+      set_count :&#x3D; set_count + 1; 
+    END IF; 
+  END IF; 
+   
+  sql_string :&#x3D; sql_string || &#39; WHERE employee_id &#x3D; &#39; || id; 
+      
+  IF set_count &gt; 0 THEN 
+    EXECUTE IMMEDIATE sql_string; 
+  ELSE 
+    DBMS_OUTPUT.PUT_LINE(&#39;No update needed, &#39; || 
+        &#39;all fields match original values&#39;); 
+  END IF; 
+ 
+EXCEPTION 
+  WHEN NO_DATA_FOUND THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;No matching employee found&#39;); 
+  WHEN OTHERS THEN 
+    DBMS_OUTPUT.PUT_LINE(&#39;Data entry error has occurred, &#39; || 
+                &#39;please check values and try again&#39; || sql_string); 
+END; </code></pre>
+<p>Execution and Results: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec update_employees(187, 
+&#39;Anthony&#39;, 
+&#39;Cabrio&#39;, 
+&#39;ACABRIO&#39;, 
+&#39;650.509.4876&#39;, 
+ &#39;SH_CLERK&#39; 
+,6501, 
+.08, 
+121, 
+50); </code></pre>
+<p>No update needed, all fields match original values<br>As mentioned previously, this procedure accepts input from a user data entry form. The input<br>pertains to an existing employee’s database record. The values accepted as input are compared against<br>those that already exist in the database, and if they are different, then they are added into the SQL UPDATE<br>statement that is dynamically created. This code could be simplified by creating a separate function to<br>take care of comparing values and building the SQL string, but this procedure gives you a good idea of<br>how dynamic SQL can be used to EXECUTE an UPDATE statement. </p>
+<p><strong><strong>How It Works</strong></strong><br>Dynamic SQL statement execution is straightforward when using native dynamic SQL. The procedure in<br>the <strong>Solution</strong> to this recipe creates a SQL string based upon certain criteria, after which it is executed with<br>the use of the EXECUTE IMMEDIATE statement.<br>The EXECUTE IMMEDIATE statement works the same way for most DML statements. If you read Recipe<br>8-3 on creating and running a dynamic INSERT statement, then you can see that executing an UPDATE<br>statement works in the same manner.<br>Any values that need to be substituted into the SQL string should be coded as bind variables. For<br>more information regarding bind variables, please refer to Recipe 8-3. The format for executing an<br>UPDATE statement with the EXECUTE IMMEDIATE statement is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXECUTE IMMEDIATE update_statement_string 
+[USING variable1, variable2, etc]; </code></pre>
+<p>Just as with the execution of the INSERT statement in Recipe 8-3, the EXECUTE IMMEDIATE statement<br>requires the use of the USING clause only if there are variables that need to be substituted into the SQL<br>statement at runtime.<br>■ Note If you are able to write a static SQL UPDATE statement for your application, then do so. Use of dynamic SQL<br>will incur a small performance penalty.<br>The DBMS_SQL package can also be used to work with dynamic SQL updates. However, this technique<br>is not used very much since the introduction of native dynamic SQL in Oracle 9i. For an example of using<br>the DBMS_SQL package with DML statements, please refer to Recipe 8-3. Although the example in Recipe<br>8-3 demonstrates an INSERT statement, an UPDATE statement is processed the same way; only the SQL<br>string needs to be changed. </p>
+<h2 id="8-5-Writing-a-Dynamic-Delete-Statement"><a href="#8-5-Writing-a-Dynamic-Delete-Statement" class="headerlink" title="8-5. Writing a Dynamic Delete Statement"></a>8-5. Writing a Dynamic Delete Statement</h2><p><strong><strong>Problem</strong></strong><br>You need to create a procedure that will delete rows from a table. However, the exact SQL for deleting<br>the rows is not known until runtime. For instance, you need create a procedure to delete an employee<br>from the EMPLOYEES table, but rather than limit the procedure to accepting only employee ID numbers<br>for employee identification, you also want to accept an e-mail address. The procedure will determine<br>whether an e-mail address or an ID has been passed and will construct the appropriate DELETE<br>statement.<br><strong><strong>Solution</strong></strong><br>Use native dynamic SQL to process a string that is dynamically created based upon values that are<br>passed into the procedure. In the following example, a procedure is created that will build a dynamic<br>SQL string to delete an employee record. The DELETE statement syntax may vary depending upon what<br>type of value is passed into the procedure. Valid entries include EMPLOYEE_ID values or EMAIL values. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE delete_employee(emp_value IN VARCHAR2) AS 
+ 
+  is_number         NUMBER :&#x3D; 0; 
+  valid_flag        BOOLEAN :&#x3D; FALSE; 
+  sql_stmt          VARCHAR2(1000); 
+  emp_count         NUMBER :&#x3D; 0; 
+BEGIN 
+  sql_stmt :&#x3D; &#39;DELETE FROM EMPLOYEES &#39;; 
+ 
+  -- DETERMINE IF emp_value IS NUMERIC, IF SO THEN QUERY 
+  -- DATABASE TO FIND OCCURRENCES OF MATCHING EMPLOYEE_ID 
+  IF LENGTH(TRIM(TRANSLATE(emp_value, &#39; +-.0123456789&#39;, &#39; &#39;))) IS NULL THEN 
+    SELECT COUNT(*) 
+    INTO emp_count 
+    FROM EMPLOYEES 
+    WHERE EMPLOYEE_ID &#x3D; emp_value; 
+ 
+    IF emp_count &gt; 0 THEN 
+      sql_stmt :&#x3D; sql_stmt || &#39;WHERE EMPLOYEE_ID &#x3D; :emp_val&#39;; 
+      valid_flag :&#x3D; TRUE; 
+    END IF; 
+  ELSE 
+    SELECT COUNT(*) 
+    INTO emp_count 
+    FROM EMPLOYEES 
+    WHERE EMAIL &#x3D; upper(emp_value); 
+ 
+    IF emp_count &gt; 0 THEN 
+      sql_stmt :&#x3D; sql_stmt || &#39;WHERE EMAIL &#x3D; :emp_val&#39;; 
+      valid_flag :&#x3D; TRUE; 
+    ELSE  
+      valid_flag :&#x3D; FALSE; 
+    END IF; 
+  END IF; 
+ 
+  IF valid_flag &#x3D; TRUE THEN 
+ 
+    EXECUTE IMMEDIATE sql_stmt 
+    USING emp_value; 
+ 
+    DBMS_OUTPUT.PUT_LINE(&#39;Employee has been deleted&#39;); 
+  ELSE 
+    DBMS_OUTPUT.PUT_LINE(&#39;No matching employee found, please try again&#39;); 
+  END IF; 
+ 
+END; </code></pre>
+<p>The procedure can be called by passing in either an EMPLOYEE_ID value or an EMAIL value. If a<br>matching employee record is found, then it will be deleted from the database table.<br><strong><strong>How It Works</strong></strong><br>Dynamic SQL can be used to execute DELETE statements as well. In the <strong>Solution</strong> to this recipe, a dynamic<br>SQL string is built that will remove an employee entry that contains a matching EMPLOYEE_ID or EMAIL<br>value that is passed into the procedure as a parameter. The parameter is checked to find out whether it is<br>a numeric or alphanumeric value by using a combination of the LENGTH, TRIM, and TRANSLATE functions. If<br>it is numeric, then it is assumed to be an EMPLOYEE_ID value, and the database is queried to see whether<br>there are any matches. If the parameter is found to be alphanumeric, then it is assumed to be an EMAIL<br>value, and the database is queried to see whether there are any matches. If matches are found in either<br>case, then a dynamic SQL string is built to DELETE the matching record from the database.<br>In this example, native dynamic SQL is used to perform the database operation. The DBMS_SQL<br>package can also be used to perform this task using the same techniques that were demonstrated in<br>Recipe 8-3. </p>
+<h2 id="8-6-Returning-Data-from-a-Dynamic-Query-into-a-Record"><a href="#8-6-Returning-Data-from-a-Dynamic-Query-into-a-Record" class="headerlink" title="8-6. Returning Data from a Dynamic Query into a Record"></a>8-6. Returning Data from a Dynamic Query into a Record</h2><p><strong><strong>Problem</strong></strong><br>You are writing a block of code that will need to use dynamic SQL to execute a query because the exact<br>SQL string is not known until runtime. The query needs to return the entire contents of the table row so<br>that all columns of data can be used. You want to return the columns into a record variable.<br><strong><strong>Solution</strong></strong><br>Create a native dynamic SQL query to accommodate the SQL string that is unknown until runtime. FETCH<br>the data using BULK COLLECT into a table of records. Our <strong>Solution</strong> example shows rows from the jobs table<br>being fetched into records, after which the individual record columns of data can be worked with. The<br>following code block demonstrates this technique: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE obtain_job_info(min_sal  NUMBER DEFAULT 0, 
+max_sal  NUMBER DEFAULT 0)
+AS 
+  sql_text      VARCHAR2(1000); 
+  TYPE job_tab IS TABLE OF jobs%ROWTYPE; 
+  job_list      job_tab; 
+  job_elem      jobs%ROWTYPE; 
+  max_sal_temp  NUMBER; 
+  filter_flag   BOOLEAN :&#x3D; FALSE; 
+  cursor_var    NUMBER; 
+  TYPE          cur_type IS REF CURSOR; 
+  cur           cur_type;
+BEGIN 
+  sql_text :&#x3D; &#39;SELECT * &#39; || 
+              &#39;FROM JOBS WHERE &#39; || 
+              &#39;min_salary &gt;&#x3D; :min_sal &#39; || 
+              &#39;and max_salary &lt;&#x3D; :max_sal&#39;; 
+   
+  IF max_sal &#x3D; 0 THEN 
+    SELECT max(max_salary) 
+    INTO max_sal_temp 
+    FROM JOBS; 
+  ELSE 
+    max_sal_temp :&#x3D; max_sal; 
+  END IF; 
+ 
+  OPEN cur FOR sql_text USING min_sal, max_sal_temp; 
+  FETCH cur BULK COLLECT INTO job_list; 
+  CLOSE cur; 
+ 
+  FOR i IN job_list.FIRST .. job_list.LAST LOOP 
+    DBMS_OUTPUT.PUT_LINE(job_list(i).job_id || &#39; - &#39; || job_list(i).job_title); 
+  END LOOP; 
+ 
+END; </code></pre>
+<p>As the salaries are obtained from the user input, they are used to determine how the bind variables<br>will be populated within the query. The SQL is then executed, and the results are traversed. Each record<br>is fetched and returned into a PL&#x2F;SQL table of job records using BULK_COLLECT, and then in turn, each<br>record is used to process the results. In this example, the data is simply printed out using<br>DBMS_OUTPUT.PUT_LINE, but any number of tasks could be completed with the data.<br><strong><strong>How It Works</strong></strong><br>Dynamic SQL can be processed in a number of ways. In this <strong>Solution</strong>, a record type is created by using<br>the %ROWTYPE attribute of the table that is being queried. In this case, the %ROWTYPE attribute of the JOBS<br>table is being used as a record. The data that is returned from performing a SELECT * on the JOBS table<br>will be stored within that record, and then it will be processed accordingly. The record is created using<br>the following syntax: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">record_name     table_name%ROWTYPE; </code></pre>
+<p>Using this format, the record_name is any name of your choice that complies with PL&#x2F;SQL’s naming<br>conventions. The table_name is the name of the table from which you will be gathering the data for each<br>column, and the %ROWTYPE attribute is a special table attribute that creates a record type.<br>To process each record, create a REF CURSOR using the dynamic SQL string and perform a BULK<br>COLLECT to fetch each row of data into a record in the table of JOBS records. The BULK COLLECT will load all<br>of the resulting records at once into a PL&#x2F;SQL collection object. Once all the data has been retrieved into<br>an object, it can be processed accordingly. The BULK COLLECT is much more efficient than fetching each<br>row from the table one-by-one using a LOOP construct. </p>
+<h2 id="8-7-Executing-a-Dynamic-Block-of-PL-x2F-SQL"><a href="#8-7-Executing-a-Dynamic-Block-of-PL-x2F-SQL" class="headerlink" title="8-7. Executing a Dynamic Block of PL&#x2F;SQL"></a>8-7. Executing a Dynamic Block of PL&#x2F;SQL</h2><p><strong><strong>Problem</strong></strong><br>You want to execute a specific stored procedure based upon events that occur within your application.<br>Therefore, you need to provide the ability for your application to execute procedures that are unknown<br>until runtime. In short, you want to execute PL&#x2F;SQL in the same dynamic manner as SQL. </p>
+<p><strong><strong>Solution</strong> #1</strong><br>Native dynamic SQL can be used to create and execute a block of code at runtime. This strategy can be<br>used to create a dynamic block of code that executes a given procedure when an event occurs. In this<br>example, a procedure is created that accepts an event identifier. An event handler within the application<br>can call upon this procedure passing an event identifier, and subsequently a procedure that can be<br>determined via the identifier will be invoked. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- Create first Procedure 
+CREATE OR REPLACE PROCEDURE TEST_PROCEDURE1 AS 
+BEGIN 
+  DBMS_OUTPUT.PUT_LINE(&#39;YOU HAVE EXECUTED PROCEDURE 1…&#39;); 
+END; 
+ 
+-- Create Second Procedure 
+CREATE OR REPLACE PROCEDURE TEST_PROCEDURE2 AS 
+BEGIN 
+  DBMS_OUTPUT.PUT_LINE(&#39;YOU HAVE EXECUTED PROCEDURE 2…&#39;); 
+END; 
+ 
+-- Create Event Handling Procedure 
+CREATE OR REPLACE PROCEDURE run_test(test_id  IN NUMBER DEFAULT 1) AS 
+  sql_text  VARCHAR2(200); 
+BEGIN 
+  sql_text :&#x3D; &#39;BEGIN &#39; || 
+              &#39;  TEST_PROCEDURE&#39; || test_id || &#39;; &#39; || 
+              &#39;END;&#39;; 
+ 
+  EXECUTE IMMEDIATE sql_text; 
+ 
+END; </code></pre>
+<p>When an event handler passes a given event number to this procedure, it dynamically creates a code<br>block that is used to execute that procedure, passing the parameters the procedure needs. This <strong>Solution</strong><br>provides the ultimate flexibility for creating an event handler within your applications. </p>
+<p><strong><strong>Solution</strong> #2</strong><br>DBMS_SQL can also be used to execute the same dynamic code. The following example demonstrates how<br>this is done. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE run_test(test_id  IN NUMBER DEFAULT 1) AS 
+  sql_text  VARCHAR2(200); 
+  cursor_var   NUMBER :&#x3D; DBMS_SQL.OPEN_CURSOR; 
+  rows       NUMBER; 
+BEGIN 
+  sql_text :&#x3D; &#39;BEGIN &#39; || 
+              &#39;  TEST_PROCEDURE&#39; || test_id || &#39;; &#39; || 
+              &#39;END;&#39;; 
+ 
+  DBMS_SQL.PARSE(cursor_var, sql_text, DBMS_SQL.NATIVE); 
+  rows :&#x3D; DBMS_SQL.EXECUTE(cursor_var); 
+  DBMS_SQL.CLOSE_CURSOR(cursor_var); 
+ 
+END;</code></pre>
+
+<p><strong><strong>How It Works</strong></strong><br>Native dynamic SQL allows processing of a SQL statement via the EXECUTE IMMEDIATE statement. This<br>can be used to the advantage of the application and provide the ability to create dynamic blocks of<br>executable code. By doing so, you can create an application that allows more flexibility, which can help<br>ensure that your code is more easily manageable.<br>In the <strong>Solution</strong> to this recipe, an unknown procedure name along with its parameters is<br>concatenated into a SQL string that forms a code block. This code block is then executed using the<br>EXECUTE IMMEDIATE statement.<br>Using native dynamic SQL, the array of parameters has to be manually processed to create the SQL<br>string and assign each of the array values to the USING clause of the EXECUTE IMMEDIATE statement. This<br>technique works quite well, but there is a different way to implement the same procedure.<br>As far as comparing native dynamic SQL and DBMS_SQL for dynamic code block execution, which<br>code is better? That is up to you to decide. If you are using native dynamic SQL for all other dynamic SQL<br>processing within your application, then it is probably a good idea to stick with it instead of mixing both<br>techniques. However, if you are working with some legacy code that perhaps includes a mixture of both<br>DBMS_SQL and native dynamic SQL, then you may prefer to write a dynamic code block using DBMS_SQL<br>just to save some time and processing. </p>
+<h2 id="8-8-Creating-a-Table-at-Runtime"><a href="#8-8-Creating-a-Table-at-Runtime" class="headerlink" title="8-8. Creating a Table at Runtime"></a>8-8. Creating a Table at Runtime</h2><p><strong><strong>Problem</strong></strong><br>Your application needs to have the ability to create tables based upon user input. The user has the ability<br>to add additional attributes to some of your application forms, and when this is done, a new attribute<br>table needs to be created to hold the information.<br><strong><strong>Solution</strong></strong><br>Create a table at runtime using native dynamic SQL. Write a procedure that accepts a table name as an<br>argument and then creates a SQL string including the DDL that is required for creating that table. The<br>table structure will be hard-coded since the structure for an attribute table will always be the same<br>within your application. The code that follows demonstrates this technique by creating a procedure<br>named CREATE_ATTR_TABLE that dynamically creates attribute tables. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE create_attr_table(table_name      VARCHAR2) AS 
+  BEGIN 
+    EXECUTE IMMEDIATE &#39;CREATE TABLE &#39; || table_name || 
+                                           &#39;(ATTRIBUTE_ID     NUMBER PRIMARY KEY, 
+                                             ATTRIBUTE_NAME   VARCHAR2(150) NOT NULL, 
+                                             ATTRIBUTE_VALUE  VARCHAR2(150))&#39;; 
+  END create_attr_table; </code></pre>
+<p>This procedure is invoked by the application whenever a user determines that additional attributes<br>are required for a particular application form. That form will then have its own attribute table created,<br>and the user can then provide additional fields&#x2F;attributes to customize the form as needed.<br><strong><strong>How It Works</strong></strong><br>Dynamic SQL can be used to create database objects at runtime. In this recipe, it is used to create tables.<br>Native dynamic SQL is used in this example, and the EXECUTE IMMEDIATE statement performs the work.<br>When creating a table at runtime, generate a string that contains the necessary SQL to create the object.<br>Once that task has been completed, issue the EXECUTE IMMEDIATE statement passing the generated SQL<br>string. The format to use along with the EXECUTE IMMEDIATE statement to create objects is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXECUTE IMMEDIATE SQL_string; </code></pre>
+<p>The SQL_string in this example is a dynamically created string that will create an object. In the case<br>of creating objects, the USING clause is not used because you cannot use bind variables for substituting<br>object names or attributes such as column names.<br>■ Please use care when concatenating user input variables with SQL text because the technique poses a security<br>concern. Specifically, you open the door to the much-dreaded SQL injection attack. Refer to Recipe 8-14 for more<br>details and for information on protecting yourself. </p>
+<h2 id="8-9-Altering-a-Table-at-Runtime"><a href="#8-9-Altering-a-Table-at-Runtime" class="headerlink" title="8-9. Altering a Table at Runtime"></a>8-9. Altering a Table at Runtime</h2><p><strong><strong>Problem</strong></strong><br>Your application provides the ability to add attributes to forms in order to store additional information.<br>You need to provide users with the ability to make those attribute fields larger or smaller based upon<br>their needs. </p>
+<p><strong><strong>Solution</strong></strong><br>Create a procedure that will provide the ability to alter tables at runtime using native dynamic SQL. The<br>procedure in this <strong>Solution</strong> will accept two parameters, those being the table name to be altered and the<br>column name along with new type declaration. The procedure assembles a SQL string using the<br>arguments provided by the user and then executes it using native dynamic SQL. The following code<br>demonstrates this <strong>Solution</strong>: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE modify_table(tab_name    VARCHAR2, 
+                                         tab_info    VARCHAR2) AS 
+                                         sql_text    VARCHAR2(1000); 
+BEGIN 
+  sql_text :&#x3D; &#39;ALTER TABLE &#39; || tab_name ||  
+              &#39; MODIFY &#39; || tab_info; 
+  DBMS_OUTPUT.PUT_LINE(sql_text); 
+  CHAPTER 8  DYNAMIC SQL 
+175 
+  EXECUTE IMMEDIATE sql_text; 
+  DBMS_OUTPUT.PUT_LINE(&#39;Table successfully altered…&#39;); 
+EXCEPTION 
+  WHEN OTHERS THEN 
+    DBMS_OUTPUT.PUT_LINE(‘An error has occurred, table not modified’); 
+END; </code></pre>
+<p>The procedure determines whether the user-defined data is valid. If so, then the EXECUTE IMMEDIATE<br>statement executes the SQL string that was formed. Otherwise, the user will see an alert displayed.<br><strong><strong>How It Works</strong></strong><br>Similar to creating objects at runtime, Oracle provides the ability to alter objects using dynamic SQL.<br>The same technique is used for constructing the SQL string as when creating an object, and that string is<br>eventually executed via the EXECUTE IMMEDIATE statement. The EXECUTE IMMEDIATE statement for altering<br>a table at runtime uses no clause, because it is not possible to use bind variables with an ALTER TABLE<br>statement. If you try to pass in bind variable values, then you will receive an Oracle error.<br>The following format should be used when issuing the EXECUTE IMMEDIATE statement for SQL text<br>containing an ALTER TABLE statement: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXECUTE IMMEDIATE alter_table_sql_string; </code></pre>
+<p>The most important thing to remember when issuing a DDL statement using dynamic SQL is that<br>you will need to concatenate all the strings and variables in order to formulate the final SQL string that<br>will be executed. Bind variables will not work for substituting table names or column names&#x2F;attributes.  </p>
+<h2 id="8-10-Finding-All-Tables-That-Include-a-Specific-Column-Value"><a href="#8-10-Finding-All-Tables-That-Include-a-Specific-Column-Value" class="headerlink" title="8-10. Finding All Tables That Include a Specific Column Value"></a>8-10. Finding All Tables That Include a Specific Column Value</h2><p><strong><strong>Problem</strong></strong><br>You are required to update all instances of a particular data column value across multiple tables within<br>your database.<br><strong><strong>Solution</strong></strong><br>Search all user tables for the particular column you are interested in finding. Create a cursor that will be<br>used to loop through all the results and execute a subsequent UPDATE statement in each iteration of the<br>loop. The UPDATE statement will update all matching column values for the table that is current for that<br>iteration of the cursor.<br>The following example shows how this technique can be performed. The procedure will be used to<br>change a manager ID when a department or job position changes management.  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE change_manager(current_manager_id NUMBER, 
+ 
+new_manager_id  NUMBER) 
+AS 
+ 
+cursor manager_tab_cur is 
+select table_name 
+from user_tab_columns 
+where column_name &#x3D; &#39;MANAGER_ID&#39; 
+and table_name not in (select view_name from user_views); 
+ 
+rec_count            number :&#x3D; 0; 
+ref_count            number :&#x3D; 0; 
+ 
+BEGIN 
+ 
+   -- Print out the tables which will be updated 
+ 
+   DBMS_OUTPUT.PUT_LINE(&#39;Tables referencing the selected MANAGER ID#:&#39; || 
+ current_manager_id); 
+ 
+   FOR manager_rec IN manager_tab_cur LOOP 
+      EXECUTE IMMEDIATE &#39;select count(*) total &#39; || 
+                        &#39;from &#39; || manager_rec.table_name || 
+                        &#39; where manager_id &#x3D; :manager_id_num&#39; 
+      INTO rec_count 
+      USING current_manager_id; 
+ 
+      if rec_count &gt; 0 then 
+                   DBMS_OUTPUT.PUT_LINE(manager_rec.table_name || &#39;: &#39; || rec_count); 
+                   ref_count :&#x3D; ref_count + 1; 
+      end if; 
+ 
+      rec_count :&#x3D; 0; 
+ 
+   END LOOP; 
+ 
+   if ref_count &gt; 0 then 
+      DBMS_OUTPUT.PUT_LINE(&#39;Manager is referenced in &#39; || ref_count || &#39; tables.&#39;); 
+      DBMS_OUTPUT.PUT_LINE(&#39;...Now Changing the Manager Identifier...&#39;); 
+   end if; 
+ 
+   -- Perform the actual table updates 
+ 
+   FOR manager_rec IN manager_tab_cur LOOP 
+      EXECUTE IMMEDIATE &#39;select count(*) total &#39; || 
+                                                  &#39;from &#39; || manager_rec.table_name || 
+                                                  &#39; where manager_id &#x3D; :manager_id_num&#39; 
+      INTO rec_count 
+      USING current_manager_id; 
+ 
+      if rec_count &gt; 0 then 
+ 
+         EXECUTE IMMEDIATE &#39;update &#39; || manager_rec.table_name || &#39; &#39; || 
+                                                     &#39;set manager_id &#x3D; :new_manager_id &#39; || 
+                                                     &#39;where manager_id &#x3D; :old_manager_id&#39; 
+         USING new_manager_id, current_manager_id; 
+ 
+      end if; 
+ 
+      rec_count :&#x3D; 0; 
+ 
+   END LOOP; 
+ 
+   -- Print out the tables which still reference the manager number. 
+ 
+   FOR manager_rec IN manager_tab_cur LOOP 
+      EXECUTE IMMEDIATE &#39;select count(*) total &#39; || 
+                        &#39;from &#39; || manager_rec.table_name || 
+                        &#39; where manager_id &#x3D; :manager_id&#39; 
+      INTO rec_count 
+      USING current_manager_id; 
+ 
+      if rec_count &gt; 0 then 
+                   DBMS_OUTPUT.PUT_LINE(manager_rec.table_name || &#39;: &#39; || rec_count); 
+                   ref_count :&#x3D; ref_count + 1; 
+      end if; 
+ 
+      rec_count :&#x3D; 0; 
+ 
+   END LOOP; 
+ 
+   if ref_count &gt; 0 then 
+      DBMS_OUTPUT.PUT_LINE(&#39;Manager #: &#39; || current_manager_id  
+                           || &#39; is now referenced in &#39; || 
+                       ref_count || &#39; tables.&#39;); 
+      DBMS_OUTPUT.PUT_LINE(&#39;...There should be no tables listed above...&#39;); 
+   end if; 
+ 
+end; </code></pre>
+<p>Since MANAGER_ID depends upon a corresponding MANAGER_ID within the DEPARTMENTS table, you must<br>first ensure that the MANAGER_ID that you want to change to is designated to a department within that<br>table. In the following scenario, a manager is added to a department that does not have a manager.<br>Afterward, the manager with ID of 205 is swapped for the newly populated manager. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; update departments 
+  2  set manager_id &#x3D; 241 
+  3  where department_id &#x3D; 270; 
+ 
+1 row updated. 
+
+SQL&gt; exec change_manager(205, 241); 
+Tables referencing the selected MANAGER ID#:205 
+DEPARTMENTS: 1 
+EMP: 1 
+EMPLOYEES: 1 
+Manager is referenced in 3 tables. 
+...Now Changing the Manager Identifier... 
+Manager #: 205 is now referenced in 3 tables. 
+...There should be no tables listed above... 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p>■ Note If you attempt to swap a manager with one that is not associated with a department, then you will receive<br>a foreign key error. This same concept holds true in the real world—ensure that constraints are reviewed before<br>applying this technique.<br>If management decides to change a manager for a particular department, then this procedure will<br>be called. The caller will pass in the old manager’s ID number and the new manager’s ID number. This<br>procedure will then query all tables within the current schema for a matching current manager ID and<br>update it to reflect the new ID number. </p>
+<p><strong><strong>How It Works</strong></strong><br>To determine all instances of a specific column or database field, you must search all database tables for<br>that column name. Of course, this assumes that the database was created using the same name for the<br>same column in each different table. If columns containing the same data are named differently across<br>tables, then this recipe’s technique will not work.<br>■ Note Although most relational databases are set up with efficiency in mind and only populate data for a specific<br>field value into one database table column, there are some legacy databases that still use the same fields across<br>more than one table.<br>As the <strong>Solution</strong> to this recipe entails, assume that a column name is coded into the procedure, and<br>all tables will then be searched to find out whether that column exists. You can perform the search using<br>the built-in USER_TAB_COLUMNS data dictionary view. This view is comprised of column information for all<br>the tables within a particular schema. Querying any Oracle view that is prefixed with USER_ indicates that<br>the view pertains to data contained within the current user’s schema only. Querying the<br>USER_TAB_COLUMNS view allows a table name and column name to be specified. In this case, since you<br>need to find all tables that contain a specific column, query the USER_TAB_COLUMNS view to return all<br>instances of TABLE_NAME where COLUMN_NAME is equal to the name that is passed into the procedure. This<br>query should be defined as a cursor variable so that it can be parsed via a FOR loop in the code block.<br>■ Warning Be sure to exclude views from this process, or you may receive an error from attempting to update a<br>value that is contained within a view if it is not an updatable view.<br>Now that the cursor is ready to parse all table names that contain a matching column, it is time to<br>loop through the cursor and query each table that contains that column for a matching value. A user<br>passes two values into the procedure: current manager ID and new manager ID. In the Solution to this<br>recipe, each table that contains a matching column is queried so that you can see how many matches<br>were found prior to the updates taking place. A counter is used to tally the number of matches found<br>throughout the tables. Next, looping through the cursor again performs the actual updates. This time,<br>the tables are each queried to find matches again, but when a match is found, then that table will be<br>updated so that the value is changed from the old value to the new value.<br>Lastly, the cursor is parsed again, and each table is queried to find existing matches once again. This<br>last loop is done for consistency and to ensure that all matches have been found and updated to the<br>current value. If any matches are found during this last loop, then all changes should be rolled back, and<br>the changes should be manually processed instead.<br>This procedure can be updated to work with any column value change that may be needed. The<br>code can also be shortened significantly if you do not want to perform verifications prior to and after<br>performing an update.  </p>
+<h2 id="8-11-Storing-Dynamic-SQL-in-Large-Objects"><a href="#8-11-Storing-Dynamic-SQL-in-Large-Objects" class="headerlink" title="8-11 Storing Dynamic SQL in Large Objects"></a>8-11 Storing Dynamic SQL in Large Objects</h2><p><strong><strong>Problem</strong></strong><br>The SQL code that you need to assemble at runtime is likely to exceed the 32KB limit that is bound to<br>VARCHAR2 types. You need to be able to store dynamic SQL text in a type that will allow more for a large<br>amount of text.<br><strong><strong>Solution</strong> #1</strong><br>Declare a CLOB variable, and store your SQL string within it. After the CLOB has been created, execute the<br>SQL. This can be done using either native dynamic SQL or the DBMS_SQL package. For the example,<br>assume that a block of text is being read from an external file, and it will be passed to a procedure to be<br>processed. That text will be the SQL string that will be dynamically processed within the procedure.<br>Since the external text file can be virtually any size, this text must be read into a CLOB data type and then<br>passed to the procedure in this example for processing. The following procedure processes the CLOB as<br>dynamic SQL.<br>The first example demonstrates the parsing and execution of a dynamic SQL statement that has<br>been stored in a CLOB using the DBMS_SQL package. Note that this procedure does not return any value, so<br>it is not meant for issuing queries but rather for executing code. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE execute_clob(sql_text CLOB) AS 
+  sql_string    CLOB; 
+  cur_var       BINARY_INTEGER; 
+  ret_var       INTEGER; 
+  return_value  VARCHAR2(100); 
+BEGIN 
+  sql_string :&#x3D; sql_text; 
+  cur_var :&#x3D; DBMS_SQL.OPEN_CURSOR; 
+  DBMS_SQL.PARSE(cur_var, sql_string, DBMS_SQL.NATIVE); 
+  ret_var :&#x3D; DBMS_SQL.EXECUTE(cur_var); 
+  DBMS_SQL.CLOSE_CURSOR(cur_var); 
+END; </code></pre>
+<p><strong><strong>Solution</strong> #2</strong><br>The second example is the same procedure written to use native dynamic SQL. You will notice that the<br>code is a bit shorter, and there is less work that needs to be done in order to complete the same<br>transaction.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE execute_clob_nds(sql_text    IN CLOB) AS 
+  sql_string    CLOB; 
+BEGIN 
+  sql_string :&#x3D; sql_text; 
+  EXECUTE IMMEDIATE sql_string;
+END;</code></pre>
+<p>As noted previously, the native dynamic SQL is easier to follow and takes less code to implement.<br>For the sake of maintaining a current code base, use of native dynamic SQL would be encouraged.<br>However, DBMS_SQL is still available and offers different options as mentioned in the first recipes in this<br>chapter.<br><strong><strong>How It Works</strong></strong><br>Oracle added some new features for working with dynamic SQL into the Oracle Database 11g release.<br>Providing the ability to store dynamic SQL into a CLOB is certainly a useful addition. Prior to Oracle<br>Database 11g, the only way to dynamically process a string that was larger than 32KB was to concatenate<br>two VARCHAR types that were at or near 32KB in size. The largest string that could be processed by native<br>dynamic SQL was 64KB. With the release of Oracle Database 11g, the CLOB (character large object) can be<br>used in such cases, mitigating the need to concatenate two different variables to form the complete SQL.<br>Using DBMS_SQL and its PARSE function, SQL that is stored within a CLOB can be easily processed. The<br>following lines of code are the lines from the first <strong>Solution</strong> that read and process the CLOB: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">cur_var :&#x3D; DBMS_SQL.OPEN_CURSOR;
+DBMS_SQL.PARSE(cur_var, v_sql, DBMS_SQL.NATIVE);
+ret_var :&#x3D; DBMS_SQL.EXECUTE(cur_var);
+DBMS_SQL.CLOSE_CURSOR(cur_var); </code></pre>
+<p>The first line opens a new cursor using DBMS_SQL.OPEN_CURSOR. It assigns an integer to the cur_var<br>variable, which is then passed to the DBMS_SQL.PARSE procedure. DBMS_SQL.PARSE also accepts the SQL<br>CLOB and a constant DBMS_SQL.NATIVE that helps discern the dialect that should be used to process the<br>SQL. The dialect is also referred to as the language_flag, and it is used to determine how Oracle will<br>process the SQL statement. Possible values include V6 for version 6 behavior, V7 for Oracle database 7<br>behavior, and NATIVE to specify normal behavior for the database to which the program is connected.<br>After the SQL has been parsed, it can be executed using the DBMS_SQL.EXECUTE function. This function<br>will accept the cursor variable as input and execute the SQL. A code of 0 is returned if the SQL is<br>executed successfully. Lastly, remember to close the cursor using DBMS_SQL.CLOSE_CURSOR and passing<br>the cursor variable to it.<br>The example in <strong>Solution</strong> #2 of this recipe demonstrates the use of native dynamic SQL for execution<br>of dynamic SQL text that is stored within a CLOB. Essentially no differences exist between the execution of<br>SQL text stored in a VARCHAR data type as opposed to SQL text stored within a CLOB for native dynamic<br>SQL. The code is short and precise, and it is easy to read. </p>
+<h2 id="8-12-Passing-NULL-Values-to-Dynamic-SQL"><a href="#8-12-Passing-NULL-Values-to-Dynamic-SQL" class="headerlink" title="8-12. Passing NULL Values to Dynamic SQL"></a>8-12. Passing NULL Values to Dynamic SQL</h2><p><strong><strong>Problem</strong></strong><br>You want to pass a NULL value to a dynamic query that you are using. For example, you want to query the<br>EMPLOYEES table for all records that have a NULL MANAGER_ID value. </p>
+<p><strong><strong>Solution</strong></strong><br>Create an uninitialized variable, and place it into the USING clause. In this example, a dynamic query is<br>written and executed using native dynamic SQL. The dynamic query will retrieve all employees who do<br>not currently have a manager assigned to their record. To retrieve the records that are required, the<br>WHERE clause needs to filter the selection so that only records containing a NULL MANAGER_ID value are<br>returned. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  TYPE cur_type IS REF CURSOR; 
+  cur                cur_type; 
+  null_value         CHAR(1); 
+  sql_string         VARCHAR2(150); 
+  emp_rec            employees%ROWTYPE; 
+BEGIN 
+  sql_string :&#x3D; &#39;SELECT * &#39; || 
+                    &#39;FROM EMPLOYEES &#39; || 
+                    &#39;WHERE MANAGER_ID IS :null_val&#39;; 
+ 
+  OPEN cur FOR sql_string USING null_value; 
+  LOOP 
+    FETCH cur INTO emp_rec; 
+    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; || emp_rec.last_name ||  
+                                                        &#39; - &#39; || emp_rec.email); 
+    EXIT WHEN cur%NOTFOUND; 
+  END LOOP; 
+  CLOSE cur; 
+ END; </code></pre>
+<p>In this <strong>Solution</strong>, the bind variable :null_val has an uninitialized variable value substituted in its<br>place. This will cause the query to evaluate the bind variable as a NULL value. All records that reside<br>within the EMPLOYEES table and do not have a MANAGER_ID assigned to them should be printed by the<br>DBMS_OUTPUT package. </p>
+<p><strong><strong>How It Works</strong></strong><br>It is not possible to simply pass a NULL value using native dynamic SQL. At least, you cannot pass a NULL<br>as a literal. However, oftentimes it is useful to initialize a bind variable to null.<br>An uninitialized variable in PL&#x2F;SQL inherently has the value of NULL. Hence, if you do not initialize a<br>variable, then it will contain a NULL value. Passing an uninitialized variable via the EXECUTE IMMEDIATE<br>statement will have the same effect as substituting a NULL value for a bind variable. </p>
+<h2 id="8-13-Switching-Between-DBMS-SQL-and-Native-Dynamic-SQL"><a href="#8-13-Switching-Between-DBMS-SQL-and-Native-Dynamic-SQL" class="headerlink" title="8-13. Switching Between DBMS_SQL and Native Dynamic SQL"></a>8-13. Switching Between DBMS_SQL and Native Dynamic SQL</h2><p><strong><strong>Problem</strong></strong><br>Your consulting company is currently migrating all its applications from using DBMS_SQL to native<br>dynamic SQL. To help ensure that the migration can be done piecemeal, you want to provide the ability<br>to switch between the two different techniques so that legacy code can coexist with the newer native<br>dynamic SQL. </p>
+<p><strong><strong>Solution</strong></strong><br>When you need both the DBMS_SQL package and native dynamic SQL, you can switch between them using<br>the DBMS_SQL.TO_REFCURSOR and DBMS_SQL.TO_CURSOR_NUMBER APIs. The DBMS_SQL.TO_REFCURSOR API<br>provides the ability to execute dynamic SQL using the DBMS_SQL package and then convert the DBMS_SQL<br>cursor to a REF CURSOR. The DBMS_SQL.TO_CURSOR_NUMBER API allows for executing dynamic SQL via a REF<br>CURSOR and then converting to DBMS_SQL for data retrieval.<br>The following example illustrates the usage of DBMS_SQL.TO_REFCURSOR. In the example, a simple<br>dynamic query is being executed using DBMS_SQL, and the cursor is then being converted to a REF CURSOR. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  sql_string           CLOB; 
+  cur_var              BINARY_INTEGER :&#x3D; DBMS_SQL.OPEN_CURSOR; 
+  ref_cur              SYS_REFCURSOR; 
+  return_value         BINARY_INTEGER; 
+  cur_rec              jobs%ROWTYPE; 
+  salary               NUMBER :&#x3D; &amp;salary; 
+BEGIN 
+  -- Formulate query 
+  sql_string :&#x3D; &#39;SELECT * FROM JOBS &#39; || 
+                      &#39;WHERE MAX_SALARY &gt;&#x3D; :sal&#39;; 
+  -- Parse SQL 
+  DBMS_SQL.PARSE(cur_var, sql_string, DBMS_SQL.NATIVE); 
+ 
+  -- Bind variable(s) 
+  DBMS_SQL.BIND_VARIABLE(cur_var, &#39;sal&#39;, salary); 
+   
+  -- Execute query and convert to REF CURSOR 
+ 
+  return_value :&#x3D; DBMS_SQL.EXECUTE(cur_var); 
+  ref_cur :&#x3D; DBMS_SQL.TO_REFCURSOR(cur_var); 
+  DBMS_OUTPUT.PUT_LINE(&#39;Jobs that have a maximum salary over &#39; || salary); 
+  LOOP 
+    FETCH ref_cur INTO cur_rec; 
+    DBMS_OUTPUT.PUT_LINE(cur_rec.job_id || &#39; - &#39; || cur_rec.job_title); 
+    EXIT WHEN ref_cur%NOTFOUND; 
+  END LOOP; 
+ 
+  CLOSE ref_cur; 
+ 
+END; </code></pre>
+<p>The example prompts for the entry of a maximum salary via the :sal bind variable and the SQL*Plus<br>&amp;salary substitution variable. The DBMS_SQL API then binds the maximum salary that was entered to the<br>dynamic SQL string and executes the query to find all jobs that have a maximum salary greater than the<br>amount that was entered. Once the query is executed, the cursor is converted to a REF CURSOR using the<br>DBMS_SQL.TO_REFCURSOR API. Native dynamic SQL is then used to process the results of the query. As you<br>can see, the native dynamic SQL is much easier to read and process. The advantage of converting to a<br>REF CURSOR is to have the ability to easily process code using native dynamic SQL but still have some of<br>the advantages of using DBMS_SQL for querying the data. For instance, if the number of bind variables was<br>unknown until runtime, then DBMS_SQL would be required.<br>A similar technique can be used if DBMS_SQL is required to process the results of a query. The<br>DBMS_SQL.TO_CURSOR_NUMBER API provides the ability to convert a cursor from a REF CURSOR to DBMS_SQL.<br>The following example shows the same query on the JOBS table, but this time native dynamic SQL is used<br>to set up the query and execute it, and DBMS_SQL is used to describe the table structure. One of the nice<br>features of the DBMS_SQL API is that it is possible to describe the columns of a query that will be returned. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  sql_string         CLOB; 
+  ref_cur            SYS_REFCURSOR; 
+  cursor_var         BINARY_INTEGER; 
+  cols_var           BINARY_INTEGER; 
+  desc_var           DBMS_SQL.DESC_TAB; 
+  v_job_id           NUMBER; 
+  v_job_title        VARCHAR2(25); 
+  salary             NUMBER(6) :&#x3D; &amp;salary; 
+  return_val         NUMBER; 
+ 
+BEGIN 
+  -- Formulate query 
+  sql_string :&#x3D; &#39;SELECT * FROM JOBS &#39; || 
+                          &#39;WHERE MAX_SALARY &gt;&#x3D; :sal&#39;; 
+  -- Open REF CURSOR 
+  OPEN ref_cur FOR sql_string USING salary; 
+   
+  cursor_var :&#x3D; DBMS_SQL.TO_CURSOR_NUMBER(ref_cur); 
+  DBMS_SQL.DESCRIBE_COLUMNS(cursor_var, cols_var, desc_var); 
+  DBMS_SQL.CLOSE_CURSOR(cursor_var); 
+   
+  FOR x IN 1 .. cols_var LOOP 
+    DBMS_OUTPUT.PUT_LINE(desc_var(x).col_name || &#39; - &#39; || 
+                           CASE desc_var(x).col_type 
+                                      WHEN 1 THEN &#39;VARCHAR2&#39; 
+                                      WHEN 2 THEN &#39;NUMBER&#39; 
+                           ELSE &#39;OTHER&#39; 
+                           END); 
+  END LOOP; 
+END; </code></pre>
+<p>Each of these techniques has their place within the world of PL&#x2F;SQL programming. Using this type<br>of conversion is especially useful for enabling your application to use the features DBMS_SQL has to offer<br>without compromising the ease and structure of native dynamic SQL. </p>
+<p><strong><strong>How It Works</strong></strong><br>Oracle Database 11g added some new capabilities to dynamic SQL. One of those new features is the<br>ability to convert between native dynamic SQL and DBMS_SQL. DBMS_SQL provides some functionality that<br>is not offered by the newer and easier native dynamic SQL API. Now that Oracle Database 11g provides<br>the ability to make use of native dynamic SQL but still gain the advantages of using DBMS_SQL, Oracle<br>dynamic SQL is much more complete.<br>The DBMS_SQL.TO_REFCURSOR API is used to convert SQL that is using DBMS_SQL into a REF CURSOR,<br>which allows you to work with the resulting records using native dynamic SQL. To convert SQL to a REF<br>CURSOR, you will use DBMS_SQL to parse the SQL, bind any variables, and finally to execute it. Afterward,<br>you call DBMS_SQL.TO_REFCURSOR and pass the original DBMS_SQL cursor as an argument. This will return a<br>REF CURSOR that can be used to work with the results from the query. The statement that performs the<br>conversion contains DBMS_SQL.EXECUTE. The EXECUTE function accepts a DBMS_SQL cursor as an argument.<br>As a result, a REF CURSOR is returned, and it can be used to work with the results from the dynamic query.<br>Conversely, DBMS_SQL.TO_CURSOR_NUMBER can be used to convert a REF CURSOR into a DBMS_SQL cursor.<br>You may choose to do this in order to use some additional functionality that DBMS_SQL has to offer such<br>as the ability to DESCRIBE an object (DESCRIBE is a SQL*Plus feature). As you can see in the second<br>example, native dynamic SQL is used to open the REF CURSOR and bind the variable to the SQL. Once this<br>has been completed, the cursor is converted to DBMS_SQL using DBMS_SQL.TO_CURSOR_NUMBER and passing<br>the REF CURSOR. After this conversion is complete, you can utilize the DBMS_SQL API to work with the<br>resulting cursor.</p>
+<h2 id="8-14-Guarding-Against-SQL-Injection-Attacks"><a href="#8-14-Guarding-Against-SQL-Injection-Attacks" class="headerlink" title="8-14. Guarding Against SQL Injection Attacks"></a>8-14. Guarding Against SQL Injection Attacks</h2><p><strong><strong>Problem</strong></strong><br>To provide the best security for your application, you want to ensure that your dynamic SQL statements<br>are unable to be altered as a result of data entered from an application form. </p>
+<p><strong><strong>Solution</strong></strong><br>Take care to provide security against SQL injection attacks by validating user input prior and using it in<br>your dynamic SQL statements or queries. The easiest way to ensure that there are no malicious<br>injections into your SQL is to make use of bind variables.<br>The following code is an example of a PL&#x2F;SQL procedure that is vulnerable to SQL injection because<br>it concatenates a variable that is populated with user input and does not properly validate the input<br>prior: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE check_password(username IN VARCHAR2) AS 
+  sql_stmt    VARCHAR2(1000); 
+  password    VARCHAR2(30); 
+BEGIN 
+ sql_stmt :&#x3D; &#39;SELECT password &#39; || 
+                       &#39;FROM user_records &#39; || 
+                       &#39;WHERE username &#x3D; &#39;&#39;&#39; || username || &#39;&#39;&#39;; 
+  EXECUTE sql_stmt 
+  INTO password; 
+ 
+  -- PROCESS PASSWORD 
+END; 
+  CHAPTER 8  DYNAMIC SQL 
+185 
+ 
+To properly code this example to guard against SQL injection, use bind variables. The following is 
+the same procedure that has been rewritten to make it invulnerable to SQL injection: 
+ 
+CREATE OR REPLACE PROCEDURE check_password(username IN VARCHAR2) AS 
+  sql_stmt    VARCHAR2(1000); 
+  password    VARCHAR2(30); 
+BEGIN 
+  sql_stmt :&#x3D; &#39;SELECT password &#39; || 
+              &#39;FROM user_records &#39; || 
+              &#39;WHERE username &#x3D; :username&#39;; 
+ 
+  EXECUTE sql_stmt 
+  INTO password 
+  USING username; 
+ 
+  -- PROCESS PASSWORD 
+END; </code></pre>
+<p>Making just a couple of minor changes can significantly increase the security against SQL injection<br>attacks.<br>** <strong>How It Works</strong>**<br>SQL injection attacks can occur when data that is accepted as input from an application form is<br>concatenated into dynamic SQL queries or statements without proper validation. SQL injection is a form<br>of malicious database attack that is caused by a user placing some code or escape characters into a form<br>field so that the underlying application SQL query or statement becomes affected in an undesirable<br>manner. In the <strong>Solution</strong> to this recipe, all passwords stored in the USER_RECORDS table could be<br>compromised if a malicious user were to place a line of text similar to the following into the form field<br>for the USERNAME: </p>
+<p>‘WHATEVER ‘’ OR username is NOT NULL–’ </p>
+<p>The strange-looking text that you see here can cause major issues because it essentially changes the<br>query to read as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT password 
+FROM user_records 
+WHERE username &#x3D; &#39;WHATEVER &#39; OR username is NOT NULL; </code></pre>
+<p>Bind variables can be used to guard against SQL injection attacks, because their contents are not<br>interpreted at all by Oracle. The value of a bind variable is never parsed as part of the string containing<br>the SQL query or statement to be executed. Thus, the use of bind variables provides absolute protection<br>against SQL injection attacks.<br>Another way to safeguard your code against SQL injection attacks is to validate user input to ensure<br>that it is not malicious. Only valid input should be used within a statement or query.<br>There are ways to validate user input depending upon the type of input you are receiving. For<br>instance, to verify the integrity of user input, you can use regular expressions. If you are expecting to<br>receive an e-mail address from a user input field, then the value that is passed into your code should be<br>verified to ensure that it is in proper format of an e-mail address. Here’s an example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">IF owa_pattern.match(email_variable,&#39;^\w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\w&#123;1,&#125;&#39; || 
+           &#39;[.,0-9,a-z,A-Z,_]\w&#123;1,&#125;&#39;|| 
+           &#39;@\w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\&#39; || 
+           &#39;w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\w&#123;1,&#125;[.,0-9,a-z,A-Z,_]\w&#123;1,&#125;$&#39;) then 
+  -- Perform valid transaction 
+ELSE 
+  -- Raise an error message </code></pre>
+<p>It is imperative that you do not allow users of your applications to see the Oracle error codes that are<br>returned by an error. Use proper exception handling (covered in Chapter 9) to ensure that you are<br>catching any possible exceptions and returning a vaguely descriptive error message to the user. It is not<br>wise to allow Oracle errors or detailed error messages to be displayed because they will most likely<br>provide a malicious user with valuable information for attacking your database.<br>Using bind variables, validating user input, and displaying user-friendly and appropriate error<br>messages can help ensure that your database is not attacked. It is never an enjoyable experience to<br>explain to your users that all usernames and passwords were compromised. Time is much better spent<br>securing your code than going back to clean up after a malicious attack. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"
+                    data-tooltip="Oracle PLSQL Recipes 09-Exceptions"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 09-Exceptions"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_07/"
+                    data-tooltip="Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                    aria-label="NEXT: Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"
+                    data-tooltip="Oracle PLSQL Recipes 09-Exceptions"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 09-Exceptions"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_07/"
+                    data-tooltip="Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                    aria-label="NEXT: Oracle PLSQL Recipes 07-Numbers, Strings, and Dates"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_08/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,992 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 11-Automating Routine Tasks - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n\n11. Automating Routine TasksOracle provides methods to schedule one-time and recurring jobs within the database, which isbeneficial when you want to automate repetitive tasks and run them at times when a DBA may not beavailable. This chapter provides recipes to help you get started scheduling jobs (especially PL&#x2F;SQL jobs),capturing output, sending e-mail notifications, and keeping data in sync with other databases. \n11-1. Scheduling Recurring JobsProblemYou want to schedule a PL&#x2F;SQL procedure to run at a fixed time or at fixed intervals.SolutionUse the EXEC DBMS_SCHEDULER.CREATE_JOB procedure to create and schedule one-time jobs and jobs thatrun on a recurring schedule. Suppose, for example, that you need to run a stored procedure namedcalc_commissions every night at 2:30 a.m. to calculate commissions based on the employees’ salaries.Normally, commissions would be based on sales, but the default HR schema doesn’t provide that table,so we’ll use an alternate calculation for demonstration purposes: \nEXEC DBMS_SCHEDULER.CREATE_JOB (               - \n           JOB_NAME&#x3D;&gt;&#39;nighly_commissions&#39;,     - \n           JOB_TYPE&#x3D;&gt;&#39;STORED_PROCEDURE&#39;,       - \n         JOB_ACTION&#x3D;&gt;&#39;calc_commisions&#39;,        - \n            ENABLED&#x3D;&gt;TRUE,                     - \n    REPEAT_INTERVAL&#x3D;&gt;&#39;FREQ&#x3D;DAILY;INTERVAL&#x3D;1;BYHOUR&#x3D;02;BYMINUTE&#x3D;30&#39;);\n\nHow It WorksThe DBMS_SCHEDULER.CREATE_JOB procedure sets up a nightly batch job. JOB_NAME must be unique. TheJOB_TYPE, in this example, is STORED_PROCEDURE. This informs the scheduler the job is a PL&#x2F;SQL procedurestored in the database. In addition to scheduling a stored procedure, the scheduler can also execute aPL&#x2F;SQL_BLOCK, an external EXECUTABLE program, or a job CHAIN. See Recipe 11-6 for an example onscheduling job chains.The JOB_ACTION identifies the stored procedure to run. If the procedure is owned by anotherschema, then include the schema name, for example, HR.calc_commission. If the procedure is part of alarger package, include that as well, for example, HR.my_package.calc_commission.ENABLED is set to TRUE to tell the scheduler to run at the next scheduled time. By default, the ENABLEDparameter is FALSE and would require a call to the DBMS_SCHEDULER.ENABLE procedure to enable the job.The REPEAT_INTERVAL is an important part of the CREATE_JOB routine. It identifies the frequency, inthis case DAILY. The INTERVAL tells scheduler to run the job every day, as opposed to 2 or 3, which wouldrun every other day, or every third day. The BYHOUR and BYMINUTE sections specifies the exact time of theday to run. In this example, the job will run at 2:30 a.m.The scheduled job, nightly_commissions, runs the stored procedure calc_commission, which readsthe data, calculates the commission, and stores the commission records. Running this job nightly keepsthe employees’ commission data current with respect to daily sales figures. \n11-2. E-mailing Output from a Scheduled JobProblemYou have a scheduled job that runs a stored procedure at a regular interval. The procedure producesoutput that ordinarily would be sent to the screen via the DBMS_OUTPUT.PUT_LINE procedure, but since itruns as a nightly batch job, you want to send the output to a distribution list as an e-mail message.SolutionSave the output in a CLOB variable and then send it to the target distribution list using theUTL_MAIL.SEND procedure. For example, suppose you want to audit the employee table periodically tofind all employees who have not been assigned to a department within the company. Here’s a procedureto do that: \nCREATE OR REPLACE PROCEDURE employee_audit AS \n \nCURSOR    driver IS    -- find all employees not in a department \nSELECT    employee_id, first_name, last_name \nFROM      employees \nWHERE     department_id is null \nORDER BY  last_name, first_name; \n \nbuffer        CLOB :&#x3D; null; -- the e-mail message \n \nBEGIN \n \n   FOR rec IN driver LOOP    -- generate the e-mail message \n      buffer :&#x3D; buffer  || \n        rec.employee_id || &#39; &#39;  || \n        rec.last_name   || &#39;, &#39; || \n        rec.first_name  || chr(10); \n   END LOOP; \n \n--    Send the e-mail \n   IF buffer is not null THEN -- there are employees without a department \n      buffer :&#x3D; &#39;Employees with no Department&#39; || CHR(10) || CHR(10) || buffer; \n \n      UTL_MAIL.SEND ( \n              SENDER&#x3D;&gt;&#39;someone@mycompany.com&#39;, \n          RECIPIENTS&#x3D;&gt;&#39;audit_list@mycompany.com&#39;, \n             SUBJECT&#x3D;&gt;&#39;Employee Audit Results&#39;, \n             MESSAGE&#x3D;&gt;buffer); \n   END IF; \n \nEND;\nHow It WorksThe procedure is very straightforward in that it finds all employees with no department. When run as ascheduled job, calls to DBMS_OUTPUT.PUT_LINE won’t work because there is no “screen” to view the output.Instead, the output is collected in a CLOB variable to later use in the UTL_MAIL.SEND procedure. The key toremember in this recipe is there is no screen output from a stored procedure while running as ascheduled job. You must store the intended output and either write it to an operating system file or, as inthis example, send it to users in an e-mail. \n11-3. Using E-mail for Job Status NotificationProblemYou have a scheduled job that is running on a regular basis, and you need to know whether the job failsfor any reason.SolutionUse the ADD_JOB_EMAIL_NOTIFICATION procedure to set up an e-mail notification that sends an e-mailwhen the job fails to run successfully. Note, this Solution builds on Recipe 11-1 where a nightly batch jobwas set up to calculate commissions. \nEXEC DBMS_SCHEDULER.ADD_JOB_EMAIL_NOTIFICATION (    - \n      JOB_NAME&#x3D;&gt;&#39;nightly_commissions&#39;, - \n    RECIPIENTS&#x3D;&gt; &#39;me@my_company.com,dist_list@my_company.com&#39;); \nHow It WorksThe previous recipe is the simplest example of automating e-mail in the event a job fails. TheADD_JOB_EMAIL_NOTIFICATION procedure accepts several parameters; however, the only requiredparameters are JOB_NAME and RECIPIENTS. The JOB_NAME must already exist from a previous call to theCREATE_JOB procedure (see Recipe 11-1 for an example). The RECIPIENTS is a comma-separated list of e-mail addresses to receive e-mail when an event occurs; by default the events that trigger an e-mail areJOB_FAILED, JOB_BROKEN, JOB_SCH_LIM_REACHED, JOB_CHAIN_STALLED, and JOB_OVER_MAX_DUR. Additionalevent parameters are JOB_ALL_EVENTS, JOB_COMPLETED, JOB_DISABLED, JOB_RUN_COMPLETED, JOB_STARTED,JOB_STOPPED, AND JOB_SUCCEEDED.The full format of the ADD_JOB_EMAIL_NOTIFICATION procedure accepts additional parameters, butthe default for each is sufficient to keep tabs on the running jobs. The body of the e-mail will return theerror messages required to debug the issue that caused the job to fail.To demonstrate the notification process, the commissions table was dropped after the job was setup to run. The database produced an e-mail with the following subject and body: \nSUBJECT: Oracle Scheduler Job Notification - HR.NIGHTLY_COMMISSIONS JOB_FAILEDBODY:Job: JYTHON.NIGHTLY_COMMISSIONSEvent: JOB_FAILEDDate: 28-AUG-10 03.15.30.102000 PM US&#x2F;CENTRALLog id: 1118Job class: DEFAULT_JOB_CLASSRun count: 1Failure count: 1Retry count: 0Error code: 6575Error message: ORA-06575: Package or function CALC_COMMISSIONS is in an invalid state \n11-4. Refreshing a Materialized View on a Timed IntervalProblemYou have a materialized view that must be refreshed on a scheduled basis to reflect changes made to theunderlying table.SolutionFirst, create the materialized view with a CREATE MATERIALIZED VIEW statement. In this example, amaterialized view is created consisting of the department and its total salary.: \nCREATE MATERIALIZED VIEW dept_salaries \nBUILD IMMEDIATE \nAS \nSELECT department_id, SUM(salary) total_salary \nFROM employees \nGROUP BY department_id; \nDisplay the contents of the materialized view: \nSELECT * \nFROM dept_salaries \nORDER BY department_id; \n \nDEPARTMENT_ID TOTAL_SALARY \n------------- ------------ \n           10         6500 \n           20        20200 \n           30        43500 \n           40         6500 \n           50       297100 \n           60        35000 \n           70        10000 \n           80       305600 \n           90        58000 \n          100        51600 \n          110        20300 \n                      7000 \nUse the EXEC DBMS_REFRESH.MAKE procedure to set up a refresh of the materialized view: \nEXEC DBMS_REFRESH.MAKE (‘HR_MVs’, ‘dept_salaries’, SYSDATE, ‘TRUNC(SYSDATE)+1’); \nChange the underlying data of the view.: \nUPDATE employeesSET salary &#x3D; salary * 1.03; \nCOMMIT; \nNote that the materialized view has not changed: \nSELECT * \nFROM dept_salaries \nORDER BY department_id; \n \nDEPARTMENT_ID TOTAL_SALARY \n------------- ------------ \n           10         6500 \n           20        20200 \n           30        43500 \n           40         6500 \n           50       297100 \n           60        35000 \n           70        10000 \n           80       305600 \n           90        58000 \n          100        51600 \n          110        20300 \n                      7000 \nNext, manually refresh the materialized view: \nEXEC DBMS_REFRESH.REFRESH (&#39;HR_MVs&#39;); \nThe materialized view now reflects the updated salaries: \nSELECT * \nFROM dept_salaries \nORDER BY department_id; \n \nDEPARTMENT_ID TOTAL_SALARY \n------------- ------------ \n           10         6695 \n           20        20806 \n           30        44805 \n           40         6695 \n           50       306013 \n           60        36050 \n           70        10300 \n           80       314768 \n           90        59740 \n          100        53148 \n          110        20909 \n                      7210\nHow It WorksThe DBMS_REFRESH.MAKE procedure creates a list of materialized views that refresh at a specified time.Although you could schedule a job that calls the DBMS_REFRESH.REFRESH procedure to refresh the view, theMAKE procedure simplifies this automated task. In addition, once your refresh list is created, you can lateradd more materialized views to the schedule using the DBMS_REFRESH.ADD procedure. The first argument of the DBMS_REFRESH.MAKE procedure specifies the name of this list; in thisexample, the list name is HR_MVs. This name must be unique among lists. The next parameter is a list ofall materialized views to refresh. The procedure accepts either a comma-separated string of materializedview names or an INDEX BY table, each containing a view name. If the list contains a view not owned bythe schema creating the list, then the view name must be qualified with the owner, for example,HR.dept_salaries. The third parameter specifies the first time the refresh will run. In this example,sysdate is used, so the refresh is immediate. The fourth parameter is the interval, which must be afunction that returns a date&#x2F;time for the next run time. This recipe uses ‘TRUNC(SYSDATE)+1’, whichcauses the refresh to run at midnight every night.In this example, the CREATE MATERIALIZED VIEW statement creates a simple materialized view of thetotal salary by departments, and the data is selected from the view to verify that it is populated withcorrect data. Note After adding a 3 percent raise to each employee’s salary, we continue to see a materialized view thatreflects the old data. The DBMS_REFRESH routine solves that Problem.Although the refresh list was created, the content of the materialized view remains unchanged untilthe automatic update, which occurs every night at midnight. After the refresh occurs, the materializedview will reflect all changes made to employee salary since the last refresh occurred.The manual call to DBMS_REFRESH.REFRESH demonstrates how the content of the materialized viewchanges once the view is refreshed. Without the call to the REFRESH procedure, the content of thematerialized view remains unchanged until the next automated run of the REFRESH procedure. \n11-5. Synchronizing Data with a Remote Data SourceProblemYour database instance requires data that is readily available in another Oracle instance but cannot besynchronized with a materialized view, and you do not want to duplicate data entry.SolutionWrite a procedure that creates a connection to the remote HR database and performs the steps neededto synchronize the two databases. Then use the EXEC DBMS_SCHEDULER.CREATE_JOB procedure to run theprocedure on a regular basis. Suppose, for example, that your Oracle Database instance requires datafrom the HR employee table, which is in another instance. In addition, your employee table containstables with foreign key references on the employee_id that prevents you from using a materialized viewto keep the HR employee table in synchronization.Create a database connection to the remote HR database, and then download the data on a regularbasis: \nCREATE DATABASE LINK hr_data \nCONNECT TO hr \nIDENTIFIED BY hr_password \nUSING &#39;(DESCRIPTION&#x3D;(ADDRESS&#x3D;(PROTOCOL&#x3D;TCP)(HOST&#x3D;node_name)(PORT&#x3D;1521))(CONNECT_DATA&#x3D;(SERVICE_NAME&#x3D;hr_service_name)))&#39;; \n \nCREATE OR REPLACE PROCEDURE sync_hr_data AS \n \nCURSOR    driver IS \nSELECT    * \nFROM    employees@hr_data; \n \nTYPE    recs_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; \nrecs    recs_type; \n \nBEGIN \n \n   OPEN DRIVER; \n   FETCH DRIVER BULK COLLECT INTO recs; \n   CLOSE DRIVER; \n \n   FOR i IN 1..recs.COUNT LOOP \n      UPDATE employees \n      SET    first_name      &#x3D; recs(i).first_name, \n        last_name            &#x3D; recs(i).last_name, \n        email                &#x3D; recs(i).email, \n        phone_number         &#x3D; recs(i).phone_number, \n        hire_date            &#x3D; recs(i).hire_date, \n        job_id               &#x3D; recs(i).job_id, \n        salary               &#x3D; recs(i).salary, \n        commission_pct       &#x3D; recs(i).commission_pct, \n        manager_id           &#x3D; recs(i).manager_id, \n        department_id        &#x3D; recs(i).department_id \n      WHERE  employee_id     &#x3D; recs(i).employee_id \n      AND    (    NVL(first_name,&#39;~&#39;)  &lt;&gt; NVL(recs(i).first_name,&#39;~&#39;) \n       OR    last_name                 &lt;&gt; recs(i).last_name \n       OR    email                     &lt;&gt; recs(i).email \n       OR    NVL(phone_number,&#39;~&#39;)     &lt;&gt; NVL(recs(i).phone_number,&#39;~&#39;) \n       OR    hire_date                 &lt;&gt; recs(i).hire_date \n       OR    job_id                    &lt;&gt; recs(i).job_id \n       OR    NVL(salary,-1)            &lt;&gt; NVL(recs(i).salary,-1) \n       OR    NVL(commission_pct,-1)    &lt;&gt; NVL(recs(i).commission_pct,-1) \n       OR    NVL(manager_id,-1)        &lt;&gt; NVL(recs(i).manager_id,-1) \n       OR    NVL(department_id,-1)     &lt;&gt; NVL(recs(i).department_id,-1) \n        ); \n   END LOOP; \n-- find all new rows in the HR database since the last refresh \n   INSERT INTO employees \n   SELECT * \n   FROM   employees@hr_data \n   WHERE  employee_id NOT IN ( \n    SELECT    employee_id \n    FROM      employees); \nEND sync_hr_data; \nEXEC DBMS_SCHEDULER.CREATE_JOB (            - \n          JOB_NAME&#x3D;&gt;&#39;sync_HR_employees&#39;,    - \n          JOB_TYPE&#x3D;&gt;&#39;STORED_PROCEDURE&#39;,     - \n        JOB_ACTION&#x3D;&gt;&#39;sync_hr_data&#39;,         - \n           ENABLED&#x3D;&gt;TRUE,                   - \n    REPEAT_INTERVAL&#x3D;&gt;&#39;FREQ&#x3D;DAILY;INTERVAL&#x3D;1;BYHOUR&#x3D;00;BYMINUTE&#x3D;30&#39;);\nHow It WorksA database link is required to access the data. This recipe focuses more on the synchronization process,but the creation of the database link is demonstrated here. This link, when used, will remotely log intothe HR instance as the HR schema owner.The procedure sync_hr_data reads all records from the HR instances. It does so in a BULK COLLECTstatement, because this is the most efficient method to read large chunks of data, especially over aremote connection. The procedure then loops through each of the employee records updating the localrecords, but only if the data changed, because there is no need to issue the UPDATE unless something haschanged. The NVL is required in the WHERE clause to accommodate values that are NULL and change to anon-NULL value, or vice versa.The final step is to schedule the nightly job. The CREATE_JOB procedure of the DBMS_SCHEDULERpackage completes this recipe. The stored procedure sync_hr_data is executed nightly at 12:30 a.m. SeeRecipe 11-1 for more information on scheduling a nightly batch job. \n11-6. Scheduling a Job ChainProblemYou have several PL&#x2F;SQL procedures that must run in a fixed sequence—some steps sequentially, othersin parallel. If one step fails, processing should stop.SolutionUse the DBMS_SCHEDULER _CHAIN commands to create and define the order of execution of the chainedprocedures. Figure 11-1 depicts a simple example of a chain of procedures where the successfulcompletion of step 1 kicks off parallel executions of two additional steps. When the two parallel stepscompete successfully, the final step runs. \nFigure 11-1. Flowchart representation of a job chain.The following code shows how you can use the CREATE_CHAIN, CREATE_PROGRAM, DEFINE_CHAIN_STEP,and DEFINE_CHAIN_RULE options to implement the order of execution shown in Figure 11-1. \n-- Define the Chain \nBEGIN \n   DBMS_SCHEDULER.CREATE_CHAIN ( \n    CHAIN_NAME    &#x3D;&gt; &#39;Chain1&#39;); \nEND; \n \n-- Create&#x2F;define the program to run in each step \nBEGIN \n   DBMS_SCHEDULER.CREATE_PROGRAM ( \n    PROGRAM_NAME    &#x3D;&gt; &#39;Program1&#39;,   \n    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   \n    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure1&#39;, \n    ENABLED         &#x3D;&gt; true); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.CREATE_PROGRAM ( \n    PROGRAM_NAME    &#x3D;&gt; &#39;Program2&#39;,   \n    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   \n    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure2&#39;, \n    ENABLED         &#x3D;&gt; true); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.CREATE_PROGRAM ( \n    PROGRAM_NAME    &#x3D;&gt; &#39;Program3&#39;,   \n    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   \n    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure3&#39;, \n    ENABLED         &#x3D;&gt; true); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.CREATE_PROGRAM ( \n    PROGRAM_NAME    &#x3D;&gt; &#39;Program4&#39;,   \n    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   \n    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure4&#39;, \n    ENABLED         &#x3D;&gt; true); \nEND; \n \n-- Create each step using a unique name \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   \n    STEP_NAME    &#x3D;&gt; &#39;Step1&#39;,   \n    PROGRAM_NAME &#x3D;&gt; &#39;Program1&#39;); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   \n    STEP_NAME    &#x3D;&gt; &#39;Step2_1&#39;,   \n    PROGRAM_NAME &#x3D;&gt; &#39;Program2&#39;); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   \n    STEP_NAME    &#x3D;&gt; &#39;Step2_2&#39;,   \n    PROGRAM_NAME &#x3D;&gt; &#39;Program3&#39;); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   \n    STEP_NAME    &#x3D;&gt; &#39;Step3&#39;,   \n    PROGRAM_NAME &#x3D;&gt; &#39;Program4&#39;); \nEND; \n \n-- Define the step rules; which step runs first and their order \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, \n    CONDITION    &#x3D;&gt; &#39;TRUE&#39;, \n    ACTION       &#x3D;&gt; &#39;START Step1&#39;); \n \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, \n    CONDITION    &#x3D;&gt; &#39;Step1 COMPLETED&#39;, \n    ACTION       &#x3D;&gt; &#39;START Step2_1, Step2_2&#39;); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, \n    CONDITION    &#x3D;&gt; &#39;Step2_1 COMPLETED AND Step2_2 COMPLETED&#39;, \n    ACTION       &#x3D;&gt; &#39;START Step3&#39;); \nEND; \n \nBEGIN \n   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( \n    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, \n    CONDITION    &#x3D;&gt; &#39;Step3 COMPLETED&#39;, \n    ACTION       &#x3D;&gt; &#39;END&#39;); \nEND; \n \n-- Enable the chain \nBEGIN \n   DBMS_SCHEDULER.ENABLE (&#39;Chain1&#39;); \nEND; \n&#x2F; \n \n-- Schedule a Job to run the chain every night \nBEGIN \n   DBMS_SCHEDULE.CREATE_JOB ( \n    JOB_NAME        &#x3D;&gt; &#39;chain1_Job&#39;, \n    JOB_TYPE        &#x3D;&gt; &#39;CHAIN&#39;, \n    JOB_ACTION      &#x3D;&gt; &#39;Chain1&#39;, \n    REPEAT_INTERVAL &#x3D;&gt; &#39;freq&#x3D;daily;byhour&#x3D;3;byminute&#x3D;0;bysecond&#x3D;0&#39;, \n    enabled         &#x3D;&gt; TRUE); \nEND;\nHow It WorksDefining and scheduling a job chain may seem daunting at first but can be broken down into thefollowing steps:Create the chain.Define each program that will run.Create each step in the chain.Create the rules that link the chain together.Enable the chain.Schedule the chain as a job to run a specific time or interval. \nThe DBMS_SCHEDULER.CREATE_CHAIN procedure creates a chain named as Chain1. Note The chain_name must be unique and will be used in subsequent steps.The DBMS_SCHEDULER.CREATE_PROGRAM procedure defines the executable code that will run. Theprograms defined here are run when a chain step is executed. The procedure accepts the followingparameters:• PROGRAM_NAME: A unique name to identify the program.• PROGRAM_TYPE : Valid values are plsql_block, stored_procedure, and executable.• PROGRAM_ACTION : Defines what code actually runs when executed based on thevalue for PROGRAM_TYPE. For a PROGRAM_TYPE of PLSQL_BLOCK, it is a text string of thePL&#x2F;SQL code to run. For a STORED_PROCEDURE, it is the name of an internal PL&#x2F;SQLprocedure. For an EXECUTABLE, it is the name of an external program.• ENABLE : Determines whether the program can be executed; the default is FALSE ifnot specified.The DBMS_SCHEDULER.DEFINE_CHAIN_STEP procedure defines each step in the chain. You must supplythe chain’s name as its first parameters, which was created in the DBMS_SCHEDULER.CREATE_CHAINprocedure, along with a unique name for the step in the chained process and the name of the PL&#x2F;SQLprogram to execute during the step. Note that the program is the name assigned in theDBMS_SCHEDULER.CREATE_PROGRAM procedure; it is not the name of your PL&#x2F;SQL program.The DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure defines how each step in the chain is linkedtogether. Arguably, this is the most difficult step in the process because you must define the starting andending steps in the chain properly. In addition, you must take care in defining links between sequentialsteps and parallel steps. Sketching a flow chart like the one shown in Figure 11-1 can aid in thesequencing of the chain steps.The DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure accepts the following parameters:• CHAIN_NAME: The name used when you created the chain.• CONDITION: An expression that must evaluate to a boolean expression and mustevaluate to true to perform the action. Possible test conditions are NOT_STARTED,SCHEDULED, RUNNING, PAUSED, STALLED, SUCCEEDED, FAILED, and STOPPED.• ACTION: The action to perform when the condition evaluates to true. Possibleactions are start a step, stop a step, or end the chain.• RULE_NAME: The name you want to give to the rule being created. If omitted, Oraclewill generate a unique name.• COMMENTS : Optional text to describe the rule.In this example, the first call to the DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure sets the conditionto TRUE and the action to START Step1. This causes step 1 to run immediately when the chain starts. Thenext call to the DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure defines the action to take when step 1completes successfully. In this example, steps 2.1 and 2.2 are started. Starting multiple stepssimultaneously allows you to schedule steps to run in parallel. In the third call to theDBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure, the condition waits for the successful completion ofsteps 2.1 and 2.2 and then starts step 3 as its action. The final call to theDBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure waits for the successful completion of step 3 and thenends the chain.If any step in the chain fails, the entire chained process stops at its next condition test. For example,if step 1 fails, steps 2.1 and 2.2 are never started. However, if steps 2.1 and 2.2 are running and step 2.1fails, step 2.2 will continue to run and may complete successfully, but step 3 will never run. You canaccount for chain failures and other conditions by testing for a condition such as NOT_STARTED,SCHEDULED, RUNNING, PAUSED, STALLED, FAILED, and STOPPED.The call to the procedure DBMS_SCHEDULER.ENABLE does just what you expect; it enables the chain torun. It is best to keep the chain disabled while defining the steps and rules. You can run the chainmanually with a call to the DBMS_SCHEDULE.RUN_CHAIN procedure or, as shown in this example, with a callto the DBMS_SCHEDULE.CREATE_JOB procedure. See Recipe 11-1 for more information on scheduling a job. \n","dateCreated":"2022-11-08T23:20:03+08:00","dateModified":"2022-11-08T23:40:20+08:00","datePublished":"2022-11-08T23:20:03+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 11-Automating Routine Tasks","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 11-Automating Routine Tasks">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:20:03.425Z">
+<meta property="article:modified_time" content="2022-11-08T15:40:20.885Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 11-Automating Routine Tasks
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:20:03+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#11-Automating-Routine-Tasks"><span class="toc-text">11. Automating Routine Tasks</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#11-1-Scheduling-Recurring-Jobs"><span class="toc-text">11-1. Scheduling Recurring Jobs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-2-E-mailing-Output-from-a-Scheduled-Job"><span class="toc-text">11-2. E-mailing Output from a Scheduled Job</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-3-Using-E-mail-for-Job-Status-Notification"><span class="toc-text">11-3. Using E-mail for Job Status Notification</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-4-Refreshing-a-Materialized-View-on-a-Timed-Interval"><span class="toc-text">11-4. Refreshing a Materialized View on a Timed Interval</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-5-Synchronizing-Data-with-a-Remote-Data-Source"><span class="toc-text">11-5. Synchronizing Data with a Remote Data Source</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-6-Scheduling-a-Job-Chain"><span class="toc-text">11-6. Scheduling a Job Chain</span></a></li></ol></li></ol>
+
+
+<h1 id="11-Automating-Routine-Tasks"><a href="#11-Automating-Routine-Tasks" class="headerlink" title="11. Automating Routine Tasks"></a>11. Automating Routine Tasks</h1><p>Oracle provides methods to schedule one-time and recurring jobs within the database, which is<br>beneficial when you want to automate repetitive tasks and run them at times when a DBA may not be<br>available. This chapter provides recipes to help you get started scheduling jobs (especially PL&#x2F;SQL jobs),<br>capturing output, sending e-mail notifications, and keeping data in sync with other databases. </p>
+<h2 id="11-1-Scheduling-Recurring-Jobs"><a href="#11-1-Scheduling-Recurring-Jobs" class="headerlink" title="11-1. Scheduling Recurring Jobs"></a>11-1. Scheduling Recurring Jobs</h2><p><strong>Problem</strong><br>You want to schedule a PL&#x2F;SQL procedure to run at a fixed time or at fixed intervals.<br><strong>Solution</strong><br>Use the EXEC DBMS_SCHEDULER.CREATE_JOB procedure to create and schedule one-time jobs and jobs that<br>run on a recurring schedule. Suppose, for example, that you need to run a stored procedure named<br>calc_commissions every night at 2:30 a.m. to calculate commissions based on the employees’ salaries.<br>Normally, commissions would be based on sales, but the default HR schema doesn’t provide that table,<br>so we’ll use an alternate calculation for demonstration purposes: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC DBMS_SCHEDULER.CREATE_JOB (               - 
+           JOB_NAME&#x3D;&gt;&#39;nighly_commissions&#39;,     - 
+           JOB_TYPE&#x3D;&gt;&#39;STORED_PROCEDURE&#39;,       - 
+         JOB_ACTION&#x3D;&gt;&#39;calc_commisions&#39;,        - 
+            ENABLED&#x3D;&gt;TRUE,                     - 
+    REPEAT_INTERVAL&#x3D;&gt;&#39;FREQ&#x3D;DAILY;INTERVAL&#x3D;1;BYHOUR&#x3D;02;BYMINUTE&#x3D;30&#39;);</code></pre>
+
+<p><strong>How It Works</strong><br>The DBMS_SCHEDULER.CREATE_JOB procedure sets up a nightly batch job. JOB_NAME must be unique. The<br>JOB_TYPE, in this example, is STORED_PROCEDURE. This informs the scheduler the job is a PL&#x2F;SQL procedure<br>stored in the database. In addition to scheduling a stored procedure, the scheduler can also execute a<br>PL&#x2F;SQL_BLOCK, an external EXECUTABLE program, or a job CHAIN. See Recipe 11-6 for an example on<br>scheduling job chains.<br>The JOB_ACTION identifies the stored procedure to run. If the procedure is owned by another<br>schema, then include the schema name, for example, HR.calc_commission. If the procedure is part of a<br>larger package, include that as well, for example, HR.my_package.calc_commission.<br>ENABLED is set to TRUE to tell the scheduler to run at the next scheduled time. By default, the ENABLED<br>parameter is FALSE and would require a call to the DBMS_SCHEDULER.ENABLE procedure to enable the job.<br>The REPEAT_INTERVAL is an important part of the CREATE_JOB routine. It identifies the frequency, in<br>this case DAILY. The INTERVAL tells scheduler to run the job every day, as opposed to 2 or 3, which would<br>run every other day, or every third day. The BYHOUR and BYMINUTE sections specifies the exact time of the<br>day to run. In this example, the job will run at 2:30 a.m.<br>The scheduled job, nightly_commissions, runs the stored procedure calc_commission, which reads<br>the data, calculates the commission, and stores the commission records. Running this job nightly keeps<br>the employees’ commission data current with respect to daily sales figures. </p>
+<h2 id="11-2-E-mailing-Output-from-a-Scheduled-Job"><a href="#11-2-E-mailing-Output-from-a-Scheduled-Job" class="headerlink" title="11-2. E-mailing Output from a Scheduled Job"></a>11-2. E-mailing Output from a Scheduled Job</h2><p><strong>Problem</strong><br>You have a scheduled job that runs a stored procedure at a regular interval. The procedure produces<br>output that ordinarily would be sent to the screen via the DBMS_OUTPUT.PUT_LINE procedure, but since it<br>runs as a nightly batch job, you want to send the output to a distribution list as an e-mail message.<br><strong>Solution</strong><br>Save the output in a CLOB variable and then send it to the target distribution list using the<br>UTL_MAIL.SEND procedure. For example, suppose you want to audit the employee table periodically to<br>find all employees who have not been assigned to a department within the company. Here’s a procedure<br>to do that: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE employee_audit AS 
+ 
+CURSOR    driver IS    -- find all employees not in a department 
+SELECT    employee_id, first_name, last_name 
+FROM      employees 
+WHERE     department_id is null 
+ORDER BY  last_name, first_name; 
+ 
+buffer        CLOB :&#x3D; null; -- the e-mail message 
+ 
+BEGIN 
+ 
+   FOR rec IN driver LOOP    -- generate the e-mail message 
+      buffer :&#x3D; buffer  || 
+        rec.employee_id || &#39; &#39;  || 
+        rec.last_name   || &#39;, &#39; || 
+        rec.first_name  || chr(10); 
+   END LOOP; 
+ 
+--    Send the e-mail 
+   IF buffer is not null THEN -- there are employees without a department 
+      buffer :&#x3D; &#39;Employees with no Department&#39; || CHR(10) || CHR(10) || buffer; 
+ 
+      UTL_MAIL.SEND ( 
+              SENDER&#x3D;&gt;&#39;someone@mycompany.com&#39;, 
+          RECIPIENTS&#x3D;&gt;&#39;audit_list@mycompany.com&#39;, 
+             SUBJECT&#x3D;&gt;&#39;Employee Audit Results&#39;, 
+             MESSAGE&#x3D;&gt;buffer); 
+   END IF; 
+ 
+END;</code></pre>
+<p><strong>How It Works</strong><br>The procedure is very straightforward in that it finds all employees with no department. When run as a<br>scheduled job, calls to DBMS_OUTPUT.PUT_LINE won’t work because there is no “screen” to view the output.<br>Instead, the output is collected in a CLOB variable to later use in the UTL_MAIL.SEND procedure. The key to<br>remember in this recipe is there is no screen output from a stored procedure while running as a<br>scheduled job. You must store the intended output and either write it to an operating system file or, as in<br>this example, send it to users in an e-mail. </p>
+<h2 id="11-3-Using-E-mail-for-Job-Status-Notification"><a href="#11-3-Using-E-mail-for-Job-Status-Notification" class="headerlink" title="11-3. Using E-mail for Job Status Notification"></a>11-3. Using E-mail for Job Status Notification</h2><p><strong>Problem</strong><br>You have a scheduled job that is running on a regular basis, and you need to know whether the job fails<br>for any reason.<br><strong>Solution</strong><br>Use the ADD_JOB_EMAIL_NOTIFICATION procedure to set up an e-mail notification that sends an e-mail<br>when the job fails to run successfully. Note, this <strong>Solution</strong> builds on Recipe 11-1 where a nightly batch job<br>was set up to calculate commissions. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC DBMS_SCHEDULER.ADD_JOB_EMAIL_NOTIFICATION (    - 
+      JOB_NAME&#x3D;&gt;&#39;nightly_commissions&#39;, - 
+    RECIPIENTS&#x3D;&gt; &#39;me@my_company.com,dist_list@my_company.com&#39;); </code></pre>
+<p><strong>How It Works</strong><br>The previous recipe is the simplest example of automating e-mail in the event a job fails. The<br>ADD_JOB_EMAIL_NOTIFICATION procedure accepts several parameters; however, the only required<br>parameters are JOB_NAME and RECIPIENTS. The JOB_NAME must already exist from a previous call to the<br>CREATE_JOB procedure (see Recipe 11-1 for an example). The RECIPIENTS is a comma-separated list of e-<br>mail addresses to receive e-mail when an event occurs; by default the events that trigger an e-mail are<br>JOB_FAILED, JOB_BROKEN, JOB_SCH_LIM_REACHED, JOB_CHAIN_STALLED, and JOB_OVER_MAX_DUR. Additional<br>event parameters are JOB_ALL_EVENTS, JOB_COMPLETED, JOB_DISABLED, JOB_RUN_COMPLETED, JOB_STARTED,<br>JOB_STOPPED, AND JOB_SUCCEEDED.<br>The full format of the ADD_JOB_EMAIL_NOTIFICATION procedure accepts additional parameters, but<br>the default for each is sufficient to keep tabs on the running jobs. The body of the e-mail will return the<br>error messages required to debug the issue that caused the job to fail.<br>To demonstrate the notification process, the commissions table was dropped after the job was set<br>up to run. The database produced an e-mail with the following subject and body: </p>
+<p>SUBJECT: Oracle Scheduler Job Notification - HR.NIGHTLY_COMMISSIONS JOB_FAILED<br>BODY:<br>Job: JYTHON.NIGHTLY_COMMISSIONS<br>Event: JOB_FAILED<br>Date: 28-AUG-10 03.15.30.102000 PM US&#x2F;CENTRAL<br>Log id: 1118<br>Job class: DEFAULT_JOB_CLASS<br>Run count: 1<br>Failure count: 1<br>Retry count: 0<br>Error code: 6575<br>Error message: ORA-06575: Package or function CALC_COMMISSIONS is in an invalid state </p>
+<h2 id="11-4-Refreshing-a-Materialized-View-on-a-Timed-Interval"><a href="#11-4-Refreshing-a-Materialized-View-on-a-Timed-Interval" class="headerlink" title="11-4. Refreshing a Materialized View on a Timed Interval"></a>11-4. Refreshing a Materialized View on a Timed Interval</h2><p><strong>Problem</strong><br>You have a materialized view that must be refreshed on a scheduled basis to reflect changes made to the<br>underlying table.<br><strong>Solution</strong><br>First, create the materialized view with a CREATE MATERIALIZED VIEW statement. In this example, a<br>materialized view is created consisting of the department and its total salary.: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE MATERIALIZED VIEW dept_salaries 
+BUILD IMMEDIATE 
+AS 
+SELECT department_id, SUM(salary) total_salary 
+FROM employees 
+GROUP BY department_id; </code></pre>
+<p>Display the contents of the materialized view: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT * 
+FROM dept_salaries 
+ORDER BY department_id; 
+ 
+DEPARTMENT_ID TOTAL_SALARY 
+------------- ------------ 
+           10         6500 
+           20        20200 
+           30        43500 
+           40         6500 
+           50       297100 
+           60        35000 
+           70        10000 
+           80       305600 
+           90        58000 
+          100        51600 
+          110        20300 
+                      7000 </code></pre>
+<p>Use the EXEC DBMS_REFRESH.MAKE procedure to set up a refresh of the materialized view: </p>
+<p>EXEC DBMS_REFRESH.MAKE (‘HR_MVs’, ‘dept_salaries’, SYSDATE, ‘TRUNC(SYSDATE)+1’); </p>
+<p>Change the underlying data of the view.: </p>
+<p>UPDATE employees<br>SET salary &#x3D; salary * 1.03; </p>
+<p>COMMIT; </p>
+<p>Note that the materialized view has not changed: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT * 
+FROM dept_salaries 
+ORDER BY department_id; 
+ 
+DEPARTMENT_ID TOTAL_SALARY 
+------------- ------------ 
+           10         6500 
+           20        20200 
+           30        43500 
+           40         6500 
+           50       297100 
+           60        35000 
+           70        10000 
+           80       305600 
+           90        58000 
+          100        51600 
+          110        20300 
+                      7000 </code></pre>
+<p>Next, manually refresh the materialized view: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">EXEC DBMS_REFRESH.REFRESH (&#39;HR_MVs&#39;); </code></pre>
+<p>The materialized view now reflects the updated salaries: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SELECT * 
+FROM dept_salaries 
+ORDER BY department_id; 
+ 
+DEPARTMENT_ID TOTAL_SALARY 
+------------- ------------ 
+           10         6695 
+           20        20806 
+           30        44805 
+           40         6695 
+           50       306013 
+           60        36050 
+           70        10300 
+           80       314768 
+           90        59740 
+          100        53148 
+          110        20909 
+                      7210</code></pre>
+<p><strong>How It Works</strong><br>The DBMS_REFRESH.MAKE procedure creates a list of materialized views that refresh at a specified time.<br>Although you could schedule a job that calls the DBMS_REFRESH.REFRESH procedure to refresh the view, the<br>MAKE procedure simplifies this automated task. In addition, once your refresh list is created, you can later<br>add more materialized views to the schedule using the DBMS_REFRESH.ADD procedure.<br> The first argument of the DBMS_REFRESH.MAKE procedure specifies the name of this list; in this<br>example, the list name is HR_MVs. This name must be unique among lists. The next parameter is a list of<br>all materialized views to refresh. The procedure accepts either a comma-separated string of materialized<br>view names or an INDEX BY table, each containing a view name. If the list contains a view not owned by<br>the schema creating the list, then the view name must be qualified with the owner, for example,<br>HR.dept_salaries. The third parameter specifies the first time the refresh will run. In this example,<br>sysdate is used, so the refresh is immediate. The fourth parameter is the interval, which must be a<br>function that returns a date&#x2F;time for the next run time. This recipe uses ‘TRUNC(SYSDATE)+1’, which<br>causes the refresh to run at midnight every night.<br>In this example, the CREATE MATERIALIZED VIEW statement creates a simple materialized view of the<br>total salary by departments, and the data is selected from the view to verify that it is populated with<br>correct data.<br> Note After adding a 3 percent raise to each employee’s salary, we continue to see a materialized view that<br>reflects the old data. The DBMS_REFRESH routine solves that Problem.<br>Although the refresh list was created, the content of the materialized view remains unchanged until<br>the automatic update, which occurs every night at midnight. After the refresh occurs, the materialized<br>view will reflect all changes made to employee salary since the last refresh occurred.<br>The manual call to DBMS_REFRESH.REFRESH demonstrates how the content of the materialized view<br>changes once the view is refreshed. Without the call to the REFRESH procedure, the content of the<br>materialized view remains unchanged until the next automated run of the REFRESH procedure. </p>
+<h2 id="11-5-Synchronizing-Data-with-a-Remote-Data-Source"><a href="#11-5-Synchronizing-Data-with-a-Remote-Data-Source" class="headerlink" title="11-5. Synchronizing Data with a Remote Data Source"></a>11-5. Synchronizing Data with a Remote Data Source</h2><p><strong>Problem</strong><br>Your database instance requires data that is readily available in another Oracle instance but cannot be<br>synchronized with a materialized view, and you do not want to duplicate data entry.<br><strong>Solution</strong><br>Write a procedure that creates a connection to the remote HR database and performs the steps needed<br>to synchronize the two databases. Then use the EXEC DBMS_SCHEDULER.CREATE_JOB procedure to run the<br>procedure on a regular basis. Suppose, for example, that your Oracle Database instance requires data<br>from the HR employee table, which is in another instance. In addition, your employee table contains<br>tables with foreign key references on the employee_id that prevents you from using a materialized view<br>to keep the HR employee table in synchronization.<br>Create a database connection to the remote HR database, and then download the data on a regular<br>basis: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE DATABASE LINK hr_data 
+CONNECT TO hr 
+IDENTIFIED BY hr_password 
+USING &#39;(DESCRIPTION&#x3D;(ADDRESS&#x3D;(PROTOCOL&#x3D;TCP)(HOST&#x3D;node_name)(PORT&#x3D;1521))(CONNECT_DATA&#x3D;(SERVICE_NAME&#x3D;hr_service_name)))&#39;; 
+ 
+CREATE OR REPLACE PROCEDURE sync_hr_data AS 
+ 
+CURSOR    driver IS 
+SELECT    * 
+FROM    employees@hr_data; 
+ 
+TYPE    recs_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; 
+recs    recs_type; 
+ 
+BEGIN 
+ 
+   OPEN DRIVER; 
+   FETCH DRIVER BULK COLLECT INTO recs; 
+   CLOSE DRIVER; 
+ 
+   FOR i IN 1..recs.COUNT LOOP 
+      UPDATE employees 
+      SET    first_name      &#x3D; recs(i).first_name, 
+        last_name            &#x3D; recs(i).last_name, 
+        email                &#x3D; recs(i).email, 
+        phone_number         &#x3D; recs(i).phone_number, 
+        hire_date            &#x3D; recs(i).hire_date, 
+        job_id               &#x3D; recs(i).job_id, 
+        salary               &#x3D; recs(i).salary, 
+        commission_pct       &#x3D; recs(i).commission_pct, 
+        manager_id           &#x3D; recs(i).manager_id, 
+        department_id        &#x3D; recs(i).department_id 
+      WHERE  employee_id     &#x3D; recs(i).employee_id 
+      AND    (    NVL(first_name,&#39;~&#39;)  &lt;&gt; NVL(recs(i).first_name,&#39;~&#39;) 
+       OR    last_name                 &lt;&gt; recs(i).last_name 
+       OR    email                     &lt;&gt; recs(i).email 
+       OR    NVL(phone_number,&#39;~&#39;)     &lt;&gt; NVL(recs(i).phone_number,&#39;~&#39;) 
+       OR    hire_date                 &lt;&gt; recs(i).hire_date 
+       OR    job_id                    &lt;&gt; recs(i).job_id 
+       OR    NVL(salary,-1)            &lt;&gt; NVL(recs(i).salary,-1) 
+       OR    NVL(commission_pct,-1)    &lt;&gt; NVL(recs(i).commission_pct,-1) 
+       OR    NVL(manager_id,-1)        &lt;&gt; NVL(recs(i).manager_id,-1) 
+       OR    NVL(department_id,-1)     &lt;&gt; NVL(recs(i).department_id,-1) 
+        ); 
+   END LOOP; 
+-- find all new rows in the HR database since the last refresh 
+   INSERT INTO employees 
+   SELECT * 
+   FROM   employees@hr_data 
+   WHERE  employee_id NOT IN ( 
+    SELECT    employee_id 
+    FROM      employees); 
+END sync_hr_data; 
+EXEC DBMS_SCHEDULER.CREATE_JOB (            - 
+          JOB_NAME&#x3D;&gt;&#39;sync_HR_employees&#39;,    - 
+          JOB_TYPE&#x3D;&gt;&#39;STORED_PROCEDURE&#39;,     - 
+        JOB_ACTION&#x3D;&gt;&#39;sync_hr_data&#39;,         - 
+           ENABLED&#x3D;&gt;TRUE,                   - 
+    REPEAT_INTERVAL&#x3D;&gt;&#39;FREQ&#x3D;DAILY;INTERVAL&#x3D;1;BYHOUR&#x3D;00;BYMINUTE&#x3D;30&#39;);</code></pre>
+<p><strong>How It Works</strong><br>A database link is required to access the data. This recipe focuses more on the synchronization process,<br>but the creation of the database link is demonstrated here. This link, when used, will remotely log into<br>the HR instance as the HR schema owner.<br>The procedure sync_hr_data reads all records from the HR instances. It does so in a BULK COLLECT<br>statement, because this is the most efficient method to read large chunks of data, especially over a<br>remote connection. The procedure then loops through each of the employee records updating the local<br>records, but only if the data changed, because there is no need to issue the UPDATE unless something has<br>changed. The NVL is required in the WHERE clause to accommodate values that are NULL and change to a<br>non-NULL value, or vice versa.<br>The final step is to schedule the nightly job. The CREATE_JOB procedure of the DBMS_SCHEDULER<br>package completes this recipe. The stored procedure sync_hr_data is executed nightly at 12:30 a.m. See<br>Recipe 11-1 for more information on scheduling a nightly batch job. </p>
+<h2 id="11-6-Scheduling-a-Job-Chain"><a href="#11-6-Scheduling-a-Job-Chain" class="headerlink" title="11-6. Scheduling a Job Chain"></a>11-6. Scheduling a Job Chain</h2><p><strong>Problem</strong><br>You have several PL&#x2F;SQL procedures that must run in a fixed sequence—some steps sequentially, others<br>in parallel. If one step fails, processing should stop.<br><strong>Solution</strong><br>Use the DBMS_SCHEDULER _CHAIN commands to create and define the order of execution of the chained<br>procedures. Figure 11-1 depicts a simple example of a chain of procedures where the successful<br>completion of step 1 kicks off parallel executions of two additional steps. When the two parallel steps<br>compete successfully, the final step runs. </p>
+<p>Figure 11-1. Flowchart representation of a job chain.<br>The following code shows how you can use the CREATE_CHAIN, CREATE_PROGRAM, DEFINE_CHAIN_STEP,<br>and DEFINE_CHAIN_RULE options to implement the order of execution shown in Figure 11-1. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- Define the Chain 
+BEGIN 
+   DBMS_SCHEDULER.CREATE_CHAIN ( 
+    CHAIN_NAME    &#x3D;&gt; &#39;Chain1&#39;); 
+END; 
+ 
+-- Create&#x2F;define the program to run in each step 
+BEGIN 
+   DBMS_SCHEDULER.CREATE_PROGRAM ( 
+    PROGRAM_NAME    &#x3D;&gt; &#39;Program1&#39;,   
+    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   
+    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure1&#39;, 
+    ENABLED         &#x3D;&gt; true); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.CREATE_PROGRAM ( 
+    PROGRAM_NAME    &#x3D;&gt; &#39;Program2&#39;,   
+    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   
+    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure2&#39;, 
+    ENABLED         &#x3D;&gt; true); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.CREATE_PROGRAM ( 
+    PROGRAM_NAME    &#x3D;&gt; &#39;Program3&#39;,   
+    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   
+    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure3&#39;, 
+    ENABLED         &#x3D;&gt; true); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.CREATE_PROGRAM ( 
+    PROGRAM_NAME    &#x3D;&gt; &#39;Program4&#39;,   
+    PROGRAM_TYPE    &#x3D;&gt; &#39;STORED_PROCEDURE&#39;,   
+    PROGRAM_ACTION  &#x3D;&gt; &#39;Procedure4&#39;, 
+    ENABLED         &#x3D;&gt; true); 
+END; 
+ 
+-- Create each step using a unique name 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   
+    STEP_NAME    &#x3D;&gt; &#39;Step1&#39;,   
+    PROGRAM_NAME &#x3D;&gt; &#39;Program1&#39;); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   
+    STEP_NAME    &#x3D;&gt; &#39;Step2_1&#39;,   
+    PROGRAM_NAME &#x3D;&gt; &#39;Program2&#39;); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   
+    STEP_NAME    &#x3D;&gt; &#39;Step2_2&#39;,   
+    PROGRAM_NAME &#x3D;&gt; &#39;Program3&#39;); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_STEP ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;,   
+    STEP_NAME    &#x3D;&gt; &#39;Step3&#39;,   
+    PROGRAM_NAME &#x3D;&gt; &#39;Program4&#39;); 
+END; 
+ 
+-- Define the step rules; which step runs first and their order 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, 
+    CONDITION    &#x3D;&gt; &#39;TRUE&#39;, 
+    ACTION       &#x3D;&gt; &#39;START Step1&#39;); 
+ 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, 
+    CONDITION    &#x3D;&gt; &#39;Step1 COMPLETED&#39;, 
+    ACTION       &#x3D;&gt; &#39;START Step2_1, Step2_2&#39;); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, 
+    CONDITION    &#x3D;&gt; &#39;Step2_1 COMPLETED AND Step2_2 COMPLETED&#39;, 
+    ACTION       &#x3D;&gt; &#39;START Step3&#39;); 
+END; 
+ 
+BEGIN 
+   DBMS_SCHEDULER.DEFINE_CHAIN_RULE ( 
+    CHAIN_NAME   &#x3D;&gt; &#39;Chain1&#39;, 
+    CONDITION    &#x3D;&gt; &#39;Step3 COMPLETED&#39;, 
+    ACTION       &#x3D;&gt; &#39;END&#39;); 
+END; 
+ 
+-- Enable the chain 
+BEGIN 
+   DBMS_SCHEDULER.ENABLE (&#39;Chain1&#39;); 
+END; 
+&#x2F; 
+ 
+-- Schedule a Job to run the chain every night 
+BEGIN 
+   DBMS_SCHEDULE.CREATE_JOB ( 
+    JOB_NAME        &#x3D;&gt; &#39;chain1_Job&#39;, 
+    JOB_TYPE        &#x3D;&gt; &#39;CHAIN&#39;, 
+    JOB_ACTION      &#x3D;&gt; &#39;Chain1&#39;, 
+    REPEAT_INTERVAL &#x3D;&gt; &#39;freq&#x3D;daily;byhour&#x3D;3;byminute&#x3D;0;bysecond&#x3D;0&#39;, 
+    enabled         &#x3D;&gt; TRUE); 
+END;</code></pre>
+<p><strong>How It Works</strong><br>Defining and scheduling a job chain may seem daunting at first but can be broken down into the<br>following steps:<br>Create the chain.<br>Define each program that will run.<br>Create each step in the chain.<br>Create the rules that link the chain together.<br>Enable the chain.<br>Schedule the chain as a job to run a specific time or interval. </p>
+<p>The DBMS_SCHEDULER.CREATE_CHAIN procedure creates a chain named as Chain1.<br> Note The chain_name must be unique and will be used in subsequent steps.<br>The DBMS_SCHEDULER.CREATE_PROGRAM procedure defines the executable code that will run. The<br>programs defined here are run when a chain step is executed. The procedure accepts the following<br>parameters:<br>• PROGRAM_NAME: A unique name to identify the program.<br>• PROGRAM_TYPE : Valid values are plsql_block, stored_procedure, and executable.<br>• PROGRAM_ACTION : Defines what code actually runs when executed based on the<br>value for PROGRAM_TYPE. For a PROGRAM_TYPE of PLSQL_BLOCK, it is a text string of the<br>PL&#x2F;SQL code to run. For a STORED_PROCEDURE, it is the name of an internal PL&#x2F;SQL<br>procedure. For an EXECUTABLE, it is the name of an external program.<br>• ENABLE : Determines whether the program can be executed; the default is FALSE if<br>not specified.<br>The DBMS_SCHEDULER.DEFINE_CHAIN_STEP procedure defines each step in the chain. You must supply<br>the chain’s name as its first parameters, which was created in the DBMS_SCHEDULER.CREATE_CHAIN<br>procedure, along with a unique name for the step in the chained process and the name of the PL&#x2F;SQL<br>program to execute during the step. Note that the program is the name assigned in the<br>DBMS_SCHEDULER.CREATE_PROGRAM procedure; it is not the name of your PL&#x2F;SQL program.<br>The DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure defines how each step in the chain is linked<br>together. Arguably, this is the most difficult step in the process because you must define the starting and<br>ending steps in the chain properly. In addition, you must take care in defining links between sequential<br>steps and parallel steps. Sketching a flow chart like the one shown in Figure 11-1 can aid in the<br>sequencing of the chain steps.<br>The DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure accepts the following parameters:<br>• CHAIN_NAME: The name used when you created the chain.<br>• CONDITION: An expression that must evaluate to a boolean expression and must<br>evaluate to true to perform the action. Possible test conditions are NOT_STARTED,<br>SCHEDULED, RUNNING, PAUSED, STALLED, SUCCEEDED, FAILED, and STOPPED.<br>• ACTION: The action to perform when the condition evaluates to true. Possible<br>actions are start a step, stop a step, or end the chain.<br>• RULE_NAME: The name you want to give to the rule being created. If omitted, Oracle<br>will generate a unique name.<br>• COMMENTS : Optional text to describe the rule.<br>In this example, the first call to the DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure sets the condition<br>to TRUE and the action to START Step1. This causes step 1 to run immediately when the chain starts. The<br>next call to the DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure defines the action to take when step 1<br>completes successfully. In this example, steps 2.1 and 2.2 are started. Starting multiple steps<br>simultaneously allows you to schedule steps to run in parallel. In the third call to the<br>DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure, the condition waits for the successful completion of<br>steps 2.1 and 2.2 and then starts step 3 as its action. The final call to the<br>DBMS_SCHEDULER.DEFINE_CHAIN_RULE procedure waits for the successful completion of step 3 and then<br>ends the chain.<br>If any step in the chain fails, the entire chained process stops at its next condition test. For example,<br>if step 1 fails, steps 2.1 and 2.2 are never started. However, if steps 2.1 and 2.2 are running and step 2.1<br>fails, step 2.2 will continue to run and may complete successfully, but step 3 will never run. You can<br>account for chain failures and other conditions by testing for a condition such as NOT_STARTED,<br>SCHEDULED, RUNNING, PAUSED, STALLED, FAILED, and STOPPED.<br>The call to the procedure DBMS_SCHEDULER.ENABLE does just what you expect; it enables the chain to<br>run. It is best to keep the chain disabled while defining the steps and rules. You can run the chain<br>manually with a call to the DBMS_SCHEDULE.RUN_CHAIN procedure or, as shown in this example, with a call<br>to the DBMS_SCHEDULE.CREATE_JOB procedure. See Recipe 11-1 for more information on scheduling a job. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"
+                    data-tooltip="Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"
+                    data-tooltip="Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                    aria-label="NEXT: Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_12/"
+                    data-tooltip="Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 12-Oracle SQL Developer"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"
+                    data-tooltip="Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                    aria-label="NEXT: Oracle PLSQL Recipes 10-PL/SQL Collections and Records"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

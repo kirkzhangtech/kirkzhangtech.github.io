@@ -1,0 +1,1245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 15-Java in the Database - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n15. Java in the DatabaseJava plays an important role in the application development space today. It has become increasinglypopular over the years, because it is cross-platform, powerful, and easy to learn. Although Javadevelopment is not directly related to PL&#x2F;SQL, it is important for a PL&#x2F;SQL developer to learn a bit aboutJava since there are some major benefits to using it to perform database tasks. Integrating the twolanguages when you’re building Oracle Database applications is a seamless effort. Oracle Database 11gcontains JVM compatibility with Java 1.5, which includes substantial changes to the Java language,making it an even more complementary development platform. Also starting with Oracle 11g, thedatabase includes a just-in-time compiler, which compiles Java bytecode into machine languageinstructions, making Java in the database run much faster. In 2010, Oracle acquired Sun Microsystems,so it now owns Java. This may help the database JVM compatibility remain in concert with the latestreleases.In this chapter, you will learn how to combine the power of PL&#x2F;SQL development with Java codethat is stored within the database. You will learn how to create stored procedures, functions, and triggersusing the Java language. Running Java in the database is a substantial topic that has filled entire books,but in this chapter, we will focus only on using the Java types in conjunction with PL&#x2F;SQL applications—which, after all, is the subject of this book. For complete documentation on using Java inside OracleDatabase, please see the Oracle Java developers guide athttp://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm. \n15-1. Creating a Java Database ClassProblemYou want to write a Java class that will query the database and return a result.SolutionCreate a Java class that uses the Java Database Connectivity (JDBC) API to query the Oracle Database.For example, the Java class in the following example will query the EMPLOYEES table for all employees whobelong to the IT department. The example entails a complete Java class that is named Employees. Thisclass contains a method named getItEmps() that will become a Java stored procedure. The Employeesclass shown here will be stored into a file named Employees.java. \nimport java.sql.;import oracle.jdbc.; \npublic class Employees &#123; \n  public static void getItEmps()&#123; \nCHAPTER 15  JAVA IN THE DATABASE \n320 \n      String firstName &#x3D; null; \n      String lastName &#x3D; null; \n      String email &#x3D; null; \n      try &#123; \n           Connection conn &#x3D; DriverManager. \n                        getConnection(&quot;jdbc:default:connection:&quot;); \n           String sql &#x3D; &quot;SELECT FIRST_NAME, LAST_NAME, EMAIL &quot; +  \n                        &quot;FROM EMPLOYEES &quot; + \n                        &quot;WHERE DEPARTMENT_ID &#x3D; 60&quot;; \n           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); \n           ResultSet rset &#x3D; pstmt.executeQuery(); \n           while(rset.next()) &#123; \n             firstName &#x3D; rset.getString(1); \n             lastName &#x3D; rset.getString(2); \n             email &#x3D; rset.getString(3); \n             System.out.println(firstName + &quot; &quot; + lastName + &quot; &quot; + \n                                email); \n           &#125; \n           pstmt.close(); \n           rset.close(); \n      &#125; catch (SQLException ex)&#123; \n          System.err.println(&quot;ERROR: &quot; + ex); \n      &#125;           \n  &#125;; \nThe following lines from SQL*Plus show how to execute this Java in the database, followed by theoutput from the program. Prior to executing the code, you must load it into the database and compile it.You will learn more about doing this in the next recipe. To learn more about executing Java in thedatabase, please see Recipe 15-5. For now, it is important to see the output that will result from asuccessful call to this Java program. \nSQL&gt; exec get_it_emps;\nAlexander Hunold AHUNOLD\nBruce Ernst BERNST\nDavid Austin DAUSTIN\nValli Pataballa VPATABAL\nDiana Lorentz DLORENTZ \nPL&#x2F;SQL procedure successfully completed. \nThe Java class in this example performs a simple query and then prints the result. Although thisclass does not demonstrate the full potential of using Java, it is a good segue into Java databasedevelopment.How It WorksJava is a mature language that can be used in conjunction with PL&#x2F;SQL. Sometimes it makes sense tocode portions of your application in Java, while in other instances it may make sense to code the entireapplication in Java. Both PL&#x2F;SQL and Java can coexist in the same application, and you must use PL&#x2F;SQLto access Java via the database.This recipe demonstrates how to create a simple Java class that queries the database for EMPLOYEErecords. The JDBC APIs provide a way for Java programs to methodically perform the tasks you willtypically want to complete whenever you access a database, whether it’s querying data, updatingrecords, or deleting rows.A Java class that you will use to access an Oracle Database as a stored procedure must adhere to afew standards. The class must be public, and each of its methods must be public and static. Failure tofollow these standards will render the class methods inaccessible for use as stored procedures.The first step taken in the Solution to this recipe is to obtain a connection to the database. In a Javaclass that lives outside the database, obtaining a connection is a performance-intensive operation, andyou must pass a user name and password along with the database host name. However, obtaining aconnection using stored procedures is a bit different since they reside within the database itself. Theonly requirement is that you pass jdbc:default:connection to the getConnection() method. \nNext, the SQL query (sql) is formed as a String, and a PreparedStatement object (pstmt) is thencreated from it using the prepareStatement method. The prepared statement is what actually queries thedatabase. The next line of code in the Solution issues the query by calling the executeQuery() method onthe prepared statement object, which returns a result set. The result set is what you need to use in orderto access the rows that have been returned via the query. Use a simple while loop to traverse the rows,and obtain each of the values from the result set within each iteration of the loop by indicating theposition of the column you want to retrieve. For instance, to obtain the FIRST_NAME, you will callrset.getString(1) because FIRST_NAME is the first column that is listed within the query.Lastly, the class in the Solution closes the prepared statement and result set objects. Not doing somay cause issues such as memory leaks, although Java has a very efficient garbage collection system, soit should take care of this for you. Again, closing the objects is a form of good practice to ensure thatresources can be reallocated.The Oracle Java virtual machine (JVM) also supports the use of SQLJ for database access. Use ofSQLJ is beyond the scope of this book, but if you are interested in learning about it JVM, then please referto the Oracle Java Developer Guide, which can be found athttp://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm. \n15-2. Loading a Java Database Class into a DatabaseProblemYou want to load a Java class into a schema within your Oracle Database.Solution #1You can use the CREATE JAVA command to load the Java source into the database by copying and pastingthe Java source into a SQL file. This is the easiest way to create a Java class and then load it into thedatabase if you are not working directly on the database server but rather remotely using an editor orSQL*Plus. The following lines of SQL code will load the Java class that was created in Recipe 15-1 into thedatabase using the CREATE JAVA command: \nCREATE OR REPLACE JAVA SOURCE NAMED &quot;Employees&quot; AS \nimport java.sql.*; \nimport oracle.jdbc.*; \n \npublic class Employees &#123; \n  public static void getItEmps()&#123; \n      String firstName &#x3D; null; \n      String lastName &#x3D; null; \n      String email &#x3D; null; \n      try &#123; \n           Connection conn &#x3D; DriverManager. \n                        getConnection(&quot;jdbc:default:connection:&quot;); \n           String sql &#x3D; &quot;SELECT FIRST_NAME, LAST_NAME, EMAIL &quot; +  \n                        &quot;FROM EMPLOYEES &quot; + \n                        &quot;WHERE DEPARTMENT_ID &#x3D; 60&quot;; \n \n           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); \n           ResultSet rset &#x3D; pstmt.executeQuery(); \n           while(rset.next()) &#123; \n             firstName &#x3D; rset.getString(1); \n             lastName &#x3D; rset.getString(2); \n             email &#x3D; rset.getString(3); \n             System.out.println(firstName + &quot; &quot; + lastName + &quot; &quot; + \n                                email); \n           &#125; \n           pstmt.close(); \n           rset.close(); \n      &#125; catch (SQLException ex)&#123; \n          System.err.println(&quot;ERROR: &quot; + ex); \n          &#125; \n      &#125;           \n  &#125;;\nNext, you need to compile the code. To do so, use the ALTER JAVA CLASS  RESOLVE command.The following line of code compiles the Employees Java source: \nALTER JAVA CLASS “Employees” RESOLVE;Solution #2You can use the loadjava utility that is provided by Oracle in order to load Java code into the database.This situation works best if you are working directly on the database server and have access to theloadjava utility that is installed in the Oracle Database home. This utility is also nice to use if you alreadyhave the Java code stored in a file and do not want to copy and paste code into an editor or SQL*Plus.The following code demonstrates loading a Java source file named Employees.java using the loadjavautility: \nloadjava –user dbuser Employees.java \nAfter the command is issued, you will be prompted for the password to the user who you namedusing the –user option. By issuing the –resolve option, you will be loading the Java into the database andcompiling at the same time. This saves you the step of issuing the ALTER JAVA CLASS  RESOLVEcommand.How It WorksYou can load Java source code into the database directly using the CREATE JAVA SOURCE command. Thiswill load the source and make it accessible to the schema in which it was loaded. Once loaded, you cancreate a call specification for any of the class methods that you want to make into a stored procedure orfunction. The call specification maps the Java method names, parameter types, and return types to theirSQL counterparts. You will learn more about creating call specifications in Recipe 15-4. We recommendcompiling the source using the RESOLVE command before attempting to invoke any of its methods.However, if you do not issue the RESOLVE command, then Oracle Database will attempt to compile theJava source dynamically at runtime. Note A class name can be a maximum of 30 characters in length. If the specified name is more than 30characters in length, then Oracle will automatically shorten it for you and create and use a map to correlate thelong name with the shortened name. You can still specify the long name in most cases, and Oracle willautomatically convert that name to the shortened name for you. However, in some cases you will need to use theDBMS_JAVA.SHORTNAME(‘long_classname’) function to map the name for you. Conversely, if you want to retrievethe long name by using its corresponding short name, you can use theDBMS_JAVA.LONGNAME(‘short_classname’) function.The loadjava utility, which is the tool you use to implement the second Solution, uses the CREATEJAVA command to load the Java into the database. It also allows you to specify the –resolve option,which will compile the code once it has been loaded. The advantage to using loadjava is that you canload Java source files directly into the database without the need to create a separate SQL file containingthe CREATE JAVA command or copy and paste the Java class into SQL*Plus. The downside is that youmust have access to the loadjava binary executable that resides on the Oracle Database server. Thisutility can also be used to load files of type .class, .sqlj. ,  .properties,  and .ser.If your code is unable to compile because of errors, then it will not execute if you attempt to invokeone of its methods. You must repair the error(s) and ensure that the code compiles successfully before itcan be used. If your code does not compile, then you can check the USER_ERRORS table to see whatissue(s) are preventing the code from compiling successfully. The USER_ERRORS table describes thecurrent errors on all the objects that are contained within the user’s schema. To learn more aboutquerying the USER_ERRORS table, please refer to Recipe 15-15. \n15-3. Loading a Compiled Java Class Into the DatabaseProblemYou want to load a compiled Java class into the database so that you can use one or more of its methodsas stored procedures.SolutionUse the loadjava command-line utility to load the compiled Java class into the database. The followingline of code demonstrates how to use the loadjava utility to load a compiled Java class file namedEmployees.class into the database. \nloadjava -user dbuser -resolve Employees.classYou will be prompted to enter the password for the database user who you designated when issuingthe command.How It WorksThe loadjava utility can be used to load compiled Java class files into the database. To do so, you haveaccess to the binary loadjava utility executable. Usually this means you are located directly on theOracle Database server hosting the database that you want to load the Java into. Before you can invokethe loadjava utility, you should be sure that the ORACLE_SID for the target database has been set. If theserver on which you are located contains more than one Oracle home, then it is a good idea to also setthe ORACLE_HOME environment variable to be sure you will be invoking the correct version of the loadjavautility for your database. The loadjava utility is located within the bin directory of the Oracle Databasehome. The following statements show how to set these two environment variables on a Windowsmachine: \nSET ORACLE_SID&#x3D;MYDATABASE \nSET ORACLE_HOME&#x3D;&lt;PATH_TO_ORACLE_HOME&gt; \nIf you happen to be working on a Unix or Linux machine, the equivalent commands would be asfollows: \nsetenv ORACLE_SID &#x3D; MYDATABASE \nsetenv ORACLE_HOME&#x3D; &lt;PATH_TO_ORACLE_HOME&gt; \nYou must have the following permissions in order to use the loadjava utility:• CREATE PROCEDURE• CREATE TABLE• Oracle.aurora.security.JServerPermission.loadLibraryInClass.classname \nSeveral options are at your disposal when using loadjava to load source or compiled class files intothe database. The –resolve option can be used to compile Java source and mark it as VALID within theOracle Database. The –resolver option can be used for locating other Java class files that your code isdependant upon. For a complete listing of loadjava options, please see the online Oracledocumentation, which can be found athttp://download.oracle.com/docs/cd/E11882_01/java.112/e10588/cheleven.htm#CACFHDJE. \nThe loadjava utility is a member of the DBMS_JAVA package, and it can be invoked directly fromwithin your PL&#x2F;SQL code as well. To do this, issue a call to DBMS_JAVA.loadjava, and pass the optionsseparated by spaces. This is demonstrated by the following lines of text in SQL*Plus: \ncall dbms_java.loadjava(‘Employees.class’); \n15-4. Exposing a Java Class As a Stored ProcedureProblemYou have created a Java stored procedure and loaded it into the database, and now you want to access itvia PL&#x2F;SQL.SolutionCreate a PL&#x2F;SQL call specification for the Java class. The PL&#x2F;SQL call specification will essentially wrapthe call to the Java class, enabling you to have access to the class from PL&#x2F;SQL. The following codedemonstrates the creation of a call specification for the Java class that was created in Recipe 15-1 andloaded into the database in Recipe 15-2. \nCREATE OR REPLACE PROCEDURE get_it_emps AS LANGUAGE JAVA \nNAME &#39;Employees.getItEmps()&#39;; \nHow It WorksTo make the Java class accessible from the database, you must create a PL&#x2F;SQL call specification(sometimes known as PL&#x2F;SQL wrapper) for the stored Java code. A call specification maps a Java methodcall to a PL&#x2F;SQL procedure so that the Java code can be called from the database directly. A callspecification also maps any parameters and return type to the Java code. To learn more about mappingparameters and return types, please see Recipe 15-7.The call specification for a Java stored procedure is a PL&#x2F;SQL procedure itself that specifies ASLANGUAGE JAVA, followed by the name of the Java class and method that will be mapped to the procedurename. The name of the Java method to be invoked must be preceded by the Java class name thatcontains it. This is because the method has been defined as static, meaning it is a class method ratherthan an instance method. When a call to the specification is made, Oracle will automatically call theunderlying Java class method. Note Two types of methods can be created in a Java class: class methods and instance methods. Classmethods belong to the class, rather than to an instance of the class. This means the methods are instantiated oncefor each class. Instance methods belong to an instance of the class. This means that if a new instance of the classis created, a new method will be created with that instance. Class methods have access to class variables(otherwise known as static), whereas instance methods have access only to instance variables. \n15-5. Executing a Java Stored ProcedureProblemYou want to execute a Java stored procedure that you have created from within SQLPlus.CHAPTER 15  JAVA IN THE DATABASE326SolutionCall the PL&#x2F;SQL call specification that maps to the Java stored procedure. The following SQLPlus codedemonstrates how to execute the Java class for which you created a call specification in Recipe 15-3. \nSQL&gt; set serveroutput on \nSQL&gt; call dbms_java.set_output(2000); \n \nCall completed. \n \nSQL&gt; exec get_it_emps; \nAlexander Hunold AHUNOLD \nBruce Ernst BERNST \nDavid Austin DAUSTIN \nValli Pataballa VPATABAL \nDiana Lorentz DLORENTZ \n \nPL&#x2F;SQL procedure successfully completed.\nAs you can see, when the code is executed, the results are returned to SQLPlus and displayed as if itwere the output of a PL&#x2F;SQL procedure or function.How It WorksJava can be executed directly from within the database once a call specification has been made for thecorresponding Java method. Since the call specification is a PL&#x2F;SQL procedure itself, you can invoke theunderlying Java just as if it were PL&#x2F;SQL using the EXEC command from SQLPlus or call it from any otherPL&#x2F;SQL block as if it were PL&#x2F;SQL as illustrated in Recipe 15-6. To see any output from the Java, youmust set the buffer size appropriately to display it. If the buffer size is not set, then no output will bedisplayed. Similarly, if the buffer size is set too small, then only a portion of the output will be displayed.Personally, we recommend setting the output size to 2000 and moving up from there if needed. To setthe buffer size, issue this command: \nCALL DBMS_JAVA.SET_OUTPUT(buffer_size); The Java will be executed seamlessly and display the result, if any, just as if it were a PL&#x2F;SQLresponse. In the Solution to this recipe, the get_it_emps PL&#x2F;SQL procedure is called. Since get_it_emps isa call specification, it will invoke the underlying Java class method getItEmps() that actually performs thequery and displays the content. \n15-6. Calling a Java Stored Procedure from PL&#x2F;SQLProblemYou want to access a Java stored procedure from within one of your PL&#x2F;SQL applications. For instance,you are creating a PL&#x2F;SQL procedure, and you want to make a call to a Java stored procedure fromwithin it.SolutionMake a call to the Java stored procedure using the call specification that you created for it. The followingcode demonstrates a PL&#x2F;SQL package that makes a call to a Java stored procedure and then resumesPL&#x2F;SQL execution once the call has been made. \nCREATE OR REPLACE PROCEDURE employee_reports AS \n  CURSOR emp_cur IS \n  SELECT first_name, last_name, email \n  FROM employees \n  WHERE department_id &#x3D; 50; \n \n  emp_rec    emp_cur%ROWTYPE; \nBEGIN \n  DBMS_OUTPUT.PUT_LINE(&#39;Employees from Shipping Department&#39;); \n  DBMS_OUTPUT.PUT_LINE(&#39;----------------------------------&#39;); \n  FOR emp_rec IN emp_cur LOOP \n    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; ||  \n                         emp_rec.last_name || &#39; &#39; || \n                         emp_rec.email); \n  END LOOP; \n   \n  DBMS_OUTPUT.PUT_LINE(&#39;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#39;); \n  DBMS_OUTPUT.PUT_LINE(&#39;Employees from IT Department&#39;); \n  DBMS_OUTPUT.PUT_LINE(&#39;----------------------------&#39;); \n  get_it_emps; \nEND; \nThis results in the following output: \nSQL&gt; EXEC EMPLOYEE_REPORTS \nEmployees from Shipping Department \n---------------------------------- \nMatthew Weiss MWEISS \nAdam Fripp AFRIPP \n… \nAlana Walsh AWALSH \nKevin Feeney KFEENEY \nDonald OConnell DOCONNEL \nDouglas Grant DGRANT \n&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; \nEmployees from IT Department \n---------------------------- \nAlexander Hunold AHUNOLD \nBruce Ernst BERNST \nDavid Austin DAUSTIN \nValli Pataballa VPATABAL \nDiana Lorentz DLORENTZ \n \nPL&#x2F;SQL procedure successfully completed. \nThe call to the Java stored procedure from within the PL&#x2F;SQL procedure is seamless. It is integratedinto the PL&#x2F;SQL procedure body and invoked as if it were PL&#x2F;SQL.How It WorksThe call specification publishes the Java stored procedure as if it were a PL&#x2F;SQL procedure. This allowsfor seamless integration of Java stored procedures and PL&#x2F;SQL. In the Solution to this recipe, theEMPLOYEES table is queried via a PL&#x2F;SQL cursor for all employees who belong to department 50. Thatcursor is then parsed, and the results are displayed. After the cursor results have been processed, a call ismade to the Java stored procedure getItEmps() using the call specification get_it_emps. The Java storedprocedure is executed, and its results are displayed along with those from the PL&#x2F;SQL cursor processing.As you can see, Java can be executed from PL&#x2F;SQL just as if it were native PL&#x2F;SQL code. It can bevery useful to create database jobs utilizing Java stored procedures by developing a PL&#x2F;SQL storedprocedure or anonymous block that makes a series of calls to different Java stored procedures orfunctions that perform the actual processing. PL&#x2F;SQL and Java in the database can be verycomplementary to each other. \n15-7. Passing Parameters Between PL&#x2F;SQL and JavaProblemYou want to pass parameters from PL&#x2F;SQL to a Java stored procedure that expects them.SolutionCreate a call specification that accepts the same number of parameters as the number the Java storedprocedure expects. For this example, an additional method will be added to the Employee Java class thatwas created in Recipe 15-1. This method will be an enhanced version of the original method that willaccept a department ID as an input argument. It will then query the database for the employees whobelong to that department and display them.The following code is the enhanced Java method that will be added the Employees class containedwithin the Employees.java file: \npublic static void getItEmpsByDept(int departmentId)&#123; \n      String firstName &#x3D; null; \n      String lastName &#x3D; null; \n      String email &#x3D; null; \n      try &#123; \n           Connection conn &#x3D; DriverManager. \n                        getConnection(&quot;jdbc:default:connection:&quot;); \n           String sql &#x3D; &quot;SELECT FIRST_NAME, LAST_NAME, EMAIL &quot; +  \n                        &quot;FROM EMPLOYEES &quot; + \n                        &quot;WHERE DEPARTMENT_ID &#x3D; ?&quot;; \n \n           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); \n           pstmt.setInt(1, departmentId); \n           ResultSet rset &#x3D; pstmt.executeQuery(); \n           while(rset.next()) &#123; \n             firstName &#x3D; rset.getString(1); \n             lastName &#x3D; rset.getString(2); \n  CHAPTER 15  JAVA IN THE DATABASE \n329 \n             email &#x3D; rset.getString(3); \n             System.out.println(firstName + &quot; &quot; + lastName + &quot; &quot; + \n                                email); \n           &#125; \n           pstmt.close(); \n           rset.close(); \n      &#125; catch (SQLException ex)&#123; \n          System.err.println(&quot;ERROR: &quot; + ex); \n          &#125; \n  &#125; \nOnce this method has been added to the Employees class, then the Java source should be loaded intothe database using the technique demonstrated in Recipe 15-2. Note You must include the OR REPLACE clause of the CREATE JAVA statement if the Employees source isalready contained in the database. If you do not include this clause, then you will receive an Oracle error.Once the Java has been loaded into the database and compiled, you will need to create the callspecification that will be used by PL&#x2F;SQL for accessing the Java stored procedure. The following codedemonstrates a call specification that will accept a parameter when invoked and pass it to the Javastored procedure: \nCREATE OR REPLACE PROCEDURE get_it_emps_by_dept(dept_id IN NUMBER) \n AS LANGUAGE JAVA \nNAME &#39;Employees.getItEmpsByDept(int)&#39;; \nThe procedure can now be called by passing a department ID value as such: \nSQL&gt; exec get_it_emps_by_dept(60);                          \nAlexander Hunold AHUNOLD \nBruce Ernst BERNST \nDavid Austin DAUSTIN \nValli Pataballa VPATABAL \nDiana Lorentz DLORENTZ \n \nPL&#x2F;SQL procedure successfully completed.\nHow It WorksThe call specification is what determines how a Java stored procedure or function’s arguments aremapped to PL&#x2F;SQL arguments. To implement parameters, the call specification must match eachparameter in the stored procedure or function to an argument in the specification. As mentioned inprevious recipes, the call specification is a PL&#x2F;SQL procedure itself, and each argument that is coded inthe specification matches an argument that is coded within the Java stored procedure.The datatypes that Java uses do not match those used in PL&#x2F;SQL. In fact, a translation must takeplace when passing parameters listed as a PL&#x2F;SQL datatype to a Java stored procedure that acceptsparameters as a Java datatype. If you are familiar enough with each of the two languages, the translationis fairly straightforward. However, there are always those cases where one is not sure what datatype tomatch against. Table 15-1 lists some of the most common datatypes and how they map between Javaand PL&#x2F;SQL. For a complete datatype map, please refer to the Oracle documentation athttp://download.oracle.com/docs/cd/B28359_01/java.111/b31225/chsix.htm#CHDFACEE. \nTable 15-1. Datatype Map \nSQL Datatype      Java Type \nCHAR              oracle.sql.CHAR \nVARCHAR           java.lang.String \nLONG              java.lang.String \nNUMBER            java.lang.Integer,Java.lang.Float,Java.lang.Double,Java. math.BigDecimal,Java.lang.Byte,Oracle.sql.NUMBER,Java.lang.Short, \nDATE              oracle.sql.DATE \nTIMESTAMP         oracle.sql.TIMESTAMP \nTIMESTAMP         WITH TIME ZONE oracle.sql.TIMESTAMPTZ \nTIMESTAMP         WITH LOCAL TIME ZONE  oracle.sql.TIMESTAMPLTZ \nBLOB              oracle.sql.BLOB \nCLOB              oracle.sql.CLOB \nCreating a PL&#x2F;SQL call specification that includes parameters must use the fully qualified Java classname when specifying the parameter datatypes in the Java class method signature. If an incorrectdatatype is specified, then an exception will be thrown. For instance, if you want to pass a VARCHAR2 fromPL&#x2F;SQL to a Java stored procedure, the signature for the Java class method must accept an argument oftype java.lang.String. The following pseudocode demonstrates this type of call specification:CREATE OR REPLACE PROCEDURE procedure_name(value   VARCHAR2)AS LANGUAGE JAVANAME ‘JavaClass.javaMethod(java.lang.String)’; \n15-8. Creating and Calling a Java Database FunctionProblemYou want to create a database function using the Java language.  CHAPTER 15  JAVA IN THE DATABASE331SolutionCreate a function written in Java, and then create a call specification for the function. Ensure that the callspecification allows for the same number of parameters to pair up with the Java function and allows for areturning result. For this recipe, you will add a function to the Employees Java class that will accept anemployee ID and return that employee’s job title. The following code is the Java source for the functionnamed getEmpJobTitle: \npublic static String getEmpJobTitle(int empId)&#123; \n      String jobTitle &#x3D; null; \n      try &#123; \n           Connection conn &#x3D; DriverManager. \n                        getConnection(&quot;jdbc:default:connection:&quot;); \n           String sql &#x3D; &quot;SELECT JOB_TITLE &quot; +  \n                        &quot;FROM EMPLOYEES EMP, &quot; + \n            &quot;JOBS JOBS &quot; + \n                        &quot;WHERE EMP.EMPLOYEE_ID &#x3D; ? &quot; + \n                         &quot;AND JOBS.JOB_ID &#x3D; EMP.JOB_ID&quot;; \n \n           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); \n           pstmt.setInt(1, empId); \n           ResultSet rset &#x3D; pstmt.executeQuery(); \n           while(rset.next()) &#123; \n             jobTitle &#x3D; rset.getString(1); \n           &#125; \n           pstmt.close(); \n           rset.close(); \n                          &#125; catch (SQLException ex)&#123; \n                                     System.err.println(&quot;ERROR: &quot; + ex); \n                                     jobTitle &#x3D; &quot;N&#x2F;A&quot;; \n          &#125; \n                  if (jobTitle &#x3D;&#x3D; null)&#123; \n                       jobTitle &#x3D; &quot;N&#x2F;A&quot;; \n                 &#125; \n                                    return jobTitle; \n  &#125; \nNext is the call specification for the function: \nCREATE OR REPLACE FUNCTION get_emp_job_title(emp_id IN NUMBER)RETURN VARCHAR2 AS LANGUAGE JAVANAME ‘Employees.getEmpJobTitle(int) return java.lang.String’;The function can now be called just like a PL&#x2F;SQL function would. The following lines of code showa SQL SELECT statement that calls the function passing an employee ID number of 200. \nSQL&gt; select get_emp_job_title(200) from dual; \n \nGET_EMP_JOB_TITLE(200) \n-------------------------------------------------------------------------------- \nAdministration Assistant \n\nHow It WorksThe difference between a stored procedure and a stored function is that a function always returns avalue. In the Java language, a method may or may not return a value. The difference between a PL&#x2F;SQLcall specification for a Java stored procedure and a PL&#x2F;SQL call specifcation for a Java function is that thePL&#x2F;SQL call specification will specify a return value if it is being used to invoke an underlying function.In the Solution to this recipe, the example PL&#x2F;SQL call specification returns a VARCHAR2 data type becausethe Java function that is being called will return a Java String. \n15-9. Creating a Java Database TriggerProblemYou want to create a database trigger that uses a Java stored procedure to do its work.SolutionCreate a Java stored procedure that does the work you require, and publish it as a Java stored procedure,making it accessible to PL&#x2F;SQL. Once it’s published, write a standard PL&#x2F;SQL trigger that calls the Javastored procedure.For example, suppose you need a trigger to audit INSERT events on the EMPLOYEES table and recordthem in another table. First, you must create the table that will be used to record each of the loggedevents. The following DDL creates one: \nCREATE TABLE EMPLOYEE_AUDIT_LOG ( \nemployee_id     NUMBER, \nenter_date      DATE); \nNext, you will need to code the Java stored procedure that you want to have executed each time an \nINSERT occurs on the EMPLOYEES table. Add the following Java method to the Employees class of previous \nrecipes in this chapter: \npublic static void employeeAudit(int empId)&#123; \n      try &#123; \n           Connection conn &#x3D; DriverManager. \n                        getConnection(&quot;jdbc:default:connection:&quot;); \n           String sql &#x3D; &quot;INSERT INTO EMPLOYEE_AUDIT_LOG VALUES(&quot; + \n                    &quot;?, sysdate)&quot;; \n           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); \n           pstmt.setInt(1, empId); \n           pstmt.executeUpdate(); \n       pstmt.close(); \n       conn.commit(); \n       \n      &#125; catch (SQLException ex)&#123; \n          System.err.println(&quot;ERROR: &quot; + ex); \n          &#125; \n       \n  &#125; \nNext, the PL&#x2F;SQL call specification for the Java stored procedure must be created. The following isthe code to implement the call specification: \nCREATE OR REPLACE PROCEDURE emp_audit(emp_id NUMBER) \nAS LANGUAGE JAVA \nNAME &#39;Employees.employeeAudit(int)&#39;; \n\nFinally, a trigger to call the EMP_AUDIT procedure must be created. The trigger will be executed onINSERT to the EMPLOYEES table. The following code will generate the trigger to call EMP_AUDIT: \nCREATE OR REPLACE TRIGGER emp_audit_ins \nAFTER INSERT ON EMPLOYEES \nFOR EACH ROW \nCALL emp_audit(:new.employee_id); \n\nOnce all these pieces have been successfully created within the database, the EMP_AUDIT_INS triggerwill be executed each time there is an INSERT made to the EMPLOYEES table. In turn, the trigger will call theEMP_AUDIT PL&#x2F;SQL procedure, which calls the Java method contained within the Employees class. TheSQL*Plus output shown here demonstrates an INSERT into the EMPLOYEES table, followed by a query onthe EMPLOYEE_AUDIT_LOG table to show that the trigger has been invoked: \nSQL&gt; insert into employees values( \n   employees_seq.nextval, \n   &#39;Jane&#39;, \n   &#39;Doe&#39;, \n   &#39;jane.doe@mycompany.com&#39;, \n   null, \n   sysdate, \n   &#39;FI_MGR&#39;, \n   null, \n   null, \n   null, \n   null); \n \n1 row created. \n\nSQL&gt; select * from employee_audit_log; \n \nEMPLOYEE_ID ENTER_DAT \n----------- --------- \n    265 02-NOV-10 \n\n\nHow It WorksA Java-based trigger combines the power of Java code with the native ease of performing datamanipulation using PL&#x2F;SQL triggers. Although creating a Java trigger requires more steps than usingnative PL&#x2F;SQL, the Java code is portable. If your application is supported on more than one databaseplatform, this lets you write code once and deploy it in many environments. It also makes sense to codea trigger using Java if you require the use of Java libraries or technologies that are unavailable to PL&#x2F;SQL.In the Solution to this recipe, a trigger was created that will insert a row into an audit table each timean INSERT is made on the EMPLOYEES table. The actual work is performed within a Java method that isadded to a Java class and loaded into the database. For more information on loading Java into thedatabase, please see Recipe 15-2. To invoke the stored Java method, you must create a PL&#x2F;SQL callspecification, which maps the Java method to a PL&#x2F;SQL stored procedure. The call specification canaccept zero, one, or many parameters, and it will seamlessly pass the parameters to the underlying Javamethod. The final step to creating a Java trigger is to code a PL&#x2F;SQL trigger that invokes the PL&#x2F;SQLstored procedure that was created.Creating a Java-based trigger entails a series of steps. Each piece of code depends upon the others,and like a domino effect, the trigger will call the procedure that in turn executes the Java method. ThisSolution opens the world of Java libraries and thousands of possibilities to the standard PL&#x2F;SQL trigger. \n15-10. Passing Data Objects from PL&#x2F;SQL to JavaProblemYou have retrieved a row of data from the database using PL&#x2F;SQL, and you want to populate a PL&#x2F;SQLobject type with that data and then pass the populated data object to a Java procedure.SolutionCreate a PL&#x2F;SQL object type, along with a call specification for the Java stored procedure that you wantto pass the object to. Ensure that the Java stored procedure accepts an object of type oracle.sql.STRUCTand that the call specification accepts the PL&#x2F;SQL object type you have created. For this recipe, theexample will demonstrate the creation of a Java method that will accept an Employee object and returnthat employee’s corresponding department name. The Java code will be invoked from within a PL&#x2F;SQLanonymous block that queries each employee, loads an Employee object with the data, passes the objectto the Java method, and returns the result.First, add the following Java method to the Employees class you’ve used with previous recipes in thischapter: \npublic static String getEmpDepartment(oracle.sql.STRUCT emp) &#123; \n     \n    String deptName &#x3D; null; \n    BigDecimal employeeId &#x3D; null; \n    try &#123; \n          Object[] attribs &#x3D; emp.getAttributes(); \n       &#x2F;&#x2F; Use indexes to grab individual attributes. \n       Object empId &#x3D; attribs[0]; \n       try&#123; \n           employeeId &#x3D; (BigDecimal) empId; \n       &#125; catch (ClassCastException cce) &#123; \n           System.out.println(cce); \n       &#125; \n       Connection conn &#x3D; DriverManager. \n                        getConnection(&quot;jdbc:default:connection:&quot;); \n           String sql &#x3D; &quot;SELECT DEPARTMENT_NAME &quot; +  \n                        &quot;FROM DEPARTMENTS DEPT, &quot; + \n            &quot;EMPLOYEES EMP &quot; + \n                        &quot;WHERE EMP.EMPLOYEE_ID &#x3D; ? &quot; + \n            &quot;AND DEPT.DEPARTMENT_ID &#x3D; EMP.DEPARTMENT_ID&quot;; \n \n           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); \n           pstmt.setInt(1, employeeId.intValue()); \n           ResultSet rset &#x3D; pstmt.executeQuery(); \n           while(rset.next()) &#123; \n             deptName &#x3D; rset.getString(1); \n           &#125; \n           pstmt.close(); \n           rset.close(); \n      &#125; catch (java.sql.SQLException ex)&#123; \n          System.err.println(&quot;ERROR: &quot; + ex); \n          deptName &#x3D; &quot;N&#x2F;A&quot;; \n          &#125; \n      if (deptName &#x3D;&#x3D; null)&#123; \n        deptName &#x3D; &quot;N&#x2F;A&quot;; \n      &#125; \n      return deptName; \n  &#125;\nNext, create the PL&#x2F;SQL object that will contain employee information. The following SQLstatement will create this object: \nCREATE TYPE Employee AS OBJECT ( \nemp_id NUMBER(6), \nfirst VARCHAR2(20), \nlast  VARCHAR2(25), \nemail VARCHAR2(25), \njob VARCHAR2(10), \ndept NUMBER(4) \n); \nNow you need to create the call specification for the Java method. Since the method is returning avalue, the call specification needs to be a PL&#x2F;SQL function that accepts an Employee object and returns aString value. The following code demonstrates such a call specification for the getEmpDepartment Javamethod: \nCREATE OR REPLACE FUNCTION get_emp_department (emp Employee) RETURN VARCHAR2 AS \nLANGUAGE JAVA \nNAME &#39;Employees.getEmpDepartment(oracle.sql.STRUCT) return java.lang.String&#39;; \nFinally, call the new Java function from within an anonymous block. The following PL&#x2F;SQL blockuses a cursor to traverse the EMPLOYEES table and populates an Employee object with each iteration. Inturn, the object is passed to the Java stored procedure via the PL&#x2F;SQL function GET_EMP_DEPARTMENT, andthe corresponding DEPARTMENT_NAME is returned. \nDECLARE \n  CURSOR emp_cur IS \n  SELECT * FROM EMPLOYEES; \n   \n  emp_rec    emp_cur%ROWTYPE; \n  emp        Employee; \nBEGIN \n  FOR emp_rec IN emp_cur LOOP \n    emp :&#x3D; Employee(emp_rec.employee_id, \n                    emp_rec.first_name, \n                    emp_rec.last_name, \n                    emp_rec.email, \n                    emp_rec.job_id, \n                    emp_rec.department_id); \n    DBMS_OUTPUT.PUT_LINE(emp.first || &#39; &#39; || emp.last || &#39; - &#39; || \n            get_emp_department(emp)); \n  END LOOP; \nEND; \nHow It WorksPassing objects to Java code should be second nature to you since Java is an object-oriented language.You can create PL&#x2F;SQL objects as well and use them within your PL&#x2F;SQL and Java mashup applications.The Solution to this recipe demonstrated the creation of an Employee object in PL&#x2F;SQL that was passed toJava.To accept a PL&#x2F;SQL object type, Java code must use a parameter of type oracle.sql.STRUCT in placeof the object. The STRUCT object is basically a container that allows the contents to be accessed by callingthe getAttributes method. In the Solution to this recipe, the oracle.sql.STRUCT object is accepted in theJava class as a parameter, and then the getAttributes method is called on it. This creates an array ofobjects that contains the data. The Java stored procedure accesses the object using the 0 index position,which is the first placeholder from the PL&#x2F;SQL object. This position maps to the emp_id field in thePL&#x2F;SQL object. The Java class then uses that emp_id to query the database and retrieve a correspondingDEPARTMENT_ID if it exists.The call specification must accept the PL&#x2F;SQL object type as a parameter but use theoracle.sql.STRUCT object as the parameter in the Java source signature. When the object is passed to thePL&#x2F;SQL call specification procedure, it will be converted into an oracle.sql.STRUCT object, which is adatatype that a Java class can accept.Organizing your data into objects can be useful, especially when the object you are creating doesnot match a table definition exactly. For instance, you could create an object that contains employeeinformation along with region information. There are no tables that contain both of these fields, so inorder to retrieve the information together, you are forced into either using a SQL query that containstable joins or creating a database view. In such a case, it may be easier to populate the object usingPL&#x2F;SQL and then hand it off to the Java program for processing. \n15-11. Embedding a Java Class Into a PL&#x2F;SQL PackageProblemYou are interested in creating a Java class and making each of its methods and attributes available toPL&#x2F;SQL in an organized unit of code.SolutionUse a PL&#x2F;SQL package to declare each of the attributes and methods that reside within the Java class,and then create separate call specifications for each of the Java methods within the PL&#x2F;SQL packagebody. The following code demonstrates the creation of a PL&#x2F;SQL package named EMP_PKG, whichdeclares each of the methods that reside within the Employee Java class and makes them available toPL&#x2F;SQL via call specifications that are implemented within the package body.First, create the package header as follows: \nCREATE OR REPLACE PACKAGE EMP_PKG AS \n \n    PROCEDURE get_it_emps; \n    PROCEDURE get_it_emps_by_dept(dept_id IN NUMBER); \n    PROCEDURE emp_audit(emp_id NUMBER); \n     \n    FUNCTION get_emp_job_title(emp_id IN NUMBER) RETURN VARCHAR2; \n    FUNCTION get_emp_department (emp Employee) RETURN VARCHAR2; \n \nEND; \nNext, create the package body as follows, adding a call specification for each Java method or \nattribute you plan to use: \n \nCREATE PACKAGE BODY EMP_PKG AS \n \n    PROCEDURE get_it_emps \n    AS LANGUAGE JAVA \n    NAME &#39;Employees.getItEmps()&#39;; \n     \n    PROCEDURE get_it_emps_by_dept(dept_id IN NUMBER) \n    AS LANGUAGE JAVA \n    NAME &#39;Employees.getItEmpsByDept(int)&#39;; \n     \n    PROCEDURE emp_audit(emp_id NUMBER) \n    AS LANGUAGE JAVA \n    NAME &#39;Employees.employeeAudit(int)&#39;; \n     \n    FUNCTION get_emp_job_title(emp_id IN NUMBER) RETURN VARCHAR2 \n    AS LANGUAGE JAVA \n    NAME &#39;Employees.getEmpJobTitle(int) return String&#39;; \n     \n    FUNCTION get_emp_department (emp Employee) RETURN VARCHAR2 \n    AS LANGUAGE JAVA \n    NAME &#39;Employees.getEmpDepartment(oracle.sql.STRUCT) return java.lang.String&#39;; \n \nEND; \nNow the package can be used to call each of the underlying Java stored procedures instead of havingseparate PL&#x2F;SQL procedures and functions for each. The following anonymous block has been modifiedto make use of the PL&#x2F;SQL package for calling GET_EMP_DEPARTMENT rather than a stand-alone function. \nDECLARE \n  CURSOR emp_cur IS \n  SELECT * FROM EMPLOYEES; \n   \n  emp_rec    emp_cur%ROWTYPE; \n  emp        Employee; \nBEGIN \n  FOR emp_rec IN emp_cur LOOP \n    emp :&#x3D; Employee(emp_rec.employee_id, \n                    emp_rec.first_name, \n                    emp_rec.last_name, \n                    emp_rec.email, \n                    emp_rec.job_id, \n                    emp_rec.department_id); \n    DBMS_OUTPUT.PUT_LINE(emp.first || &#39; &#39; || emp.last || &#39; - &#39; || \n            emp_pkg.get_emp_department(emp)); \n  END LOOP; \nEND; \nHow It WorksIn programming, it is a best practice to organize code in a way that makes it easy to maintain.  Placingrelated procedures and functions inside a single PL&#x2F;SQL package is one such application of thatapproach. The same can be said for working with Java code in the database. A few Java storedprocedures or functions will not cause much trouble to maintain. However, once you start toaccumulate more than a handful within the same underlying Java class, then it is a good idea toconsolidate the call specifications into a single PL&#x2F;SQL package.In the Solution to this recipe, all the Java stored procedures that are contained within the EmployeesJava class have call specifications that are grouped into a single PL&#x2F;SQL package. If you create onePL&#x2F;SQL package containing call specifications per each Java class that is loaded into the database, youwill have a nicely organized environment. In some cases, you may have more than one Java class thatcontains the implementations that are to be used within a single PL&#x2F;SQL application. In those cases, itmay make more sense to combine all call specifications into a single PL&#x2F;SQL package.Using PL&#x2F;SQL package to group call specifications is a good idea. Not only will this technique makefor easier maintenance, but it also makes for more uniform applications with consistent interfaces. \n15-12. Loading Java Libraries Into the DatabaseProblemYou want to create a Java class that utilizes some external Java libraries. To do so, you must load thoseexternal libraries into the database.SolutionUse the loadjava utility to store the external libraries into the database. In this example, a Java utilityclass containing a method that uses the JavaMail API to send e-mail will be loaded into the database. Themethod relies on some external Java libraries to use the JavaMail API. The following loadjava commandsdemonstrate the loading of three essential JAR files for using the JavaMail API: \nloadjava –u  mail.jarloadjava –u  standard.jarloadjava –u  activation.jar \nNext, load the Java source for the JavaUtils class into the database: \nCREATE OR REPLACE JAVA SOURCE NAMED &quot;JavaUtils&quot; AS \nimport java.util.*; \nimport java.util.logging.Level; \nimport java.util.logging.Logger; \nimport javax.activation.*; \nimport javax.mail.*; \nimport javax.mail.internet.*; \nimport javax.naming.*; \n \npublic class JavaUtils &#123; \n \n public static void sendMail(String subject, \n            String recipient, \n            String message) &#123; \n        try &#123; \n \n            Properties props &#x3D; System.getProperties(); \n            props.put(&quot;mail.from&quot;, &quot;me@mycompany.com&quot;); \n            props.put(&quot;mail.smtp.host&quot;,&quot;company.smtp.server&quot;); \n            Session session &#x3D; Session.getDefaultInstance(props,null); \n            Message msg &#x3D; new MimeMessage(session); \n            msg &#x3D; new MimeMessage(session); \n            msg.setSubject(subject); \n            msg.setSentDate(new java.util.Date()); \n            msg.setFrom(); \n             \n            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient, \nfalse)); \n             \n            MimeBodyPart body &#x3D; new MimeBodyPart(); \n            body.setText(message); \n            Multipart mp &#x3D; new MimeMultipart(); \n            mp.addBodyPart(body); \n            msg.setContent(mp); \n \n            Transport.send(msg); \n        &#125; catch (MessagingException ex) &#123; \n            Logger.getLogger(JavaUtils.class.getName()).log(Level.SEVERE, null, ex); \n        &#125;  \n    &#125;;\nCompile the Java sources using the ALTER JAVA SOURCE command. The sources should compilewithout issues since the JAR files containing the required library references have been loaded into thedatabase. If the JAR files had not been loaded, then the class would not compile successfully. \nALTER JAVA SOURCE &quot;JavaUtils&quot; RESOLVE;Lastly, create the call specification for the sendMail Java stored procedure. In this case, a PL&#x2F;SQLpackage will be created that contains the call specification for sendMail. \nCREATE OR REPLACE PACKAGE JAVA_UTILS AS \n    PROCEDURE send_mail(subject VARCHAR2, \n                        recipient VARCHAR2, \n                        message VARCHAR2); \n    \nEND; \nCREATE OR REPLACE PACKAGE BODY JAVA_UTILS AS \n    PROCEDURE send_mail(subject VARCHAR2, \n                        recipient VARCHAR2, \n                        message VARCHAR2) \n    AS LANGUAGE JAVA \n    NAME &#39;JavaUtils.sendMail(java.lang.String, java.lang.String, java.lang.String)&#39;; \n    \nEND; \nThe stored procedure can now be executed using the following command:EXEC java_utils.send_mail(‘Test’,‘&#109;&#121;&#101;&#x6d;&#97;&#x69;&#x6c;&#x40;&#109;&#x79;&#99;&#x6f;&#x6d;&#x70;&#x61;&#x6e;&#121;&#46;&#x63;&#x6f;&#x6d;‘,’Test Message’);If the message is sucessfully sent, you will see the following output:PL&#x2F;SQL procedure successfully completed.How It WorksJava libraries are packaged into JAR files so that they can be easily distributed. The loadjava utility canbe used to load Java libraries into the database. To use the utility, download the JAR files that you want toload into the database, and place them into a directory that can be accessed by the database server.Open the command prompt or terminal, traverse into that directory, and execute the loadjava utility,using the –u flag to specify the database user and passing the name of the JAR file to load. If successful,the JAR file will be loaded into the schema that you indicated with the –u flag, and you may begin to usethe libraries contained in the JAR file within your stored Java code.The loadjava utility contains a number of options. For a complete listing of loadjava options, pleasesee the online Oracle documentation athttp://download.oracle.com/docs/cd/B28359_01/java.111/b31225/cheleven.htm.Additional options are not necessary to load a JAR file into the schema that you indicate with the -uflag. Since the JAR file consists of compiled Java libraries, there is no need to resolve the library onceloaded. As indicated in the Solution to this recipe, you can begin to import classes from the libraries assoon as they have been loaded. \n15-13. Removing a Java ClassProblemYou want to drop a Java class from your database.SolutionIssue the SQL DROP JAVA command along with the schema and object name you want to drop. Forinstance, you want to drop the Java source for the Employees class. In this case, you would issue thefollowing command: \nDROP JAVA SOURCE “Employees”;How It WorksThere may come a time when you need to drop a Java class or sources from the database. For instance, ifyou no longer want to maintain or allow access to a particular Java class, it may make sense to drop it.The DROP JAVA SOURCE command does this by passing the name of the class or source as demonstratedwithin the Solution to this recipe. Note Be careful not to drop a Java class if other Java procedures or PL&#x2F;SQL call specifications depend upon it.Doing so will invalidate any dependent code, and you will receive an error if you try to execute. The data dictionaryprovides views, such as DBA_DEPENDENCIES, that can be queried in order to find dependent objects. \nAlternately, if you are on the database server, there is a dropjava utility that works in the samefashion as the loadjava utility that was demonstrated in Recipe 15-3. To use the dropjava utility, issuethe dropjava command at the command line, and pass the database connect string using the –u flagalong with the name of the Java class or source you want to drop. The following example demonstratesthe command to drop the Employees Java class using the dropjava utility. \ndropjava –u username&#x2F;password@database_host:port:database_name Employees.classThe dropjava utility actually invokes the DROP JAVA SOURCE command. The downside to using theutility is that you must be located on the database server to use it. I recommend using the DROP JAVASOURCE command from SQLPlus if possible because it tends to make life easier if you are working withinSQLPlus on a machine that is remote from the server. \n15-14. Retrieving Database Metadata with JavaProblemYou are interested in retrieving some metadata regarding the database from within your Java storedprocedure. In this recipe, you want to list all the schemas within the database.SolutionCreate a Java stored procedure that utilizes the OracleDatabaseMetaData object to pull information fromthe connection. In the following example, a Java stored procedure is created that utilizes theOracleDatabaseMetaData object to retrieve schema names from the Oracle connection. This Java methodwill be added to the JavaUtils class. \npublic static void listDatabaseSchemas() &#123; \n        Connection conn &#x3D; null; \n        try &#123; \n            conn &#x3D; DriverManager.getConnection(&quot;jdbc:default:connection:&quot;); \n            OracleDatabaseMetaData meta &#x3D; (OracleDatabaseMetaData) conn.getMetaData(); \n \n            if (meta &#x3D;&#x3D; null) &#123; \n                System.out.println(&quot;Database metadata is unavailable&quot;); \n            &#125; else &#123; \n                ResultSet rs &#x3D; meta.getSchemas(); \n                while (rs.next()) &#123; \n                    System.out.println(rs.getString(1)); \n                &#125; \n            &#125; \n        &#125; catch (SQLException ex) &#123; \n            System.out.println(ex); \n        &#125;  \n    &#125; \nThe output from the execution of this Java method will be a list of all database schemas.How It WorksSometimes it may be useful to use Java code for obtaining database metadata. One such instance mightarise when you are developing a Java class that needs to access database metadata. Your code will beeasier to maintain and read if you use Java to obtain the metadata rather than a PL&#x2F;SQL procedure. TheOracleDatabaseMetaData object was created for that purpose. In the Solution to this recipe, the metadataobject is used to retrieve a listing of all database schemas. However, several other methods can be calledon the OracleDatabaseMetaData object to obtain other useful database metadata. For instance,information about the underlying database tables or columns can also be obtained using this resource.For a complete listing of the different options available via the OracleDatabaseMetaData object, pleaserefer to the online documentation atwww.oracle.com/technology/docs/tech/java/sqlj_jdbc/doc_library/javadoc/oracle.jdbc.driver.OracleDatabaseMetaData.html. \nIn the Solution to this recipe, a Java Connection object is obtained using jdbc:default:connection.The getMetaData method can be called on a Connection object and casted to an OracleDatabaseMetaDataobject type. This Solution demonstrates this technique and then uses the object to retrieve informationabout the database. \n15-15. Querying the Database to Help Resolve JavaCompilation IssuesProblemYou are attempting to compile Java source within the database, and you are receiving an unsuccessfulresult. You need to determine the underlying issue to the Problem that is preventing the Java sourcefrom compiling correctly.SolutionQuery the USER_ERRORS table to determine the cause of the compilation issue. For example, suppose theJavaUtils class source is loaded into the database with an incorrect variable name. This will cause acompiler error that will be displayed within the USER_ERRORS table. The following is an excerpt from aSQL*Plus session where an attempt has been made to compile the code: \nSQL&gt; ALTER JAVA SOURCE &quot;JavaUtils&quot; RESOLVE; \nWarning: Java altered with compilation errors. \nSince compilation errors have occurred, query the USER_ERRORS table to determine the exact cause ofthe error so that it can be repaired. The following query demonstrates this technique: \nSQL&gt; COL TEXT FOR A25 \nSQL&gt; SELECT NAME, TYPE, LINE, TEXT \n  2  FROM USER_ERRORS \n  3  WHERE TYPE LIKE &#39;JAVA%&#39;; \n \nNAME                   TYPE          LINE TEXT \n------------------------------ ------------ ---------- ------------------------- \nJavaUtils               JAVA CLASS         0 ORA-29535: source require \n                               s recompilation \n \nJavaUtils               JAVA SOURCE         0 JavaUtils:51: cannot find \n                            symbol \n \nJavaUtils               JAVA SOURCE         0 symbol  : variable me \nJavaUtils               JAVA SOURCE         0 location: class JavaUtils \nJavaUtils               JAVA SOURCE         0               ResultSet \n                            rs &#x3D; me.getSchemas(); \n \n \nNAME                   TYPE          LINE TEXT \n------------------------------ ------------ ---------- ------------------------- \nJavaUtils               JAVA SOURCE         0 \n                                 ^ \n \nJavaUtils               JAVA SOURCE         0 1 error \n \n7 rows selected. \nHow It WorksThe USER_ERRORS table contains the most recent errors generated by PL&#x2F;SQL or Java code. It is the mostuseful way to determine the issues that are causing compilation errors when attempting to resolve Javasource errors. Unlike PL&#x2F;SQL, you are unable to issue the SHOW ERRORS command to display the mostrecent compiler errors. The Java compiler, as well as the PL&#x2F;SQL compiler, writes output to theUSER_ERRORS table, making it a beneficial tool when writing Java code for the database. \n","dateCreated":"2022-11-08T23:22:24+08:00","dateModified":"2022-11-08T23:40:54+08:00","datePublished":"2022-11-08T23:22:24+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 15-Java in the Database","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 15-Java in the Database">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:22:24.895Z">
+<meta property="article:modified_time" content="2022-11-08T15:40:54.325Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 15-Java in the Database
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:22:24+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#15-Java-in-the-Database"><span class="toc-text">15. Java in the Database</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#15-1-Creating-a-Java-Database-Class"><span class="toc-text">15-1. Creating a Java Database Class</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-2-Loading-a-Java-Database-Class-into-a-Database"><span class="toc-text">15-2. Loading a Java Database Class into a Database</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-3-Loading-a-Compiled-Java-Class-Into-the-Database"><span class="toc-text">15-3. Loading a Compiled Java Class Into the Database</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-4-Exposing-a-Java-Class-As-a-Stored-Procedure"><span class="toc-text">15-4. Exposing a Java Class As a Stored Procedure</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-5-Executing-a-Java-Stored-Procedure"><span class="toc-text">15-5. Executing a Java Stored Procedure</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-6-Calling-a-Java-Stored-Procedure-from-PL-x2F-SQL"><span class="toc-text">15-6. Calling a Java Stored Procedure from PL&#x2F;SQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-7-Passing-Parameters-Between-PL-x2F-SQL-and-Java"><span class="toc-text">15-7. Passing Parameters Between PL&#x2F;SQL and Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-8-Creating-and-Calling-a-Java-Database-Function"><span class="toc-text">15-8. Creating and Calling a Java Database Function</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-9-Creating-a-Java-Database-Trigger"><span class="toc-text">15-9. Creating a Java Database Trigger</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-10-Passing-Data-Objects-from-PL-x2F-SQL-to-Java"><span class="toc-text">15-10. Passing Data Objects from PL&#x2F;SQL to Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-11-Embedding-a-Java-Class-Into-a-PL-x2F-SQL-Package"><span class="toc-text">15-11. Embedding a Java Class Into a PL&#x2F;SQL Package</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-12-Loading-Java-Libraries-Into-the-Database"><span class="toc-text">15-12. Loading Java Libraries Into the Database</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-13-Removing-a-Java-Class"><span class="toc-text">15-13. Removing a Java Class</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-14-Retrieving-Database-Metadata-with-Java"><span class="toc-text">15-14. Retrieving Database Metadata with Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-15-Querying-the-Database-to-Help-Resolve-Java"><span class="toc-text">15-15. Querying the Database to Help Resolve Java</span></a></li></ol></li></ol>
+
+<h1 id="15-Java-in-the-Database"><a href="#15-Java-in-the-Database" class="headerlink" title="15. Java in the Database"></a>15. Java in the Database</h1><p>Java plays an important role in the application development space today. It has become increasingly<br>popular over the years, because it is cross-platform, powerful, and easy to learn. Although Java<br>development is not directly related to PL&#x2F;SQL, it is important for a PL&#x2F;SQL developer to learn a bit about<br>Java since there are some major benefits to using it to perform database tasks. Integrating the two<br>languages when you’re building Oracle Database applications is a seamless effort. Oracle Database 11g<br>contains JVM compatibility with Java 1.5, which includes substantial changes to the Java language,<br>making it an even more complementary development platform. Also starting with Oracle 11g, the<br>database includes a just-in-time compiler, which compiles Java bytecode into machine language<br>instructions, making Java in the database run much faster. In 2010, Oracle acquired Sun Microsystems,<br>so it now owns Java. This may help the database JVM compatibility remain in concert with the latest<br>releases.<br>In this chapter, you will learn how to combine the power of PL&#x2F;SQL development with Java code<br>that is stored within the database. You will learn how to create stored procedures, functions, and triggers<br>using the Java language. Running Java in the database is a substantial topic that has filled entire books,<br>but in this chapter, we will focus only on using the Java types in conjunction with PL&#x2F;SQL applications—<br>which, after all, is the subject of this book. For complete documentation on using Java inside Oracle<br>Database, please see the Oracle Java developers guide at<br><a target="_blank" rel="noopener" href="http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm">http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm</a>. </p>
+<h2 id="15-1-Creating-a-Java-Database-Class"><a href="#15-1-Creating-a-Java-Database-Class" class="headerlink" title="15-1. Creating a Java Database Class"></a>15-1. Creating a Java Database Class</h2><p><strong>Problem</strong><br>You want to write a Java class that will query the database and return a result.<br><strong>Solution</strong><br>Create a Java class that uses the Java Database Connectivity (JDBC) API to query the Oracle Database.<br>For example, the Java class in the following example will query the EMPLOYEES table for all employees who<br>belong to the IT department. The example entails a complete Java class that is named Employees. This<br>class contains a method named getItEmps() that will become a Java stored procedure. The Employees<br>class shown here will be stored into a file named Employees.java. </p>
+<p>import java.sql.<em>;<br>import oracle.jdbc.</em>; </p>
+<pre class="language-java" data-language="java"><code class="language-java">public class Employees &#123; 
+  public static void getItEmps()&#123; 
+CHAPTER 15  JAVA IN THE DATABASE 
+320 
+      String firstName &#x3D; null; 
+      String lastName &#x3D; null; 
+      String email &#x3D; null; 
+      try &#123; 
+           Connection conn &#x3D; DriverManager. 
+                        getConnection(&quot;jdbc:default:connection:&quot;); 
+           String sql &#x3D; &quot;SELECT FIRST_NAME, LAST_NAME, EMAIL &quot; +  
+                        &quot;FROM EMPLOYEES &quot; + 
+                        &quot;WHERE DEPARTMENT_ID &#x3D; 60&quot;; 
+           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); 
+           ResultSet rset &#x3D; pstmt.executeQuery(); 
+           while(rset.next()) &#123; 
+             firstName &#x3D; rset.getString(1); 
+             lastName &#x3D; rset.getString(2); 
+             email &#x3D; rset.getString(3); 
+             System.out.println(firstName + &quot; &quot; + lastName + &quot; &quot; + 
+                                email); 
+           &#125; 
+           pstmt.close(); 
+           rset.close(); 
+      &#125; catch (SQLException ex)&#123; 
+          System.err.println(&quot;ERROR: &quot; + ex); 
+      &#125;           
+  &#125;; </code></pre>
+<p>The following lines from SQL*Plus show how to execute this Java in the database, followed by the<br>output from the program. Prior to executing the code, you must load it into the database and compile it.<br>You will learn more about doing this in the next recipe. To learn more about executing Java in the<br>database, please see Recipe 15-5. For now, it is important to see the output that will result from a<br>successful call to this Java program. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec get_it_emps;
+Alexander Hunold AHUNOLD
+Bruce Ernst BERNST
+David Austin DAUSTIN
+Valli Pataballa VPATABAL
+Diana Lorentz DLORENTZ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p>The Java class in this example performs a simple query and then prints the result. Although this<br>class does not demonstrate the full potential of using Java, it is a good segue into Java database<br>development.<br><strong>How It Works</strong><br>Java is a mature language that can be used in conjunction with PL&#x2F;SQL. Sometimes it makes sense to<br>code portions of your application in Java, while in other instances it may make sense to code the entire<br>application in Java. Both PL&#x2F;SQL and Java can coexist in the same application, and you must use PL&#x2F;SQL<br>to access Java via the database.<br>This recipe demonstrates how to create a simple Java class that queries the database for EMPLOYEE<br>records. The JDBC APIs provide a way for Java programs to methodically perform the tasks you will<br>typically want to complete whenever you access a database, whether it’s querying data, updating<br>records, or deleting rows.<br>A Java class that you will use to access an Oracle Database as a stored procedure must adhere to a<br>few standards. The class must be public, and each of its methods must be public and static. Failure to<br>follow these standards will render the class methods inaccessible for use as stored procedures.<br>The first step taken in the <strong>Solution</strong> to this recipe is to obtain a connection to the database. In a Java<br>class that lives outside the database, obtaining a connection is a performance-intensive operation, and<br>you must pass a user name and password along with the database host name. However, obtaining a<br>connection using stored procedures is a bit different since they reside within the database itself. The<br>only requirement is that you pass jdbc:default:connection to the getConnection() method. </p>
+<p>Next, the SQL query (sql) is formed as a String, and a PreparedStatement object (pstmt) is then<br>created from it using the prepareStatement method. The prepared statement is what actually queries the<br>database. The next line of code in the <strong>Solution</strong> issues the query by calling the executeQuery() method on<br>the prepared statement object, which returns a result set. The result set is what you need to use in order<br>to access the rows that have been returned via the query. Use a simple while loop to traverse the rows,<br>and obtain each of the values from the result set within each iteration of the loop by indicating the<br>position of the column you want to retrieve. For instance, to obtain the FIRST_NAME, you will call<br>rset.getString(1) because FIRST_NAME is the first column that is listed within the query.<br>Lastly, the class in the <strong>Solution</strong> closes the prepared statement and result set objects. Not doing so<br>may cause issues such as memory leaks, although Java has a very efficient garbage collection system, so<br>it should take care of this for you. Again, closing the objects is a form of good practice to ensure that<br>resources can be reallocated.<br>The Oracle Java virtual machine (JVM) also supports the use of SQLJ for database access. Use of<br>SQLJ is beyond the scope of this book, but if you are interested in learning about it JVM, then please refer<br>to the Oracle Java Developer Guide, which can be found at<br><a target="_blank" rel="noopener" href="http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm">http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/toc.htm</a>. </p>
+<h2 id="15-2-Loading-a-Java-Database-Class-into-a-Database"><a href="#15-2-Loading-a-Java-Database-Class-into-a-Database" class="headerlink" title="15-2. Loading a Java Database Class into a Database"></a>15-2. Loading a Java Database Class into a Database</h2><p><strong>Problem</strong><br>You want to load a Java class into a schema within your Oracle Database.<br><strong>Solution</strong> #1<br>You can use the CREATE JAVA command to load the Java source into the database by copying and pasting<br>the Java source into a SQL file. This is the easiest way to create a Java class and then load it into the<br>database if you are not working directly on the database server but rather remotely using an editor or<br>SQL*Plus. The following lines of SQL code will load the Java class that was created in Recipe 15-1 into the<br>database using the CREATE JAVA command: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE JAVA SOURCE NAMED &quot;Employees&quot; AS 
+import java.sql.*; 
+import oracle.jdbc.*; 
+ 
+public class Employees &#123; 
+  public static void getItEmps()&#123; 
+      String firstName &#x3D; null; 
+      String lastName &#x3D; null; 
+      String email &#x3D; null; 
+      try &#123; 
+           Connection conn &#x3D; DriverManager. 
+                        getConnection(&quot;jdbc:default:connection:&quot;); 
+           String sql &#x3D; &quot;SELECT FIRST_NAME, LAST_NAME, EMAIL &quot; +  
+                        &quot;FROM EMPLOYEES &quot; + 
+                        &quot;WHERE DEPARTMENT_ID &#x3D; 60&quot;; 
+ 
+           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); 
+           ResultSet rset &#x3D; pstmt.executeQuery(); 
+           while(rset.next()) &#123; 
+             firstName &#x3D; rset.getString(1); 
+             lastName &#x3D; rset.getString(2); 
+             email &#x3D; rset.getString(3); 
+             System.out.println(firstName + &quot; &quot; + lastName + &quot; &quot; + 
+                                email); 
+           &#125; 
+           pstmt.close(); 
+           rset.close(); 
+      &#125; catch (SQLException ex)&#123; 
+          System.err.println(&quot;ERROR: &quot; + ex); 
+          &#125; 
+      &#125;           
+  &#125;;</code></pre>
+<p>Next, you need to compile the code. To do so, use the ALTER JAVA CLASS <name> RESOLVE command.<br>The following line of code compiles the Employees Java source: </p>
+<p>ALTER JAVA CLASS “Employees” RESOLVE;<br><strong>Solution</strong> #2<br>You can use the loadjava utility that is provided by Oracle in order to load Java code into the database.<br>This situation works best if you are working directly on the database server and have access to the<br>loadjava utility that is installed in the Oracle Database home. This utility is also nice to use if you already<br>have the Java code stored in a file and do not want to copy and paste code into an editor or SQL*Plus.<br>The following code demonstrates loading a Java source file named Employees.java using the loadjava<br>utility: </p>
+<p>loadjava –user dbuser Employees.java </p>
+<p>After the command is issued, you will be prompted for the password to the user who you named<br>using the –user option. By issuing the –resolve option, you will be loading the Java into the database and<br>compiling at the same time. This saves you the step of issuing the ALTER JAVA CLASS <name> RESOLVE<br>command.<br><strong>How It Works</strong><br>You can load Java source code into the database directly using the CREATE JAVA SOURCE command. This<br>will load the source and make it accessible to the schema in which it was loaded. Once loaded, you can<br>create a call specification for any of the class methods that you want to make into a stored procedure or<br>function. The call specification maps the Java method names, parameter types, and return types to their<br>SQL counterparts. You will learn more about creating call specifications in Recipe 15-4. We recommend<br>compiling the source using the RESOLVE command before attempting to invoke any of its methods.<br>However, if you do not issue the RESOLVE command, then Oracle Database will attempt to compile the<br>Java source dynamically at runtime.<br> Note A class name can be a maximum of 30 characters in length. If the specified name is more than 30<br>characters in length, then Oracle will automatically shorten it for you and create and use a map to correlate the<br>long name with the shortened name. You can still specify the long name in most cases, and Oracle will<br>automatically convert that name to the shortened name for you. However, in some cases you will need to use the<br>DBMS_JAVA.SHORTNAME(‘long_classname’) function to map the name for you. Conversely, if you want to retrieve<br>the long name by using its corresponding short name, you can use the<br>DBMS_JAVA.LONGNAME(‘short_classname’) function.<br>The loadjava utility, which is the tool you use to implement the second <strong>Solution</strong>, uses the CREATE<br>JAVA command to load the Java into the database. It also allows you to specify the –resolve option,<br>which will compile the code once it has been loaded. The advantage to using loadjava is that you can<br>load Java source files directly into the database without the need to create a separate SQL file containing<br>the CREATE JAVA command or copy and paste the Java class into SQL*Plus. The downside is that you<br>must have access to the loadjava binary executable that resides on the Oracle Database server. This<br>utility can also be used to load files of type .class, .sqlj. ,  .properties,  and .ser.<br>If your code is unable to compile because of errors, then it will not execute if you attempt to invoke<br>one of its methods. You must repair the error(s) and ensure that the code compiles successfully before it<br>can be used. If your code does not compile, then you can check the USER_ERRORS table to see what<br>issue(s) are preventing the code from compiling successfully. The USER_ERRORS table describes the<br>current errors on all the objects that are contained within the user’s schema. To learn more about<br>querying the USER_ERRORS table, please refer to Recipe 15-15. </p>
+<h2 id="15-3-Loading-a-Compiled-Java-Class-Into-the-Database"><a href="#15-3-Loading-a-Compiled-Java-Class-Into-the-Database" class="headerlink" title="15-3. Loading a Compiled Java Class Into the Database"></a>15-3. Loading a Compiled Java Class Into the Database</h2><p><strong>Problem</strong><br>You want to load a compiled Java class into the database so that you can use one or more of its methods<br>as stored procedures.<br><strong>Solution</strong><br>Use the loadjava command-line utility to load the compiled Java class into the database. The following<br>line of code demonstrates how to use the loadjava utility to load a compiled Java class file named<br>Employees.class into the database. </p>
+<p>loadjava -user dbuser -resolve Employees.class<br>You will be prompted to enter the password for the database user who you designated when issuing<br>the command.<br><strong>How It Works</strong><br>The loadjava utility can be used to load compiled Java class files into the database. To do so, you have<br>access to the binary loadjava utility executable. Usually this means you are located directly on the<br>Oracle Database server hosting the database that you want to load the Java into. Before you can invoke<br>the loadjava utility, you should be sure that the ORACLE_SID for the target database has been set. If the<br>server on which you are located contains more than one Oracle home, then it is a good idea to also set<br>the ORACLE_HOME environment variable to be sure you will be invoking the correct version of the loadjava<br>utility for your database. The loadjava utility is located within the bin directory of the Oracle Database<br>home. The following statements show how to set these two environment variables on a Windows<br>machine: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SET ORACLE_SID&#x3D;MYDATABASE 
+SET ORACLE_HOME&#x3D;&lt;PATH_TO_ORACLE_HOME&gt; </code></pre>
+<p>If you happen to be working on a Unix or Linux machine, the equivalent commands would be as<br>follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">setenv ORACLE_SID &#x3D; MYDATABASE 
+setenv ORACLE_HOME&#x3D; &lt;PATH_TO_ORACLE_HOME&gt; </code></pre>
+<p>You must have the following permissions in order to use the loadjava utility:<br>• CREATE PROCEDURE<br>• CREATE TABLE<br>• Oracle.aurora.security.JServerPermission.loadLibraryInClass.classname </p>
+<p>Several options are at your disposal when using loadjava to load source or compiled class files into<br>the database. The –resolve option can be used to compile Java source and mark it as VALID within the<br>Oracle Database. The –resolver option can be used for locating other Java class files that your code is<br>dependant upon. For a complete listing of loadjava options, please see the online Oracle<br>documentation, which can be found at<br><a target="_blank" rel="noopener" href="http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/cheleven.htm#CACFHDJE">http://download.oracle.com/docs/cd/E11882_01/java.112/e10588/cheleven.htm#CACFHDJE</a>. </p>
+<p>The loadjava utility is a member of the DBMS_JAVA package, and it can be invoked directly from<br>within your PL&#x2F;SQL code as well. To do this, issue a call to DBMS_JAVA.loadjava, and pass the options<br>separated by spaces. This is demonstrated by the following lines of text in SQL*Plus: </p>
+<p>call dbms_java.loadjava(‘Employees.class’); </p>
+<h2 id="15-4-Exposing-a-Java-Class-As-a-Stored-Procedure"><a href="#15-4-Exposing-a-Java-Class-As-a-Stored-Procedure" class="headerlink" title="15-4. Exposing a Java Class As a Stored Procedure"></a>15-4. Exposing a Java Class As a Stored Procedure</h2><p><strong>Problem</strong><br>You have created a Java stored procedure and loaded it into the database, and now you want to access it<br>via PL&#x2F;SQL.<br><strong>Solution</strong><br>Create a PL&#x2F;SQL call specification for the Java class. The PL&#x2F;SQL call specification will essentially wrap<br>the call to the Java class, enabling you to have access to the class from PL&#x2F;SQL. The following code<br>demonstrates the creation of a call specification for the Java class that was created in Recipe 15-1 and<br>loaded into the database in Recipe 15-2. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE get_it_emps AS LANGUAGE JAVA 
+NAME &#39;Employees.getItEmps()&#39;; </code></pre>
+<p><strong>How It Works</strong><br>To make the Java class accessible from the database, you must create a PL&#x2F;SQL call specification<br>(sometimes known as PL&#x2F;SQL wrapper) for the stored Java code. A call specification maps a Java method<br>call to a PL&#x2F;SQL procedure so that the Java code can be called from the database directly. A call<br>specification also maps any parameters and return type to the Java code. To learn more about mapping<br>parameters and return types, please see Recipe 15-7.<br>The call specification for a Java stored procedure is a PL&#x2F;SQL procedure itself that specifies AS<br>LANGUAGE JAVA, followed by the name of the Java class and method that will be mapped to the procedure<br>name. The name of the Java method to be invoked must be preceded by the Java class name that<br>contains it. This is because the method has been defined as static, meaning it is a class method rather<br>than an instance method. When a call to the specification is made, Oracle will automatically call the<br>underlying Java class method.<br> Note Two types of methods can be created in a Java class: class methods and instance methods. Class<br>methods belong to the class, rather than to an instance of the class. This means the methods are instantiated once<br>for each class. Instance methods belong to an instance of the class. This means that if a new instance of the class<br>is created, a new method will be created with that instance. Class methods have access to class variables<br>(otherwise known as static), whereas instance methods have access only to instance variables. </p>
+<h2 id="15-5-Executing-a-Java-Stored-Procedure"><a href="#15-5-Executing-a-Java-Stored-Procedure" class="headerlink" title="15-5. Executing a Java Stored Procedure"></a>15-5. Executing a Java Stored Procedure</h2><p><strong>Problem</strong><br>You want to execute a Java stored procedure that you have created from within SQL<em>Plus.<br>CHAPTER 15  JAVA IN THE DATABASE<br>326<br><strong>Solution</strong><br>Call the PL&#x2F;SQL call specification that maps to the Java stored procedure. The following SQL</em>Plus code<br>demonstrates how to execute the Java class for which you created a call specification in Recipe 15-3. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; set serveroutput on 
+SQL&gt; call dbms_java.set_output(2000); 
+ 
+Call completed. 
+ 
+SQL&gt; exec get_it_emps; 
+Alexander Hunold AHUNOLD 
+Bruce Ernst BERNST 
+David Austin DAUSTIN 
+Valli Pataballa VPATABAL 
+Diana Lorentz DLORENTZ 
+ 
+PL&#x2F;SQL procedure successfully completed.</code></pre>
+<p>As you can see, when the code is executed, the results are returned to SQL<em>Plus and displayed as if it<br>were the output of a PL&#x2F;SQL procedure or function.<br><strong>How It Works</strong><br>Java can be executed directly from within the database once a call specification has been made for the<br>corresponding Java method. Since the call specification is a PL&#x2F;SQL procedure itself, you can invoke the<br>underlying Java just as if it were PL&#x2F;SQL using the EXEC command from SQL</em>Plus or call it from any other<br>PL&#x2F;SQL block as if it were PL&#x2F;SQL as illustrated in Recipe 15-6. To see any output from the Java, you<br>must set the buffer size appropriately to display it. If the buffer size is not set, then no output will be<br>displayed. Similarly, if the buffer size is set too small, then only a portion of the output will be displayed.<br>Personally, we recommend setting the output size to 2000 and moving up from there if needed. To set<br>the buffer size, issue this command: </p>
+<p><code>CALL DBMS_JAVA.SET_OUTPUT(buffer_size); </code><br>The Java will be executed seamlessly and display the result, if any, just as if it were a PL&#x2F;SQL<br>response. In the <strong>Solution</strong> to this recipe, the get_it_emps PL&#x2F;SQL procedure is called. Since get_it_emps is<br>a call specification, it will invoke the underlying Java class method getItEmps() that actually performs the<br>query and displays the content. </p>
+<h2 id="15-6-Calling-a-Java-Stored-Procedure-from-PL-x2F-SQL"><a href="#15-6-Calling-a-Java-Stored-Procedure-from-PL-x2F-SQL" class="headerlink" title="15-6. Calling a Java Stored Procedure from PL&#x2F;SQL"></a>15-6. Calling a Java Stored Procedure from PL&#x2F;SQL</h2><p><strong>Problem</strong><br>You want to access a Java stored procedure from within one of your PL&#x2F;SQL applications. For instance,<br>you are creating a PL&#x2F;SQL procedure, and you want to make a call to a Java stored procedure from<br>within it.<br><strong>Solution</strong><br>Make a call to the Java stored procedure using the call specification that you created for it. The following<br>code demonstrates a PL&#x2F;SQL package that makes a call to a Java stored procedure and then resumes<br>PL&#x2F;SQL execution once the call has been made. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE employee_reports AS 
+  CURSOR emp_cur IS 
+  SELECT first_name, last_name, email 
+  FROM employees 
+  WHERE department_id &#x3D; 50; 
+ 
+  emp_rec    emp_cur%ROWTYPE; 
+BEGIN 
+  DBMS_OUTPUT.PUT_LINE(&#39;Employees from Shipping Department&#39;); 
+  DBMS_OUTPUT.PUT_LINE(&#39;----------------------------------&#39;); 
+  FOR emp_rec IN emp_cur LOOP 
+    DBMS_OUTPUT.PUT_LINE(emp_rec.first_name || &#39; &#39; ||  
+                         emp_rec.last_name || &#39; &#39; || 
+                         emp_rec.email); 
+  END LOOP; 
+   
+  DBMS_OUTPUT.PUT_LINE(&#39;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#39;); 
+  DBMS_OUTPUT.PUT_LINE(&#39;Employees from IT Department&#39;); 
+  DBMS_OUTPUT.PUT_LINE(&#39;----------------------------&#39;); 
+  get_it_emps; 
+END; </code></pre>
+<p>This results in the following output: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; EXEC EMPLOYEE_REPORTS 
+Employees from Shipping Department 
+---------------------------------- 
+Matthew Weiss MWEISS 
+Adam Fripp AFRIPP 
+… 
+Alana Walsh AWALSH 
+Kevin Feeney KFEENEY 
+Donald OConnell DOCONNEL 
+Douglas Grant DGRANT 
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; 
+Employees from IT Department 
+---------------------------- 
+Alexander Hunold AHUNOLD 
+Bruce Ernst BERNST 
+David Austin DAUSTIN 
+Valli Pataballa VPATABAL 
+Diana Lorentz DLORENTZ 
+ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p>The call to the Java stored procedure from within the PL&#x2F;SQL procedure is seamless. It is integrated<br>into the PL&#x2F;SQL procedure body and invoked as if it were PL&#x2F;SQL.<br><strong>How It Works</strong><br>The call specification publishes the Java stored procedure as if it were a PL&#x2F;SQL procedure. This allows<br>for seamless integration of Java stored procedures and PL&#x2F;SQL. In the <strong>Solution</strong> to this recipe, the<br>EMPLOYEES table is queried via a PL&#x2F;SQL cursor for all employees who belong to department 50. That<br>cursor is then parsed, and the results are displayed. After the cursor results have been processed, a call is<br>made to the Java stored procedure getItEmps() using the call specification get_it_emps. The Java stored<br>procedure is executed, and its results are displayed along with those from the PL&#x2F;SQL cursor processing.<br>As you can see, Java can be executed from PL&#x2F;SQL just as if it were native PL&#x2F;SQL code. It can be<br>very useful to create database jobs utilizing Java stored procedures by developing a PL&#x2F;SQL stored<br>procedure or anonymous block that makes a series of calls to different Java stored procedures or<br>functions that perform the actual processing. PL&#x2F;SQL and Java in the database can be very<br>complementary to each other. </p>
+<h2 id="15-7-Passing-Parameters-Between-PL-x2F-SQL-and-Java"><a href="#15-7-Passing-Parameters-Between-PL-x2F-SQL-and-Java" class="headerlink" title="15-7. Passing Parameters Between PL&#x2F;SQL and Java"></a>15-7. Passing Parameters Between PL&#x2F;SQL and Java</h2><p><strong>Problem</strong><br>You want to pass parameters from PL&#x2F;SQL to a Java stored procedure that expects them.<br><strong>Solution</strong><br>Create a call specification that accepts the same number of parameters as the number the Java stored<br>procedure expects. For this example, an additional method will be added to the Employee Java class that<br>was created in Recipe 15-1. This method will be an enhanced version of the original method that will<br>accept a department ID as an input argument. It will then query the database for the employees who<br>belong to that department and display them.<br>The following code is the enhanced Java method that will be added the Employees class contained<br>within the Employees.java file: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">public static void getItEmpsByDept(int departmentId)&#123; 
+      String firstName &#x3D; null; 
+      String lastName &#x3D; null; 
+      String email &#x3D; null; 
+      try &#123; 
+           Connection conn &#x3D; DriverManager. 
+                        getConnection(&quot;jdbc:default:connection:&quot;); 
+           String sql &#x3D; &quot;SELECT FIRST_NAME, LAST_NAME, EMAIL &quot; +  
+                        &quot;FROM EMPLOYEES &quot; + 
+                        &quot;WHERE DEPARTMENT_ID &#x3D; ?&quot;; 
+ 
+           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); 
+           pstmt.setInt(1, departmentId); 
+           ResultSet rset &#x3D; pstmt.executeQuery(); 
+           while(rset.next()) &#123; 
+             firstName &#x3D; rset.getString(1); 
+             lastName &#x3D; rset.getString(2); 
+  CHAPTER 15  JAVA IN THE DATABASE 
+329 
+             email &#x3D; rset.getString(3); 
+             System.out.println(firstName + &quot; &quot; + lastName + &quot; &quot; + 
+                                email); 
+           &#125; 
+           pstmt.close(); 
+           rset.close(); 
+      &#125; catch (SQLException ex)&#123; 
+          System.err.println(&quot;ERROR: &quot; + ex); 
+          &#125; 
+  &#125; </code></pre>
+<p>Once this method has been added to the Employees class, then the Java source should be loaded into<br>the database using the technique demonstrated in Recipe 15-2.<br> Note You must include the OR REPLACE clause of the CREATE JAVA statement if the Employees source is<br>already contained in the database. If you do not include this clause, then you will receive an Oracle error.<br>Once the Java has been loaded into the database and compiled, you will need to create the call<br>specification that will be used by PL&#x2F;SQL for accessing the Java stored procedure. The following code<br>demonstrates a call specification that will accept a parameter when invoked and pass it to the Java<br>stored procedure: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE get_it_emps_by_dept(dept_id IN NUMBER) 
+ AS LANGUAGE JAVA 
+NAME &#39;Employees.getItEmpsByDept(int)&#39;; </code></pre>
+<p>The procedure can now be called by passing a department ID value as such: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec get_it_emps_by_dept(60);                          
+Alexander Hunold AHUNOLD 
+Bruce Ernst BERNST 
+David Austin DAUSTIN 
+Valli Pataballa VPATABAL 
+Diana Lorentz DLORENTZ 
+ 
+PL&#x2F;SQL procedure successfully completed.</code></pre>
+<p><strong>How It Works</strong><br>The call specification is what determines how a Java stored procedure or function’s arguments are<br>mapped to PL&#x2F;SQL arguments. To implement parameters, the call specification must match each<br>parameter in the stored procedure or function to an argument in the specification. As mentioned in<br>previous recipes, the call specification is a PL&#x2F;SQL procedure itself, and each argument that is coded in<br>the specification matches an argument that is coded within the Java stored procedure.<br>The datatypes that Java uses do not match those used in PL&#x2F;SQL. In fact, a translation must take<br>place when passing parameters listed as a PL&#x2F;SQL datatype to a Java stored procedure that accepts<br>parameters as a Java datatype. If you are familiar enough with each of the two languages, the translation<br>is fairly straightforward. However, there are always those cases where one is not sure what datatype to<br>match against. Table 15-1 lists some of the most common datatypes and how they map between Java<br>and PL&#x2F;SQL. For a complete datatype map, please refer to the Oracle documentation at<br><a target="_blank" rel="noopener" href="http://download.oracle.com/docs/cd/B28359_01/java.111/b31225/chsix.htm#CHDFACEE">http://download.oracle.com/docs/cd/B28359_01/java.111/b31225/chsix.htm#CHDFACEE</a>. </p>
+<pre class="language-text" data-language="text"><code class="language-text">Table 15-1. Datatype Map 
+SQL Datatype      Java Type 
+CHAR              oracle.sql.CHAR 
+VARCHAR           java.lang.String 
+LONG              java.lang.String 
+NUMBER            java.lang.Integer,Java.lang.Float,Java.lang.Double,Java. math.BigDecimal,Java.lang.Byte,Oracle.sql.NUMBER,Java.lang.Short, 
+DATE              oracle.sql.DATE 
+TIMESTAMP         oracle.sql.TIMESTAMP 
+TIMESTAMP         WITH TIME ZONE oracle.sql.TIMESTAMPTZ 
+TIMESTAMP         WITH LOCAL TIME ZONE  oracle.sql.TIMESTAMPLTZ 
+BLOB              oracle.sql.BLOB 
+CLOB              oracle.sql.CLOB </code></pre>
+<p>Creating a PL&#x2F;SQL call specification that includes parameters must use the fully qualified Java class<br>name when specifying the parameter datatypes in the Java class method signature. If an incorrect<br>datatype is specified, then an exception will be thrown. For instance, if you want to pass a VARCHAR2 from<br>PL&#x2F;SQL to a Java stored procedure, the signature for the Java class method must accept an argument of<br>type java.lang.String. The following pseudocode demonstrates this type of call specification:<br>CREATE OR REPLACE PROCEDURE procedure_name(value   VARCHAR2)<br>AS LANGUAGE JAVA<br>NAME ‘JavaClass.javaMethod(java.lang.String)’; </p>
+<h2 id="15-8-Creating-and-Calling-a-Java-Database-Function"><a href="#15-8-Creating-and-Calling-a-Java-Database-Function" class="headerlink" title="15-8. Creating and Calling a Java Database Function"></a>15-8. Creating and Calling a Java Database Function</h2><p><strong>Problem</strong><br>You want to create a database function using the Java language.<br>  CHAPTER 15  JAVA IN THE DATABASE<br>331<br><strong>Solution</strong><br>Create a function written in Java, and then create a call specification for the function. Ensure that the call<br>specification allows for the same number of parameters to pair up with the Java function and allows for a<br>returning result. For this recipe, you will add a function to the Employees Java class that will accept an<br>employee ID and return that employee’s job title. The following code is the Java source for the function<br>named getEmpJobTitle: </p>
+<pre class="language-java" data-language="java"><code class="language-java">public static String getEmpJobTitle(int empId)&#123; 
+      String jobTitle &#x3D; null; 
+      try &#123; 
+           Connection conn &#x3D; DriverManager. 
+                        getConnection(&quot;jdbc:default:connection:&quot;); 
+           String sql &#x3D; &quot;SELECT JOB_TITLE &quot; +  
+                        &quot;FROM EMPLOYEES EMP, &quot; + 
+            &quot;JOBS JOBS &quot; + 
+                        &quot;WHERE EMP.EMPLOYEE_ID &#x3D; ? &quot; + 
+                         &quot;AND JOBS.JOB_ID &#x3D; EMP.JOB_ID&quot;; 
+ 
+           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); 
+           pstmt.setInt(1, empId); 
+           ResultSet rset &#x3D; pstmt.executeQuery(); 
+           while(rset.next()) &#123; 
+             jobTitle &#x3D; rset.getString(1); 
+           &#125; 
+           pstmt.close(); 
+           rset.close(); 
+                          &#125; catch (SQLException ex)&#123; 
+                                     System.err.println(&quot;ERROR: &quot; + ex); 
+                                     jobTitle &#x3D; &quot;N&#x2F;A&quot;; 
+          &#125; 
+                  if (jobTitle &#x3D;&#x3D; null)&#123; 
+                       jobTitle &#x3D; &quot;N&#x2F;A&quot;; 
+                 &#125; 
+                                    return jobTitle; 
+  &#125; </code></pre>
+<p>Next is the call specification for the function: </p>
+<p>CREATE OR REPLACE FUNCTION get_emp_job_title(emp_id IN NUMBER)<br>RETURN VARCHAR2 AS LANGUAGE JAVA<br>NAME ‘Employees.getEmpJobTitle(int) return java.lang.String’;<br>The function can now be called just like a PL&#x2F;SQL function would. The following lines of code show<br>a SQL SELECT statement that calls the function passing an employee ID number of 200. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; select get_emp_job_title(200) from dual; 
+ 
+GET_EMP_JOB_TITLE(200) 
+-------------------------------------------------------------------------------- 
+Administration Assistant </code></pre>
+
+<p><strong>How It Works</strong><br>The difference between a stored procedure and a stored function is that a function always returns a<br>value. In the Java language, a method may or may not return a value. The difference between a PL&#x2F;SQL<br>call specification for a Java stored procedure and a PL&#x2F;SQL call specifcation for a Java function is that the<br>PL&#x2F;SQL call specification will specify a return value if it is being used to invoke an underlying function.<br>In the <strong>Solution</strong> to this recipe, the example PL&#x2F;SQL call specification returns a VARCHAR2 data type because<br>the Java function that is being called will return a Java String. </p>
+<h2 id="15-9-Creating-a-Java-Database-Trigger"><a href="#15-9-Creating-a-Java-Database-Trigger" class="headerlink" title="15-9. Creating a Java Database Trigger"></a>15-9. Creating a Java Database Trigger</h2><p><strong>Problem</strong><br>You want to create a database trigger that uses a Java stored procedure to do its work.<br><strong>Solution</strong><br>Create a Java stored procedure that does the work you require, and publish it as a Java stored procedure,<br>making it accessible to PL&#x2F;SQL. Once it’s published, write a standard PL&#x2F;SQL trigger that calls the Java<br>stored procedure.<br>For example, suppose you need a trigger to audit INSERT events on the EMPLOYEES table and record<br>them in another table. First, you must create the table that will be used to record each of the logged<br>events. The following DDL creates one: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE TABLE EMPLOYEE_AUDIT_LOG ( 
+employee_id     NUMBER, 
+enter_date      DATE); 
+Next, you will need to code the Java stored procedure that you want to have executed each time an 
+INSERT occurs on the EMPLOYEES table. Add the following Java method to the Employees class of previous 
+recipes in this chapter: 
+public static void employeeAudit(int empId)&#123; 
+      try &#123; 
+           Connection conn &#x3D; DriverManager. 
+                        getConnection(&quot;jdbc:default:connection:&quot;); 
+           String sql &#x3D; &quot;INSERT INTO EMPLOYEE_AUDIT_LOG VALUES(&quot; + 
+                    &quot;?, sysdate)&quot;; 
+           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); 
+           pstmt.setInt(1, empId); 
+           pstmt.executeUpdate(); 
+       pstmt.close(); 
+       conn.commit(); 
+       
+      &#125; catch (SQLException ex)&#123; 
+          System.err.println(&quot;ERROR: &quot; + ex); 
+          &#125; 
+       
+  &#125; </code></pre>
+<p>Next, the PL&#x2F;SQL call specification for the Java stored procedure must be created. The following is<br>the code to implement the call specification: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PROCEDURE emp_audit(emp_id NUMBER) 
+AS LANGUAGE JAVA 
+NAME &#39;Employees.employeeAudit(int)&#39;; </code></pre>
+
+<p>Finally, a trigger to call the EMP_AUDIT procedure must be created. The trigger will be executed on<br>INSERT to the EMPLOYEES table. The following code will generate the trigger to call EMP_AUDIT: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE TRIGGER emp_audit_ins 
+AFTER INSERT ON EMPLOYEES 
+FOR EACH ROW 
+CALL emp_audit(:new.employee_id); </code></pre>
+
+<p>Once all these pieces have been successfully created within the database, the EMP_AUDIT_INS trigger<br>will be executed each time there is an INSERT made to the EMPLOYEES table. In turn, the trigger will call the<br>EMP_AUDIT PL&#x2F;SQL procedure, which calls the Java method contained within the Employees class. The<br>SQL*Plus output shown here demonstrates an INSERT into the EMPLOYEES table, followed by a query on<br>the EMPLOYEE_AUDIT_LOG table to show that the trigger has been invoked: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; insert into employees values( 
+   employees_seq.nextval, 
+   &#39;Jane&#39;, 
+   &#39;Doe&#39;, 
+   &#39;jane.doe@mycompany.com&#39;, 
+   null, 
+   sysdate, 
+   &#39;FI_MGR&#39;, 
+   null, 
+   null, 
+   null, 
+   null); 
+ 
+1 row created. 
+
+SQL&gt; select * from employee_audit_log; 
+ 
+EMPLOYEE_ID ENTER_DAT 
+----------- --------- 
+    265 02-NOV-10 
+</code></pre>
+
+<p><strong>How It Works</strong><br>A Java-based trigger combines the power of Java code with the native ease of performing data<br>manipulation using PL&#x2F;SQL triggers. Although creating a Java trigger requires more steps than using<br>native PL&#x2F;SQL, the Java code is portable. If your application is supported on more than one database<br>platform, this lets you write code once and deploy it in many environments. It also makes sense to code<br>a trigger using Java if you require the use of Java libraries or technologies that are unavailable to PL&#x2F;SQL.<br>In the <strong>Solution</strong> to this recipe, a trigger was created that will insert a row into an audit table each time<br>an INSERT is made on the EMPLOYEES table. The actual work is performed within a Java method that is<br>added to a Java class and loaded into the database. For more information on loading Java into the<br>database, please see Recipe 15-2. To invoke the stored Java method, you must create a PL&#x2F;SQL call<br>specification, which maps the Java method to a PL&#x2F;SQL stored procedure. The call specification can<br>accept zero, one, or many parameters, and it will seamlessly pass the parameters to the underlying Java<br>method. The final step to creating a Java trigger is to code a PL&#x2F;SQL trigger that invokes the PL&#x2F;SQL<br>stored procedure that was created.<br>Creating a Java-based trigger entails a series of steps. Each piece of code depends upon the others,<br>and like a domino effect, the trigger will call the procedure that in turn executes the Java method. This<br><strong>Solution</strong> opens the world of Java libraries and thousands of possibilities to the standard PL&#x2F;SQL trigger. </p>
+<h2 id="15-10-Passing-Data-Objects-from-PL-x2F-SQL-to-Java"><a href="#15-10-Passing-Data-Objects-from-PL-x2F-SQL-to-Java" class="headerlink" title="15-10. Passing Data Objects from PL&#x2F;SQL to Java"></a>15-10. Passing Data Objects from PL&#x2F;SQL to Java</h2><p><strong>Problem</strong><br>You have retrieved a row of data from the database using PL&#x2F;SQL, and you want to populate a PL&#x2F;SQL<br>object type with that data and then pass the populated data object to a Java procedure.<br><strong>Solution</strong><br>Create a PL&#x2F;SQL object type, along with a call specification for the Java stored procedure that you want<br>to pass the object to. Ensure that the Java stored procedure accepts an object of type oracle.sql.STRUCT<br>and that the call specification accepts the PL&#x2F;SQL object type you have created. For this recipe, the<br>example will demonstrate the creation of a Java method that will accept an Employee object and return<br>that employee’s corresponding department name. The Java code will be invoked from within a PL&#x2F;SQL<br>anonymous block that queries each employee, loads an Employee object with the data, passes the object<br>to the Java method, and returns the result.<br>First, add the following Java method to the Employees class you’ve used with previous recipes in this<br>chapter: </p>
+<pre class="language-java" data-language="java"><code class="language-java">public static String getEmpDepartment(oracle.sql.STRUCT emp) &#123; 
+     
+    String deptName &#x3D; null; 
+    BigDecimal employeeId &#x3D; null; 
+    try &#123; 
+          Object[] attribs &#x3D; emp.getAttributes(); 
+       &#x2F;&#x2F; Use indexes to grab individual attributes. 
+       Object empId &#x3D; attribs[0]; 
+       try&#123; 
+           employeeId &#x3D; (BigDecimal) empId; 
+       &#125; catch (ClassCastException cce) &#123; 
+           System.out.println(cce); 
+       &#125; 
+       Connection conn &#x3D; DriverManager. 
+                        getConnection(&quot;jdbc:default:connection:&quot;); 
+           String sql &#x3D; &quot;SELECT DEPARTMENT_NAME &quot; +  
+                        &quot;FROM DEPARTMENTS DEPT, &quot; + 
+            &quot;EMPLOYEES EMP &quot; + 
+                        &quot;WHERE EMP.EMPLOYEE_ID &#x3D; ? &quot; + 
+            &quot;AND DEPT.DEPARTMENT_ID &#x3D; EMP.DEPARTMENT_ID&quot;; 
+ 
+           PreparedStatement pstmt &#x3D; conn.prepareStatement(sql); 
+           pstmt.setInt(1, employeeId.intValue()); 
+           ResultSet rset &#x3D; pstmt.executeQuery(); 
+           while(rset.next()) &#123; 
+             deptName &#x3D; rset.getString(1); 
+           &#125; 
+           pstmt.close(); 
+           rset.close(); 
+      &#125; catch (java.sql.SQLException ex)&#123; 
+          System.err.println(&quot;ERROR: &quot; + ex); 
+          deptName &#x3D; &quot;N&#x2F;A&quot;; 
+          &#125; 
+      if (deptName &#x3D;&#x3D; null)&#123; 
+        deptName &#x3D; &quot;N&#x2F;A&quot;; 
+      &#125; 
+      return deptName; 
+  &#125;</code></pre>
+<p>Next, create the PL&#x2F;SQL object that will contain employee information. The following SQL<br>statement will create this object: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE TYPE Employee AS OBJECT ( 
+emp_id NUMBER(6), 
+first VARCHAR2(20), 
+last  VARCHAR2(25), 
+email VARCHAR2(25), 
+job VARCHAR2(10), 
+dept NUMBER(4) 
+); </code></pre>
+<p>Now you need to create the call specification for the Java method. Since the method is returning a<br>value, the call specification needs to be a PL&#x2F;SQL function that accepts an Employee object and returns a<br>String value. The following code demonstrates such a call specification for the getEmpDepartment Java<br>method: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION get_emp_department (emp Employee) RETURN VARCHAR2 AS 
+LANGUAGE JAVA 
+NAME &#39;Employees.getEmpDepartment(oracle.sql.STRUCT) return java.lang.String&#39;; </code></pre>
+<p>Finally, call the new Java function from within an anonymous block. The following PL&#x2F;SQL block<br>uses a cursor to traverse the EMPLOYEES table and populates an Employee object with each iteration. In<br>turn, the object is passed to the Java stored procedure via the PL&#x2F;SQL function GET_EMP_DEPARTMENT, and<br>the corresponding DEPARTMENT_NAME is returned. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  CURSOR emp_cur IS 
+  SELECT * FROM EMPLOYEES; 
+   
+  emp_rec    emp_cur%ROWTYPE; 
+  emp        Employee; 
+BEGIN 
+  FOR emp_rec IN emp_cur LOOP 
+    emp :&#x3D; Employee(emp_rec.employee_id, 
+                    emp_rec.first_name, 
+                    emp_rec.last_name, 
+                    emp_rec.email, 
+                    emp_rec.job_id, 
+                    emp_rec.department_id); 
+    DBMS_OUTPUT.PUT_LINE(emp.first || &#39; &#39; || emp.last || &#39; - &#39; || 
+            get_emp_department(emp)); 
+  END LOOP; 
+END; </code></pre>
+<p><strong>How It Works</strong><br>Passing objects to Java code should be second nature to you since Java is an object-oriented language.<br>You can create PL&#x2F;SQL objects as well and use them within your PL&#x2F;SQL and Java mashup applications.<br>The <strong>Solution</strong> to this recipe demonstrated the creation of an Employee object in PL&#x2F;SQL that was passed to<br>Java.<br>To accept a PL&#x2F;SQL object type, Java code must use a parameter of type oracle.sql.STRUCT in place<br>of the object. The STRUCT object is basically a container that allows the contents to be accessed by calling<br>the getAttributes method. In the <strong>Solution</strong> to this recipe, the oracle.sql.STRUCT object is accepted in the<br>Java class as a parameter, and then the getAttributes method is called on it. This creates an array of<br>objects that contains the data. The Java stored procedure accesses the object using the 0 index position,<br>which is the first placeholder from the PL&#x2F;SQL object. This position maps to the emp_id field in the<br>PL&#x2F;SQL object. The Java class then uses that emp_id to query the database and retrieve a corresponding<br>DEPARTMENT_ID if it exists.<br>The call specification must accept the PL&#x2F;SQL object type as a parameter but use the<br>oracle.sql.STRUCT object as the parameter in the Java source signature. When the object is passed to the<br>PL&#x2F;SQL call specification procedure, it will be converted into an oracle.sql.STRUCT object, which is a<br>datatype that a Java class can accept.<br>Organizing your data into objects can be useful, especially when the object you are creating does<br>not match a table definition exactly. For instance, you could create an object that contains employee<br>information along with region information. There are no tables that contain both of these fields, so in<br>order to retrieve the information together, you are forced into either using a SQL query that contains<br>table joins or creating a database view. In such a case, it may be easier to populate the object using<br>PL&#x2F;SQL and then hand it off to the Java program for processing. </p>
+<h2 id="15-11-Embedding-a-Java-Class-Into-a-PL-x2F-SQL-Package"><a href="#15-11-Embedding-a-Java-Class-Into-a-PL-x2F-SQL-Package" class="headerlink" title="15-11. Embedding a Java Class Into a PL&#x2F;SQL Package"></a>15-11. Embedding a Java Class Into a PL&#x2F;SQL Package</h2><p><strong>Problem</strong><br>You are interested in creating a Java class and making each of its methods and attributes available to<br>PL&#x2F;SQL in an organized unit of code.<br><strong>Solution</strong><br>Use a PL&#x2F;SQL package to declare each of the attributes and methods that reside within the Java class,<br>and then create separate call specifications for each of the Java methods within the PL&#x2F;SQL package<br>body. The following code demonstrates the creation of a PL&#x2F;SQL package named EMP_PKG, which<br>declares each of the methods that reside within the Employee Java class and makes them available to<br>PL&#x2F;SQL via call specifications that are implemented within the package body.<br>First, create the package header as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE EMP_PKG AS 
+ 
+    PROCEDURE get_it_emps; 
+    PROCEDURE get_it_emps_by_dept(dept_id IN NUMBER); 
+    PROCEDURE emp_audit(emp_id NUMBER); 
+     
+    FUNCTION get_emp_job_title(emp_id IN NUMBER) RETURN VARCHAR2; 
+    FUNCTION get_emp_department (emp Employee) RETURN VARCHAR2; 
+ 
+END; 
+Next, create the package body as follows, adding a call specification for each Java method or 
+attribute you plan to use: 
+ 
+CREATE PACKAGE BODY EMP_PKG AS 
+ 
+    PROCEDURE get_it_emps 
+    AS LANGUAGE JAVA 
+    NAME &#39;Employees.getItEmps()&#39;; 
+     
+    PROCEDURE get_it_emps_by_dept(dept_id IN NUMBER) 
+    AS LANGUAGE JAVA 
+    NAME &#39;Employees.getItEmpsByDept(int)&#39;; 
+     
+    PROCEDURE emp_audit(emp_id NUMBER) 
+    AS LANGUAGE JAVA 
+    NAME &#39;Employees.employeeAudit(int)&#39;; 
+     
+    FUNCTION get_emp_job_title(emp_id IN NUMBER) RETURN VARCHAR2 
+    AS LANGUAGE JAVA 
+    NAME &#39;Employees.getEmpJobTitle(int) return String&#39;; 
+     
+    FUNCTION get_emp_department (emp Employee) RETURN VARCHAR2 
+    AS LANGUAGE JAVA 
+    NAME &#39;Employees.getEmpDepartment(oracle.sql.STRUCT) return java.lang.String&#39;; 
+ 
+END; </code></pre>
+<p>Now the package can be used to call each of the underlying Java stored procedures instead of having<br>separate PL&#x2F;SQL procedures and functions for each. The following anonymous block has been modified<br>to make use of the PL&#x2F;SQL package for calling GET_EMP_DEPARTMENT rather than a stand-alone function. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+  CURSOR emp_cur IS 
+  SELECT * FROM EMPLOYEES; 
+   
+  emp_rec    emp_cur%ROWTYPE; 
+  emp        Employee; 
+BEGIN 
+  FOR emp_rec IN emp_cur LOOP 
+    emp :&#x3D; Employee(emp_rec.employee_id, 
+                    emp_rec.first_name, 
+                    emp_rec.last_name, 
+                    emp_rec.email, 
+                    emp_rec.job_id, 
+                    emp_rec.department_id); 
+    DBMS_OUTPUT.PUT_LINE(emp.first || &#39; &#39; || emp.last || &#39; - &#39; || 
+            emp_pkg.get_emp_department(emp)); 
+  END LOOP; 
+END; </code></pre>
+<p><strong>How It Works</strong><br>In programming, it is a best practice to organize code in a way that makes it easy to maintain.  Placing<br>related procedures and functions inside a single PL&#x2F;SQL package is one such application of that<br>approach. The same can be said for working with Java code in the database. A few Java stored<br>procedures or functions will not cause much trouble to maintain. However, once you start to<br>accumulate more than a handful within the same underlying Java class, then it is a good idea to<br>consolidate the call specifications into a single PL&#x2F;SQL package.<br>In the <strong>Solution</strong> to this recipe, all the Java stored procedures that are contained within the Employees<br>Java class have call specifications that are grouped into a single PL&#x2F;SQL package. If you create one<br>PL&#x2F;SQL package containing call specifications per each Java class that is loaded into the database, you<br>will have a nicely organized environment. In some cases, you may have more than one Java class that<br>contains the implementations that are to be used within a single PL&#x2F;SQL application. In those cases, it<br>may make more sense to combine all call specifications into a single PL&#x2F;SQL package.<br>Using PL&#x2F;SQL package to group call specifications is a good idea. Not only will this technique make<br>for easier maintenance, but it also makes for more uniform applications with consistent interfaces. </p>
+<h2 id="15-12-Loading-Java-Libraries-Into-the-Database"><a href="#15-12-Loading-Java-Libraries-Into-the-Database" class="headerlink" title="15-12. Loading Java Libraries Into the Database"></a>15-12. Loading Java Libraries Into the Database</h2><p><strong>Problem</strong><br>You want to create a Java class that utilizes some external Java libraries. To do so, you must load those<br>external libraries into the database.<br><strong>Solution</strong><br>Use the loadjava utility to store the external libraries into the database. In this example, a Java utility<br>class containing a method that uses the JavaMail API to send e-mail will be loaded into the database. The<br>method relies on some external Java libraries to use the JavaMail API. The following loadjava commands<br>demonstrate the loading of three essential JAR files for using the JavaMail API: </p>
+<p>loadjava –u <username> mail.jar<br>loadjava –u <username> standard.jar<br>loadjava –u <username> activation.jar </p>
+<p>Next, load the Java source for the JavaUtils class into the database: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE JAVA SOURCE NAMED &quot;JavaUtils&quot; AS 
+import java.util.*; 
+import java.util.logging.Level; 
+import java.util.logging.Logger; 
+import javax.activation.*; 
+import javax.mail.*; 
+import javax.mail.internet.*; 
+import javax.naming.*; 
+ 
+public class JavaUtils &#123; 
+ 
+ public static void sendMail(String subject, 
+            String recipient, 
+            String message) &#123; 
+        try &#123; 
+ 
+            Properties props &#x3D; System.getProperties(); 
+            props.put(&quot;mail.from&quot;, &quot;me@mycompany.com&quot;); 
+            props.put(&quot;mail.smtp.host&quot;,&quot;company.smtp.server&quot;); 
+            Session session &#x3D; Session.getDefaultInstance(props,null); 
+            Message msg &#x3D; new MimeMessage(session); 
+            msg &#x3D; new MimeMessage(session); 
+            msg.setSubject(subject); 
+            msg.setSentDate(new java.util.Date()); 
+            msg.setFrom(); 
+             
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient, 
+false)); 
+             
+            MimeBodyPart body &#x3D; new MimeBodyPart(); 
+            body.setText(message); 
+            Multipart mp &#x3D; new MimeMultipart(); 
+            mp.addBodyPart(body); 
+            msg.setContent(mp); 
+ 
+            Transport.send(msg); 
+        &#125; catch (MessagingException ex) &#123; 
+            Logger.getLogger(JavaUtils.class.getName()).log(Level.SEVERE, null, ex); 
+        &#125;  
+    &#125;;</code></pre>
+<p>Compile the Java sources using the ALTER JAVA SOURCE command. The sources should compile<br>without issues since the JAR files containing the required library references have been loaded into the<br>database. If the JAR files had not been loaded, then the class would not compile successfully. </p>
+<p><code>ALTER JAVA SOURCE &quot;JavaUtils&quot; RESOLVE;</code><br>Lastly, create the call specification for the sendMail Java stored procedure. In this case, a PL&#x2F;SQL<br>package will be created that contains the call specification for sendMail. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE JAVA_UTILS AS 
+    PROCEDURE send_mail(subject VARCHAR2, 
+                        recipient VARCHAR2, 
+                        message VARCHAR2); 
+    
+END; 
+CREATE OR REPLACE PACKAGE BODY JAVA_UTILS AS 
+    PROCEDURE send_mail(subject VARCHAR2, 
+                        recipient VARCHAR2, 
+                        message VARCHAR2) 
+    AS LANGUAGE JAVA 
+    NAME &#39;JavaUtils.sendMail(java.lang.String, java.lang.String, java.lang.String)&#39;; 
+    
+END; </code></pre>
+<p>The stored procedure can now be executed using the following command:<br>EXEC java_utils.send_mail(‘Test’,‘<a href="mailto:&#109;&#121;&#101;&#x6d;&#97;&#x69;&#x6c;&#x40;&#109;&#x79;&#99;&#x6f;&#x6d;&#x70;&#x61;&#x6e;&#121;&#46;&#x63;&#x6f;&#x6d;">&#109;&#121;&#101;&#x6d;&#97;&#x69;&#x6c;&#x40;&#109;&#x79;&#99;&#x6f;&#x6d;&#x70;&#x61;&#x6e;&#121;&#46;&#x63;&#x6f;&#x6d;</a>‘,’Test Message’);<br>If the message is sucessfully sent, you will see the following output:<br>PL&#x2F;SQL procedure successfully completed.<br><strong>How It Works</strong><br>Java libraries are packaged into JAR files so that they can be easily distributed. The loadjava utility can<br>be used to load Java libraries into the database. To use the utility, download the JAR files that you want to<br>load into the database, and place them into a directory that can be accessed by the database server.<br>Open the command prompt or terminal, traverse into that directory, and execute the loadjava utility,<br>using the –u flag to specify the database user and passing the name of the JAR file to load. If successful,<br>the JAR file will be loaded into the schema that you indicated with the –u flag, and you may begin to use<br>the libraries contained in the JAR file within your stored Java code.<br>The loadjava utility contains a number of options. For a complete listing of loadjava options, please<br>see the online Oracle documentation at<br><a target="_blank" rel="noopener" href="http://download.oracle.com/docs/cd/B28359_01/java.111/b31225/cheleven.htm">http://download.oracle.com/docs/cd/B28359_01/java.111/b31225/cheleven.htm</a>.<br>Additional options are not necessary to load a JAR file into the schema that you indicate with the -u<br>flag. Since the JAR file consists of compiled Java libraries, there is no need to resolve the library once<br>loaded. As indicated in the <strong>Solution</strong> to this recipe, you can begin to import classes from the libraries as<br>soon as they have been loaded. </p>
+<h2 id="15-13-Removing-a-Java-Class"><a href="#15-13-Removing-a-Java-Class" class="headerlink" title="15-13. Removing a Java Class"></a>15-13. Removing a Java Class</h2><p><strong>Problem</strong><br>You want to drop a Java class from your database.<br><strong>Solution</strong><br>Issue the SQL DROP JAVA command along with the schema and object name you want to drop. For<br>instance, you want to drop the Java source for the Employees class. In this case, you would issue the<br>following command: </p>
+<p><code>DROP JAVA SOURCE “Employees”;</code><br><strong>How It Works</strong><br>There may come a time when you need to drop a Java class or sources from the database. For instance, if<br>you no longer want to maintain or allow access to a particular Java class, it may make sense to drop it.<br>The DROP JAVA SOURCE command does this by passing the name of the class or source as demonstrated<br>within the Solution to this recipe.<br> Note Be careful not to drop a Java class if other Java procedures or PL&#x2F;SQL call specifications depend upon it.<br>Doing so will invalidate any dependent code, and you will receive an error if you try to execute. The data dictionary<br>provides views, such as DBA_DEPENDENCIES, that can be queried in order to find dependent objects. </p>
+<p>Alternately, if you are on the database server, there is a dropjava utility that works in the same<br>fashion as the loadjava utility that was demonstrated in Recipe 15-3. To use the dropjava utility, issue<br>the dropjava command at the command line, and pass the database connect string using the –u flag<br>along with the name of the Java class or source you want to drop. The following example demonstrates<br>the command to drop the Employees Java class using the dropjava utility. </p>
+<p>dropjava –u username&#x2F;password@database_host:port:database_name Employees.class<br>The dropjava utility actually invokes the DROP JAVA SOURCE command. The downside to using the<br>utility is that you must be located on the database server to use it. I recommend using the DROP JAVA<br>SOURCE command from SQL<em>Plus if possible because it tends to make life easier if you are working within<br>SQL</em>Plus on a machine that is remote from the server. </p>
+<h2 id="15-14-Retrieving-Database-Metadata-with-Java"><a href="#15-14-Retrieving-Database-Metadata-with-Java" class="headerlink" title="15-14. Retrieving Database Metadata with Java"></a>15-14. Retrieving Database Metadata with Java</h2><p><strong>Problem</strong><br>You are interested in retrieving some metadata regarding the database from within your Java stored<br>procedure. In this recipe, you want to list all the schemas within the database.<br><strong>Solution</strong><br>Create a Java stored procedure that utilizes the OracleDatabaseMetaData object to pull information from<br>the connection. In the following example, a Java stored procedure is created that utilizes the<br>OracleDatabaseMetaData object to retrieve schema names from the Oracle connection. This Java method<br>will be added to the JavaUtils class. </p>
+<pre class="language-java" data-language="java"><code class="language-java">public static void listDatabaseSchemas() &#123; 
+        Connection conn &#x3D; null; 
+        try &#123; 
+            conn &#x3D; DriverManager.getConnection(&quot;jdbc:default:connection:&quot;); 
+            OracleDatabaseMetaData meta &#x3D; (OracleDatabaseMetaData) conn.getMetaData(); 
+ 
+            if (meta &#x3D;&#x3D; null) &#123; 
+                System.out.println(&quot;Database metadata is unavailable&quot;); 
+            &#125; else &#123; 
+                ResultSet rs &#x3D; meta.getSchemas(); 
+                while (rs.next()) &#123; 
+                    System.out.println(rs.getString(1)); 
+                &#125; 
+            &#125; 
+        &#125; catch (SQLException ex) &#123; 
+            System.out.println(ex); 
+        &#125;  
+    &#125; </code></pre>
+<p>The output from the execution of this Java method will be a list of all database schemas.<br><strong>How It Works</strong><br>Sometimes it may be useful to use Java code for obtaining database metadata. One such instance might<br>arise when you are developing a Java class that needs to access database metadata. Your code will be<br>easier to maintain and read if you use Java to obtain the metadata rather than a PL&#x2F;SQL procedure. The<br>OracleDatabaseMetaData object was created for that purpose. In the <strong>Solution</strong> to this recipe, the metadata<br>object is used to retrieve a listing of all database schemas. However, several other methods can be called<br>on the OracleDatabaseMetaData object to obtain other useful database metadata. For instance,<br>information about the underlying database tables or columns can also be obtained using this resource.<br>For a complete listing of the different options available via the OracleDatabaseMetaData object, please<br>refer to the online documentation at<br><a target="_blank" rel="noopener" href="http://www.oracle.com/technology/docs/tech/java/sqlj_jdbc/doc_library/javadoc/oracle.jdbc.driver.Orac">www.oracle.com/technology/docs/tech/java/sqlj_jdbc/doc_library/javadoc/oracle.jdbc.driver.Orac</a><br>leDatabaseMetaData.html. </p>
+<p>In the <strong>Solution</strong> to this recipe, a Java Connection object is obtained using jdbc:default:connection.<br>The getMetaData method can be called on a Connection object and casted to an OracleDatabaseMetaData<br>object type. This <strong>Solution</strong> demonstrates this technique and then uses the object to retrieve information<br>about the database. </p>
+<h2 id="15-15-Querying-the-Database-to-Help-Resolve-Java"><a href="#15-15-Querying-the-Database-to-Help-Resolve-Java" class="headerlink" title="15-15. Querying the Database to Help Resolve Java"></a>15-15. Querying the Database to Help Resolve Java</h2><p>Compilation Issues<br><strong>Problem</strong><br>You are attempting to compile Java source within the database, and you are receiving an unsuccessful<br>result. You need to determine the underlying issue to the Problem that is preventing the Java source<br>from compiling correctly.<br><strong>Solution</strong><br>Query the USER_ERRORS table to determine the cause of the compilation issue. For example, suppose the<br>JavaUtils class source is loaded into the database with an incorrect variable name. This will cause a<br>compiler error that will be displayed within the USER_ERRORS table. The following is an excerpt from a<br>SQL*Plus session where an attempt has been made to compile the code: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; ALTER JAVA SOURCE &quot;JavaUtils&quot; RESOLVE; </code></pre>
+<p>Warning: Java altered with compilation errors. </p>
+<p>Since compilation errors have occurred, query the USER_ERRORS table to determine the exact cause of<br>the error so that it can be repaired. The following query demonstrates this technique: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; COL TEXT FOR A25 
+SQL&gt; SELECT NAME, TYPE, LINE, TEXT 
+  2  FROM USER_ERRORS 
+  3  WHERE TYPE LIKE &#39;JAVA%&#39;; 
+ 
+NAME                   TYPE          LINE TEXT 
+------------------------------ ------------ ---------- ------------------------- 
+JavaUtils               JAVA CLASS         0 ORA-29535: source require 
+                               s recompilation 
+ 
+JavaUtils               JAVA SOURCE         0 JavaUtils:51: cannot find 
+                            symbol 
+ 
+JavaUtils               JAVA SOURCE         0 symbol  : variable me 
+JavaUtils               JAVA SOURCE         0 location: class JavaUtils 
+JavaUtils               JAVA SOURCE         0               ResultSet 
+                            rs &#x3D; me.getSchemas(); 
+ 
+ 
+NAME                   TYPE          LINE TEXT 
+------------------------------ ------------ ---------- ------------------------- 
+JavaUtils               JAVA SOURCE         0 
+                                 ^ 
+ 
+JavaUtils               JAVA SOURCE         0 1 error 
+ 
+7 rows selected. </code></pre>
+<p><strong>How It Works</strong><br>The USER_ERRORS table contains the most recent errors generated by PL&#x2F;SQL or Java code. It is the most<br>useful way to determine the issues that are causing compilation errors when attempting to resolve Java<br>source errors. Unlike PL&#x2F;SQL, you are unable to issue the SHOW ERRORS command to display the most<br>recent compiler errors. The Java compiler, as well as the PL&#x2F;SQL compiler, writes output to the<br>USER_ERRORS table, making it a beneficial tool when writing Java code for the database. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"
+                    data-tooltip="Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"
+                    data-tooltip="Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                    aria-label="NEXT: Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"
+                    data-tooltip="Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_14/"
+                    data-tooltip="Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                    aria-label="NEXT: Oracle PLSQL Recipes 14-Using PL/SQL on the Web"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_15/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

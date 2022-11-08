@@ -1,0 +1,1121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 10-PL/SQL Collections and Records - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n\n10. PL&#x2F;SQL Collections and RecordsCollections are single-dimensional arrays of data all with the same datatype and are accessed by anindex; usually the index is a number, but it can be a string. Collections indexed by strings are commonlyknown as hash arrays.Records are groups of related data, each with its own field name and datatype, similar to tablesstored in the database. The record data structure in PL&#x2F;SQL allows you to manipulate data at the field orrecord level. PL&#x2F;SQL provides an easy method to define a record’s structure based on a database table’sstructure or a cursor. Combining records and collections provide a powerful programming advantagedescribed in the following recipes. \n10-1. Creating and Accessing a VARRAYProblemYou have a small, static list of elements that you initialize once and that would benefit from using in aloop body.SolutionPlace the elements into a varray (or varying array). Once initialized, a varray may be referenced by itsindex. Begin by declaring a datatype of varray with a fixed number of elements, and then declare thedatatype of the elements. Next, declare the variable that will hold the data using the newly defined type.For example, the following code creates a varying array to hold the abbreviations for the days of theweek: \nDECLARE \n \nTYPE    dow_type IS VARRAY(7) OF VARCHAR2(3); \ndow     dow_type :&#x3D; dow_type (&#39;Sun&#39;, &#39;Mon&#39;, &#39;Tue&#39;, &#39;Wed&#39;, &#39;Thu&#39;, &#39;Fri&#39;, &#39;Sat&#39;); \n \nBEGIN \n \n   FOR i IN 1..dow.COUNT LOOP \n      DBMS_OUTPUT.PUT_LINE (dow(i)); \n   END LOOP; \n \nEND; \n \nResults \nSun \nMon \nTue \nWed \nThu \nFri \nSat \nHow It WorksThe type statement dow_type defines a data structure to store seven instances of VARCHAR2(3). This issufficient space to hold the abbreviations of the seven days of the week. The dow variable is defined as aVARRAY of the dow_type defined in the previous line. That definition invokes a built-in constructormethod to initialize values for each of the elements in the VARRAY.The FOR .. LOOP traverses the dow variable starting at the first element and ending with the last. TheCOUNT method returns the number of elements defined in a collection; in this recipe, there are sevenelements in the VARRAY, so the LOOP increments from one to seven. The DBMS_OUTPUT.PUT_LINE statementdisplays its value.A VARRAY is best used when you know the size the array and it will not likely change. The VARRAYconstruct also allows you to initialize its values in the declaration section. \n10-2. Creating and Accessing an Indexed TableProblemYou need to store a group of numbers for later processing in another procedure.SolutionCreate an indexed table using an integer index to reference the elements. For example, this recipe loadsvalues into an indexed table of numbers.  \nDECLARE \n \nTYPE    num_type IS TABLE OF number INDEX BY BINARY_INTEGER; \nnums    num_type; \ntotal   number; \n \nBEGIN \n \n   nums(1) :&#x3D; 127.56; \n   nums(2) :&#x3D; 56.79; \n   nums(3) :&#x3D; 295.34; \n \n   -- call subroutine to process numbers; \n   -- total :&#x3D; total_table (nums); \nEND;  \n\nHow It WorksPL&#x2F;SQL tables are indexed collections of data of the same type. The datatype can be any of the built-indatatypes provided by PL&#x2F;SQL; in this example, the datatype is a number. Here are some things to noteabout the example:• The TYPE statement declares a TABLE of numbers.• The INDEX BY clause defines how the array is accessed, in this case by an INTEGER.• The array is populated by assigning values to specific indexes.Because the TABLE is INDEXED BY an INTEGER, there is no predefined limit on the index value, otherthan those imposed by Oracle, which is -231 – 231. Indexed tables are best suited for collections where thenumber of elements stored is not known until runtime.This recipe is an example of a TABLE indexed by an INTEGER. PL&#x2F;SQL provides for tables indexed bystrings as well. See Recipe 10-5 for an example. \n10-3. Creating Simple RecordsProblemYou need a PL&#x2F;SQL data structure to group related employee data to make manipulating the groupeasier.SolutionDefine a record structure of the related employee data, and then create a variable to hold the recordstructure. In this example, a simple RECORD structure is defined and initialized. \nDECLARE \n \nTYPE    rec_type IS RECORD ( \n                last_name       varchar2(25), \n                department      varchar2(30), \n                salary          number ); \nrec     rec_type; \n \nbegin \n \n   rec.last_name        :&#x3D; &#39;Juno&#39;; \n   rec.department       :&#x3D; &#39;IT&#39;; \n   rec.salary           :&#x3D; &#39;5000&#39;; \n \nEND;\nHow It WorksRecord structures are created in PL&#x2F;SQL by using the TYPE statement along with a RECORD structureformat. The fields defined in the record structure can be, and often are, of different datatypes. Recordstructures use dot notation to access individual fields. Once defined, the rec_type record structure in theSolution can be used throughout the code to create as many instantiations of data structures as needed. \n10-4. Creating and Accessing Record CollectionsProblemYou need to load records from a database table or view into a simple data structure that would benefitfrom use in a loop body or to pass as a parameter to another function or procedure. You want to actupon sets of records as a single unit.SolutionUse a TYPE to define a TABLE based on the database table structure. The following example declares acursor and then uses it to declare the table of records. The result is a variable named recs that holds thedata fetched by the cursor. \nDECLARE \n \nCURSOR  driver IS \nSELECT  * \nFROM    employees; \n \nTYPE    emp_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; \nrecs    emp_type; \ntotal   number :&#x3D; 0.0; \n \nBEGIN \n \n   OPEN DRIVER; \n   FETCH DRIVER BULK COLLECT INTO recs; \n   CLOSE DRIVER; \n \n   DBMS_OUTPUT.PUT_LINE (recs.COUNT || &#39; records found&#39;); \n \n   FOR i in 1..recs.COUNT LOOP \n      total :&#x3D; total + recs(i).salary; \n   END LOOP; \n \nEND; \nWhen you execute this block of code, you will see a message such as the following: 103 records foundHow It WorksThe TYPE statement defines a data structure using the attributes (columns) of the employees table aselements within the structure. The TABLE OF clause defines multiple instances of the record structure.The INDEX BY clause defines the index method, in this case an integer. Think of this structure as aspreadsheet with the rows being separate records from the database and the columns being theattributes (fields) in the database. The recipe works whether your cursor selects all the fields (SELECT *)or selects just a subset of fields from the table.The BULK COLLECT portion of the fetch statement is more efficient than looping through the data in astandard cursor loop because PL&#x2F;SQL switches control to the database just once to retrieve the data asopposed to switching to the database for each record retrieved in a cursor FOR .. LOOP. In a BULKCOLLECT, all records meeting the query condition are retrieved and stored in the data structure in a singleoperation. Once the records are retrieved, processing may occur in a standard FOR .. standard FOR ..LOOP. \n10-5. Creating and Accessing Hash Array CollectionsProblemYou want to use a single cursor to query employee data and sum the salaries across departments.SolutionYou can use two cursors—one to select all employees and the other to sum the salary grouping bydepartment. However, you can more easily and efficiently accomplish your task by using one cursor anda hashed collection. Define your cursor to select employee data, joined with the department table. Use ahash array collection to total by department by using the INDEX BY option to index your collection basedon the department name rather than an integer. The following code example illustrates this moreefficient approach: \nDECLARE \n \nCURSOR  driver IS \nSELECT  ee.employee_id, ee.first_name, ee.last_name, ee.salary, d.department_name \nFROM    departments     d, \n        employees       ee \nWHERE   d.department_id &#x3D; ee.department_id; \n  \nTYPE    total_type IS TABLE OF number INDEX BY departments.department_name%TYPE; \ntotals  total_type; \n \ndept    departments.department_name%TYPE; \n \nBEGIN \n \n   FOR rec IN driver LOOP \n      -- process paycheck \n      if NOT totals.EXISTS(rec.department_name) then  -- create element in the array \n         totals(rec.department_name) :&#x3D; 0; -- initialize to zero \n      end if; \n \n      totals(rec.department_name) :&#x3D; totals(rec.department_name) + nvl (rec.salary, 0); \n   END LOOP; \n \n   dept :&#x3D; totals.FIRST; \n   LOOP \n      EXIT WHEN dept IS NULL; \n      DBMS_OUTPUT.PUT_LINE (to_char (totals(dept),  &#39;999,999.00&#39;) || &#39; &#39; || dept); \n      dept :&#x3D; totals.NEXT(dept); \n   END LOOP; \nEND; \nWhen you execute this block of code, you will see the following results: \n20,310.00 Accounting\n58,720.00 Executive\n51,600.00 Finance\n6,500.00 Human Resources\n19,000.00 Marketing\n2,345.34 Payroll\n10,000.00 Public Relations\n304,500.00 Sales\n156,400.00 Shipping\n35,295.00 Web Developments \nHow It WorksThe TOTAL_TYPES PL&#x2F;SQL type is defined as a collection of numbers that is indexed by the departmentname. Indexing by department name gives the advantage of automatically sorting the results bydepartment name.As new elements are created, using the EXISTS method, the index keys are automatically sorted byPL&#x2F;SQL. The totals are accumulated by department name as opposed to a numerical index, such asdepartment ID, which may not be sequential. This approach has the added advantage of not requiring aseparate collection for the department names.Once the employee paychecks are processed, the dept variable is initialized with the firstdepartment name from the totals array using the FIRST method. In this example, the first department isaccounting. A loop is required to process the remaining records. The NEXT method is used to find thenext department name—in alphabetical order—and this process repeats until all departments aredisplayed.  \n10-6. Creating and Accessing Complex CollectionsProblemYou need a routine to load managers and their corresponding employees from the database and storethem in one data structure. The data must be loaded in a manner such that direct reports are associatedwith their manager. In addition, the number of direct reports for any given manager varies, so yourstructure to hold the manager&#x2F;employee relationships must handle any number of subordinates.SolutionCombine records and collections to define one data structure capable of storing all the data. PL&#x2F;SQLallows you to use data structures you create via the type statement as datatypes within other collections.Once your data structures are defined, use dot notation to distinguish attributes within the collections.Use the structure’s index to reference items within the table. For example: \nSET SERVEROUT ON SIZE 1000000 \n \nDECLARE \n \nTYPE    person_type IS RECORD ( \n                employee_id     employees.employee_id%TYPE, \n                first_name      employees.first_name%TYPE, \n                last_name       employees.last_name%TYPE); \n \n  -- a collection of people \nTYPE    direct_reports_type IS TABLE OF person_type INDEX BY BINARY_INTEGER;  \n \n  -- the main record definition, which contains a collection of records \nTYPE    rec_type IS RECORD ( \n                mgr             person_type, \n                emps            direct_reports_type); \n \nTYPE    recs_type IS TABLE OF rec_type INDEX BY BINARY_INTEGER; \nrecs    recs_type; \n \nCURSOR  mgr_cursor IS  -- finds all managers \nSELECT  employee_id, first_name, last_name \nFROM    employees \nWHERE   employee_id IN \n        (       SELECT  distinct manager_id \n                FROM    employees) \nORDER BY last_name, first_name; \n \nCURSOR  emp_cursor (mgr_id integer) IS  -- finds all direct reports for a manager \nSELECT  employee_id, first_name, last_name \nFROM    employees \nWHERE   manager_id &#x3D; mgr_id \nORDER BY last_name, first_name; \n \n  -- temporary collection of records to hold the managers. \nTYPE            mgr_recs_type IS TABLE OF emp_cursor%ROWTYPE \n                                INDEX BY BINARY_INTEGER; \nmgr_recs        mgr_recs_type; \n \nBEGIN \n \n   OPEN mgr_cursor; \n   FETCH mgr_cursor BULK COLLECT INTO mgr_recs; \n   CLOSE mgr_cursor; \n \n   FOR i IN 1..mgr_recs.COUNT LOOP \n      recs(i).mgr :&#x3D; mgr_recs(i);  -- move the manager record into the final structure \n \n        -- moves direct reports directly into the final structure \n      OPEN emp_cursor (recs(i).mgr.employee_id); \n      FETCH emp_cursor BULK COLLECT INTO recs(i).emps; \n      CLOSE emp_cursor; \n   END LOOP; \n \n        -- traverse the data structure to display the manager and direct reports \n        -- note the use of dot notation within the data structure \n   FOR i IN 1..recs.COUNT LOOP \n      DBMS_OUTPUT.PUT_LINE (&#39;Manager: &#39; || recs(i).mgr.last_name); \n      FOR j IN 1..recs(i).emps.count LOOP \n         DBMS_OUTPUT.PUT_LINE (&#39;***   Employee: &#39; || recs(i).emps(j).last_name); \n      END LOOP; \n   END LOOP; \n \nEND;  \nExecuting this code block produces the following results: \nManager: Cambrault***   Employee: Bates***   Employee: Bloom***   Employee: Fox***   Employee: Kumar***   Employee: Ozer***   Employee: Smith…  &lt;&gt;Manager: Zlotkey***   Employee: Abel***   Employee: Grant***   Employee: Hutton***   Employee: Johnson***   Employee: Livingston***   Employee: TaylorHow It WorksCombining records with collections is one of the most powerful techniques for defining data structuresin PL&#x2F;SQL. It allows you to logically group common data, process large amounts of data efficiently, andseamlessly pass data between procedures and functions.The data structure contains a collection of managers; each manager contains a collection of directreports. Managers and direct reports are both person_type. Once your complex structure is defined, youcan use the BULK COLLECT feature to quickly fetch data from the database and load it into the structure.The BULK COLLECT of the MGR_CURSOR selects all persons who are managers at once and then loadsthem into the temporary structure MGR_RECS. Now that you have retrieved the records, it is easy to movethem into your final data structure. Looping through the manager records allows you to move the entiredata record for each manager via the RECS(I).MGR :&#x3D; MGR_RECS(I); statement. This statement movesevery element (field) from the MGR_RECS into the RECS structure.The EMP_CURSOR uses the managers’ ID to fetch the managers’ direct reports. The cursor is opened bypassing the managers’ ID, and then another BULK COLLECT is used to directly store the fetched data intothe data structure; no temporary data structure is needed because the structure of the fetched dataexactly matches the target data structure.Now that the data is stored in the data structure, it can be passed to another routine for processing.Grouping large sets of related data is an efficient method for exchanging data between routines. Thishelps separate data retrieval routines from business processing routines. It’s a very powerful feature inPL&#x2F;SQL, as you’ll see in the next recipe. \n10-7. Passing a Collection As a ParameterProblemYou want to pass a collection as a parameter to a procedure or function. For example, you have a datastructure that contains employee data, and you need to pass the data to a routine that prints employeepaychecks.SolutionCreate a collection of employee records to hold all employee data, and then pass the data to thesubroutine to process the paychecks. The TYPE statement defining the data structure must be visible tothe called procedure; therefore, it must be defined globally, prior to defining any procedure or functionthat uses it.In this example, employee data is fetched from the database into a collection and then passed to asubroutine for processing. \nset serverout on size 1000000 \n \nDECLARE \n \nCURSOR  driver IS \nSELECT  employee_id, first_name, last_name, salary \nFROM    employees \nORDER BY last_name, first_name; \n \nTYPE    emps_type IS TABLE OF driver%ROWTYPE; \nrecs    emps_type; \n \n   PROCEDURE print_paycheck (emp_recs emps_type) IS \n \n   BEGIN \n \n      FOR i IN 1..emp_recs.COUNT LOOP \n         DBMS_OUTPUT.PUT (&#39;Pay to the order of: &#39;); \n         DBMS_OUTPUT.PUT (emp_recs(i).first_name || &#39; &#39; || emp_recs(i).last_name); \n         DBMS_OUTPUT.PUT_LINE (&#39; $&#39; || to_char (emp_recs(i).salary, &#39;FM999,990.00&#39;)); \n      END LOOP; \n \n   END;  \n \nBEGIN \n \n   OPEN driver; \n   FETCH driver BULK COLLECT INTO recs; \n   CLOSE driver; \n \n   print_paycheck (recs); \n \nEND;  \nResults \nPay to the order of: Ellen Abel $11,000.00Pay to the order of: Sundar Ande $6,400.00Pay to the order of: Mozhe Atkinson $2,800.00… &lt;&gt;Pay to the order of: Alana Walsh $3,100.00Pay to the order of: Matthew Weiss $8,000.00Pay to the order of: Eleni Zlotkey $10,500.00How It WorksTYPE globally defines the data structure as a collection of records for use by the PL&#x2F;SQL block and theenclosed procedure. This declaration of both the type and the procedure at the same level—inside thesame code block—is necessary to allow the data to be passed to the function. The type and theprocedure are within the same scope, and thus the procedure can reference the type and accept valuesof the type.Defining the recs structure as a collection makes it much easier to pass large amounts of databetween routines with a single parameter. The data structure emps_type is defined as a collection ofemployee records that can be passed to any function or procedure that requires employee data forprocessing. This recipe is especially useful in that the logic of who receives a paycheck can be removedfrom the routine that does the printing or the routine that archives the payroll data, for example. \n10-8. Returning a Collection As a ParameterProblemRetrieving a collection of data is a common need. For example, you need a function that returns allemployee data and is easily called from any procedure.SolutionWrite a function that returns a complete collection of employee data. In this example, a package is usedto globally define a collection of employee records and return all employee data as a collection. \nCREATE OR REPLACE PACKAGE empData AS \n \ntype    emps_type is table of employees%ROWTYPE INDEX BY BINARY_INTEGER; \n \nFUNCTION get_emp_data RETURN emps_type; \n \nEND empData; \n \nCREATE OR REPLACE PACKAGE BODY empData as \n \nFUNCTION get_emp_data RETURN emps_type is \n \ncursor  driver is \nselect  * \nfrom    employees \norder by last_name, first_name; \n \nrecs    emps_type; \n \nbegin \n \n   open driver; \n   FETCH driver BULK COLLECT INTO recs; \n   close driver; \n \n   return recs; \n \nend get_emp_data; \n \nend empData; \n \ndeclare \n \nemp_recs empData.emps_type; \n \nbegin \n \n   emp_recs :&#x3D; empData.get_emp_data; \n   dbms_output.put_line (&#39;Employee Records: &#39; || emp_recs.COUNT); \n \nEND;  \nExecuting this block of code produces the following results. Employee Records: 103How It WorksBy defining a PACKAGE, the data structure emps_type is available for use by any package, procedure, orfunction that has access rights to it.1 The function get_emp_data within the common package contains allthe code necessary to fetch and return the employee data. This common routine can be used by multipleapplications that require the employee data for processing. This is a much more efficient method thancoding the same select statement in multiple applications.It is not uncommon to include business rules in this type of function; for example, the routine mayfetch only active employees. If the definition of an active employee changes, you need to update onlyone routine to fix all the applications that use it. \n1 To grant access rights, enter the following command: grant execute on empData to SCHEMA, where SCHEMA isthe user name that requires access. To grant access to every user in the database, use grant execute on empDatato PUBLIC;. \n10-9. Counting the Members in a CollectionProblemYou have a collection, and you need to determine the total number of elements in the collection.SolutionInvoke the built-in COUNT method on the collection. For example, the following code creates twocollections: a varying array and an INDEX BY array. The code then invokes the COUNT method on bothcollections, doing so before and after adding some records to each. \nDECLARE \n \nTYPE    vtype   IS VARRAY(3) OF DATE; \nTYPE    ctype   IS TABLE OF DATE INDEX BY BINARY_INTEGER; \n \nvdates  vtype :&#x3D; vtype (sysdate); \ncdates  ctype; \n \nBEGIN \n \n \n   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); \n   DBMS_OUTPUT.PUT_LINE (&#39;cdates size is: &#39; || cdates.COUNT); \n \n   FOR i IN 1..3 LOOP \n      cdates(i) :&#x3D; SYSDATE + 1; \n   END LOOP; \n \n   DBMS_OUTPUT.PUT_LINE (&#39;cdates size is: &#39; || cdates.COUNT); \n \nEND;  \nExecuting this block of code produces the following results: \nvdates size is: 1cdates size is: 0cdates size is: 3How It WorksThe variable vdates is initialized with one value, so its size is reported as 1 even though it is defined tohold a maximum of three values. The variable cdates is not initialized, so it is first reported with a size of \n\nThe loop creates and sets three collection values, which increases its count to 3.Assigning a value directly to cdates(i) is allowed because cdates is an INDEX BY collection.Assigning a value to vdates in the loop would cause an error because the array has only one definedvalue. See the EXTEND method later in this chapter for more information on assigning values to non-INDEXBY collections.The COUNT method is especially useful when used on a collection populated with a fetch from BULKCOLLECT statement to determine the number of records fetched or to process records in a FOR .. LOOP.\n\n10-10. Deleting a Record from a CollectionProblemYou need to randomly select employees from a collection. Using a random generator may select thesame employee more than once, so you need to remove the record from the collection before selectingthe next employee.SolutionInvoke the built-in DELETE method on the collection. For example, the following code creates a collectionof employees and then randomly selects one from the collection. The selected employee is removedfrom the collection using the DELETE method. This process is repeated until three employees have beenselected. \nDECLARE \n \nCURSOR  driver IS \nSELECT  last_name \nFROM    employees; \n \nTYPE    rec_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; \nrecs    rec_type; \nj       INTEGER; \n \nBEGIN \n \n   OPEN driver; \n   FETCH driver BULK COLLECT INTO recs; \n   CLOSE driver; \n \n   DBMS_RANDOM.INITIALIZE(TO_NUMBER (TO_CHAR (SYSDATE, &#39;SSSSS&#39;) ) ); \n \n   FOR i IN 1..3 LOOP \n--      Randomly select an employee \n      j :&#x3D; MOD (ABS (DBMS_RANDOM.RANDom), recs.COUNT) + 1; \n      DBMS_OUTPUT.PUT_LINE (recs(j).last_name); \n \n--      Move all employees up one postion in the collection \n      FOR k IN j+1..recs.COUNT LOOP \n         recs(k-1) :&#x3D; recs(k); \n      END LOOP; \n \n--      Remove the last element in the collection \n--      so the random number generator has the correct count. \n      recs.DELETE(recs.COUNT); \n   END LOOP; \n \n   DBMS_RANDOM.TERMINATE; \n \nEND; \nExecuting this block of code produces the following results: \nOlsonChungSeoHow It WorksThe collection recs is populated with employee names via a BULK COLLECT. The FOR .. LOOP selects threeemployees at random by generating a random number between 1 and the number of records in thecollection. Once an employee is selected, their name is removed from the collection, and the DELETEmethod is used to reduce the number of elements, which changes the value returned by the COUNTmethod for the next randomly generated number.  Note: The DELETE method applies only to collections that are indexed. You can invoke DELETE only if thecollection’s underlying TYPE definition contains the INDEX BY clause. \n10-11. Checking Whether an Element ExistsProblemYou are processing elements in a collection but cannot be certain that each element exists. Referencingan element in a collection that does not exist will throw an exception. You want to avoid exceptions bytesting for existence before you access an element.SolutionUse the EXISTS method to test whether a collection has a value for a particular index value. In thefollowing Solution, a table collection is created, and then the second element is deleted. It is importantto note that a deleted element or an element that was never initialized is not equivalent to an elementwith a null value. \nDECLARE \n \nTYPE ctype IS TABLE OF DATE INDEX BY BINARY_INTEGER; \n \ncdates ctype; \n \nBEGIN \n \n   FOR i IN 1..3 LOOP \n  CHAPTER 10  PL&#x2F;SQL COLLECTIONS AND RECORDS \n229 \n     cdates(i) :&#x3D; sysdate + i; \n   END LOOP; \n \n   cdates.DELETE(2); \n \n   FOR i IN 1..3 LOOP \n      IF cdates.EXISTS(i) then \n         DBMS_OUTPUT.PUT_LINE (&#39;cdates(&#39; || i || &#39;)&#x3D; &#39; || cdates(i) ); \n      END IF; \n   END LOOP; \n \nEND;  \nExecuting this block of code produces the following results: \ncdates(1)&#x3D; 07-AUG-10cdates(3)&#x3D; 09-AUG-10How It WorksThe first loop creates and initializes the elements in the collection; the DELETE method removes thesecond element. Now we’re ready to loop through the data. The second loop tests for the existence of theelement index before attempting to use the variable. Attempting to access a value to an element in thecollection that does not exist throws an exception.If the first loop initialized the collection elements to NULL, the remaining would execute in exactlythe same manner. The only difference would be in the output from running the block of code. In thiscase, no dates would print. Referencing an element in a collection with a null value does not throw anexception because the indexed element exists, whereas referencing an element that does not exist doesthrow an exception. Here is the output in this example. Note neither Solution prints an element forsubscript 2. \ncdates(1)&#x3D;cdates(3)&#x3D; \n10-12. Increasing the Size of a CollectionProblemYou have a VARRAY with a defined maximum size, but not all elements are initialized, and you need toadd more elements to the collection.SolutionUse the EXTEND method to create new elements within the predefined boundaries. The followingexample adds five elements using a loop: \nDECLARE \n \nTYPE    vtype   IS VARRAY(5) OF DATE; \nvdates  vtype :&#x3D; vtype (sysdate, sysdate+1, sysdate+2); -- initialize 3 of the 5 elements \nBEGIN \n   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); \n   FOR i IN 1..5 LOOP \n      if NOT vdates.EXISTS(i) then \n         vdates.EXTEND; \n         vdates(i) :&#x3D; SYSDATE + i; \n      END IF; \n   END LOOP; \n   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); \nEND; \nExecuting this block of code produces the following results:vdates size is: 3vdates size is: 5How It WorksThe TYPE declaration defines a maximum of five elements in the collection, which is initialized with threevalues. The loop tests for the existence of the elements by index number. The EXTEND method allocatesstorage space for the new elements. Without the EXTEND statement preceding the assignment, Oracle willraise an error “ORA-06533: Subscript beyond count.” This occurs when the loop attempts to assign avalue to the fourth element in the collection.The EXTEND method applies to TABLE and VARRAY collections that are not indexed. In other words, theEXTEND method applies when the TABLE or VARRAY type definition does not contain the INDEX BYclause. To assign a value to a collection that is indexed, simply reference the collection using the indexvalue.  \n10-13. Navigating CollectionsProblemYou need a routine to display sales totaled by region, which is stored in a collection of numbers, but thecollection is indexed by a character string. Using a LOOP from 1 to the maximum size will not work.SolutionUse the FIRST and LAST method to traverse the collection allowing PL&#x2F;SQL to supply the proper indexvalues. In this example, sales amounts are stored in a TABLE indexed by a string. \nDECLARE \nTYPE    ntype   IS TABLE OF NUMBER INDEX BY VARCHAR2(5);\nnlist   ntype; \nidx     VARCHAR2(5); \ntotal   integer :&#x3D; 0; \n \nBEGIN \n \n   nlist(&#39;North&#39;) :&#x3D; 100; \n   nlist(&#39;South&#39;) :&#x3D; 125; \n   nlist(&#39;East&#39;)  :&#x3D; 75; \n   nlist(&#39;West&#39;)  :&#x3D; 75; \n \n   idx :&#x3D; nlist.FIRST; \n   LOOP \n      EXIT WHEN idx is null; \n      DBMS_OUTPUT.PUT_LINE (idx || &#39; &#x3D; &#39; || nlist(idx) ); \n      total :&#x3D; total + nlist(idx); \n      idx   :&#x3D; nlist.NEXT(idx); \n   END LOOP; \n \n   DBMS_OUTPUT.PUT_LINE (&#39;Total: &#39; || total); \n \nEND;  \nExecuting this block of code produces the following results: \nEast &#x3D; 75North &#x3D; 100South &#x3D; 125West &#x3D; 75Total: 375How It WorksThe FIRST method returns the lowest index value in the collection. In this case, the value is East, becausethe collection is sorted alphabetically. The loop is entered with idx initialized to the first value in thecollection. The NEXT method returns the next index value alphabetically in the collection. The loopcontinues executing until the NEXT method returns a null value, which occurs after the last index value inthe collect is retrieved.To traverse the collection in reverse alphabetical order, simply initialize the idx value to nlist.LAST.Then replace the nlist.NEXT with nlist.PRIOR.  Note The FIRST, NEXT, PRIOR, and LAST methods are most useful with associative arrays but also work withcollections indexed by an integer. \n10-14. Trimming a CollectionProblemYou need to remove one or more items from the end of a non-INDEX BY collection. The DELETE methodwill not work because it applies only to INDEX BY collections.SolutionUse the TRIM method to remove one or more elements from the end of the collection. In this example, aVARRY is initialized with five elements. The TRIM method is used to remove elements from the end of thecollection. \nDECLARE \n \nTYPE    vtype   IS VARRAY(5) OF DATE; \nvdates  vtype :&#x3D; vtype (sysdate, sysdate+1, sysdate+2, sysdate+3, sysdate+4); \n \nBEGIN \n \n   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); \n   vdates.TRIM; \n   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); \n   vdates.TRIM(2); \n   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); \n \nEND;  \nExecuting this block of code produces the following results: \nvdates size is: 5vdates size is: 4vdates size is: 2How It WorksThe TRIM method deletes elements from the end of the collection including elements not initialized. Itaccepts an optional parameter for the number of elements to delete; otherwise, it defaults to the lastelement. The TRIM method applies to TABLE and VARRAY collections that are not indexed. If the underlyingTYPE definition does not contain the INDEX BY clause, then you can invoke TRIM.The TRIM method is limited to removing elements from the end of a collection, whereas the DELETEmethod can remove elements anywhere in a collection. If you DELETE an element in the middle of acollection, then executing a FOR .. LOOP from one to the collection’s COUNT will not work properly. First,if you attempt to access the element that was deleted without checking whether it EXISTS, an exception isthrown. Second, the COUNT method will return a value that is less than the collection’s maximum indexvalue, which means the FOR .. LOOP will not process all elements in the collection. \n","dateCreated":"2022-11-08T23:19:02+08:00","dateModified":"2022-11-08T23:40:09+08:00","datePublished":"2022-11-08T23:19:02+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 10-PL/SQL Collections and Records","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 10-PL&#x2F;SQL Collections and Records">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:19:02.475Z">
+<meta property="article:modified_time" content="2022-11-08T15:40:09.815Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 10-PL/SQL Collections and Records
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:19:02+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#10-PL-x2F-SQL-Collections-and-Records"><span class="toc-text">10. PL&#x2F;SQL Collections and Records</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#10-1-Creating-and-Accessing-a-VARRAY"><span class="toc-text">10-1. Creating and Accessing a VARRAY</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-2-Creating-and-Accessing-an-Indexed-Table"><span class="toc-text">10-2. Creating and Accessing an Indexed Table</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-3-Creating-Simple-Records"><span class="toc-text">10-3. Creating Simple Records</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-4-Creating-and-Accessing-Record-Collections"><span class="toc-text">10-4. Creating and Accessing Record Collections</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-5-Creating-and-Accessing-Hash-Array-Collections"><span class="toc-text">10-5. Creating and Accessing Hash Array Collections</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-6-Creating-and-Accessing-Complex-Collections"><span class="toc-text">10-6. Creating and Accessing Complex Collections</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-7-Passing-a-Collection-As-a-Parameter"><span class="toc-text">10-7. Passing a Collection As a Parameter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-8-Returning-a-Collection-As-a-Parameter"><span class="toc-text">10-8. Returning a Collection As a Parameter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-9-Counting-the-Members-in-a-Collection"><span class="toc-text">10-9. Counting the Members in a Collection</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-10-Deleting-a-Record-from-a-Collection"><span class="toc-text">10-10. Deleting a Record from a Collection</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-11-Checking-Whether-an-Element-Exists"><span class="toc-text">10-11. Checking Whether an Element Exists</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-12-Increasing-the-Size-of-a-Collection"><span class="toc-text">10-12. Increasing the Size of a Collection</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-13-Navigating-Collections"><span class="toc-text">10-13. Navigating Collections</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-14-Trimming-a-Collection"><span class="toc-text">10-14. Trimming a Collection</span></a></li></ol></li></ol>
+
+
+<h1 id="10-PL-x2F-SQL-Collections-and-Records"><a href="#10-PL-x2F-SQL-Collections-and-Records" class="headerlink" title="10. PL&#x2F;SQL Collections and Records"></a>10. PL&#x2F;SQL Collections and Records</h1><p>Collections are single-dimensional arrays of data all with the same datatype and are accessed by an<br>index; usually the index is a number, but it can be a string. Collections indexed by strings are commonly<br>known as hash arrays.<br>Records are groups of related data, each with its own field name and datatype, similar to tables<br>stored in the database. The record data structure in PL&#x2F;SQL allows you to manipulate data at the field or<br>record level. PL&#x2F;SQL provides an easy method to define a record’s structure based on a database table’s<br>structure or a cursor. Combining records and collections provide a powerful programming advantage<br>described in the following recipes. </p>
+<h2 id="10-1-Creating-and-Accessing-a-VARRAY"><a href="#10-1-Creating-and-Accessing-a-VARRAY" class="headerlink" title="10-1. Creating and Accessing a VARRAY"></a>10-1. Creating and Accessing a VARRAY</h2><p><strong>Problem</strong><br>You have a small, static list of elements that you initialize once and that would benefit from using in a<br>loop body.<br><strong>Solution</strong><br>Place the elements into a varray (or varying array). Once initialized, a varray may be referenced by its<br>index. Begin by declaring a datatype of varray with a fixed number of elements, and then declare the<br>datatype of the elements. Next, declare the variable that will hold the data using the newly defined type.<br>For example, the following code creates a varying array to hold the abbreviations for the days of the<br>week: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+TYPE    dow_type IS VARRAY(7) OF VARCHAR2(3); 
+dow     dow_type :&#x3D; dow_type (&#39;Sun&#39;, &#39;Mon&#39;, &#39;Tue&#39;, &#39;Wed&#39;, &#39;Thu&#39;, &#39;Fri&#39;, &#39;Sat&#39;); 
+ 
+BEGIN 
+ 
+   FOR i IN 1..dow.COUNT LOOP 
+      DBMS_OUTPUT.PUT_LINE (dow(i)); 
+   END LOOP; 
+ 
+END; 
+ 
+Results 
+Sun 
+Mon 
+Tue 
+Wed 
+Thu 
+Fri 
+Sat </code></pre>
+<p><strong>How It Works</strong><br>The type statement dow_type defines a data structure to store seven instances of VARCHAR2(3). This is<br>sufficient space to hold the abbreviations of the seven days of the week. The dow variable is defined as a<br>VARRAY of the dow_type defined in the previous line. That definition invokes a built-in constructor<br>method to initialize values for each of the elements in the VARRAY.<br>The FOR .. LOOP traverses the dow variable starting at the first element and ending with the last. The<br>COUNT method returns the number of elements defined in a collection; in this recipe, there are seven<br>elements in the VARRAY, so the LOOP increments from one to seven. The DBMS_OUTPUT.PUT_LINE statement<br>displays its value.<br>A VARRAY is best used when you know the size the array and it will not likely change. The VARRAY<br>construct also allows you to initialize its values in the declaration section. </p>
+<h2 id="10-2-Creating-and-Accessing-an-Indexed-Table"><a href="#10-2-Creating-and-Accessing-an-Indexed-Table" class="headerlink" title="10-2. Creating and Accessing an Indexed Table"></a>10-2. Creating and Accessing an Indexed Table</h2><p><strong>Problem</strong><br>You need to store a group of numbers for later processing in another procedure.<br><strong>Solution</strong><br>Create an indexed table using an integer index to reference the elements. For example, this recipe loads<br>values into an indexed table of numbers.  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+TYPE    num_type IS TABLE OF number INDEX BY BINARY_INTEGER; 
+nums    num_type; 
+total   number; 
+ 
+BEGIN 
+ 
+   nums(1) :&#x3D; 127.56; 
+   nums(2) :&#x3D; 56.79; 
+   nums(3) :&#x3D; 295.34; 
+ 
+   -- call subroutine to process numbers; 
+   -- total :&#x3D; total_table (nums); 
+END;  </code></pre>
+
+<p><strong>How It Works</strong><br>PL&#x2F;SQL tables are indexed collections of data of the same type. The datatype can be any of the built-in<br>datatypes provided by PL&#x2F;SQL; in this example, the datatype is a number. Here are some things to note<br>about the example:<br>• The TYPE statement declares a TABLE of numbers.<br>• The INDEX BY clause defines how the array is accessed, in this case by an INTEGER.<br>• The array is populated by assigning values to specific indexes.<br>Because the TABLE is INDEXED BY an INTEGER, there is no predefined limit on the index value, other<br>than those imposed by Oracle, which is -231 – 231. Indexed tables are best suited for collections where the<br>number of elements stored is not known until runtime.<br>This recipe is an example of a TABLE indexed by an INTEGER. PL&#x2F;SQL provides for tables indexed by<br>strings as well. See Recipe 10-5 for an example. </p>
+<h2 id="10-3-Creating-Simple-Records"><a href="#10-3-Creating-Simple-Records" class="headerlink" title="10-3. Creating Simple Records"></a>10-3. Creating Simple Records</h2><p><strong>Problem</strong><br>You need a PL&#x2F;SQL data structure to group related employee data to make manipulating the group<br>easier.<br><strong>Solution</strong><br>Define a record structure of the related employee data, and then create a variable to hold the record<br>structure. In this example, a simple RECORD structure is defined and initialized. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+TYPE    rec_type IS RECORD ( 
+                last_name       varchar2(25), 
+                department      varchar2(30), 
+                salary          number ); 
+rec     rec_type; 
+ 
+begin 
+ 
+   rec.last_name        :&#x3D; &#39;Juno&#39;; 
+   rec.department       :&#x3D; &#39;IT&#39;; 
+   rec.salary           :&#x3D; &#39;5000&#39;; 
+ 
+END;</code></pre>
+<p><strong>How It Works</strong><br>Record structures are created in PL&#x2F;SQL by using the TYPE statement along with a RECORD structure<br>format. The fields defined in the record structure can be, and often are, of different datatypes. Record<br>structures use dot notation to access individual fields. Once defined, the rec_type record structure in the<br><strong>Solution</strong> can be used throughout the code to create as many instantiations of data structures as needed. </p>
+<h2 id="10-4-Creating-and-Accessing-Record-Collections"><a href="#10-4-Creating-and-Accessing-Record-Collections" class="headerlink" title="10-4. Creating and Accessing Record Collections"></a>10-4. Creating and Accessing Record Collections</h2><p><strong>Problem</strong><br>You need to load records from a database table or view into a simple data structure that would benefit<br>from use in a loop body or to pass as a parameter to another function or procedure. You want to act<br>upon sets of records as a single unit.<br><strong>Solution</strong><br>Use a TYPE to define a TABLE based on the database table structure. The following example declares a<br>cursor and then uses it to declare the table of records. The result is a variable named recs that holds the<br>data fetched by the cursor. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+CURSOR  driver IS 
+SELECT  * 
+FROM    employees; 
+ 
+TYPE    emp_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; 
+recs    emp_type; 
+total   number :&#x3D; 0.0; 
+ 
+BEGIN 
+ 
+   OPEN DRIVER; 
+   FETCH DRIVER BULK COLLECT INTO recs; 
+   CLOSE DRIVER; 
+ 
+   DBMS_OUTPUT.PUT_LINE (recs.COUNT || &#39; records found&#39;); 
+ 
+   FOR i in 1..recs.COUNT LOOP 
+      total :&#x3D; total + recs(i).salary; 
+   END LOOP; 
+ 
+END; </code></pre>
+<p>When you execute this block of code, you will see a message such as the following: 103 records found<br><strong>How It Works</strong><br>The TYPE statement defines a data structure using the attributes (columns) of the employees table as<br>elements within the structure. The TABLE OF clause defines multiple instances of the record structure.<br>The INDEX BY clause defines the index method, in this case an integer. Think of this structure as a<br>spreadsheet with the rows being separate records from the database and the columns being the<br>attributes (fields) in the database. The recipe works whether your cursor selects all the fields (SELECT *)<br>or selects just a subset of fields from the table.<br>The BULK COLLECT portion of the fetch statement is more efficient than looping through the data in a<br>standard cursor loop because PL&#x2F;SQL switches control to the database just once to retrieve the data as<br>opposed to switching to the database for each record retrieved in a cursor FOR .. LOOP. In a BULK<br>COLLECT, all records meeting the query condition are retrieved and stored in the data structure in a single<br>operation. Once the records are retrieved, processing may occur in a standard FOR .. standard FOR ..<br>LOOP. </p>
+<h2 id="10-5-Creating-and-Accessing-Hash-Array-Collections"><a href="#10-5-Creating-and-Accessing-Hash-Array-Collections" class="headerlink" title="10-5. Creating and Accessing Hash Array Collections"></a>10-5. Creating and Accessing Hash Array Collections</h2><p><strong>Problem</strong><br>You want to use a single cursor to query employee data and sum the salaries across departments.<br><strong>Solution</strong><br>You can use two cursors—one to select all employees and the other to sum the salary grouping by<br>department. However, you can more easily and efficiently accomplish your task by using one cursor and<br>a hashed collection. Define your cursor to select employee data, joined with the department table. Use a<br>hash array collection to total by department by using the INDEX BY option to index your collection based<br>on the department name rather than an integer. The following code example illustrates this more<br>efficient approach: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+CURSOR  driver IS 
+SELECT  ee.employee_id, ee.first_name, ee.last_name, ee.salary, d.department_name 
+FROM    departments     d, 
+        employees       ee 
+WHERE   d.department_id &#x3D; ee.department_id; 
+  
+TYPE    total_type IS TABLE OF number INDEX BY departments.department_name%TYPE; 
+totals  total_type; 
+ 
+dept    departments.department_name%TYPE; 
+ 
+BEGIN 
+ 
+   FOR rec IN driver LOOP 
+      -- process paycheck 
+      if NOT totals.EXISTS(rec.department_name) then  -- create element in the array 
+         totals(rec.department_name) :&#x3D; 0; -- initialize to zero 
+      end if; 
+ 
+      totals(rec.department_name) :&#x3D; totals(rec.department_name) + nvl (rec.salary, 0); 
+   END LOOP; 
+ 
+   dept :&#x3D; totals.FIRST; 
+   LOOP 
+      EXIT WHEN dept IS NULL; 
+      DBMS_OUTPUT.PUT_LINE (to_char (totals(dept),  &#39;999,999.00&#39;) || &#39; &#39; || dept); 
+      dept :&#x3D; totals.NEXT(dept); 
+   END LOOP; 
+END; </code></pre>
+<p>When you execute this block of code, you will see the following results: </p>
+<pre class="language-text" data-language="text"><code class="language-text">20,310.00 Accounting
+58,720.00 Executive
+51,600.00 Finance
+6,500.00 Human Resources
+19,000.00 Marketing
+2,345.34 Payroll
+10,000.00 Public Relations
+304,500.00 Sales
+156,400.00 Shipping
+35,295.00 Web Developments </code></pre>
+<p><strong>How It Works</strong><br>The TOTAL_TYPES PL&#x2F;SQL type is defined as a collection of numbers that is indexed by the department<br>name. Indexing by department name gives the advantage of automatically sorting the results by<br>department name.<br>As new elements are created, using the EXISTS method, the index keys are automatically sorted by<br>PL&#x2F;SQL. The totals are accumulated by department name as opposed to a numerical index, such as<br>department ID, which may not be sequential. This approach has the added advantage of not requiring a<br>separate collection for the department names.<br>Once the employee paychecks are processed, the dept variable is initialized with the first<br>department name from the totals array using the FIRST method. In this example, the first department is<br>accounting. A loop is required to process the remaining records. The NEXT method is used to find the<br>next department name—in alphabetical order—and this process repeats until all departments are<br>displayed.  </p>
+<h2 id="10-6-Creating-and-Accessing-Complex-Collections"><a href="#10-6-Creating-and-Accessing-Complex-Collections" class="headerlink" title="10-6. Creating and Accessing Complex Collections"></a>10-6. Creating and Accessing Complex Collections</h2><p><strong>Problem</strong><br>You need a routine to load managers and their corresponding employees from the database and store<br>them in one data structure. The data must be loaded in a manner such that direct reports are associated<br>with their manager. In addition, the number of direct reports for any given manager varies, so your<br>structure to hold the manager&#x2F;employee relationships must handle any number of subordinates.<br><strong>Solution</strong><br>Combine records and collections to define one data structure capable of storing all the data. PL&#x2F;SQL<br>allows you to use data structures you create via the type statement as datatypes within other collections.<br>Once your data structures are defined, use dot notation to distinguish attributes within the collections.<br>Use the structure’s index to reference items within the table. For example: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SET SERVEROUT ON SIZE 1000000 
+ 
+DECLARE 
+ 
+TYPE    person_type IS RECORD ( 
+                employee_id     employees.employee_id%TYPE, 
+                first_name      employees.first_name%TYPE, 
+                last_name       employees.last_name%TYPE); 
+ 
+  -- a collection of people 
+TYPE    direct_reports_type IS TABLE OF person_type INDEX BY BINARY_INTEGER;  
+ 
+  -- the main record definition, which contains a collection of records 
+TYPE    rec_type IS RECORD ( 
+                mgr             person_type, 
+                emps            direct_reports_type); 
+ 
+TYPE    recs_type IS TABLE OF rec_type INDEX BY BINARY_INTEGER; 
+recs    recs_type; 
+ 
+CURSOR  mgr_cursor IS  -- finds all managers 
+SELECT  employee_id, first_name, last_name 
+FROM    employees 
+WHERE   employee_id IN 
+        (       SELECT  distinct manager_id 
+                FROM    employees) 
+ORDER BY last_name, first_name; 
+ 
+CURSOR  emp_cursor (mgr_id integer) IS  -- finds all direct reports for a manager 
+SELECT  employee_id, first_name, last_name 
+FROM    employees 
+WHERE   manager_id &#x3D; mgr_id 
+ORDER BY last_name, first_name; 
+ 
+  -- temporary collection of records to hold the managers. 
+TYPE            mgr_recs_type IS TABLE OF emp_cursor%ROWTYPE 
+                                INDEX BY BINARY_INTEGER; 
+mgr_recs        mgr_recs_type; 
+ 
+BEGIN 
+ 
+   OPEN mgr_cursor; 
+   FETCH mgr_cursor BULK COLLECT INTO mgr_recs; 
+   CLOSE mgr_cursor; 
+ 
+   FOR i IN 1..mgr_recs.COUNT LOOP 
+      recs(i).mgr :&#x3D; mgr_recs(i);  -- move the manager record into the final structure 
+ 
+        -- moves direct reports directly into the final structure 
+      OPEN emp_cursor (recs(i).mgr.employee_id); 
+      FETCH emp_cursor BULK COLLECT INTO recs(i).emps; 
+      CLOSE emp_cursor; 
+   END LOOP; 
+ 
+        -- traverse the data structure to display the manager and direct reports 
+        -- note the use of dot notation within the data structure 
+   FOR i IN 1..recs.COUNT LOOP 
+      DBMS_OUTPUT.PUT_LINE (&#39;Manager: &#39; || recs(i).mgr.last_name); 
+      FOR j IN 1..recs(i).emps.count LOOP 
+         DBMS_OUTPUT.PUT_LINE (&#39;***   Employee: &#39; || recs(i).emps(j).last_name); 
+      END LOOP; 
+   END LOOP; 
+ 
+END;  </code></pre>
+<p>Executing this code block produces the following results: </p>
+<p>Manager: Cambrault<br>***   Employee: Bates<br>***   Employee: Bloom<br>***   Employee: Fox<br>***   Employee: Kumar<br>***   Employee: Ozer<br>***   Employee: Smith<br>…  &lt;<snip>&gt;<br>Manager: Zlotkey<br>***   Employee: Abel<br>***   Employee: Grant<br>***   Employee: Hutton<br>***   Employee: Johnson<br>***   Employee: Livingston<br>***   Employee: Taylor<br><strong>How It Works</strong><br>Combining records with collections is one of the most powerful techniques for defining data structures<br>in PL&#x2F;SQL. It allows you to logically group common data, process large amounts of data efficiently, and<br>seamlessly pass data between procedures and functions.<br>The data structure contains a collection of managers; each manager contains a collection of direct<br>reports. Managers and direct reports are both person_type. Once your complex structure is defined, you<br>can use the BULK COLLECT feature to quickly fetch data from the database and load it into the structure.<br>The BULK COLLECT of the MGR_CURSOR selects all persons who are managers at once and then loads<br>them into the temporary structure MGR_RECS. Now that you have retrieved the records, it is easy to move<br>them into your final data structure. Looping through the manager records allows you to move the entire<br>data record for each manager via the RECS(I).MGR :&#x3D; MGR_RECS(I); statement. This statement moves<br>every element (field) from the MGR_RECS into the RECS structure.<br>The EMP_CURSOR uses the managers’ ID to fetch the managers’ direct reports. The cursor is opened by<br>passing the managers’ ID, and then another BULK COLLECT is used to directly store the fetched data into<br>the data structure; no temporary data structure is needed because the structure of the fetched data<br>exactly matches the target data structure.<br>Now that the data is stored in the data structure, it can be passed to another routine for processing.<br>Grouping large sets of related data is an efficient method for exchanging data between routines. This<br>helps separate data retrieval routines from business processing routines. It’s a very powerful feature in<br>PL&#x2F;SQL, as you’ll see in the next recipe. </p>
+<h2 id="10-7-Passing-a-Collection-As-a-Parameter"><a href="#10-7-Passing-a-Collection-As-a-Parameter" class="headerlink" title="10-7. Passing a Collection As a Parameter"></a>10-7. Passing a Collection As a Parameter</h2><p><strong>Problem</strong><br>You want to pass a collection as a parameter to a procedure or function. For example, you have a data<br>structure that contains employee data, and you need to pass the data to a routine that prints employee<br>paychecks.<br><strong>Solution</strong><br>Create a collection of employee records to hold all employee data, and then pass the data to the<br>subroutine to process the paychecks. The TYPE statement defining the data structure must be visible to<br>the called procedure; therefore, it must be defined globally, prior to defining any procedure or function<br>that uses it.<br>In this example, employee data is fetched from the database into a collection and then passed to a<br>subroutine for processing. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">set serverout on size 1000000 
+ 
+DECLARE 
+ 
+CURSOR  driver IS 
+SELECT  employee_id, first_name, last_name, salary 
+FROM    employees 
+ORDER BY last_name, first_name; 
+ 
+TYPE    emps_type IS TABLE OF driver%ROWTYPE; 
+recs    emps_type; 
+ 
+   PROCEDURE print_paycheck (emp_recs emps_type) IS 
+ 
+   BEGIN 
+ 
+      FOR i IN 1..emp_recs.COUNT LOOP 
+         DBMS_OUTPUT.PUT (&#39;Pay to the order of: &#39;); 
+         DBMS_OUTPUT.PUT (emp_recs(i).first_name || &#39; &#39; || emp_recs(i).last_name); 
+         DBMS_OUTPUT.PUT_LINE (&#39; $&#39; || to_char (emp_recs(i).salary, &#39;FM999,990.00&#39;)); 
+      END LOOP; 
+ 
+   END;  
+ 
+BEGIN 
+ 
+   OPEN driver; 
+   FETCH driver BULK COLLECT INTO recs; 
+   CLOSE driver; 
+ 
+   print_paycheck (recs); 
+ 
+END;  </code></pre>
+<p>Results </p>
+<p>Pay to the order of: Ellen Abel $11,000.00<br>Pay to the order of: Sundar Ande $6,400.00<br>Pay to the order of: Mozhe Atkinson $2,800.00<br>… &lt;<snip>&gt;<br>Pay to the order of: Alana Walsh $3,100.00<br>Pay to the order of: Matthew Weiss $8,000.00<br>Pay to the order of: Eleni Zlotkey $10,500.00<br><strong>How It Works</strong><br>TYPE globally defines the data structure as a collection of records for use by the PL&#x2F;SQL block and the<br>enclosed procedure. This declaration of both the type and the procedure at the same level—inside the<br>same code block—is necessary to allow the data to be passed to the function. The type and the<br>procedure are within the same scope, and thus the procedure can reference the type and accept values<br>of the type.<br>Defining the recs structure as a collection makes it much easier to pass large amounts of data<br>between routines with a single parameter. The data structure emps_type is defined as a collection of<br>employee records that can be passed to any function or procedure that requires employee data for<br>processing. This recipe is especially useful in that the logic of who receives a paycheck can be removed<br>from the routine that does the printing or the routine that archives the payroll data, for example. </p>
+<h2 id="10-8-Returning-a-Collection-As-a-Parameter"><a href="#10-8-Returning-a-Collection-As-a-Parameter" class="headerlink" title="10-8. Returning a Collection As a Parameter"></a>10-8. Returning a Collection As a Parameter</h2><p><strong>Problem</strong><br>Retrieving a collection of data is a common need. For example, you need a function that returns all<br>employee data and is easily called from any procedure.<br><strong>Solution</strong><br>Write a function that returns a complete collection of employee data. In this example, a package is used<br>to globally define a collection of employee records and return all employee data as a collection. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE empData AS 
+ 
+type    emps_type is table of employees%ROWTYPE INDEX BY BINARY_INTEGER; 
+ 
+FUNCTION get_emp_data RETURN emps_type; 
+ 
+END empData; 
+ 
+CREATE OR REPLACE PACKAGE BODY empData as 
+ 
+FUNCTION get_emp_data RETURN emps_type is 
+ 
+cursor  driver is 
+select  * 
+from    employees 
+order by last_name, first_name; 
+ 
+recs    emps_type; 
+ 
+begin 
+ 
+   open driver; 
+   FETCH driver BULK COLLECT INTO recs; 
+   close driver; 
+ 
+   return recs; 
+ 
+end get_emp_data; 
+ 
+end empData; 
+ 
+declare 
+ 
+emp_recs empData.emps_type; 
+ 
+begin 
+ 
+   emp_recs :&#x3D; empData.get_emp_data; 
+   dbms_output.put_line (&#39;Employee Records: &#39; || emp_recs.COUNT); 
+ 
+END;  </code></pre>
+<p>Executing this block of code produces the following results.<br> Employee Records: 103<br><strong>How It Works</strong><br>By defining a PACKAGE, the data structure emps_type is available for use by any package, procedure, or<br>function that has access rights to it.1 The function get_emp_data within the common package contains all<br>the code necessary to fetch and return the employee data. This common routine can be used by multiple<br>applications that require the employee data for processing. This is a much more efficient method than<br>coding the same select statement in multiple applications.<br>It is not uncommon to include business rules in this type of function; for example, the routine may<br>fetch only active employees. If the definition of an active employee changes, you need to update only<br>one routine to fix all the applications that use it. </p>
+<p>1 To grant access rights, enter the following command: grant execute on empData to SCHEMA, where SCHEMA is<br>the user name that requires access. To grant access to every user in the database, use grant execute on empData<br>to PUBLIC;. </p>
+<h2 id="10-9-Counting-the-Members-in-a-Collection"><a href="#10-9-Counting-the-Members-in-a-Collection" class="headerlink" title="10-9. Counting the Members in a Collection"></a>10-9. Counting the Members in a Collection</h2><p><strong>Problem</strong><br>You have a collection, and you need to determine the total number of elements in the collection.<br><strong>Solution</strong><br>Invoke the built-in COUNT method on the collection. For example, the following code creates two<br>collections: a varying array and an INDEX BY array. The code then invokes the COUNT method on both<br>collections, doing so before and after adding some records to each. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+TYPE    vtype   IS VARRAY(3) OF DATE; 
+TYPE    ctype   IS TABLE OF DATE INDEX BY BINARY_INTEGER; 
+ 
+vdates  vtype :&#x3D; vtype (sysdate); 
+cdates  ctype; 
+ 
+BEGIN 
+ 
+ 
+   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); 
+   DBMS_OUTPUT.PUT_LINE (&#39;cdates size is: &#39; || cdates.COUNT); 
+ 
+   FOR i IN 1..3 LOOP 
+      cdates(i) :&#x3D; SYSDATE + 1; 
+   END LOOP; 
+ 
+   DBMS_OUTPUT.PUT_LINE (&#39;cdates size is: &#39; || cdates.COUNT); 
+ 
+END;  </code></pre>
+<p>Executing this block of code produces the following results: </p>
+<p>vdates size is: 1<br>cdates size is: 0<br>cdates size is: 3<br><strong>How It Works</strong><br>The variable vdates is initialized with one value, so its size is reported as 1 even though it is defined to<br>hold a maximum of three values. The variable cdates is not initialized, so it is first reported with a size of </p>
+<ol>
+<li>The loop creates and sets three collection values, which increases its count to 3.<br>Assigning a value directly to cdates(i) is allowed because cdates is an INDEX BY collection.<br>Assigning a value to vdates in the loop would cause an error because the array has only one defined<br>value. See the EXTEND method later in this chapter for more information on assigning values to non-INDEX<br>BY collections.<br>The COUNT method is especially useful when used on a collection populated with a fetch from BULK<br>COLLECT statement to determine the number of records fetched or to process records in a FOR .. LOOP.</li>
+</ol>
+<h2 id="10-10-Deleting-a-Record-from-a-Collection"><a href="#10-10-Deleting-a-Record-from-a-Collection" class="headerlink" title="10-10. Deleting a Record from a Collection"></a>10-10. Deleting a Record from a Collection</h2><p><strong>Problem</strong><br>You need to randomly select employees from a collection. Using a random generator may select the<br>same employee more than once, so you need to remove the record from the collection before selecting<br>the next employee.<br><strong>Solution</strong><br>Invoke the built-in DELETE method on the collection. For example, the following code creates a collection<br>of employees and then randomly selects one from the collection. The selected employee is removed<br>from the collection using the DELETE method. This process is repeated until three employees have been<br>selected. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+CURSOR  driver IS 
+SELECT  last_name 
+FROM    employees; 
+ 
+TYPE    rec_type IS TABLE OF driver%ROWTYPE INDEX BY BINARY_INTEGER; 
+recs    rec_type; 
+j       INTEGER; 
+ 
+BEGIN 
+ 
+   OPEN driver; 
+   FETCH driver BULK COLLECT INTO recs; 
+   CLOSE driver; 
+ 
+   DBMS_RANDOM.INITIALIZE(TO_NUMBER (TO_CHAR (SYSDATE, &#39;SSSSS&#39;) ) ); 
+ 
+   FOR i IN 1..3 LOOP 
+--      Randomly select an employee 
+      j :&#x3D; MOD (ABS (DBMS_RANDOM.RANDom), recs.COUNT) + 1; 
+      DBMS_OUTPUT.PUT_LINE (recs(j).last_name); 
+ 
+--      Move all employees up one postion in the collection 
+      FOR k IN j+1..recs.COUNT LOOP 
+         recs(k-1) :&#x3D; recs(k); 
+      END LOOP; 
+ 
+--      Remove the last element in the collection 
+--      so the random number generator has the correct count. 
+      recs.DELETE(recs.COUNT); 
+   END LOOP; 
+ 
+   DBMS_RANDOM.TERMINATE; 
+ 
+END; </code></pre>
+<p>Executing this block of code produces the following results: </p>
+<p>Olson<br>Chung<br>Seo<br><strong>How It Works</strong><br>The collection recs is populated with employee names via a BULK COLLECT. The FOR .. LOOP selects three<br>employees at random by generating a random number between 1 and the number of records in the<br>collection. Once an employee is selected, their name is removed from the collection, and the DELETE<br>method is used to reduce the number of elements, which changes the value returned by the COUNT<br>method for the next randomly generated number.<br>  Note: The DELETE method applies only to collections that are indexed. You can invoke DELETE only if the<br>collection’s underlying TYPE definition contains the INDEX BY clause. </p>
+<h2 id="10-11-Checking-Whether-an-Element-Exists"><a href="#10-11-Checking-Whether-an-Element-Exists" class="headerlink" title="10-11. Checking Whether an Element Exists"></a>10-11. Checking Whether an Element Exists</h2><p><strong>Problem</strong><br>You are processing elements in a collection but cannot be certain that each element exists. Referencing<br>an element in a collection that does not exist will throw an exception. You want to avoid exceptions by<br>testing for existence before you access an element.<br><strong>Solution</strong><br>Use the EXISTS method to test whether a collection has a value for a particular index value. In the<br>following <strong>Solution</strong>, a table collection is created, and then the second element is deleted. It is important<br>to note that a deleted element or an element that was never initialized is not equivalent to an element<br>with a null value. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+TYPE ctype IS TABLE OF DATE INDEX BY BINARY_INTEGER; 
+ 
+cdates ctype; 
+ 
+BEGIN 
+ 
+   FOR i IN 1..3 LOOP 
+  CHAPTER 10  PL&#x2F;SQL COLLECTIONS AND RECORDS 
+229 
+     cdates(i) :&#x3D; sysdate + i; 
+   END LOOP; 
+ 
+   cdates.DELETE(2); 
+ 
+   FOR i IN 1..3 LOOP 
+      IF cdates.EXISTS(i) then 
+         DBMS_OUTPUT.PUT_LINE (&#39;cdates(&#39; || i || &#39;)&#x3D; &#39; || cdates(i) ); 
+      END IF; 
+   END LOOP; 
+ 
+END;  </code></pre>
+<p>Executing this block of code produces the following results: </p>
+<p>cdates(1)&#x3D; 07-AUG-10<br>cdates(3)&#x3D; 09-AUG-10<br><strong>How It Works</strong><br>The first loop creates and initializes the elements in the collection; the DELETE method removes the<br>second element. Now we’re ready to loop through the data. The second loop tests for the existence of the<br>element index before attempting to use the variable. Attempting to access a value to an element in the<br>collection that does not exist throws an exception.<br>If the first loop initialized the collection elements to NULL, the remaining would execute in exactly<br>the same manner. The only difference would be in the output from running the block of code. In this<br>case, no dates would print. Referencing an element in a collection with a null value does not throw an<br>exception because the indexed element exists, whereas referencing an element that does not exist does<br>throw an exception. Here is the output in this example. Note neither <strong>Solution</strong> prints an element for<br>subscript 2. </p>
+<p>cdates(1)&#x3D;<br>cdates(3)&#x3D; </p>
+<h2 id="10-12-Increasing-the-Size-of-a-Collection"><a href="#10-12-Increasing-the-Size-of-a-Collection" class="headerlink" title="10-12. Increasing the Size of a Collection"></a>10-12. Increasing the Size of a Collection</h2><p><strong>Problem</strong><br>You have a VARRAY with a defined maximum size, but not all elements are initialized, and you need to<br>add more elements to the collection.<br><strong>Solution</strong><br>Use the EXTEND method to create new elements within the predefined boundaries. The following<br>example adds five elements using a loop: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+TYPE    vtype   IS VARRAY(5) OF DATE; 
+vdates  vtype :&#x3D; vtype (sysdate, sysdate+1, sysdate+2); -- initialize 3 of the 5 elements 
+BEGIN 
+   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); 
+   FOR i IN 1..5 LOOP 
+      if NOT vdates.EXISTS(i) then 
+         vdates.EXTEND; 
+         vdates(i) :&#x3D; SYSDATE + i; 
+      END IF; 
+   END LOOP; 
+   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); 
+END; </code></pre>
+<p>Executing this block of code produces the following results:<br>vdates size is: 3<br>vdates size is: 5<br><strong>How It Works</strong><br>The TYPE declaration defines a maximum of five elements in the collection, which is initialized with three<br>values. The loop tests for the existence of the elements by index number. The EXTEND method allocates<br>storage space for the new elements. Without the EXTEND statement preceding the assignment, Oracle will<br>raise an error “ORA-06533: Subscript beyond count.” This occurs when the loop attempts to assign a<br>value to the fourth element in the collection.<br>The EXTEND method applies to TABLE and VARRAY collections that are not indexed. In other words, the<br>EXTEND method applies when the TABLE or VARRAY type definition does not contain the INDEX BY<br>clause. To assign a value to a collection that is indexed, simply reference the collection using the index<br>value.  </p>
+<h2 id="10-13-Navigating-Collections"><a href="#10-13-Navigating-Collections" class="headerlink" title="10-13. Navigating Collections"></a>10-13. Navigating Collections</h2><p><strong>Problem</strong><br>You need a routine to display sales totaled by region, which is stored in a collection of numbers, but the<br>collection is indexed by a character string. Using a LOOP from 1 to the maximum size will not work.<br><strong>Solution</strong><br>Use the FIRST and LAST method to traverse the collection allowing PL&#x2F;SQL to supply the proper index<br>values. In this example, sales amounts are stored in a TABLE indexed by a string. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+TYPE    ntype   IS TABLE OF NUMBER INDEX BY VARCHAR2(5);
+nlist   ntype; 
+idx     VARCHAR2(5); 
+total   integer :&#x3D; 0; 
+ 
+BEGIN 
+ 
+   nlist(&#39;North&#39;) :&#x3D; 100; 
+   nlist(&#39;South&#39;) :&#x3D; 125; 
+   nlist(&#39;East&#39;)  :&#x3D; 75; 
+   nlist(&#39;West&#39;)  :&#x3D; 75; 
+ 
+   idx :&#x3D; nlist.FIRST; 
+   LOOP 
+      EXIT WHEN idx is null; 
+      DBMS_OUTPUT.PUT_LINE (idx || &#39; &#x3D; &#39; || nlist(idx) ); 
+      total :&#x3D; total + nlist(idx); 
+      idx   :&#x3D; nlist.NEXT(idx); 
+   END LOOP; 
+ 
+   DBMS_OUTPUT.PUT_LINE (&#39;Total: &#39; || total); 
+ 
+END;  </code></pre>
+<p>Executing this block of code produces the following results: </p>
+<p>East &#x3D; 75<br>North &#x3D; 100<br>South &#x3D; 125<br>West &#x3D; 75<br>Total: 375<br><strong>How It Works</strong><br>The FIRST method returns the lowest index value in the collection. In this case, the value is East, because<br>the collection is sorted alphabetically. The loop is entered with idx initialized to the first value in the<br>collection. The NEXT method returns the next index value alphabetically in the collection. The loop<br>continues executing until the NEXT method returns a null value, which occurs after the last index value in<br>the collect is retrieved.<br>To traverse the collection in reverse alphabetical order, simply initialize the idx value to nlist.LAST.<br>Then replace the nlist.NEXT with nlist.PRIOR.<br>  Note The FIRST, NEXT, PRIOR, and LAST methods are most useful with associative arrays but also work with<br>collections indexed by an integer. </p>
+<h2 id="10-14-Trimming-a-Collection"><a href="#10-14-Trimming-a-Collection" class="headerlink" title="10-14. Trimming a Collection"></a>10-14. Trimming a Collection</h2><p><strong>Problem</strong><br>You need to remove one or more items from the end of a non-INDEX BY collection. The DELETE method<br>will not work because it applies only to INDEX BY collections.<br><strong>Solution</strong><br>Use the TRIM method to remove one or more elements from the end of the collection. In this example, a<br>VARRY is initialized with five elements. The TRIM method is used to remove elements from the end of the<br>collection. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DECLARE 
+ 
+TYPE    vtype   IS VARRAY(5) OF DATE; 
+vdates  vtype :&#x3D; vtype (sysdate, sysdate+1, sysdate+2, sysdate+3, sysdate+4); 
+ 
+BEGIN 
+ 
+   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); 
+   vdates.TRIM; 
+   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); 
+   vdates.TRIM(2); 
+   DBMS_OUTPUT.PUT_LINE (&#39;vdates size is: &#39; || vdates.COUNT); 
+ 
+END;  </code></pre>
+<p>Executing this block of code produces the following results: </p>
+<p>vdates size is: 5<br>vdates size is: 4<br>vdates size is: 2<br><strong>How It Works</strong><br>The TRIM method deletes elements from the end of the collection including elements not initialized. It<br>accepts an optional parameter for the number of elements to delete; otherwise, it defaults to the last<br>element. The TRIM method applies to TABLE and VARRAY collections that are not indexed. If the underlying<br>TYPE definition does not contain the INDEX BY clause, then you can invoke TRIM.<br>The TRIM method is limited to removing elements from the end of a collection, whereas the DELETE<br>method can remove elements anywhere in a collection. If you DELETE an element in the middle of a<br>collection, then executing a FOR .. LOOP from one to the collection’s COUNT will not work properly. First,<br>if you attempt to access the element that was deleted without checking whether it EXISTS, an exception is<br>thrown. Second, the COUNT method will return a value that is less than the collection’s maximum index<br>value, which means the FOR .. LOOP will not process all elements in the collection. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"
+                    data-tooltip="Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"
+                    data-tooltip="Oracle PLSQL Recipes 09-Exceptions"
+                    aria-label="NEXT: Oracle PLSQL Recipes 09-Exceptions"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_11/"
+                    data-tooltip="Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                    aria-label="PREVIOUS: Oracle PLSQL Recipes 11-Automating Routine Tasks"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_09/"
+                    data-tooltip="Oracle PLSQL Recipes 09-Exceptions"
+                    aria-label="NEXT: Oracle PLSQL Recipes 09-Exceptions"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_10/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,1314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle PLSQL Recipes 17-Unit Testing With utPLSQL - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://simonteo58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 其实这个讲PLSQL有点基础\n\n\n\n\n\n\n17. Unit Testing With utPLSQLTesting is a necessary evil of the application development process. Sadly, testing is oftentimesoverlooked or bypassed when time is short. Distribution of untested or undertested code can lead tocode that is riddled with bugs and to disappointed users. Unit testing with a well-constructed frameworkcan help to alleviate some of the time that it takes to conform to a well-tested development process.There are a few different options available to you for testing your PL&#x2F;SQL code. SQL Developerprovides some good debugging options that you can read about in Recipe 12-12. You can also useDBMS_OUTPUT statements within your code to display the results of variables as your code executes. This isa good technique for helping to pinpoint issues in your code and one you can read about in Recipe 17-1.There are also unit-testing frameworks available that will help you to write unit tests for your PL&#x2F;SQLcode objects. Although not covered in this book, the PLUTO (PL&#x2F;SQL Unit Testing for Oracle) framework(http://code.google.com/p/pluto-test-framework/) is one such framework. Another is the utPLSQL unit-testing framework, and this chapter will focus on utPLSQL since it is more widely adopted than theothers.The utPLSQL unit-testing framework can alleviate some of the pain of unit testing. The framework iseasy to use and performs nicely for testing code under every circumstance that can be imagined. Thereare also many options in utPLSQL that can be used to enhance your unit testing process. This chapterincludes recipes that show how to use the framework for testing PL&#x2F;SQL objects, how to create testsuites, and how to automate your unit tests. In the end, you will learn to make the unit testing process afunctional part of your development process. As a result of using unit testing, your applications will besuccessful, and you will spend much less time maintaining the code base. \n17-1. Testing Stored PL&#x2F;SQL Code Without Unit TestsProblemYou want to ensure that a block of PL&#x2F;SQL code is working properly, but don’t want to take the time towrite a unit test.Solution Wrap the code in DBMS_OUTPUT statements that display or print the results of intermediate and finalcomputations and the results of complex conditional steps and branches. This will enable you to see thepath that the code is taking when the function is called with specified parameters. The followingexample demonstrates this tactic for placing comments into strategic locations within a PL&#x2F;SQL codeblock in order to help determine if code is functioning as expected. For example, suppose you wish toquickly test the function we introduced in the example for Recipe 4-1. Here’s how you’d modify it toquickly test the correctness of its results.  \nCREATE OR REPLACE \nFUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS \n  CALCULATED_HOURS NUMBER :&#x3D; 0; \nBEGIN \n \n   -- if HOURS is greater than one, then calculate the decimal portion \n  -- based upon quarterly hours \n IF HOURS &gt; 1 THEN \n  -- calculate the modulus of the HOURS variable and compare it to \n  DBMS_OUTPUT.Put_LINE(&#39;The value passed in was greater than one hour...&#39;); \n  -- fractional values \n    IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN \n       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt; .125&#39;); \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); \n    ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN \n       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .375&#39;); \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); \n    ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN \n       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .625&#39;); \n       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); \n    ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN \n       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .825&#39;); \n       CALCULATED_HOURS :&#x3D; SUBSTR(TO_CHAR(HOURS),0,1) + MOD(.75,1); \n    ELSIF MOD(HOURS, 1) &gt; .825 AND MOD(HOURS,1) &lt;&#x3D; .999 THEN \n       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .999&#39;); \n       CALCULATED_HOURS :&#x3D; (substr(to_char(HOURS),0,1) + 1) + MOD(.00,1); \n    ELSE \n       DBMS_OUTPUT.Put_LINE(&#39;The hours passed in will use standard rounding&#39;); \n       CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n \n    END IF; \n \n  ELSE \n    -- if HOURS is less than one, then calculate the entire value \n    DBMS_OUTPUT.Put_LINE(&#39;Less than 1 hour was passed in...&#39;); \n    -- based upon quarterly hours \n    IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN \n        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt; .125&#39;); \n        CALCULATED_HOURS :&#x3D; .25; \n    ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN \n        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .625&#39;); \n        CALCULATED_HOURS :&#x3D; .5; \n    ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN \n        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .825&#39;); \n        CALCULATED_HOURS :&#x3D; .75; \n    ELSIF HOURS &gt; .825 AND HOURS &lt;&#x3D; .999 THEN \n        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .999&#39;); \n        CALCULATED_HOURS :&#x3D; 1; \n    ELSE \n        DBMS_OUTPUT.Put_LINE(&#39;The hours passed in will use standard rounding&#39;); \n        CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); \n    END IF; \n \n  END IF; \n \n  RETURN CALCULATED_HOURS; \n \nEND CALC_QUARTER_HOUR; \n&#x2F;\nWhen the CALC_QUARTER_HOUR function is executed with a value of 7.34, the comments will bedisplayed as seen in the next snippet from a SQL*Plus session. \nSQL&gt; set serveroutput on \nSQL&gt; select calc_quarter_hour(7.34) from dual; \n \nCALC_QUARTER_HOUR(7.34) \n----------------------- \n                  7.25 \nThe value passed in was greater than one hour…The decimal portion &lt;&#x3D; .375How It WorksThe use of DBMS_OUTPUT statements within PL&#x2F;SQL code for displaying data or information pertaining tothe functionality of the code has been a great tactic for testing code in any language. As a matter of fact,it is probably one of the most widely used techniques for debugging code. The ability to see values asthey are calculated or to determine how a condition is being handled can be very useful for determiningwhether your code is executing as it should.In order to use DBMS_OUTPUT statements for testing your code, you must place them in strategiclocations. In the example for this recipe, comments have been placed within each of the IF-ELSE blocksto display a bit of text that will tell the developer how the values are being processed within the function.This can be very useful when testing the code because a series of numbers can be passed into thefunction in order to determine whether the correct result is being returned. If not, then you will be ableto see exactly where the code is being evaluated incorrectly.Although using DBMS_OUTPUT statements in code can be very useful for determining where code isfunctioning properly, it can cause clutter, and can also create its own issues. For example, if you forget toplace a quote after one of the DBMS_OUTPUT statements that you place into your code, then the code willnot compile correctly, causing you to hunt for the cause of yet another issue. Also, it is a good idea toremove the output statements before code is released into production. This can take some time, whichcould be better spent on development. As a means for testing small units of code, using DBMS_OUTPUTstatements works quite well. However, if you wish to develop entire test suites and automated unittesting then you should go on to read Recipe 17-2 regarding utPLSQL. \n17-2. Installing the utPLSQL Unit Testing FrameworkProblemYou’ve chosen the utPLSQL unit-testing framework for PL&#x2F;SQL for your work, and you want to install it.SolutionFirst, download the utPLSQL sources from http://utplsql.sourceforge.net/. Once you have obtainedthe sources, use the following steps to install the utPLSQL package into the database for which you wishto write unit tests, and make it available for all schemas.Create a user to host the utPLSQL tables, packages, and other objects. In thisexample, the user will be named UTP, and the default permanent andtemporary tablespaces will be used. \nSQL&gt; create user utp identified by abc123; \nGrant privileges to the newly created UTP user using the GRANT privilege_name TO \nuser_name statement, replacing values with the appropriate privilege and \nusername. The user will require the following privileges: \n Create session \n Create procedure \n Create table \n Create view \n Create sequence \n Create public synonym \n Drop public synonym \nInstall the objects by running the ut_i_do.sql script. \nSQL&gt; @ut_i_do install \nOnce these steps have been completed then you will have the ability to run unit tests on packagesthat are loaded into different schemas within the database.How It WorksBefore you can begin to write and run unit tests within the utPLSQL framework for the PL&#x2F;SQL containedwithin your database, you must install the utPLSQL package into a database schema. While the utPLSQLframework can be loaded into the SYSTEM schema, it is better to separate the framework into its ownschema by creating a separate user and installing the packages, tables, and other objects into it. TheSolution to this recipe steps through the recommended approach taken to install the utPLSQL frameworkinto the database of your choice.Once you have created a user schema in which to install the utPLSQL framework objects, you mustgrant it the appropriate privileges. The majority of the privileges are used to create the objects that arerequired to make the framework functional. Public synonyms are created for many of the frameworkobjects, and this allows them to be accessible to other database user accounts. After all privileges havebeen granted, running the ut_i_do.sql script and passing the install parameter will complete theinstallation of the framework. After completion, you can begin to build unit test packages and installthem into different schemas within the database, depending on which PL&#x2F;SQL objects that you wish totest.■ Note Unit tests will be executed from the same schema in which the PL&#x2F;SQL object that is being tested resides,not from the schema that contains the utPLSQL framework objects. \n17-3. Building a utPLSQL Test PackageProblemYou would like to build a unit test package for one or more of the PL&#x2F;SQL objects in your databaseschema.SolutionYou want to build a utPLSQL test package to test an object in your database. A test package consists of twoseparate files, a package header and a package body.Create a header for the test package and save it in a file with the same name youhave given the header and with a .pks suffix. A header file contains threeprocedures: ut_setup, ut_teardown, and the procedure that performs the unittests of the target object in your database. For example, suppose you want tocreate a unit test package to test the code for the CALC_QUARTERLY_HOURSfunction of Recipe 17-1. This package header should be stored into a filenamed ut_calc_quarter_hour.pks and loaded into the database whose objectsyou are testing. \nCREATE OR REPLACE PACKAGE ut_calc_quarter_hour \nIS \n  PROCEDURE ut_setup; \n  PROCEDURE ut_teardown; \n \n  PROCEDURE ut_calc_quarter_hour; \nEND ut_calc_quarter_hour;\nCreate the package body that implements the procedures specified by the unit testpackage header and save it as a file with the same name as the header, but thistime with a .pkb suffix. The following package body should be stored into a filenamed ut_calc_quarter_hour.pkb and loaded into the database. \nCREATE OR REPLACE PACKAGE BODY ut_calc_quarter_hour \nIS \n \nPROCEDURE ut_setup IS \nBEGIN \n  NULL; \nEND; \n \nPROCEDURE ut_teardown IS \nBEGIN \n  NULL; \nEND; \n \nPROCEDURE ut_calc_quarter_hour IS \nBEGIN \n \n  -- Perform unit tests here \n  NULL; \n   \nEND ut_calc_quarter_hour; \n \nEND ut_calc_quarter_hour; \nThe package body in this example conforms to the format that must be used for testing packagesusing the utPLSQL framework.■ Note The .pks and .pkb suffixes could be changed to something different, like .sql, if you wish. You couldalso store both the package header and body in the same file. However, utPLSQL framework will look for the .pksand .pkb suffixes in order to automatically recompile your test packages before each test. It is best to follow theutPLSQL convention to ensure that your test packages are always valid.How It WorksA unit test package for the utPLSQL framework consists of a package header and a body. The packageheader declares a setup procedure, a teardown procedure, and a unit testing procedure. The packagebody consists of the PL&#x2F;SQL code that implements the unit test. When you create a ut_PLSQL package, itsname must be prefixed with ut_, followed by the procedure or function name for which you are writingthe unit test. The unit test prefix can be changed, but ut_ is the default. For more information onchanging the unit test prefix, please see Recipe 12-8.The test package body must contain both a setup and teardown procedure. These procedures mustalso be given names that use the same prefix you have chosen for your unit testing. Therefore, as you cansee in the Solution to this recipe, the package header declares ut_setup and ut_teardown procedures. Theut_setup procedure is to initialize the variables or data structures the unit test procedure uses. When aunit test is executed, ut_setup is always the first procedure to execute. The ut_teardown procedure isused to clean up after all of the tests have been run. You should use this procedure to destroy all of thedata structures and variables created to support your unit tests. The ut_teardown procedure is alwaysexecuted last, after all unit tests have been run.■ Note If you are choosing to use manual registration for your tests, you will be required to register each testprocedure in the ut_setup procedure as well. By default, registration of unit test procedures occurs automatically,so you do not need to register them within ut_setup. If you are interested in learning more about manual unit testregistration, please see the online documentation that can be found at: http://utplsql.oracledeveloper.nl/The package must also contain an implementation for your unit test procedures. The unit testprocedure names should begin with the ut_ prefix followed by the name of the PL&#x2F;SQL object that youare testing. In the case of the Solution for this recipe, the procedure name is ut_calc_quarter_hour. TheSolution to this recipe does not contain any unit tests per se, but in order to perform a valid unit test ofthe PL&#x2F;SQL object, you must define a test case for each possible scenario using the assertion routinesthat are made available by utAssert. To learn more about the different assertion routines, please seeRecipe 17-4. \n17-4. Writing a utPLSQL Unit Test ProcedureProblemYou have a PL&#x2F;SQL object that you’d like to test to verify it returns the expected values.SolutionCreate a utPLSQL test package to test every code branch and computation within your function. UseutPLSQL assertion statements to test every foreseeable use case for the function. For example, supposeyou wish to test a simple factorial function that contains four code branches, each of which returns avalue. Here’s the target function: \nCREATE OR REPLACE FUNCTION factorial (fact INTEGER) RETURN INTEGER is \n \nBEGIN \n \n   IF fact &lt; 0 THEN RETURN NULL; \n   ELSIF fact &#x3D; 0 THEN RETURN 1; \n   ELSIF fact &#x3D; 1 THEN RETURN fact; \n   ELSE RETURN fact * factorial (fact-1); \n   END IF; \n \nEND factorial; \nNext, create the unit test package to test the factorial function. Name the package using the samename as the function to be tested and adding the prefix ut_ to it In this example, you’ll name thepackage ut_factorial. Create the three required procedures within the package for setup, teardown,and testing. Remember to save the file as a PKS file (i.e., one with a .pks file extension).  \nCREATE OR REPLACE PACKAGE ut_factorial IS \n \n   PROCEDURE ut_setup; \n   PROCEDURE ut_teardown; \n   PROCEDURE ut_factorial; \n \nEND ut_factorial; \nNow create the unit testing package body. No code is required for the ut_setup or the ut_teardownprocedures as these are usually reserved for code that updates the database prior to or after running thetests. For example, the setup procedure may insert records that are required only by the unit test, whichmeans that the teardown routine must clean up any data the test leaves behind. The ut_factorial \nprocedure is built with a series of assert statements that test each code branch in the factorialfunction. Remember to save the file as a PKB file (i.e., one with a .pkb file extension). \nCREATE OR REPLACE PACKAGE BODY ut_factorial IS \n \nPROCEDURE ut_setup IS \nBEGIN \n   NULL; \nEND ut_setup; \n \nPROCEDURE ut_teardown IS \nBEGIN \n   NULL; \nEND ut_teardown; \n \nPROCEDURE ut_factorial IS \nBEGIN \n   utAssert.isnull (&#39;is NULL test&#39;, factorial(-1)); \n   utAssert.eqQuery (&#39;0! Test&#39;, &#39;select factorial(0) from dual&#39;, &#39;select 1 from dual&#39;); \n   utAssert.eqQuery (&#39;1! Test&#39;, &#39;select factorial(1) from dual&#39;, &#39;select 1 from dual&#39;); \n   utAssert.eqQuery (&#39;N! Test&#39;, &#39;select FACTORIAL(5) from dual&#39;, &#39;select 120 from dual&#39;); \nEND ut_factorial; \n \nEND ut_factorial; \nHow It WorksThe utPLSQL package contains a number of tests that can be used to ensure that your code is workingproperly. Each of these tests is an assertion, which is a statement that evaluates to either true or falsedepending on whether its conditions are met. The Solution to this recipe uses four tests to determinewhether the function returns an appropriate result for each scenario. The utAssert.isnull procedureverifies the second parameter returns a null value when executed. The utAssert.eqQuery procedure usesthe select statements in parameter positions two and three to determine if the unit test succeeds orfails. Each select statement must return the same value when executed to succeed. The three calls toutAssert.eqQuery procedure in the ut_factorial procedure tests one branch (if statement) within thefactorial function. The expected return value from the factorial is used in the select statement of thethird parameter to retrieve the value from dual. If the factorial is updated in such a way that any codebranch no longer returns the expected value, the unit test will fail. This test should be performed aftermodifying the factorial function to test for bugs introduced by the update. Table 17-1 lists the differentassertion tests that are part of the utAssert package. \nTable 17-1. utPLSQL Assertion Tests \nAssertion Name Description \nutAssert.eq Checks equality of scalar values \nutAssert.eq_refc_query Checks equality of RefCursor and Query \nutAssert.eq_refc_table Checks equality of RefCursor and Database Tables \nAssertion Name  Description \nutAssert.eqcoll Checks equality of collections \nutAssert.eqcollapi Checks equality of collections \nutAssert.eqfile Checks equality of files \nutAssert.eqoutput Checks equality of DBMS_OUTPUT values \nutAssert.eqpipe Checks equality of database pipes \nutAssert.eqquery Checks equality of different queries \nutAssert.eqqueryvalue Checks equality of query against a value \nutAssert.eqtabcount Checks equality of table counts \nutAssert.eqtable Checks equality of different database tables \nUTASSERT.isnotnull Checks for NOT NULL values \nutAssert.isnull  Checks for NULL values \nutAssert.objexists Checks for the existence of database objects \nutAssert.objnotexists Checks for the existence of database objects \nutAssert.previous_failed Checks if the previous assertion failed \nutAssert.previous_passed Checks if the previous assertion passed \nutAssert.this Generic “this” procedure \nutAssert.throws Checks if a procedure or function throws an exception \nThere are many other tests that can also be used to help build your unit test packages. For an entirelist of the tests that are available, please see the documentation that can be found online at:http://utplsql.oracledeveloper.nl/. \n17-5. Running a utPLSQL TestProblemWith a unit test package defined, you want to run it to verify that a function returns the values you expectunder a variety of scenarios.CHAPTER 17  UNIT TESTING WITH UTPLSQL370SolutionUse the utPLSQL.test procedure to run your test package. For example, suppose you want to run the unittest you built in 17-4. To do so, enter the following commands.set serverout onexec utPLSQL.test(‘factorial’, recompile_in &#x3D;&gt; FALSE)Executing the commands above produces the following output. \n>    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS \n>   S    S  U     U  C   C   C   C  E        S    S   S    S \n>  S        U     U C     C C     C E       S        S \n>   S       U     U C       C       E        S        S \n>    SSSS   U     U C       C       EEEE      SSSS     SSSS \n>        S  U     U C       C       E             S        S \n>         S U     U C     C C     C E              S        S \n>   S    S   U   U   C   C   C   C  E        S    S   S    S \n>    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS \nSUCCESS: “factorial” \n> Individual Test Case Results: \n> \nSUCCESS - factorial.UT_FACTORIAL: ISNULL \"is NULL test\" Expected \"\" and got \"\" \n> \nSUCCESS - factorial.UT_FACTORIAL: EQQUERY \"0! Test\" Result: Result set for \"select\nfactorial(0) from dual does match that of \"select 1 from dual\" \n CHAPTER 17  UNIT TESTING WITH UTPLSQL \n371 \n> \nSUCCESS - factorial.UT_FACTORIAL: EQQUERY \"1! Test\" Result: Result set for \"select \nfactorial(1) from dual does match that of \"select 1 from dual\" \n> \nSUCCESS - factorial.UT_FACTORIAL: EQQUERY \"N! Test\" Result: Result set for \"select \nFACTORIAL(5) from dual does match that of \"select 120 from dual\" \n> \n> \n> Errors recorded in utPLSQL Error Log: \n> \n> NONE FOUND \n \nPL/SQL procedure successfully completed. \nSQL> spool off \nWhat if one of your test cases fails? Suppose that one of the test cases for the FACTORIAL test hasbeen modified so that a failure will result. Following is the resulting output from a failed unit test. \nSQL&gt; exec utPLSQL.test(&#39;factorial&#39;, recompile_in &#x3D;&gt; FALSE) \n. \n&gt;  FFFFFFF   AA     III  L      U     U RRRRR   EEEEEEE \n&gt;  F        A  A     I   L      U     U R    R  E \n&gt;  F       A    A    I   L      U     U R     R E \n&gt;  F      A      A   I   L      U     U R     R E \n&gt;  FFFF   A      A   I   L      U     U RRRRRR  EEEE \nCHAPTER 17  UNIT TESTING WITH UTPLSQL \n372 \n&gt;  F      AAAAAAAA   I   L      U     U R   R   E \n&gt;  F      A      A   I   L      U     U R    R  E \n&gt;  F      A      A   I   L       U   U  R     R E \n&gt;  F      A      A  III  LLLLLLL  UUU   R     R EEEEEEE \n. \nFAILURE: &quot;factorial&quot; \n. \n&gt; Individual Test Case Results: \n&gt; \nSUCCESS - factorial.UT_FACTORIAL: ISNULL &quot;is NULL test&quot; Expected &quot;&quot; and got &quot;&quot; \n&gt; \nSUCCESS - factorial.UT_FACTORIAL: EQQUERY &quot;0! Test&quot; Result: Result set for \n&quot;select factorial(0) from dual does match that of &quot;select 1 from dual&quot; \n&gt; \nSUCCESS - factorial.UT_FACTORIAL: EQQUERY &quot;1! Test&quot; Result: Result set for \n&quot;select factorial(1) from dual does match that of &quot;select 1 from dual&quot; \n&gt; \nFAILURE - factorial.UT_FACTORIAL: EQQUERY &quot;N! Test&quot; Result: Result set for \n&quot;select FACTORIAL(5) from dual does  not match that of &quot;select 121 from dual&quot; \n&gt; \n&gt; \n&gt; Errors recorded in utPLSQL Error Log: \n&gt; \n&gt; NONE FOUND \n\nPL&#x2F;SQL procedure successfully completed. \nHow It WorksThe utPLSQL framework makes it easy to execute all of the tests that you have setup within a unit testpackage; you need only to enter a utPLSQL.test command. In the Solution to this recipe, the SETSERVEROUT ON command enables output from the DBMS_OUTPUT statements within the utPLSQL.testprocedure. Without this command you cannot view the results of the unit test. The call to theutPLSQL.test procedure passes two parameters, the first is the name of the unit test to run. Notice thatyou do not specify the name of the package built for the unit test. Instead, you pass the name of thefunction being tested. The second parameter tells the utPLSQL.test procedure not to recompile any ofthe code before running the test. \n17-6. Building a utPLSQL Test SuiteProblemYou have created numerous unit test procedures that you must run every time you modify your code.Running each test individually is both time-consuming and error-prone, as you may forget to run a testor two. You need a simple method to run all of your tests at once.SolutionUse the utsuite.add command of utPLSQL to build a test suite, use the utPackage.add command to addindividual unit tests to it, and then run the result. For example, here’s how to build a suite to run the unittests you developed in Recipes 17-3 and 17-4.Create the test suite.exec utSuite.add (‘My Test Suite’, ‘Test all my functions’);Add individual unit tests to the suite.exec utPackage.add (‘My Test Suite’, ‘calc_quarter_hour’);exec utPackage.add (‘My Test Suite’, ‘factorial’);Run the test suite. See recipe 17-7.How It WorksThe utSuite.add routine creates a new test suite using the text in the first parameter as its unique name.Note that the utPLSQL utility uppercases the suite name before saving, so take that into consideration, assuite names must be unique. The second parameter is descriptive text for your test suite.Once the suite is created, use the utPackage.add procedure to add existing unit tests to the suite. Thefirst parameter must match the name of an existing test suite. The second parameter is the name of theunit test to run. As more unit tests are developed, they can be added to the suite to provide an easymethod to run all tests at once. \n17-7. Running a utPLSQL Test SuiteProblemYou have defined a test suite and now wish to run the tests.SolutionUse the utPLSQL.testSuite routine to run your tests. For example, here’s how run the test suite definedin Recipe 17-6. \nexec utPLSQL.testSuite (&#39;My Test Suite&#39;, recompile_in=&gt;false);\nExecuting the above test suite produces the following results. \nSQL&gt; exec utPLSQL.testSuite (&#39;My Test Suite&#39;, recompile_in&#x3D;&gt;false); \n. \n&gt;    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS \n&gt;   S    S  U     U  C   C   C   C  E        S    S   S    S \n&gt;  S        U     U C     C C     C E       S        S \n&gt;   S       U     U C       C       E        S        S \n&gt;    SSSS   U     U C       C       EEEE      SSSS     SSSS \n&gt;        S  U     U C       C       E             S        S \n&gt;         S U     U C     C C     C E              S        S \n&gt;   S    S   U   U   C   C   C   C  E        S    S   S    S \n&gt;    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS \n. \nSUCCESS: &quot;FACTORIAL&quot; \n. \n&gt; Individual Test Case Results: \n&gt; \n CHAPTER 17  UNIT TESTING WITH UTPLSQL \n375 \nSUCCESS - FACTORIAL.UT_FACTORIAL: ISNULL &quot;is NULL test&quot; Expected &quot;&quot; and got &quot;&quot; \n&gt; \nSUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;0! Test&quot; Result: Result set for &quot;select \nfactorial(0) from dual does match that of &quot;select 1 from dual&quot; \n&gt; \nSUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;1! Test&quot; Result: Result set for &quot;select \nfactorial(1) from dual does match that of &quot;select 1 from dual&quot; \n&gt; \nSUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;N! Test&quot; Result: Result set for &quot;select \nFACTORIAL(5) from dual does match that of &quot;select 120 from dual&quot; \n&gt; \n&gt; \n&gt; Errors recorded in utPLSQL Error Log: \n&gt; \n&gt; NONE FOUND \n. \n&gt;    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS \n&gt;   S    S  U     U  C   C   C   C  E        S    S   S    S \n&gt;  S        U     U C     C C     C E       S        S \n&gt;   S       U     U C       C       E        S        S \n&gt;    SSSS   U     U C       C       EEEE      SSSS     SSSS \n&gt;        S  U     U C       C       E             S        S \n&gt;         S U     U C     C C     C E              S        S \n&gt;   S    S   U   U   C   C   C   C  E        S    S   S    S \n&gt;    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS \nCHAPTER 17  UNIT TESTING WITH UTPLSQL \n376 \n. \nSUCCESS: &quot;CALC_QUARTER_HOUR&quot; \n. \n&gt; Individual Test Case Results: \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: ISNULL &quot;NULL value&quot; Expected &quot;&quot; and got &quot;&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .10 rounds down&quot; \nResult: Result set for &quot;select calc_quarter_hour(6.10) from dual does match that of &quot;select \n6 from dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .15 rounds up&quot; Result: \nResult set for &quot;select calc_quarter_hour(6.15) from dual does match that of &quot;select 6.25 \nfrom dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .35 rounds down&quot; \nResult: Result set for &quot;select calc_quarter_hour(6.35) from dual does match that of &quot;select \n6.25 from dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .40 rounds up&quot; Result: \nResult set for &quot;select calc_quarter_hour(6.40) from dual does match that of &quot;select 6.5 from \ndual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .65 rounds up&quot; Result: \nResult set for &quot;select calc_quarter_hour(6.65) from dual does match that of &quot;select 6.75 \nfrom dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .83 rounds down&quot; \nResult: Result set for &quot;select calc_quarter_hour(6.83) from dual does match that of &quot;select \n7 from dual&quot; \n CHAPTER 17  UNIT TESTING WITH UTPLSQL \n377 \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .92 rounds up&quot; Result: \nResult set for &quot;select calc_quarter_hour(6.92) from dual does match that of &quot;select 7 from \ndual&quot; \n&gt; \n&gt; \n&gt; Errors recorded in utPLSQL Error Log: \n&gt; \n&gt; NONE FOUND \nIf you happen to have a test fail, then the output of the test suite will display a failure message for \nthe unit test that failed. In the following output, one of the test cases for the FACTORIAL unit test fails. \n&gt;  FFFFFFF   AA     III  L      U     U RRRRR   EEEEEEE \n&gt;  F        A  A     I   L      U     U R    R  E \n&gt;  F       A    A    I   L      U     U R     R E \n&gt;  F      A      A   I   L      U     U R     R E \n&gt;  FFFF   A      A   I   L      U     U RRRRRR  EEEE \n&gt;  F      AAAAAAAA   I   L      U     U R   R   E \n&gt;  F      A      A   I   L      U     U R    R  E \n&gt;  F      A      A   I   L       U   U  R     R E \n&gt;  F      A      A  III  LLLLLLL  UUU   R     R EEEEEEE \n. \nFAILURE: &quot;FACTORIAL&quot; \n. \n&gt; Individual Test Case Results: \n&gt; \nSUCCESS - FACTORIAL.UT_FACTORIAL: ISNULL &quot;is NULL test&quot; Expected &quot;&quot; and got &quot;&quot; \n&gt; \nSUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;0! Test&quot; Result: Result set for \n&quot;select factorial(0) from dual does match that of &quot;select 1 from dual&quot; \n&gt; \nSUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;1! Test&quot; Result: Result set for \n&quot;select factorial(1) from dual does match that of &quot;select 1 from dual&quot; \n&gt; \nFAILURE - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;N! Test&quot; Result: Result set for \n&quot;select FACTORIAL(5) from dual does  not match that of &quot;select 121 from dual&quot; \n&gt; \n&gt; \n&gt; Errors recorded in utPLSQL Error Log: \n&gt; \n&gt; NONE FOUND \n. \n&gt;    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS \n&gt;   S    S  U     U  C   C   C   C  E        S    S   S    S \n&gt;  S        U     U C     C C     C E       S        S \n&gt;   S       U     U C       C       E        S        S \n&gt;    SSSS   U     U C       C       EEEE      SSSS     SSSS \n&gt;        S  U     U C       C       E             S       S \n CHAPTER 17  UNIT TESTING WITH UTPLSQL \n379 \n&gt;         S U     U C     C C     C E              S        S \n&gt;   S    S   U   U   C   C   C   C  E        S    S   S    S \n&gt;    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS \n. \nSUCCESS: &quot;CALC_QUARTER_HOUR&quot; \n. \n&gt; Individual Test Case Results: \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: ISNULL &quot;NULL value&quot; Expected \n&quot;&quot; and got &quot;&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .10 rounds \ndown&quot; Result: Result set for &quot;select calc_quarter_hour(6.10) from dual does \nmatch that of &quot;select 6 from dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .15 rounds \nup&quot; Result: Result set for &quot;select calc_quarter_hour(6.15) from dual does match \nthat of &quot;select 6.25 from dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .35 rounds \ndown&quot; Result: Result set for &quot;select calc_quarter_hour(6.35) from dual does \nmatch that of &quot;select 6.25 from dual&quot; \n&gt; \nCHAPTER 17  UNIT TESTING WITH UTPLSQL \n380 \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .40 rounds \nup&quot; Result: Result set for &quot;select calc_quarter_hour(6.40) from dual does match \nthat of &quot;select 6.5 from dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .65 rounds \nup&quot; Result: Result set for &quot;select calc_quarter_hour(6.65) from dual does match \nthat of &quot;select 6.75 from dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .83 rounds \ndown&quot; Result: Result set for &quot;select calc_quarter_hour(6.83) from dual does \nmatch that of &quot;select 7 from dual&quot; \n&gt; \nSUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .92 rounds \nup&quot; Result: Result set for &quot;select calc_quarter_hour(6.92) from dual does match \nthat of &quot;select 7 from dual&quot; \n&gt; \n&gt; \n&gt; Errors recorded in utPLSQL Error Log: \n&gt; \n&gt; NONE FOUND \nPL&#x2F;SQL procedure successfully completed. \nHow It WorksThe utPLSQL.testSuite procedure steps though each unit test added using the utPackage.add procedureand executes each test. In turn, each test executes and sends its results to the screen. This is a quickmethod to run all tests and see the output on one screen capture. If one of the test cases within a unittest fails, all of the remaining tests in the suite will continue to execute, and the test that failed will benoted in the output. This is very useful as it will allow tests of many PL&#x2F;SQL objects at once, and you willbe able to see which tests had issues and which did not.■ Hint Spool the output to a file if the number of tests exceeds the screen buffer’s capacity. \n17-8. Reconfiguring utPLSQL ParametersProblemYou would like to change some of the configurations for your utPLSQL install. For instance, you wouldlike to change the prefix for all of your unit test packages so that, instead of beginning with ut_, they allstart with test_.SolutionUse the utConfig package to alter the configurations for utPLSQL. For this Solution, you will see howutConfig can be used to change the prefix that is used for all of your test packages. For example, here’show to change the prefix for your test packages from ut_ to test_ using the utConfig package for thecurrent schema. \nSQL&gt; exec utConfig.setPrefix(&#39;test_&#39;); \n \nPL&#x2F;SQL procedure successfully completed. \nAfter executing the statement in the example, the utPLSQL unit test framework will look for testpackages beginning with the test_ prefix rather than ut_ within the current schema, until the prefix ischanged again using the utConfig package.How It WorksThe utPLSQL test framework can be configured to operate differently from its default manner bychanging options using the utConfig package. Changes can be made for the current schema only, or forall schemas within the database. In the Solution to this recipe, you have seen that the prefix for testpackages is configurable. To change the prefix, pass the desired prefix in string format toutConfig.setPrefix(). The setPrefix() procedure also accepts an additional schema name that willspecify the schema to which the configuration option will be applied. If you do not pass a schema name,the changes will occur within the current schema. The actual format for executing theutConfig.setPrefix procedure is as follows: \nexec utConfig.setPrefix(desired_prefix, [schema]); \nThere are many configurable options that can be changed using the utConfig package. Table 17-2shows the complete list of options. \nTable 17-2. utConfig Configuration Options \nOption Description \nutConfig.autocompile Configure autocompile feature \nutConfig.registertest Configure the registration mode (manual or automatic) \nutConfig.setdateformat Configure the date format for the date portion of output file names \nutConfig.setdelimiter Configure the V2 delimiter \nutConfig.setdir Configure the directory containing the test package code \nutConfig.setfiledir Configure the directory for file output \nutConfig.setfileextension Configure the file extension for output file names \nutConfig.setfileinfo Configure all of the above file output related items \nutConfig.setincludeprogname Configure whether to include the name of the program being tested \nwithin output file names \nutConfig.setprefix Configure the default unit test prefix \nutConfig.setreporter Configure the default Output Reporter  \nutConfig.settester Configure whose configuration is used \nutConfig.setuserprefix Configure the user prefix for output file names \nutConfig.showfailuresonly Switch off the display for successful tests \nYou can set of the options shown here using a syntax similar to that shown for the setPrefix()procedure that was demonstrated in the Solution to this recipe. For more information on using theconfigurations listed in Table 17-2, please see the online documentation that can be found at:http://utplsql.oracledeveloper.nl/. Along with configurable options, the utConfig package includessome functions that can be called to retrieve information regarding the unit test configuration for thedatabase or for a particular schema. Table 17-3 contains a listing of the options that utConfig makes \navailable for obtaining information. \nTable 17-3. utConfig Informational Options \nOption Name Description \nutConfig.autocompiling Returns autocompile flag value \nutConfig.dateformat Returns date format used to construct output file names \nutConfig.delimiter Returns V2 delimiter \nutConfig.dir Returns directory containing the test package code \nutConfig.filedir Returns file output directory \nutConfig.fileextension Returns output file name extension \nutConfig.fileinfo Returns all file output—related items \nutConfig.getreporter Obtains name of the default Output Reporter to use \nutConfig.includeprogname Returns whether to include the name of the program being tested \nwithin file names \nutConfig.prefix Returns default unit test prefix for your code \nutConfig.registering Returns registration mode \nutConfig.showconfig Displays a schema configuration \nutConfig.showingfailuresonly Returns whether successful test results are displayed \nutConfig.tester Returns the schema whose configuration is used \nutConfig.userprefix Returns the user prefix for output files \nThe functions can be called just as if they were standard functions within your schema. Some, suchas the utConfig.showconfig procedure, require you to set serveroutput on in order to display the output.The following excerpt from a SQL*Plus session shows a call to utConfig.showconfig. \nSQL&gt; set serveroutput on \nSQL&gt; exec utconfig.showconfig \n&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; \nutPLSQL Configuration for USERNAME \nDirectory: \nAutcompile? \nManual test registration? \nPrefix &#x3D; \nDefault reporter     &#x3D; \n----- File Output settings: \nOutput directory: \nUser prefix     &#x3D; \nInclude progname? \nDate format     &#x3D; \nFile extension  &#x3D; \n----- End File Output settings \n&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; \n \nPL&#x2F;SQL procedure successfully completed. \nThe utConfig package contains a variety of configurable options that will allow you to adjust unittesting according to your specific needs. Out of the box, the utPLSQL testing framework contains defaultvalues for each of these options, so you may never need to touch utConfig, but the option is available ifyou need it. Another nice feature is that you can set configurable options for a specific schema. Doing sowill allow different schemas in the database to act differently when performing unit testing.  \n17-9. Redirecting utPLSQL Test Results to a FileProblemYou are interested in writing the results of a unit test to a file.SolutionChange the setting of the setreporter option of utPLSQL so that output is redirected to a file instead ofDBMS_OUTPUT. Once the configuration has been altered, execute the unit tests for which you would like tohave the output captured to the file. After you’ve run your tests, close the file and change theconfiguration back to its default. In the following lines of code, all of the steps that are necessary forredirecting test results to a file are exhibited. For example, suppose that the database has a directory thathas already been enabled for use with the database named FILE_SYSTEM. \nSQL&gt;  BEGIN \n  utconfig.setfiledir(&#39;FILE_SYSTEM&#39;); \n  -- Causes output to be redirected to file system \n  utconfig.setreporter(&#39;File&#39;); \n  utPLSQL.test(&#39;calc_quarter_hour&#39;); \n  -- Closes the fle \n  utfilereporter.close(); \n  -- Returns output redirection to DBMS_OUTPUT \n  utconfig.setreporter(&#39;Output&#39;); \nEND; \n \nPL&#x2F;SQL procedure successfully completed. \nWhen the code block in this example is executed, a file will be created within the directoryrepresented by FILE_SYSTEM. The unit test for CALC_QUARTER_HOUR will then be executed and the resultswill be redirected to the newly created file. Lastly, the file will be closed and the output will be redirectedback to DBMS_OUTPUT.How It WorksOne of the configurable options of utPLSQL allows for the output of your unit tests to be redirected. Thechoices for displaying unit test results include Output, File, and HTML. The standard Output option isOutput , which causes output to be displayed within the SQLPlus environment using DBMS_OUTPUT. TheFile option allows for a file to be created and unit test results to be written to that file. Lastly, the HTMLoption allows for unit test results to be formatted into file in the format of an HTML table. In the Solutionto this recipe, the use of the File output reporter is demonstrated.Prior to redirecting unit test output to a file, you must create a database directory using the CREATEDIRECTORY statement with a privileged account. For more information about creating directories, pleasesee the Oracle documentation that can be found at:http://download.oracle.com/docs/cd/E11882_01/server.112/e17118/statements_5007.htm#SQLRF01207.Once you have created a database directory, you can use it to write the results of unit tests by setting thefile directory using the utConfig.setfiledir() procedure. This procedure accepts the name of thedatabase directory as a parameter. In the Solution to this recipe, the directory is named FILE_SYSTEM. Toredirect the unit test output from utPLSQL, you must use the utConfig.setreporter() procedure. Thisprocedure accepts the name of the reporter that you would like to use for displaying output. As you cansee from the Solution to this recipe, the File reporter is chosen to redirect the output to a file on the filesystem. It is also possible to create a custom reporter configuration that you can pass to theutConfig.setreporter() procedure. For more information about creating customized reporters, pleasesee the utPLSQL documentation that can be found at:http://utplsql.sourceforge.net/Doc/reporter.html.After the output has been redirected using utConfig.setreporter(), you can run as many tests asyou wish and all of the output will be directed to a file instead of to the SQLPlus command prompt. Inthe Solution to this recipe, the CALC_QUARTER_HOUR function is tested. Once you have finished runningyour tests, you must close the output file in order to make it available for you to use. If you fail to closethe file, you will be unable to open it or use it because the database will maintain a lock on the file. Toclose the file, use issue utfilereporter.close(). Lastly, I recommend redirecting unit test output to thedefault Ouput option, which will cause it to be sent to DBMS_OUTPUT. By doing so, the next person who runsa unit test will receive the functionality that he or she expects by default, as the output will be directed tothe screen. It is a good idea to set the default output at the beginning of all test suites just to ensure thatyou know where the output will be directed. However, if you are the only person running unit tests, or ifyou prefer to maintain the File reporter as your default, then omit the final call toutConfig.setreporter() that is shown in this Solution.Many times it can be useful to have unit test results redirected to an output file rather thandisplayed within the SQLPlus environment. For instance, if you are running unit tests during off hoursand would like to see the output, then it would be helpful to have it recorded to a file that can be viewedat a later time. Similarly, if you are running several unit tests, it may be easier to read through a file ratherthan scrolling through SQLPlus output. Whatever the requirement may be, utPLSQL makes it easy toredirect unit test output to a file or another device by creating a custom reporter. \n17-10. Automating Unit Tests for PL&#x2F;SQL and Java Stored Procedures Using AntProblemYou wish to automatically run your unit tests for PL&#x2F;SQL code and Java stored procedures each day andto write the results of the unit test to a file.CHAPTER 17  UNIT TESTING WITH UTPLSQL386SolutionUse Apache’s Ant build system to perform unit testing on your PL&#x2F;SQL code. At the same time, Ant canbuild and compile any Java code that you will be using for your stored procedures. To do so, develop anAnt build script that will execute some SQL statements, automate your unit tests, and compile Javasource into a directory. For example, the following build.xml file is an example of such a build that canbe used to compile Java sources and execute unit tests on PL&#x2F;SQL within a single Ant run. \n&lt;project name=\"MyPLSQLProject\" default=\"unitTest\" basedir=\".\"> \n    &lt;description> \n        PLSQL Unit Test and Application Builder \n    &lt;/description> \n  &lt;!-- set global properties for this build --> \n  &lt;property name=\"src\" location=\"src\"/> \n  &lt;property name=\"build\" location=\"build\" value=”build”/> \n  &lt;property name=\"user\" value=\"myuser\"/> \n  &lt;property name=\"db_password\" value=\"mypassword\"/> \n  &lt;property name=\"database.jdbc.url\" value=\"jdbc:oracle:thin:@hostname:1521:database\"/> \n \n  &lt;target name=\"init\"> \n    &lt;!-- Create the time stamp --> \n    &lt;tstamp/> \n    &lt;mkdir dir=\"$&#123;build&#125;\"/> \n  &lt;/target> \n \n  &lt;target name=\"compile\" depends=\"init\" \n        description=\"compile the source \" > \n    &lt;!-- Compile the java code from $&#123;src&#125; into $&#123;build&#125; --> \n    &lt;!-- This is where you place the code for your java stored procedures --> \n    &lt;javac srcdir=\"$&#123;src&#125;\" destdir=\"$&#123;build&#125;\"/> \n  &lt;/target> \n \n  &lt;target name=\"unitTest\" depends=\"compile\" \n        description=\"Execute PLSQL Unit Tests\" > \n    &lt;sql \n     driver = \"oracle.jdbc.driver.OracleDriver\" \n     url = \"$&#123;database.jdbc.url&#125;\" \n     userid = \"$&#123;user&#125;\" \n     password = \"$&#123;db_password&#125;\" \n     print=\"true\" \n    > \n      call utconfig.setfiledir('FILE_SYSTEM'); \n      call utconfig.setreporter('File'); \n      call utPLSQL.test('calc_quarter_hour'); \n      -- Closes the fle \n      call utfilereporter.close(); \n      -- Returns output redirection to DBMS_OUTPUT \n      call utconfig.setreporter('Output'); \n \n    &lt;/sql> \n    \n  &lt;/target> \n&lt;/project> \nThis build script can be executed by issuing the ant command from within the terminal orcommand prompt. The results will resemble the following output. \njuneau$ ant \nBuildfile: &#x2F;Users&#x2F;juneau&#x2F;Documents&#x2F;PLSQL_Recipes&#x2F;sources&#x2F;17&#x2F;build.xml \n \ninit: \n \ncompile: \n    [javac] &#x2F;Users&#x2F;juneau&#x2F;Documents&#x2F;PLSQL_Recipes&#x2F;sources&#x2F;17&#x2F;build.xml:22: warning: \n&#39;includeantruntime&#39; was not set, defaulting to build.sysclasspath&#x3D;last; set to false for \nrepeatable builds \n \nunitTest: \n      [sql] Executing commands \n      [sql] 0 rows affected \n      [sql] 0 rows affected \n      [sql] 0 rows affected \n      [sql] 0 rows affected \n      [sql] 0 rows affected \n      [sql] 5 of 5 SQL statements executed successfully \n \nBUILD SUCCESSFUL \nTotal time: 4 seconds \nHow It WorksAutomating unit tests can be very helpful, especially if you are working on a project where there may bemore than one developer contributing code. The Apache Ant build system is useful for automatingbuilds and unit tests for Java projects. However, it can also be used to perform a myriad of other tasks,including issuing SQL statements, as seen in the Solution to this recipe. Ant provides an entire build andunit test Solution that is easy to use. To set up a build, all you need to do is install Ant on your machineand then create a build.xml file that consists of targets that Ant will use to build the project. Once youhave created a build file, then simply open a command prompt or terminal and traverse into thedirectory containing your build file. Once in the directory, issue the ant command and it willautomatically look for a file named build.xml that will provide Ant the sequence used for the build.Ant uses simple logic to determine the order of sequence that will be used to execute the targets thatare listed within the build.xml file. In the Solution to this recipe, the build file contains three targets,init, compile, and unitTest. Ant will start the build by executing the target listed within the &lt;–project–&gt;tag as the default. In this case, the default target is unitTest.  \n&lt;project name=&quot;MyPLSQLProject&quot; default=&quot;unitTest&quot; basedir=&quot;.&quot;&gt; \nThe unitTest target contains a depends attribute, which lists the compile target. This tells Ant thatthe compile target should be executed first because unitTest depends upon its outcome.  \n&lt;target name=\"unitTest\" depends=\"compile\" \n        description=\"Execute PLSQL Unit Tests\" > \nConsequently, the compile target depends upon the init target, so init will be executed beforecompile.  \n&lt;target name=\"compile\" depends=\"init\" \n        description=\"compile the source \" > \nThe order of target execution for the Solution to this recipe will be the init target first, followed bythe compile target, and lastly the unitTest target. The project tag also contains an attribute namedbasedir. This attribute tells Ant where the build files should be located. In the Solution to this recipe,basedir contains a period “.” that tells Ant to use the current directory.At the top of the build file, you can see that there is a  tag. This is used to provide abrief description of the tasks completed by the build file. There are also several  tags. Thesetags are used to define the variables that will be used within the build file. Each  tag contains aname attribute and either a value or location attribute.  \n&lt;property name=\"src\" location=\"src\"/> \n&lt;property name=\"build\" location=\"build\" value=”build”/> \n&lt;property name=\"user\" value=\"myuser\"/> \n&lt;property name=\"db_password\" value=\"mypassword\"/> \n&lt;property name=\"database.jdbc.url\" value=\"jdbc:oracle:thin:@hostname:1521:database\"/> \nThe properties that use a value attribute are used to assign values to the property name, whereas theproperties that contain location attributes are used to assign a location to the property name. Propertiescan be referenced within the build file by using the following syntax: “${property_name}”. As you can seefrom the Solution to this recipe, each target within the build file consists of a number of tasks in the formof XML tags. The init target creates a timestamp by using the &lt;–tstamp&#x2F;&gt; tag, and it creates a directoryusing the &lt;–mkdir&#x2F;&gt; tag and passing the name of a directory to be created. In this case, the directory namewill be named the same as the value that is assigned to the &lt;–property&gt; tag that is named build.  \n&lt;target name=\"init\"> \n    &lt;!-- Create the time stamp --> \n    &lt;tstamp/> \n    &lt;mkdir dir=\"$&#123;build&#125;\"/> \n  &lt;/target> \nThe compile target is used to compile all of the Java sources contained in the project. All of thesources should reside within a named directory that is located in the base directory of the Ant project.The compile target contains a single task using the &lt;–javac&gt; tag. This tag contains a src attribute thatdefines the location of the sources to be compiled, and a destdir attribute that tells Ant where to placethe resulting Java class files. An Ant project that builds a Java project may contain only this task, but canbuild several hundred Java class files. In the Solution to this recipe, and for most Ant uses with PL&#x2F;SQLprojects, however, the project will probably contain no Java source files or only a few at most. If a projectcontains no Java source files, then the target will be executed, but the &lt;–javac&gt; task will do nothing sincethere are not any sources to be compiled. \n&lt;target name=\"compile\" depends=\"init\" \n        description=\"compile the source \" > \n    &lt;!-- Compile the java code from $&#123;src&#125; into $&#123;build&#125; --> \n    &lt;!-- This is where you place the code for your java stored procedures --> \n    &lt;javac srcdir=\"$&#123;src&#125;\" destdir=\"$&#123;build&#125;\"/> \n  &lt;/target> \nThe most important target in the Solution to this recipe is the unitTest target. It consists of a singletask using the  tag. The sole purpose of the  task is to execute SQL within a designateddatabase. The  tag contains a driver attribute that is used to list the JDBC driver for the targetdatabase, a url attribute used to define the JDBC URL for the target database, a userid and passwordattribute for defining the database username and password, and a print attribute that tells Ant whetherto print the result sets from the SQL statements. In the Solution to this recipe, the SQL that is required toexecute the unit tests is contained within the  opening and closing tags. This causes the unit tests tobe executed as if you were issuing these statements at the SQL*Plus command prompt. \n&lt;target name=\"unitTest\" depends=\"compile\" \n        description=\"Execute PLSQL Unit Tests\" > \n    &lt;sql \n     driver = \"oracle.jdbc.driver.OracleDriver\" \n     url = \"$&#123;database.jdbc.url&#125;\" \n     userid = \"$&#123;user&#125;\" \n     password = \"$&#123;db_password&#125;\" \n     print=\"true\" > \n\n      call utconfig.setfiledir('FILE_SYSTEM'); \n      call utconfig.setreporter('File'); \n      call utPLSQL.test('calc_quarter_hour'); \n      -- Closes the fle \n      call utfilereporter.close(); \n      -- Returns output redirection to DBMS_OUTPUT \n      call utconfig.setreporter('Output'); \n    &lt;/sql> \n    \n  &lt;/target>\nTo automate your Ant build, you will need to set up an operating system task that starts the Antbuild. The task is very simple and needs to contain only very few lines. The following lines of codecontain batch script for the Windows operating system that can be used to invoke the Ant build. Thisassumes that the java.exe executable is contained within the PATH environment variable.cd C:&#x2F;path_to_project_directoryantYou will also need to ensure that the JDBC driver for the Oracle database is contained within yourCLASSPATH. If you do not include the JDBC driver in the CLASSPATH, then you will receive an error whenyou try to execute the build. When the Ant build is executed, a file will be placed onto the database serverin the location designated by the FILE_SYSTEM database directory. The file will contain the results of theunit test execution.Ant is a complex build system that can be used for configuration and preparation of your builds and unittests. It is a widely used build system, especially for organizations that do lots of Java development. Asyou can see, it is easy to use, but does contain complexity in that there are a number of different tasksand attributes that can be used. This recipe does not even scratch the surface of everything that Ant cando. However, there are lots of sources for documentation on Ant that can be found online as well as inbook format. To learn more about Ant, you can start by reading the online documentation that can befound at: http://ant.apache.org/manual/. \n","dateCreated":"2022-11-08T23:24:23+08:00","dateModified":"2022-11-08T23:41:32+08:00","datePublished":"2022-11-08T23:24:23+08:00","description":"摘要: 其实这个讲PLSQL有点基础","headline":"Oracle PLSQL Recipes 17-Unit Testing With utPLSQL","image":[null,"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"}</script>
+    <meta name="description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle PLSQL Recipes 17-Unit Testing With utPLSQL">
+<meta property="og:url" content="https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 其实这个讲PLSQL有点基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-08T15:24:23.465Z">
+<meta property="article:modified_time" content="2022-11-08T15:41:32.075Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://simonteo58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-y9io9e1ok9lpsmk4fyk7quzstdgr6eztu8x2xr6n9iikjgfjbcqqpobdlqy8.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle PLSQL Recipes 17-Unit Testing With utPLSQL
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-11-08T23:24:23+08:00">
+	
+		    Nov 08, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 其实这个讲PLSQL有点基础</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#17-Unit-Testing-With-utPLSQL"><span class="toc-text">17. Unit Testing With utPLSQL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#17-1-Testing-Stored-PL-x2F-SQL-Code-Without-Unit-Tests"><span class="toc-text">17-1. Testing Stored PL&#x2F;SQL Code Without Unit Tests</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-2-Installing-the-utPLSQL-Unit-Testing-Framework"><span class="toc-text">17-2. Installing the utPLSQL Unit Testing Framework</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-3-Building-a-utPLSQL-Test-Package"><span class="toc-text">17-3. Building a utPLSQL Test Package</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-4-Writing-a-utPLSQL-Unit-Test-Procedure"><span class="toc-text">17-4. Writing a utPLSQL Unit Test Procedure</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-5-Running-a-utPLSQL-Test"><span class="toc-text">17-5. Running a utPLSQL Test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-6-Building-a-utPLSQL-Test-Suite"><span class="toc-text">17-6. Building a utPLSQL Test Suite</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-7-Running-a-utPLSQL-Test-Suite"><span class="toc-text">17-7. Running a utPLSQL Test Suite</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-8-Reconfiguring-utPLSQL-Parameters"><span class="toc-text">17-8. Reconfiguring utPLSQL Parameters</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-9-Redirecting-utPLSQL-Test-Results-to-a-File"><span class="toc-text">17-9. Redirecting utPLSQL Test Results to a File</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-10-Automating-Unit-Tests-for-PL-x2F-SQL-and-Java-Stored-Procedures-Using-Ant"><span class="toc-text">17-10. Automating Unit Tests for PL&#x2F;SQL and Java Stored Procedures Using Ant</span></a></li></ol></li></ol>
+
+
+
+<h1 id="17-Unit-Testing-With-utPLSQL"><a href="#17-Unit-Testing-With-utPLSQL" class="headerlink" title="17. Unit Testing With utPLSQL"></a>17. Unit Testing With utPLSQL</h1><p>Testing is a necessary evil of the application development process. Sadly, testing is oftentimes<br>overlooked or bypassed when time is short. Distribution of untested or undertested code can lead to<br>code that is riddled with bugs and to disappointed users. Unit testing with a well-constructed framework<br>can help to alleviate some of the time that it takes to conform to a well-tested development process.<br>There are a few different options available to you for testing your PL&#x2F;SQL code. SQL Developer<br>provides some good debugging options that you can read about in Recipe 12-12. You can also use<br>DBMS_OUTPUT statements within your code to display the results of variables as your code executes. This is<br>a good technique for helping to pinpoint issues in your code and one you can read about in Recipe 17-1.<br>There are also unit-testing frameworks available that will help you to write unit tests for your PL&#x2F;SQL<br>code objects. Although not covered in this book, the PLUTO (PL&#x2F;SQL Unit Testing for Oracle) framework<br>(<a target="_blank" rel="noopener" href="http://code.google.com/p/pluto-test-framework/">http://code.google.com/p/pluto-test-framework/</a>) is one such framework. Another is the utPLSQL unit-<br>testing framework, and this chapter will focus on utPLSQL since it is more widely adopted than the<br>others.<br>The utPLSQL unit-testing framework can alleviate some of the pain of unit testing. The framework is<br>easy to use and performs nicely for testing code under every circumstance that can be imagined. There<br>are also many options in utPLSQL that can be used to enhance your unit testing process. This chapter<br>includes recipes that show how to use the framework for testing PL&#x2F;SQL objects, how to create test<br>suites, and how to automate your unit tests. In the end, you will learn to make the unit testing process a<br>functional part of your development process. As a result of using unit testing, your applications will be<br>successful, and you will spend much less time maintaining the code base. </p>
+<h2 id="17-1-Testing-Stored-PL-x2F-SQL-Code-Without-Unit-Tests"><a href="#17-1-Testing-Stored-PL-x2F-SQL-Code-Without-Unit-Tests" class="headerlink" title="17-1. Testing Stored PL&#x2F;SQL Code Without Unit Tests"></a>17-1. Testing Stored PL&#x2F;SQL Code Without Unit Tests</h2><p><strong>Problem</strong><br>You want to ensure that a block of PL&#x2F;SQL code is working properly, but don’t want to take the time to<br>write a unit test.<br><strong>Solution</strong><br> Wrap the code in DBMS_OUTPUT statements that display or print the results of intermediate and final<br>computations and the results of complex conditional steps and branches. This will enable you to see the<br>path that the code is taking when the function is called with specified parameters. The following<br>example demonstrates this tactic for placing comments into strategic locations within a PL&#x2F;SQL code<br>block in order to help determine if code is functioning as expected. For example, suppose you wish to<br>quickly test the function we introduced in the example for Recipe 4-1. Here’s how you’d modify it to<br>quickly test the correctness of its results.  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE 
+FUNCTION CALC_QUARTER_HOUR(HOURS IN NUMBER) RETURN NUMBER AS 
+  CALCULATED_HOURS NUMBER :&#x3D; 0; 
+BEGIN 
+ 
+   -- if HOURS is greater than one, then calculate the decimal portion 
+  -- based upon quarterly hours 
+ IF HOURS &gt; 1 THEN 
+  -- calculate the modulus of the HOURS variable and compare it to 
+  DBMS_OUTPUT.Put_LINE(&#39;The value passed in was greater than one hour...&#39;); 
+  -- fractional values 
+    IF MOD(HOURS, 1) &lt;&#x3D;.125 THEN 
+       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt; .125&#39;); 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1); 
+    ELSIF MOD(HOURS, 1) &gt; .125 AND MOD(HOURS,1) &lt;&#x3D; .375 THEN 
+       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .375&#39;); 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.25,1); 
+    ELSIF MOD(HOURS, 1) &gt; .375 AND MOD(HOURS,1) &lt;&#x3D; .625 THEN 
+       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .625&#39;); 
+       CALCULATED_HOURS :&#x3D; substr(to_char(HOURS),0,1) + MOD(.50,1); 
+    ELSIF MOD(HOURS, 1) &gt; .63 AND MOD(HOURS,1) &lt;&#x3D; .825 THEN 
+       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .825&#39;); 
+       CALCULATED_HOURS :&#x3D; SUBSTR(TO_CHAR(HOURS),0,1) + MOD(.75,1); 
+    ELSIF MOD(HOURS, 1) &gt; .825 AND MOD(HOURS,1) &lt;&#x3D; .999 THEN 
+       DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .999&#39;); 
+       CALCULATED_HOURS :&#x3D; (substr(to_char(HOURS),0,1) + 1) + MOD(.00,1); 
+    ELSE 
+       DBMS_OUTPUT.Put_LINE(&#39;The hours passed in will use standard rounding&#39;); 
+       CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+ 
+    END IF; 
+ 
+  ELSE 
+    -- if HOURS is less than one, then calculate the entire value 
+    DBMS_OUTPUT.Put_LINE(&#39;Less than 1 hour was passed in...&#39;); 
+    -- based upon quarterly hours 
+    IF HOURS &gt; 0 AND HOURS &lt;&#x3D;.375 THEN 
+        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt; .125&#39;); 
+        CALCULATED_HOURS :&#x3D; .25; 
+    ELSIF HOURS &gt; .375 AND HOURS &lt;&#x3D; .625 THEN 
+        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .625&#39;); 
+        CALCULATED_HOURS :&#x3D; .5; 
+    ELSIF HOURS &gt; .625 AND HOURS &lt;&#x3D; .825 THEN 
+        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .825&#39;); 
+        CALCULATED_HOURS :&#x3D; .75; 
+    ELSIF HOURS &gt; .825 AND HOURS &lt;&#x3D; .999 THEN 
+        DBMS_OUTPUT.Put_LINE(&#39;The decimal portion &lt;&#x3D; .999&#39;); 
+        CALCULATED_HOURS :&#x3D; 1; 
+    ELSE 
+        DBMS_OUTPUT.Put_LINE(&#39;The hours passed in will use standard rounding&#39;); 
+        CALCULATED_HOURS :&#x3D; ROUND(HOURS,1); 
+    END IF; 
+ 
+  END IF; 
+ 
+  RETURN CALCULATED_HOURS; 
+ 
+END CALC_QUARTER_HOUR; 
+&#x2F;</code></pre>
+<p>When the CALC_QUARTER_HOUR function is executed with a value of 7.34, the comments will be<br>displayed as seen in the next snippet from a SQL*Plus session. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; set serveroutput on 
+SQL&gt; select calc_quarter_hour(7.34) from dual; 
+ 
+CALC_QUARTER_HOUR(7.34) 
+----------------------- 
+                  7.25 </code></pre>
+<p>The value passed in was greater than one hour…<br>The decimal portion &lt;&#x3D; .375<br><strong>How It Works</strong><br>The use of DBMS_OUTPUT statements within PL&#x2F;SQL code for displaying data or information pertaining to<br>the functionality of the code has been a great tactic for testing code in any language. As a matter of fact,<br>it is probably one of the most widely used techniques for debugging code. The ability to see values as<br>they are calculated or to determine how a condition is being handled can be very useful for determining<br>whether your code is executing as it should.<br>In order to use DBMS_OUTPUT statements for testing your code, you must place them in strategic<br>locations. In the example for this recipe, comments have been placed within each of the IF-ELSE blocks<br>to display a bit of text that will tell the developer how the values are being processed within the function.<br>This can be very useful when testing the code because a series of numbers can be passed into the<br>function in order to determine whether the correct result is being returned. If not, then you will be able<br>to see exactly where the code is being evaluated incorrectly.<br>Although using DBMS_OUTPUT statements in code can be very useful for determining where code is<br>functioning properly, it can cause clutter, and can also create its own issues. For example, if you forget to<br>place a quote after one of the DBMS_OUTPUT statements that you place into your code, then the code will<br>not compile correctly, causing you to hunt for the cause of yet another issue. Also, it is a good idea to<br>remove the output statements before code is released into production. This can take some time, which<br>could be better spent on development. As a means for testing small units of code, using DBMS_OUTPUT<br>statements works quite well. However, if you wish to develop entire test suites and automated unit<br>testing then you should go on to read Recipe 17-2 regarding utPLSQL. </p>
+<h2 id="17-2-Installing-the-utPLSQL-Unit-Testing-Framework"><a href="#17-2-Installing-the-utPLSQL-Unit-Testing-Framework" class="headerlink" title="17-2. Installing the utPLSQL Unit Testing Framework"></a>17-2. Installing the utPLSQL Unit Testing Framework</h2><p><strong>Problem</strong><br>You’ve chosen the utPLSQL unit-testing framework for PL&#x2F;SQL for your work, and you want to install it.<br><strong>Solution</strong><br>First, download the utPLSQL sources from <a target="_blank" rel="noopener" href="http://utplsql.sourceforge.net/">http://utplsql.sourceforge.net/</a>. Once you have obtained<br>the sources, use the following steps to install the utPLSQL package into the database for which you wish<br>to write unit tests, and make it available for all schemas.<br>Create a user to host the utPLSQL tables, packages, and other objects. In this<br>example, the user will be named UTP, and the default permanent and<br>temporary tablespaces will be used. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; create user utp identified by abc123; 
+Grant privileges to the newly created UTP user using the GRANT privilege_name TO 
+user_name statement, replacing values with the appropriate privilege and 
+username. The user will require the following privileges: 
+ Create session 
+ Create procedure 
+ Create table 
+ Create view 
+ Create sequence 
+ Create public synonym 
+ Drop public synonym 
+Install the objects by running the ut_i_do.sql script. 
+SQL&gt; @ut_i_do install </code></pre>
+<p>Once these steps have been completed then you will have the ability to run unit tests on packages<br>that are loaded into different schemas within the database.<br><strong>How It Works</strong><br>Before you can begin to write and run unit tests within the utPLSQL framework for the PL&#x2F;SQL contained<br>within your database, you must install the utPLSQL package into a database schema. While the utPLSQL<br>framework can be loaded into the SYSTEM schema, it is better to separate the framework into its own<br>schema by creating a separate user and installing the packages, tables, and other objects into it. The<br><strong>Solution</strong> to this recipe steps through the recommended approach taken to install the utPLSQL framework<br>into the database of your choice.<br>Once you have created a user schema in which to install the utPLSQL framework objects, you must<br>grant it the appropriate privileges. The majority of the privileges are used to create the objects that are<br>required to make the framework functional. Public synonyms are created for many of the framework<br>objects, and this allows them to be accessible to other database user accounts. After all privileges have<br>been granted, running the ut_i_do.sql script and passing the install parameter will complete the<br>installation of the framework. After completion, you can begin to build unit test packages and install<br>them into different schemas within the database, depending on which PL&#x2F;SQL objects that you wish to<br>test.<br>■ Note Unit tests will be executed from the same schema in which the PL&#x2F;SQL object that is being tested resides,<br>not from the schema that contains the utPLSQL framework objects. </p>
+<h2 id="17-3-Building-a-utPLSQL-Test-Package"><a href="#17-3-Building-a-utPLSQL-Test-Package" class="headerlink" title="17-3. Building a utPLSQL Test Package"></a>17-3. Building a utPLSQL Test Package</h2><p><strong>Problem</strong><br>You would like to build a unit test package for one or more of the PL&#x2F;SQL objects in your database<br>schema.<br><strong>Solution</strong><br>You want to build a utPLSQL test package to test an object in your database. A test package consists of two<br>separate files, a package header and a package body.<br>Create a header for the test package and save it in a file with the same name you<br>have given the header and with a .pks suffix. A header file contains three<br>procedures: ut_setup, ut_teardown, and the procedure that performs the unit<br>tests of the target object in your database. For example, suppose you want to<br>create a unit test package to test the code for the CALC_QUARTERLY_HOURS<br>function of Recipe 17-1. This package header should be stored into a file<br>named ut_calc_quarter_hour.pks and loaded into the database whose objects<br>you are testing. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE ut_calc_quarter_hour 
+IS 
+  PROCEDURE ut_setup; 
+  PROCEDURE ut_teardown; 
+ 
+  PROCEDURE ut_calc_quarter_hour; 
+END ut_calc_quarter_hour;</code></pre>
+<p>Create the package body that implements the procedures specified by the unit test<br>package header and save it as a file with the same name as the header, but this<br>time with a .pkb suffix. The following package body should be stored into a file<br>named ut_calc_quarter_hour.pkb and loaded into the database. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY ut_calc_quarter_hour 
+IS 
+ 
+PROCEDURE ut_setup IS 
+BEGIN 
+  NULL; 
+END; 
+ 
+PROCEDURE ut_teardown IS 
+BEGIN 
+  NULL; 
+END; 
+ 
+PROCEDURE ut_calc_quarter_hour IS 
+BEGIN 
+ 
+  -- Perform unit tests here 
+  NULL; 
+   
+END ut_calc_quarter_hour; 
+ 
+END ut_calc_quarter_hour; </code></pre>
+<p>The package body in this example conforms to the format that must be used for testing packages<br>using the utPLSQL framework.<br>■ Note The .pks and .pkb suffixes could be changed to something different, like .sql, if you wish. You could<br>also store both the package header and body in the same file. However, utPLSQL framework will look for the .pks<br>and .pkb suffixes in order to automatically recompile your test packages before each test. It is best to follow the<br>utPLSQL convention to ensure that your test packages are always valid.<br><strong>How It Works</strong><br>A unit test package for the utPLSQL framework consists of a package header and a body. The package<br>header declares a setup procedure, a teardown procedure, and a unit testing procedure. The package<br>body consists of the PL&#x2F;SQL code that implements the unit test. When you create a ut_PLSQL package, its<br>name must be prefixed with ut_, followed by the procedure or function name for which you are writing<br>the unit test. The unit test prefix can be changed, but ut_ is the default. For more information on<br>changing the unit test prefix, please see Recipe 12-8.<br>The test package body must contain both a setup and teardown procedure. These procedures must<br>also be given names that use the same prefix you have chosen for your unit testing. Therefore, as you can<br>see in the Solution to this recipe, the package header declares ut_setup and ut_teardown procedures. The<br>ut_setup procedure is to initialize the variables or data structures the unit test procedure uses. When a<br>unit test is executed, ut_setup is always the first procedure to execute. The ut_teardown procedure is<br>used to clean up after all of the tests have been run. You should use this procedure to destroy all of the<br>data structures and variables created to support your unit tests. The ut_teardown procedure is always<br>executed last, after all unit tests have been run.<br>■ Note If you are choosing to use manual registration for your tests, you will be required to register each test<br>procedure in the ut_setup procedure as well. By default, registration of unit test procedures occurs automatically,<br>so you do not need to register them within ut_setup. If you are interested in learning more about manual unit test<br>registration, please see the online documentation that can be found at: <a target="_blank" rel="noopener" href="http://utplsql.oracledeveloper.nl/">http://utplsql.oracledeveloper.nl/</a><br>The package must also contain an implementation for your unit test procedures. The unit test<br>procedure names should begin with the ut_ prefix followed by the name of the PL&#x2F;SQL object that you<br>are testing. In the case of the Solution for this recipe, the procedure name is ut_calc_quarter_hour. The<br>Solution to this recipe does not contain any unit tests per se, but in order to perform a valid unit test of<br>the PL&#x2F;SQL object, you must define a test case for each possible scenario using the assertion routines<br>that are made available by utAssert. To learn more about the different assertion routines, please see<br>Recipe 17-4. </p>
+<h2 id="17-4-Writing-a-utPLSQL-Unit-Test-Procedure"><a href="#17-4-Writing-a-utPLSQL-Unit-Test-Procedure" class="headerlink" title="17-4. Writing a utPLSQL Unit Test Procedure"></a>17-4. Writing a utPLSQL Unit Test Procedure</h2><p><strong>Problem</strong><br>You have a PL&#x2F;SQL object that you’d like to test to verify it returns the expected values.<br><strong>Solution</strong><br>Create a utPLSQL test package to test every code branch and computation within your function. Use<br>utPLSQL assertion statements to test every foreseeable use case for the function. For example, suppose<br>you wish to test a simple factorial function that contains four code branches, each of which returns a<br>value. Here’s the target function: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE FUNCTION factorial (fact INTEGER) RETURN INTEGER is 
+ 
+BEGIN 
+ 
+   IF fact &lt; 0 THEN RETURN NULL; 
+   ELSIF fact &#x3D; 0 THEN RETURN 1; 
+   ELSIF fact &#x3D; 1 THEN RETURN fact; 
+   ELSE RETURN fact * factorial (fact-1); 
+   END IF; 
+ 
+END factorial; </code></pre>
+<p>Next, create the unit test package to test the factorial function. Name the package using the same<br>name as the function to be tested and adding the prefix ut_ to it In this example, you’ll name the<br>package ut_factorial. Create the three required procedures within the package for setup, teardown,<br>and testing. Remember to save the file as a PKS file (i.e., one with a .pks file extension).  </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE ut_factorial IS 
+ 
+   PROCEDURE ut_setup; 
+   PROCEDURE ut_teardown; 
+   PROCEDURE ut_factorial; 
+ 
+END ut_factorial; </code></pre>
+<p>Now create the unit testing package body. No code is required for the ut_setup or the ut_teardown<br>procedures as these are usually reserved for code that updates the database prior to or after running the<br>tests. For example, the setup procedure may insert records that are required only by the unit test, which<br>means that the teardown routine must clean up any data the test leaves behind. The ut_factorial </p>
+<p>procedure is built with a series of assert statements that test each code branch in the factorial<br>function. Remember to save the file as a PKB file (i.e., one with a .pkb file extension). </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE OR REPLACE PACKAGE BODY ut_factorial IS 
+ 
+PROCEDURE ut_setup IS 
+BEGIN 
+   NULL; 
+END ut_setup; 
+ 
+PROCEDURE ut_teardown IS 
+BEGIN 
+   NULL; 
+END ut_teardown; 
+ 
+PROCEDURE ut_factorial IS 
+BEGIN 
+   utAssert.isnull (&#39;is NULL test&#39;, factorial(-1)); 
+   utAssert.eqQuery (&#39;0! Test&#39;, &#39;select factorial(0) from dual&#39;, &#39;select 1 from dual&#39;); 
+   utAssert.eqQuery (&#39;1! Test&#39;, &#39;select factorial(1) from dual&#39;, &#39;select 1 from dual&#39;); 
+   utAssert.eqQuery (&#39;N! Test&#39;, &#39;select FACTORIAL(5) from dual&#39;, &#39;select 120 from dual&#39;); 
+END ut_factorial; 
+ 
+END ut_factorial; </code></pre>
+<p><strong>How It Works</strong><br>The utPLSQL package contains a number of tests that can be used to ensure that your code is working<br>properly. Each of these tests is an assertion, which is a statement that evaluates to either true or false<br>depending on whether its conditions are met. The <strong>Solution</strong> to this recipe uses four tests to determine<br>whether the function returns an appropriate result for each scenario. The utAssert.isnull procedure<br>verifies the second parameter returns a null value when executed. The utAssert.eqQuery procedure uses<br>the select statements in parameter positions two and three to determine if the unit test succeeds or<br>fails. Each select statement must return the same value when executed to succeed. The three calls to<br>utAssert.eqQuery procedure in the ut_factorial procedure tests one branch (if statement) within the<br>factorial function. The expected return value from the factorial is used in the select statement of the<br>third parameter to retrieve the value from dual. If the factorial is updated in such a way that any code<br>branch no longer returns the expected value, the unit test will fail. This test should be performed after<br>modifying the factorial function to test for bugs introduced by the update. Table 17-1 lists the different<br>assertion tests that are part of the utAssert package. </p>
+<pre class="language-text" data-language="text"><code class="language-text">Table 17-1. utPLSQL Assertion Tests 
+Assertion Name Description 
+utAssert.eq Checks equality of scalar values 
+utAssert.eq_refc_query Checks equality of RefCursor and Query 
+utAssert.eq_refc_table Checks equality of RefCursor and Database Tables 
+Assertion Name  Description 
+utAssert.eqcoll Checks equality of collections 
+utAssert.eqcollapi Checks equality of collections 
+utAssert.eqfile Checks equality of files 
+utAssert.eqoutput Checks equality of DBMS_OUTPUT values 
+utAssert.eqpipe Checks equality of database pipes 
+utAssert.eqquery Checks equality of different queries 
+utAssert.eqqueryvalue Checks equality of query against a value 
+utAssert.eqtabcount Checks equality of table counts 
+utAssert.eqtable Checks equality of different database tables 
+UTASSERT.isnotnull Checks for NOT NULL values 
+utAssert.isnull  Checks for NULL values 
+utAssert.objexists Checks for the existence of database objects 
+utAssert.objnotexists Checks for the existence of database objects 
+utAssert.previous_failed Checks if the previous assertion failed 
+utAssert.previous_passed Checks if the previous assertion passed 
+utAssert.this Generic “this” procedure 
+utAssert.throws Checks if a procedure or function throws an exception </code></pre>
+<p>There are many other tests that can also be used to help build your unit test packages. For an entire<br>list of the tests that are available, please see the documentation that can be found online at:<br><a target="_blank" rel="noopener" href="http://utplsql.oracledeveloper.nl/">http://utplsql.oracledeveloper.nl/</a>. </p>
+<h2 id="17-5-Running-a-utPLSQL-Test"><a href="#17-5-Running-a-utPLSQL-Test" class="headerlink" title="17-5. Running a utPLSQL Test"></a>17-5. Running a utPLSQL Test</h2><p><strong>Problem</strong><br>With a unit test package defined, you want to run it to verify that a function returns the values you expect<br>under a variety of scenarios.<br>CHAPTER 17  UNIT TESTING WITH UTPLSQL<br>370<br><strong>Solution</strong><br>Use the utPLSQL.test procedure to run your test package. For example, suppose you want to run the unit<br>test you built in 17-4. To do so, enter the following commands.<br>set serverout on<br>exec utPLSQL.test(‘factorial’, recompile_in &#x3D;&gt; FALSE)<br>Executing the commands above produces the following output. </p>
+<pre class="language-text" data-language="text"><code class="language-text">>    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS 
+>   S    S  U     U  C   C   C   C  E        S    S   S    S 
+>  S        U     U C     C C     C E       S        S 
+>   S       U     U C       C       E        S        S 
+>    SSSS   U     U C       C       EEEE      SSSS     SSSS 
+>        S  U     U C       C       E             S        S 
+>         S U     U C     C C     C E              S        S 
+>   S    S   U   U   C   C   C   C  E        S    S   S    S 
+>    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS </code></pre>
+<p>SUCCESS: “factorial” </p>
+<pre class="language-text" data-language="text"><code class="language-text">> Individual Test Case Results: 
+> 
+SUCCESS - factorial.UT_FACTORIAL: ISNULL "is NULL test" Expected "" and got "" 
+> 
+SUCCESS - factorial.UT_FACTORIAL: EQQUERY "0! Test" Result: Result set for "select
+factorial(0) from dual does match that of "select 1 from dual" 
+ CHAPTER 17  UNIT TESTING WITH UTPLSQL 
+371 
+> 
+SUCCESS - factorial.UT_FACTORIAL: EQQUERY "1! Test" Result: Result set for "select 
+factorial(1) from dual does match that of "select 1 from dual" 
+> 
+SUCCESS - factorial.UT_FACTORIAL: EQQUERY "N! Test" Result: Result set for "select 
+FACTORIAL(5) from dual does match that of "select 120 from dual" 
+> 
+> 
+> Errors recorded in utPLSQL Error Log: 
+> 
+> NONE FOUND 
+ 
+PL/SQL procedure successfully completed. 
+SQL> spool off </code></pre>
+<p>What if one of your test cases fails? Suppose that one of the test cases for the FACTORIAL test has<br>been modified so that a failure will result. Following is the resulting output from a failed unit test. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec utPLSQL.test(&#39;factorial&#39;, recompile_in &#x3D;&gt; FALSE) 
+. 
+&gt;  FFFFFFF   AA     III  L      U     U RRRRR   EEEEEEE 
+&gt;  F        A  A     I   L      U     U R    R  E 
+&gt;  F       A    A    I   L      U     U R     R E 
+&gt;  F      A      A   I   L      U     U R     R E 
+&gt;  FFFF   A      A   I   L      U     U RRRRRR  EEEE 
+CHAPTER 17  UNIT TESTING WITH UTPLSQL 
+372 
+&gt;  F      AAAAAAAA   I   L      U     U R   R   E 
+&gt;  F      A      A   I   L      U     U R    R  E 
+&gt;  F      A      A   I   L       U   U  R     R E 
+&gt;  F      A      A  III  LLLLLLL  UUU   R     R EEEEEEE 
+. 
+FAILURE: &quot;factorial&quot; 
+. 
+&gt; Individual Test Case Results: 
+&gt; 
+SUCCESS - factorial.UT_FACTORIAL: ISNULL &quot;is NULL test&quot; Expected &quot;&quot; and got &quot;&quot; 
+&gt; 
+SUCCESS - factorial.UT_FACTORIAL: EQQUERY &quot;0! Test&quot; Result: Result set for 
+&quot;select factorial(0) from dual does match that of &quot;select 1 from dual&quot; 
+&gt; 
+SUCCESS - factorial.UT_FACTORIAL: EQQUERY &quot;1! Test&quot; Result: Result set for 
+&quot;select factorial(1) from dual does match that of &quot;select 1 from dual&quot; 
+&gt; 
+FAILURE - factorial.UT_FACTORIAL: EQQUERY &quot;N! Test&quot; Result: Result set for 
+&quot;select FACTORIAL(5) from dual does  not match that of &quot;select 121 from dual&quot; 
+&gt; 
+&gt; 
+&gt; Errors recorded in utPLSQL Error Log: 
+&gt; 
+&gt; NONE FOUND 
+
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p><strong>How It Works</strong><br>The utPLSQL framework makes it easy to execute all of the tests that you have setup within a unit test<br>package; you need only to enter a utPLSQL.test command. In the <strong>Solution</strong> to this recipe, the SET<br>SERVEROUT ON command enables output from the DBMS_OUTPUT statements within the utPLSQL.test<br>procedure. Without this command you cannot view the results of the unit test. The call to the<br>utPLSQL.test procedure passes two parameters, the first is the name of the unit test to run. Notice that<br>you do not specify the name of the package built for the unit test. Instead, you pass the name of the<br>function being tested. The second parameter tells the utPLSQL.test procedure not to recompile any of<br>the code before running the test. </p>
+<h2 id="17-6-Building-a-utPLSQL-Test-Suite"><a href="#17-6-Building-a-utPLSQL-Test-Suite" class="headerlink" title="17-6. Building a utPLSQL Test Suite"></a>17-6. Building a utPLSQL Test Suite</h2><p><strong>Problem</strong><br>You have created numerous unit test procedures that you must run every time you modify your code.<br>Running each test individually is both time-consuming and error-prone, as you may forget to run a test<br>or two. You need a simple method to run all of your tests at once.<br><strong>Solution</strong><br>Use the utsuite.add command of utPLSQL to build a test suite, use the utPackage.add command to add<br>individual unit tests to it, and then run the result. For example, here’s how to build a suite to run the unit<br>tests you developed in Recipes 17-3 and 17-4.<br>Create the test suite.<br>exec utSuite.add (‘My Test Suite’, ‘Test all my functions’);<br>Add individual unit tests to the suite.<br>exec utPackage.add (‘My Test Suite’, ‘calc_quarter_hour’);<br>exec utPackage.add (‘My Test Suite’, ‘factorial’);<br>Run the test suite. See recipe 17-7.<br><strong>How It Works</strong><br>The utSuite.add routine creates a new test suite using the text in the first parameter as its unique name.<br>Note that the utPLSQL utility uppercases the suite name before saving, so take that into consideration, as<br>suite names must be unique. The second parameter is descriptive text for your test suite.<br>Once the suite is created, use the utPackage.add procedure to add existing unit tests to the suite. The<br>first parameter must match the name of an existing test suite. The second parameter is the name of the<br>unit test to run. As more unit tests are developed, they can be added to the suite to provide an easy<br>method to run all tests at once. </p>
+<h2 id="17-7-Running-a-utPLSQL-Test-Suite"><a href="#17-7-Running-a-utPLSQL-Test-Suite" class="headerlink" title="17-7. Running a utPLSQL Test Suite"></a>17-7. Running a utPLSQL Test Suite</h2><p><strong>Problem</strong><br>You have defined a test suite and now wish to run the tests.<br><strong>Solution</strong><br>Use the utPLSQL.testSuite routine to run your tests. For example, here’s how run the test suite defined<br>in Recipe 17-6. </p>
+<p><code>exec utPLSQL.testSuite (&#39;My Test Suite&#39;, recompile_in=&gt;false);</code></p>
+<p>Executing the above test suite produces the following results. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec utPLSQL.testSuite (&#39;My Test Suite&#39;, recompile_in&#x3D;&gt;false); 
+. 
+&gt;    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS 
+&gt;   S    S  U     U  C   C   C   C  E        S    S   S    S 
+&gt;  S        U     U C     C C     C E       S        S 
+&gt;   S       U     U C       C       E        S        S 
+&gt;    SSSS   U     U C       C       EEEE      SSSS     SSSS 
+&gt;        S  U     U C       C       E             S        S 
+&gt;         S U     U C     C C     C E              S        S 
+&gt;   S    S   U   U   C   C   C   C  E        S    S   S    S 
+&gt;    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS 
+. 
+SUCCESS: &quot;FACTORIAL&quot; 
+. 
+&gt; Individual Test Case Results: 
+&gt; 
+ CHAPTER 17  UNIT TESTING WITH UTPLSQL 
+375 
+SUCCESS - FACTORIAL.UT_FACTORIAL: ISNULL &quot;is NULL test&quot; Expected &quot;&quot; and got &quot;&quot; 
+&gt; 
+SUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;0! Test&quot; Result: Result set for &quot;select 
+factorial(0) from dual does match that of &quot;select 1 from dual&quot; 
+&gt; 
+SUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;1! Test&quot; Result: Result set for &quot;select 
+factorial(1) from dual does match that of &quot;select 1 from dual&quot; 
+&gt; 
+SUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;N! Test&quot; Result: Result set for &quot;select 
+FACTORIAL(5) from dual does match that of &quot;select 120 from dual&quot; 
+&gt; 
+&gt; 
+&gt; Errors recorded in utPLSQL Error Log: 
+&gt; 
+&gt; NONE FOUND 
+. 
+&gt;    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS 
+&gt;   S    S  U     U  C   C   C   C  E        S    S   S    S 
+&gt;  S        U     U C     C C     C E       S        S 
+&gt;   S       U     U C       C       E        S        S 
+&gt;    SSSS   U     U C       C       EEEE      SSSS     SSSS 
+&gt;        S  U     U C       C       E             S        S 
+&gt;         S U     U C     C C     C E              S        S 
+&gt;   S    S   U   U   C   C   C   C  E        S    S   S    S 
+&gt;    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS 
+CHAPTER 17  UNIT TESTING WITH UTPLSQL 
+376 
+. 
+SUCCESS: &quot;CALC_QUARTER_HOUR&quot; 
+. 
+&gt; Individual Test Case Results: 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: ISNULL &quot;NULL value&quot; Expected &quot;&quot; and got &quot;&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .10 rounds down&quot; 
+Result: Result set for &quot;select calc_quarter_hour(6.10) from dual does match that of &quot;select 
+6 from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .15 rounds up&quot; Result: 
+Result set for &quot;select calc_quarter_hour(6.15) from dual does match that of &quot;select 6.25 
+from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .35 rounds down&quot; 
+Result: Result set for &quot;select calc_quarter_hour(6.35) from dual does match that of &quot;select 
+6.25 from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .40 rounds up&quot; Result: 
+Result set for &quot;select calc_quarter_hour(6.40) from dual does match that of &quot;select 6.5 from 
+dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .65 rounds up&quot; Result: 
+Result set for &quot;select calc_quarter_hour(6.65) from dual does match that of &quot;select 6.75 
+from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .83 rounds down&quot; 
+Result: Result set for &quot;select calc_quarter_hour(6.83) from dual does match that of &quot;select 
+7 from dual&quot; 
+ CHAPTER 17  UNIT TESTING WITH UTPLSQL 
+377 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .92 rounds up&quot; Result: 
+Result set for &quot;select calc_quarter_hour(6.92) from dual does match that of &quot;select 7 from 
+dual&quot; 
+&gt; 
+&gt; 
+&gt; Errors recorded in utPLSQL Error Log: 
+&gt; 
+&gt; NONE FOUND 
+If you happen to have a test fail, then the output of the test suite will display a failure message for 
+the unit test that failed. In the following output, one of the test cases for the FACTORIAL unit test fails. 
+&gt;  FFFFFFF   AA     III  L      U     U RRRRR   EEEEEEE 
+&gt;  F        A  A     I   L      U     U R    R  E 
+&gt;  F       A    A    I   L      U     U R     R E 
+&gt;  F      A      A   I   L      U     U R     R E 
+&gt;  FFFF   A      A   I   L      U     U RRRRRR  EEEE 
+&gt;  F      AAAAAAAA   I   L      U     U R   R   E 
+&gt;  F      A      A   I   L      U     U R    R  E 
+&gt;  F      A      A   I   L       U   U  R     R E 
+&gt;  F      A      A  III  LLLLLLL  UUU   R     R EEEEEEE 
+. 
+FAILURE: &quot;FACTORIAL&quot; 
+. 
+&gt; Individual Test Case Results: 
+&gt; 
+SUCCESS - FACTORIAL.UT_FACTORIAL: ISNULL &quot;is NULL test&quot; Expected &quot;&quot; and got &quot;&quot; 
+&gt; 
+SUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;0! Test&quot; Result: Result set for 
+&quot;select factorial(0) from dual does match that of &quot;select 1 from dual&quot; 
+&gt; 
+SUCCESS - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;1! Test&quot; Result: Result set for 
+&quot;select factorial(1) from dual does match that of &quot;select 1 from dual&quot; 
+&gt; 
+FAILURE - FACTORIAL.UT_FACTORIAL: EQQUERY &quot;N! Test&quot; Result: Result set for 
+&quot;select FACTORIAL(5) from dual does  not match that of &quot;select 121 from dual&quot; 
+&gt; 
+&gt; 
+&gt; Errors recorded in utPLSQL Error Log: 
+&gt; 
+&gt; NONE FOUND 
+. 
+&gt;    SSSS   U     U   CCC     CCC   EEEEEEE   SSSS     SSSS 
+&gt;   S    S  U     U  C   C   C   C  E        S    S   S    S 
+&gt;  S        U     U C     C C     C E       S        S 
+&gt;   S       U     U C       C       E        S        S 
+&gt;    SSSS   U     U C       C       EEEE      SSSS     SSSS 
+&gt;        S  U     U C       C       E             S       S 
+ CHAPTER 17  UNIT TESTING WITH UTPLSQL 
+379 
+&gt;         S U     U C     C C     C E              S        S 
+&gt;   S    S   U   U   C   C   C   C  E        S    S   S    S 
+&gt;    SSSS     UUU     CCC     CCC   EEEEEEE   SSSS     SSSS 
+. 
+SUCCESS: &quot;CALC_QUARTER_HOUR&quot; 
+. 
+&gt; Individual Test Case Results: 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: ISNULL &quot;NULL value&quot; Expected 
+&quot;&quot; and got &quot;&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .10 rounds 
+down&quot; Result: Result set for &quot;select calc_quarter_hour(6.10) from dual does 
+match that of &quot;select 6 from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .15 rounds 
+up&quot; Result: Result set for &quot;select calc_quarter_hour(6.15) from dual does match 
+that of &quot;select 6.25 from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .35 rounds 
+down&quot; Result: Result set for &quot;select calc_quarter_hour(6.35) from dual does 
+match that of &quot;select 6.25 from dual&quot; 
+&gt; 
+CHAPTER 17  UNIT TESTING WITH UTPLSQL 
+380 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .40 rounds 
+up&quot; Result: Result set for &quot;select calc_quarter_hour(6.40) from dual does match 
+that of &quot;select 6.5 from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .65 rounds 
+up&quot; Result: Result set for &quot;select calc_quarter_hour(6.65) from dual does match 
+that of &quot;select 6.75 from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .83 rounds 
+down&quot; Result: Result set for &quot;select calc_quarter_hour(6.83) from dual does 
+match that of &quot;select 7 from dual&quot; 
+&gt; 
+SUCCESS - CALC_QUARTER_HOUR.UT_CALC_QUARTER_HOUR: EQQUERY &quot;Check that .92 rounds 
+up&quot; Result: Result set for &quot;select calc_quarter_hour(6.92) from dual does match 
+that of &quot;select 7 from dual&quot; 
+&gt; 
+&gt; 
+&gt; Errors recorded in utPLSQL Error Log: 
+&gt; 
+&gt; NONE FOUND 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p><strong>How It Works</strong><br>The utPLSQL.testSuite procedure steps though each unit test added using the utPackage.add procedure<br>and executes each test. In turn, each test executes and sends its results to the screen. This is a quick<br>method to run all tests and see the output on one screen capture. If one of the test cases within a unit<br>test fails, all of the remaining tests in the suite will continue to execute, and the test that failed will be<br>noted in the output. This is very useful as it will allow tests of many PL&#x2F;SQL objects at once, and you will<br>be able to see which tests had issues and which did not.<br>■ Hint Spool the output to a file if the number of tests exceeds the screen buffer’s capacity. </p>
+<h2 id="17-8-Reconfiguring-utPLSQL-Parameters"><a href="#17-8-Reconfiguring-utPLSQL-Parameters" class="headerlink" title="17-8. Reconfiguring utPLSQL Parameters"></a>17-8. Reconfiguring utPLSQL Parameters</h2><p><strong>Problem</strong><br>You would like to change some of the configurations for your utPLSQL install. For instance, you would<br>like to change the prefix for all of your unit test packages so that, instead of beginning with ut_, they all<br>start with test_.<br><strong>Solution</strong><br>Use the utConfig package to alter the configurations for utPLSQL. For this <strong>Solution</strong>, you will see how<br>utConfig can be used to change the prefix that is used for all of your test packages. For example, here’s<br>how to change the prefix for your test packages from ut_ to test_ using the utConfig package for the<br>current schema. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; exec utConfig.setPrefix(&#39;test_&#39;); 
+ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p>After executing the statement in the example, the utPLSQL unit test framework will look for test<br>packages beginning with the test_ prefix rather than ut_ within the current schema, until the prefix is<br>changed again using the utConfig package.<br><strong>How It Works</strong><br>The utPLSQL test framework can be configured to operate differently from its default manner by<br>changing options using the utConfig package. Changes can be made for the current schema only, or for<br>all schemas within the database. In the <strong>Solution</strong> to this recipe, you have seen that the prefix for test<br>packages is configurable. To change the prefix, pass the desired prefix in string format to<br>utConfig.setPrefix(). The setPrefix() procedure also accepts an additional schema name that will<br>specify the schema to which the configuration option will be applied. If you do not pass a schema name,<br>the changes will occur within the current schema. The actual format for executing the<br>utConfig.setPrefix procedure is as follows: </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">exec utConfig.setPrefix(desired_prefix, [schema]); </code></pre>
+<p>There are many configurable options that can be changed using the utConfig package. Table 17-2<br>shows the complete list of options. </p>
+<pre class="language-text" data-language="text"><code class="language-text">Table 17-2. utConfig Configuration Options 
+Option Description 
+utConfig.autocompile Configure autocompile feature 
+utConfig.registertest Configure the registration mode (manual or automatic) 
+utConfig.setdateformat Configure the date format for the date portion of output file names 
+utConfig.setdelimiter Configure the V2 delimiter 
+utConfig.setdir Configure the directory containing the test package code 
+utConfig.setfiledir Configure the directory for file output 
+utConfig.setfileextension Configure the file extension for output file names 
+utConfig.setfileinfo Configure all of the above file output related items 
+utConfig.setincludeprogname Configure whether to include the name of the program being tested 
+within output file names 
+utConfig.setprefix Configure the default unit test prefix 
+utConfig.setreporter Configure the default Output Reporter  
+utConfig.settester Configure whose configuration is used 
+utConfig.setuserprefix Configure the user prefix for output file names 
+utConfig.showfailuresonly Switch off the display for successful tests </code></pre>
+<p>You can set of the options shown here using a syntax similar to that shown for the setPrefix()<br>procedure that was demonstrated in the <strong>Solution</strong> to this recipe. For more information on using the<br>configurations listed in Table 17-2, please see the online documentation that can be found at:<br><a target="_blank" rel="noopener" href="http://utplsql.oracledeveloper.nl/">http://utplsql.oracledeveloper.nl/</a>. Along with configurable options, the utConfig package includes<br>some functions that can be called to retrieve information regarding the unit test configuration for the<br>database or for a particular schema. Table 17-3 contains a listing of the options that utConfig makes </p>
+<p>available for obtaining information. </p>
+<pre class="language-text" data-language="text"><code class="language-text">Table 17-3. utConfig Informational Options 
+Option Name Description 
+utConfig.autocompiling Returns autocompile flag value 
+utConfig.dateformat Returns date format used to construct output file names 
+utConfig.delimiter Returns V2 delimiter 
+utConfig.dir Returns directory containing the test package code 
+utConfig.filedir Returns file output directory 
+utConfig.fileextension Returns output file name extension 
+utConfig.fileinfo Returns all file output—related items 
+utConfig.getreporter Obtains name of the default Output Reporter to use 
+utConfig.includeprogname Returns whether to include the name of the program being tested 
+within file names 
+utConfig.prefix Returns default unit test prefix for your code 
+utConfig.registering Returns registration mode 
+utConfig.showconfig Displays a schema configuration 
+utConfig.showingfailuresonly Returns whether successful test results are displayed 
+utConfig.tester Returns the schema whose configuration is used 
+utConfig.userprefix Returns the user prefix for output files </code></pre>
+<p>The functions can be called just as if they were standard functions within your schema. Some, such<br>as the utConfig.showconfig procedure, require you to set serveroutput on in order to display the output.<br>The following excerpt from a SQL*Plus session shows a call to utConfig.showconfig. </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">SQL&gt; set serveroutput on 
+SQL&gt; exec utconfig.showconfig 
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; 
+utPLSQL Configuration for USERNAME 
+Directory: 
+Autcompile? 
+Manual test registration? 
+Prefix &#x3D; 
+Default reporter     &#x3D; 
+----- File Output settings: 
+Output directory: 
+User prefix     &#x3D; 
+Include progname? 
+Date format     &#x3D; 
+File extension  &#x3D; 
+----- End File Output settings 
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; 
+ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p>The utConfig package contains a variety of configurable options that will allow you to adjust unit<br>testing according to your specific needs. Out of the box, the utPLSQL testing framework contains default<br>values for each of these options, so you may never need to touch utConfig, but the option is available if<br>you need it. Another nice feature is that you can set configurable options for a specific schema. Doing so<br>will allow different schemas in the database to act differently when performing unit testing.  </p>
+<h2 id="17-9-Redirecting-utPLSQL-Test-Results-to-a-File"><a href="#17-9-Redirecting-utPLSQL-Test-Results-to-a-File" class="headerlink" title="17-9. Redirecting utPLSQL Test Results to a File"></a>17-9. Redirecting utPLSQL Test Results to a File</h2><p><strong>Problem</strong><br>You are interested in writing the results of a unit test to a file.<br><strong>Solution</strong><br>Change the setting of the setreporter option of utPLSQL so that output is redirected to a file instead of<br>DBMS_OUTPUT. Once the configuration has been altered, execute the unit tests for which you would like to<br>have the output captured to the file. After you’ve run your tests, close the file and change the<br>configuration back to its default. In the following lines of code, all of the steps that are necessary for<br>redirecting test results to a file are exhibited. For example, suppose that the database has a directory that<br>has already been enabled for use with the database named FILE_SYSTEM. </p>
+<pre class="language-none"><code class="language-none">SQL&gt;  BEGIN 
+  utconfig.setfiledir(&#39;FILE_SYSTEM&#39;); 
+  -- Causes output to be redirected to file system 
+  utconfig.setreporter(&#39;File&#39;); 
+  utPLSQL.test(&#39;calc_quarter_hour&#39;); 
+  -- Closes the fle 
+  utfilereporter.close(); 
+  -- Returns output redirection to DBMS_OUTPUT 
+  utconfig.setreporter(&#39;Output&#39;); 
+END; 
+ 
+PL&#x2F;SQL procedure successfully completed. </code></pre>
+<p>When the code block in this example is executed, a file will be created within the directory<br>represented by FILE_SYSTEM. The unit test for CALC_QUARTER_HOUR will then be executed and the results<br>will be redirected to the newly created file. Lastly, the file will be closed and the output will be redirected<br>back to DBMS_OUTPUT.<br><strong>How It Works</strong><br>One of the configurable options of utPLSQL allows for the output of your unit tests to be redirected. The<br>choices for displaying unit test results include Output, File, and HTML. The standard Output option is<br>Output , which causes output to be displayed within the SQL<em>Plus environment using DBMS_OUTPUT. The<br>File option allows for a file to be created and unit test results to be written to that file. Lastly, the HTML<br>option allows for unit test results to be formatted into file in the format of an HTML table. In the Solution<br>to this recipe, the use of the File output reporter is demonstrated.<br>Prior to redirecting unit test output to a file, you must create a database directory using the CREATE<br>DIRECTORY statement with a privileged account. For more information about creating directories, please<br>see the Oracle documentation that can be found at:<br><a target="_blank" rel="noopener" href="http://download.oracle.com/docs/cd/E11882_01/server.112/e17118/statements_5007.htm#SQLRF01207">http://download.oracle.com/docs/cd/E11882_01/server.112/e17118/statements_5007.htm#SQLRF01207</a>.<br>Once you have created a database directory, you can use it to write the results of unit tests by setting the<br>file directory using the utConfig.setfiledir() procedure. This procedure accepts the name of the<br>database directory as a parameter. In the Solution to this recipe, the directory is named FILE_SYSTEM. To<br>redirect the unit test output from utPLSQL, you must use the utConfig.setreporter() procedure. This<br>procedure accepts the name of the reporter that you would like to use for displaying output. As you can<br>see from the Solution to this recipe, the File reporter is chosen to redirect the output to a file on the file<br>system. It is also possible to create a custom reporter configuration that you can pass to the<br>utConfig.setreporter() procedure. For more information about creating customized reporters, please<br>see the utPLSQL documentation that can be found at:<br><a target="_blank" rel="noopener" href="http://utplsql.sourceforge.net/Doc/reporter.html">http://utplsql.sourceforge.net/Doc/reporter.html</a>.<br>After the output has been redirected using utConfig.setreporter(), you can run as many tests as<br>you wish and all of the output will be directed to a file instead of to the SQL</em>Plus command prompt. In<br>the Solution to this recipe, the CALC_QUARTER_HOUR function is tested. Once you have finished running<br>your tests, you must close the output file in order to make it available for you to use. If you fail to close<br>the file, you will be unable to open it or use it because the database will maintain a lock on the file. To<br>close the file, use issue utfilereporter.close(). Lastly, I recommend redirecting unit test output to the<br>default Ouput option, which will cause it to be sent to DBMS_OUTPUT. By doing so, the next person who runs<br>a unit test will receive the functionality that he or she expects by default, as the output will be directed to<br>the screen. It is a good idea to set the default output at the beginning of all test suites just to ensure that<br>you know where the output will be directed. However, if you are the only person running unit tests, or if<br>you prefer to maintain the File reporter as your default, then omit the final call to<br>utConfig.setreporter() that is shown in this Solution.<br>Many times it can be useful to have unit test results redirected to an output file rather than<br>displayed within the SQL<em>Plus environment. For instance, if you are running unit tests during off hours<br>and would like to see the output, then it would be helpful to have it recorded to a file that can be viewed<br>at a later time. Similarly, if you are running several unit tests, it may be easier to read through a file rather<br>than scrolling through SQL</em>Plus output. Whatever the requirement may be, utPLSQL makes it easy to<br>redirect unit test output to a file or another device by creating a custom reporter. </p>
+<h2 id="17-10-Automating-Unit-Tests-for-PL-x2F-SQL-and-Java-Stored-Procedures-Using-Ant"><a href="#17-10-Automating-Unit-Tests-for-PL-x2F-SQL-and-Java-Stored-Procedures-Using-Ant" class="headerlink" title="17-10. Automating Unit Tests for PL&#x2F;SQL and Java Stored Procedures Using Ant"></a>17-10. Automating Unit Tests for PL&#x2F;SQL and Java Stored Procedures Using Ant</h2><p><strong>Problem</strong><br>You wish to automatically run your unit tests for PL&#x2F;SQL code and Java stored procedures each day and<br>to write the results of the unit test to a file.<br>CHAPTER 17  UNIT TESTING WITH UTPLSQL<br>386<br><strong>Solution</strong><br>Use Apache’s Ant build system to perform unit testing on your PL&#x2F;SQL code. At the same time, Ant can<br>build and compile any Java code that you will be using for your stored procedures. To do so, develop an<br>Ant build script that will execute some SQL statements, automate your unit tests, and compile Java<br>source into a directory. For example, the following build.xml file is an example of such a build that can<br>be used to compile Java sources and execute unit tests on PL&#x2F;SQL within a single Ant run. </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>project</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>MyPLSQLProject<span class="token punctuation">"</span></span> <span class="token attr-name">default</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>unitTest<span class="token punctuation">"</span></span> <span class="token attr-name">basedir</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>.<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>description</span><span class="token punctuation">></span></span> 
+        PLSQL Unit Test and Application Builder 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>description</span><span class="token punctuation">></span></span> 
+  <span class="token comment">&lt;!-- set global properties for this build --></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>src<span class="token punctuation">"</span></span> <span class="token attr-name">location</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>src<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>build<span class="token punctuation">"</span></span> <span class="token attr-name">location</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>build<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span>”build”/</span><span class="token punctuation">></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>user<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>myuser<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>db_password<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mypassword<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>database.jdbc.url<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>jdbc:oracle:thin:@hostname:1521:database<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+ 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>init<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token comment">&lt;!-- Create the time stamp --></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tstamp</span><span class="token punctuation">/></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mkdir</span> <span class="token attr-name">dir</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>$&#123;build&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>target</span><span class="token punctuation">></span></span> 
+ 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile<span class="token punctuation">"</span></span> <span class="token attr-name">depends</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>init<span class="token punctuation">"</span></span> 
+        <span class="token attr-name">description</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile the source <span class="token punctuation">"</span></span> <span class="token punctuation">></span></span> 
+    <span class="token comment">&lt;!-- Compile the java code from $&#123;src&#125; into $&#123;build&#125; --></span> 
+    <span class="token comment">&lt;!-- This is where you place the code for your java stored procedures --></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>javac</span> <span class="token attr-name">srcdir</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>$&#123;src&#125;<span class="token punctuation">"</span></span> <span class="token attr-name">destdir</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>$&#123;build&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>target</span><span class="token punctuation">></span></span> 
+ 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>unitTest<span class="token punctuation">"</span></span> <span class="token attr-name">depends</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile<span class="token punctuation">"</span></span> 
+        <span class="token attr-name">description</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Execute PLSQL Unit Tests<span class="token punctuation">"</span></span> <span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sql</span> 
+     <span class="token attr-name">driver</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>oracle.jdbc.driver.OracleDriver<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">url</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>$&#123;database.jdbc.url&#125;<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">userid</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>$&#123;user&#125;<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">password</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>$&#123;db_password&#125;<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">print</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span> 
+    <span class="token punctuation">></span></span> 
+      call utconfig.setfiledir('FILE_SYSTEM'); 
+      call utconfig.setreporter('File'); 
+      call utPLSQL.test('calc_quarter_hour'); 
+      -- Closes the fle 
+      call utfilereporter.close(); 
+      -- Returns output redirection to DBMS_OUTPUT 
+      call utconfig.setreporter('Output'); 
+ 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>sql</span><span class="token punctuation">></span></span> 
+    
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>target</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>project</span><span class="token punctuation">></span></span> </code></pre>
+<p>This build script can be executed by issuing the ant command from within the terminal or<br>command prompt. The results will resemble the following output. </p>
+<pre class="language-java" data-language="java"><code class="language-java">juneau$ ant 
+Buildfile: &#x2F;Users&#x2F;juneau&#x2F;Documents&#x2F;PLSQL_Recipes&#x2F;sources&#x2F;17&#x2F;build.xml 
+ 
+init: 
+ 
+compile: 
+    [javac] &#x2F;Users&#x2F;juneau&#x2F;Documents&#x2F;PLSQL_Recipes&#x2F;sources&#x2F;17&#x2F;build.xml:22: warning: 
+&#39;includeantruntime&#39; was not set, defaulting to build.sysclasspath&#x3D;last; set to false for 
+repeatable builds 
+ 
+unitTest: 
+      [sql] Executing commands 
+      [sql] 0 rows affected 
+      [sql] 0 rows affected 
+      [sql] 0 rows affected 
+      [sql] 0 rows affected 
+      [sql] 0 rows affected 
+      [sql] 5 of 5 SQL statements executed successfully 
+ 
+BUILD SUCCESSFUL 
+Total time: 4 seconds </code></pre>
+<p><strong>How It Works</strong><br>Automating unit tests can be very helpful, especially if you are working on a project where there may be<br>more than one developer contributing code. The Apache Ant build system is useful for automating<br>builds and unit tests for Java projects. However, it can also be used to perform a myriad of other tasks,<br>including issuing SQL statements, as seen in the Solution to this recipe. Ant provides an entire build and<br>unit test Solution that is easy to use. To set up a build, all you need to do is install Ant on your machine<br>and then create a build.xml file that consists of targets that Ant will use to build the project. Once you<br>have created a build file, then simply open a command prompt or terminal and traverse into the<br>directory containing your build file. Once in the directory, issue the ant command and it will<br>automatically look for a file named build.xml that will provide Ant the sequence used for the build.<br>Ant uses simple logic to determine the order of sequence that will be used to execute the targets that<br>are listed within the build.xml file. In the Solution to this recipe, the build file contains three targets,<br>init, compile, and unitTest. Ant will start the build by executing the target listed within the &lt;–project–&gt;<br>tag as the default. In this case, the default target is unitTest.  </p>
+<p><code>&lt;project name=&quot;MyPLSQLProject&quot; default=&quot;unitTest&quot; basedir=&quot;.&quot;&gt; </code></p>
+<p>The unitTest target contains a depends attribute, which lists the compile target. This tells Ant that<br>the compile target should be executed first because unitTest depends upon its outcome.  </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>unitTest<span class="token punctuation">"</span></span> <span class="token attr-name">depends</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile<span class="token punctuation">"</span></span> 
+        <span class="token attr-name">description</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Execute PLSQL Unit Tests<span class="token punctuation">"</span></span> <span class="token punctuation">></span></span> </code></pre>
+<p>Consequently, the compile target depends upon the init target, so init will be executed before<br>compile.  </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile<span class="token punctuation">"</span></span> <span class="token attr-name">depends</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>init<span class="token punctuation">"</span></span> 
+        <span class="token attr-name">description</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile the source <span class="token punctuation">"</span></span> <span class="token punctuation">></span></span> </code></pre>
+<p>The order of target execution for the <strong>Solution</strong> to this recipe will be the init target first, followed by<br>the compile target, and lastly the unitTest target. The project tag also contains an attribute named<br>basedir. This attribute tells Ant where the build files should be located. In the <strong>Solution</strong> to this recipe,<br>basedir contains a period “.” that tells Ant to use the current directory.<br>At the top of the build file, you can see that there is a <description> tag. This is used to provide a<br>brief description of the tasks completed by the build file. There are also several <property> tags. These<br>tags are used to define the variables that will be used within the build file. Each <property> tag contains a<br>name attribute and either a value or location attribute.  </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>src<span class="token punctuation">"</span></span> <span class="token attr-name">location</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>src<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>build<span class="token punctuation">"</span></span> <span class="token attr-name">location</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>build<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span>”build”/</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>user<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>myuser<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>db_password<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mypassword<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>database.jdbc.url<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>jdbc:oracle:thin:@hostname:1521:database<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> </code></pre>
+<p>The properties that use a value attribute are used to assign values to the property name, whereas the<br>properties that contain location attributes are used to assign a location to the property name. Properties<br>can be referenced within the build file by using the following syntax: “${property_name}”. As you can see<br>from the Solution to this recipe, each target within the build file consists of a number of tasks in the form<br>of XML tags. The init target creates a timestamp by using the &lt;–tstamp&#x2F;&gt; tag, and it creates a directory<br>using the &lt;–mkdir&#x2F;&gt; tag and passing the name of a directory to be created. In this case, the directory name<br>will be named the same as the value that is assigned to the &lt;–property&gt; tag that is named build.  </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>init<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token comment">&lt;!-- Create the time stamp --></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tstamp</span><span class="token punctuation">/></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mkdir</span> <span class="token attr-name">dir</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>$&#123;build&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>target</span><span class="token punctuation">></span></span> </code></pre>
+<p>The compile target is used to compile all of the Java sources contained in the project. All of the<br>sources should reside within a named directory that is located in the base directory of the Ant project.<br>The compile target contains a single task using the &lt;–javac&gt; tag. This tag contains a src attribute that<br>defines the location of the sources to be compiled, and a destdir attribute that tells Ant where to place<br>the resulting Java class files. An Ant project that builds a Java project may contain only this task, but can<br>build several hundred Java class files. In the Solution to this recipe, and for most Ant uses with PL&#x2F;SQL<br>projects, however, the project will probably contain no Java source files or only a few at most. If a project<br>contains no Java source files, then the target will be executed, but the &lt;–javac&gt; task will do nothing since<br>there are not any sources to be compiled. </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile<span class="token punctuation">"</span></span> <span class="token attr-name">depends</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>init<span class="token punctuation">"</span></span> 
+        <span class="token attr-name">description</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile the source <span class="token punctuation">"</span></span> <span class="token punctuation">></span></span> 
+    <span class="token comment">&lt;!-- Compile the java code from $&#123;src&#125; into $&#123;build&#125; --></span> 
+    <span class="token comment">&lt;!-- This is where you place the code for your java stored procedures --></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>javac</span> <span class="token attr-name">srcdir</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>$&#123;src&#125;<span class="token punctuation">"</span></span> <span class="token attr-name">destdir</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>$&#123;build&#125;<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span> 
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>target</span><span class="token punctuation">></span></span> </code></pre>
+<p>The most important target in the <strong>Solution</strong> to this recipe is the unitTest target. It consists of a single<br>task using the <sql> tag. The sole purpose of the <sql> task is to execute SQL within a designated<br>database. The <sql> tag contains a driver attribute that is used to list the JDBC driver for the target<br>database, a url attribute used to define the JDBC URL for the target database, a userid and password<br>attribute for defining the database username and password, and a print attribute that tells Ant whether<br>to print the result sets from the SQL statements. In the <strong>Solution</strong> to this recipe, the SQL that is required to<br>execute the unit tests is contained within the <sql> opening and closing tags. This causes the unit tests to<br>be executed as if you were issuing these statements at the SQL*Plus command prompt. </p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>target</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>unitTest<span class="token punctuation">"</span></span> <span class="token attr-name">depends</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>compile<span class="token punctuation">"</span></span> 
+        <span class="token attr-name">description</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Execute PLSQL Unit Tests<span class="token punctuation">"</span></span> <span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sql</span> 
+     <span class="token attr-name">driver</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>oracle.jdbc.driver.OracleDriver<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">url</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>$&#123;database.jdbc.url&#125;<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">userid</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>$&#123;user&#125;<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">password</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">"</span>$&#123;db_password&#125;<span class="token punctuation">"</span></span> 
+     <span class="token attr-name">print</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span> <span class="token punctuation">></span></span> 
+
+      call utconfig.setfiledir('FILE_SYSTEM'); 
+      call utconfig.setreporter('File'); 
+      call utPLSQL.test('calc_quarter_hour'); 
+      -- Closes the fle 
+      call utfilereporter.close(); 
+      -- Returns output redirection to DBMS_OUTPUT 
+      call utconfig.setreporter('Output'); 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>sql</span><span class="token punctuation">></span></span> 
+    
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>target</span><span class="token punctuation">></span></span></code></pre>
+<p>To automate your Ant build, you will need to set up an operating system task that starts the Ant<br>build. The task is very simple and needs to contain only very few lines. The following lines of code<br>contain batch script for the Windows operating system that can be used to invoke the Ant build. This<br>assumes that the java.exe executable is contained within the PATH environment variable.<br>cd C:&#x2F;path_to_project_directory<br>ant<br>You will also need to ensure that the JDBC driver for the Oracle database is contained within your<br>CLASSPATH. If you do not include the JDBC driver in the CLASSPATH, then you will receive an error when<br>you try to execute the build. When the Ant build is executed, a file will be placed onto the database server<br>in the location designated by the FILE_SYSTEM database directory. The file will contain the results of the<br>unit test execution.<br>Ant is a complex build system that can be used for configuration and preparation of your builds and unit<br>tests. It is a widely used build system, especially for organizations that do lots of Java development. As<br>you can see, it is easy to use, but does contain complexity in that there are a number of different tasks<br>and attributes that can be used. This recipe does not even scratch the surface of everything that Ant can<br>do. However, there are lots of sources for documentation on Ant that can be found online as well as in<br>book format. To learn more about Ant, you can start by reading the online documentation that can be<br>found at: <a target="_blank" rel="noopener" href="http://ant.apache.org/manual/">http://ant.apache.org/manual/</a>. </p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"
+                    data-tooltip="Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                    aria-label="NEXT: Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_16/"
+                    data-tooltip="Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                    aria-label="NEXT: Oracle PLSQL Recipes 16-Accessing PL/SQL from JDBC"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://simonteo58.github.io/2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-4u8r0fo0pgap8c0kebqie2krcfxcv3h259cjxizeggkmknhnwzjt04ztqpi1.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2022/11/08/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes_17/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>
