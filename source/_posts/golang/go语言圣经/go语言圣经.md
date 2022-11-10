@@ -244,7 +244,7 @@ func main() {
 练习 1.2： 修改 echo 程序，使其打印每个参数的索引和值，每个一行。
 练习 1.3： 做实验测量潜在低效的版本和使用了 strings.Join 的版本的运行时间差异。（1.6 节讲解了部分 time 包，11.4 节展示了如何写标准测试程序，以得到系统性的性能评测。）
 summary:  
-1. `os`包提供跨平台的方式。具体怎么用要[参考文档](https://pkg.go.dev/os)
+1. `os`包提供跨平台的方式。具体怎么用要[参考文档](https://pkg.go.dev/os),文档主要提供了`type DirEntry`,`type File`,`type FileInfo`
 2. golang定义参数的方式`var a,b,c int=0,0,0`,还有海马运算符
       `s := ""`
       `var s , v string`
@@ -252,7 +252,11 @@ summary:
       `var s string = ""`
       golang字符串类型也可以使用简单的A+B方式进行拼接
       string.Join()方法第一位参数是slice，然后seperator
-3. `for k,v := range os.Args[1:]{}`
+3. for statement commonly
+   1. `for k,v := range os.Args[1:]{}`
+   2. `for condition {}`
+   3. `for {}`
+   4. `for i:=0;i<m;i++{}`
 4. 切片的使用
     ```text
     切片的基本使用，slice[m:n]可以截取切片区间，包头不包尾巴,其中包含n-m个元素
@@ -276,6 +280,13 @@ summary:
 ```
 
 1. `a := make(map[string]int)`
+   1. `var fileMap map[string][]string 定义map`
+   2. `fileMap:= map[string][]string{"kirk":[1,2,3],"zhang":[4,5,6]}`定义map并初始化
+   3. `fileMap:= make(map[string][]string ,5)` make创建map并初始化存储能力
+   4. 增-`fileMap["kirk"]=[1,2,3]`
+   5. 删-`delete(fileMap,"kirk")`
+   6. 改-`fileMap["kirk"]=[4,5,6]`,简介修改`fileMap := newFileMap`这时候地址就改了
+   7. 查-`value, ok := myMap["1234"]; !ok{//处理找到的value}else{}`
 2. golang的传递都是值传递
 
 ## 1.4 GIF动画

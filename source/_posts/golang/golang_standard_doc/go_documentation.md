@@ -5,10 +5,33 @@ categories:
 tag: golang
 ---
 
+
 > source link: <https://pkg.go.dev/std>
 abstarct: Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
 <!-- more -->
 <!-- toc -->
+- [1. archive](#1-archive)
+  - [1.1 tar](#11-tar)
+  - [1.2 zip](#12-zip)
+- [2. bufio](#2-bufio)
+- [3. builtin](#3-builtin)
+- [4. bytes](#4-bytes)
+- [5. compress](#5-compress)
+  - [5.1 bzip2](#51-bzip2)
+  - [5.2 gzip](#52-gzip)
+  - [5.3 lzw](#53-lzw)
+  - [5.4 compress/zlib](#54-compresszlib)
+- [6. container](#6-container)
+  - [6.1 container/heap](#61-containerheap)
+  - [6.2 container/list](#62-containerlist)
+- [7. os](#7-os)
+- [8. time](#8-time)
+- [9. math](#9-math)
+  - [9.1 big](#91-big)
+  - [9.2 bits](#92-bits)
+  - [9.3 cmplx](#93-cmplx)
+  - [9.4 rand](#94-rand)
+
 
 # 1. archive
 
@@ -844,6 +867,7 @@ type Interface
 ## 6.2 container/list
 
 **Overview**
+
 Package list implements a doubly linked list.
 
 To iterate over a list (where l is a *List):
@@ -878,7 +902,8 @@ func (l \*List) Remove(e \*Element) any
 # 7. os
 
 **overview**
-Package os provides a platform-independent interface to operating system functionality. The design is Unix-like, although the error handling is Go-like; failing calls return values of type error rather than error numbers. Often, more information is available within the error. For example, if a call that takes a file name fails, such as Open or Stat, the error will include the failing file name when printed and will be of type *PathError, which may be unpacked for more information.
+
+Package os provides a platform-independent interface to operating system functionality. The design is Unix-like, although the error handling is Go-like; failing calls return values of type error rather than error numbers. Often, more information is available within the error. For example, if a call that takes a file name fails, such as Open or Stat, the error will include the failing file name when printed and will be of type `*PathError`, which may be unpacked for more information.
 
 The os interface is intended to be uniform across all operating systems. Features not generally available appear in the system-specific package syscall.
 
@@ -897,17 +922,19 @@ The file's data can then be read into a slice of bytes. Read and Write take thei
 
 ```golang
 data := make([]byte, 100)
-count, err := file.Read(data)
+count, err := file.Read(data) // put data into data variable
 if err != nil {
 	log.Fatal(err)
 }
 fmt.Printf("read %d bytes: %q\n", count, data[:count])
 ```
+
 Note: The maximum number of concurrent operations on a File may be limited by the OS or the system. The number should be high, but exceeding(adj.超越的) it may degrade(vt.贬低) performance or cause other issues.
 
 summary:  
 1. failing calls return values of type error rather than error numbers.like above open file failed. and emit "open file.go: no such file or directory"
 2.  The maximum number of concurrent operations on a File may be limited by the OS or the system(not know the root cause and knowledge)
+
 
 **Constants**
 ```golang
@@ -932,13 +959,16 @@ const (
 	SEEK_END int = 2 // seek relative to the end
 )
 ```
+
 Deprecated: Use io.SeekStart, io.SeekCurrent, and io.SeekEnd.
+
 ```golang
 const (
 	PathSeparator     = '/' // OS-specific path separator
 	PathListSeparator = ':' // OS-specific path list separator
 )
 ```
+
 ```golang
 const (
 	// The single letters are the abbreviations
@@ -960,13 +990,16 @@ const (
 	// Mask for the type bits. For regular files, none will be set.
 	ModeType = fs.ModeType
 
-	ModePerm = fs.ModePerm // Unix permission bits, 0o777
+	ModePerm = fs.ModePerm // Unix permission bits, 0777
 )
 ```
+
 The defined file mode bits are the most significant bits of the FileMode. The nine least-significant bits are the standard Unix `rwxrwxrwx` permissions. The values of these bits should be considered part of the public API and may be used in wire protocols or disk representations: they must not be changed, although new bits might be added.
+
 ```golang
 const DevNull = "/dev/null"
 ```
+
 DevNull is the name of the operating system's “null device.” On Unix-like systems, it is "/dev/null"; on Windows, "NUL".
 
 **variables**
@@ -975,12 +1008,10 @@ var (
 	// ErrInvalid indicates an invalid argument.
 	// Methods on File will return this error when the receiver is nil.
 	ErrInvalid = fs.ErrInvalid // "invalid argument"
-
 	ErrPermission = fs.ErrPermission // "permission denied"
 	ErrExist      = fs.ErrExist      // "file already exists"
 	ErrNotExist   = fs.ErrNotExist   // "file does not exist"
 	ErrClosed     = fs.ErrClosed     // "file already closed"
-
 	ErrNoDeadline       = errNoDeadline()       // "file type does not support deadline"
 	ErrDeadlineExceeded = errDeadlineExceeded() // "i/o timeout"
 )
@@ -991,7 +1022,8 @@ Errors returned from this package may be tested against these errors with errors
 
 `Stdin`, `Stdout`, and `Stderr` are open Files pointing to the standard input, standard output, and standard error file descriptors.
 
-Note that the Go runtime writes to standard error for panics and crashes; closing Stderr may cause those messages to go elsewhere, perhaps to a file opened later.
+Note that the Go runtime writes to standard error for panics and crashes; closing `Stderr` may cause those messages to go elsewhere, perhaps to a file opened later.
+
 ```golang
 var Args []string
 ```
@@ -1000,12 +1032,15 @@ Args hold the command-line arguments, starting with the program name.
 
 ```golang
 var ErrProcessDone = errors.New("os: process already finished")
+
 ```
-ErrProcessDone indicates a Process has finished.
+
+`ErrProcessDone` indicates a Process has finished.
 
 **fucntion**
 
 **func Chdir(dir string) error**
+
 Chdir changes the current working directory to the named directory. If there is an error, it will be of type *PathError.
 ```golang
 package main
@@ -1031,9 +1066,11 @@ func main() {
 $ Current working directory:  /home/kirkzhang/go-workspace
 
 ```
+
 NOTE : more like `cd` command in linux
 
 **func Chmod(name string, mode FileMode) error**
+
 Chmod changes the mode of the named file to mode. If the file is a symbolic link, it changes the mode of the link's target. If there is an error, it will be of type *PathError.
 
 A different subset of the mode bits are used, depending on the operating system.
@@ -1063,6 +1100,7 @@ func main() {
 ```
 
 **func Chown(name string, uid, gid int) error**
+
 Chown changes the numeric uid and gid of the named file. If the file is a symbolic link, it changes the uid and gid of the link's target. A uid or gid of -1 means to not change that value. If there is an error, it will be of type *PathError.
 
 On Windows or Plan 9, Chown always returns the syscall.EWINDOWS or EPLAN9 error, wrapped in *PathError.
@@ -1073,6 +1111,7 @@ Chtimes changes the access and modification times of the named file, similar to 
 The underlying filesystem may truncate or round the values to a less precise time unit. If there is an error, it will be of type *PathError.
 
 **func Clearenv()**
+
 Clearenv deletes all environment variables.
 func DirFS(dir string) fs.FS
 DirFS returns a file system (an fs.FS) for the tree of files rooted at the directory dir.
@@ -1080,69 +1119,220 @@ DirFS returns a file system (an fs.FS) for the tree of files rooted at the direc
 Note that DirFS("/prefix") only guarantees that the Open calls it makes to the operating system will begin with "/prefix": DirFS("/prefix").Open("file") is the same as os.Open("/prefix/file"). So if /prefix/file is a symbolic link pointing outside the /prefix tree, then using DirFS does not stop the access any more than using os.Open does. Additionally, the root of the fs.FS returned for a relative path, DirFS("prefix"), will be affected by later calls to Chdir. DirFS is therefore not a general substitute for a chroot-style security mechanism when the directory tree contains arbitrary content.
 
 **func Environ() []string**
+
 Environ returns a copy of strings representing the environment, in the form "key=value".
 
 **func Executable() (string, error)**
+
 Executable returns the path name for the executable that started the current process. There is no guarantee that the path is still pointing to the correct executable. If a symlink was used to start the process, depending on the operating system, the result might be the symlink or the path it pointed to. If a stable result is needed, path/filepath.EvalSymlinks might help.
 
 Executable returns an absolute path unless an error occurred.
 
 The main use case is finding resources located relative to an executable.
 
-func Exit(code int)
+**func Exit(code int)**
+
 Exit causes the current program to exit with the given status code. Conventionally, code zero indicates success, non-zero an error. The program terminates immediately; deferred functions are not run.
 
 For portability, the status code should be in the range [0, 125].
-func Expand(s string, mapping func(string) string) string
+
+**func Expand(s string, mapping func(string) string) string**
+
 Expand replaces ${var} or $var in the string based on the mapping function. For example, os.ExpandEnv(s) is equivalent to os.Expand(s, os.Getenv).
-func ExpandEnv(s string) string
+```golang
+
+import (
+	"fmt"
+	"os"
+)
+func main() {
+	mapper := func(placeholderName string) string {
+		switch placeholderName {
+		case "DAY":
+			return "fucker"
+		case "NAME":
+			return "Gopher"
+		}
+		return ""
+	}
+	fmt.Println(os.Expand("Good ${DAY_PART}, $NAME!", mapper))
+}
+
+```
+
+**func ExpandEnv(s string) string**
+
 ExpandEnv replaces ${var} or $var in the string according to the values of the current environment variables. References to undefined variables are replaced by the empty string.
-func Getegid() int
-Getegid returns the numeric effective group id of the caller.
+```golang
+package main
+import (
+	"fmt"
+	"os"
+)
+func main() {
+	os.Setenv("NAME", "gopher")
+	os.Setenv("BURROW", "/usr/gopher")
+	fmt.Println(os.ExpandEnv("$NAME lives in ${BURROW}."))
+}
+```
 
-On Windows, it returns -1.
-func Getenv(key string) string
+```text
+you could read multi-environment by one line
+```
+
+**func Getenv(key string) string**
 Getenv retrieves the value of the environment variable named by the key. It returns the value, which will be empty if the variable is not present. To distinguish between an empty value and an unset value, use LookupEnv.
-func Geteuid() int
 
-func Getgid() int
+```golang
+package main
+import (
+	"fmt"
+	"os"
+)
+func main() {
+
+	os.Setenv("NAME", "gopher")
+	os.Setenv("BURROW", "/usr/gopher")
+	fmt.Printf("%s lives in %s.\n", os.Getenv("NAME"), os.Getenv("BURROW"))
+
+}
+
+```
+
+```text
+you could read environment variable one by one,the other lang also support this way
+```
+
+**func Getegid() int**
+
+Getegid returns the numeric effective group id of the caller.
+On Windows, it returns -1.
+
+
+**func Geteuid() int**
+
 Geteuid returns the numeric effective user id of the caller.
-
 On Windows, it returns -1.
-func Getgroups() ([]int, error)
-Getgid returns the numeric group id of the caller.
 
+**func Getgid() int**
+
+Getgid returns the numeric group id of the caller
 On Windows, it returns -1.
-func Getpagesize() int
-Getgroups returns a list of the numeric ids of groups that the caller belongs to.
 
-On Windows, it returns syscall.EWINDOWS. See the os/user package for a possible alternative.
-func Getpid() int
+**func Getpagesize() int**
+
 Getpagesize returns the underlying system's memory page size.
-func Getppid() int
+
+**func Getpid() int**
 Getpid returns the process id of the caller.
-func Getuid() int
+
+
+**func Getppid() int**
+
+Getppid returns the process id of the caller's parent.
+
+**func Getuid() int**
 Geteuid returns the numeric effective user id of the caller.
 
 On Windows, it returns -1.
-func Getwd() (dir string, err error)
-Getgid returns the numeric group id of the caller.
 
-On Windows, it returns -1.
-func Hostname() (name string, err error)
-func IsExist(err error) bool
-func IsNotExist(err error) bool
-func IsPathSeparator(c uint8) bool
-func IsPermission(err error) bool
-func IsTimeout(err error) bool
-func Lchown(name string, uid, gid int) error
-func Link(oldname, newname string) error
-func LookupEnv(key string) (string, bool)
-func Mkdir(name string, perm FileMode) error
-func MkdirAll(path string, perm FileMode) error
-func MkdirTemp(dir, pattern string) (string, error)
-func NewSyscallError(syscall string, err error) error
-func Pipe() (r *File, w *File, err error)
+**func Getwd() (dir string, err error)**
+Getwd returns a rooted path name corresponding to the current directory. If the current directory can be reached via multiple paths (due to symbolic links), Getwd may return any one of them.
+
+
+**func Hostname() (name string, err error)**
+Hostname returns the host name reported by the kernel.
+
+**func IsExist(err error) bool**
+IsExist returns a boolean indicating whether the error is known to report that a file or directory already exists. It is satisfied by `ErrExist` as well as some syscall errors.
+This function predates(vt.在日期上早于) errors.Is. It only supports errors returned by the os package. New code should use errors.Is(err, fs.ErrExist).
+
+
+**func IsNotExist(err error) bool**
+IsNotExist returns a boolean indicating whether the error is known to report that a file or directory does not exist. It is satisfied by `ErrNotExist` as well as some syscall errors.
+This function predates errors.Is. It only supports errors returned by the os package. New code should use errors.Is(err, fs.ErrNotExist).
+
+**func IsPathSeparator(c uint8) bool**
+IsPathSeparator reports whether c is a directory separator character.
+
+
+**func IsPermission(err error) bool**
+
+IsPermission returns a boolean indicating whether the error is known to report that permission is denied. It is satisfied by ErrPermission as well as some syscall errors.
+
+This function predates errors.Is. It only supports errors returned by the os package. New code should use errors.Is(err, fs.ErrPermission).
+
+**func IsTimeout(err error) bool**
+
+IsTimeout returns a boolean indicating whether the error is known to report that a timeout occurred.
+
+This function predates errors.Is, and the notion of whether an error indicates a timeout can be ambiguous. For example, the Unix error EWOULDBLOCK sometimes indicates a timeout and sometimes does not. New code should use errors.Is with a value appropriate to the call returning the error, such as os.ErrDeadlineExceeded.
+
+**func Lchown(name string, uid, gid int) error**
+Lchown changes the numeric uid and gid of the named file. If the file is a symbolic link, it changes the uid and gid of the link itself. If there is an error, it will be of type `*PathError`.
+
+On Windows, it always returns the syscall.EWINDOWS error, wrapped in `*PathError`.
+
+
+**func Link(oldname, newname string) error**
+
+Link creates newname as a hard link to the oldname file. If there is an error, it will be of type *LinkError.
+
+
+**func LookupEnv(key string) (string, bool)**
+LookupEnv retrieves the value of the environment variable named by the key. If the variable is present in the environment the value (which may be empty) is returned and the boolean is true. Otherwise the returned value will be empty and the boolean will be false.
+
+**func Mkdir(name string, perm FileMode) error**
+Mkdir creates a new directory with the specified name and permission bits (before umask). If there is an error, it will be of type *PathError.
+**func MkdirAll(path string, perm FileMode) error**
+MkdirAll creates a directory named path, along with any necessary parents, and returns nil, or else returns an error. The permission bits perm (before umask) are used for all directories that MkdirAll creates. If path is already a directory, MkdirAll does nothing and returns nil.
+```golang
+package main
+
+import (
+	"log"
+	"os"
+)
+
+func main() {
+	err := os.Mkdir("testdir", 0777)
+	if err != nil && !os.IsExist(err) {
+		log.Fatal(err)
+	}
+	err = os.WriteFile("testdir/testfile.txt", []byte("Hello, Gophers!"), 0660)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
+**func MkdirTemp(dir, pattern string) (string, error)**
+MkdirAll creates a directory named path, along with any necessary parents, and returns nil, or else returns an error. The permission bits perm (before umask) are used for all directories that MkdirAll creates. If path is already a directory, MkdirAll does nothing and returns nil.
+```golang
+import (
+	"log"
+	"os"
+	"path/filepath"
+)
+
+func main() {
+	dir, err := os.MkdirTemp("", "example")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.RemoveAll(dir) // clean up
+
+	file := filepath.Join(dir, "tmpfile")
+	if err := os.WriteFile(file, []byte("content"), 0666); err != nil {
+		log.Fatal(err)
+	}
+}
+
+```
+
+**func NewSyscallError(syscall string, err error) error**
+
+
+**func Pipe() (r *File, w *File, err error)**
 func ReadFile(name string) ([]byte, error)
 func Readlink(name string) (string, error)
 func Remove(name string) error
@@ -1220,15 +1410,6 @@ type SyscallError
 func (e *SyscallError) Error() string
 func (e *SyscallError) Timeout() bool
 func (e *SyscallError) Unwrap() error
-
-
-
-
-
-
-
-
-
 
 
 
