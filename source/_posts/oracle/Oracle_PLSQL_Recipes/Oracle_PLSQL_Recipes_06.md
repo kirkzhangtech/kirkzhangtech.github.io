@@ -14,9 +14,9 @@ coverMeta: out
 
 <!-- toc -->
 
- 
 
-# 6.Type Conversion 
+# 6.Type Conversion
+
 Type conversion takes place in almost every PL/SQL program. It is important to know how to convert 
 from one datatype to another so that your applications can contain more versatility. Not only are 
 datatype conversions important to developers, but they can also be a godsend to database 
@@ -31,9 +31,9 @@ Oracle. There are many datatypes that can be converted using implicit type conve
 not recommended that you rely on implicit conversion, because you never know exactly how Oracle will 
 convert something. The recipes in this chapter will show you more reliable explicit conversion 
 techniques that will give you the ability to convert types in such a way that your application will be rock 
-solid. 
+solid.
 
-## 6-1. Converting a String to a Number 
+## 6-1. Converting a String to a Number
 **Problem** 
 You need to convert some strings into numbers. For instance, your application contains several strings 
 that are entered via a user input screen. These strings need to be converted into numbers so that they 
