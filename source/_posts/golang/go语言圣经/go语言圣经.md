@@ -127,10 +127,11 @@ summary:
         -trimpath
         -toolexec 'cmd args'
         ```
-4. go拥有丰富的库函数
-5. `func` 接收器、函数名、参数列表、返回值列表
+4. go拥有丰富的库函数(😂)
+5. `func (*raft) runFollower(str []string)(err error){ var var_name int = 1 ,var var_cos = customStruct{}}`接收器、函数名、参数列表、返回值列表
 6. 函数的左括号 { 必须和 func 函数声明在同一行上，且位于末尾，不能独占一行(第一节对格式有说明)
-7. gofmt工具把代码格式化为标准格式,只能服从
+7. var,const 定义的变量要初始化
+8. gofmt工具把代码格式化为标准格式,只能服从
 
 ## 1.2 命令行参数(os package)
 
@@ -204,7 +205,6 @@ import (
     "fmt"
     "os"
 )
-
 func main() {
     s, sep := "", ""
     for _, arg := range os.Args[1:] {
@@ -241,15 +241,53 @@ func main() {
 这条语句的输出结果跟 strings.Join 得到的结果很像，只是被放到了一对方括号里。切片都会被打印成这种格式。
 
 练习 1.1： 修改 echo 程序，使其能够打印 os.Args[0]，即被执行命令本身的名字。
+```golang
+package main
+import (
+	"fmt"
+	"os"
+)
+func main() {
+
+	fileName := os.Args[0]
+	if fileName != "" {
+		fmt.Printf("executable name is %s \n", fileName)
+	}
+}
+```
+
 练习 1.2： 修改 echo 程序，使其打印每个参数的索引和值，每个一行。
+```golang
+package main
+import (
+	"fmt"
+	"os"
+)
+func main() {
+	fileName := os.Args[0:]
+	if len(fileName) != 0 {
+		fmt.Printf("param is empty \n")
+		return
+	}
+	for i := 1; i < len(fileName); i++ {
+		fmt.Printf("param[%d]=%s \n", i, fileName[i])
+	}
+}
+```
 练习 1.3： 做实验测量潜在低效的版本和使用了 strings.Join 的版本的运行时间差异。（1.6 节讲解了部分 time 包，11.4 节展示了如何写标准测试程序，以得到系统性的性能评测。）
+```golang
+
+
+```
 summary:  
-1. `os`包提供跨平台的方式。具体怎么用要[参考文档](https://pkg.go.dev/os),文档主要提供了`type DirEntry`,`type File`,`type FileInfo`
+1. `os`包提供跨平台的方式。具体怎么用要[参考文档](https://pkg.go.dev/os),文档主要提供了`type DirEntry`,`type File`,`type FileInfo`,`os.Args`返回的是string切片,os.Args[0]是executable的名字
 2. golang定义参数的方式`var a,b,c int=0,0,0`,还有海马运算符
-      `s := ""`
-      `var s , v string`
-      `var s = ""`
-      `var s string = ""`
+      ```golang
+      s := ""
+      var s , v string
+      var s = ""
+      var s string = ""
+      ```
       golang字符串类型也可以使用简单的A+B方式进行拼接
       string.Join()方法第一位参数是slice，然后seperator
 3. for statement commonly
@@ -262,7 +300,8 @@ summary:
     切片的基本使用，slice[m:n]可以截取切片区间，包头不包尾巴,其中包含n-m个元素
     slice[1:]是从位置1直到末尾
     ```
-5. 所以j=i++非法，而且 ++ 和 -- 都只能放在变量名后面，因此 --i 也非法。
+5. 所以j=i++非法，而且 ++ 和 -- 都只能放在变量名后面，因此 --i 也非法。只能是i++,i--
+6. `time`包
 
 ## 1.3 查找重复的行
 
@@ -290,6 +329,7 @@ summary:
 2. golang的传递都是值传递
 
 ## 1.4 GIF动画
+
 没啥意思，都是介绍功能
 
 ## 1.5 获取URL
@@ -331,7 +371,7 @@ summary:
 |return| you know |
 |select| select {case a: }|
 |struct| 相当于java的类,跟c的struct很像|
-|switch| switch conditional {}|
+|switch| switch conditional {} , switch bool {case true case false }|
 |type| type A struct {}|
 |var| var a , b, int = 0,1 . var ( linkFile int =1  dFile int =2 )|
 
