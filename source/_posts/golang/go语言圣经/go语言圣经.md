@@ -128,8 +128,8 @@ summary:
         -toolexec 'cmd args'
         ```
 4. go拥有丰富的库函数(😂)
-5. `func (*raft) runFollower(str []string)(err error){ var var_name int = 1 ,var var_cos = customStruct{}}`接收器、函数名、参数列表、返回值列表
-6. 函数的左括号 { 必须和 func 函数声明在同一行上，且位于末尾，不能独占一行(第一节对格式有说明)
+5. `func (*raft) runFollower(str []string)(err error){ var var_name int = 1, var A_var A = A{} fmt.Println(A_var) var AA_var *A = &A{}//放回的是地址 fmt.Println(AA_var)}`接收器、函数名、参数列表、返回值列表
+6. 函数的左括号 { 必须和 func 函数声明在同一行上，且位于末尾，不能独占一行(第一节对格式有说明)而在表达式 x+y 中，可在 + 后换行，不能在 + 前换行（译注：以+结尾的话不会被插入分号分隔符，但是以 x 结尾的话则会被分号分隔符，从而导致编译错误
 7. var,const 定义的变量要初始化
 8. gofmt工具把代码格式化为标准格式,只能服从
 
