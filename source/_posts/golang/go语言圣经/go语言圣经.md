@@ -313,7 +313,7 @@ summary:
 |break|退出循环|
 |case|switch case, select case|
 |chan| var ch chan int, ch := make(chan int),ch := make(chan int,1) |
-|const| const( a int,b int ,c string)|
+|const|const (a int    = 1  b int    = 2 c string = "3")|
 |continue| 退出循环 |
 |default| 常见于select {}一起使用 |
 |defer| 函数退出前执行|
@@ -333,7 +333,7 @@ summary:
 |struct| 相当于java的类,跟c的struct很像|
 |switch| switch conditional {}|
 |type| type A struct {}|
-|var| var a , b, int|
+|var| var a , b, int = 0,1 . var ( linkFile int =1  dFile int =2 )|
 
 |内建常量|关键字|
 |---|---|
