@@ -3448,56 +3448,11 @@ if w, ok := w.(*os.File); ok {
     // ...use w...
 }
 ```
+
 summary:
 1. A:=x.(T)这个会检查x的动态类型跟具体类型T是不是一样的，如果一样那么A就是x的具体类型，检查两个类型是不是相同
-2. 第二种，如果x的实际类型是否实现满足T接口类型(一般是指是否实现全部实现对应接口)，那么也会是成功的，那么此时新类型就是T，实际值就是X的实际值(不是x的类型)
+2. 第二种，如果x的实际类型是否实现满足T接口类型(一般是指是否实现全部实现对应接口)，如果成功，那么此时新类型就是T，实际值就是X的实际值(不是x的类型)
 
-
-## 7.11. 基于类型断言区别错误类型
-
-对这些判断的一个缺乏经验的实现可能会去检查错误消息是否包含了特定的子字符串，但是处理I/O错误的逻辑可能一个和另一个平台非常的不同，所以这种方案并不健壮，并且对相同的失败可能会报出各种不同的错误消息。在测试的过程中，通过检查错误消息的子字符串来保证特定的函数以期望的方式失败是非常有用的，但对于线上的代码是不够的。
-
-一个更可靠的方式是使用一个专门的类型来描述结构化的错误。os包中定义了一个PathError类型来描述在文件路径操作中涉及到的失败，像Open或者Delete操作；并且定义了一个叫LinkError的变体来描述涉及到两个文件路径的操作，像Symlink和Rename。这下面是os.PathError：
-
-```golang
-
-
-package main
-
-import (
- "errors"
- "fmt"
- "os"
- "syscall"
-)
-
-type PathError struct {
- Op   string
- Path string
- Err  error
-}
-
-func (e *PathError) Error() string {
- return e.Op + " " + e.Path + ": " + e.Err.Error()
-}
-
-var ErrNotExist = errors.New("file does not exist")
-
-// IsNotExist returns a boolean indicating whether the error is known to
-// report that a file or directory does not exist. It is satisfied by
-// ErrNotExist as well as some syscall errors.
-func IsNotExist(err error) bool {
- if pe, ok := err.(*PathError); ok {
-  err = pe.Err
- }
- return err == syscall.ENOENT || err == ErrNotExist
-}
-
-func main() {
- _, err := os.Open("/no/such/file")
- fmt.Println(os.IsNotExist(err)) // "true"
-}
-```
 
 ## 7.11. 基于类型断言区别错误类型
 
@@ -3518,9 +3473,10 @@ func IsNotExist(err error) bool {
     return strings.Contains(err.Error(), "file does not exist")
 }
 ```
+
 但是处理I/O错误的逻辑可能一个和另一个平台非常的不同，所以这种方案并不健壮，并且对相同的失败可能会报出各种不同的错误消息。在测试的过程中，通过检查错误消息的子字符串来保证特定的函数以期望的方式失败是非常有用的，但对于线上的代码是不够的。
 
-一个更可靠的方式是使用一个专门的类型来描述结构化的错误。os包中定义了一个PathError类型来描述在文件路径操作中涉及到的失败，像Open或者Delete操作；并且定义了一个叫LinkError的变体来描述涉及到两个文件路径的操作，像Symlink和Rename。这下面是os.PathError：
+一个更可靠的方式是使用一个专门的类型来描述结构化的错误。os包中定义了一个`PathError`类型来描述在文件路径操作中涉及到的失败，像Open或者Delete操作；并且定义了一个叫`LinkError`的变体来描述涉及到两个文件路径的操作，像Symlink和Rename。这下面是os.PathError：
 
 ```golang
 package os
@@ -3536,7 +3492,8 @@ func (e *PathError) Error() string {
     return e.Op + " " + e.Path + ": " + e.Err.Error()
 }
 ```
-大多数调用方都不知道PathError并且通过调用错误本身的Error方法来统一处理所有的错误。尽管PathError的Error方法简单地把这些字段连接起来生成错误消息，PathError的结构保护了内部的错误组件。调用方需要使用类型断言来检测错误的具体类型以便将一种失败和另一种区分开；具体的类型可以比字符串提供更多的细节。
+
+大多数调用方都不知道`PathError`并且通过调用错误本身的Error方法来统一处理所有的错误。尽管PathError的Error方法简单地把这些字段连接起来生成错误消息，PathError的结构保护了内部的错误组件。调用方需要使用类型断言来检测错误的具体类型以便将一种失败和另一种区分开；具体的类型可以比字符串提供更多的细节。
 
 ```golang
 _, err := os.Open("/no/such/file")
