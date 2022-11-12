@@ -412,8 +412,8 @@ func ListenAndServe(addr string, handler Handler) error
 多行注释可以用 /* ... \*/ 来包裹，和其它大多数语言一样。在文件一开头的注释一般都是这种形式，或者一大段的解释性的注释文字也会被这符号包住，来避免每一行都需要加//。在注释中//和/*是没什么意义的，所以不要在注释中再嵌入注释。
 
 
-summary:  
-1. 写之前可以去这[](https://golang.org/pkg)和[](https://godoc.org),找一找是否有现成的pkg
+summary:
+1. 写之前可以去这[golang.org/pkg](https://golang.org/pkg)和[godoc.org](https://godoc.org),找一找是否有现成的pkg
 2. `go doc 包.函数`或者 `go doc 包`
 3. 大段注释使用/**/
 4. 指针是可见的内存地址，`&`操作符可以返回一个变量的内存地址，并且*操作符可以获取指针指向的变量内容，但是在Go语言里没有指针运算，也就是不能像c语言里可以对指针进行加或减操作
@@ -2381,7 +2381,7 @@ type Value interface {
 
 ## 7.5 接口值
 
-概念上讲接口的值,由两部分组成,是其`类型(值)`和`具体类型的值`,他们的组合被称为接口的`动态类型`和`动态值`.
+概念上讲接口的值,由两部分组成,是其`类型`和`具体类型的值`,他们的组合被称为接口的`动态类型`和`动态值`.
 对于像Go语言这种静态类型的语言,类型是编译期的概念;因此一个类型不是一个值。在我们的概念模型中，
 一些提供每个类型信息的值被称为类型描述符，比如类型的名称和方法。在一个接口值中，类型部分代表与之相关类型的描述符。  
 下面语句中，变量w得到了3个不同的值,他们三个的值都是相同的
@@ -2501,7 +2501,7 @@ var x interface{} = time.Now()
 
 ```golang
 
-var w io.Writer
+var w io.Writer // w是接口类型
 fmt.Printf("%T\n", w) // "<nil>"
 w = os.Stdout
 fmt.Printf("%T\n", w) // "*os.File"
@@ -3404,17 +3404,18 @@ func plot(w http.ResponseWriter, r *http.Request) {
 var w io.Writer
 w = os.Stdout
 f := w.(*os.File)      // success: f == os.Stdout
+// T是实际类型，那么断言就是检查两个实际类型是否相等
 c := w.(*bytes.Buffer) // panic: interface holds *os.File, not *bytes.Buffer
 ```
 第二种，如果相反地断言的类型T是一个接口类型，然后类型断言检查是否x的动态类型满足T。如果这个检查成功了，动态值没有获取到；这个结果仍然是一个有相同动态类型和值部分的接口值，但是结果为类型T。换句话说，对一个接口类型的类型断言改变了类型的表述方式，改变了可以获取的方法集合（通常更大），但是它保留了接口值内部的动态类型和值的部分。
 
 在下面的第一个类型断言后，w和rw都持有os.Stdout，因此它们都有一个动态类型*os.File，但是变量w是一个io.Writer类型，只对外公开了文件的Write方法，而rw变量还公开了它的Read方法。
-
 ```golang
 var w io.Writer
-w = os.Stdout
+w = os.Stdout   // 接口类型是有w,但是实际类型确是rw,os.Stdout赋值给rw是因为os.Stdout实现了w方法
 rw := w.(io.ReadWriter) // success: *os.File has both Read and Write
-w = new(ByteCounter)
+// 这里rw类型是T,但是实际值是w的实际值(os.Stdout)
+w = new(ByteCounter) 
 rw = w.(io.ReadWriter) // panic: *ByteCounter has no Read method
 ```
 如果断言操作的对象是一个nil接口值，那么不论被断言的类型是什么这个类型断言都会失败。我们几乎不需要对一个更少限制性的接口类型（更少的方法集合）做断言，因为它表现的就像是赋值操作一样，除了对于nil接口值的情况。
@@ -3447,6 +3448,10 @@ if w, ok := w.(*os.File); ok {
     // ...use w...
 }
 ```
+summary:
+1. A:=x.(T)这个会检查x的动态类型跟具体类型T是不是一样的，如果一样那么A就是x的具体类型，检查两个类型是不是相同
+2. 第二种，如果x的实际类型是否实现满足T接口类型(一般是指是否实现全部实现对应接口)，那么也会是成功的，那么此时新类型就是T，实际值就是X的实际值(不是x的类型)
+
 
 ## 7.11. 基于类型断言区别错误类型
 
@@ -4663,7 +4668,7 @@ func NewReplacer(oldnew ...string) *Replacer
 type Reader struct{ /* ... */ }
 func NewReader(s string) *Reader
 ```
-包名strings并没有出现在任何成员名字中。因为用户会这样引用这些成员strings.Index、strings.Replacer等。
+包名strings并没有出现在任何成员名字中。因为用户会这样引用这些成员`strings.Index`、`strings.Replacer`等。
 
 其它一些包，可能只描述了单一的数据类型，例如html/template和math/rand等，只暴露一个主要的数据结构和与它相关的方法，还有一个以New命名的函数用于创建实例。
 
@@ -4674,9 +4679,11 @@ type Rand struct{ /* ... */ }
 func New(source Source) *Rand
 ```
 
-这可能导致一些名字重复，例如`template.Templat`e`或`rand.Rand`，这就是这些种类的包名往往特别短的原因之一。
+这可能导致一些名字重复，例如`template.Template`或`rand.Rand`，这就是这些种类的包名往往特别短的原因之一。
 
 在另一个极端，还有像`net/http`包那样含有非常多的名字和种类不多的数据类型，因为它们都是要执行一个复杂的复合任务。尽管有将近二十种类型和更多的函数，但是包中最重要的成员名字却是简单明了的：Get、Post、Handle、Error、Client、Server等。
+summary:
+1. 定义良好风格的包名和函数名是非常重要的
 
 
 ## 10.7. 工具
@@ -4685,7 +4692,7 @@ func New(source Source) *Rand
 
 Go语言的工具箱集合了一系列功能的命令集。它可以看作是一个包管理器（类似于Linux中的apt和rpm工具），用于包的查询、计算包的依赖关系、从远程版本控制系统下载它们等任务。它也是一个构建系统，计算文件的依赖关系，然后调用编译器、汇编器和链接器构建程序，虽然它故意被设计成没有标准的make命令那么复杂。它也是一个单元测试和基准测试的驱动程序，我们将在第11章讨论测试话题。
 
-Go语言工具箱的命令有着类似“瑞士军刀”的风格，带着一打的子命令，有一些我们经常用到，例如get、run、build和fmt等。你可以运行go或go help命令查看内置的帮助文档，为了查询方便，我们列出了最常用的命令：
+Go语言工具箱的命令有着类似"瑞士军刀"的风格，带着一打的子命令，有一些我们经常用到，例如get、run、build和fmt等。你可以运行go或go help命令查看内置的帮助文档，为了查询方便，我们列出了最常用的命令：
 
 ```golang
 $ go
@@ -4711,7 +4718,7 @@ Use "go help [command]" for more information about a command.
 
 ### 10.7.1. 工作区结构
 
-对于大多数的Go语言用户，只需要配置一个名叫GOPATH的环境变量，用来指定当前工作目录即可。当需要切换到不同工作区的时候，只要更新GOPATH就可以了。例如，我们在编写本书时将GOPATH设置为
+对于大多数的Go语言用户，只需要配置一个名叫`GOPATH`的环境变量，用来指定当前工作目录即可。当需要切换到不同工作区的时候，只要更新GOPATH就可以了。例如，我们在编写本书时将GOPATH设置为
 ```shell
 $HOME/gobook：
 $ export GOPATH=$HOME/gobook
@@ -4756,6 +4763,7 @@ GOOS="darwin"
 ```
 
 ### 10.7.2. 下载包
+
 使用Go语言工具箱的go命令，不仅可以根据包导入路径找到本地工作区的包，甚至可以从互联网上找到和更新包。
 
 使用命令go get可以下载一个单一的包或者用...下载整个子目录里面的每个包。Go语言工具箱的go命令同时计算并下载所依赖的每个包，这也是前一个例子中golang.org/x/net/html自动出现在本地工作区目录的原因。
@@ -4797,6 +4805,7 @@ go get -u命令只是简单地保证每个包是最新版本，如果是第一�
 练习 10.3: 从 http://gopl.io/ch1/helloworld?go-get=1 获取内容，查看本书的代码的真实托管的网址（go get请求HTML页面时包含了go-get参数，以区别普通的浏览器请求）。
 
 ### 10.7.3. 构建包
+
 go build命令编译命令行参数指定的每个包。如果包是一个库，则忽略输出结果；这可以用于检测包是可以正确编译的。如果包的名字是main，go build将调用链接器在当前目录创建一个可执行程序；以导入路径的最后一段作为可执行程序的名字。
 
 由于每个目录只包含一个包，因此每个对应可执行程序或者叫Unix术语中的命令的包，会要求放到一个独立的目录中。这些目录有时候会放在名叫cmd目录的子目录下面，例如用于提供Go文档服务的golang.org/x/tools/cmd/godoc命令就是放在cmd子目录（§10.7.4）。
