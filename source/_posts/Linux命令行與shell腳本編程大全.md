@@ -674,7 +674,72 @@ to_be_continue
 
 ### 7.1.2 修改用户
 
-to_be_continue
+Linux提供了一些不同的工具来修改已有用户账户的信息
+
+```text
+usermod     修改用户账户的字段，还可以指定主要组以及附加组的所属关系
+passwd      修改已有用户的密码
+chpasswd    从文件中读取登录名密码对，并更新密码
+chage       修改密码的过期日期
+chfn        修改用户账户的备注信息
+chsh        修改用户账户的默认登录shell 
+```
+
+1. `usermod` usermod命令是用户账户修改工具中最强大的一个。它能用来修改`/etc/passwd`文件中的大部分字段，只需用与想修改的字段对应的命令行参数就可以了。参数大部分跟`useradd`命令的参数一样（比如，-c修改备注字段，-e修改过期日期，-g修改默认的登录组）。除此之外，还有另外一些可能派上用场的选项。要让账户恢复正常，只要用-U选项就行了。
+  ```text
+   -l修改用户账户的登录名。
+   -L锁定账户，使用户无法登录。
+   -p修改账户的密码。
+   -U解除锁定，使用户能够登录。
+    -L选项尤其实用。它可以将账户锁定，使用户无法登录，同时无需删除账户和用户的数据。
+  ```
+2. passwd和chpasswd,如果只用passwd命令，它会改你自己的密码。系统上的任何用户都能改自己的密码，但只有root用户才有权限改别人的密码。-e选项能强制用户下次登录时修改密码。你可以先给用户设置一个简单的密码，之后再强制在下次登录时改成他们能记住的更复杂的密码。如果需要为系统中的大量用户修改密码，chpasswd命令可以事半功倍。chpasswd命令能从
+标准输入自动读取登录名和密码对（由冒号分割）列表，给密码加密，然后为用户账户设置。你也可以用重定向命令来将含有userid:passwd对的文件重定向给该命令。
+  ```shell
+   # passwd test
+    Changing password for user test. 
+    New UNIX password: 
+    Retype new UNIX password: 
+    passwd: all authentication tokens updated successfully. 
+  ```
+  ```shell
+  # chpasswd < users.txt 
+  ```
+3. chsh、chfn和chage
+   chsh、chfn和chage工具专门用来修改特定的账户信息。chsh命令用来快速修改默认的用户登录shell。使用时必须用shell的全路径名作为参数，不能只用shell名。
+   ```shell
+   # chsh -s /bin/csh test
+   Changing shell for test.
+   Shell changed. 
+   ```
+   chfn命令提供了在/etc/passwd文件的备注字段中存储信息的标准方法。chfn命令会将用于Unix的finger命令的信息存进备注字段，而不是简单地存入一些随机文本（比如名字或昵称之类的），或是将备注字段留空。finger命令可以非常方便地查看Linux系统上的用户信息。
+   ```shell
+   # finger rich
+    Login: rich Name: Rich Blum 
+    Directory: /home/rich Shell: /bin/bash 
+    On since Thu Sep 20 18:03 (EDT) on pts/0 from 192.168.1.2 
+    No mail. 
+    No Plan. 
+   ```
+   如果在使用chfn命令时没有参数，它会向你询问要将哪些适合的内容加进备注字段。
+   ```shell
+   # chfn test
+   Changing finger information for test. 
+   Name []: Ima Test 
+   Office []: Director of Technology 
+   Office Phone []: (123)555-1234 
+   Home Phone []: (123)555-9876 
+   ```
+   所有的指纹信息现在都存在/etc/passwd文件中了。最后，chage命令用来帮助管理用户账户的有效期。你需要对每个值设置多个参数，如表7-4所示。
+   ```text
+    参 数       描 述
+    -d          设置上次修改密码到现在的天数
+    -E          设置密码过期的日期
+    -I          设置密码过期到锁定账户的天数
+    -m          设置修改密码之间最少要多少天
+    -W          设置密码过期前多久开始出现提醒信息
+   ```
+   chage命令的日期值可以用下面两种方式中的任意一种： YYYY-MM-DD格式的日期 代表从1970年1月1日起到该日期天数的数值chage命令中有个好用的功能是设置账户的过期日期。有了它，你就能创建在特定日期自动过期的临时用户，再也不需要记住删除用户了！过期的账户跟锁定的账户很相似：账户仍然存在，但用户无法用它登录。
 
 ## 7.2 使用linux组
 
