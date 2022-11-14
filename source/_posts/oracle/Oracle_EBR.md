@@ -2,7 +2,13 @@
 title: Edition-Based Redefinition Technical Deep Dive
 categories:
 - oracle
+thumbnailImagePosition: bottom
+# thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
+coverImage: https://user-images.githubusercontent.com/46363359/201715474-35abea08-9840-4b33-a645-210948d5dafc.jpg
+metaAlignment: center
+coverMeta: out
 ---
+
 摘要: 当应用程序的数据库组件在应用程序升级过程中被更新时，大型的关键的应用程序可能会经历几十个小时，甚至更长的停机时间。app的数据库组件在应用程序升级期间进行更新。Oracle数据库推出了基于版本的重新定义（EBR），这是一项革命性的功能，可以在不间断的情况下在线升级应用程序。革命性的功能，它允许在线应用升级，并保证应用的不间断可用性。
 
 <!-- more -->
