@@ -16,3 +16,4 @@ categories:
 |html 标签，作为总结部分||\<text style="font-family:Courier New;color:red"\>\<\/text\>|
 ||https://michaelnielsen.org/blog/principles-of-effective-research/|高校研究个人准则|
 |wsl切换默认suer|--|ubuntu2004.exe config --default-user root|
+|Excel函数大全||http://hanshu.xuewps.com/|

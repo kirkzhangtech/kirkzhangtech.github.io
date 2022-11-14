@@ -73,10 +73,10 @@ SQL小的大部分命名需求实际上是Oracie数据库的需求; Oracle数据
 
 架构对象
 架构对象是存储在数据库中由用户所有的数据或其他对象的逻辑集合。下面的对象类型可以被认为是架构对象:
-- 簇
+- 簇(不知道是什么)
 - 数塘库链接
 - 数据库触发器
-- 维度
+- 维度(不知道是什么)
 - 扩展过程库
 - 索引组织表
 - 索引
@@ -117,8 +117,7 @@ select ename ,empno,sal from scott.emp@test where sal>500;
 **分区语法**
 当引用一个已分区表中的特定分区或子分区时，使用下列语法:
 ```sql
-schema.table_name {PARTITION(partition) |
-Subpartition (subpartition)}
+schema.table_name {PARTITION(partition) | Subpartition (subpartition)}
 ```
 该语法元素具有以下意义;
 - 架构（ schema )
@@ -131,7 +130,14 @@ Subpartition (subpartition)}
     表的子分区名。
 该结构被称为分区扩展表名( partition-extended table name)。分区扩展表名可以没有与之相关的数据库链接。因此，如果你想访问远端数据库上的该对象，就必须创建可以使用以前描述的常用架构对象语法访问的视图(不是太理解)
 
-### 1.2 书类型
+summary:
+1. oracle数据库专业术语，主要是由用户所有的数据或其他对象的逻辑集合，叫架构对象，这些对象主要是为了完成业务逻辑
+2. 常用查询语法，`select ename ,empno,sal from scott.emp@test where sal>500;`
+3. 表分区查询方法,但是具体没使用过，还是不知道怎么查询
+
+
+### 1.2 数据类型
+
 **字符数据**
 `char[(length)]`
 定长字符数据，最长可以到2000字节。length指定了被存储字符的最大长度。如果存储的数据没有达到指定长度，自动补足空格。指定长度时，默认长度的计量单位由NLS_LENGTH_SEMANTICS（默认为字节byte）参数决定，但是我们可以手动指定为char或者byte。oracle建议使用NLS_LENGTH_SEMANTICS来指定计量单位，这样可以提高效率。在plsql中，最大存储长度可以达到32767个字节。使用char时，可以不指定最大长度，此时最大长度为1.
@@ -246,23 +252,30 @@ ROWID代表了物理位置，所以、如果行以不同的形式存储，则该
         Oracle序列名。
     - CURRVAL
         序列的当前值。
-**NEXTVAL**
+- NEXTVAL
 在使用Oracle SEQUENCE值时，伪列NEXTVAL返回序列的下–个值、而且使序列增加1。你可以只在NEXTVAL与序列相关时才引用它:
 [schema.]sequence_name.NEXTVAL
-- schema
-    序列的所有者。如果省略schema，Oracle就假设为当前连接到数据库的用户名。
-- sequence _name
-    Oracle序列名。
-- NEXTVAL
-    序列的下--个值。
-注意:Oracle将只在给定的SQL语句中增加序列，所以，如果语句中包含NEXTVAL的多个
-引用,那么第二个和后继的引用将返回相同的CURRVAL值。
-
-**LEVEL**
+  - schema
+      序列的所有者。如果省略schema，Oracle就假设为当前连接到数据库的用户名。
+  - sequence_name
+      Oracle序列名。
+  - NEXTVAL
+      序列的下-个值。
+    注意:Oracle将只在给定的SQL语句中增加序列，所以，如果语句中包含NEXTVAL的多个引用,那么第二个和后继的引用将返回相同的CURRVAL值。
+- LEVEL
     被分层查询(使用order bu从句)返回的每…行，LEVEL返回1表示根节点，2表示返回根节点的子节点等等。根节点是转换树中的最高节点、子节点是任何非根节点的节点，父节点是有子节点的节点，而叶节点是没有子节点的节点。
-**USER**
+- USER
     该伪列将一直包含你连接到数据库的Oracle用户名。
-**SYSDATE**
+- SYSDATE
     该伪列将包含当前H期和时间。该列是一个标准的Oracle期数据类型。
     在SYSDATE中包含的日期和时间来源于处理查询的服务器，而不是运行查询的客户端。所以，如果你从伦敦的客户工作站连接到东京的服务器.上，那么日期和时间将是东京服务器t的具体日期和时间（而且日期大概会提前Ⅰ天)。
-警告:如果你通过数据库链接返回SYSDATE列（例如，SELECT SYSDATE FROM dual@london )，则会返回被连接的服务器的日期和时间，而不是数据库链接引用的远端服务器的日期和时间。
+    警告:如果你通过数据库链接返回SYSDATE列（例如，SELECT SYSDATE FROM dual@london )，则会返回被连接的服务器的日期和时间，而不是数据库链接引用的远端服务器的日期和时间。
+
+summary:
+1. 字符串类型
+2. 数字类型
+3. 日期，这里边涉及到相关的格式化问题
+4. nil
+5. 定位符,rowid,urowid
+6. 伪列,ROWNUM,currval,nextval,level,user,sysdate
+缺少demo实践
