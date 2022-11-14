@@ -9,12 +9,18 @@ metaAlignment: center
 coverMeta: out
 ---
 
+作者寄语:This book is dedicated to my family.Even though you’re far away, you are still in my heart.
+About the Author: Jason Price is a freelance consultant and former product manager of Oracle Corporation. He has contributed to many of Oracle’s products
+
+<!-- more -->
+
 # 12.Creating Tables, Sequences, Indexes, and Views
+
 In this chapter, you will learn how to perform the following tasks:
 - Create,modify, and drop tables
 - Create and use sequences, which generate a series of numbers
 - Create and use indexes,which can improve the performance of queries
-- Create and use views, which are predefined(adj.[计]预先定义的) queries 
+- Create and use views, which are predefined(adj.[计]预先定义的) queries
 - Examine flashback data archives,which store row changes made over a period of time
 
 ## Tables
