@@ -162,6 +162,7 @@ You don’t need any special tools to install Vue. The following will do just fi
 ```js
 <div id="app"></div>
 <script src="https://unpkg.com/vue"></script>
+// <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script> 非常重要
 <script>
 new Vue({
 el: '#app',
