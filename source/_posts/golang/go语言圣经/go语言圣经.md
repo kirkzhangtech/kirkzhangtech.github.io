@@ -536,7 +536,7 @@ summary:
 |real ||
 |imag ||
 |panic |panic("unknown status)|
-|recover||
+|recover|恢复panic|
 
 Go语言中的函数名、变量名、常量名、类型名、语句标号和包名等所有的命名，都遵循一个简单的命名规则：一个名字必须以一个字母（Unicode字母）或下划线开头，后面可以跟任意数量的**字母**、**数字**或**下划线**。大写字母和小写字母是不同的：heapSort和Heapsort是两个不同的名字。
 
@@ -645,7 +645,6 @@ Go语言主要有四种类型的声明语句:
 
 `boilingF`是包一级的变量在包内可以访问。如果函数没有返回值，那么返回值列表是省略的。函数顺序执行直到遇到return返回语句，如果没有返回语句则是执行到函数末尾，然后返回到函数调用者
 
-summary:  
 1. `fmt`包的使用[fmt](https://pkg.go.dev/fmt@go1.19.3)
 
 ## 2.3 变量
@@ -813,7 +812,7 @@ incr(&v)              // side effect: v is now 2
 fmt.Println(incr(&v)) // "3" (and v is 3)
 ```
 
-每次我们对一个变量取地址，或者复制指针，我们都是为原变量创建了新的别名。例如，*p就是变量v的别名。指针特别有价值的地方在于我们可以不用名字而访问一个变量，但是这是一把双刃剑：要找到一个变量的所有访问者并不容易，我们必须知道变量全部的别名（译注：这是Go语言的垃圾回收器所做的工作）。不仅仅是指针会创建别名，很多其他引用类型也会创建别名，例如slice、map和chan，甚至结构体、数组和接口都会创建所引用变量的别名。
+每次我们对一个变量取地址，或者复制指针，我们都是为原变量创建了新的别名。例如，*p就是变量v的别名。指针特别有价值的地方在于我们可以不用名字而访问一个变量，但是这是一把双刃剑：要找到一个变量的所有访问者并不容易，我们必须知道变量全部的别名（译注：这是Go语言的垃圾回收器所做的工作）。不仅仅是指针会创建别名，很多其他引用类型也会创建别名，例如slice,map和chan，甚至结构体、数组和接口都会创建所引用变量的别名。
 
 指针是实现标准库中flag包的关键技术，它使用命令行参数来设置对应变量的值，而这些对应命令行标志参数的变量可能会零散分布在整个程序中。为了说明这一点，在早些的echo版本中，就包含了两个可选的命令行参数：-n用于忽略行尾的换行符，-s sep用于指定分隔字符（默认是空格）。下面这是第四个版本，对应包路径为gopl.io/ch2/echo4。
 (E5)
@@ -858,6 +857,7 @@ Usage of ./echo4:
         separator (default " ")
 ```
 summary:
+
 1. 指针是真的神奇的一个东西
 2. 这节主要是讲解`flag`包，这个地方很多东西要深挖
 3. E4,*p就是变量v的别名。指针特别有价值的地方在于我们可以不用名字而访问一个变量，但是这是一把双刃剑
@@ -894,13 +894,9 @@ q := new(int)
 fmt.Println(p == q) // "false"
 ```
 当然也可能有特殊情况：如果两个类型都是空的，也就是说类型的大小是0，例如struct{}和[0]int，有可能有相同的地址（依赖具体的语言实现）（译注：请谨慎使用大小为0的类型，因为如果类型的大小为0的话，可能导致Go语言的自动垃圾回收器有不同的行为，具体请查看runtime.SetFinalizer函数相关文档）。
-
 new函数使用通常相对比较少，因为对于结构体来说，直接用字面量语法创建新变量的方法会更灵活（§4.4.1）。
-
 由于new只是一个预定义的函数，它并不是一个关键字，因此我们可以将new名字重新定义为别的类型。例如下面的例子：
-
-
-func delta(old, new int) int { return new - old }
+`func delta(old, new int) int { return new - old }`
 由于new被定义为int类型的变量名，因此在delta函数内部是无法使用内置的new函数的。
 summary: 
 1. new返回的是指针类型
@@ -1039,54 +1035,313 @@ summary:
   medals[2] = "bronze"
   ```
 
-- 对于两个值是否可以用==或!=进行相等比较的能力也和可赋值能力有关系
+
+### 2.4.2. 可赋值性
+
+赋值语句是显式的赋值形式，但是程序中还有很多地方会发生隐式的赋值行为：函数调用会隐式地将调用参数的值赋值给函数的参数变量，一个返回语句会隐式地将返回操作的值赋值给结果变量，一个复合类型的字面量（§4.2）也会产生赋值行为。例如下面的语句：
+
+```golang
+medals := []string{"gold", "silver", "bronze"}
+```
+
+隐式地对slice的每个元素进行赋值操作，类似这样写的行为：
+
+```golang
+medals[0] = "gold"
+medals[1] = "silver"
+medals[2] = "bronze"
+```
+
+map和chan的元素，虽然不是普通的变量，但是也有类似的隐式赋值行为。
+不管是隐式还是显式地赋值，在赋值语句左边的变量和右边最终的求到的值必须有相同的数据类型。更直白地说，只有右边的值对于左边的变量是可赋值的，赋值语句才是允许的。
+可赋值性的规则对于不同类型有着不同要求，对每个新类型特殊的地方我们会专门解释。对于目前我们已经讨论过的类型，它的规则是简单的：类型必须完全匹配，nil可以赋值给任何指针或引用类型的变量。常量（§3.6）则有更灵活的赋值规则，因为这样可以避免不必要的显式的类型转换。
+对于两个值是否可以用==或!=进行相等比较的能力也和可赋值能力有关系：对于任何类型的值的相等比较，第二个值必须是对第一个值类型对应的变量是可赋值的，反之亦然。和前面一样，我们会对每个新类型比较特殊的地方做专门的解释。
+
+summary:
+1. 类型必须完全匹配，nil可以赋值给任何指针或引用类型的变量
+
+
 
 ## 2.5 类型
 
-  ```golang
-  package tempconv
+变量或表达式的类型定义了对应存储值的属性特征，例如数值在内存的存储大小（或者是元素的bit个数），它们在内部是如何表达的，是否支持一些操作符，以及它们自己关联的方法集等。
 
-  import "fmt"
+在任何程序中都会存在一些变量有着相同的内部结构，但是却表示完全不同的概念。例如，一个int类型的变量可以用来表示一个循环的迭代索引、或者一个时间戳、或者一个文件描述符、或者一个月份；一个float64类型的变量可以用来表示每秒移动几米的速度、或者是不同温度单位下的温度；一个字符串可以用来表示一个密码或者一个颜色的名称。
 
-  type Celsius float64    // 摄氏温度
-  type Fahrenheit float64 // 华氏温度
+一个类型声明语句创建了一个新的类型名称，和现有类型具有相同的底层结构。新命名的类型提供了一个方法，用来分隔不同概念的类型，这样即使它们底层类型相同也是不兼容的。
 
-  const (
-      AbsoluteZeroC Celsius = -273.15 // 绝对零度
-      FreezingC     Celsius = 0       // 结冰点温度
-      BoilingC      Celsius = 100     // 沸水温度
-  )
+`type 类型名字 底层类型`
+类型声明语句一般出现在包一级，因此如果新创建的类型名字的首字符大写，则在包外部也可以使用。
 
-  func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9/5 + 32) }
+译注：对于中文汉字，Unicode标志都作为小写字母处理，因此中文的命名默认不能导出；不过国内的用户针对该问题提出了不同的看法，根据RobPike的回复，在Go2中有可能会将中日韩等字符当作大写字母处理。下面是RobPik在 Issue763 的回复：
 
-  func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
+```text
+A solution that's been kicking around for a while:
 
-  ```
+For Go 2 (can't do it before then): Change the definition to “lower case letters and _ are package-local; all else is exported”. Then with non-cased languages, such as Japanese, we can write 日本语 for an exported name and _日本语 for a local name. This rule has no effect, relative to the Go 1 rule, with cased languages. They behave exactly the same.
+```
 
+为了说明类型声明，我们将不同温度单位分别定义为不同的类型:
+
+```golang
+// Package tempconv performs Celsius and Fahrenheit temperature computations.
+package tempconv
+
+import "fmt"
+
+type Celsius float64    // 摄氏温度
+type Fahrenheit float64 // 华氏温度
+
+const (
+    AbsoluteZeroC Celsius = -273.15 // 绝对零度
+    FreezingC     Celsius = 0       // 结冰点温度
+    BoilingC      Celsius = 100     // 沸水温度
+)
+
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9/5 + 32) }
+
+func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
+```
+我们在这个包声明了两种类型：Celsius和Fahrenheit分别对应不同的温度单位。它们虽然有着相同的底层类型float64，但是它们是不同的数据类型，因此它们不可以被相互比较或混在一个表达式运算。刻意区分类型，可以避免一些像无意中使用不同单位的温度混合计算导致的错误；因此需要一个类似Celsius(t)或Fahrenheit(t)形式的显式转型操作才能将float64转为对应的类型。Celsius(t)和Fahrenheit(t)是类型转换操作，它们并不是函数调用。类型转换不会改变值本身，但是会使它们的语义发生变化。另一方面，CToF和FToC两个函数则是对不同温度单位下的温度进行换算，它们会返回不同的值。
+
+对于每一个类型T，都有一个对应的类型转换操作T(x)，用于将x转为T类型(译注：如果T是指针类型，可能会需要用小括弧包装T，比如(*int)(0))。只有当两个类型的底层基础类型相同时，才允许这种转型操作，或者是两者都是指向相同底层结构的指针类型，这些转换只改变类型而不会影响值本身。如果x是可以赋值给T类型的值，那么x必然也可以被转为T类型，但是一般没有这个必要。
+
+数值类型之间的转型也是允许的，并且在字符串和一些特定类型的slice之间也是可以转换的，在下一章我们会看到这样的例子。这类转换可能改变值的表现。例如，将一个浮点数转为整数将丢弃小数部分，将一个字符串转为[]byte类型的slice将拷贝一个字符串数据的副本。在任何情况下，运行时不会发生转换失败的错误（译注: 错误只会发生在编译阶段）。
+
+底层数据类型决定了内部结构和表达方式，也决定是否可以像底层类型一样对内置运算符的支持。这意味着，Celsius和Fahrenheit类型的算术运算行为和底层的float64类型是一样的，正如我们所期望的那样。
+```golang
+fmt.Printf("%g\n", BoilingC-FreezingC) // "100" °C
+boilingF := CToF(BoilingC)
+fmt.Printf("%g\n", boilingF-CToF(FreezingC)) // "180" °F
+fmt.Printf("%g\n", boilingF-FreezingC)       // compile error: type mismatch
+```
+比较运算符==和<也可以用来比较一个命名类型的变量和另一个有相同类型的变量，或有着相同底层类型的未命名类型的值之间做比较。但是如果两个值有着不同的类型，则不能直接进行比较：
+
+```golang
+var c Celsius
+var f Fahrenheit
+fmt.Println(c == 0)          // "true"
+fmt.Println(f >= 0)          // "true"
+fmt.Println(c == f)          // compile error: type mismatch
+fmt.Println(c == Celsius(f)) // "true"!
+```
+注意最后那个语句。尽管看起来像函数调用，但是Celsius(f)是类型转换操作，它并不会改变值，仅仅是改变值的类型而已。测试为真的原因是因为c和f都是零值。
+
+一个命名的类型可以提供书写方便，特别是可以避免一遍又一遍地书写复杂类型（译注：例如用匿名的结构体定义变量）。虽然对于像float64这种简单的底层类型没有简洁很多，但是如果是复杂的类型将会简洁很多，特别是我们即将讨论的结构体类型。
+
+命名类型还可以为该类型的值定义新的行为。这些行为表示为一组关联到该类型的函数集合，我们称为类型的方法集。我们将在第六章中讨论方法的细节，这里只说些简单用法。
+
+下面的声明语句，Celsius类型的参数c出现在了函数名的前面，表示声明的是Celsius类型的一个名叫String的方法，该方法返回该类型对象c带着°C温度单位的字符串:
+
+```golang
+func (c Celsius) String() string { return fmt.Sprintf("%g°C", c) }
+```
+
+许多类型都会定义一个String方法，因为当使用fmt包的打印方法时，将会优先使用该类型对应的String方法返回的结果打印，我们将在7.1节讲述
+
+```golang
+c := FToC(212.0)
+fmt.Println(c.String()) // "100°C"
+fmt.Printf("%v\n", c)   // "100°C"; no need to call String explicitly
+fmt.Printf("%s\n", c)   // "100°C"
+fmt.Println(c)          // "100°C"
+fmt.Printf("%g\n", c)   // "100"; does not call String
+fmt.Println(float64(c)) // "100"; does not call String
+```
+
+summary:
 - 类型声明语句一般出现在包一级，因此如果新创建的类型名字的首字符大写，则在包外部也可以使用
-- `Celsius`和`Fahrenheit`是两种不同类型,`Celsius(t)`或`Fahrenheit(t)`形式的显式转型,`整数`->`小数`回省略小数部分(CPP在这部分有很详细的讨论)
+- `Celsius`和`Fahrenheit`虽然底层类型相同，但却是两种不同类型,`Celsius(t)`或`Fahrenheit(t)`形式的显式转型,`整数`->`小数`会省略小数部分(CPP在这部分有很详细的讨论)
 - 如果两个值有着不同的类型，则不能直接进行比较
-- 命名类型还可以为该类型的值定义新的行为。这些行为表示为一组关联到该类型的函数集合，我们称为类型的方法集后面详细讨论
+- 命名类型还可以为该类型的值定义新的行为。这些行为表示为一组关联到该类型的函数集合，我们称为类型的方法集(后面详细讨论)
 
 ## 2.6 包和文件
+Go语言中的包和其他语言的库或模块的概念类似，目的都是为了支持模块化、封装、单独编译和代码重用。一个包的源代码保存在一个或多个以.go为文件后缀名的源文件中，通常一个包所在目录路径的后缀是包的导入路径；例如包gopl.io/ch1/helloworld对应的目录路径是$GOPATH/src/gopl.io/ch1/helloworld。
+
+每个包都对应一个独立的名字空间。例如，在image包中的Decode函数和在unicode/utf16包中的 Decode函数是不同的。要在外部引用该函数，必须显式使用image.Decode或utf16.Decode形式访问。
+
+包还可以让我们通过控制哪些名字是外部可见的来隐藏内部实现信息。在Go语言中，一个简单的规则是：如果一个名字是大写字母开头的，那么该名字是导出的（译注：因为汉字不区分大小写，因此汉字开头的名字是没有导出的）。
+
+为了演示包基本的用法，先假设我们的温度转换软件已经很流行，我们希望到Go语言社区也能使用这个包。我们该如何做呢？
+
+让我们创建一个名为gopl.io/ch2/tempconv的包，这是前面例子的一个改进版本。（这里我们没有按照惯例按顺序对例子进行编号，因此包路径看起来更像一个真实的包）包代码存储在两个源文件中，用来演示如何在一个源文件声明然后在其他的源文件访问；虽然在现实中，这样小的包一般只需要一个文件。
+
+我们把变量的声明、对应的常量，还有方法都放到tempconv.go源文件中：
+
+```golang
+// Package tempconv performs Celsius and Fahrenheit conversions.
+package tempconv
+
+import "fmt"
+
+type Celsius float64
+type Fahrenheit float64
+
+const (
+    AbsoluteZeroC Celsius = -273.15
+    FreezingC     Celsius = 0
+    BoilingC      Celsius = 100
+)
+
+func (c Celsius) String() string    { return fmt.Sprintf("%g°C", c) }
+func (f Fahrenheit) String() string { return fmt.Sprintf("%g°F", f) }
+```
+转换函数则放在另一个conv.go源文件中：
+```golang
+package tempconv
+
+// CToF converts a Celsius temperature to Fahrenheit.
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9/5 + 32) }
+
+// FToC converts a Fahrenheit temperature to Celsius.
+func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
+
+```
+每个源文件都是以包的声明语句开始，用来指明包的名字。当包被导入的时候，包内的成员将通过类似tempconv.CToF的形式访问。而包级别的名字，例如在一个文件声明的类型和常量，在同一个包的其他源文件也是可以直接访问的，就好像所有代码都在一个文件一样。要注意的是tempconv.go源文件导入了fmt包，但是conv.go源文件并没有，因为这个源文件中的代码并没有用到fmt包。
+
+因为包级别的常量名都是以大写字母开头，它们可以像tempconv.AbsoluteZeroC这样被外部代码访问：
+`fmt.Printf("Brrrr! %v\n", tempconv.AbsoluteZeroC) // "Brrrr! -273.15°C"`
+要将摄氏温度转换为华氏温度，需要先用import语句导入gopl.io/ch2/tempconv包，然后就可以使用下面的代码进行转换了：
+`fmt.Println(tempconv.CToF(tempconv.BoilingC)) // "212°F"`
+在每个源文件的包声明前紧跟着的注释是包注释（§10.7.4）。通常，包注释的第一句应该先是包的功能概要说明。一个包通常只有一个源文件有包注释（译注：如果有多个包注释，目前的文档工具会根据源文件名的先后顺序将它们链接为一个包注释）。如果包注释很大，通常会放到一个独立的doc.go文件中。
+
+练习 2.1： 向tempconv包添加类型、常量和函数用来处理Kelvin绝对温度的转换，Kelvin 绝对零度是−273.15°C，Kelvin绝对温度1K和摄氏度1°C的单位间隔是一样的。
+
+### 2.6.1. 导入包
+在Go语言程序中，每个包都有一个全局唯一的导入路径。导入语句中类似"gopl.io/ch2/tempconv"的字符串对应包的导入路径。Go语言的规范并没有定义这些字符串的具体含义或包来自哪里，它们是由构建工具来解释的。当使用Go语言自带的go工具箱时（第十章），一个导入路径代表一个目录中的一个或多个Go源文件。
+
+除了包的导入路径，每个包还有一个包名，包名一般是短小的名字（并不要求包名是唯一的），包名在包的声明处指定。按照惯例，一个包的名字和包的导入路径的最后一个字段相同，例如gopl.io/ch2/tempconv包的名字一般是tempconv。
+
+要使用gopl.io/ch2/tempconv包，需要先导入：
+```golang
+// Cf converts its numeric argument to Celsius and Fahrenheit.
+package main
+
+import (
+    "fmt"
+    "os"
+    "strconv"
+
+    "gopl.io/ch2/tempconv"
+)
+
+func main() {
+    for _, arg := range os.Args[1:] {
+        t, err := strconv.ParseFloat(arg, 64)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "cf: %v\n", err)
+            os.Exit(1)
+        }
+        f := tempconv.Fahrenheit(t)
+        c := tempconv.Celsius(t)
+        fmt.Printf("%s = %s, %s = %s\n",
+            f, tempconv.FToC(f), c, tempconv.CToF(c))
+    }
+}
+```
+导入语句将导入的包绑定到一个短小的名字，然后通过该短小的名字就可以引用包中导出的全部内容。上面的导入声明将允许我们以tempconv.CToF的形式来访问gopl.io/ch2/tempconv包中的内容。在默认情况下，导入的包绑定到tempconv名字（译注：指包声明语句指定的名字），但是我们也可以绑定到另一个名称，以避免名字冲突（§10.4）。
+
+cf程序将命令行输入的一个温度在Celsius和Fahrenheit温度单位之间转换：
+```shell
+$ go build gopl.io/ch2/cf
+$ ./cf 32
+32°F = 0°C, 32°C = 89.6°F
+$ ./cf 212
+212°F = 100°C, 212°C = 413.6°F
+$ ./cf -40
+-40°F = -40°C, -40°C = -40°F
+
+```
+如果导入了一个包，但是又没有使用该包将被当作一个编译错误处理。这种强制规则可以有效减少不必要的依赖，虽然在调试期间可能会让人讨厌，因为删除一个类似log.Print("got here!")的打印语句可能导致需要同时删除log包导入声明，否则，编译器将会发出一个错误。在这种情况下，我们需要将不必要的导入删除或注释掉。
+
+不过有更好的解决方案，我们可以使用golang.org/x/tools/cmd/goimports导入工具，它可以根据需要自动添加或删除导入的包；许多编辑器都可以集成goimports工具，然后在保存文件的时候自动运行。类似的还有gofmt工具，可以用来格式化Go源文件。
+
+练习 2.2： 写一个通用的单位转换程序，用类似cf程序的方式从命令行读取参数，如果缺省的话则是从标准输入读取参数，然后做类似Celsius和Fahrenheit的单位转换，长度单位可以对应英尺和米，重量单位可以对应磅和公斤等。
+
+### 2.6.2. 包的初始化
+
+包的初始化首先是解决包级变量的依赖顺序，然后按照包级变量声明出现的顺序依次初始化：
+
+```golang
+var a = b + c // a 第三个初始化, 为 3
+var b = f()   // b 第二个初始化, 为 2, 通过调用 f (依赖c)
+var c = 1     // c 第一个初始化, 为 1
+
+func f() int { return c + 1 }
+```
+如果包中含有多个.go源文件，它们将按照发给编译器的顺序进行初始化，Go语言的构建工具首先会将.go文件根据文件名排序，然后依次调用编译器编译。
+
+对于在包级别声明的变量，如果有初始化表达式则用表达式初始化，还有一些没有初始化表达式的，例如某些表格数据初始化并不是一个简单的赋值过程。在这种情况下，我们可以用一个特殊的init初始化函数来简化初始化工作。每个文件都可以包含多个init初始化函数
+`func init() { /* ... */ }`
+这样的init初始化函数除了不能被调用或引用外，其他行为和普通函数类似。在每个文件中的init初始化函数，在程序开始执行时按照它们声明的顺序被自动调用。
+
+每个包在解决依赖的前提下，以导入声明的顺序初始化，每个包只会被初始化一次。因此，如果一个p包导入了q包，那么在p包初始化的时候可以认为q包必然已经初始化过了。初始化工作是自下而上进行的，main包最后被初始化。以这种方式，可以确保在main函数执行之前，所有依赖的包都已经完成初始化工作了。
+
+下面的代码定义了一个PopCount函数，用于返回一个数字中含二进制1bit的个数。它使用init初始化函数来生成辅助表格pc，pc表格用于处理每个8bit宽度的数字含二进制的1bit的bit个数，这样的话在处理64bit宽度的数字时就没有必要循环64次，只需要8次查表就可以了。（这并不是最快的统计1bit数目的算法，但是它可以方便演示init函数的用法，并且演示了如何预生成辅助表格，这是编程中常用的技术）。
+
+```golang
+package popcount
+
+// pc[i] is the population count of i.
+var pc [256]byte
+
+func init() {
+    for i := range pc {
+        pc[i] = pc[i/2] + byte(i&1)
+    }
+}
+
+// PopCount returns the population count (number of set bits) of x.
+func PopCount(x uint64) int {
+    return int(pc[byte(x>>(0*8))] +
+        pc[byte(x>>(1*8))] +
+        pc[byte(x>>(2*8))] +
+        pc[byte(x>>(3*8))] +
+        pc[byte(x>>(4*8))] +
+        pc[byte(x>>(5*8))] +
+        pc[byte(x>>(6*8))] +
+        pc[byte(x>>(7*8))])
+}
+```
+译注：对于pc这类需要复杂处理的初始化，可以通过将初始化逻辑包装为一个匿名函数处理，像下面这样：
+```golang
+// pc[i] is the population count of i.
+var pc [256]byte = func() (pc [256]byte) {
+    for i := range pc {
+        pc[i] = pc[i/2] + byte(i&1)
+    }
+    return
+}()
+```
+要注意的是在init函数中，range循环只使用了索引，省略了没有用到的值部分。循环也可以这样写：
+`for i, _ := range pc {`
+我们在下一节和10.5节还将看到其它使用init函数的地方。
+
+练习 2.3： 重写PopCount函数，用一个循环代替单一的表达式。比较两个版本的性能。（11.4节将展示如何系统地比较两个不同实现的性能。）
+
+练习 2.4： 用移位算法重写PopCount函数，每次测试最右边的1bit，然后统计总数。比较和查表算法的性能差异。
+
+练习 2.5： 表达式x&(x-1)用于将x的最低的一个非零的bit位清零。使用这个算法重写PopCount函数，然后比较性能。
+
+summary:
 
 - `名字空间`每个包都对应一个独立的名字空间,例如，在image包中的Decode函数和在unicode/utf16包中的 Decode函数是不同的。要在外部引用该函数，必须显式使用image.Decode或utf16.Decode形式访问
 - `包的导入`Go语言的规范并没有定义这些源代码的具体含义或包来自哪里，它们是由构建工具来解释的。当使用Go语言自带的go工具箱时（第十章），一个导入路径代表一个目录中的一个或多个Go源文件。
 - `包的初始化`。包级别声明的变量，如果有初始化表达式则用表达式初始化，还有一些没有初始化表达式的。例如`func init() { /* ... */ }`,`init`不能被调用，也不能被声明。包会按照声明的顺序初始化。
 - `包的初始化顺序`。如果一个p包导入了q包，那么在p包初始化的时候可以认为q包必然已经初始化过了。初始化工作是自下而上进行的，main包最后被初始化。以这种方式，可以确保在main函数执行之前，所有依赖的包都已经完成初始化工作了
 
-    复杂初始化可以用以下方式
+复杂初始化可以用以下方式
 
-    ```golang
-    //可以使用匿名函数处理
-    var pc [256]byte = func() (pc [256]byte) {
-      for i := range pc {
-          pc[i] = pc[i/2] + byte(i&1)
-      }
-      return
-    }()
+```golang
+//可以使用匿名函数处理
+var pc [256]byte = func() (pc [256]byte) {
+  for i := range pc {
+  pc[i] = pc[i/2] + byte(i&1)
+  }
+   return
+}()
 
-    ```
+```
   
 ## 2.7. 作用域
 
