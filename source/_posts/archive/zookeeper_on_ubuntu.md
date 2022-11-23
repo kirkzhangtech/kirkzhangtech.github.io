@@ -16,7 +16,7 @@ categories:
 - 将`zookeeper-1`中的`zoo.example.cfg`文件复制一份改名为: `zoo.cfg`
 - 修改`config/zoo.cfg`文件
   - 修改端口: `clientPort=2181`
-  - 修改数据目录: `dataDir=/ashura/zookeeper-1/datalog`
+  - 修改数据目录: `dataDir=/home/kirk/usr/traces/zookeeper_data_log/`
   - 增加以下配置: `server.1=localhost.:2887:3887 server.2=localhost.:2888:3888 server.3=localhost.:2889:3889 admin.serverPort=8000`
 
 完成的配置文件如下:
@@ -56,37 +56,37 @@ server.2=localhost.:2888:3888
 server.3=localhost.:2889:3889
 ```
 将这份zoo.cfg分别复制到zookeeper-2,zookeeper-3的config目录下.
-修改zookeeper2的zoo.cfg中clientPort=2183,dataDir=/ashura/zookeeper-2/datalog
-修改zookeeper3的zoo.cfg中clientPort=2184,dataDir=/ashura/zookeeper-3/datalog
+修改zookeeper2的zoo.cfg中clientPort=2183,dataDir=/home/kirk/usr/traces/zookeeper_data_log/
+修改zookeeper3的zoo.cfg中clientPort=2184,dataDir=/home/kirk/usr/traces/zookeeper_data_log/
 
 创建刚才在配置文件中写的目录
 
 ```bash
-mkdir /ashura/zookeeper-1/datalog
-mkdir /ashura/zookeeper-2/datalog
-mkdir /ashura/zookeeper-3/datalog
+mkdir /home/kirk/usr/traces/zookeeper_data_log
+mkdir /home/kirk/usr/traces/zookeeper_data_log
+mkdir /home/kirk/usr/traces/zookeeper_data_log
 ```
 
 分别{-- 在datalog目录下 --}执行以下命令,写入myid。
 
 ```bash
-echo "1" > /ashura/zookeeper-1/datalog/myid
-echo "2" > /ashura/zookeeper-2/datalog/myid
-echo "3" > /ashura/zookeeper-3/datalog/myid
+echo "1" > /home/kirk/usr/traces/zookeeper_data_log/zookeeper-1/datalog/myid
+echo "2" > /home/kirk/usr/traces/zookeeper_data_log/zookeeper-2/datalog/myid
+echo "3" > /home/kirk/usr/traces/zookeeper_data_log/zookeeper-3/datalog/myid
 ```
 
 最后分别启动zookeeper集群
 
 ```bash
-/ashura/zookeeper-1/bin/zkServer.sh start
-/ashura/zookeeper-2/bin/zkServer.sh start
-/ashura/zookeeper-3/bin/zkServer.sh start
+/opt/zookeeper/apache-zookeeper-3.8.0-1/bin/zkServer.sh start
+/opt/zookeeper/apache-zookeeper-3.8.0-2/bin/zkServer.sh start
+/opt/zookeeper/apache-zookeeper-3.8.0-3/bin/zkServer.sh start
 ```
 
 使用如下命令判断是否启动成功
 
 ```bash
-/ashura/zookeeper-1/bin/zkServer.sh status
-/ashura/zookeeper-2/bin/zkServer.sh status
-/ashura/zookeeper-3/bin/zkServer.sh status
+/opt/zookeeper/apache-zookeeper-3.8.0-3/bin/zkServer.sh status
+/opt/zookeeper/apache-zookeeper-3.8.0-3/bin/zkServer.sh status
+/opt/zookeeper/apache-zookeeper-3.8.0-3/bin/zkServer.sh status
 ```
