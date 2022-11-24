@@ -490,7 +490,7 @@ summary:
 |struct| 相当于java的类,跟c的struct很像|
 |switch| switch conditional {} <br> switch bool {case true case false }select可以没有condition,如果没有默认跟true作比较|
 |type| type ABC struct {}|
-|var| var a , b, int = 0,1 <br> var ( <br> linkFile int =1 <br> dFile int =2 <br> )|
+|var| var a , b, int = 0,1 <br> var ( <br> linkFile int =1 <br> dFile int =2 <br> ) <br> var cards []int = []int{1, 2, 3, 4, 5}|
 
 |内建常量|关键字|
 |---|---|
