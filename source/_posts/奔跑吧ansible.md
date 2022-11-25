@@ -5,15 +5,11 @@ categories:
 ---
 
 
-摘要:
+摘要:fuck them all
+
 <!-- more -->
 
-<!-- toc -->- [3. 第三章 inventory:描述你的服务器](#3-第三章-inventory描述你的服务器)
-  - [3.1 inventory基本参数含义](#31-inventory基本参数含义)
-    - [3.1.1 主机别名和群组](#311-主机别名和群组)
-    - [3.1.2 主机和群组变量，在inventory各自文件中](#312-主机和群组变量在inventory各自文件中)
-    - [3.1.3 动态inventory脚本接口](#313-动态inventory脚本接口)
-    - [3.1.4 add_host模块和group_by模块](#314-add_host模块和group_by模块)
+<!-- toc -->
 
 # 3. 第三章 inventory:描述你的服务器
 

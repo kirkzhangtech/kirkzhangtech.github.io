@@ -591,6 +591,9 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
     `mytest=(one two three four five)`定义了环境变量数组,`echo ${mytest[2]}`使用下标索引可以访问具体值,`echo ${mytest[*]}`可以访问所有的值,`unset mytest[2]`删除某个值,`unset mytest`删除全部
 - 总结
     bash shell会在启动时执行几个启动文件。这些启动文件包含了环境变量的定义，可用于为每个bash会话设置标准环境变量。每次登录Linux系统，bash shell都会访问`/etc/profile`启动文件以及3个针对每个用户的本地启动文件：`$HOME/.bash_profile`、`$HOME/.bash_login`和`$HOME/.profile`。用户可以在这些文件中定制自己想要的环境变量和启动脚本。
+ 
+
+
 
 # 7. linux文件权限
 
