@@ -41,6 +41,11 @@ categories:
   - [3.3 复数](#33-复数)
   - [3.4 布尔类型](#34-布尔类型)
   - [3.5 字符串](#35-字符串)
+    - [3.5.1. 字符串面值](#351-字符串面值)
+    - [3.5.2. Unicode](#352-unicode)
+    - [3.5.3. UTF-8](#353-utf-8)
+    - [3.5.4. 字符串和Byte切片](#354-字符串和byte切片)
+    - [3.5.5. 字符串和数字的转换](#355-字符串和数字的转换)
   - [3.6. 常量](#36-常量)
     - [3.6.1. iota 常量生成器](#361-iota-常量生成器)
     - [3.6.2. 无类型常量](#362-无类型常量)
@@ -1182,6 +1187,13 @@ summary:
 
 ## 2.5 类型
 
+summary:
+- 类型声明语句一般出现在包一级，因此如果新创建的类型名字的首字符大写，则在包外部也可以使用
+- `type Celsius float64`和`var Fahrenheit float64`虽然底层类型相同，但却是两种不同类型,`Celsius(t)`或`Fahrenheit(t)`形式的显式转型,`整数`->`小数`会省略小数部分(CPP在这部分有很详细的讨论),类型转换不会改变值本身
+- 可能会需要用小括弧包装T，比如( *int )(0)。只有当两个类型的底层基础类型相同时，才允许这种转型操作，或者是两者都是指向相同底层结构的指针类型，这些转换只改变类型而不会影响值本身
+- 如果两个值有着不同的类型，不能直接进行比较,但是相同的却可以直接比较
+- 命名类型提供了很方便书写体验，还可以为该类型的值定义新的行为。这些行为表示为一组关联到该类型的函数集合，我们称为类型的方法集(后面详细讨论)
+
 变量或表达式的类型定义了对应存储值的属性特征，例如数值在内存的存储大小（或者是元素的bit个数），它们在内部是如何表达的，是否支持一些操作符，以及它们自己关联的方法集等。
 
 在任何程序中都会存在一些变量有着相同的内部结构，但是却表示完全不同的概念。例如，一个int类型的变量可以用来表示一个循环的迭代索引、或者一个时间戳、或者一个文件描述符、或者一个月份；一个float64类型的变量可以用来表示每秒移动几米的速度、或者是不同温度单位下的温度；一个字符串可以用来表示一个密码或者一个颜色的名称。
@@ -1220,7 +1232,8 @@ func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9/5 + 32) }
 
 func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
 ```
-我们在这个包声明了两种类型：Celsius和Fahrenheit分别对应不同的温度单位。它们虽然有着相同的底层类型float64，但是它们是不同的数据类型，因此它们不可以被相互比较或混在一个表达式运算。刻意区分类型，可以避免一些像无意中使用不同单位的温度混合计算导致的错误；因此需要一个类似Celsius(t)或Fahrenheit(t)形式的显式转型操作才能将float64转为对应的类型。Celsius(t)和Fahrenheit(t)是类型转换操作，它们并不是函数调用。类型转换不会改变值本身，但是会使它们的语义发生变化。另一方面，CToF和FToC两个函数则是对不同温度单位下的温度进行换算，它们会返回不同的值。
+
+我们在这个包声明了两种类型:Celsius和Fahrenheit分别对应不同的温度单位。它们虽然有着相同的底层类型`float64`，但是它们是不同的数据类型，因此它们不可以被相互比较或混在一个表达式运算。刻意区分类型，可以避免一些像无意中使用不同单位的温度混合计算导致的错误；因此需要一个类似Celsius(t)或Fahrenheit(t)形式的显式转型操作才能将float64转为对应的类型。`Celsius(t)`和`Fahrenheit(t)`是类型转换操作，它们并不是函数调用。类型转换不会改变值本身，但是会使它们的语义发生变化。另一方面，CToF和FToC两个函数则是对不同温度单位下的温度进行换算，它们会返回不同的值。
 
 对于每一个类型T，都有一个对应的类型转换操作T(x)，用于将x转为T类型(译注：如果T是指针类型，可能会需要用小括弧包装T，比如(*int)(0))。只有当两个类型的底层基础类型相同时，才允许这种转型操作，或者是两者都是指向相同底层结构的指针类型，这些转换只改变类型而不会影响值本身。如果x是可以赋值给T类型的值，那么x必然也可以被转为T类型，但是一般没有这个必要。
 
@@ -1267,13 +1280,13 @@ fmt.Printf("%g\n", c)   // "100"; does not call String
 fmt.Println(float64(c)) // "100"; does not call String
 ```
 
-summary:
-- 类型声明语句一般出现在包一级，因此如果新创建的类型名字的首字符大写，则在包外部也可以使用
-- `Celsius`和`Fahrenheit`虽然底层类型相同，但却是两种不同类型,`Celsius(t)`或`Fahrenheit(t)`形式的显式转型,`整数`->`小数`会省略小数部分(CPP在这部分有很详细的讨论)
-- 如果两个值有着不同的类型，则不能直接进行比较
-- 命名类型还可以为该类型的值定义新的行为。这些行为表示为一组关联到该类型的函数集合，我们称为类型的方法集(后面详细讨论)
-
 ## 2.6 包和文件
+
+summary:
+
+1. 包都有自己独立名字空间，在image包中的Decode函数和在unicode/utf16包中的 Decode函数是不同的，外部引用时候需要指定`包名.类型/函数`，需要主义的是golang导入的是包，也就是导入语句最后的字符串就是包名
+2. golang有个规矩就是包名，类型名，函数名的首字母大小写决定了可见性，一个`包`可以存储多个源代码文件
+
 Go语言中的包和其他语言的库或模块的概念类似，目的都是为了支持模块化、封装、单独编译和代码重用。一个包的源代码保存在一个或多个以.go为文件后缀名的源文件中，通常一个包所在目录路径的后缀是包的导入路径；例如包gopl.io/ch1/helloworld对应的目录路径是$GOPATH/src/gopl.io/ch1/helloworld。
 
 每个包都对应一个独立的名字空间。例如，在image包中的Decode函数和在unicode/utf16包中的 Decode函数是不同的。要在外部引用该函数，必须显式使用image.Decode或utf16.Decode形式访问。
@@ -1326,6 +1339,7 @@ func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
 练习 2.1： 向tempconv包添加类型、常量和函数用来处理Kelvin绝对温度的转换，Kelvin 绝对零度是−273.15°C，Kelvin绝对温度1K和摄氏度1°C的单位间隔是一样的。
 
 ### 2.6.1. 导入包
+
 在Go语言程序中，每个包都有一个全局唯一的导入路径。导入语句中类似"gopl.io/ch2/tempconv"的字符串对应包的导入路径。Go语言的规范并没有定义这些字符串的具体含义或包来自哪里，它们是由构建工具来解释的。当使用Go语言自带的go工具箱时（第十章），一个导入路径代表一个目录中的一个或多个Go源文件。
 
 除了包的导入路径，每个包还有一个包名，包名一般是短小的名字（并不要求包名是唯一的），包名在包的声明处指定。按照惯例，一个包的名字和包的导入路径的最后一个字段相同，例如gopl.io/ch2/tempconv包的名字一般是tempconv。
@@ -1467,7 +1481,7 @@ var pc [256]byte = func() (pc [256]byte) {
 
 不要将作用域和生命周期混为一谈。声明语句的作用域对应的是一个源代码的文本区域；它是一个编译时的属性。一个变量的生命周期是指程序运行时变量存在的有效时间段，在此时间区域内它可以被程序的其他部分引用；是一个运行时的概念。
 
-句法块是由花括弧所包含的一系列语句，就像函数体或循环体花括弧包裹的内容一样。句法块内部声明的名字是无法被外部块访问的。这个块决定了内部声明的名字的作用域范围。我们可以把块（block）的概念推广到包括其他声明的群组，这些声明在代码中并未显式地使用花括号包裹起来，我们称之为词法块。对全局的源代码来说，存在一个整体的词法块，称为全局词法块；对于每个包；每个for、if和switch语句，也都有对应词法块；每个switch或select的分支也有独立的词法块；当然也包括显式书写的词法块（花括弧包含的语句）。
+句法块是由花括弧所包含的一系列语句，就像函数体或循环体花括弧包裹的内容一样。句法块内部声明的名字是无法被外部块访问的。这个块决定了内部声明的名字的作用域范围。我们可以把块(block)的概念推广到包括其他声明的群组，这些声明在代码中并未显式地使用花括号包裹起来，我们称之为词法块。对全局的源代码来说，存在一个整体的词法块，称为全局词法块；对于每个包；每个for、if和switch语句，也都有对应词法块；每个switch或select的分支也有独立的词法块；当然也包括显式书写的词法块（花括弧包含的语句）。
 
 声明语句对应的词法域决定了作用域范围的大小。对于内置的类型、函数和常量，比如int、len和true等是在全局作用域的，因此可以在整个程序中直接使用。任何在函数外部（也就是包级语法域）声明的名字可以在同一个包的任何源文件中访问的。对于导入的包，例如tempconv导入的fmt包，则是对应源文件级的作用域，因此只能在当前的文件中访问导入的fmt包，当前包的其它源文件无法访问在当前源文件导入的包。还有许多声明语句，比如tempconv.CToF函数中的变量c，则是局部作用域的，它只能在函数内部（甚至只能是局部的某些部分）访问。
 
@@ -1836,13 +1850,14 @@ Go语言还提供了以下的bit位操作运算符，前面4个操作运算符�
 &      位运算 AND
 |      位运算 OR
 ^      位运算 XOR
-&^     位清空（AND NOT）
+&^     位清空( AND NOT )
 <<     左移
 >>     右移
 ```
-位操作运算符^作为二元运算符时是按位异或（XOR），当用作一元运算符时表示按位取反；也就是说，它返回一个每个bit位都取反的数。位操作运算符&^用于按位置零（AND NOT）：如果对应y中bit位为1的话，表达式z = x &^ y结果z的对应的bit位为0，否则z对应的bit位等于x相应的bit位的值。
+位操作运算符^作为二元运算符时是按位异或（XOR），当用作一元运算符时表示按位取反；也就是说，它返回一个每个bit位都取反的数。位操作运算符&^用于按位置零(AND NOT): 如果对应y中bit位为1的话，表达式z = x &^ y结果z的对应的bit位为0，否则z对应的bit位等于x相应的bit位的值。
 
-下面的代码演示了如何使用位操作解释uint8类型值的8个独立的bit位。它使用了Printf函数的%b参数打印二进制格式的数字；其中%08b中08表示打印至少8个字符宽度，不足的前缀部分用0填充。
+下面的代码演示了如何使用位操作解释uint8类型值的8个独立的bit位。它使用了Printf函数的%b参数打印二进制格式的数字；其中%08b中08表示打印至少8个字符宽度，不足的前缀部分用0填充.
+
 ```golang
 var x uint8 = 1<<1 | 1<<5
 var y uint8 = 1<<1 | 1<<2
@@ -1860,7 +1875,8 @@ for i := uint(0); i < 8; i++ {
 fmt.Printf("%08b\n", x<<1) // "01000100", the set {2, 6}
 fmt.Printf("%08b\n", x>>1) // "00010001", the set {0, 4}
 ```
-在x<< n和 x>>n移位运算中，决定了移位操作的bit数部分必须是无符号数；被操作的x可以是有符号数或无符号数。算术上，一个x<<n左移运算等价于乘以$2^n$，一个x>>n右移运算等价于除以$2^n$。
+
+在x<< n和 x>>n移位运算中，决定了移位操作的bit数部分必须是无符号数；被操作的x可以是有符号数或无符号数。算术上，一个x<< n左移运算等价于乘以 $2^n$ ，一个x>>n右移运算等价于除以$2^n$。
 
 左移运算用零填充右边空缺的bit位，无符号数的右移运算也是用0填充左边空缺的bit位，但是有符号数的右移运算会用符号位的值填充左边空缺的bit位。因为这个原因，最好用无符号运算，这样你可以将整数完全当作一个bit位模式处理。
 
@@ -1872,22 +1888,26 @@ for i := len(medals) - 1; i >= 0; i-- {
     fmt.Println(medals[i]) // "bronze", "silver", "gold"
 }
 ```
+
 另一个选择对于上面的例子来说将是灾难性的。如果len函数返回一个无符号数，那么i也将是无符号的uint类型，然后条件i >= 0则永远为真。在三次迭代之后，也就是i == 0时，i--语句将不会产生-1，而是变成一个uint类型的最大值（可能是$2^64-1$），然后medals[i]表达式运行时将发生panic异常（§5.9），也就是试图访问一个slice范围以外的元素。
 
 出于这个原因，无符号数往往只有在位运算或其它特殊的运算场景才会使用，就像bit集合、分析二进制文件格式或者是哈希和加密操作等。它们通常并不用于仅仅是表达非负数量的场合。
 
 一般来说，需要一个显式的转换将一个值从一种类型转化为另一种类型，并且算术和逻辑运算的二元操作中必须是相同的类型。虽然这偶尔会导致需要很长的表达式，但是它消除了所有和类型相关的问题，而且也使得程序容易理解。
 
-在很多场景，会遇到类似下面代码的常见的错误：
+在很多场景，会遇到类似下面代码的常见的错误:
+
 ```golang
 var apples int32 = 1
 var oranges int16 = 2
 var compote int = apples + oranges // compile error
 ```
+
 当尝试编译这三个语句时，将产生一个错误信息：`invalid operation: apples + oranges (mismatched types int32 and int16)`
 
 这种类型不匹配的问题可以有几种不同的方法修复，最常见方法是将它们都显式转型为一个常见类型：`var compote = int(apples) + int(oranges)`
-如2.5节所述，对于每种类型T，如果转换允许的话，类型转换操作T(x)将x转换为T类型。许多整数之间的相互转换并不会改变数值；它们只是告诉编译器如何解释这个值。但是对于将一个大尺寸的整数类型转为一个小尺寸的整数类型，或者是将一个浮点数转为整数，可能会改变数值或丢失精度：
+如2.5节所述，对于每种类型T，如果转换允许的话，类型转换操作T(x)将x转换为T类型。许多整数之间的相互转换并不会改变数值；它们只是告诉编译器如何解释这个值。但是对于将一个大尺寸的整数类型转为一个小尺寸的整数类型，或者是将一个浮点数转为整数，可能会改变数值或丢失精度:
+
 ```golang
 f := 3.141 // a float64
 i := int(f)
@@ -1895,14 +1915,18 @@ fmt.Println(f, i) // "3.141 3"
 f = 1.99
 fmt.Println(int(f)) // "1"
 ```
+
 浮点数到整数的转换将丢失任何小数部分，然后向数轴零方向截断。你应该避免对可能会超出目标类型表示范围的数值做类型转换，因为截断的行为可能依赖于具体的实现：
+
 ```golang
 f := 1e100  // a float64
 i := int(f) // 结果依赖于具体实现
 ```
+
 任何大小的整数字面值都可以用以0开始的八进制格式书写，例如0666；或用以0x或0X开头的十六进制格式书写，例如0xdeadbeef。十六进制数字可以用大写或小写字母。如今八进制数据通常用于POSIX操作系统上的文件访问权限标志，十六进制数字则更强调数字值的bit位模式。
 
-当使用fmt包打印一个数值时，我们可以用%d、%o或%x参数控制输出的进制格式，就像下面的例子：
+当使用fmt包打印一个数值时，我们可以用%d、%o或%x参数控制输出的进制格式，就像下面的例子:
+
 ```golang
 o := 0666
 fmt.Printf("%d %[1]o %#[1]o\n", o) // "438 666 0666"
@@ -1911,11 +1935,13 @@ fmt.Printf("%d %[1]x %#[1]x %#[1]X\n", x)
 // Output:
 // 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF
 ```
+
 请注意fmt的两个使用技巧。通常Printf格式化字符串包含多个%参数时将会包含对应相同数量的额外操作数，但是%之后的[1]副词告诉Printf函数再次使用第一个操作数。第二，%后的#副词告诉Printf在用%o、%x或%X输出时生成0、0x或0X前缀。
 
 字符面值通过一对单引号直接包含对应字符。最简单的例子是ASCII中类似'a'写法的字符面值，但是我们也可以通过转义的数值来表示任意的Unicode码点对应的字符，马上将会看到这样的例子。
 
-字符使用%c参数打印，或者是用%q参数打印带单引号的字符：
+字符使用%c参数打印，或者是用%q参数打印带单引号的字符:
+
 ```golang
 ascii := 'a'
 unicode := '国'
@@ -1933,8 +1959,10 @@ summary:
 4. 还有一种无符号的整数类型`uintptr`，没有指定具体的bit大小但是足以容纳指针。`uintptr`类型只有在底层编程时才需要，特别是Go语言和C语言函数库或操作系统接口相交互的地方
 5. `int`、`uint`和`uintptr`是不同类型的兄弟类型。其中`int`和`int32`也是不同的类型，即使`int`的大小也是32bit，在需要将int当作int32类型的地方需要一个显式的类型转换操作，反之亦然
 6. 位元素符号
-7. `int32`和`int64`无法直接四则运算
-8. `fmt.Printf("%d %[1]o %#[1]o\n", o) // "438 666 0666"`中的`fmt`两个使用技巧.(1)%之后的[1]副词告诉Printf函数再次使用第一个操作数.(2)后的#副词告诉Printf在用%o、%x或%X输出时生成0、0x或0X前缀
+7. +x是0+x的简写，-x则是0-x的简写
+8. `int32`和`int64`无法直接四则运算
+9. `fmt.Printf("%d %[1]o %#[1]o\n", o) // "438 666 0666"`中的`fmt`两个使用技巧.(1)%之后的[1]副词告诉Printf函数再次使用第一个操作数.(2)后的#副词告诉Printf在用%o、%x或%X输出时生成0、0x或0X前缀
+
 
 ## 3.2 浮点数
 
@@ -1969,6 +1997,442 @@ if b {
 
 ## 3.5 字符串
 
+一个字符串是一个不可改变的字节序列。字符串可以包含任意的数据，包括byte值0，但是通常是用来包含人类可读的文本。文本字符串通常被解释为采用UTF8编码的Unicode码点（rune）序列，我们稍后会详细讨论这个问题。
+
+内置的len函数可以返回一个字符串中的字节数目（不是rune字符数目），索引操作s[i]返回第i个字节的字节值，i必须满足0 ≤ i< len(s)条件约束。
+
+```golang
+s := "hello, world"
+fmt.Println(len(s))     // "12"
+fmt.Println(s[0], s[7]) // "104 119" ('h' and 'w')
+```
+如果试图访问超出字符串索引范围的字节将会导致panic异常：
+
+```golang
+c := s[len(s)] // panic: index out of range
+```
+
+第i个字节并不一定是字符串的第i个字符，因为对于非ASCII字符的UTF8编码会要两个或多个字节。我们先简单说下字符的工作方式。
+
+子字符串操作s[i:j]基于原始的s字符串的第i个字节开始到第j个字节（并不包含j本身）生成一个新字符串。生成的新字符串将包含j-i个字节。
+
+`fmt.Println(s[0:5]) // "hello"`
+同样，如果索引超出字符串范围或者j小于i的话将导致panic异常。
+
+不管i还是j都可能被忽略，当它们被忽略时将采用0作为开始位置，采用len(s)作为结束的位置。
+
+```golang
+fmt.Println(s[:5]) // "hello"
+fmt.Println(s[7:]) // "world"
+fmt.Println(s[:])  // "hello, world"
+```
+
+其中\+操作符将两个字符串连接构造一个新字符串：
+
+
+fmt.Println("goodbye" + s[5:]) // "goodbye, world"
+字符串可以用==和<进行比较；比较通过逐个字节比较完成的，因此比较的结果是字符串自然编码的顺序。
+
+字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变，当然我们也可以给一个字符串变量分配一个新字符串值。可以像下面这样将一个字符串追加到另一个字符串：
+
+```golang
+s := "left foot"
+t := s
+s += ", right foot"
+```
+
+这并不会导致原始的字符串值被改变，但是变量s将因为+=语句持有一个新的字符串值，但是t依然是包含原先的字符串值。
+
+```golang
+fmt.Println(s) // "left foot, right foot"
+fmt.Println(t) // "left foot"
+```
+
+因为字符串是不可修改的，因此尝试修改字符串内部数据的操作也是被禁止的：
+
+```golang
+s[0] = 'L' // compile error: cannot assign to s[0]
+```
+
+不变性意味着如果两个字符串共享相同的底层数据的话也是安全的，这使得复制任何长度的字符串代价是低廉的。同样，一个字符串s和对应的子字符串切片s[7:]的操作也可以安全地共享相同的内存，因此字符串切片操作代价也是低廉的。在这两种情况下都没有必要分配新的内存。 图3.4演示了一个字符串和两个子串共享相同的底层数据。
+
+### 3.5.1. 字符串面值
+
+字符串值也可以用字符串面值方式编写，只要将一系列字节序列包含在双引号内即可：
+
+```text
+"Hello, world"
+```
+
+因为Go语言源文件总是用UTF8编码，并且Go语言的文本字符串也以UTF8编码的方式处理，因此我们可以将Unicode码点也写到字符串面值中。
+
+在一个双引号包含的字符串面值中，可以用以反斜杠\开头的转义序列插入任意的数据。下面的换行、回车和制表符等是常见的ASCII控制代码的转义方式：
+
+```text
+\a      响铃
+\b      退格
+\f      换页
+\n      换行
+\r      回车
+\t      制表符
+\v      垂直制表符
+\'      单引号（只用在 '\'' 形式的rune符号面值中）
+\"      双引号（只用在 "..." 形式的字符串面值中）
+\\      反斜杠
+```
+
+可以通过十六进制或八进制转义在字符串面值中包含任意的字节。一个十六进制的转义形式是\xhh，其中两个h表示十六进制数字（大写或小写都可以）。一个八进制转义形式是\ooo，包含三个八进制的o数字（0到7），但是不能超过\377（译注：对应一个字节的范围，十进制为255）。每一个单一的字节表达一个特定的值。稍后我们将看到如何将一个Unicode码点写到字符串面值中。
+
+一个原生的字符串面值形式是`...`，使用反引号代替双引号。在原生的字符串面值中，没有转义操作；全部的内容都是字面的意思，包含退格和换行，因此一个程序中的原生字符串面值可能跨越多行（译注：在原生字符串面值内部是无法直接写`字符的，可以用八进制或十六进制转义或+"`"连接字符串常量完成）。唯一的特殊处理是会删除回车以保证在所有平台上的值都是一样的，包括那些把回车也放入文本文件的系统（译注：Windows系统会把回车和换行一起放入文本文件中）。
+
+原生字符串面值用于编写正则表达式会很方便，因为正则表达式往往会包含很多反斜杠。原生字符串面值同时被广泛应用于HTML模板、JSON面值、命令行提示信息以及那些需要扩展到多行的场景。
+
+```golang
+const GoUsage = `Go is a tool for managing Go source code.
+
+Usage:
+    go command [arguments]
+...`
+```
+
+### 3.5.2. Unicode
+在很久以前，世界还是比较简单的，起码计算机世界就只有一个ASCII字符集：美国信息交换标准代码。ASCII，更准确地说是美国的ASCII，使用7bit来表示128个字符：包含英文字母的大小写、数字、各种标点符号和设备控制符。对于早期的计算机程序来说，这些就足够了，但是这也导致了世界上很多其他地区的用户无法直接使用自己的符号系统。随着互联网的发展，混合多种语言的数据变得很常见（译注：比如本身的英文原文或中文翻译都包含了ASCII、中文、日文等多种语言字符）。如何有效处理这些包含了各种语言的丰富多样的文本数据呢？
+
+答案就是使用Unicode（ http://unicode.org ），它收集了这个世界上所有的符号系统，包括重音符号和其它变音符号，制表符和回车符，还有很多神秘的符号，每个符号都分配一个唯一的Unicode码点，Unicode码点对应Go语言中的rune整数类型（译注：rune是int32等价类型）。
+
+在第八版本的Unicode标准里收集了超过120,000个字符，涵盖超过100多种语言。这些在计算机程序和数据中是如何体现的呢？通用的表示一个Unicode码点的数据类型是int32，也就是Go语言中rune对应的类型；它的同义词rune符文正是这个意思。
+
+我们可以将一个符文序列表示为一个int32序列。这种编码方式叫UTF-32或UCS-4，每个Unicode码点都使用同样大小的32bit来表示。这种方式比较简单统一，但是它会浪费很多存储空间，因为大多数计算机可读的文本是ASCII字符，本来每个ASCII字符只需要8bit或1字节就能表示。而且即使是常用的字符也远少于65,536个，也就是说用16bit编码方式就能表达常用字符。但是，还有其它更好的编码方法吗？
+
+### 3.5.3. UTF-8
+UTF8是一个将Unicode码点编码为字节序列的变长编码。UTF8编码是由Go语言之父Ken Thompson和Rob Pike共同发明的，现在已经是Unicode的标准。UTF8编码使用1到4个字节来表示每个Unicode码点，ASCII部分字符只使用1个字节，常用字符部分使用2或3个字节表示。每个符号编码后第一个字节的高端bit位用于表示编码总共有多少个字节。如果第一个字节的高端bit为0，则表示对应7bit的ASCII字符，ASCII字符每个字符依然是一个字节，和传统的ASCII编码兼容。如果第一个字节的高端bit是110，则说明需要2个字节；后续的每个高端bit都以10开头。更大的Unicode码点也是采用类似的策略处理。
+
+```golang
+0xxxxxxx                             runes 0-127    (ASCII)
+110xxxxx 10xxxxxx                    128-2047       (values <128 unused)
+1110xxxx 10xxxxxx 10xxxxxx           2048-65535     (values <2048 unused)
+11110xxx 10xxxxxx 10xxxxxx 10xxxxxx  65536-0x10ffff (other values unused)
+```
+
+变长的编码无法直接通过索引来访问第n个字符，但是UTF8编码获得了很多额外的优点。首先UTF8编码比较紧凑，完全兼容ASCII码，并且可以自动同步：它可以通过向前回朔最多3个字节就能确定当前字符编码的开始字节的位置。它也是一个前缀编码，所以当从左向右解码时不会有任何歧义也并不需要向前查看（译注：像GBK之类的编码，如果不知道起点位置则可能会出现歧义）。没有任何字符的编码是其它字符编码的子串，或是其它编码序列的字串，因此搜索一个字符时只要搜索它的字节编码序列即可，不用担心前后的上下文会对搜索结果产生干扰。同时UTF8编码的顺序和Unicode码点的顺序一致，因此可以直接排序UTF8编码序列。同时因为没有嵌入的NUL(0)字节，可以很好地兼容那些使用NUL作为字符串结尾的编程语言。
+
+Go语言的源文件采用UTF8编码，并且Go语言处理UTF8编码的文本也很出色。unicode包提供了诸多处理rune字符相关功能的函数（比如区分字母和数字，或者是字母的大写和小写转换等），unicode/utf8包则提供了用于rune字符序列的UTF8编码和解码的功能。
+
+有很多Unicode字符很难直接从键盘输入，并且还有很多字符有着相似的结构；有一些甚至是不可见的字符（译注：中文和日文就有很多相似但不同的字）。Go语言字符串面值中的Unicode转义字符让我们可以通过Unicode码点输入特殊的字符。有两种形式：\uhhhh对应16bit的码点值，\Uhhhhhhhh对应32bit的码点值，其中h是一个十六进制数字；一般很少需要使用32bit的形式。每一个对应码点的UTF8编码。例如：下面的字母串面值都表示相同的值：
+
+```golang
+"世界"
+"\xe4\xb8\x96\xe7\x95\x8c"
+"\u4e16\u754c"
+"\U00004e16\U0000754c"
+```
+
+上面三个转义序列都为第一个字符串提供替代写法，但是它们的值都是相同的。
+
+Unicode转义也可以使用在rune字符中。下面三个字符是等价的：
+
+```golang
+'世' '\u4e16' '\U00004e16'
+```
+
+对于小于256的码点值可以写在一个十六进制转义字节中，例如\x41对应字符'A'，但是对于更大的码点则必须使用\u或\U转义形式。因此，\xe4\xb8\x96并不是一个合法的rune字符，虽然这三个字节对应一个有效的UTF8编码的码点。
+
+得益于UTF8编码优良的设计，诸多字符串操作都不需要解码操作。我们可以不用解码直接测试一个字符串是否是另一个字符串的前缀：
+
+```golang
+func HasPrefix(s, prefix string) bool {
+    return len(s) >= len(prefix) && s[:len(prefix)] == prefix
+}
+```
+
+或者是后缀测试：
+
+```golang
+func HasSuffix(s, suffix string) bool {
+    return len(s) >= len(suffix) && s[len(s)-len(suffix):] == suffix
+}
+```
+
+或者是包含子串测试：
+
+```golang
+func Contains(s, substr string) bool {
+    for i := 0; i < len(s); i++ {
+        if HasPrefix(s[i:], substr) {
+            return true
+        }
+    }
+    return false
+}
+```
+对于UTF8编码后文本的处理和原始的字节处理逻辑是一样的。但是对应很多其它编码则并不是这样的。（上面的函数都来自strings字符串处理包，真实的代码包含了一个用哈希技术优化的Contains 实现。）
+
+另一方面，如果我们真的关心每个Unicode字符，我们可以使用其它处理方式。考虑前面的第一个例子中的字符串，它混合了中西两种字符。图3.5展示了它的内存表示形式。字符串包含13个字节，以UTF8形式编码，但是只对应9个Unicode字符：
+
+```golang
+import "unicode/utf8"
+
+s := "Hello, 世界"
+fmt.Println(len(s))                    // "13"
+fmt.Println(utf8.RuneCountInString(s)) // "9"
+```
+
+为了处理这些真实的字符，我们需要一个UTF8解码器。unicode/utf8包提供了该功能，我们可以这样使用：
+
+```golang
+for i := 0; i < len(s); {
+    r, size := utf8.DecodeRuneInString(s[i:])
+    fmt.Printf("%d\t%c\n", i, r)
+    i += size
+}
+```
+
+每一次调用DecodeRuneInString函数都返回一个r和长度，r对应字符本身，长度对应r采用UTF8编码后的编码字节数目。长度可以用于更新第i个字符在字符串中的字节索引位置。但是这种编码方式是笨拙的，我们需要更简洁的语法。幸运的是，Go语言的range循环在处理字符串的时候，会自动隐式解码UTF8字符串。下面的循环运行如图3.5所示；需要注意的是对于非ASCII，索引更新的步长将超过1个字节。
+
+```golang
+for i, r := range "Hello, 世界" {
+    fmt.Printf("%d\t%q\t%d\n", i, r, r)
+}
+```
+
+我们可以使用一个简单的循环来统计字符串中字符的数目，像这样：
+
+```golang
+n := 0
+for _, _ = range s {
+    n++
+}
+```
+
+像其它形式的循环那样，我们也可以忽略不需要的变量：
+
+```golang
+n := 0
+for range s {
+    n++
+}
+```
+
+或者我们可以直接调用utf8.RuneCountInString(s)函数。
+
+正如我们前面提到的，文本字符串采用UTF8编码只是一种惯例，但是对于循环的真正字符串并不是一个惯例，这是正确的。如果用于循环的字符串只是一个普通的二进制数据，或者是含有错误编码的UTF8数据，将会发生什么呢？
+
+每一个UTF8字符解码，不管是显式地调用utf8.DecodeRuneInString解码或是在range循环中隐式地解码，如果遇到一个错误的UTF8编码输入，将生成一个特别的Unicode字符\uFFFD，在印刷中这个符号通常是一个黑色六角或钻石形状，里面包含一个白色的问号"?"。当程序遇到这样的一个字符，通常是一个危险信号，说明输入并不是一个完美没有错误的UTF8字符串。
+
+UTF8字符串作为交换格式是非常方便的，但是在程序内部采用rune序列可能更方便，因为rune大小一致，支持数组索引和方便切割。
+
+将[]rune类型转换应用到UTF8编码的字符串，将返回字符串编码的Unicode码点序列：
+
+```golang
+// "program" in Japanese katakana
+s := "プログラム"
+fmt.Printf("% x\n", s) // "e3 83 97 e3 83 ad e3 82 b0 e3 83 a9 e3 83 a0"
+r := []rune(s)
+fmt.Printf("%x\n", r)  // "[30d7 30ed 30b0 30e9 30e0]"
+```
+
+(在第一个Printf中的% x参数用于在每个十六进制数字前插入一个空格)
+
+如果是将一个[]rune类型的Unicode字符slice或数组转为string，则对它们进行UTF8编码：
+
+```golang
+fmt.Println(string(r)) // "プログラム"
+```
+
+将一个整数转型为字符串意思是生成以只包含对应Unicode码点字符的UTF8字符串：
+
+```golang
+fmt.Println(string(65))     // "A", not "65"
+fmt.Println(string(0x4eac)) // "京"
+```
+
+如果对应码点的字符是无效的，则用\uFFFD无效字符作为替换：
+
+```golang
+fmt.Println(string(1234567)) // "?"
+```
+
+### 3.5.4. 字符串和Byte切片
+标准库中有四个包对字符串处理尤为重要：bytes、strings、strconv和unicode包。strings包提供了许多如字符串的查询、替换、比较、截断、拆分和合并等功能。
+
+bytes包也提供了很多类似功能的函数，但是针对和字符串有着相同结构的[]byte类型。因为字符串是只读的，因此逐步构建字符串会导致很多分配和复制。在这种情况下，使用bytes.Buffer类型将会更有效，稍后我们将展示。
+
+strconv包提供了布尔型、整型数、浮点数和对应字符串的相互转换，还提供了双引号转义相关的转换。
+
+unicode包提供了IsDigit、IsLetter、IsUpper和IsLower等类似功能，它们用于给字符分类。每个函数有一个单一的rune类型的参数，然后返回一个布尔值。而像ToUpper和ToLower之类的转换函数将用于rune字符的大小写转换。所有的这些函数都是遵循Unicode标准定义的字母、数字等分类规范。strings包也有类似的函数，它们是ToUpper和ToLower，将原始字符串的每个字符都做相应的转换，然后返回新的字符串。
+
+下面例子的basename函数灵感源于Unix shell的同名工具。在我们实现的版本中，basename(s)将看起来像是系统路径的前缀删除，同时将看似文件类型的后缀名部分删除：
+
+
+fmt.Println(basename("a/b/c.go")) // "c"
+fmt.Println(basename("c.d.go"))   // "c.d"
+fmt.Println(basename("abc"))      // "abc"
+第一个版本并没有使用任何库，全部手工硬编码实现：
+
+gopl.io/ch3/basename1
+
+
+// basename removes directory components and a .suffix.
+// e.g., a => a, a.go => a, a/b/c.go => c, a/b.c.go => b.c
+func basename(s string) string {
+    // Discard last '/' and everything before.
+    for i := len(s) - 1; i >= 0; i-- {
+        if s[i] == '/' {
+            s = s[i+1:]
+            break
+        }
+    }
+    // Preserve everything before last '.'.
+    for i := len(s) - 1; i >= 0; i-- {
+        if s[i] == '.' {
+            s = s[:i]
+            break
+        }
+    }
+    return s
+}
+这个简化版本使用了strings.LastIndex库函数：
+
+gopl.io/ch3/basename2
+
+
+func basename(s string) string {
+    slash := strings.LastIndex(s, "/") // -1 if "/" not found
+    s = s[slash+1:]
+    if dot := strings.LastIndex(s, "."); dot >= 0 {
+        s = s[:dot]
+    }
+    return s
+}
+path和path/filepath包提供了关于文件路径名更一般的函数操作。使用斜杠分隔路径可以在任何操作系统上工作。斜杠本身不应该用于文件名，但是在其他一些领域可能会用于文件名，例如URL路径组件。相比之下，path/filepath包则使用操作系统本身的路径规则，例如POSIX系统使用/foo/bar，而Microsoft Windows使用c:\foo\bar等。
+
+让我们继续另一个字符串的例子。函数的功能是将一个表示整数值的字符串，每隔三个字符插入一个逗号分隔符，例如“12345”处理后成为“12,345”。这个版本只适用于整数类型；支持浮点数类型的留作练习。
+
+```golang
+gopl.io/ch3/comma
+// comma inserts commas in a non-negative decimal integer string.
+func comma(s string) string {
+    n := len(s)
+    if n <= 3 {
+        return s
+    }
+    return comma(s[:n-3]) + "," + s[n-3:]
+}
+```
+输入comma函数的参数是一个字符串。如果输入字符串的长度小于或等于3的话，则不需要插入逗号分隔符。否则，comma函数将在最后三个字符前的位置将字符串切割为两个子串并插入逗号分隔符，然后通过递归调用自身来得出前面的子串。
+
+一个字符串是包含只读字节的数组，一旦创建，是不可变的。相比之下，一个字节slice的元素则可以自由地修改。
+
+字符串和字节slice之间可以相互转换：
+
+```golang
+s := "abc"
+b := []byte(s)
+s2 := string(b)
+```
+
+从概念上讲，一个[]byte(s)转换是分配了一个新的字节数组用于保存字符串数据的拷贝，然后引用这个底层的字节数组。编译器的优化可以避免在一些场景下分配和复制字符串数据，但总的来说需要确保在变量b被修改的情况下，原始的s字符串也不会改变。将一个字节slice转换到字符串的string(b)操作则是构造一个字符串拷贝，以确保s2字符串是只读的。
+
+为了避免转换中不必要的内存分配，bytes包和strings同时提供了许多实用函数。下面是strings包中的六个函数：
+
+```golang
+func Contains(s, substr string) bool
+func Count(s, sep string) int
+func Fields(s string) []string
+func HasPrefix(s, prefix string) bool
+func Index(s, sep string) int
+func Join(a []string, sep string) string
+```
+
+bytes包中也对应的六个函数：
+
+```golang
+func Contains(b, subslice []byte) bool
+func Count(s, sep []byte) int
+func Fields(s []byte) [][]byte
+func HasPrefix(s, prefix []byte) bool
+func Index(s, sep []byte) int
+func Join(s [][]byte, sep []byte) []byte
+```
+它们之间唯一的区别是字符串类型参数被替换成了字节slice类型的参数。
+
+bytes包还提供了Buffer类型用于字节slice的缓存。一个Buffer开始是空的，但是随着string、byte或[]byte等类型数据的写入可以动态增长，一个bytes.Buffer变量并不需要初始化，因为零值也是有效的：
+
+```golang
+gopl.io/ch3/printints
+// intsToString is like fmt.Sprint(values) but adds commas.
+func intsToString(values []int) string {
+    var buf bytes.Buffer
+    buf.WriteByte('[')
+    for i, v := range values {
+        if i > 0 {
+            buf.WriteString(", ")
+        }
+        fmt.Fprintf(&buf, "%d", v)
+    }
+    buf.WriteByte(']')
+    return buf.String()
+}
+
+func main() {
+    fmt.Println(intsToString([]int{1, 2, 3})) // "[1, 2, 3]"
+}
+```
+当向bytes.Buffer添加任意字符的UTF8编码时，最好使用bytes.Buffer的WriteRune方法，但是WriteByte方法对于写入类似'['和']'等ASCII字符则会更加有效。
+
+bytes.Buffer类型有着很多实用的功能，我们在第七章讨论接口时将会涉及到，我们将看看如何将它用作一个I/O的输入和输出对象，例如当做Fprintf的io.Writer输出对象，或者当作io.Reader类型的输入源对象。
+
+练习 3.10： 编写一个非递归版本的comma函数，使用bytes.Buffer代替字符串链接操作。
+
+练习 3.11： 完善comma函数，以支持浮点数处理和一个可选的正负号的处理。
+
+练习 3.12： 编写一个函数，判断两个字符串是否是相互打乱的，也就是说它们有着相同的字符，但是对应不同的顺序。
+
+### 3.5.5. 字符串和数字的转换
+
+summary:
+
+1. 整数转成字符串,fmt.Sprintf,或者strconv包提供更多的转换函数,例如strconv.Iota()
+2. 字符串转换为数字,strconv.ParseInt
+3. 用fmt.Scanf来解析输入的字符串和数字，特别是当字符串和数字混合在一行的时候，它可以灵活处理不完整或不规则的输入
+
+
+除了字符串、字符、字节之间的转换，字符串和数值之间的转换也比较常见。由strconv包提供这类转换功能。
+
+将一个整数转为字符串，一种方法是用`fmt.Sprintf`返回一个格式化的字符串;
+另一个方法是用strconv.Itoa(“整数到ASCII”)：
+
+```golang
+x := 123
+y := fmt.Sprintf("%d", x)
+fmt.Println(y, strconv.Itoa(x)) // "123 123"
+```
+
+FormatInt和FormatUint函数可以用不同的进制来格式化数字：
+
+```golang
+fmt.Println(strconv.FormatInt(int64(x), 2)) // "1111011"
+```
+
+`fmt.Printf`函数的%b、%d、%o和%x等参数提供功能往往比strconv包的Format函数方便很多，特别是在需要包含有附加额外信息的时候：
+
+```golang
+s := fmt.Sprintf("x=%b", x) // "x=1111011"
+```
+
+如果要将一个字符串解析为整数，可以使用strconv包的Atoi或ParseInt函数，还有用于解析无符号整数的ParseUint函数：
+
+```golang
+x, err := strconv.Atoi("123")             // x is an int
+y, err := strconv.ParseInt("123", 10, 64) // base 10, up to 64 bits
+```
+
+ParseInt函数的第三个参数是用于指定整型数的大小；例如16表示int16，0则表示int。在任何情况下，返回的结果y总是int64类型，你可以通过强制类型转换将它转为更小的整数类型。
+
+有时候也会使用fmt.Scanf来解析输入的字符串和数字，特别是当字符串和数字混合在一行的时候，它可以灵活处理不完整或不规则的输入。
+
+
+
 - 字符串可以用==和<进行比较；比较通过逐个字节比较完成的
 - 字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变.故`s[0] = 'L' // compile error: cannot assign to s[0]`
 
@@ -1999,7 +2463,7 @@ const (
 ```
 所有常量的运算都可以在编译期完成，这样可以减少运行时的工作，也方便其他编译优化。当操作数是常量时，一些运行时的错误也可以在编译时被发现，例如整数除零、字符串索引越界、任何导致无效浮点数的操作等。
 
-常量间的所有算术运算、逻辑运算和比较运算的结果也是常量，对常量的类型转换操作或以下函数调用都是返回常量结果：len、cap、real、imag、complex和unsafe.Sizeof（§13.1）。
+常量间的所有算术运算、逻辑运算和比较运算的结果也是常量，对常量的类型转换操作或以下函数调用都是返回常量结果：len、cap、real、imag、complex和unsafe.Sizeof （§13.1）。
 
 
 因为它们的值是在编译期就确定的，因此常量可以是构成类型的一部分，例如用于指定数组类型的长度：
@@ -2026,6 +2490,7 @@ fmt.Printf("%T %[1]v\n", time.Minute) // "time.Duration 1m0s"
 如果是批量声明的常量，除了第一个外其它的常量右边的初始化表达式都可以省略，如果省略初始化表达式则表示使用前面常量的初始化表达式写法，对应的常量类型也一样的。例如：
 
 ```golang
+[T1]
 const (
     a = 1
     b
@@ -2037,11 +2502,18 @@ const (
 fmt.Println(a, b, c, d) // "1 1 2 2"
 ```
 如果只是简单地复制右边的常量表达式，其实并没有太实用的价值。但是它可以带来其它的特性，那就是iota常量生成器语法。
+
 summary:
-1. 算术运算和逻辑运算，比较运算之后的结果都是常量
-2. 如果省略初始化表达式则表示使用前面常量的初始化表达式写法，如上面例子
+
+1. 算术运算和逻辑运算，比较运算之后的结果都是常量,比如len、cap、real、imag、complex和unsafe.Sizeof
+2. 如果省略初始化表达式则表示使用前面常量的初始化表达式写法，如上面例子[T1]
 
 ### 3.6.1. iota 常量生成器
+
+summary:
+
+1. iota也可以进行运算，但是文章中那种移位运算我是真的草了
+2. 
 
 常量声明可以使用iota常量生成器初始化，它用于生成一组以相似规则初始化的常量，但是不用每行都写一遍初始化表达式。在一个const声明语句中，在第一个声明的常量所在的行，iota将会被置为0，然后在每一个有常量声明的行加一。
 
@@ -2075,11 +2547,10 @@ const (
     FlagMulticast            // supports multicast access capability
 )
 ```
-随着iota的递增，每个常量对应表达式1 << iota，是连续的2的幂，分别对应一个bit位置。使用这些常量可以用于测试、设置或清除对应的bit位的值：
+随着iota的递增，每个常量对应表达式1 << iota，是连续的2的幂，分别对应一个bit位置。使用这些常量可以用于测试、设置或清除对应的bit位的值:
+
 ```golang
 gopl.io/ch3/netflag
-
-
 func IsUp(v Flags) bool     { return v&FlagUp == FlagUp }
 func TurnDown(v *Flags)     { *v &^= FlagUp }
 func SetBroadcast(v *Flags) { *v |= FlagBroadcast }
@@ -2095,6 +2566,7 @@ func main() {
     fmt.Printf("%b %t\n", v, IsCast(v)) // "10010 true"
 }
 ```
+
 下面是一个更复杂的例子，每个常量都是1024的幂：
 
 ```golang
@@ -2110,19 +2582,33 @@ const (
     YiB // 1208925819614629174706176
 )
 ```
+
 不过iota常量生成规则也有其局限性。例如，它并不能用于产生1000的幂（KB、MB等），因为Go语言并没有计算幂的运算符。
 
 练习 3.13： 编写KB、MB的常量声明，然后扩展到YB。
 
 ### 3.6.2. 无类型常量
 
-Go语言的常量有个不同寻常之处。虽然一个常量可以有任意一个确定的基础类型，例如int或float64，或者是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确基础类型的数字常量提供比基础类型更高精度的算术运算；你可以认为至少有256bit的运算精度。这里有六种未明确类型的常量类型，分别是无类型的布尔型、无类型的整数、无类型的字符、无类型的浮点数、无类型的复数、无类型的字符串。
+summary:
 
-通过延迟明确常量的具体类型，无类型的常量不仅可以提供更高的运算精度，而且可以直接用于更多的表达式而不需要显式的类型转换。例如，例子中的ZiB和YiB的值已经超出任何Go语言中整数类型能表达的范围，但是它们依然是合法的常量，而且像下面的常量表达式依然有效（译注：YiB/ZiB是在编译期计算出来的，并且结果常量是1024，是Go语言int变量能有效表示的）：
+1. 无类型的布尔型、无类型的整数、无类型的字符、无类型的浮点数、无类型的复数、无类型的字符串(不要把无符号类型和无类型搞混)
+2. YiB这种常量已经超出了表示范围，但因为是编译期计算得出
+3. 类型的转换。math.pi (untyped float) 转化为float32等等
+4. 通过延迟明确常量的具体类型，无类型的常量不仅可以提供更高的运算精度
+5. 0,0.0,0i和 \u0000,它们分别对应无类型的整数、无类型的浮点数、无类型的复数和无类型的字符
+6. `5/9` is an untyped integer, 0 。 `5.0/9.0` is an untyped float 0
+7. 就像例子E2那样，定义时候不指定类型，那么进行赋值操作的时候就会隐式进行类型转化
+8. 例子E3说明，隐式类型决定了变量的类型，比如`i := 0 `右边确实是无类型，但是会隐式转换为`int`类型
+9. 当尝试将这些无类型的常量转为一个接口值时（见第7章），这些默认类型将显得尤为重要，因为要靠它们明确接口对应的动态类型。
+
+Go语言的常量有个不同寻常之处。虽然一个常量可以有任意一个确定的基础类型，例如int或float64，或者是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确基础类型的数字常量提供比基础类型更高精度的算术运算；你可以认为至少有256bit的运算精度。这里有六种未明确类型的常量类型，分别是无类型的布尔型、无类型的整数(uint,uint8,uint32,uint64)、无类型的字符、无类型的浮点数、无类型的复数、无类型的字符串。
+
+通过延迟明确常量的具体类型，无类型的常量不仅可以提供更高的运算精度，而且可以直接用于更多的表达式而不需要显式的类型转换。例如，例子中的ZiB和YiB的值已经超出任何Go语言中整数类型能表达的范围，但是它们依然是合法的常量，而且像下面的常量表达式依然有效(译注：YiB/ZiB是在编译期计算出来的，并且结果常量是1024，是Go语言int变量能有效表示的):
 
 ```golang
 fmt.Println(YiB/ZiB) // "1024"
 ```
+
 另一个例子，math.Pi无类型的浮点数常量，可以直接用于任意需要浮点数或复数的地方：
 
 ```golang
@@ -2130,7 +2616,9 @@ var x float32 = math.Pi
 var y float64 = math.Pi
 var z complex128 = math.Pi
 ```
+
 如果math.Pi被确定为特定类型，比如float64，那么结果精度可能会不一样，同时对于需要float32或complex128类型值的地方则会强制需要一个明确的类型转换：
+
 ```golang
 const Pi64 float64 = math.Pi
 
@@ -2138,19 +2626,23 @@ var x float32 = float32(Pi64)
 var y float64 = Pi64
 var z complex128 = complex128(Pi64)
 ```
-对于常量面值，不同的写法可能会对应不同的类型。例如0、0.0、0i和\u0000虽然有着相同的常量值，但是它们分别对应无类型的整数、无类型的浮点数、无类型的复数和无类型的字符等不同的常量类型。同样，true和false也是无类型的布尔类型，字符串面值常量是无类型的字符串类型。
 
-前面说过除法运算符/会根据操作数的类型生成对应类型的结果。因此，不同写法的常量除法表达式可能对应不同的结果：
+对于常量面值，不同的写法可能会对应不同的类型。例如0,0.0,0i和 \u0000 虽然有着相同的常量值，但是它们分别对应无类型的整数、无类型的浮点数、无类型的复数和无类型的字符等不同的常量类型。同样，true和false也是无类型的布尔类型，字符串面值常量是无类型的字符串类型。
+
+前面说过除法运算符`/`会根据操作数的类型生成对应类型的结果。因此，不同写法的常量除法表达式可能对应不同的结果：
 
 ```golang
+[E1]
 var f float64 = 212
 fmt.Println((f - 32) * 5 / 9)     // "100"; (f - 32) * 5 is a float64
 fmt.Println(5 / 9 * (f - 32))     // "0";   5/9 is an untyped integer, 0
 fmt.Println(5.0 / 9.0 * (f - 32)) // "100"; 5.0/9.0 is an untyped float
 ```
+
 只有常量可以是无类型的。当一个无类型的常量被赋值给一个变量的时候，就像下面的第一行语句，或者出现在有明确类型的变量声明的右边，如下面的其余三行语句，无类型的常量将会被隐式转换为对应的类型，如果转换合法的话.
 
 ```golang
+[E2]
 var f float64 = 3 + 0i // untyped complex -> float64
 f = 2                  // untyped integer -> float64
 f = 1e123              // untyped floating-point -> float64
@@ -2165,7 +2657,9 @@ f = float64(2)
 f = float64(1e123)
 f = float64('a')
 ```
+
 无论是隐式或显式转换，将一种类型转换为另一种类型都要求目标可以表示原始值。对于浮点数和复数，可能会有舍入处理：
+
 ```golang
 const (
     deadbeef = 0xdeadbeef // untyped int with value 3735928559
@@ -2177,21 +2671,27 @@ const (
     f = uint(-1)          // compile error: constant underflows uint
 )
 ```
+
 对于一个没有显式类型的变量声明（包括简短变量声明），常量的形式将隐式决定变量的默认类型，就像下面的例子：
+
 ```golang
+[E3]
 i := 0      // untyped integer;        implicit int(0)
 r := '\000' // untyped rune;           implicit rune('\000')
 f := 0.0    // untyped floating-point; implicit float64(0.0)
 c := 0i     // untyped complex;        implicit complex128(0i)
 ```
+
 注意有一点不同：无类型整数常量转换为int，它的内存大小是不确定的，但是无类型浮点数和复数常量则转换为内存大小明确的float64和complex128。 如果不知道浮点数类型的内存大小是很难写出正确的数值算法的，因此Go语言不存在整型类似的不确定内存大小的浮点数和复数类型。
 
 如果要给变量一个不同的类型，我们必须显式地将无类型的常量转化为所需的类型，或给声明的变量指定明确的类型，像下面例子这样：
 
 ```golang
+//强制类型转化
 var i = int8(0)
 var i int8 = 0
 ```
+
 当尝试将这些无类型的常量转为一个接口值时（见第7章），这些默认类型将显得尤为重要，因为要靠它们明确接口对应的动态类型。
 
 ```golang
@@ -2203,13 +2703,24 @@ fmt.Printf("%T\n", '\000') // "int32" (rune)
 
 现在我们已经讲述了Go语言中全部的基础数据类型。下一步将演示如何用基础数据类型组合成数组或结构体等复杂数据类型，然后构建用于解决实际编程问题的数据结构，这将是第四章的讨论主题。
 
+
+
 # 4. 复合数据类型
 
 ## 4.1 数组
 
+
+summary:
+
+1. 定义定长数组E1
+2. 定义不定长的数组E2
+3. 定义数组并指定索引初始化E3
+4. 定义数组并将也定位置初始化E4
+
 数组代码示例
 
 ```golang
+[E1]
 var a [3]int             // array of 3 integers
 fmt.Println(a[0])        // print the first element
 fmt.Println(a[len(a)-1]) // print the last element, a[2]
@@ -2228,13 +2739,14 @@ for _, v := range a {
 如果在数组的长度位置出现的是“...”省略号，则表示数组的长度是根据初始化值的个数来计算
 
 ```golang
+[E2]
 q := [...]int{1, 2, 3}
 fmt.Printf("%T\n", q) // "[3]int"
 ```
 
 上面的形式是直接提供顺序初始化值序列，但是也可以指定一个索引和对应值列表的方式初始化
-
 ```golang
+[E3]
 type Currency int
 
 const (
@@ -2244,6 +2756,7 @@ const (
     RMB                 // 人民币
 )
 
+// 指定位置
 symbol := [...]string{USD: "$", EUR: "€", GBP: "￡", RMB: "￥"}
 
 fmt.Println(RMB, symbol[RMB]) // "3 ￥"
@@ -2252,10 +2765,13 @@ fmt.Println(RMB, symbol[RMB]) // "3 ￥"
 定义了一个含有100个元素的数组r，最后一个元素被初始化为-1，其它元素都是用0初始化。
 
 ```golang
+[E4]
+// 指定位置
 r := [...]int{99: -1}
 ```
 
 数组进行比较是比较所有元素是否相等
+
 
 ## 4.2 slice
 
@@ -2268,7 +2784,7 @@ s := []int{0, 1, 2, 3, 4, 5}
 ```
 
 `slice`和`数组`典型的不同就是`slice`不指定长度
-`bytes.Equal`函数来判断两个字节型slice是否相等（[]byte)
+`bytes.Equal`函数来判断两个字节型slice是否相等([]byte)
 
 ```golang
 func equal(x, y []string) bool {
@@ -2299,7 +2815,12 @@ s = []int{}    // len(s) == 0, s != nil
 
 ## 4.3 Map
 
-其中K对应的key必须是支持==比较运算符的数据类型,所以map可以通过测试key是否相等来判断是否已经存在  
+summary:
+
+1. key必须支持==可比较
+2. map返回两个值，第一个值是bool类型,false则说明不存在这个key.
+
+其中K对应的key必须是支持`==`比较运算符的数据类型,所以map可以通过测试key是否相等来判断是否已经存在  
 创建map
 
 ```golang
@@ -2337,9 +2858,7 @@ map的key要求必须是可比较类型，那么如果想用slice作为key就需
 
 ```golang
 var m = make(map[string]int)
-
 func k(list []string) string { return fmt.Sprintf("%q", list) }
-
 func Add(list []string)       { m[k(list)]++ }
 func Count(list []string) int { return m[k(list)] }
 ```
@@ -2357,7 +2876,14 @@ if _, ok := seen[s]; !ok {
 
 ### 4.4.1 结构体字面值
 
+summary:
+
+1. 两种初始化方式具体参考E1，一种是直接按照顺序赋值，另一种是无序，但需要指定字段名
+2. 非导出字段不能在其他包中赋值，具体参考E2
+3. 如果考虑效率的话，较大的结构体通常会用指针的方式传入和返回-- 这是一条非常重要的建议,大对象的移动非常低效,建议指针传值
+
 ```golang
+[E1]
 type Point struct{ X, Y int }
 //第一种类型初始化方式
 p := Point{1, 2}
@@ -2368,6 +2894,7 @@ p :=Point{x:1,y:2}
 非导出结构体或者字段，不能在其他包中进行赋值
 
 ```golang
+[E2]
 package p
 type T struct{ a, b int } // a and b are not exported
 
@@ -2401,10 +2928,15 @@ pp := new(Point)
 
 ### 4.4.2 结构体的比较
 
+summary:
+
+1. E1为什么回事false ? 因为对象地址不同
+
+
 首先结构体是可比较类型
 
 ```golang
-
+[E1]
 type Point struct{ X, Y int }
 
 p := Point{1, 2}
@@ -2416,8 +2948,15 @@ fmt.Println(p == q)                   // "false"
 
 ### 4.4.3 结构体嵌入和匿名成员
 
-```golang
+summary:
 
+1. E1展示了结构体的组合,并赋值的操作
+2. E2说明了如何简化组合结构体的赋值,可以直接用`.`字符进行访问最里层的字段
+3. E3展示了嵌套结构体的初始化过程
+
+
+```golang
+[E1]
 type Point struct {
     X, Y int
 }
@@ -2442,6 +2981,7 @@ w.Spokes = 20
 匿名成员，说白了就是只写类型不写名字.
 
 ```golang
+[E2]
 type Circle struct {
     Point
     Radius int
@@ -2465,9 +3005,12 @@ w = Wheel{X: 8, Y: 8, Radius: 5, Spokes: 20} // compile error: unknown fields
 所以我们只能用下面两种方式进行初始化
 
 ```golang
-
+[E3]
+//都是可导出类型
+// 直接指定
 w = Wheel{Circle{Point{8, 8}, 5}, 20}
 
+// 按照命名初始化
 w = Wheel{
     Circle: Circle{
         Point:  Point{X: 8, Y: 8},
@@ -2492,8 +3035,30 @@ fmt.Printf("%#v\n", w)
 
 ## 4.5 json字符串
 
-`json.Marshal`包
-代码例子
+
+JavaScript对象表示法（JSON）是一种用于发送和接收结构化信息的标准协议。在类似的协议中，JSON并不是唯一的一个标准协议。 XML（§7.14）、ASN.1和Google的Protocol Buffers都是类似的协议，并且有各自的特色，但是由于简洁性、可读性和流行程度等原因，JSON是应用最广泛的一个。
+
+Go语言对于这些标准格式的编码和解码都有良好的支持，由标准库中的encoding/json、encoding/xml、encoding/asn1等包提供支持（译注：Protocol Buffers的支持由 github.com/golang/protobuf 包提供），并且这类包都有着相似的API接口。本节，我们将对重要的encoding/json包的用法做个概述。
+
+JSON是对JavaScript中各种类型的值——字符串、数字、布尔值和对象——Unicode本文编码。它可以用有效可读的方式表示第三章的基础数据类型和本章的数组、slice、结构体和map等聚合数据类型。
+
+基本的JSON类型有数字（十进制或科学记数法）、布尔值（true或false）、字符串，其中字符串是以双引号包含的Unicode字符序列，支持和Go语言类似的反斜杠转义特性，不过JSON使用的是\Uhhhh转义数字来表示一个UTF-16编码（译注：UTF-16和UTF-8一样是一种变长的编码，有些Unicode码点较大的字符需要用4个字节表示；而且UTF-16还有大端和小端的问题），而不是Go语言的rune类型。
+
+这些基础类型可以通过JSON的数组和对象类型进行递归组合。一个JSON数组是一个有序的值序列，写在一个方括号中并以逗号分隔；一个JSON数组可以用于编码Go语言的数组和slice。一个JSON对象是一个字符串到值的映射，写成一系列的name:value对形式，用花括号包含并以逗号分隔；JSON的对象类型可以用于编码Go语言的map类型（key类型是字符串）和结构体。例如：
+
+```golang
+boolean         true
+number          -273.15
+string          "She said \"Hello, BF\""
+array           ["gold", "silver", "bronze"]
+object          {"year": 1980,
+                 "event": "archery",
+                 "medals": ["gold", "silver", "bronze"]}
+
+```
+
+考虑一个应用程序，该程序负责收集各种电影评论并提供反馈功能。它的Movie数据类型和一个典型的表示电影的值列表如下所示。（在结构体声明中，Year和Color成员后面的字符串面值是结构体成员Tag；我们稍后会解释它的作用。）
+
 
 ```golang
 type Movie struct {
@@ -2514,7 +3079,217 @@ var movies = []Movie{
 }
 ```
 
+这样的数据结构特别适合JSON格式，并且在两者之间相互转换也很容易。将一个Go语言中类似movies的结构体slice转为JSON的过程叫编组(marshaling)。编组通过调用json.Marshal函数完成:
+
+```golang
+// slice --> json
+data, err := json.Marshal(movies)
+if err != nil {
+    log.Fatalf("JSON marshaling failed: %s", err)
+}
+fmt.Printf("%s\n", data)
+```
+
+Marshal函数返回一个编码后的字节slice，包含很长的字符串，并且没有空白缩进；我们将它折行以便于显示：
+
+```golang
+[{"Title":"Casablanca","released":1942,"Actors":["Humphrey Bogart","Ingr
+id Bergman"]},{"Title":"Cool Hand Luke","released":1967,"color":true,"Ac
+tors":["Paul Newman"]},{"Title":"Bullitt","released":1968,"color":true,"
+Actors":["Steve McQueen","Jacqueline Bisset"]}]
+```
+这种紧凑的表示形式虽然包含了全部的信息，但是很难阅读。为了生成便于阅读的格式，另一个json.MarshalIndent函数将产生整齐缩进的输出。该函数有两个额外的字符串参数用于表示每一行输出的前缀和每一个层级的缩进：
+上面的代码将产生这样的输出（译注：在最后一个成员或元素后面并没有逗号分隔符）：
+
+```golang
+[
+    {
+        "Title": "Casablanca",
+        "released": 1942,
+        "Actors": [
+            "Humphrey Bogart",
+            "Ingrid Bergman"
+        ]
+    },
+    {
+        "Title": "Cool Hand Luke",
+        "released": 1967,
+        "color": true,
+        "Actors": [
+            "Paul Newman"
+        ]
+    },
+    {
+        "Title": "Bullitt",
+        "released": 1968,
+        "color": true,
+        "Actors": [
+            "Steve McQueen",
+            "Jacqueline Bisset"
+        ]
+    }
+]
+```
+
+在编码时，默认使用Go语言结构体的成员名字作为JSON的对象（通过reflect反射技术，我们将在12.6节讨论）。只有导出的结构体成员才会被编码，这也就是我们为什么选择用大写字母开头的成员名称。
+
+细心的读者可能已经注意到，其中Year名字的成员在编码后变成了released，还有Color成员编码后变成了小写字母开头的color。这是因为结构体成员Tag所导致的。一个结构体成员Tag是和在编译阶段关联到该成员的元信息字符串：
+
+```golang
+Year  int  `json:"released"`
+Color bool `json:"color,omitempty"`
+```
+结构体的成员Tag可以是任意的字符串面值，但是通常是一系列用空格分隔的key:"value"键值对序列；因为值中含有双引号字符，因此成员Tag一般用原生字符串面值的形式书写。json开头键名对应的值用于控制encoding/json包的编码和解码的行为，并且encoding/...下面其它的包也遵循这个约定。成员Tag中json对应值的第一部分用于指定JSON对象的名字，比如将Go语言中的TotalCount成员对应到JSON中的total_count对象。Color成员的Tag还带了一个额外的omitempty选项，表示当Go语言结构体成员为空或零值时不生成该JSON对象（这里false为零值）。果然，Casablanca是一个黑白电影，并没有输出Color成员。
+
+编码的逆操作是解码，对应将JSON数据解码为Go语言的数据结构，Go语言中一般叫unmarshaling，通过json.Unmarshal函数完成。下面的代码将JSON格式的电影数据解码为一个结构体slice，结构体中只有Title成员。通过定义合适的Go语言数据结构，我们可以选择性地解码JSON中感兴趣的成员。当Unmarshal函数调用返回，slice将被只含有Title信息的值填充，其它JSON成员将被忽略。
+
+```golang
+var titles []struct{ Title string }
+if err := json.Unmarshal(data, &titles); err != nil {
+    log.Fatalf("JSON unmarshaling failed: %s", err)
+}
+fmt.Println(titles) // "[{Casablanca} {Cool Hand Luke} {Bullitt}]"
+```
+许多web服务都提供JSON接口，通过HTTP接口发送JSON格式请求并返回JSON格式的信息。为了说明这一点，我们通过Github的issue查询服务来演示类似的用法。首先，我们要定义合适的类型和常量：
+
+```golang
+// Package github provides a Go API for the GitHub issue tracker.
+// See https://developer.github.com/v3/search/#search-issues.
+package github
+
+import "time"
+
+const IssuesURL = "https://api.github.com/search/issues"
+
+type IssuesSearchResult struct {
+    TotalCount int `json:"total_count"`
+    Items          []*Issue
+}
+
+type Issue struct {
+    Number    int
+    HTMLURL   string `json:"html_url"`
+    Title     string
+    State     string
+    User      *User
+    CreatedAt time.Time `json:"created_at"`
+    Body      string    // in Markdown format
+}
+
+type User struct {
+    Login   string
+    HTMLURL string `json:"html_url"`
+}
+```
+
+和前面一样，即使对应的JSON对象名是小写字母，每个结构体的成员名也是声明为大写字母开头的。因为有些JSON成员名字和Go结构体成员名字并不相同，因此需要Go语言结构体成员Tag来指定对应的JSON名字。同样，在解码的时候也需要做同样的处理，GitHub服务返回的信息比我们定义的要多很多。
+
+SearchIssues函数发出一个HTTP请求，然后解码返回的JSON格式的结果。因为用户提供的查询条件可能包含类似?和&之类的特殊字符，为了避免对URL造成冲突，我们用url.QueryEscape来对查询中的特殊字符进行转义操作。
+
+```golang
+package github
+
+import (
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "net/url"
+    "strings"
+)
+
+// SearchIssues queries the GitHub issue tracker.
+func SearchIssues(terms []string) (*IssuesSearchResult, error) {
+    q := url.QueryEscape(strings.Join(terms, " "))
+    resp, err := http.Get(IssuesURL + "?q=" + q)
+    if err != nil {
+        return nil, err
+    }
+
+    // We must close resp.Body on all execution paths.
+    // (Chapter 5 presents 'defer', which makes this simpler.)
+    if resp.StatusCode != http.StatusOK {
+        resp.Body.Close()
+        return nil, fmt.Errorf("search query failed: %s", resp.Status)
+    }
+
+    var result IssuesSearchResult
+    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+        resp.Body.Close()
+        return nil, err
+    }
+    resp.Body.Close()
+    return &result, nil
+}
+```
+在早些的例子中，我们使用了json.Unmarshal函数来将JSON格式的字符串解码为字节slice。但是这个例子中，我们使用了基于流式的解码器json.Decoder，它可以从一个输入流解码JSON数据，尽管这不是必须的。如您所料，还有一个针对输出流的json.Encoder编码对象。
+
+我们调用Decode方法来填充变量。这里有多种方法可以格式化结构。下面是最简单的一种，以一个固定宽度打印每个issue，但是在下一节我们将看到如何利用模板来输出复杂的格式
+```golang
+// Issues prints a table of GitHub issues matching the search terms.
+package main
+
+import (
+    "fmt"
+    "log"
+    "os"
+
+    "gopl.io/ch4/github"
+)
+
+func main() {
+    result, err := github.SearchIssues(os.Args[1:])
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%d issues:\n", result.TotalCount)
+    for _, item := range result.Items {
+        fmt.Printf("#%-5d %9.9s %.55s\n",
+            item.Number, item.User.Login, item.Title)
+    }
+}
+```
+
+通过命令行参数指定检索条件。下面的命令是查询Go语言项目中和JSON解码相关的问题，还有查询返回的结果：
+
+```golang
+$ go build gopl.io/ch4/issues
+$ ./issues repo:golang/go is:open json decoder
+13 issues:
+#5680    eaigner encoding/json: set key converter on en/decoder
+#6050  gopherbot encoding/json: provide tokenizer
+#8658  gopherbot encoding/json: use bufio
+#8462  kortschak encoding/json: UnmarshalText confuses json.Unmarshal
+#5901        rsc encoding/json: allow override type marshaling
+#9812  klauspost encoding/json: string tag not symmetric
+#7872  extempora encoding/json: Encoder internally buffers full output
+#9650    cespare encoding/json: Decoding gives errPhase when unmarshalin
+#6716  gopherbot encoding/json: include field name in unmarshal error me
+#6901  lukescott encoding/json, encoding/xml: option to treat unknown fi
+#6384    joeshaw encoding/json: encode precise floating point integers u
+#6647    btracey x/tools/cmd/godoc: display type kind of each named type
+#4237  gjemiller encoding/base64: URLEncoding padding is optional
+
+```
+GitHub的Web服务接口 https://developer.github.com/v3/ 包含了更多的特性。
+练习 4.10： 修改issues程序，根据问题的时间进行分类，比如不到一个月的、不到一年的、超过一年。
+
+练习 4.11： 编写一个工具，允许用户在命令行创建、读取、更新和关闭GitHub上的issue，当必要的时候自动打开用户默认的编辑器用于输入文本信息。
+
+练习 4.12： 流行的web漫画服务xkcd也提供了JSON接口。例如，一个 https://xkcd.com/571/info.0.json 请求将返回一个很多人喜爱的571编号的详细描述。下载每个链接（只下载一次）然后创建一个离线索引。编写一个xkcd工具，使用这些离线索引，打印和命令行输入的检索词相匹配的漫画的URL。
+
+练习 4.13： 使用开放电影数据库的JSON服务接口，允许你检索和下载 https://omdbapi.com/ 上电影的名字和对应的海报图像。编写一个poster工具，通过命令行输入的电影名字，下载对应的海报。
+
+
 ## 4.6 文本和HTML模板
+
+summary:
+1. template包提供了更复杂的变量填充的方式,一模板是一个字符串或是一个文件,里面包含了多个双花括号
+2. 
+前面的例子，只是最简单的格式化，使用Printf是完全足够的。但是有时候会需要复杂的打印格式，这时候一般需要将格式化代码分离出来以便更安全地修改。这些功能是由text/template和html/template等模板包提供的，它们提供了一个将变量值填充到一个文本或HTML格式的模板的机制。
+
+一个模板是一个字符串或一个文件，里面包含了一个或多个由双花括号包含的{{action}}对象。大部分的字符串只是按字面值打印，但是对于actions部分将触发其它的行为。每个actions都包含了一个用模板语言书写的表达式，一个action虽然简短但是可以输出复杂的打印值，模板语言包含通过选择结构体的成员、调用函数或方法、表达式控制流if-else语句和range循环语句，还有其它实例化模板等诸多特性。下面是一个简单的模板字符串：
+
+
 
 (后面需要时候着重的看)
 `text/template和html/template`,们提供了一个将变量值填充到一个文本或HTML格式的模板的机制。模板语言支持流程控制语句

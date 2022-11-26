@@ -1,5 +1,5 @@
 ---
-title: 线性表
+title: 王道数据结构
 categories: 
 - 算法
 thumbnailImagePosition: bottom
