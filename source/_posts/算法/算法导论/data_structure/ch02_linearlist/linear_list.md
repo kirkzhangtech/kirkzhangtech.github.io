@@ -79,3 +79,30 @@ L.data=new ElemType[Initsize] //初始化指定长度;
 ```
 顺序表最主要的特点是随机访问，即通过首地址和元素序号可在时间 O(1)内找到指定的元素。
 顺序表的存储密度高，每个结点只存储数据元素。顺序表逻辑上相邻的元素物理上也相邻，所以插入和删除操作需要移动大量元素
+
+### 2.2.2 顺序表上基本操作的实现
+
+1. 插入数据
+在顺序表L的i位置插入元素e
+
+```c
+
+// 1,2,3,4,5,6
+// 0,1,2,3,4,5
+bool ListInsert(Sqlist &L , int i ,ElemType e){
+    if (i<1 || i> L.length+1){
+        return false;
+    }
+    if (L.length>=MaxSize){
+        return false
+    }
+    // 简化了程序，这个地方要试探是否可以重新开辟一个单元数据
+    for (int j=L.length ; j>=i ;j--){
+            L.data[j]=L.data[j-1]
+    }
+    L.data[i-1]=e
+    L.length++
+    return true
+}
+
+```
