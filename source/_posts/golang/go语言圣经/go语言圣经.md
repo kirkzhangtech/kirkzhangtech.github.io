@@ -57,9 +57,9 @@ categories:
     - [4.2.2. Slice内存技巧](#422-slice内存技巧)
   - [4.3 Map](#43-map)
   - [4.4 结构体](#44-结构体)
-    - [4.4.1 结构体字面值](#441-结构体字面值)
-    - [4.4.2 结构体的比较](#442-结构体的比较)
-    - [4.4.3 结构体嵌入和匿名成员](#443-结构体嵌入和匿名成员)
+    - [4.4.1. 结构体字面值](#441-结构体字面值)
+    - [4.4.2. 结构体比较](#442-结构体比较)
+    - [4.4.3. 结构体嵌入和匿名成员](#443-结构体嵌入和匿名成员)
   - [4.5 json字符串](#45-json字符串)
   - [4.6 文本和HTML模板](#46-文本和html模板)
 - [5. 函数](#5-函数)
@@ -3206,6 +3206,7 @@ _ = &ages["bob"] // compile error: cannot take address of map element
 
 Map的迭代顺序是不确定的，并且不同的哈希函数实现可能导致不同的遍历顺序。在实践中，遍历的顺序是随机的，每一次遍历的顺序都不相同。这是故意的，每次都使用随机的遍历顺序可以强制要求程序不会依赖具体的哈希函数实现。如果要按顺序遍历key/value对，我们必须显式地对key进行排序，可以使用sort包的Strings函数对字符串slice进行排序
 
+
 ```golang
 import "sort"
 
@@ -3231,6 +3232,129 @@ func Count(list []string) int { return m[k(list)] }
 
 ## 4.4 结构体
 
+结构体是一种聚合的数据类型，是由零个或多个任意类型的值聚合成的实体。每个值称为结构体的成员。用结构体的经典案例是处理公司的员工信息，每个员工信息包含一个唯一的员工编号、员工的名字、家庭住址、出生日期、工作岗位、薪资、上级领导等等。所有的这些信息都需要绑定到一个实体中，可以作为一个整体单元被复制，作为函数的参数或返回值，或者是被存储到数组中，等等。
+
+下面两个语句声明了一个叫Employee的命名的结构体类型，并且声明了一个Employee类型的变量dilbert：
+
+```golang
+type Employee struct {
+    ID        int
+    Name      string
+    Address   string
+    DoB       time.Time
+    Position  string
+    Salary    int
+    ManagerID int
+}
+
+var dilbert Employee
+```
+
+dilbert结构体变量的成员可以通过点操作符访问，比如`dilbert.Name`和`dilbert.DoB`。因为dilbert是一个变量，它所有的成员也同样是变量，我们可以直接对每个成员赋值：
+
+```golang
+dilbert.Salary -= 5000 // demoted, for writing too few lines of code
+```
+
+或者是对成员取地址，然后通过指针访问:
+
+```golangg
+position := &dilbert.Position
+*position = "Senior " + *position // promoted, for outsourcing to Elbonia
+```
+
+点操作符也可以和指向结构体的指针一起工作：
+
+```golang
+var employeeOfTheMonth *Employee = &dilbert
+employeeOfTheMonth.Position += " (proactive team player)"
+```
+
+相当于下面语句
+
+```golang
+(*employeeOfTheMonth).Position += " (proactive team player)"
+```
+
+下面的EmployeeByID函数将根据给定的员工ID返回对应的员工信息结构体的指针。我们可以使用点操作符来访问它里面的成员：
+
+```golang
+func EmployeeByID(id int) *Employee { /* ... */ }
+fmt.Println(EmployeeByID(dilbert.ManagerID).Position) // "Pointy-haired boss"
+id := dilbert.ID
+EmployeeByID(id).Salary = 0 // fired for... no real reason
+```
+
+后面的语句通过EmployeeByID返回的结构体指针更新了Employee结构体的成员。如果将EmployeeByID函数的返回值从*Employee指针类型改为Employee值类型，那么更新语句将不能编译通过，因为在赋值语句的左边并不确定是一个变量（译注：调用函数返回的是值，并不是一个可取地址的变量）。
+
+通常一行对应一个结构体成员，成员的名字在前类型在后，不过如果相邻的成员类型如果相同的话可以被合并到一行，就像下面的Name和Address成员那样：
+
+```golang
+type Employee struct {
+    ID            int
+    Name, Address string
+    DoB           time.Time
+    Position      string
+    Salary        int
+    ManagerID     int
+}
+```
+
+结构体成员的输入顺序也有重要的意义。我们也可以将Position成员合并（因为也是字符串类型），或者是交换Name和Address出现的先后顺序，那样的话就是定义了不同的结构体类型。通常，我们只是将相关的成员写到一起。
+
+如果结构体成员名字是以大写字母开头的，那么该成员就是导出的；这是Go语言导出规则决定的。一个结构体可能同时包含导出和未导出的成员。
+
+结构体类型往往是冗长的，因为它的每个成员可能都会占一行。虽然我们每次都可以重写整个结构体成员，但是重复会令人厌烦。因此，完整的结构体写法通常只在类型声明语句的地方出现，就像Employee类型声明语句那样。
+
+一个命名为S的结构体类型将不能再包含S类型的成员：因为一个聚合的值不能包含它自身。（该限制同样适用于数组。）但是S类型的结构体可以包含*S指针类型的成员，这可以让我们创建递归的数据结构，比如链表和树结构等。在下面的代码中，我们使用一个二叉树来实现一个插入排序：
+
+```golang
+gopl.io/ch4/treesort
+type tree struct {
+    value       int
+    left, right *tree
+}
+
+// Sort sorts values in place.
+func Sort(values []int) {
+    var root *tree
+    for _, v := range values {
+        root = add(root, v)
+    }
+    appendValues(values[:0], root)
+}
+
+// appendValues appends the elements of t to values in order
+// and returns the resulting slice.
+func appendValues(values []int, t *tree) []int {
+    if t != nil {
+        values = appendValues(values, t.left)
+        values = append(values, t.value)
+        values = appendValues(values, t.right)
+    }
+    return values
+}
+
+func add(t *tree, value int) *tree {
+    if t == nil {
+        // Equivalent to return &tree{value: value}.
+        t = new(tree)
+        t.value = value
+        return t
+    }
+    if value < t.value {
+        t.left = add(t.left, value)
+    } else {
+        t.right = add(t.right, value)
+    }
+    return t
+}
+```
+
+结构体类型的零值是每个成员都是零值。通常会将零值作为最合理的默认值。例如，对于bytes.Buffer类型，结构体初始值就是一个随时可用的空缓存，还有在第9章将会讲到的sync.Mutex的零值也是有效的未锁定状态。有时候这种零值可用的特性是自然获得的，但是也有些类型需要一些额外的工作。
+
+如果结构体没有任何成员的话就是空结构体，写作struct{}。它的大小为0，也不包含任何信息，但是有时候依然是有价值的。有些Go语言程序员用map来模拟set数据结构时，用它来代替map中布尔类型的value，只是强调key的重要性，但是因为节约的空间有限，而且语法比较复杂，所以我们通常会避免这样的用法。
+
 ```golang
 seen := make(map[string]struct{}) // set of strings
 // ...
@@ -3240,7 +3364,8 @@ if _, ok := seen[s]; !ok {
 }
 ```
 
-### 4.4.1 结构体字面值
+### 4.4.1. 结构体字面值
+
 
 summary:
 
@@ -3292,12 +3417,82 @@ pp := new(Point)
 *pp = Point{1, 2}
 ```
 
-### 4.4.2 结构体的比较
+
+
+结构体值也可以用结构体字面值表示，结构体字面值可以指定每个成员的值。
+
+```golang
+type Point struct{ X, Y int }
+
+p := Point{1, 2}
+```
+这里有两种形式的结构体字面值语法，上面的是第一种写法，要求以结构体成员定义的顺序为每个结构体成员指定一个字面值。它要求写代码和读代码的人要记住结构体的每个成员的类型和顺序，不过结构体成员有细微的调整就可能导致上述代码不能编译。因此，上述的语法一般只在定义结构体的包内部使用，或者是在较小的结构体中使用，这些结构体的成员排列比较规则，比如image.Point{x, y}或color.RGBA{red, green, blue, alpha}。
+
+其实更常用的是第二种写法，以成员名字和相应的值来初始化，可以包含部分或全部的成员，如1.4节的Lissajous程序的写法：
+
+```golang
+anim := gif.GIF{LoopCount: nframes}
+```
+
+在这种形式的结构体字面值写法中，如果成员被忽略的话将默认用零值。因为提供了成员的名字，所以成员出现的顺序并不重要。
+
+两种不同形式的写法不能混合使用。而且，你不能企图在外部包中用第一种顺序赋值的技巧来偷偷地初始化结构体中未导出的成员。
+
+```golang
+package p
+type T struct{ a, b int } // a and b are not exported
+
+package q
+import "p"
+var _ = p.T{a: 1, b: 2} // compile error: can't reference a, b
+var _ = p.T{1, 2}       // compile error: can't reference a, b
+```
+
+虽然上面最后一行代码的编译错误信息中并没有显式提到未导出的成员，但是这样企图隐式使用未导出成员的行为也是不允许的。
+
+结构体可以作为函数的参数和返回值。例如，这个Scale函数将Point类型的值缩放后返回：
+
+```golang
+func Scale(p Point, factor int) Point {
+    return Point{p.X * factor, p.Y * factor}
+}
+
+fmt.Println(Scale(Point{1, 2}, 5)) // "{5 10}"
+```
+如果考虑效率的话，较大的结构体通常会用指针的方式传入和返回，
+
+```golang
+func Bonus(e *Employee, percent int) int {
+    return e.Salary * percent / 100
+}
+```
+
+如果要在函数内部修改结构体成员的话，用指针传入是必须的；因为在Go语言中，所有的函数参数都是值拷贝传入的，函数参数将不再是函数调用时的原始变量。
+
+```golang
+func AwardAnnualRaise(e *Employee) {
+    e.Salary = e.Salary * 105 / 100
+}
+```
+因为结构体通常通过指针处理，可以用下面的写法来创建并初始化一个结构体变量，并返回结构体的地址：
+
+```golang
+pp := &Point{1, 2}
+```
+
+它和下面的语句是等价的
+
+```golang
+pp := new(Point)
+*pp = Point{1, 2}
+```
+
+不过&Point{1, 2}写法可以直接在表达式中使用，比如一个函数调用。
+
+### 4.4.2. 结构体比较
 
 summary:
-
 1. E1为什么回事false ? 因为对象地址不同
-
 
 首先结构体是可比较类型
 
@@ -3312,7 +3507,29 @@ fmt.Println(p == q)                   // "false"
 
 ```
 
-### 4.4.3 结构体嵌入和匿名成员
+如果结构体的全部成员都是可以比较的，那么结构体也是可以比较的，那样的话两个结构体将可以使用==或!=运算符进行比较。相等比较运算符==将比较两个结构体的每个成员，因此下面两个比较的表达式是等价的：
+
+```golang
+type Point struct{ X, Y int }
+
+p := Point{1, 2}
+q := Point{2, 1}
+fmt.Println(p.X == q.X && p.Y == q.Y) // "false"
+fmt.Println(p == q)                   // "false"
+```
+可比较的结构体类型和其他可比较的类型一样，可以用于map的key类型。
+
+```golang
+type address struct {
+    hostname string
+    port     int
+}
+
+hits := make(map[address]int)
+hits[address{"golang.org", 443}]++
+```
+
+### 4.4.3. 结构体嵌入和匿名成员
 
 summary:
 
@@ -3398,6 +3615,124 @@ fmt.Printf("%#v\n", w)
 ```
 
 需要注意，但是在包外部，因为circle和point没有导出，不能访问它们的成员，因此简短的匿名成员访问语法也是禁止的。
+
+
+在本节中，我们将看到如何使用Go语言提供的不同寻常的结构体嵌入机制让一个命名的结构体包含另一个结构体类型的匿名成员，这样就可以通过简单的点运算符x.f来访问匿名成员链中嵌套的x.d.e.f成员。
+
+考虑一个二维的绘图程序，提供了一个各种图形的库，例如矩形、椭圆形、星形和轮形等几何形状。这里是其中两个的定义：
+
+```golang
+type Circle struct {
+    X, Y, Radius int
+}
+
+type Wheel struct {
+    X, Y, Radius, Spokes int
+}
+```
+一个Circle代表的圆形类型包含了标准圆心的X和Y坐标信息，和一个Radius表示的半径信息。一个Wheel轮形除了包含Circle类型所有的全部成员外，还增加了Spokes表示径向辐条的数量。我们可以这样创建一个wheel变量：
+
+```golang
+var w Wheel
+w.X = 8
+w.Y = 8
+w.Radius = 5
+w.Spokes = 20
+```
+
+随着库中几何形状数量的增多，我们一定会注意到它们之间的相似和重复之处，所以我们可能为了便于维护而将相同的属性独立出来：
+
+```golang
+type Point struct {
+    X, Y int
+}
+
+type Circle struct {
+    Center Point
+    Radius int
+}
+
+type Wheel struct {
+    Circle Circle
+    Spokes int
+}
+```
+这样改动之后结构体类型变的清晰了，但是这种修改同时也导致了访问每个成员变得繁琐：
+
+```golang
+var w Wheel
+w.Circle.Center.X = 8
+w.Circle.Center.Y = 8
+w.Circle.Radius = 5
+w.Spokes = 20
+```
+Go语言有一个特性让我们只声明一个成员对应的数据类型而不指名成员的名字；这类成员就叫匿名成员。匿名成员的数据类型必须是命名的类型或指向一个命名的类型的指针。下面的代码中，Circle和Wheel各自都有一个匿名成员。我们可以说Point类型被嵌入到了Circle结构体，同时Circle类型被嵌入到了Wheel结构体。
+
+```golang
+type Circle struct {
+    Point
+    Radius int
+}
+
+type Wheel struct {
+    Circle
+    Spokes int
+}
+```
+得益于匿名嵌入的特性，我们可以直接访问叶子属性而不需要给出完整的路径：
+
+```golang
+var w Wheel
+w.X = 8            // equivalent to w.Circle.Point.X = 8
+w.Y = 8            // equivalent to w.Circle.Point.Y = 8
+w.Radius = 5       // equivalent to w.Circle.Radius = 5
+w.Spokes = 20
+```
+在右边的注释中给出的显式形式访问这些叶子成员的语法依然有效，因此匿名成员并不是真的无法访问了。其中匿名成员Circle和Point都有自己的名字——就是命名的类型名字——但是这些名字在点操作符中是可选的。我们在访问子成员的时候可以忽略任何匿名成员部分。
+
+不幸的是，结构体字面值并没有简短表示匿名成员的语法， 因此下面的语句都不能编译通过：
+
+```golang
+w = Wheel{8, 8, 5, 20}                       // compile error: unknown fields
+w = Wheel{X: 8, Y: 8, Radius: 5, Spokes: 20} // compile error: unknown fields
+```
+结构体字面值必须遵循形状类型声明时的结构，所以我们只能用下面的两种语法，它们彼此是等价的：
+
+```golang
+gopl.io/ch4/embed
+w = Wheel{Circle{Point{8, 8}, 5}, 20}
+w = Wheel{
+    Circle: Circle{
+        Point:  Point{X: 8, Y: 8},
+        Radius: 5,
+    },
+    Spokes: 20, // NOTE: trailing comma necessary here (and at Radius)
+}
+
+fmt.Printf("%#v\n", w)
+// Output:
+// Wheel{Circle:Circle{Point:Point{X:8, Y:8}, Radius:5}, Spokes:20}
+
+w.X = 42
+
+fmt.Printf("%#v\n", w)
+// Output:
+// Wheel{Circle:Circle{Point:Point{X:42, Y:8}, Radius:5}, Spokes:20}
+```
+
+需要注意的是Printf函数中%v参数包含的#副词，它表示用和Go语言类似的语法打印值。对于结构体类型来说，将包含每个成员的名字。
+
+因为匿名成员也有一个隐式的名字，因此不能同时包含两个类型相同的匿名成员，这会导致名字冲突。同时，因为成员的名字是由其类型隐式地决定的，所以匿名成员也有可见性的规则约束。在上面的例子中，Point和Circle匿名成员都是导出的。即使它们不导出（比如改成小写字母开头的point和circle），我们依然可以用简短形式访问匿名成员嵌套的成员
+
+```golang
+w.X = 8 // equivalent to w.circle.point.X = 8
+```
+
+但是在包外部，因为circle和point没有导出，不能访问它们的成员，因此简短的匿名成员访问语法也是禁止的。
+
+到目前为止，我们看到匿名成员特性只是对访问嵌套成员的点运算符提供了简短的语法糖。稍后，我们将会看到匿名成员并不要求是结构体类型；其实任何命名的类型都可以作为结构体的匿名成员。但是为什么要嵌入一个没有任何子成员类型的匿名成员类型呢？
+
+答案是匿名类型的方法集。简短的点运算符语法可以用于选择匿名成员嵌套的成员，也可以用于访问它们的方法。实际上，外层的结构体不仅仅是获得了匿名成员类型的所有成员，而且也获得了该类型导出的全部的方法。这个机制可以用于将一些有简单行为的对象组合成有复杂行为的对象。组合是Go语言中面向对象编程的核心，我们将在6.3节中专门讨论。
 
 ## 4.5 json字符串
 
@@ -6370,6 +6705,8 @@ func dirents(dir string) []os.FileInfo {
 
 ## 9.1 sync.Mutex与sync.RMutex互斥锁
 
+summary:
+
 比如银行存款查询余额的场景，因为所有的余额查询请求是顺序执行的，这样会互斥地获得锁，并且会暂时阻止其它的goroutine运行。由于Balance函数只需要读取变量的状态，所以我们同时让多个Balance调用并发运行事实上是安全的，只要在运行的时候没有存款或者取款(这句话很关键要没有)操作就行。在这种场景下我们需要一种特殊类型的锁，其允许多个只读操作并行执行，但写操作会完全互斥。这种锁叫作“多读单写”锁
 
 - 总结
@@ -6379,9 +6716,183 @@ func dirents(dir string) []os.FileInfo {
   - golang不支持重入锁
   - sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞，但是sync.RWMutex.RLock()阻塞之间不阻塞
 
+
+在一个线性（就是说只有一个goroutine的）的程序中，程序的执行顺序只由程序的逻辑来决定。例如，我们有一段语句序列，第一个在第二个之前（废话），以此类推。在有两个或更多goroutine的程序中，每一个goroutine内的语句也是按照既定的顺序去执行的，但是一般情况下我们没法去知道分别位于两个goroutine的事件x和y的执行顺序，x是在y之前还是之后还是同时发生是没法判断的。当我们没有办法自信地确认一个事件是在另一个事件的前面或者后面发生的话，就说明x和y这两个事件是并发的。
+
+考虑一下，一个函数在线性程序中可以正确地工作。如果在并发的情况下，这个函数依然可以正确地工作的话，那么我们就说这个函数是并发安全的，并发安全的函数不需要额外的同步工作。我们可以把这个概念概括为一个特定类型的一些方法和操作函数，对于某个类型来说，如果其所有可访问的方法和操作都是并发安全的话，那么该类型便是并发安全的。
+
+在一个程序中有非并发安全的类型的情况下，我们依然可以使这个程序并发安全。确实，并发安全的类型是例外，而不是规则，所以只有当文档中明确地说明了其是并发安全的情况下，你才可以并发地去访问它。我们会避免并发访问大多数的类型，无论是将变量局限在单一的一个goroutine内，还是用互斥条件维持更高级别的不变性，都是为了这个目的。我们会在本章中说明这些术语。
+
+相反，包级别的导出函数一般情况下都是并发安全的。由于package级的变量没法被限制在单一的gorouine，所以修改这些变量"必须"使用互斥条件。
+
+一个函数在并发调用时没法工作的原因太多了，比如死锁(deadlock)、活锁(livelock)和饿死(resource starvation)。我们没有空去讨论所有的问题，这里我们只聚焦在竞争条件上。
+
+竞争条件指的是程序在多个goroutine交叉执行操作时，没有给出正确的结果。竞争条件是很恶劣的一种场景，因为这种问题会一直潜伏在你的程序里，然后在非常少见的时候蹦出来，或许只是会在很大的负载时才会发生，又或许是会在使用了某一个编译器、某一种平台或者某一种架构的时候才会出现。这些使得竞争条件带来的问题非常难以复现而且难以分析诊断。
+
+传统上经常用经济损失来为竞争条件做比喻，所以我们来看一个简单的银行账户程序。
+
+```golang
+// Package bank implements a bank with only one account.
+package bank
+var balance int
+func Deposit(amount int) { balance = balance + amount }
+func Balance() int { return balance }
+```
+
+(当然我们也可以把Deposit存款函数写成balance += amount，这种形式也是等价的，不过长一些的形式解释起来更方便一些。)
+
+对于这个简单的程序而言，我们一眼就能看出，以任意顺序调用函数Deposit和Balance都会得到正确的结果。也就是说，Balance函数会给出之前的所有存入的额度之和。然而，当我们并发地而不是顺序地调用这些函数的话，Balance就再也没办法保证结果正确了。考虑一下下面的两个goroutine，其代表了一个银行联合账户的两笔交易：
+
+```golang
+// Alice:
+go func() {
+    bank.Deposit(200)                // A1
+    fmt.Println("=", bank.Balance()) // A2
+}()
+
+// Bob:
+go bank.Deposit(100)                 // B
+
+```
+
+Alice存了$200，然后检查她的余额，同时Bob存了$100。因为A1和A2是和B并发执行的，我们没法预测他们发生的先后顺序。直观地来看的话，我们会认为其执行顺序只有三种可能性：“Alice先”，“Bob先”以及“Alice/Bob/Alice”交错执行。下面的表格会展示经过每一步骤后balance变量的值。引号里的字符串表示余额单。
+
+```shell
+Alice first        Bob first        Alice/Bob/Alice
+          0                0                      0
+  A1    200        B     100             A1     200
+  A2 "= 200"       A1    300             B      300
+  B     300        A2 "= 300"            A2  "= 300"
+```
+
+所有情况下最终的余额都是$300。唯一的变数是Alice的余额单是否包含了Bob交易，不过无论怎么着客户都不会在意。
+
+但是事实是上面的直觉推断是错误的。第四种可能的结果是事实存在的，这种情况下Bob的存款会在Alice存款操作中间，在余额被读到（balance + amount）之后，在余额被更新之前（balance = ...），这样会导致Bob的交易丢失。而这是因为Alice的存款操作A1实际上是两个操作的一个序列，读取然后写；可以称之为A1r和A1w。下面是交叉时产生的问题：
+
+```golang
+Data race
+0
+A1r      0     ... = balance + amount
+B      100
+A1w    200     balance = ...
+A2  "= 200"
+```
+
+在A1r之后，balance + amount会被计算为200，所以这是A1w会写入的值，并不受其它存款操作的干预。最终的余额是$200。银行的账户上的资产比Bob实际的资产多了$100。（译注：因为丢失了Bob的存款操作，所以其实是说Bob的钱丢了。）
+
+**这个程序包含了一个特定的竞争条件，叫作数据竞争。无论任何时候，只要有两个goroutine并发访问同一变量(全局或者结构体变量)，且至少其中的一个是写操作的时候就会发生数据竞争**
+**这个程序包含了一个特定的竞争条件，叫作数据竞争。无论任何时候，只要有两个goroutine并发访问同一变量，且至少其中的一个是写操作的时候就会发生数据竞争**
+**这个程序包含了一个特定的竞争条件，叫作数据竞争。无论任何时候，只要有两个goroutine并发访问同一变量，且至少其中的一个是写操作的时候就会发生数据竞争**
+
+如果数据竞争的对象是一个比一个机器字（译注：32位机器上一个字=4个字节）更大的类型时，事情就变得更麻烦了，比如interface，string或者slice类型都是如此。下面的代码会并发地更新两个不同长度的slice：
+
+```golang
+var x []int
+go func() { x = make([]int, 10) }()
+go func() { x = make([]int, 1000000) }()
+x[999999] = 1 // NOTE: undefined behavior; memory corruption possible!
+```
+
+最后一个语句中的x的值是未定义的；其可能是nil，或者也可能是一个长度为10的slice，也可能是一个长度为1,000,000的slice。但是回忆一下slice的三个组成部分：指针（pointer）、长度（length）和容量（capacity）。如果指针是从第一个make调用来，而长度从第二个make来，x就变成了一个混合体，一个自称长度为1,000,000但实际上内部只有10个元素的slice。这样导致的结果是存储999,999元素的位置会碰撞一个遥远的内存位置，这种情况下难以对值进行预测，而且debug也会变成噩梦。这种语义雷区被称为**未定义行为**，对C程序员来说应该很熟悉；幸运的是在Go语言里造成的麻烦要比C里小得多。
+
+尽管并发程序的概念让我们知道并发并不是简单的语句交叉执行。我们将会在9.4节中看到，数据竞争可能会有奇怪的结果。许多程序员，甚至一些非常聪明的人也还是会偶尔提出一些理由来允许数据竞争，比如：“互斥条件代价太高”，“这个逻辑只是用来做logging”，“我不介意丢失一些消息”等等。因为在他们的编译器或者平台上很少遇到问题，可能给了他们错误的信心。一个好的经验法则是根本就没有什么所谓的良性数据竞争。所以我们一定要避免数据竞争，那么在我们的程序中要如何做到呢？
+
+我们来重复一下数据竞争的定义，因为实在太重要了：数据竞争会在两个以上的goroutine并发访问相同的变量且至少其中一个为写操作时发生。根据上述定义，有三种方式可以避免数据竞争：
+
+第一种方法是不要去写变量。考虑一下下面的map，会被“懒”填充，也就是说在每个key被第一次请求到的时候才会去填值。如果Icon是被顺序调用的话，这个程序会工作很正常，但如果Icon被并发调用，那么对于这个map来说就会存在数据竞争。
+
+```golang
+var icons = make(map[string]image.Image)
+func loadIcon(name string) image.Image
+
+// NOTE: not concurrency-safe!
+func Icon(name string) image.Image {
+    icon, ok := icons[name]
+    if !ok {
+        icon = loadIcon(name)
+        icons[name] = icon
+    }
+    return icon
+}
+```
+
+反之，如果我们在创建goroutine之前的初始化阶段，就初始化了map中的所有条目并且再也不去修改它们，那么任意数量的goroutine并发访问Icon都是安全的，因为每一个goroutine都只是去读取而已。
+
+```golang
+var icons = map[string]image.Image{
+    "spades.png":   loadIcon("spades.png"),
+    "hearts.png":   loadIcon("hearts.png"),
+    "diamonds.png": loadIcon("diamonds.png"),
+    "clubs.png":    loadIcon("clubs.png"),
+}
+
+// Concurrency-safe.
+func Icon(name string) image.Image { return icons[name] }
+
+```
+
+上面的例子里icons变量在包初始化阶段就已经被赋值了，包的初始化是在程序main函数开始执行之前就完成了的。只要初始化完成了，icons就再也不会被修改。数据结构如果从不被修改或是不变量则是并发安全的，无需进行同步。不过显然，如果update操作是必要的，我们就没法用这种方法，比如说银行账户。
+
+第二种避免数据竞争的方法是，避免从多个goroutine访问变量。这也是前一章中大多数程序所采用的方法。例如前面的并发web爬虫（§8.6）的main goroutine是唯一一个能够访问seen map的goroutine，而聊天服务器（§8.10）中的broadcaster goroutine是唯一一个能够访问clients map的goroutine。这些变量都被限定在了一个单独的goroutine中。
+
+由于其它的goroutine不能够直接访问变量，它们只能使用一个channel来发送请求给指定的goroutine来查询更新变量。这也就是Go的口头禅“不要使用共享数据来通信；使用通信来共享数据”。一个提供对一个指定的变量通过channel来请求的goroutine叫做这个变量的monitor（监控）goroutine。例如broadcaster goroutine会监控clients map的全部访问。
+
+下面是一个重写了的银行的例子，这个例子中balance变量被限制在了monitor goroutine中，名为teller：
+```golang
+gopl.io/ch9/bank1
+// Package bank provides a concurrency-safe bank with one account.
+package bank
+var deposits = make(chan int) // send amount to deposit
+var balances = make(chan int) // receive balance
+func Deposit(amount int) { deposits <- amount }
+func Balance() int       { return <-balances }
+func teller() {
+    var balance int // balance is confined to teller goroutine
+    for {
+        select {
+        case amount := <-deposits:
+            balance += amount
+        case balances <- balance:
+        }
+    }
+}
+
+func init() {
+    go teller() // start the monitor goroutine
+}
+```
+即使当一个变量无法在其整个生命周期内被绑定到一个独立的goroutine，绑定依然是并发问题的一个解决方案。例如在一条流水线上的goroutine之间共享变量是很普遍的行为，在这两者间会通过channel来传输地址信息。如果流水线的每一个阶段都能够避免在将变量传送到下一阶段后再去访问它，那么对这个变量的所有访问就是线性的。其效果是变量会被绑定到流水线的一个阶段，传送完之后被绑定到下一个，以此类推。这种规则有时被称为**串行绑定**。
+
+下面的例子中，Cakes会被严格地顺序访问，先是baker gorouine，然后是icer gorouine：
+
+```golang
+type Cake struct{ state string }
+
+func baker(cooked chan<- *Cake) {
+    for {
+        cake := new(Cake)
+        cake.state = "cooked"
+        cooked <- cake // baker never touches this cake again
+    }
+}
+
+func icer(iced chan<- *Cake, cooked <-chan *Cake) {
+    for cake := range cooked {
+        cake.state = "iced"
+        iced <- cake // icer never touches this cake again
+    }
+}
+
+```
+
+第三种避免数据竞争的方法是允许很多goroutine去访问变量，但是在同一个时刻最多只有一个goroutine在访问。这种方式被称为“互斥”，在下一节来讨论这个主题。
+
+练习 9.1： 给gopl.io/ch9/bank1程序添加一个Withdraw(amount int)取款函数。其返回结果应该要表明事务是成功了还是因为没有足够资金失败了。这条消息会被发送给monitor的goroutine，且消息需要包含取款的额度和一个新的channel，这个新channel会被monitor goroutine来把boolean结果发回给Withdraw。
+
 ## 9.2 sync.Once惰性初始化
 
 如果初始化的成本太高，需要延迟的初始化对象。可考虑使用`sync.Once`
+
 <detials>
 <summary>sync.One的demo</summary>
 <pre>
