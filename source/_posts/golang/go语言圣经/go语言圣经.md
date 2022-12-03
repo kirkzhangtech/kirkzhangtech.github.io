@@ -99,7 +99,7 @@ categories:
   - [8.3 基于select的多路复用](#83-基于select的多路复用)
   - [8.4. 并发的退出](#84-并发的退出)
 - [9. 基于共享变量的并发](#9-基于共享变量的并发)
-  - [9.1 sync.Mutex与sync.RMutex互斥锁](#91-syncmutex与syncrmutex互斥锁)
+  - [9.1 竞争条件](#91-竞争条件)
   - [9.2 sync.Once惰性初始化](#92-synconce惰性初始化)
   - [9.3 sync.Cond的使用](#93-synccond的使用)
   - [9.4. Goroutines和线程](#94-goroutines和线程)
@@ -6703,18 +6703,35 @@ func dirents(dir string) []os.FileInfo {
   - `包级别`的导出函数一般情况下都是并发安全的。由于package级的变量没法被限制在单一的gorouine，所以修改这些变量“必须”使用互斥条件。
     (多看看本章代码)
 
-## 9.1 sync.Mutex与sync.RMutex互斥锁
+## 9.1 竞争条件
 
 summary:
 
-比如银行存款查询余额的场景，因为所有的余额查询请求是顺序执行的，这样会互斥地获得锁，并且会暂时阻止其它的goroutine运行。由于Balance函数只需要读取变量的状态，所以我们同时让多个Balance调用并发运行事实上是安全的，只要在运行的时候没有存款或者取款(这句话很关键要没有)操作就行。在这种场景下我们需要一种特殊类型的锁，其允许多个只读操作并行执行，但写操作会完全互斥。这种锁叫作“多读单写”锁
+竞争条件: 数据竞争会在两个以上的goroutine并发访问相同的变量(地址)且至少其中一个为写操作时发生。如果单线程所有逻辑按部就班的执行就不会有数据不一致的情况出现，但是一个函数在并发调用时不工作的原因太多了，比如死锁，活锁，饿死等等状态,比如E1的例子就是这样多个线程同时修改全局变量，E1的例子就已经说明了并发访问全局变量可能遇到的情况
+1. A1写，A1读，B写等等，情况如下，三种操作全排列都有可能
+```shell
+Alice first        Bob first        Alice/Bob/Alice
+          0                0                      0
+  A1    200        B     100             A1     200
+  A2 "= 200"       A1    300             B      300
+  B     300        A2 "= 300"            A2  "= 300"
+  极端情况会出现第四种
+  A1r      0     ... = balance + amount
+  B      100
+  A1w    200     balance = ...
+  A2  "= 200"
+```
 
-- 总结
-  - 避免临界区中的变量在中途被其他的goroutine修改
-  - 使用mutex包进行互斥goroutine
-  - 一个deferred Unlock即使在临界区发生`panic`时依然会执行
-  - golang不支持重入锁
-  - sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞，但是sync.RWMutex.RLock()阻塞之间不阻塞
+**未定义行为**的恶梦如E2所示,这时候就会导致逻辑歧义，创建出长度和容量不匹配的变量。有如下三种方法组织数据竞争
+1. 不要写变量，并发访问没有mutex保护的写操作代码,如代码E3
+2. 避免从多个goroutine访问变量,如遇到多线程就是用channel来进行通信，一个提供对一个指定的变量通过channel来请求的goroutine叫做这个变量的**monitor(监控)goroutine**如代码E4
+3. 允许很多goroutine去访问变量，但是在同一个时刻最多只有一个goroutine在访问,主要使用mutex
+
+- 避免临界区中的变量在中途被其他的goroutine修改
+- 使用mutex包进行互斥goroutine
+- 一个deferred Unlock即使在临界区发生`panic`时依然会执行
+- golang不支持重入锁
+- sync.RWMutex.RLock()持锁，sync.RWMutex.Lock()会阻塞，相同的RWMutex.Lock()持锁，sync.RWMutex.RLock()阻塞，但是sync.RWMutex.RLock()阻塞之间不阻塞
 
 
 在一个线性（就是说只有一个goroutine的）的程序中，程序的执行顺序只由程序的逻辑来决定。例如，我们有一段语句序列，第一个在第二个之前（废话），以此类推。在有两个或更多goroutine的程序中，每一个goroutine内的语句也是按照既定的顺序去执行的，但是一般情况下我们没法去知道分别位于两个goroutine的事件x和y的执行顺序，x是在y之前还是之后还是同时发生是没法判断的。当我们没有办法自信地确认一个事件是在另一个事件的前面或者后面发生的话，就说明x和y这两个事件是并发的。
@@ -6732,6 +6749,7 @@ summary:
 传统上经常用经济损失来为竞争条件做比喻，所以我们来看一个简单的银行账户程序。
 
 ```golang
+[E1]
 // Package bank implements a bank with only one account.
 package bank
 var balance int
@@ -6787,6 +6805,7 @@ A2  "= 200"
 如果数据竞争的对象是一个比一个机器字（译注：32位机器上一个字=4个字节）更大的类型时，事情就变得更麻烦了，比如interface，string或者slice类型都是如此。下面的代码会并发地更新两个不同长度的slice：
 
 ```golang
+[E2]
 var x []int
 go func() { x = make([]int, 10) }()
 go func() { x = make([]int, 1000000) }()
@@ -6802,6 +6821,7 @@ x[999999] = 1 // NOTE: undefined behavior; memory corruption possible!
 第一种方法是不要去写变量。考虑一下下面的map，会被“懒”填充，也就是说在每个key被第一次请求到的时候才会去填值。如果Icon是被顺序调用的话，这个程序会工作很正常，但如果Icon被并发调用，那么对于这个map来说就会存在数据竞争。
 
 ```golang
+[E3]
 var icons = make(map[string]image.Image)
 func loadIcon(name string) image.Image
 
@@ -6839,6 +6859,7 @@ func Icon(name string) image.Image { return icons[name] }
 
 下面是一个重写了的银行的例子，这个例子中balance变量被限制在了monitor goroutine中，名为teller：
 ```golang
+[E4]
 gopl.io/ch9/bank1
 // Package bank provides a concurrency-safe bank with one account.
 package bank
