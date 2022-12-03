@@ -108,7 +108,7 @@ theme: tranquilpeak
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
 - type: git
-  repo: git@github.com:SimonTeo58/SimonTeo58.github.io.git  
+  repo: git@github.com:SimonTeo58/SimonTeo58.github.io.git
   branch: gh-pages
 
 
