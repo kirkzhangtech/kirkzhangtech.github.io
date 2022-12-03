@@ -1,5 +1,5 @@
 ---
-title: <The Go Programming Language>
+title: 《The Go Programming Language》
 categories:
 - golang
 ---
