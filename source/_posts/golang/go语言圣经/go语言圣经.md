@@ -6724,7 +6724,7 @@ Alice first        Bob first        Alice/Bob/Alice
 
 **未定义行为**的恶梦如E2所示,这时候就会导致逻辑歧义，创建出长度和容量不匹配的变量。有如下三种方法组织数据竞争
 1. 不要写变量，并发访问没有mutex保护的写操作代码,如代码E3
-2. 避免从多个goroutine访问变量,如遇到多线程就是用channel来进行通信，一个提供对一个指定的变量通过channel来请求的goroutine叫做这个变量的**monitor(监控)goroutine**如代码E4
+2. 由于其它的goroutine不能够直接访问变量，它们只能使用一个channel来发送请求给指定的goroutine来查询更新变量。这也就是Go的口头禅“不要使用共享数据来通信；使用通信来共享数据”。一个提供对一个指定的变量通过channel来请求的goroutine叫做这个变量的**monitor(监控)goroutine**。如代码E4
 3. 允许很多goroutine去访问变量，但是在同一个时刻最多只有一个goroutine在访问,主要使用mutex
 
 - 避免临界区中的变量在中途被其他的goroutine修改
