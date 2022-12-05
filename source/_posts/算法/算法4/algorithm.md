@@ -8,6 +8,8 @@ metaAlignment: center
 coverMeta: out
 ---
 
+<!-- more -->
+
 # 第一章 算法
 
 summary:
