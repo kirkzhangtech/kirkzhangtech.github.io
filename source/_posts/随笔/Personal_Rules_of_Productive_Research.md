@@ -10,7 +10,7 @@ thumbnailImagePosition: bottom
 ---
 > 作者：Eugene Vinitsky
 
-Personal Rules of Productive Research
+Personal Rules of Productive Research<br>
 Caveats(`['kæviæt] 警告;说明`) and intent(`[ɪn'tɛnt]意图;目的;含义`): 
 Painstakingly extracted via trial and error, ever evolving. Mostly an exercise to think through prior mistakes and avoid making them again. These are my personal rules, they might not work for you but it’s invariably a mistake when I stray from them. Given that I’m not the world’s most successful researcher (I’m not too shabby either though) maybe you’re better off taking advice from someone else. On the other hand, I would contend that these rules are universally useful.
 

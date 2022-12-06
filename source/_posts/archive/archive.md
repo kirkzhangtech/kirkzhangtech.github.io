@@ -11,7 +11,7 @@ categories:
 |避免内存泄漏在java|https://medium.com/javarevisited/memory-leak-in-java-how-to-detect-and-avoid-dea648fba770|NULL|
 |markdown文章中使用html达到折叠代码块| ```     <details> <summary><font size="4" color="orange">Show Code</font></summary> <pre><code class="language-cpp">这里填充代码</code></pre> </details>```|
 |安装pyspark和spark|pyspark=3.2.2,spark=3.2.2,jdk=11,python3=3.8,scala=2.11.12.最重要的是版本保持一致|
-|英语中 in which 用法|in which 是relative pronoun(关系代词)，用来引导定语从句,在which前加介词显得正式，省去which就不正式.[1] This is the car in which I travelled to Beijing. [2] This is the house in which I grew up. [3] This is the pitch on which I played football all those years ago. [4] ack at school, the name by which I was known was Charlie. [5] And these are the friends with whom I played every day. 这里的frinends是指代后面从句的宾语，故用whome|
+|英语中 in which 用法|in which 是relative pronoun(关系代词)，用来引导定语从句,在which前加介词显得正式，省去which就不正式.[1] This is the car in which I travelled to Beijing. [2] This is the house in which I grew up. [3] This is the pitch on which I played football all those years ago. [4] ack at school, the name by which I was known was Charlie. [5] And these are the friends with whom I played every day. 这里的frinends是指代后面从句的宾语，故用whome<br>在英语语法中，「in which」是一种连词，它用来引导非限制性定语从句。非限制性定语从句是指那些不必要的从句，它们可以提供有关主句主语的额外信息，但不会对主句造成影响。例如：The house, in which we used to live, has been sold.<br>The book, in which I found the information I needed, is on the shelf<br>在这两个例子中，「in which」都用来引导非限制性定语从句，它们提供了有关主句主语的额外信息。但是，如果我们把「in which」去掉，主句仍然能够正常运行，这就表明非限制性定语从句不是必须的。|
 |vue installation|https://cbb104002.medium.com/vue-hello-world-ce15e547419c||
 |html 标签，作为总结部分||\<text style="font-family:Courier New;color:red"\>\<\/text\>|
 ||https://michaelnielsen.org/blog/principles-of-effective-research/|高校研究个人准则|
