@@ -6,6 +6,8 @@ thumbnailImagePosition: bottom
 coverImage: https://user-images.githubusercontent.com/46363359/204004628-f2a1b8e5-1d4a-47bb-9b9b-e49dc87eee1c.jpg
 metaAlignment: center
 coverMeta: out
+mathjax: true
+
 ---
 
 对付看吧,虽然打心眼里感觉不是什么好书
@@ -85,24 +87,85 @@ L.data=new ElemType[Initsize] //初始化指定长度;
 1. 插入数据
 在顺序表L的i位置插入元素e
 
-```c
-
+```java
 // 1,2,3,4,5,6
 // 0,1,2,3,4,5
-bool ListInsert(Sqlist &L , int i ,ElemType e){
-    if (i<1 || i> L.length+1){
-        return false;
-    }
-    if (L.length>=MaxSize){
+public void insert(int[] *listArray, int index, Object obj) throws Exception {
+         // TODO Auto-generated method stub
+         //如果当前线性表已满，那就不允许插入数据
+         if (size == maxSize) {
+             throw new Exception("顺序表已满，无法插入！");
+         }
+         //插入位置编号是否合法
+         if (index < 0 || index > size) {
+             throw new Exception("参数错误！");
+         }
+         //移动元素
+         for (int j = size - 1; j >= index; j--) {
+             listArray[j + 1] = listArray[j];
+         }
+ 
+         listArray[index] = obj;  //不管当前线性表的size是否为零，这句话都能正常执行，即都能正常插入
+         size++;
+}
+
+```
+最好情况: 在表尾插入(i=n+1)，元素后移语句不执行
+最坏情况: 最表头插入(i=1),元素后移语句将被执行n次
+平均情况: 假设$p_i=1/(n+1)$,则在长度为n的线性表中插入一个节点所需移动的平均次数
+
+$\sum_{i=1}^{n+1}p_i(n-i+1)=\sum_{i=1}^{n+1}\cfrac{1}{(n+1)}$
+
+2. 删除操作
+
+删除顺序表 L中第 i (1<=i<=L.length)个位置的元素，用引用变量 e 返回。若i的输入不合法，则返回false，否则，将被删元素赋给引用变量 e，并将第 +1个元素及其后的所有元素依次往前移动一个位置，返回 true。
+
+```java
+// 注意L的数据结构
+
+bool ListDelete(SqList &L , int i , Elementype &e){
+    if (i<1||i>L.length){
         return false
     }
-    // 简化了程序，这个地方要试探是否可以重新开辟一个单元数据
-    for (int j=L.length ; j>=i ;j--){
-            L.data[j]=L.data[j-1]
+    e=L.data[i-1]
+    for (int j=i;j<L.length;j++){
+        L.data[j-1]=L.data[j]
     }
-    L.data[i-1]=e
-    L.length++
+    L.length--
     return true
 }
 
 ```
+
+最好情况:删除表尾元素(即i=n)，无须移动元素，时间复杂度为 O(1)。
+最坏情况:删除表头元素(即i= 1)，需移动除表头元素外的所有元素，时间复杂度为 O(n)
+平均情况:假设 $p_i=\cfrac{1}{n}$ 是删除第i个位置上结点的概率，则在长度为n的线性表中删除一个结点时，所需移动结点的平均次数为
+
+[一串数学公式]
+
+因此，线性表删除算法的平均实践复杂度为O(n)
+
+3. 按值查找
+
+查找第一个元素值等于e的元素
+
+```java
+int LocateElem(SqList L,ElemType e){
+    int i;
+    for (i=0;i<L.length;i++){
+        if (L.data[i]==e){
+            return i+1
+        }
+    }
+}
+
+```
+
+最好情况: 查找的元素就在表头，仅需比较一次，时间复杂度为 O(1)。
+最坏情况:查找的元素在表尾(或不存在) 时，需要比较 n 次，时间复杂度为 (O)
+平均情况:假设 $p_i=\cfrac{1}{n}$ 是查的素在第 (1<=i<=L.length)个位置上的概率则在长度为 n 的线性表中查找值为 e 的元素所需比较的平均次数为
+
+因此线性查找算法的平均复杂度为O(n)
+
+## 2.3 线性表的链式表示
+
