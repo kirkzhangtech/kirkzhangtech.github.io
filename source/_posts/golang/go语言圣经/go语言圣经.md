@@ -5150,6 +5150,16 @@ summary:
 
 ## 7.7. http.Handler接口
 
+summary:
+1. 你的代码实现了对应的接口，你的代码就有对应的能力
+2. http.Error函数可以写错误信息给回客户端
+    ```golang
+    msg := fmt.Sprintf("no such page: %s\n", req.URL)
+    http.Error(w, msg, http.StatusNotFound) // 404
+    ```
+3. `http.NewServeMux()`的使用(还没太熟悉),能实现不同uri的映射
+
+
 在第一章中,我们粗略的了解了怎么用`net/http`包去实现网络客户端（§1.5）和服务器（§1.7）。在这个小节中，我们会对那些基于`http.Handler`接口的服务器API做更进一步的学习：
 
 ```golang
@@ -5163,7 +5173,7 @@ type Handler interface {
 func ListenAndServe(address string, h Handler) error
 ```
 
-`ListenAndServe`函数需要一个例如'localhost:8000'的服务器地址，和一个所有请求都可以分派的Handler接口实例。它会一直运行，直到这个服务因为一个错误而失败（或者启动失败），它的返回值一定是一个非空的错误。
+`ListenAndServe`函数需要一个例如"localhost:8000"的服务器地址，和一个所有请求都可以分派的Handler接口实例。它会一直运行，直到这个服务因为一个错误而失败（或者启动失败），它的返回值一定是一个非空的错误。
 
 想象一个电子商务网站，为了销售，将数据库中物品的价格映射成美元。下面这个程序可能是能想到的最简单的实现了。它将库存清单模型化为一个命名为database的map类型，我们给这个类型一个`ServeHttp`方法,这样它可以满足`http.Handler`接口。这个`handler`会遍历整个map并输出物品信息
 
@@ -5233,7 +5243,7 @@ func (db database) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 ```
 
-现在handler基于URL的路径部分(req.URL.Path)来决定执行什么逻辑。如果这个handler不能识别这个路径，它会通过调用w.WriteHeader(http.StatusNotFound)返回客户端一个HTTP错误；这个检查应该在向w写入任何值前完成。（顺便提一下，http.ResponseWriter是另一个接口。它在io.Writer上增加了发送HTTP相应头的方法。）等效地，我们可以使用实用的http.Error函数：
+现在handler基于URL的路径部分(req.URL.Path)来决定执行什么逻辑。如果这个handler不能识别这个路径，它会通过调用w.WriteHeader(http.StatusNotFound)返回客户端一个HTTP错误；这个检查应该在向w写入任何值前完成.(顺便提一下，http.ResponseWriter是另一个接口。它在io.Writer上增加了发送HTTP相应头的方法。）等效地，我们可以使用实用的http.Error函数：
 
 ```golang
 msg := fmt.Sprintf("no such page: %s\n", req.URL)
@@ -5261,7 +5271,7 @@ $ ./fetch http://localhost:8000/help
 no such page: /help
 ```
 
-显然我们可以继续向ServeHTTP方法中添加case，但在一个实际的应用中，将每个case中的逻辑定义到一个分开的方法或函数中会很实用。此外，相近的URL可能需要相似的逻辑；例如几个图片文件可能有形如/images/*.png的URL。因为这些原因，net/http包提供了一个请求多路器ServeMux来简化URL和handlers的联系。一个ServeMux将一批http.Handler聚集到一个单一的http.Handler中。再一次，我们可以看到满足同一接口的不同类型是可替换的：web服务器将请求指派给任意的http.Handler 而不需要考虑它后面的具体类型。
+显然我们可以继续向ServeHTTP方法中添加case，但在一个实际的应用中，将每个case中的逻辑定义到一个分开的方法或函数中会很实用。此外，相近的URL可能需要相似的逻辑；例如几个图片文件可能有形如/images/*.png的URL。因为这些原因，net/http包提供了一个请求多路器ServeMux来简化URL和handlers的联系。一个ServeMux将一批http.Handler聚集到一个单一的http.Handler中。再一次，我们可以看到满足同一接口的不同类型是可替换的：web服务器将请求指派给任意的http.Handler而不需要考虑它后面的具体类型。
 
 对于更复杂的应用，一些ServeMux可以通过组合来处理更加错综复杂的路由需求。Go语言目前没有一个权威的web框架，就像Ruby语言有Rails和python有Django。这并不是说这样的框架不存在，而是Go语言标准库中的构建模块就已经非常灵活以至于这些框架都是不必要的。此外，尽管在一个项目早期使用框架是非常方便的，但是它们带来额外的复杂度会使长期的维护更加困难。
 
@@ -5301,7 +5311,10 @@ func (db database) price(w http.ResponseWriter, req *http.Request) {
 
 让我们关注这两个注册到handlers上的调用。第一个db.list是一个方法值（§6.4），它是下面这个类型的值。
 
+```golang
 func(w http.ResponseWriter, req *http.Request)
+```
+
 也就是说db.list的调用会援引一个接收者是db的database.list方法。所以db.list是一个实现了handler类似行为的函数，但是因为它没有方法（理解：该方法没有它自己的方法），所以它不满足http.Handler接口并且不能直接传给mux.Handle。
 
 语句http.HandlerFunc(db.list)是一个转换而非一个函数调用，因为http.HandlerFunc是一个类型。它有如下的定义：
