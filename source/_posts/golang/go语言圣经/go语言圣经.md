@@ -503,7 +503,7 @@ summary:
 |golang的基本数据类型| 关键字|
 |---|---|
 |int |4或者8个字节|
-|int8 |一个字节|
+|int8 |一个字节,这个8表示的是比特位|
 |int16 |2个字节|
 |int32 |4个字节|
 |int64 |8个字节|
@@ -1941,10 +1941,16 @@ s[0] = 'L' // compile error: cannot assign to s[0]
 
 ### 3.5.1. 字符串面值
 
+1. 尝试替换s里面的字符值，编译器会报错
+2. 我们可以使用反引号 (`) 来表示字符串，而不是双引号。在引号中（“），您需要转义换行符、制表符和其他不需要在反引号中转义的字符，原始字符串文字量的值是由反引号之间的未解释（隐式 UTF-8 编码）字符组成的字符串；特别地，反斜杠没有特殊含义，字符串可能包含换行符。原始字符串文字量中的回车字符（\r）将被丢弃
+
+
+
+
 字符串值也可以用字符串面值方式编写，只要将一系列字节序列包含在双引号内即可：
 
 ```text
-"Hello, world"
+s := "Hello, world"
 ```
 
 因为Go语言源文件总是用UTF8编码，并且Go语言的文本字符串也以UTF8编码的方式处理，因此我们可以将Unicode码点也写到字符串面值中。
@@ -1979,6 +1985,16 @@ Usage:
 ```
 
 ### 3.5.2. Unicode
+
+summary:
+1. UTF-8 character can be defined in memory size from 1 byte (ASCII compatible) to 4 bytes
+2. A `code unit` is the number of bits an encoding uses for one single `unit cell`
+3. UTF-8 uses 8 bits(c3) and UTF-16 uses 16 bits for a code unit, that means UTF-8 needs minimum 8 bits or 1 byte to represent a character.
+4. U+00F5 is code point represented by code units (2 bytes) are c3 b5 
+5. Go introduces data type `rune` (synonym of code point) which is an alias of int32 and I told you (but not proved yet) that Go represents a character (code point) in int32 data type.
+
+
+
 在很久以前，世界还是比较简单的，起码计算机世界就只有一个ASCII字符集：美国信息交换标准代码。ASCII，更准确地说是美国的ASCII，使用7bit来表示128个字符：包含英文字母的大小写、数字、各种标点符号和设备控制符。对于早期的计算机程序来说，这些就足够了，但是这也导致了世界上很多其他地区的用户无法直接使用自己的符号系统。随着互联网的发展，混合多种语言的数据变得很常见（译注：比如本身的英文原文或中文翻译都包含了ASCII、中文、日文等多种语言字符）。如何有效处理这些包含了各种语言的丰富多样的文本数据呢？
 
 答案就是使用Unicode（ http://unicode.org ），它收集了这个世界上所有的符号系统，包括重音符号和其它变音符号，制表符和回车符，还有很多神秘的符号，每个符号都分配一个唯一的Unicode码点，Unicode码点对应Go语言中的rune整数类型（译注：rune是int32等价类型）。
@@ -1988,7 +2004,8 @@ Usage:
 我们可以将一个符文序列表示为一个int32序列。这种编码方式叫UTF-32或UCS-4，每个Unicode码点都使用同样大小的32bit来表示。这种方式比较简单统一，但是它会浪费很多存储空间，因为大多数计算机可读的文本是ASCII字符，本来每个ASCII字符只需要8bit或1字节就能表示。而且即使是常用的字符也远少于65,536个，也就是说用16bit编码方式就能表达常用字符。但是，还有其它更好的编码方法吗？
 
 ### 3.5.3. UTF-8
-UTF8是一个将Unicode码点编码为字节序列的变长编码。UTF8编码是由Go语言之父Ken Thompson和Rob Pike共同发明的，现在已经是Unicode的标准。UTF8编码使用1到4个字节来表示每个Unicode码点，ASCII部分字符只使用1个字节，常用字符部分使用2或3个字节表示。每个符号编码后第一个字节的高端bit位用于表示编码总共有多少个字节。如果第一个字节的高端bit为0，则表示对应7bit的ASCII字符，ASCII字符每个字符依然是一个字节，和传统的ASCII编码兼容。如果第一个字节的高端bit是110，则说明需要2个字节；后续的每个高端bit都以10开头。更大的Unicode码点也是采用类似的策略处理。
+
+UTF8(8 bites)是一个将Unicode码点编码为字节序列的变长编码。UTF8编码是由Go语言之父Ken Thompson和Rob Pike共同发明的，现在已经是Unicode的标准。UTF8编码使用1到4个字节来表示每个Unicode码点，ASCII部分字符只使用1个字节，常用字符部分使用2或3个字节表示。每个符号编码后第一个字节的高端bit位用于表示编码总共有多少个字节。如果第一个字节的高端bit为0，则表示对应7bit的ASCII字符，ASCII字符每个字符依然是一个字节，和传统的ASCII编码兼容。如果第一个字节的高端bit是110，则说明需要2个字节；后续的每个高端bit都以10开头。更大的Unicode码点也是采用类似的策略处理。
 
 ```golang
 0xxxxxxx                             runes 0-127    (ASCII)
@@ -2136,25 +2153,41 @@ fmt.Println(string(1234567)) // "?"
 ```
 
 ### 3.5.4. 字符串和Byte切片
+
+summary:
+1. byte.Buffer和字符串有着相同结构类型，说白了byte.Buffer也就是码值切片 
+2. 一个字符串(string类型)是包含只读字节的数组，一旦创建，是不可变的。相比之下，一个字节slice的元素则可以自由地修改。
+   1. 要了解字符串，byte切片相互转换时，内存开辟情况
+   2. string为什么是immutable[String Data Type in Go](https://medium.com/rungo/string-data-type-in-go-8af2b639478)
+
 标准库中有四个包对字符串处理尤为重要：bytes、strings、strconv和unicode包。strings包提供了许多如字符串的查询、替换、比较、截断、拆分和合并等功能。
 
-bytes包也提供了很多类似功能的函数，但是针对和字符串有着相同结构的[]byte类型。因为字符串是只读的，因此逐步构建字符串会导致很多分配和复制。在这种情况下，使用bytes.Buffer类型将会更有效，稍后我们将展示。
+bytes包也提供了很多类似功能的函数，但是针对和字符串有着相同结构的[]byte类型。因为字符串是只读的，因此逐步构建字符串会导致很多分配和复制。在这种情况下，使用`bytes.Buffer`类型将会更有效，稍后我们将展示。 如下代码展示了如何使用`byte.Buffer`基本例子
 
-strconv包提供了布尔型、整型数、浮点数和对应字符串的相互转换，还提供了双引号转义相关的转换。
+```golang
+func main() {
+	var b bytes.Buffer // A Buffer needs no initialization.
+	b.Write([]byte("Hello "))
+	fmt.Fprintf(&b, "world!")
+	b.WriteTo(os.Stdout)
+}
+```
 
-unicode包提供了IsDigit、IsLetter、IsUpper和IsLower等类似功能，它们用于给字符分类。每个函数有一个单一的rune类型的参数，然后返回一个布尔值。而像ToUpper和ToLower之类的转换函数将用于rune字符的大小写转换。所有的这些函数都是遵循Unicode标准定义的字母、数字等分类规范。strings包也有类似的函数，它们是ToUpper和ToLower，将原始字符串的每个字符都做相应的转换，然后返回新的字符串。
+`strconv`包提供了布尔型、整型数、浮点数和对应字符串的相互转换，还提供了双引号转义相关的转换。
+
+`unicode`包提供了IsDigit、IsLetter、IsUpper和IsLower等类似功能，它们用于给字符分类。每个函数有一个单一的rune类型的参数，然后返回一个布尔值。而像ToUpper和ToLower之类的转换函数将用于rune字符的大小写转换。所有的这些函数都是遵循Unicode标准定义的字母、数字等分类规范。`strings`包也有类似的函数，它们是ToUpper和ToLower，将原始字符串的每个字符都做相应的转换，然后返回新的字符串。
 
 下面例子的basename函数灵感源于Unix shell的同名工具。在我们实现的版本中，basename(s)将看起来像是系统路径的前缀删除，同时将看似文件类型的后缀名部分删除：
 
-
+```golang
 fmt.Println(basename("a/b/c.go")) // "c"
 fmt.Println(basename("c.d.go"))   // "c.d"
 fmt.Println(basename("abc"))      // "abc"
+```
 第一个版本并没有使用任何库，全部手工硬编码实现：
 
+```golang
 gopl.io/ch3/basename1
-
-
 // basename removes directory components and a .suffix.
 // e.g., a => a, a.go => a, a/b/c.go => c, a/b.c.go => b.c
 func basename(s string) string {
@@ -2174,8 +2207,11 @@ func basename(s string) string {
     }
     return s
 }
+```
+
 这个简化版本使用了strings.LastIndex库函数：
 
+```golang
 gopl.io/ch3/basename2
 
 
@@ -2187,7 +2223,9 @@ func basename(s string) string {
     }
     return s
 }
-path和path/filepath包提供了关于文件路径名更一般的函数操作。使用斜杠分隔路径可以在任何操作系统上工作。斜杠本身不应该用于文件名，但是在其他一些领域可能会用于文件名，例如URL路径组件。相比之下，path/filepath包则使用操作系统本身的路径规则，例如POSIX系统使用/foo/bar，而Microsoft Windows使用c:\foo\bar等。
+```
+
+`path`和`path/filepath`包提供了关于文件路径名更一般的函数操作。使用斜杠分隔路径可以在任何操作系统上工作。斜杠本身不应该用于文件名，但是在其他一些领域可能会用于文件名，例如`URL`路径组件。相比之下，`path/filepath`包则使用操作系统本身的路径规则，例如POSIX系统使用/foo/bar，而Microsoft Windows使用c:\foo\bar等。
 
 让我们继续另一个字符串的例子。函数的功能是将一个表示整数值的字符串，每隔三个字符插入一个逗号分隔符，例如“12345”处理后成为“12,345”。这个版本只适用于整数类型；支持浮点数类型的留作练习。
 
