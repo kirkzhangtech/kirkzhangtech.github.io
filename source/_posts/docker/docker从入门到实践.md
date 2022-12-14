@@ -164,14 +164,15 @@ UBUNTU_CODENAME=bionic
 `bash`：放在镜像名后的是 命令，这里我们希望有个交互式 Shell，因此用的是 bash。
 进入容器后，我们可以在 Shell 下操作，执行任何所需的命令。这里，我们执行了 `cat /etc/os-release`，这是 Linux 常用的查看当前系统版本的命令，从返回的结果可以看到容器内是 Ubuntu 18.04.1 LTS 系统。
 最后我们通过 exit 退出了这个容器。
+
 summary:
 1. 大陆要换镜像源
 2. `docker pull`命令的使用,`docker pull [选项] [Docker Registry 地址[:端口号]/]仓库名[:标签]`可以使用`docekr pull --help`查看具体命令
    1. 会打印出分层的镜像日志
    2. 下载结束后，给出该镜像完整的 sha256 的摘要，以确保下载一致性
 3. `docker run` 命令
-   1. -it参数
-   2. --rm 参数
+   1. -it参数，i是交互，t是代表终端
+   2. --rm 参数 ，表明退出后删除
    3. ubuntu:20.04 参数
    4. bash 参数,一般是/usr/bash
 4. `cat /etc/os-release`查看版本信息
