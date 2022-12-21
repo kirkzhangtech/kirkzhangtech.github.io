@@ -52,11 +52,15 @@ eight-sided / adj 八边的
 eg : the brass on the belt
 `brass` [bræs] / n.黄铜；铜管乐器；黄铜器，黄铜饰品；<非正式>高级官员，高级军官
 `boots` [buːts] polished [ˈpɑːlɪʃt] / n 靴子（boot的复数）  adj.擦亮的；优美的；圆滑的
+
+eg : A gray wool blanket tucked tightly under the mattress provided warmth from the cool San Diego evenings
 `trainee` [ˌtreɪˈniː] / n.接受培训者，实习生，见习生
 `mattress` [ˈmætrəs] / n 床垫，褥垫
 gray wool blanket [wʊl] [ˈblæŋkɪt] / 羊毛毯子 
 `trucked` [tʌkt] / 盘（腿）；盘（头发）；使有褶裥；使折叠；收拢
-eg : A gray wool blanket tucked tightly under the mattress provided warmth from the cool San Diego evenings
+
+
+eg : A single pillow  intersected at a ninety-degree angle with the blanket at the bottom
 `crease` [kriːs] / {服饰}皱纹,褶皱
 `blouse` [blaʊs] / n 衬衫
 `trousers` [ˈtraʊzərz] / 裤子，长裤； 裤子
@@ -66,7 +70,7 @@ eg : Were the creases in the blouse and trousers aligned?
 `blind` / 聋子
 `angle` [ˈæŋɡ(ə)l] /  n 角；倾斜，斜角
 `intersected` [ˌɪntərˈsekt] / v 相交，交叉；横穿，横断
-eg : A single pillow  intersected at a ninety-degree angle with the blanket at the bottom
+
 
 
 eg : Any deviation from this exacting requirement would be cause for me to "hit the surf" and then roll around on the beach
@@ -153,3 +157,138 @@ If you want to change your life and maybe the world—start off by making your b
 `comfort` [] / n.舒服，舒适；安慰，慰藉；令人感到安慰的人（或事物）；舒适的设施（或条件）；生活富足 v.安慰，抚慰
 `faith` / 信念
 `lift` [lɪft] / n. 鼓舞，振奋
+
+
+## chapter 2 You Can’t Go It Alone
+
+I learned early on in SEAL training the value of teamwork, the need to rely on someone else to help you through the difficult tasks. For those of us who were “tadpoles” hoping to become Navy frogmen, a ten-foot rubber raft was used to teach us this vital lesson.
+
+`tabpoles` ['tæd,pol] / n.脊椎 蝌蚪 
+`rubber` ['rʌbɚ] / n.橡胶；橡皮
+`vital` ['vaɪtl] / adj. 至关重要的；生死攸关的；有活力的
+
+Everywhere we went during the first phase of SEAL training we were required to carry the raft. We placed it on our heads as we ran from the barracks, across the highway, to the chow hall. We carried it in a low-slung position as we ran up and down the Coronado sand dunes. We paddled the boat endlessly from north to south along the coastline and through the pounding surf, seven men, all working together to get the rubber boat to its final destination.
+`chow hall`   / 食堂
+`dunes` [dʊn] / 沙丘
+`low-slung` [] / 腰身
+`poundding` ['paʊndɪŋ] / n.重击；重击声
+
+But we learned something else on our journey with the raft. Occasionally, one of the boat crew members was sick or injured, unable to give it 100 percent. I often found myself exhausted from the training day, or down with a cold or the flu. On those days, the other members picked up the slack. They paddled harder. They dug deeper. They gave me their rations for extra strength. And when the time came, later in training, I returned the favor. The small rubber boat made us realize that no man could make it through training alone. No SEAL could make it through combat alone and by extension you needed people in your life to help you through the difficult times.
+`crew` [krʊ] / n. 队，组；全体人员，全体船员 vi. 一起工作
+`slack` [slæk] / adj. 松弛的；疏忽的；不流畅的 vi. 松懈；减弱 n. 煤末；峡谷
+`picked up` [] / 捡起 获得
+`ration`  / vt. 配给；定量供应 n. 定量；口粮；配给量
+`favor`  / 喜爱和赞成
+
+Never was the need for help more apparent to me than twenty-five years later 
+when I commanded all the SEALs on the West Coast.
+I was the commodore of Naval Special Warfare Group ONE in Coronado. A Navy captain, I had by now spent the past several decades leading SEALs around the world. I was out for a routine parachute jump when things went terribly wrong.
+`captian` 上校
+
+We were in a C-130 Hercules aircraft climbing to twelve thousand feet preparing for the jump. Looking out the back of the aircraft, we could see a beautiful California day. Not a cloud in the sky. The Pacific Ocean was calm, and from this altitude you could see the border of Mexico just a few miles away.
+`climbing` [] / v 爬
+`calm` [] / adj 平静的
+
+The jumpmaster yelled to “stand by.” Now on the edge of the ramp, I could see straight down to the ground. The jumpmaster looked me in the eye, smiled, and shouted, “Go, go, go!” I dove out of the aircraft, arms fully extended and legs tucked slightly behind my back. The prop blast from the aircraft sent me tilting forward until my arms caught air and I leveled out.
+`ramp` [ræmp] / n. 斜坡，坡道；敲诈 vi. 蔓延；狂跳乱撞；
+`dove` [] / v潜水式
+`prop` [prɑp] / n. 支柱，支撑物；支持者；道具；（橄榄球中的）支柱前锋 vt. 支撑，支持，维持；使倚靠在某物上
+`blast` [blæst] / n. 爆炸；冲击波；一阵 vi. 猛攻 vt. 爆炸；损害；使枯萎
+`tilting` [tɪlt] / n. 倾卸台adj. [航][气象] 倾斜；倾卸
+`level` [] / n. 水平；标准；水平面 adj. 水平的；平坦的；同高的 vi. 瞄准；拉平；变得平坦 vt. 使同等；对准；弄平
+`altitude`  [] / n高度
+
+I quickly checked my altimeter, made sure I wasn’t spinning, and then looked around me to ensure no jumper was too close to me. Twenty seconds later I had fallen to the pull altitude of 5,500 feet.
+`altimeter` [æl'tɪmətɚ] / n 测高仪
+`too to` 这东西要多角度看
+
+Suddenly, I looked below me and another jumper had slid beneath me, intersecting my path to the ground. He pulled his rip cord, and I could see the pilot chute deploying the main parachute from his backpack. Immediately, I thrust my arms to my side, forcing my head to the ground in an attempt to get away from the blossoming chute. It was too late.
+
+The jumper’s chute popped open in front of me like an air bag, hitting me at 120 miles an hour. I bounced off the main canopy and spun out of control, barely conscious from the impact. For seconds I spun head over heels (倒转身体), trying to get stable again. I couldn’t see my altimeter and was unaware of how far I had fallen.
+`slid` [slɪd] / v 滑
+`rip`  [] / vt. 撕；锯 vi. 裂开，被撕裂 n. 裂口，裂缝
+`cord` [] / v 绳索
+`pilot` [paɪlət] / n.飞行员；领航员
+`chute` [ʃut] / 降落伞 
+`thrust` [θrʌst] /  n. [力] 推力；刺 vt. 插；插入；推挤
+`canopy` ['kænəpi] / n. 天篷；华盖；遮篷；苍穹vt. 用天蓬遮盖；遮盖
+`conscious` ['kɑnʃəs] /  adj. 意识到的；故意的；
+
+Instinctively, I reached for my rip cord and pulled. The pilot chute jettisoned from its small pouch in the back of the parachute but wrapped around my leg as I continued to tumble toward the ground. As I struggled to untangle myself the situation got worse. The main parachute partially deployed but in doing so twirled around my other leg.
+`instinctively` [in'stiŋktivli] /  adv. 本能地
+`jettisoned` ['dʒɛtɪsn] /  n. 投弃；投弃货物 vt. 投弃
+`tumble` ['tʌmbl] / vi. 摔倒；倒塌；滚动；打滚；仓惶地行动 vt. 使摔倒；使滚翻；弄乱 n. 跌倒；翻筋斗；跌跤
+`untangle` [ʌn'tæŋɡl] / vt. 清理；整顿；解开…纠结
+`twirled` [twɜːrl] / v.（使）旋转，转动；使轻快地转动；（用手指）缠绕，捻弄 n.转动，旋转（一周）；螺旋形曲线；旋转的东西
+
+Craning my neck toward the sky, I could see my legs were bound by two sets of risers, the long nylon straps that connect the main parachute to the harness on my back. One riser had wrapped around one leg, the other riser around the other leg. The main parachute was fully out of the backpack but hung up somewhere on my body.
+`crane` [kren] /n. 吊车，起重机；鹤 vi. 伸着脖子看；迟疑，踌躇 vt. 用起重机起吊；伸长脖子
+
+As I struggled to break free of the entanglement, suddenly I felt the canopy lift off my body and begin to open. Looking toward my legs, I knew what was coming next.
+`entanglement` [ɪn'tæŋɡlmənt] / n. 纠缠；铁丝网；缠绕物；牵连
+
+Within seconds, the canopy caught air. The two risers, one wrapped around each leg, suddenly and violently pulled apart, taking my legs with them. My pelvis separated instantly as the force of the opening ripped my lower torso. The thousand small muscles that connect the pelvis to the body were torn from their hinges.
+`violently` ['vaɪələntli] / adv. 猛烈地，激烈地
+`apart` [ə'pɑrt] / adv. 相距；与众不同地；分离着 adj. 分离的；与众不同的
+`torso` ['tɔrso] / n. 躯干；裸体躯干雕像
+`hinges` / . [机] 铰链；合页（hinge的复数）；小五金 v. 给…装上绞链；使以…为条件
+`torn` [] / v. 扯裂，撕开
+
+My mouth dropped open and I let out a scream that could be heard in Mexico. Searing pain arched through my body, sending waves pulsating downward to my pelvis and upward to my head. Violent, muscular convulsions racked my upper torso, shooting more pain through my arms and legs. Now, like having an out-of-body experience, I became aware of my screaming and tried to control it, but the pain was too intense.
+`searing` ['sɪrɪŋ] / adj. 灼热的 v. 使枯萎（sear的ing形式）
+`arched` [ɑrtʃt] / adj. 拱形的；有拱的；弓形结构的 v. 成弓形弯曲；成弓形
+`pelvis` [ˈpelvɪs] /  n.骨盆
+`muscular` ['mʌskjəlɚ] / adj. 肌肉的；肌肉发达的；强健的
+`convulsion` [kənˈvʌlʃnz] / n. [内科]抽搐；社会动乱；哄堂大笑；震动
+`rack` [ræk] / n. [机] 齿条；架子；拷问台 vi. 变形；随风飘；小步跑 vt. 折磨；榨取
+`intense` [ɪn'tɛns] / adj. 强烈的；紧张的；非常的；热情的
+
+Still head down and falling too fast, I turned myself upright in the harness, relieving some of the pressure on my pelvis and back.
+
+I had fallen over four thousand feet before the parachute deployed. The good news: I had a full canopy over my head. The bad news: I was broken apart by the impact of the opening.
+`relieve` vt. 解除，减轻；使不单调乏味
+`apart by` 分开 by
+
+ landed over two miles from the drop zone. Within a few minutes the drop zone crew and an ambulance arrived. I was taken to the trauma hospital in downtown San Diego. By the next day I was out of surgery. The accident had ripped my pelvis apart by almost five inches. The muscles in my stomach had become detached from the pelvic bone and the muscles in my back and legs were severely damaged from the opening shock. I had a large titanium plate screwed into my pelvis and a long scapular screw drilled into my backside for stability.
+ `downtown` ['daʊn'taʊn] / adv. 往闹市区；在市区 adj. 市中心的
+ `surgery` ['sɝdʒəri] / n. 外科；外科手术；手术室；诊疗室
+ `detached` [dɪ'tætʃt] / adj. 分离的，分开的；超然的 v.分离
+ `titanium`  [taɪ'tenɪəm;] / 钛
+ `screwed`   vt. 旋，拧；压榨；强迫 n. 螺旋；螺丝钉；吝啬鬼
+ `scapular` [ˈskæpjələr] /  n. 肩胛；修道士的肩衣；肩羽
+ `drill` [drɪl] / adj. 钻过孔的 v. 钻孔
+
+ This seemed like the end of my career. To be an effective SEAL you had to be physically fit. My rehabilitation was going to take months, maybe years, and the Navy was required to conduct a medical evaluation to determine if I was fit for duty. I left the hospital seven days later but remained bedridden at my home for the next two months.
+ `evaluation` [ɪ,væljʊ'eʃən] / n. 评价；[审计] 评估
+ `bedridden` ['bɛdrɪdn] / adj. 卧床不起的
+ `rehabilitation` [riːəˌbɪlɪ'teʃn] / n. 复原
+
+ All my life I had the feeling I was invincible. I believed that my innate athletic abilities could get me out of most perilous situations. And, up to this point, I had been right. Many times during my career I had encountered life-threatening incidents: midair collisions in another parachute; uncontrolled descent in a minisub; nearly falling hundreds of feet off an oil rig; getting trapped beneath a sinking boat; demolition that exploded prematurely(过早爆炸的拆卸工程); and countless more—incidents where a split second(每一秒) decided the fate between living and dying. Each time I had somehow managed to make the right decision, and each time I was physically fit enough to overcome the challenge before me. Not this time.
+`invincible` [ɪn'vɪnsəbl] / adj. 无敌的；不能征服的
+`innate` [ɪ'net] / adj. 先天的；固有的；与生俱来的
+`athletic` [æθ'lɛtɪk] / adj. 运动的，运动员的；体格健壮的
+`perilous ` ['pɛrələs] / adj. 危险的，冒险的
+`midair collisions` [kə'lɪʒən]  / n. [物] 碰撞；冲突；撞击
+`descent`  [dɪ'sɛnt] / n. 下降；血统；袭击 vt. 除去…的气味；使…失去香味
+`minisub` [] / 小型潜水艇
+`oil rig`  石油钻塔
+`trap` [træpt] / adj. 捕获的；陷入困境的；收集的；受到限制的vt. 诱捕
+
+Now, lying in bed, all I felt was self-pity. But that would not last for long. My wife, Georgeann, had been given nursing duties. She cleaned my wounds, gave me the required daily shots, and changed my bedpan. But most importantly, she reminded me of who I was. I had never given up on anything in my life and she assured me that I was not going to start now. She refused to let me feel sorry for myself. It was the kind of tough love that I needed, and as the days went by, I got better.
+`self-pity` [] / n. 自怜；自哀
+`bedpan` [ˈbedpæn] /  n. 便盆；睡床用脚炉
+`assure` [ə'ʃʊrd] / adj. 确定的；自信的
+`tough` [tʌf] / adj. 艰苦的，困难的；坚强的，不屈不挠的；坚韧的，牢固的；强壮的，结实的n. 恶棍 vt. 坚持；忍受，忍耐
+
+My friends came by the house, called constantly, and helped with whatever they could. My boss, Admiral Eric Olson somehow found a way around the policy that required the Navy to conduct a medical evaluation of my ability to continue to serve as a SEAL. His support for me likely saved my career.
+
+During my time in the SEAL Teams I had numerous setbacks, and in each case, someone came forward to help me: someone who had faith in my abilities; someone who saw potential in me where others might not; someone who risked their own reputation to advance my career. I have never forgotten those people and I know that anything I achieved in my life was a result of others who have helped me along the way.
+`setbacks` ['sɛt,bæk] / n. 挫折；周折（setback复数）
+`reputation` [reputation] / n. 名声，名誉；声望
+
+None of us are immune from life’s tragic moments. Like the small rubber boat we had in basic SEAL training, it takes a team of good people to get you to your destination in life. You cannot paddle the boat alone. Find someone to share your life with. Make as many friends as possible, and never forget that your success depends on others.
+`tragic` ['trædʒɪk] / adj. 悲剧的；悲痛的，不幸的
+
+summary: 
+1. 这一节的动作细节描写太多词汇了，经本上能涵盖很多基本场景
+2. 也描写很多自己经理的痛苦，take this pain as your fource
