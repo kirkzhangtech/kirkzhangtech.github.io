@@ -1,5 +1,5 @@
 ---
-title: Make_Your_Bed_Little_Things_That_Can_Change_Your_Life
+title: Make Your Bed Little Things That Can Change Your Life
 categories:
 - 非技术类
 thumbnailImagePosition: bottom

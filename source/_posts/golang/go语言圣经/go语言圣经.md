@@ -760,6 +760,17 @@ summary:
 
 ### 2.3.2. 指针
 
+summary:
+
+1. 指针是真的神奇的一个东西
+2. 这节主要是讲解`flag`包，这个地方很多东西要深挖
+3. E4,*p就是变量v的别名。指针特别有价值的地方在于我们可以不用名字而访问一个变量，但是这是一把双刃剑
+4. `任何类型`的指针的`零值`都是`nil`。如果p指向某个有效变量，那么`p != nil`测试为`真`。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。  
+5. remember pointer of golang 
+ & = you TAKE the address   
+ \* = you FOLLOW the address  
+⚠️*T = denotes a pointer type (all pointers to T, ex: *int)
+
 一个变量对应一个保存了变量对应类型值的内存空间。普通变量在声明语句创建时被绑定到一个变量名，比如叫x的变量，但是还有很多变量始终以表达式方式引入，例如x[i]或x.f变量。所有这些表达式一般都是读取一个变量的值，除非它们是出现在赋值语句的左边，这种时候是给对应变量赋予一个新的值。
 
 一个指针的值是另一个变量的地址。一个指针对应变量在内存中的存储位置。并不是每一个值都会有一个内存地址，但是对于每一个变量必然有对应的内存地址。通过指针，我们可以直接读或更新对应变量的值，而不需要知道该变量的名字（如果变量有名字的话）。
@@ -855,12 +866,7 @@ Usage of ./echo4:
   -s string
         separator (default " ")
 ```
-summary:
 
-1. 指针是真的神奇的一个东西
-2. 这节主要是讲解`flag`包，这个地方很多东西要深挖
-3. E4,*p就是变量v的别名。指针特别有价值的地方在于我们可以不用名字而访问一个变量，但是这是一把双刃剑
-4. `任何类型`的指针的`零值`都是`nil`。如果p指向某个有效变量，那么`p != nil`测试为`真`。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。
 
 ### 2.3.3. new函数
 
@@ -5406,6 +5412,12 @@ summary:
 1. 当时有个疑问，为什么`New`方法的返回值类型是`error`接口类型，但是具体的返回值是结构体类型的`指针`，因为该结构体实现了`error`接口,然后在调用一次`Error()`就可以返回具体的错误类型,并且因为是指针类型`*errorString`满足error接口而非`errorString`类型，所以每个New函数的调用都分配了一个独特的和其他错误不相同的实例，我们也不想要重要的error例如io.EOF和一个刚好有相同错误消息的error比较后相等，即使内部string是相同的错误，但是`==`仍不相等
 2. `New`等价的方法是`fmt.Errorf`
 3. 多个平台上，定义一个实现error接口的数字类型`Errno`,也就是用不同的数字来映射不同的错误类型
+4. 在hasicorp/raft中有很多预定义的error数据,等等，下面这些专门是给外部包调用的
+   ```golang
+   ErrLeader = errors.New("node is the leader")
+   ErrNotLeader = errors.New("node is not the leader")
+   ErrNotVoter = errors.New("node is not a voter")
+   ```
 
 
 从本书的开始，我们就已经创建和使用过神秘的预定义error类型，而且没有解释它究竟是什么。实际上它就是interface类型，这个类型有一个返回错误信息的单一方法：
@@ -5425,7 +5437,7 @@ package errors
 func New(text string) error { 
     // 返回的是实例
     return &errorString{text} 
-    }
+}
 
 type errorString struct { text string }
 
@@ -6718,9 +6730,10 @@ ch = make(chan int, 3) // buffered channel with capacity 3
 ### 8.4.1. 不带缓存的Channels
 
 summary:
-1. 关于无缓存的channel，一个关键的阐述，发送者会阻塞，如果接收者未就位，接收者也会阻塞，如果发送者也未就位
-2. 五缓存channel也叫同步channel
-3. 
+1. 关于无缓存的channel，一个关键的阐述，如果接收者未就位,发送者会阻塞，如果发送者也未就位，接收者也会阻塞，
+2. 无缓存channel也叫同步channel
+3. But in the interest of memory utilization, `struct{}` is the smallest data type available in Go
+
 一个基于无缓存Channels的发送操作将导致发送者goroutine阻塞，直到另一个goroutine在相同的Channels上执行接收操作，当发送的值通过Channels成功传输之后，两个goroutine可以继续执行后面的语句。反之，如果接收操作先发生，那么接收者goroutine也将阻塞，直到有另一个goroutine在相同的Channels上执行发送操作。
 
 基于无缓存Channels的发送和接收操作将导致两个goroutine做一次同步操作。因为这个原因，无缓存Channels有时候也被称为同步Channels。当通过一个无缓存Channels发送数据时，接收者收到数据发生在再次唤醒发送者goroutine之前（译注：happens before，这是Go语言并发内存模型的一个关键术语！）。
@@ -6851,6 +6864,13 @@ func main() {
 试图重复关闭一个channel将导致panic异常，试图关闭一个nil值的channel也将导致panic异常。关闭一个channels还会触发一个广播机制，我们将在8.9节讨论。
 
 ### 8.4.3. 单方向的Channel
+
+summary:
+1. 从channel里面拿就是发送，往里面塞就是接收，定义方式也不同
+   1. `rpc chan<- RPC , rpc<- x`只是发送channel
+   2. `rpc:= <-chan RPC`说明是接收rpc的变量
+2. 双向channel,比如下面的直接定义`out , in chan int`
+
 随着程序的增长，人们习惯于将大的函数拆分为小的函数。我们前面的例子中使用了三个goroutine，然后用两个channels来连接它们，它们都是main函数的局部变量。将三个goroutine拆分为以下三个函数是自然的想法：
 
 ```golang
@@ -6862,7 +6882,7 @@ func printer(in chan int)
 
 这种场景是典型的。当一个channel作为一个函数参数时，它一般总是被专门用于只发送或者只接收。
 
-为了表明这种意图并防止被滥用，Go语言的类型系统提供了单方向的channel类型，分别用于只发送或只接收的channel。类型chan<- int表示一个只发送int的channel，只能发送不能接收。相反，类型<-chan int表示一个只接收int的channel，只能接收不能发送。（箭头<-和关键字chan的相对位置表明了channel的方向。）这种限制将在编译期检测。
+为了表明这种意图并防止被滥用，Go语言的类型系统提供了单方向的channel类型，分别用于只发送或只接收的channel。类型`chan<- int`表示一个只发送int的channel，只能发送不能接收。相反，类型`<-chan int`表示一个只接收int的channel，只能接收不能发送。（箭头<-和关键字chan的相对位置表明了channel的方向。）这种限制将在编译期检测。
 
 因为关闭操作只用于断言不再向channel发送新的数据，所以只有在发送者所在的goroutine才会调用close函数，因此对一个只接收的channel调用close将是一个编译错误。
 
@@ -6871,6 +6891,7 @@ func printer(in chan int)
 ```golang
 gopl.io/ch8/pipeline3
 func counter(out chan<- int) {
+    //out是发送channel
     for x := 0; x < 100; x++ {
         out <- x
     }
@@ -6878,6 +6899,7 @@ func counter(out chan<- int) {
 }
 
 func squarer(out chan<- int, in <-chan int) {
+    //用range来迭代发送channel
     for v := range in {
         out <- v * v
     }
@@ -6893,7 +6915,8 @@ func printer(in <-chan int) {
 func main() {
     naturals := make(chan int)
     squares := make(chan int)
-    go counter(naturals)
+    //在管道中塞满数据然后关掉。后续可以用range 来迭代里面的数据
+    go counter(naturals) 
     go squarer(squares, naturals)
     printer(squares)
 }

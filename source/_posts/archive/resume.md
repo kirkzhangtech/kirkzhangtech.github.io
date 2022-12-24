@@ -6,19 +6,23 @@ thumbnailImagePosition: bottom
 # coverImage: https://user-images.githubusercontent.com/46363359/207096139-b7700474-bc00-426c-a342-b61a7d7da10e.jpg
 metaAlignment: center
 coverMeta: out
+date: 2022-12-24
 ---
 
-张士明(kirkzhang)
+## 张士明(kirkzhang)
 Knowledge isn’t free. You have to pay attention. 🧠🧠🧠
 
 email: zxc741208584@gmail.com
 homepag: https://simonteo58.github.io/
 github: https://github.com/SimonTeo58
-Education
+
+## Education
 湖南工学院 2014.9 - 2018.09
 bachelor - 无机非金属材料学士学位
-Experience
-HSBC Tech China(contractor) 2020.6 - present
+
+## Experience
+
+### HSBC Tech China(contractor) 2020.6 - present
 Mid-software-engineer
 
 as a software-engineer solving xxxxxxx
