@@ -5,6 +5,7 @@ categories:
 ---
 
 > 文档： <https://vuejs.org/guide/quick-start.html>
+
 A framework is a JavaScript tool that makes it easier for developers to create
 rich,interactive websites. Frameworks contain functionality that enable us to
 make a fully functional web application: manipulating complicated data and

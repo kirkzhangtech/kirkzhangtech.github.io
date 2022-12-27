@@ -292,3 +292,8 @@ None of us are immune from life’s tragic moments. Like the small rubber boat w
 summary: 
 1. 这一节的动作细节描写太多词汇了，经本上能涵盖很多基本场景
 2. 也描写很多自己经理的痛苦，take this pain as your fource
+
+
+## chapter 3 Only the Size of Your Heart Matters
+
+I ran to the beach with my black, rubber flippers tucked underneath my right arm and my mask in my left hand. Coming to parade rest, I anchored the flippers in the soft sand, leaning them against each other to form a teepee. Standing to my right and left were other students. Dressed in green tee shirts, khaki swim trunks, neoprene booties, and a small life jacket, we were preparing for our morning two-mile swim.

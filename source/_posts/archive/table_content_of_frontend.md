@@ -3,7 +3,7 @@ title: knowledge tree of front end
 categories:
 - archive
 thumbnailImagePosition: bottom
-coverImage: https://user-images.githubusercontent.com/46363359/209429343-4e6cf5bc-9d2d-4ee6-bb06-2ca8a836b3b3.jpg
+coverImage: https://user-images.githubusercontent.com/46363359/209688317-8fa54e46-c9c7-444c-bc73-c8ce8d4d5d19.jpg
 metaAlignment: center
 coverMeta: out
 date: 2022-12-23

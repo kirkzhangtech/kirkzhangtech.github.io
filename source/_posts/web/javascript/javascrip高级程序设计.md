@@ -1,7 +1,6 @@
 ---
 title: 《javascrip高级程序设计》
 categories: 
-- java
 - js
 thumbnailImagePosition: bottom
 # thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg

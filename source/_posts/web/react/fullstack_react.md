@@ -1,0 +1,107 @@
+---
+title: React全家桶 前端开发与实例详解
+categories:
+- js
+thumbnailImagePosition: bottom
+coverImage: https://user-images.githubusercontent.com/46363359/209692120-121acd97-15cc-4d34-b007-a871f9ba79d7.jpg
+metaAlignment: center
+coverMeta: out
+---
+
+摘要：讲react非常详细的一本书
+
+<!-- more -->
+
+# 1 第一个react web应用
+
+## 1.1 构建productt hunt项目
+
+整本书都是围绕着一个类product hunt网站的demo进行讲解
+
+## 1.2 配置开发环境
+
+### 1.2.1 代码编辑器
+
+个人还是非常喜欢使用vscode作为代码编辑器来使用。相对neovim还是比较好上手，但是最后还是过渡到neovim编辑器上
+
+### 1.2.2 nodejs和npm的安装
+
+`npm -v`查看npm版本，在ubuntu上面装nodejs并适配hexo工具会要求装很高版本的nodejs这里就要换安装方式
+
+### 1.2.3 安装git
+
+安装简单，直接`sudo apt install git`,但是使用还不太清楚
+
+### 1.2.4 浏览器
+
+没什么好说的推荐使用chrome浏览器
+
+## 1.3 针对windows用户的特殊说明
+
+我用的ubuntu所以不涉及，直接跳过
+
+## 1.4 javascript ES6/ES7 
+
+不同浏览器具有不同的执行JavaScript代码的解释器JavaScript作为互联网的客户端脚本语言被广泛采用，从而形成了标准组织来管理它的规范。规范的名称就是ECMAScript或ES。ES6有时称为ES2015，2015即它最终完成的年份。相应地，ES7通常被称为ES2016。
+
+## 1.5 开始
+
+直接download源码，然后`cd`到对应目录下执行`npm install`安装相关依赖，`npm start` 启动服务器，http://localhost:3000来查看正在运行的应用程序
+
+## 1.6 什么组件
+
+构架react应用程序的的基础就是组件（一个class），可以将单独的react组件是为应用程序的一个UI组件，正如图中product hunt程序那样，包括了了一个父组件productList，和一个product子组件。
+
+React组件可以清晰的映射到UI组件，而且是独立的，标记代码，试图逻辑以及组件的特定样式集中的在一个地方。
+比如父组件productList组件对应着一个product集合，然后是product组件对应着每一个UI中展示的组件，样式代码是不互相干扰的
+
+### 1.6.1 第一个组件
+
+示例代码 voting_app/public/js/app-1.js
+
+```js
+class ProductList extends React.Component {
+  render() {
+    return (
+      <div className='ui unstackable items'>
+        Hello, friend! I am a basic React component.
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+```
+
+- ProductList组件继承了React.Component类的ES6库，index页面也引用了React框架库，ES6引入了`类`声明语法。ES6类是JavaScript基于原型的继承模型的语法糖
+- 声明组件有两种方式
+  - 第一种就是上面那种，像是java创建类一样，但是render方式是固定要实现的
+  - 第二种就是使用create-response-class库中createReactClass()方法
+    ```js
+    import createReactClass from 'create-react-class';
+
+    const HelloWorld = createReactClass({
+        render() { return(<p>Hello, world!</p>) }
+    })
+    ```
+    返回值的语法看起来和传统的JavaScript有些不像。该语法称为JavaScript扩展语法JSX,JSX代码最后会编译成vanilla JavaScript（原生JavaScript）
+
+### 1.6.2 JSX
+**React组件最终渲染为浏览器中显示的HTML**,这个是我一开始使用没想明白的，其实React在做的根本的动作就是将所有东西都组装成HTML展示出来，这里面就涉及虚拟DOM对象，建JSX的目的是使表示HTML的JavaScript看起来更像HTML
+常规js代码渲染
+```js
+React.createElement('div', {className: 'ui items'},
+'
+Hello, friend! I am a basic React component.'
+)
+```
+JSX代码渲染
+```js
+<div className='ui items'>
+Hello, friend! I am a basic React component.
+</div>
+```
+后者的代码看起来更加的舒服，JSX在JavaScript版本上提供了轻量级抽象，虽然上面的JSX代码看起来与HTML几乎相同，但要记住JSX实际上是编译成了JavaScript

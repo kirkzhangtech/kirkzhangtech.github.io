@@ -1,12 +1,17 @@
 ---
 title: react快速上手开发
 categories:
-- 非技术类
+- js
 thumbnailImagePosition: bottom
 coverImage: https://user-images.githubusercontent.com/46363359/209441599-8240edd3-c8b8-437e-93df-ef48502cb631.jpg
 metaAlignment: center
 coverMeta: out
 ---
+
+摘要：这本书讲的太和宽泛了，没有完整和详细的例子做支撑，学起来，尤其是自己二次加工时候会很吃力
+
+<!-- more -->
+<!-- toc -->
 
 ## hello world
 
@@ -133,6 +138,7 @@ ReactDOM.render(
 ```
 
 4. state与带状态的文本框组件
+
 ```js
   <script>
       var TextAreaCounter = React.createClass({
@@ -181,3 +187,13 @@ ReactDOM.render(
 
 
 5. 关于DOM事件的说明
+  1. 传统的事件处理
+  2. React合成事件
+
+6. props和state
+当你知道render()方法中显示组件的时候，可以访问this.props和this.state ，属性是一种给外部世界设置组件的机制，而状态则负责组建内部数据的维护，如果与面向对象编程进行类比的话，this.props就像是传递给类构造函数的参数，而this.state则包含了你的`私有属性`
+
+7. 在初始化state时候使用props:一种反模式
+在 render() 方法中将 this.state 和 this.props 任意组合，以进行界面构建。但有时候，你想要传递一个值到组件中，用于构造初始状态。这种想法本身没什么不对，但如果组件的调用者以为属性（在之前的例子中是 text 属性）总是能保持最新，这种写法就有歧义了。
+
+8. 从外部访问组件

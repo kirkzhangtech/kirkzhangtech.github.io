@@ -6,7 +6,6 @@ thumbnailImagePosition: bottom
 # coverImage: https://user-images.githubusercontent.com/46363359/207096139-b7700474-bc00-426c-a342-b61a7d7da10e.jpg
 metaAlignment: center
 coverMeta: out
-date: 2022-12-24
 ---
 
 ## 张士明(kirkzhang)
