@@ -105,3 +105,54 @@ Hello, friend! I am a basic React component.
 </div>
 ```
 后者的代码看起来更加的舒服，JSX在JavaScript版本上提供了轻量级抽象，虽然上面的JSX代码看起来与HTML几乎相同，但要记住JSX实际上是编译成了JavaScript
+
+### 1.6.3 开发者控制台
+
+可以与application进行交互
+
+### 1.6.4 Babel
+
+Babel是一个JavaScript转译器,可以将ES6代码转译为ES5代码，它的另一个使用功能就是理解JSX语法.
+在index页面我们带入babel
+```js
+<head>
+<!-- ... -->
+<script src="vendor/babel-standalone.js"></script>
+<!-- ... -->
+</head>
+```
+然后我们再告诉js运行时，代码需要由babel编译，通过设置如下选项
+```js
+<script src="./js/seed.js"></script>
+<script
+  type="text/babel"
+  data-plugins="transform-class-properties"
+  src="./js/app.js">
+</script>
+
+```
+index页面导入了相关的js代码和react代码，所以就在调用react相关的功能
+
+### 1.6.5 ReactDOM.render()方法
+voting_app/public/js/app-1.js 。 我们要再特定的DOM节点渲染这个ProductList组件
+```js
+class ProductList extends React.Component {
+
+render() {
+return (
+    <div className='ui unstackable items'>
+    Hello, friend! I am a basic React component.
+    </div>
+      );
+    }
+}
+
+ReactDOM.render(
+<ProductList />,
+document.getElementById('content')
+);
+```
+这个ReactDOM.render继承自React库，其中有两个参数，一个是what，也就是你要渲染渲染哪个组件，第二个参数是where，也就是在哪个DOM节点进行渲染
+一般情况下我们自己编写的组件使用ProductList这样的名字，原生的HTML使用小写的。
+
+现在刷新页面我们发现整个流程是babel将JSX代码转译为ES5然后ReactDOM.render()将组件写入DOM
