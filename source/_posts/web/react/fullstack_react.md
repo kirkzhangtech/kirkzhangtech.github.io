@@ -11,6 +11,7 @@ coverMeta: out
 摘要：讲react非常详细的一本书
 
 <!-- more -->
+<!-- toc -->
 
 # 1 第一个react web应用
 
@@ -212,4 +213,123 @@ ReactDOM.render(
 
 ### 1.8.1 数据模型
 
-这节也就是使用
+这节也就是使用如何在使用seed.js这个预定义的数组数据，并定义了generateVoteCount()函数来模拟票数
+
+```js
+
+window.Seed = (function () {
+  function generateVoteCount() {
+    return Math.floor((Math.random() * 50) + 15);
+  }
+
+  const products = [
+    {
+      id: 1,
+      title: 'Yellow Pail',
+      description: 'On-demand sand castle construction expertise.',
+      url: '#',
+      votes: generateVoteCount(),
+      submitterAvatarUrl: 'images/avatars/daniel.jpg',
+      productImageUrl: 'images/products/image-aqua.png',
+    },
+    {
+      id: 2,
+      title: 'Supermajority: The Fantasy Congress League',
+      description: 'Earn points when your favorite politicians pass legislation.',
+      url: '#',
+      votes: generateVoteCount(),
+      submitterAvatarUrl: 'images/avatars/kristy.png',
+      productImageUrl: 'images/products/image-rose.png',
+    },
+    {
+      id: 3,
+      title: 'Tinfoild: Tailored tinfoil hats',
+      description: 'We already have your measurements and shipping address.',
+      url: '#',
+      votes: generateVoteCount(),
+      submitterAvatarUrl: 'images/avatars/veronika.jpg',
+      productImageUrl: 'images/products/image-steel.png',
+    },
+    {
+      id: 4,
+      title: 'Haught or Naught',
+      description: 'High-minded or absent-minded? You decide.',
+      url: '#',
+      votes: generateVoteCount(),
+      submitterAvatarUrl: 'images/avatars/molly.png',
+      productImageUrl: 'images/products/image-yellow.png',
+    },
+  ];
+
+  return { products: products };
+}());
+
+```
+
+### 1.8.2 使用props
+
+我们可以使用props属性在父组件和子组件中进行传递数据，这里就需要使用props属性
+示例代码voting_app/public/js/app-3.js
+```js
+
+class ProductList extends React.Component {
+  render() {
+    const product = Seed.products[0];
+    return (
+      <div className='ui unstackable items'>
+        <Product
+          id={product.id}
+          title={product.title}
+          description={product.description}
+          url={product.url}
+          votes={product.votes}
+          submitterAvatarUrl={product.submitterAvatarUrl}
+          productImageUrl={product.productImageUrl}
+        />
+      </div>
+    );
+  }
+}
+
+class Product extends React.Component {
+  render() {
+    return (
+      <div className='item'>
+        <div className='image'>
+          <img src={this.props.productImageUrl} />
+        </div>
+        <div className='middle aligned content'>
+          <div className='header'>
+            <a>
+              <i className='large caret up icon' />
+            </a>
+            {this.props.votes}
+          </div>
+          <div className='description'>
+            <a href={this.props.url}>
+              {this.props.title}
+            </a>
+            <p>
+              {this.props.description}
+            </p>
+          </div>
+          <div className='extra'>
+            <span>Submitted by:</span>
+            <img
+              className='ui avatar image'
+              src={this.props.submitterAvatarUrl}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+
+
+```

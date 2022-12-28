@@ -9,19 +9,29 @@ coverMeta: out
 ---
 
 ## 张士明(kirkzhang)
+
 Knowledge isn’t free. You have to pay attention. 🧠🧠🧠
 
 email: zxc741208584@gmail.com
-homepag: https://simonteo58.github.io/
-github: https://github.com/SimonTeo58
+homepag: https://kirk-zhang58.github.io/
+github: https://github.com/kirk-zhang58
 
 ## Education
+
 湖南工学院 2014.9 - 2018.09
 bachelor - 无机非金属材料学士学位
 
 ## Experience
 
+### 接入信息 2019.9 - 2022.6
+
+ProjectName: 阿凡达幼儿园管理系统
+Job description: build a WeChat Mini Programs to record some of student activities.
+- 
+
+
 ### HSBC Tech China(contractor) 2020.6 - present
+
 Mid-software-engineer
 
 as a software-engineer solving xxxxxxx
