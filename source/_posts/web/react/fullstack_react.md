@@ -156,3 +156,60 @@ document.getElementById('content')
 一般情况下我们自己编写的组件使用ProductList这样的名字，原生的HTML使用小写的。
 
 现在刷新页面我们发现整个流程是babel将JSX代码转译为ES5然后ReactDOM.render()将组件写入DOM
+
+
+## 1.7 构建Product组件
+
+代码样例是voting_app/public/js/app-2.js,
+
+```js
+
+class ProductList extends React.Component {
+  render() {
+    return (
+      <div className='ui unstackable items'>
+        <Product />
+      </div>
+    );
+  }
+}
+
+class Product extends React.Component {
+  render() {
+    return (
+      <div className='item'>
+        <div className='image'>
+          <img src='images/products/image-aqua.png' />
+        </div>
+        <div className='middle aligned content'>
+          <div className='description'>
+            <a>Fort Knight</a>
+            <p>Authentic renaissance actors, delivered in just two weeks.</p>
+          </div>
+          <div className='extra'>
+            <span>Submitted by:</span>
+            <img
+              className='ui avatar image'
+              src='images/avatars/daniel.jpg'
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+
+```
+这里可以看到Product组件引用了外部的css样式，jsx代码会被转译为常规的js代码，所以我们不能在jsx中使用js保留字`class`是保留字，但是react让我们使用className作为属性名称
+如示例代码所示，jsx不是最终渲染到HTML的代码，要使用Product组件，我们要修改ProductList父组件的render()方法输出，换个思路想其实就是在父组件的render方法中渲染子组件的jsx代码，然后子组件在调用自己render()方法进行渲染
+
+## 1.8 让数据驱动Product组件
+
+### 1.8.1 数据模型
+
+这节也就是使用
