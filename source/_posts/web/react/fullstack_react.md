@@ -317,6 +317,84 @@ class Product extends React.Component {
             <span>Submitted by:</span>
             <img
               className='ui avatar image'
+              src= {this.props.submitterAvatarUrl}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+
+```
+
+在JSX内部的任何地方插入一个变量，都需要用大括号（{}）来分隔变量,组件可以通过this.props对象访问所有的props. 这里注意到数组取了下标`Seed.products[0]`
+
+### 1.8.3 渲染多个产品
+
+Array对象的map()方法将函数作为参数。它使用数组内的每个子项,来调用此函数，并使用每个函数调用的返回值来构建一个新数组,因为Seed.products数组有四个子项，所以map()方法会调用此函数四次，每个子项一次。当map()方法调用此函数时，它将每个子项作为第一个参数传入。此函数调用的返回值将插入map()方法正在构建的新数组中。在处理完最后一个子项后，map()方法就会返回这个新数组。这里我们把这个新数组存储在productComponents变量中。
+示例代码 voting_app/public/js/app-4.js
+```js
+
+class ProductList extends React.Component {
+  render() {
+    // 对product进行排序
+
+    // const products = Seed.products.sort((a, b) => (
+    //   b.votes - a.votes
+    // ));
+    //这里其实是新数组
+    const productComponents = Seed.products.map((product) => (
+      <Product
+        key={'product-' + product.id}
+        id={product.id}
+        title={product.title}
+        description={product.description}
+        url={product.url}
+        votes={product.votes}
+        submitterAvatarUrl={product.submitterAvatarUrl}
+        productImageUrl={product.productImageUrl}
+      />
+    ));
+    return (
+      <div className='ui unstackable items'>
+        {productComponents}
+      </div>
+    );
+  }
+}
+
+class Product extends React.Component {
+  render() {
+    return (
+      <div className='item'>
+        <div className='image'>
+          <img src={this.props.productImageUrl} />
+        </div>
+        <div className='middle aligned content'>
+          <div className='header'>
+            <a>
+              <i className='large caret up icon' />
+            </a>
+            {this.props.votes}
+          </div>
+          <div className='description'>
+            <a href={this.props.url}>
+              {this.props.title}
+            </a>
+            <p>
+              {this.props.description}
+            </p>
+          </div>
+          <div className='extra'>
+            <span>Submitted by:</span>
+            <img
+              className='ui avatar image'
               src={this.props.submitterAvatarUrl}
             />
           </div>
@@ -333,3 +411,506 @@ ReactDOM.render(
 
 
 ```
+
+## 1.9 应用程序的第一次交互：投票事件的响应
+
+Product组件无法修改它的票数，因为this.props对象是不可变的。虽然子组件可以读取props但是无法修改它子组件不是props的所有者。
+也就是说父组件是props的拥有者，而子组件不拥有props。
+
+Product组件需要有一个方法让ProductList组件知道它的向上投票图标被点击，接着可以让ProductList组件更新子组件的对应的票数，然后更新的数据从父组件流向子组件
+
+
+### 1.9.1 事件的传递
+
+我们知道父组件通过props向子组件传递数据。因为**props是不可变的**，所以子组件需要某种方式来向父组件传递事件。然后父组件可以进行任何必要的数据更改。记住是父组件拥有props。那么这些是如何运转的呢？ProductList组件中的handleProductUpVote函数只接收一个名为productId的参数。该函数会将产品的id记录到控制台：
+首先，html中记录鼠标的点击事件，并绑定到该组件的对应的函数上，然后函数在调用父组件的函数。
+如代码voting_app/public/js/app-6.js所示
+```js
+
+class ProductList extends React.Component {
+  // 定义了函数
+  handleProductUpVote(productId) {
+    console.log(productId + ' was upvoted.');
+  }
+
+  render() {
+    const products = Seed.products.sort((a, b) => (
+      b.votes - a.votes
+    ));
+    const productComponents = products.map((product) => (
+      <Product
+        key={'product-' + product.id}
+        id={product.id}
+        title={product.title}
+        description={product.description}
+        url={product.url}
+        votes={product.votes}
+        submitterAvatarUrl={product.submitterAvatarUrl}
+        productImageUrl={product.productImageUrl}
+        // 属性名是onVote,然后将定义的函数handleProductUpVote赋值给onVote
+        onVote={this.handleProductUpVote}
+      />
+    ));
+    return (
+      <div className='ui unstackable items'>
+        {productComponents}
+      </div>
+    );
+  }
+}
+
+class Product extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleUpVote = this.handleUpVote.bind(this);
+  }
+
+  // Inside `Product`
+  handleUpVote() {
+    //然后函数调用了父组件传递过来的函数，换句话说就是再次调用了父组件中方法
+    this.props.onVote(this.props.id);
+  }
+
+  render() {
+    return (
+      <div className='item'>
+        <div className='image'>
+          <img src={this.props.productImageUrl} />
+        </div>
+        {/* Inside `render` for Product` */}
+        <div className='middle aligned content'>
+          <div className='header'>
+            //onClick接收点击事件， 然后传递给该组件的handleUpVote函数。
+            <a onClick={this.handleUpVote}>
+              <i className='large caret up icon' />
+            </a>
+            {this.props.votes}
+          </div>
+          <div className='description'>
+            <a href={this.props.url}>
+              {this.props.title}
+            </a>
+            <p>
+              {this.props.description}
+            </p>
+          </div>
+          <div className='extra'>
+            <span>Submitted by:</span>
+            <img
+              className='ui avatar image'
+              src={this.props.submitterAvatarUrl}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+
+
+```
+这里是比较奇怪的部分：在render()函数中工作时，我们已目睹了this总是绑定到当前组件，但在自定义的组件方法handleUpVote()中，this的值实际上是null。
+
+### 1.9.2 绑定自定义组件方法
+
+原来自定义组件中的自定义方法的this指针不指向当前组件，见鬼！简而言之就是React的方法都已经绑定了this
+对于自定义组件的自定义方法，需要用些手段进行绑定。
+
+```js
+
+class Product extends React.Component {
+  
+  constructor(props) {
+  super(props);
+  this.handleUpVote = this.handleUpVote.bind(this);
+}
+
+```
+那么上面代码是如何运行的，首先先到用constructor(props)函数来进行初始化，然受super(props)会调用父组件的constructor()函数
+`this.handleUpVote = this.handleUpVote.bind(this);`通过这行代码我们重新定义了组件的handleUpVote()方法，并将其赋值到相同的函数，但绑定到this变量（组件）下。现在，每当handleUpVote()函数执行时，this将引用当前组件而不是null。
+
+
+### 1.9.3 使用state
+
+props是不可变的并且由组件的父级所拥有，而state由组件拥有。this.state是组件私有的，我们将看到它可以使用this.setState()方法进行更改。
+当组件的state更新时就是重新渲染页面，每个React组件都是作为一个由this.props和this.state组成的函数来渲染的。这种渲染是确定性的。这意味着若给定一组props和一组
+state，React组件将始终以一种方式渲染。
+
+ProductList组件将此状态的所有者，会将state作为props传递给Product组件
+
+接下来的例子将会进行初始化state初始值，voting_app/public/js/app-7.js 
+```js
+
+class ProductList extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      products: [],
+    };
+  }
+
+  componentDidMount() {
+    this.setState({ products: Seed.products });
+  }
+
+  handleProductUpVote(productId) {
+    console.log(productId + ' was upvoted.');
+  }
+
+  render() {
+    const products = this.state.products.sort((a, b) => (
+      b.votes - a.votes
+    ));
+    const productComponents = products.map((product) => (
+      <Product
+        key={'product-' + product.id}
+        id={product.id}
+        title={product.title}
+        description={product.description}
+        url={product.url}
+        votes={product.votes}
+        submitterAvatarUrl={product.submitterAvatarUrl}
+        productImageUrl={product.productImageUrl}
+        onVote={this.handleProductUpVote}
+      />
+    ));
+
+    return (
+      <div className='ui unstackable items'>
+        {productComponents}
+      </div>
+    );
+  }
+}
+
+class Product extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleUpVote = this.handleUpVote.bind(this);
+  }
+
+  handleUpVote() {
+    this.props.onVote(this.props.id);
+  }
+
+  render() {
+    return (
+      <div className='item'>
+        <div className='image'>
+          <img src={this.props.productImageUrl} />
+        </div>
+        <div className='middle aligned content'>
+          <div className='header'>
+            <a onClick={this.handleUpVote}>
+              <i className='large caret up icon' />
+            </a>
+            {this.props.votes}
+          </div>
+          <div className='description'>
+            <a href={this.props.url}>
+              {this.props.title}
+            </a>
+            <p>
+              {this.props.description}
+            </p>
+          </div>
+          <div className='extra'>
+            <span>Submitted by:</span>
+            <img
+              className='ui avatar image'
+              src={this.props.submitterAvatarUrl}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+
+```
+ProductList组件现在已由自己拥有的状态驱动了。如果现在保存并刷
+新，所有的产品都会消失。这是因为在ProductList组件中没有任何机
+制可以将产品添加到它的state中。
+
+### 1.9.4 使用this.setState()设置state
+
+React指定了一组生命周期方法。在组件挂载到页面之后，React会调用`componentDidMount()`生命周期方法。我们将在此方法中为ProductList组件的state赋值。React为组件提供了this.setState()方法，用于state初始化之后的所有修改操作。除此之外，该方法会触发React组件重新渲染，这在state更改后非常重要。
+
+> 永远不要在this.setState()方法之外修改state。它为state修改提供了重要的Hook，我们不能绕过它。
+
+该组件在挂载时state是一个空的this.state.products数组。挂载后，我们使用Seed对象的数据为state赋值。该组件将重新渲染，产品也将显示出来。这是以用户察觉不到的速度发生的。
+voting_app/public/js/app-8.js 
+```js
+class ProductList extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      products: [],
+    };
+  }
+
+  componentDidMount() {
+    this.setState({ products: Seed.products });
+  }
+
+  handleProductUpVote(productId) {
+    console.log(productId + ' was upvoted.');
+  }
+
+  render() {
+    const products = this.state.products.sort((a, b) => (
+      b.votes - a.votes
+    ));
+    const productComponents = products.map((product) => (
+      <Product
+        key={'product-' + product.id}
+        id={product.id}
+        title={product.title}
+        description={product.description}
+        url={product.url}
+        votes={product.votes}
+        submitterAvatarUrl={product.submitterAvatarUrl}
+        productImageUrl={product.productImageUrl}
+        onVote={this.handleProductUpVote}
+      />
+    ));
+    return (
+      <div className='ui unstackable items'>
+        {productComponents}
+      </div>
+    );
+  }
+}
+
+class Product extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleUpVote = this.handleUpVote.bind(this);
+  }
+
+  handleUpVote() {
+    this.props.onVote(this.props.id);
+  }
+
+  render() {
+    return (
+      <div className='item'>
+        <div className='image'>
+          <img src={this.props.productImageUrl} />
+        </div>
+        <div className='middle aligned content'>
+          <div className='header'>
+            <a onClick={this.handleUpVote}>
+              <i className='large caret up icon' />
+            </a>
+            {this.props.votes}
+          </div>
+          <div className='description'>
+            <a href={this.props.url}>
+              {this.props.title}
+            </a>
+            <p>
+              {this.props.description}
+            </p>
+          </div>
+          <div className='extra'>
+            <span>Submitted by:</span>
+            <img
+              className='ui avatar image'
+              src={this.props.submitterAvatarUrl}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+```
+
+## 1.10 更新state和不变性
+
+我们刚刚讨论过只能使用this.setState()方法修改state。因此，虽然组件可以修改它的state，但我们应该将this.state对象视为不可变的。
+```js
+const nextNums = this.state.nums;
+nextNums.push(4);
+console.log(nextNums);
+// [ 1, 2, 3, 4]
+console.log(this.state.nums);
+// [ 1, 2, 3, 4] <-- Nope!
+```
+新变量nextNums与this.state.nums引用的是内存中的相同数组
+
+不过可以使用Array对象的concat()方法代替。concat()方法创建了一个新数组，该数组包含调用它的数组元素，后面是作为参数传入的元素。
+
+> 将state对象视为不可变的，对于了解这些对象是被哪些Array和Object的方法调用并修改的非常重要。
+
+products初始化为this.state.products时，products与this.state.products都引用内存中相同的数组,如例子voting_app/public/js/app-8.js 所示。Products和this.state.products两个变量都引用内存中的相同数组.因此，当我们通过forEach()方法增加某个product的票数来修改该product对象时，同时也修改了state中的原始product对象
+正确写法应该是voting_app/public/js/app-9.js所示
+```js
+/* eslint-disable no-param-reassign, operator-assignment */
+
+class ProductList extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      products: [],
+    };
+
+    this.handleProductUpVote = this.handleProductUpVote.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({ products: Seed.products });
+  }
+
+  // Inside `ProductList`
+  handleProductUpVote(productId) {
+    // map函数只是遍历数组
+    const nextProducts = this.state.products.map((product) => {
+      if (product.id === productId) {
+        return Object.assign({}, product, {
+          votes: product.votes + 1,
+        });
+      } else {
+        return product;
+      }
+    });
+    this.setState({
+      products: nextProducts,
+    });
+  }
+
+  render() {
+    const products = this.state.products.sort((a, b) => (
+      b.votes - a.votes
+    ));
+    const productComponents = products.map((product) => (
+      <Product
+        key={'product-' + product.id}
+        id={product.id}
+        title={product.title}
+        description={product.description}
+        url={product.url}
+        votes={product.votes}
+        submitterAvatarUrl={product.submitterAvatarUrl}
+        productImageUrl={product.productImageUrl}
+        onVote={this.handleProductUpVote}
+      />
+    ));
+    return (
+      <div className='ui unstackable items'>
+        {productComponents}
+      </div>
+    );
+  }
+}
+
+class Product extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleUpVote = this.handleUpVote.bind(this);
+  }
+
+  handleUpVote() {
+    this.props.onVote(this.props.id);
+  }
+
+  render() {
+    return (
+      <div className='item'>
+        <div className='image'>
+          <img src={this.props.productImageUrl} />
+        </div>
+        <div className='middle aligned content'>
+          <div className='header'>
+            <a onClick={this.handleUpVote}>
+              <i className='large caret up icon' />
+            </a>
+            {this.props.votes}
+          </div>
+          <div className='description'>
+            <a href={this.props.url}>
+              {this.props.title}
+            </a>
+            <p>
+              {this.props.description}
+            </p>
+          </div>
+          <div className='extra'>
+            <span>Submitted by:</span>
+            <img
+              className='ui avatar image'
+              src={this.props.submitterAvatarUrl}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <ProductList />,
+  document.getElementById('content')
+);
+
+```
+首先，使用map()方法遍历products数组。重要的是，map()方法返回新数组，而不是修改this.state.products数组。其次，比较当前product是否与productId匹配。如果两者匹配，那么创建新对象并复制原始product对象的属性。然后重写新product对象上的votes属性，并将其赋值为增加后的票数。我们使用Object的assign()方法来执行这些操作：最后使用setState()方法来更新state。说白了就是这个例子做了change是在副本上做的change而没有更新元数据
+
+## 1.11 用Babel插件重构transform-class-properties
+
+### 1.11.2 属性初始化器
+
+
+### 1.11.3 重构Product组件
+
+如上文所讲，handleUpVote()方法是自定义组件的自定义方法，所以React不会将该方法内部的this绑定到组件。因此我们必须在构造函
+数中手动执行绑定：
+```js
+class Product extends React.Component {
+constructor(props) {
+super(props);
+this.handleUpVote = this.handleUpVote.bind(this);
+}
+handleUpVote() {
+this.props.onVote(this.props.id);
+}
+render() {}
+```
+使用transform-class-properties插件，我们可以将handleUpVote
+写为箭头函数。这会确保函数内部的this能绑定到当前组件，正如预
+期：
+```js
+class Product extends React.Component {
+handleUpVote = () => (
+this.props.onVote(this.props.id)
+);
+render() {}
+```
+使用此特性，可以删除constructor()函数，无须手动绑定调用。
+
+### 1.11.4 重构ProductList组件
+
+同样道理ProductList组件也可以使用箭头函数进行重构
