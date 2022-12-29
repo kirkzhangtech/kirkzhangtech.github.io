@@ -19,6 +19,16 @@ coverMeta: out
 
 整本书都是围绕着一个类product hunt网站的demo进行讲解
 
+如何初始化一个react项目
+1. create-react-app 是一个依赖6.14.11版本npm的脚手架react项目
+2. `npx create-react-app react-demo` 创建项目，或者`npm install -g create-react-app` 全局安装create-react-app项目(但是不建议全局安装)
+   1. `create-react-app -V` 查看版本
+3. `yarn start` 启动服务
+   1. 安装yarn on ubuntu
+   2. `curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -`然后`echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list`
+   3. `sudo apt update && sudo apt install yarn`
+   4. `yarn --version`
+
 ## 1.2 配置开发环境
 
 ### 1.2.1 代码编辑器
@@ -878,6 +888,46 @@ ReactDOM.render(
 
 ```
 首先，使用map()方法遍历products数组。重要的是，map()方法返回新数组，而不是修改this.state.products数组。其次，比较当前product是否与productId匹配。如果两者匹配，那么创建新对象并复制原始product对象的属性。然后重写新product对象上的votes属性，并将其赋值为增加后的票数。我们使用Object的assign()方法来执行这些操作：最后使用setState()方法来更新state。说白了就是这个例子做了change是在副本上做的change而没有更新元数据
+
+Object.assign()方法详解
+1. 第四行代码为什么是true
+```js
+const target = { a: 1, b: 2 };
+const source = { b: 4, c: 5 };
+const returnedTarget = Object.assign(target, source);
+console.log(target);
+// expected output: Object { a: 1, b: 4, c: 5 }
+console.log(returnedTarget === target);
+// expected output: true
+```
+这是因为这样的写法Object.assign(target, source);是返回的修改的target，就是说并没有创建新的对象
+
+2. Cloning an object
+```js
+const obj = { a: 1 };
+const copy = Object.assign({}, obj);
+console.log(copy); // { a: 1 }
+```
+这种写法是创建了一个新对象
+
+3. Merging objects
+```js
+const o1 = { a: 1 };
+const o2 = { b: 2 };
+const o3 = { c: 3 };
+const obj = Object.assign(o1, o2, o3);
+console.log(obj); // { a: 1, b: 2, c: 3 }
+```
+If the source value is a reference to an object, it only copies the reference value.只是merge
+4. merging objects and create new reference
+```js
+const o1 = { a: 1, b: 1, c: 1 };
+const o2 = { b: 2, c: 2 };
+const o3 = { c: 3 };
+const obj = Object.assign({}, o1, o2, o3);
+console.log(obj); // { a: 1, b: 2, c: 3 }
+```
+
 
 ## 1.11 用Babel插件重构transform-class-properties
 
