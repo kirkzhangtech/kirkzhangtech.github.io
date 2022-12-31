@@ -15,7 +15,7 @@ coverMeta: out
 
 # 1 第一个react web应用
 
-## 1.1 构建productt hunt项目
+## 1.1 构建product hunt项目
 
 整本书都是围绕着一个类product hunt网站的demo进行讲解
 
