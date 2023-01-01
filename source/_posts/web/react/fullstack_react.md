@@ -28,6 +28,13 @@ coverMeta: out
    2. `curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -`然后`echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list`
    3. `sudo apt update && sudo apt install yarn`
    4. `yarn --version`
+4. yarn基本使用
+   1. 初始化项目`yarn init`
+   2. 添加依赖包`yarn add {package}`和`yarn add {package}@{version}`
+   3. 添加依赖到不同的依赖项中`yarn add {package} --dev`和`yarn add [package] --peer`和`yarn add [package] --optional`
+   4. 升级依赖包`yarn upgrade [package]`和`yarn upgrade [package]@[version]`和`yarn upgrade [package]@[tag]`
+   5. 移除依赖包`yarn remove [package]`
+   6. 安装全部依赖关系`yarn`或者`yarn install`
 
 ## 1.2 配置开发环境
 
