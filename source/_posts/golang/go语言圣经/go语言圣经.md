@@ -5803,30 +5803,43 @@ func plot(w http.ResponseWriter, r *http.Request) {
 练习7.16编写一个基于web的计算器程序。
 
 ## 7.10. 类型断言
-类型断言是一个使用在接口值上的操作。语法上它看起来像x.(T)被称为断言类型，这里x表示一个接口的类型和T表示一个类型。一个类型断言检查它操作对象的动态类型是否和断言的类型匹配。
+
+类型断言是要看x的动态类型是否跟T类型匹配，这里边x一直都会是实际类型，T可能是接口或者是实际类型
 
 这里有两种可能。第一种，如果断言的类型T是一个具体类型，然后类型断言检查x的动态类型是否和T相同。如果这个检查成功了，类型断言的结果是x的动态值，当然它的类型是T。换句话说，具体类型的类型断言从它的操作对象中获得具体的值。如果检查失败，接下来这个操作会抛出panic。例如：
 
 ```golang
+// 接口
 var w io.Writer
+// 实现了接口的具体类型，实际上是*os.File
 w = os.Stdout
-f := w.(*os.File)      // success: f == os.Stdout
-// T是实际类型，那么断言就是检查两个实际类型是否相等
-c := w.(*bytes.Buffer) // panic: interface holds *os.File, not *bytes.Buffer
+// os.Stdout和*os.File是相同类型
+// success: f == os.Stdout
+f := w.(*os.File)
+// panic: interface holds *os.File, not *bytes.Buffer
+c := w.(*bytes.Buffer)
 ```
+
 第二种，如果相反地断言的类型T是一个接口类型，然后类型断言检查是否x的动态类型满足T。如果这个检查成功了，动态值没有获取到；这个结果仍然是一个有相同动态类型和值部分的接口值，但是结果为类型T。换句话说，对一个接口类型的类型断言改变了类型的表述方式，改变了可以获取的方法集合（通常更大），但是它保留了接口值内部的动态类型和值的部分。
 
 在下面的第一个类型断言后，w和rw都持有os.Stdout，因此它们都有一个动态类型*os.File，但是变量w是一个io.Writer类型，只对外公开了文件的Write方法，而rw变量还公开了它的Read方法。
+
 ```golang
 var w io.Writer
-w = os.Stdout   // 接口类型是有w,但是实际类型确是rw,os.Stdout赋值给rw是因为os.Stdout实现了w方法
-rw := w.(io.ReadWriter) // success: *os.File has both Read and Write
+// 接口类型是有w,但是实际类型确是rw,os.Stdout赋值给rw是因为os.Stdout实现了w方法
+w = os.Stdout
+// success: *os.File has both Read and Write
 // 这里rw类型是T,但是实际值是w的实际值(os.Stdout)
-w = new(ByteCounter) 
-rw = w.(io.ReadWriter) // panic: *ByteCounter has no Read method
-```
-如果断言操作的对象是一个nil接口值，那么不论被断言的类型是什么这个类型断言都会失败。我们几乎不需要对一个更少限制性的接口类型（更少的方法集合）做断言，因为它表现的就像是赋值操作一样，除了对于nil接口值的情况。
+rw := w.(io.ReadWriter)
 
+fmt.Printf("%#v \n", rw)
+
+w = new(ByteCounter)
+// panic: *ByteCounter has no Read method
+rw = w.(io.ReadWriter)
+```
+
+如果断言操作的对象是一个nil接口值，那么不论被断言的类型是什么这个类型断言都会失败。我们几乎不需要对一个更少限制性的接口类型（更少的方法集合）做断言，因为它表现的就像是赋值操作一样，除了对于nil接口值的情况。
 ```golang
 w = rw             // io.ReadWriter is assignable to io.Writer
 w = rw.(io.Writer) // fails only if rw == nil
@@ -5857,8 +5870,10 @@ if w, ok := w.(*os.File); ok {
 ```
 
 summary:
-1. A:=x.(T)这个会检查x的动态类型跟具体类型T是不是一样的，如果一样那么A就是x的具体类型，检查两个类型是不是相同
+1. A:=x.(T)这个会检查x的动态类型是不是跟具体类型T一样的，如果一样那么A就是T这个具体的类型，检查两个类型是不是相同
 2. 第二种，如果x的实际类型是否实现满足T接口类型(一般是指是否实现全部实现对应接口)，如果成功，那么此时新类型就是T，实际值就是X的实际值(不是x的类型)
+3. nil接口类型不能做断言
+4. 断言返回一个布尔变量值作为判断，ok这个变量可以重用但是会被冲掉
 
 
 ## 7.11. 基于类型断言区别错误类型
@@ -5937,6 +5952,8 @@ fmt.Println(os.IsNotExist(err)) // "true"
 ```
 
 如果错误消息结合成一个更大的字符串，当然PathError的结构就不再为人所知，例如通过一个对fmt.Errorf函数的调用。区别错误通常必须在失败操作后，错误传回调用者前进行。
+
+
 
 ## 7.12. 通过类型断言询问行为
 
