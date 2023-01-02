@@ -9,6 +9,10 @@ metaAlignment: center
 coverMeta: out
 ---
 
+摘要：重新学下css,学完了能很快做出东西，而且是看的见东西
+
+<!-- more -->
+<!-- toc -->
 
 # 1. 层叠，优先级和继承
 
@@ -273,7 +277,7 @@ h1 {
 
 2. 层叠值
 
-浏览器遵循三个步骤，即来源、优先级、源码顺序，来解析网页上每个元素的每个属性。如果一个声明在层叠中“胜出”，它就被称作一个层叠值。元素的每个属性最多只有一个层叠值。网页上一个特定的段落（< p >）可以有一个上外边距和一个下外边距，但是不能有两个不同的上外边距或两个不同的下外边距。如果CSS为同一个属性指定了不同的值，层叠最终会选择一个值来渲染元素，这就是层叠值。层叠值——作为层叠结果，应用到一个元素上的特定属性的值。如果一个元素上始终没有指定一个属性，这个属性就没有层叠值。还是拿段落举例，可能就没有指定的边框或者内边距。
+浏览器遵循三个步骤，即来源、优先级、源码顺序，来解析网页上每个元素的每个属性。在 CSS 中指的是多个样式规则对同一个元素的样式属性进行规定时，会发生的覆盖和继承的现象。每个样式规则都有一个权值，样式规则的权值越大，则该规则对元素的样式属性的影响越大。当多个样式规则同时作用于同一个元素时，系统会根据规则的权值进行排序，将权值大的规则应用到元素上，而权值小的规则会被忽略
 
 
 ### 1.1.4 两个经验法则
@@ -281,3 +285,119 @@ h1 {
 1. 在选择器中不要使用ID。就算只用一个ID，也会大幅提升优先级
 2. 不要使用!important。它比ID更难覆盖，一旦用了它，想要覆盖原先的声明，就需要再加上一个!important，而且依然要处理优先级的问题。
 3. 关于重要性的一个重要提醒当创建一个用于分发的JavaScript模块（比如NPM包）时，强烈建议尽量不要在JavaScript里使用行内样式。如果这样做了，就是在强迫使用该包的开发人员要么全盘接受包里的样式，要么给每个想修改的属性加上!important
+
+
+## 1.2 继承
+
+某些元素，在我们不指定属性值（没有层叠值）时候，他就会考虑从父标签中继承。但并不是所有的标签属性都会被进程，只有些特定的。主要是跟文本相关的属性会被继承
+```css
+color
+font
+font-family
+font-size
+font-weight
+font-variant
+font-style
+line-height
+letter-spacing
+text-align
+text-indent
+text-transform
+white-space
+word-spacing
+```
+list-style、list-style-type、list-style-position以及list-style-image。表格的边框属性border-collapse和border-spacing也能被继承。注意，这些属性控制的是表格的边框行为，而不是常用于指定非表格元素边框的属性
+
+[代码1-13](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.13.html)
+在body元素上修改了字体属性，子元素如果没有修改对应元素，那么就会继承body元素中的关于字体的定义
+
+##  1.3 特殊值
+
+有两个特殊值可以赋给任意属性，用于控制层叠：inherit和 initial。
+
+### 1.3.1 使用inherit
+
+[代码1-15](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.15.html)
+
+通常会给页面的所有链接的字体加一个醒目的蓝色，但是有个有需求说要让页脚的链接字体跟页脚一个颜色。那么我们就可以使用继承就可以解决问题
+
+### 1.3.2 initial关键字
+
+每一个CSS属性都有初始（默认）值。如果将initial值赋给某个属性，那么就会有效地将其重置为默认值，这种操作相当于硬复位了该值。这么做的好处是不需要思考太多。如果想删除一个元素的边框，设置border: initial即可。如果想让一个元素恢复到默认宽度，设置width: initial即可。
+
+正如代码1-15所以，如果不指定inherit的话，那么也就会使用后面的样式值，因为它的样式表达式值权重更高
+
+auto不是所有属性的默认值，对很多属性来说甚至不是合法的值。比如border-width: auto和padding: auto是非法的，因此不会生效。可以花点时间研究一下这些属性的初始值，不过使用initial更简单。
+
+## 1.4 简写属性
+
+比如`font: italic bold 18px/1.2 "Helvetica", "Arial", sans-serif;`就指定了font-style、font-weight、font-size、font-height以及font-family
+更多的还有
+- background是多个背景属性的简写属性：background-color、background-image、background-size、background-repeat、background-position、background-origin、background-chip以及background-attachment。
+- border是border-width、border-style以及border-color的简写属性，而这几个属性也都是简写属性。
+- border-width是上、右、下、左四个边框宽度的简写属性。
+
+简写属性会设置省略值为其初始值
+```css
+title {
+font: 32px Helvetica, Arial, sans-serif;
+}
+```
+代码展开来写就是
+```css
+
+h1 {
+  font-weight: bold;
+}
+
+.title {
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: normal;
+  font-size: 32px;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+```
+在所有的简写属性里，font的问题最严重，因为它设置的属性值太多了。因此，要避免在<body>元素的通用样式以外使用font。当然，其他简写属性也可能会遇到一样的问题，因此要当心。
+
+### 1.4.2 理解简写样式的顺序
+
+简写属性会尽量包容指定的属性值的顺序。可以设置`border: 1px solid black`或者`border: black 1px solid`，两者都会生效。这是因为浏览器知道宽度、颜色、边框样式分别对应什么类型的值
+
+1. 上、右、下、左
+
+```css
+.
+nav a {
+color: white;
+background-color: #13a4a4;
+padding: 10px 15px 0 5px; ←---- 上、右、下、左内边距
+border-radius: 2px;
+text-decoration: none;
+}
+```
+这种模式下的属性值还可以缩写。如果声明结束时四个属性值还剩一个没指定，没有指定的一边会取其对边的值。指定三个值时，左边和右边都会使用第二个值。指定两个值时，上边和下边会使用第一个值。如果只指定一个值，那么四个方向都会使用这个值。因此下面的声明都是等价的。
+```css
+padding: 1em 2em;
+padding: 1em 2em 1em;
+padding: 1em 2em 1em 2em;
+```
+但是下面代码就是上，下，左，右
+```css
+padding: 1em ;
+```
+
+2. 水平、垂直
+
+有些属性包括background-position、box-shadow、text-shadow，比如background-position: 25% 75%则先指定水平方向的右/左属性值，然后才是垂直方向的上/下属性值。
+虽然看起来顺序相反的定义违背了直觉，原因却很简单：这两个值代表了一个笛卡儿网格。笛卡儿网格的测量值一般是按照 （水平，垂直）的顺序来的。比如，如图1-15所示，要给元素加上一个阴影，就要先指定 （水平）值。
+```css
+.nav .featured {
+background-color: orange;
+box-shadow: 10px 2px #6f9090; ←---- 阴影向右偏移10px，向下偏移2px
+}
+```
+如果属性需要指定从一个点出发的两个方向的值，就想想“笛卡儿网格”。如果属性需要指定一个元素四个方向的值，就想想"时钟"。

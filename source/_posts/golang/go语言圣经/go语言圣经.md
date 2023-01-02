@@ -5950,10 +5950,11 @@ func IsNotExist(err error) bool {
 _, err := os.Open("/no/such/file")
 fmt.Println(os.IsNotExist(err)) // "true"
 ```
-
 如果错误消息结合成一个更大的字符串，当然PathError的结构就不再为人所知，例如通过一个对fmt.Errorf函数的调用。区别错误通常必须在失败操作后，错误传回调用者前进行。
 
-
+summary:
+1. 通过定义一个pathError类型，来描述关于path相关的error, pathError里面定义有三个字段，分别记录不同种关于path错误的信息。通过类型断言可以方便的检查某个error是属于什么类型的错误。相对于判断子字符串，因为在不同平台，I/O错误的逻辑可能非常的不同，所以通过判断字符串这种方案并不健壮
+2. 从pathError结构体可以看出，发现内部又定义了一个error类型，那么就是说，可以分别的泛化为不同的pathError对象，并且拥有具体的error信息
 
 ## 7.12. 通过类型断言询问行为
 
@@ -5972,7 +5973,7 @@ func writeHeader(w io.Writer, contentType string) error {
 ```
 因为Write方法需要传入一个byte切片而我们希望写入的值是一个字符串，所以我们需要使用[]byte(...)进行转换。这个转换分配内存并且做一个拷贝，但是这个拷贝在转换后几乎立马就被丢弃掉。让我们假装这是一个web服务器的核心部分并且我们的性能分析表示这个内存分配使服务器的速度变慢。这里我们可以避免掉内存分配么？
 
-这个io.Writer接口告诉我们关于w持有的具体类型的唯一东西：就是可以向它写入字节切片。如果我们回顾net/http包中的内幕，我们知道在这个程序中的w变量持有的动态类型也有一个允许字符串高效写入的WriteString方法；这个方法会避免去分配一个临时的拷贝。（这可能像在黑夜中射击一样，但是许多满足io.Writer接口的重要类型同时也有WriteString方法，包括*bytes.Buffer，*os.File和*bufio.Writer。）
+这个io.Writer接口告诉我们关于w持有的具体类型的唯一东西：就是可以向它写入字节切片。如果我们回顾net/http包中的内幕，我们知道在这个程序中的w变量持有的动态类型也有一个允许字符串高效写入的WriteString方法；这个方法会避免去分配一个临时的拷贝。（这可能像在黑夜中射击一样，但是许多满足io.Writer接口的重要类型同时也有WriteString方法，包括\*bytes.Buffer，\*os.File和*bufio.Writer。）
 
 我们不能对任意io.Writer类型的变量w，假设它也拥有WriteString方法。但是我们可以定义一个只有这个方法的新接口并且使用类型断言来检测是否w的动态类型满足这个新接口。
 
@@ -6074,7 +6075,6 @@ func sqlQuote(x interface{}) string {
     }
 }
 ```
-switch语句可以简化if-else链，如果这个if-else链对一连串值做相等测试。一个相似的type switch（类型分支）可以简化类型断言的if-else链。
 
 在最简单的形式中，一个类型分支像普通的switch语句一样，它的运算对象是x.(type)——它使用了关键词字面量type——并且每个case有一到多个类型。一个类型分支基于这个接口值的动态类型使一个多路分支有效。这个nil的case和if x == nil匹配，并且这个default的case和如果其它case都不匹配的情况匹配。一个对sqlQuote的类型分支可能会有这些case：
 
@@ -6098,6 +6098,8 @@ switch x := x.(type) { /* ... */ }
 
 使用类型分支的扩展形式来重写sqlQuote函数会让这个函数更加的清晰：
 
+<p id="sqlQuote">
+
 ```golang
 func sqlQuote(x interface{}) string {
     switch x := x.(type) {
@@ -6120,6 +6122,12 @@ func sqlQuote(x interface{}) string {
 在这个版本的函数中，在每个单一类型的case内部，变量x和这个case的类型相同。例如，变量x在bool的case中是bool类型和string的case中是string类型。在所有其它的情况中，变量x是switch运算对象的类型（接口）；在这个例子中运算对象是一个interface{}。当多个case需要相同的操作时，比如int和uint的情况，类型分支可以很容易的合并这些情况。
 
 尽管sqlQuote接受一个任意类型的参数，但是这个函数只会在它的参数匹配类型分支中的一个case时运行到结束；其它情况的它会panic出“unexpected type”消息。虽然x的类型是interface{}，但是我们把它认为是一个int，uint，bool，string，和nil值的discriminated union（可识别联合）
+
+summary:
+1. 接口更像是将相似的类型的对象进联合捆绑,类型断言用来动态地区别这些类型
+2. 像java这种语言有多态,会动态的进行选择,Go语言查询一个SQL数据库的API会干净地将查询中固定(占位符)的部分和变化(具体值)的部分分开
+3. 编程技巧,switch语句可以简化if-else链
+4. 上面代码就是类型分支demo [sqlQuote](#sqlQuote),在case语句中,可以使用联合值进行判断,每一个case也会隐式的创建一个单独的词法块。这里有个新概念,虽然x的类型是interface{}，但是我们把它认为是一个int，uint，bool，string，和nil值的discriminated union(可识别联合), 就是一个非常抽象的类型
 
 ## 7.14. 示例: 基于标记的XML解码
 

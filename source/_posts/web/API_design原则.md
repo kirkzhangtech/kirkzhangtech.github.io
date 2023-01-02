@@ -1,7 +1,7 @@
 ---
 title: API Design Patterns
 categories:
-- web-api
+- API
 ---
 
 
@@ -9,12 +9,12 @@ categories:
 <!-- more -->
 
 <!-- toc -->
-- [1. API介绍](#1-api介绍)
-  - [1.1 什么是API](#11-什么是api)
-  - [1.2 为什么API重要](#12-为什么api重要)
-  - [1.3 什么是面向资源API](#13-什么是面向资源api)
-  - [1.4 什么是"good"API](#14-什么是goodapi)
-  - [summary](#summary)
+1. [1. API介绍](#1-api介绍)
+   1. [1.1 什么是API](#11-什么是api)
+   2. [1.2 为什么API重要](#12-为什么api重要)
+   3. [1.3 什么是面向资源API](#13-什么是面向资源api)
+   4. [1.4 什么是"good"API](#14-什么是goodapi)
+   5. [summary](#summary)
 
 ## 1. API介绍
 
