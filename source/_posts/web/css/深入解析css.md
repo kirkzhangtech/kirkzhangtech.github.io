@@ -82,51 +82,7 @@ body {
 2. 用户代理样式表=浏览器默认样式，用户代理样式表优先级低
 正如上面[示例代码1.2](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.2.html)所示，这个css主要是修饰`h1`元素的，然后css代码listing-1.2.html中作者样式覆盖了原先的默认样式
 
-
-```css
-
-<!doctype html>
-<head>
-  <style>
-h1 {
-  color: #2f4f4f;
-  margin-bottom: 10px;
-}
-
-#main-nav {
-  margin-top: 10px;
-  list-style: none;
-  padding-left: 0;
-}
-// id选择器，然后继续选择li 元素
-#main-nav li {
-  display: inline-block;
-}
-
-#main-nav a {
-  color: white;
-  background-color: #13a4a4;
-  padding: 5px;
-  border-radius: 2px;
-  text-decoration: none;
-}
-  </style>
-</head>
-<body>
-  <header class="page-header">
-    <h1 id="page-title" class="title">Wombat Coffee Roasters</h1>
-    <nav>
-      <ul id="main-nav" class="nav">
-        <li><a href="/">Home</a></li>
-        <li><a href="/coffees">Coffees</a></li>
-        <li><a href="/brewers">Brewers</a></li>
-        <li><a href="/specials" class="featured">Specials</a></li>
-      </ul>
-    </nav>
-  </header>
-</body>
-```
-!important声明,标记了!important的声明会被当作更高优先级的来源,它的优先级大于作者优先级
+!important声明,标记了!important的声明会被当作更高优先级的来源,它的优先级大于作者样式优先级
 
 
 ### 1.1.2 理解优先级
@@ -180,14 +136,16 @@ h1 {
 
 3. 优先级标记
 
-    也可以说是优先级表达式，选择器#page-header #page-title有2个ID,所以是[2.0.0],如果加上行内样式则就是[1.0.0.0]
+    也可以说是优先级表达式，选择器#page-header #page-title有2个ID,所以是[2.0.0],如果加上行内样式则就是[1.2.0.0]
 
 4. 关于优先级的思考
 
 ### 1.1.3 源码顺序
 
 [代码清单1-10](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.10.html)
-如果两个声明所影响的元素相同和优先级相同，那么源码后出现的就会起作用
+
+如果两个声明所影响的元素相同和优先级相同，那么源码(html的源码,不是样式源码)后出现的就会起作用
+
 ```css
 a.featured {
   background-color: orange;
@@ -195,7 +153,8 @@ a.featured {
 ```
 
 但是这样的写法，会出现如果其他位置也有a标签和featured的类属性，那么就会渲染到其他地方，所以要设计好html元素和选择器
-[代码清单1-10](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.11.html)
+
+[代码清单1-11](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.11.html)
 
 1. 链接样式和源码顺序
 正如之前所说，在CSS中最好的答案通常是“这得看情况”。实现相同的
