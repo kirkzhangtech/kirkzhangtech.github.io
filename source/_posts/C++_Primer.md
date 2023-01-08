@@ -19,7 +19,7 @@ categories:
 
     |1|2|3|4|
     | ------------ | --------- | ---------------- | -------- |
-    |asm          | else      | new              | this / 自身地址     |
+    |asm           | else      | new              | this / 自身地址     |
     | auto         | enum      | operator         | throw    |
     | bool         | explicit  | private          | true / 真 / 0     |
     | break        | export    | protected        | try      |

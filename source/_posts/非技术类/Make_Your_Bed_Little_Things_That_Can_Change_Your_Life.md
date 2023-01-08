@@ -287,11 +287,12 @@ During my time in the SEAL Teams I had numerous setbacks, and in each case, some
 `reputation` [reputation] / n. 名声，名誉；声望
 
 None of us are immune from life’s tragic moments. Like the small rubber boat we had in basic SEAL training, it takes a team of good people to get you to your destination in life. You cannot paddle the boat alone. Find someone to share your life with. Make as many friends as possible, and never forget that your success depends on others.
+`immune` [] / 
 `tragic` ['trædʒɪk] / adj. 悲剧的；悲痛的，不幸的
 
 summary: 
 1. 这一节的动作细节描写太多词汇了，经本上能涵盖很多基本场景
-2. 也描写很多自己经理的痛苦，take this pain as your fource
+2. 也描写很多自己经历的痛苦，take this pain as your fource
 
 
 ## chapter 3 Only the Size of Your Heart Matters
