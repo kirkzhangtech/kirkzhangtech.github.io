@@ -4,7 +4,7 @@ categories:
 - js
 thumbnailImagePosition: bottom
 # thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
-coverImage: https://user-images.githubusercontent.com/46363359/210164183-d8995c70-1555-426d-bc2b-b60ce6a33587.jpg
+coverImage: https://user-images.githubusercontent.com/46363359/211191244-88f4b395-7258-47ee-96d9-9b95d7158cb9.jpg
 metaAlignment: center
 coverMeta: out
 ---
@@ -365,3 +365,36 @@ box-shadow: 10px 2px #6f9090; ←---- 阴影向右偏移10px，向下偏移2px
 # 2. 相对单位
 
 em的单位难以把握，像素单位相对简单
+
+## 2.1 相对值的好处
+
+### 2.1.1 那些年追求的像素级完美
+
+### 2.1.2 像素级完美的时代终结了
+
+响应式：根据浏览器大小有不同的响应
+
+## 2.2 em和rem
+
+em是一种计算单位，它的单位是根据所修饰元素的字体大小进行计算。
+比如[代码2-1](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.1.html)
+如上代码设置的16px，那么padding的内边距也是16px,那么如果你的字体是32px，那么内边距就会是32px.
+
+当计算padding,heigh,width,border-radius.使用em会非常方便。这因为当元素的字体改变时就会更改em的单位。
+
+[代码2-3](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.3.html)
+
+## 2.2.1 使用em定义字号
+
+如果定义字体的的单位是em,那么那么实际上这个字体的结果是从继承的字号进行计算的。
+如[代码2-5](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.5.html)所展示的
+也就是 父字号*em = 子字体像素值，那么也就是css中的em单位是字除父字号
+
+1. em同时作用于字体和其他属性
+
+浏览器要先计算字号，然后再计算，然后再根据这个结算后的字号值，再去计算其他值
+
+2. 字体缩小的问题
+
+想象这一种场景，我们说em就是一种权重，那么如果DOM中是嵌套的，然后子元素的字体大小通过继承父元素大小计算。如果em是小于0的值，就会变成子元素逐级变小。
+[代码2-9](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.9.html) 展示出用选择器优先级来覆盖我们碰到的问题。`ul ul`选择出所有的`ul`元素
