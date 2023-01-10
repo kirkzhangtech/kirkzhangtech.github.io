@@ -2,7 +2,6 @@
 title: mysql manual
 categories:
 - mysql
-tag: mysql
 ---
 >  install mysql on ubuntu https://hevodata.com/learn/installing-mysql-on-ubuntu-20-04/
 

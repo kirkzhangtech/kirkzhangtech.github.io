@@ -287,7 +287,7 @@ During my time in the SEAL Teams I had numerous setbacks, and in each case, some
 `reputation` [reputation] / n. 名声，名誉；声望
 
 None of us are immune from life’s tragic moments. Like the small rubber boat we had in basic SEAL training, it takes a team of good people to get you to your destination in life. You cannot paddle the boat alone. Find someone to share your life with. Make as many friends as possible, and never forget that your success depends on others.
-`immune` [] / 
+`immune` [] / adj. 免疫的
 `tragic` ['trædʒɪk] / adj. 悲剧的；悲痛的，不幸的
 
 summary: 
