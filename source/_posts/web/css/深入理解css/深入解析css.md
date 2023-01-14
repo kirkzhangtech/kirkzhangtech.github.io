@@ -256,58 +256,59 @@ h1 {
 |*	| *	 | 选择所有元素。|
 |element	| p| 	选择所有 <p> 元素。|
 |element.class	| p.intro	| 选择 class="intro" 的所有 <p> 元素。| 
-element,element	div, p	选择所有 <div> 元素和所有 <p> 元素。
-element element	div p	选择 <div> 元素内的所有 <p> 元素。
-element>element	div > p	选择父元素是 <div> 的所有 <p> 元素。
-element+element	div + p	选择紧跟 <div> 元素的首个 <p> 元素。
-element1~element2	p ~ ul	选择前面有 <p> 元素的每个 <ul> 元素。
-[attribute]	[target]	选择带有 target 属性的所有元素。
-[attribute=value]	[target=_blank]	选择带有 target="_blank" 属性的所有元素。
-[attribute~=value]	[title~=flower]	选择 title 属性包含单词 "flower" 的所有元素。
-[attribute|=value]	[lang|=en]	选择 lang 属性值以 "en" 开头的所有元素。
-[attribute^=value]	a[href^="https"]	选择其 src 属性值以 "https" 开头的每个 <a> 元素。
-[attribute$=value]	a[href$=".pdf"]	选择其 src 属性以 ".pdf" 结尾的所有 <a> 元素。
-[attribute*=value]	a[href*="w3schools"]	选择其 href 属性值中包含 "abc" 子串的每个 <a> 元素。
-:active	a:active	选择活动链接。
-::after	p::after	在每个 <p> 的内容之后插入内容。
-::before	p::before	在每个 <p> 的内容之前插入内容。
-:checked	input:checked	选择每个被选中的 <input> 元素。
-:default	input:default	选择默认的 <input> 元素。
-:disabled	input:disabled	选择每个被禁用的 <input> 元素。
-:empty	p:empty	选择没有子元素的每个 <p> 元素（包括文本节点）。
-:enabled	input:enabled	选择每个启用的 <input> 元素。
-:first-child	p:first-child	选择属于父元素的第一个子元素的每个 <p> 元素。
-::first-letter	p::first-letter	选择每个 <p> 元素的首字母。
-::first-line	p::first-line	选择每个 <p> 元素的首行。
-:first-of-type	p:first-of-type	选择属于其父元素的首个 <p> 元素的每个 <p> 元素。
-:focus	input:focus	选择获得焦点的 input 元素。
-:fullscreen	:fullscreen	选择处于全屏模式的元素。
-:hover	a:hover	选择鼠标指针位于其上的链接。
-:in-range	input:in-range	选择其值在指定范围内的 input 元素。
-:indeterminate	input:indeterminate	选择处于不确定状态的 input 元素。
-:invalid	input:invalid	选择具有无效值的所有 input 元素。
-:lang(language)	p:lang(it)	选择 lang 属性等于 "it"（意大利）的每个 <p> 元素。
-:last-child	p:last-child	选择属于其父元素最后一个子元素每个 <p> 元素。
-:last-of-type	p:last-of-type	选择属于其父元素的最后 <p> 元素的每个 <p> 元素。
-:link	a:link	选择所有未访问过的链接。
-:not(selector)	:not(p)	选择非 <p> 元素的每个元素。
-:nth-child(n)	p:nth-child(2)	选择属于其父元素的第二个子元素的每个 <p> 元素。
-:nth-last-child(n)	p:nth-last-child(2)	同上，从最后一个子元素开始计数。
-:nth-of-type(n)	p:nth-of-type(2)	选择属于其父元素第二个 <p> 元素的每个 <p> 元素。
-:nth-last-of-type(n)	p:nth-last-of-type(2)	同上，但是从最后一个子元素开始计数。
-:only-of-type	p:only-of-type	选择属于其父元素唯一的 <p> 元素的每个 <p> 元素。
-:only-child	p:only-child	选择属于其父元素的唯一子元素的每个 <p> 元素。
-:optional	input:optional	选择不带 "required" 属性的 input 元素。
-:out-of-range	input:out-of-range	选择值超出指定范围的 input 元素。
-::placeholder	input::placeholder	选择已规定 "placeholder" 属性的 input 元素。
-:read-only	input:read-only	选择已规定 "readonly" 属性的 input 元素。
-:read-write	input:read-write	选择未规定 "readonly" 属性的 input 元素。
-:required	input:required	选择已规定 "required" 属性的 input 元素。
-:root	:root	选择文档的根元素。
-::selection	::selection	选择用户已选取的元素部分。
-:target	#news:target	选择当前活动的 #news 元素。
-:valid	input:valid	选择带有有效值的所有 input 元素。
-:visited	a:visited	选择所有已访问的链接。
+|element,element| div, p |	选择所有 <div> 元素和所有 <p> 元素。|
+|element element| div p	|选择 <div> 元素内的所有 <p> 元素。|
+|element>element| div > p	|选择父元素是 <div> 的所有 <p> 元素。|
+|element+element| div + p	|选择紧跟 <div> 元素的首个 <p> 元素。|
+|element1~element2|	p ~ ul	|选择前面有 <p> 元素的每个 <ul> 元素。|
+|[attribute]|	[target]|	选择带有 target 属性的所有元素。|
+|[attribute=value]	|[target=_blank]	|选择带有 target="_blank" 属性的所有元素。|
+|[attribute~=value]|	[title~=flower]|	选择 title 属性包含单词 "flower" 的所有元素。|
+|[attribute|=value]|	[lang|=en]	|选择 lang 属性值以 "en" 开头的所有元素。|
+|[attribute^=value]|	a[href^="https"]	|选择其 src 属性值以 "https" 开头的每个 <a> 元素。|
+|[attribute$=value]|	a[href$=".pdf"]|	选择其 src 属性以 ".pdf" 结尾的所有 <a> 元素。|
+|[attribute*=value]|	a[href*="w3schools"]|	选择其 href 属性值中包含 "abc" 子串的每个 <a> 元素。|
+|:active|	a:active	|选择活动链接。|
+|::after|	p::after	|在每个 <p> 的内容之后插入内容。|
+|::before	| p::before|	在每个 <p> 的内容之前插入内容。|
+|:checked	| input:checked	|选择每个被选中的 <input> 元素。|
+|:default	| input:default	|选择默认的 <input> 元素。|
+|:disabled|	input:disabled|	选择每个被禁用的 <input> 元素。|
+|:empty	|p:empty	|选择没有子元素的每个 <p> 元素（包括文本节点）。|
+|:enabled	|input:enabled	|选择每个启用的 <input> 元素。|
+|:first-child	|p:first-child	|选择属于父元素的第一个子元素的每个 <p> 元素。|
+|::first-letter|	p::first-letter|	选择每个 <p> 元素的首字母。|
+|::first-line	|p::first-line	|选择每个 <p> 元素的首行。|
+|:first-of-type|	p:first-of-type|	选择属于其父元素的首个 <p> 元素的每个 <p> 元素。|
+|:focus	|input:focus	|选择获得焦点的 input 元素。|
+|:fullscreen	|:fullscreen|	选择处于全屏模式的元素。|
+|:hover|	a:hover|	选择鼠标指针位于其上的链接。|
+|:in-range|	input:in-range|	选择其值在指定范围内的 input 元素。|
+|:indeterminate|	input:indeterminate|	选择处于不确定状态的 input 元素。|
+|:invalid|	input:invalid	|选择具有无效值的所有 input 元素。|
+|:lang(language)|	p:lang(it)|	选择 lang 属性等于 "it"（意大利）的每个 <p> 元素。|
+|:last-child	|p:last-child	|选择属于其父元素最后一个子元素每个 <p> 元素。|
+|:last-of-type|	p:last-of-type|	选择属于其父元素的最后 <p> 元素的每个 <p> 元素。|
+|:link	|a:link|	选择所有未访问过的链接。|
+|:not(selector)	|:not(p)	|选择非 <p> 元素的每个元素。|
+|:nth-child(n)|	p:nth-child(2)|	选择属于其父元素的第二个子元素的每个 <p> 元素。|
+|:nth-last-child(n)|	p:nth-last-child(2)|	同上，从最后一个子元素开始计数。|
+|:nth-of-type(n)	|p:nth-of-type(2)	|选择属于其父元素第二个 <p> 元素的每个 <p> 元素。|
+|:nth-last-of-type(n)	|p:nth-last-of-type(2)	|同上，但是从最后一个子元素开始计数。|
+|:only-of-type	|p:only-of-type	|选择属于其父元素唯一的 <p> 元素的每个 <p> 元素。|
+|:only-child	|p:only-child	|选择属于其父元素的唯一子元素的每个 <p> 元素。|
+|:optional|	input:optional	|选择不带 "required" 属性的 input 元素。|
+|:out-of-range	|input:out-of-range	|选择值超出指定范围的 input 元素。|
+|::placeholder|	input::placeholder|	选择已规定 "placeholder" 属性的 input 元素。|
+|:read-only|	input:read-only	|选择已规定 "readonly" 属性的 input 元素。|
+|:read-write|	input:read-write|	选择未规定 "readonly" 属性的 input 元素。|
+|:required	|input:required	|选择已规定 "required" 属性的 input 元素。|
+|:root	|:root|	选择文档的根元素。|
+|::selection	|::selection|	选择用户已选取的元素部分。|
+|:target	|#news:target|	选择当前活动的 #news 元素。|
+|:valid	|input:valid|	选择带有有效值的所有 input 元素。|
+|:visited	|a:visited|	选择所有已访问的链接。|
+
 ## 1.2 继承
 
 某些元素，在我们不指定属性值（没有层叠值）时候，他就会考虑从父标签中继承。但并不是所有的标签属性都会被进程，只有些特定的。主要是跟文本相关的属性会被继承
@@ -446,12 +447,11 @@ em是一种计算单位，它的单位是根据所修饰元素的字体大小进
 
 [代码2-3](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.3.html)
 
-## 2.2.1 使用em定义字号
+### 2.2.1 使用em定义字号
 
 如果定义字体的的单位是em,那么那么实际上这个字体的结果是从继承的字号进行计算的。
 如[代码2-5](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.5.html)所展示的
-也就是 父字号*em = 子字体像素值，那么也就是css中的em单位是字除父字号
-
+也就是 继承父元素字号*em = 子元素像素值，那么也就是css中的em单位是子除父字号，大多数浏览器来说，默认的字号为16px。
 1. em同时作用于字体和其他属性
 
 浏览器要先计算字号，然后再计算，然后再根据这个结算后的字号值，再去计算其他值
@@ -460,3 +460,90 @@ em是一种计算单位，它的单位是根据所修饰元素的字体大小进
 
 想象这一种场景，我们说em就是一种权重，那么如果DOM中是嵌套的，然后子元素的字体大小通过继承父元素大小计算。如果em是小于0的值，就会变成子元素逐级变小。
 [代码2-9](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.9.html) 展示出用选择器优先级来覆盖我们碰到的问题。`ul ul`选择出所有的`ul`元素
+
+
+### 2.2.2 使用rem设置字号
+
+当浏览器解析HTML文档时，会在内存里将页面的所有元素表示为DOM（文档对象模型）。它是一个树结构，其中每个元素都由一个节点表示。< html >元素是顶级（根）节点。它下面是子节点，< head >和< body >。再下面是逐级嵌套的后代节点。在文档中，根节点是所有其他元素的祖先节点。根节点有一个伪类选择器`:root`，可以用来选中它自己。这等价于类型选择器`html {}`
+
+rem是root em的缩写，rem不是相对于当前元素，还是相对根元素，不管其他元素位于网页的任何位置，都只是计算根元素的字体大小代码清单[2-10](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.10.html)
+
+
+在CSS里，设置位置通常是“看情况”。rem只是你工具包中的一种工具。掌握CSS很重要的一点是学会在适当的场景使用适当的工具。我一般会用rem设置字号，用px设置边框，用em设置其他大部分属性，尤其是内边距、外边距和圆角（不过我有时用百分比设置容器宽度）。
+
+## 2.3停止像素思考
+
+很很多程序员会设置html标签字体的大小。这也的确能计算子元素的相对值，但是这回有2种弊端
+1. 这会写很多覆盖的代码
+2. 这本质上还是像素思想，这样不利于写响应式网页
+
+
+自适应布局：是指网页能够在不同大小的终端设备上自行适应显示，也就是让一个网站在不同大小的设备上显示同一样的页面，让同一个页面适应不同大小屏幕，根据屏幕的大小，自动缩放。自适应布局的几个标志：
+1. 比如单终端（手机）的N主流产品
+2. 当网页缩写到一定程度时，界面会出现显示不全，并且出现横向滑动条；
+3. 总体框架不变，横线布局的版块太多会有所减少。
+
+响应式布局： 就是一个网站能够兼容多个终端，可以根据屏幕的大小自动调整页面的的展示方式以及布局，我们不用为每一个终端做一个特定的版本。响应式网站的几个标志：
+
+1. 同时适配PC + 平板 + 手机等；
+2. 标签导航在接近手持终端设备时改变为经典的抽屉式导航；
+3. 网站的布局会根据视口来调整模块的大小和位置；
+
+
+### 2.3.1 设置一个合理的默认的字号
+
+在写css样式代码中，不应该采用新的字号值覆盖父值的办法，这样效率非常低下，要采用相对单位来实现字体大小的调整。可设置root元素的字体值然后在其基础上进行计算。
+```css
+:root {
+  font-size:0.875em 
+}
+--公式是父/子=em
+```
+在[代码2-14](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.14.html)中使用了em设置边距和圆角，使用rem设置标题和字号
+
+### 2.3.2 构建响应式面板
+
+在构建响应式web之前需要设置响应式面板，可以根据不同媒体媒介进行设置。及@media可以指定屏幕尺寸和媒体类型。
+
+```css
+:root {
+
+font-size: 0.75em;              （以下3行）作用到所有的屏幕，但是在大屏上会被覆盖
+}
+@media (min-width: 800px) {     （以下5行）仅作用到宽度800px及其以上的屏幕，覆盖之前的值
+:root {
+font-size: 0.875em;
+}
+}
+@media (min-width: 1200px) {  （以下5行）仅作用到宽度1200px及其以上的屏幕，覆盖前面两个值
+:root {
+font-size: 1em;
+}
+}
+
+```
+上卖弄代码不难看出，第一个规则集在大屏幕会被覆盖，当屏幕大于800px然后第二个规则集会生效。大于1200px则第三个规则会生效
+具体代码如[2-15](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.15.html)
+
+### 2.3.3 缩放单个组件
+
+假如我们有个需求是对屏幕中某个组件进行缩放，那么我们可以采用覆盖值的但是正如[代码2-16](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.16.html)所示。
+
+采用高权重样式值覆盖的策略
+
+
+## 2.4 视口的相对单位
+- vh：视口高度的1/100。
+- vw：视口宽度的1/100。
+- vmin：视口宽、高中较小的一方的1/100（IE9中叫vm，而不是vmin）。
+- vmax：视口宽、高中较大的一方的1/100（本书写作时IE和Edge均不支持vmax
+
+[代码清单2-18](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.18.html)
+
+### 2.4.1 使用vw定义字号
+如果给一个元素加上font-size: 2vw会发生什么？在一个1200px的桌面显示器上，计算值为24px（1200的2%）。在一个768px宽的平板上，计算值约为15px（768的2%）。这样做的好处在于元素能够在这两种大小之间平滑地过渡，这意味着不会在某个断点突然改变。当视口大小改变时，元素会逐渐过渡。
+
+### 2.4.2 使用calc()定义字号
+
+calc()函数内可以对两个及其以上的值进行基本运算。当要结合不同单位的值时，calc()特别实用。它支持的运算包括：加（+）、减（-）、乘（×）、除（÷）。加号和减号两边必须有空白，因此我建议大家养成在每个操作符前后都加上一个空格的习惯，比如calc(1em +10px)。代码清单2-19用calc()结合了em和vw两种单位。删除之前样式表的基础字号（以及相关的媒体查询），换成如下代码。[代码2-19](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.19.html)，现在打开网页，慢慢缩放浏览器，字体会平滑地缩放。0.5em保证了最
+小字号，1vw则确保了字体会随着视口缩放。这段代码保证基础字号从iPhone 6里的11.75px一直过渡到1200px的浏览器窗口里的20px。可以按照自己的喜好调整这个值。我们不用媒体查询就实现了大部分的响应式策略。省掉三四个硬编码的断点，网页上的内容也能根据视口流畅地缩放。

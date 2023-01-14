@@ -15,3 +15,4 @@ categories:
 |wsl切换默认suer|--|ubuntu2004.exe config --default-user root|
 |Excel函数大全||http://hanshu.xuewps.com/|
 |母语非英语者如何快速写一篇满意的英文文章？可尝试用如下pipeline||1. 用母语写下梗概，用#ChatGPT 扩充 <br>2. 用#DeepL 译成英文，将英文<br> 3. 用#quillbot 润色加工最后 <br> 4. 用 #grammerly稿|
+|Manage Multiple GitHub Repositories with Renovate and CircleCI|||

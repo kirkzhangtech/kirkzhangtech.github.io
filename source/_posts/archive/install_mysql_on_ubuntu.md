@@ -28,11 +28,11 @@ The data directory is under /var/lib/mysql
 安装的过程难免会出错，这时候就可能需要卸载掉软件。下面记录下如何完全卸载掉mysql，便于之后重新安装。
 
 1. 自动卸载mysql*相关的软件  
-`sudo apt-get autoremove --purge mysql*`
+`sudo apt autoremove --purge mysql*`
 2. 删除掉卸载不完全留下的文件目录  
 `sudo rm -rf /etc/mysql /var/lib/mysql`
 3. 自动卸载无用的程序
-`sudo apt-get autoremove`
+`sudo apt autoremove`
 4. 自动清理卸载后的残留信息
-`sudo apt-get autoclean`
+`sudo apt autoclean`
 5. 这样就mysql就完全卸载好了，之后遵循上面的安装步骤进行安装即可。
