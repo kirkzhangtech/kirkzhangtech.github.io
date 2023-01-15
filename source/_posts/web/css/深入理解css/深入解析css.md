@@ -547,3 +547,120 @@ font-size: 1em;
 
 calc()函数内可以对两个及其以上的值进行基本运算。当要结合不同单位的值时，calc()特别实用。它支持的运算包括：加（+）、减（-）、乘（×）、除（÷）。加号和减号两边必须有空白，因此我建议大家养成在每个操作符前后都加上一个空格的习惯，比如calc(1em +10px)。代码清单2-19用calc()结合了em和vw两种单位。删除之前样式表的基础字号（以及相关的媒体查询），换成如下代码。[代码2-19](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.19.html)，现在打开网页，慢慢缩放浏览器，字体会平滑地缩放。0.5em保证了最
 小字号，1vw则确保了字体会随着视口缩放。这段代码保证基础字号从iPhone 6里的11.75px一直过渡到1200px的浏览器窗口里的20px。可以按照自己的喜好调整这个值。我们不用媒体查询就实现了大部分的响应式策略。省掉三四个硬编码的断点，网页上的内容也能根据视口流畅地缩放。
+
+### 2.5 无单位的数值和行高
+
+- 如果父级的line-height属性值有单位或百分比，那么子级继承的值则是换算后的一个具体的px级别的值；
+- 而如果父级的line-height属性值没有单位，则子级会直接继承这个“数值”，而非计算后的具体值，此时子级的line-height会根据本身的font-size值重新计算得到新的line-height值。
+
+每个元素使用相同的font-size，但使用不同的font-family，但渲染出来的line-height是不同的。
+
+CSS 权威指南基本视觉格式化一章中讲到：对于行内非替换元素或者匿名文本来说， font-size 指定了它们的 content area的高度，由于inline box 是由 content area 加上上下的 half-leading构成的，那么如果元素的leading为 0，在这种情况下，font-size 指定了inline box 的高度。
+
+英文字体有基线（baseline）和中线（meanline），这两条线之间就是所谓的`x-height`，即小写字母x的高度。基线之上的部分是上伸区域（ascent），基线之下的部分是下伸区域（descent).
+
+## 2.6 自定义属性(即css变量)
+
+在2015年新的css规范引入了层叠变量的自定义属性。也就是允许在css使用变量的概念。
+```css
+:root {
+  --main-font: Helvetica, Arial, sans-serif;
+}
+```
+这相当于定义了一个全局的，在整个网页都可以使用的变量`main-font`,如果是在根节点定义变量，那么它下面的子元素都可以使用该变量，同理如果在某一节点元素内定义变量，那么它下面的子元素才可以使用，兄弟元素和它的父元素都无法使用，然后我们可以调用`var()`函数取出定义的值。
+```css
+p {
+font-family: var(--main-font);
+color: var(--brand-color);
+}
+```
+思考一下如果第一个值未定义，那么就可以使用备用值.
+```css
+p {
+    font-family: var(--main-font, sans-serif);  ←---- 指定备用值为sans-serif
+    color: var(--secondary-color, blue);        ←---- secondary-color变量没有定义，因此会使
+}
+```
+如果定义的变量是个非法值就会使用属性的`默认值`
+
+### 2.6.1 动态改变自定义属性
+
+其实这节主要就是讲解自定义属性变量的作用域。有如下例子
+```css
+<!doctype html>
+<head>
+  <style>
+    :root {
+      font-size: calc(0.5em + 1vw);
+      --main-bg: #fff;
+      --main-color: #000;
+    }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+    }
+
+    .dark {
+      margin-top: 2em;
+      padding: 1em;
+      background-color: #999;
+      --main-bg: #333;
+      --main-color: #fff;
+    }
+
+    .panel {
+      font-size: 1rem;
+      padding: 1em;
+      border: 1px solid #999;
+      border-radius: 0.5em;
+      background-color: var(--main-bg);
+      color: var(--main-color);
+    }
+
+    .panel > h2 {
+      margin-top: 0;
+      font-size: 0.8em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .panel.large {
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="panel">
+    <h2>Single-origin</h2>
+    <div class="body">
+      We have built partnerships with small farms
+      around the world to hand-select beans at the
+      peak of season. We then carefully roast in
+      small batches to maximize their potential.
+    </div>
+  </div>
+
+  <aside class="dark">
+    <div class="panel">
+      <h2>Single-origin</h2>
+      <div class="body">
+        We have built partnerships with small farms
+        around the world to hand-select beans at the
+        peak of season. We then carefully roast in
+        small batches to maximize their potential.
+      </div>
+    </div>
+  </aside>
+</body>
+
+```
+在上面例子中定义了两个属性。第一个在根属性上定义了属性，第二个在dark元素上定义了属性。但是第二个属性会覆盖掉第一个全局的属性，根语言中属性作用域很像
+
+### 2.6.2 使用js改变自定义属性
+
+具体实现不需要深究，只需要知道js可以改变属性的值，从而使网页设计更灵活
+
+### 2.6.3 探索自定义属性
+
+自定义属性是CSS中一个全新的领域，开发人员刚刚开始探索。因为浏览器支持有限，所以还没有出现“典型”的用法。我相信假以时日，会出现各种最佳实践和新的用法。这需要你持续关注。继续使用自定义属性，看看能用它做出什么效果。值得注意的是，在不支持自定义属性的浏览器上，任何使用var()的声明都会被忽略。请尽量为这些浏览器提供回退方案。然而这种做法不是万能的，比如当用到自定义属性的动态特性时，就很难有备用方案。关注 Can I Use网站，查看最新的浏览器支持情况。
