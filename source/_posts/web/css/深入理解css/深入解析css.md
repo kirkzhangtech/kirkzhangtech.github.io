@@ -818,3 +818,423 @@ max-height允许元素自然地增高到一个特定界限。如果到达这个�
 ### 3.5.2 更通用的方案：猫头鹰解决方案
 
 Web设计师Heydon Pickering曾表示外边距“就像是给一个物体的一侧涂了胶水，而你还没有决定是否要将它贴到某处，或者还没想好要贴到什么东西上”。不要给网页当前的内容固定外边距，而是应该采取更通用的方式，不管网页结构如何变化都能够生效。这就是Heydon Pickering所说的迟钝的猫头鹰选择器（lobotomized owl selector）（以下简称猫头鹰选择器），因为它长这样：* + * 。该选择器开头是一个通用选择器（*），它可以选中所有元素，后面是一个相邻兄弟组合器（+），最后是另一个通用选择器。它因形似一只眼神空洞的猫头鹰而得名。猫头鹰选择器功能接近此前介绍的选择器：.social-button + .social-button，但是它不会选中直接跟在其他按钮后面的按钮，而是会选中直接跟在其他元素后面的任何元素。也就是说，它会选中页面上有着相同父级的非第一个子元素[代码3-22](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.21.html)
+
+
+# 4 理解浮动
+
+说白了主要有三种方式影响文档流
+1. 浮动
+2. Flexbox
+3. 网格布局
+
+早些时候用的更多的是浮动布局，但是这种当时布局很难理解，在本章将会介绍双容器和媒体对象
+
+## 4.1 浮动的设计初衷
+
+浮动能将一个元素（通常是一张图片）拉到其容器的一侧，这样文档流就会包围它，也可以浮动到右侧，这时候文档流会重新排列，如果多个元素浮动，那么他们会挨着浮动。设计页面的时候通常是规划好外层容器，然后再设计内层。
+双容器模式：通过将内容放置到两个嵌套的容器中，然后给内层的容器设置外边距，让它在外层容器中居中，在本例中，< body >就是外层容器。因为它默认是100%的网页宽度，所以不用给它添加新的样式。在< body >内部，整个网页的内容放在了< div class="container" >，也就是内层容器中。对于内层容器，需要设置一个max-width，并将外边距设置为auto，使内容居中。将代码[清单4-3](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch04/listing-4.3.html)添加到你的样式表中
+
+## 4.2 容器折叠和清除浮动
+
+### 4.2.1 理解容器折叠
+
+这一节一定要从代码上加以理解。[代码4-4](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch04/listing-4.4.html)
+
+### 4.2.2 理解清除浮动
+
+暂时还不理解
+
+## 4.3 出乎意料的浮动陷阱
+
+
+浮动布局先放一放
+
+# 5 Flexbox
+
+flexbox算是现代的网页布局方式
+
+## 5.1 FLexbox的原则
+
+
+`display:flex`就可以使容器变成一个弹性容器，它里面的元素就是弹性子元素把他想象成一个罐子，里面装东西，子元素按照主轴线排列，主轴的方向为主起点（左）到主终点（右）。垂直于主轴的是副轴。方向从副起点（上）到副终点（下）。下面我们看个实际应用例子[5-1](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.2.html)
+> 我们还可以使用`display:inline-flex`其行为更像是`inline--bolck`,但是其长度不会自动加到100%。
+
+### 5.1.1 创建一个基础的Flexbox菜单
+
+这一节主要是介绍了，在不同浏览器我们是要使用不同的属性名来使用flexbox的定义，我们可以使用Autoprefixer的工具进行格式化批量更改
+- 旧版safari
+  ```css
+  .site-nav {
+  display: -webkit-flex;
+  display: flex;
+  }
+  ```
+主要还是要学习下相关[示例代码5-3](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.3.html)
+
+### 5.1.2 添加内边距和间隔
+
+这节我们我们围绕[示例代码5-4](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.4.html)
+  
+注意这里的链接被设置为块级元素。如果链接还是行内元素，那么它给父元素贡献的高度会根据行高计算，而不是根据内边距和内容，这样不符合预期
+
+[代码5-5](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.5.html)教我们如何实现最后一个元素移到右面
+
+如果希望菜单项等间距，那么justify-content属性会是更好的方式。
+
+## 5.2 弹性子元素的大小
+
+flexbox提供可比width设heigh功能更强大flex属性。flex控制主轴方向的大小，flex会被自动计算然后填满容器宽度
+
+
+### 5.2.1 使用flex-basis属性
+
+flex-basis定义了元素大小的基准值，即一个初始的“主尺寸”。flex-basis属性可以设置为任意的width值，包括px、em、百分比。它的初始值是auto，此时浏览器会检查元素是否设置了width属性值。如果有，则使用width 的值作为flex-basis的值；如果没有，则用元素内容自身的大小。如果flex-basis的值不是auto，width属性会被忽略
+
+
+### 5.2.2 使用flex-grow属性
+
+我们上面使用flex-basis属性会导致页面出现空白区域，但是我们可以使用flex-grow属性，来控制页面放缩时候的放缩权重，flex-grow值越大，子元素能分配剩余可用宽度的比例越大推荐使用简写属性flex，而不是分别声明flex-grow、flex-shrink、flex-basis。与大部分简写属性不一样，如果在flex中忽略某个子属性，那么子属性的值并不会被置为初始值。相反，如果某个子属性被省略，那么flex简写属性会给出有用的默认值：flex-grow为1、flex-shrink为1、flex-basis为0%。这些默认值正是大多数情况下所需要的值
+
+### 5.2.3 使用flex-shrink属性
+
+flex-shrink属性与flex-grow遵循相似的原则。计算出弹性子元素的初始主尺寸后，它们的累加值可能会超出弹性容器的可用宽度。如果不用flex-shrink，就会导致溢出，每个子元素的flex-shrink值代表了它是否应该收缩以防止溢出。如果某个子元素为flex-shrink: 0，则不会收缩；如果值大于0，则会收缩至不再溢出。按照 flex-shrink值的比例，值越大的元素收缩得越
+多。
+
+### 5.2.4 实际应用
+
+重点是如何实现圣杯布局，众所周知，用CSS实现这种布局非常困难。该布局中，两个侧边栏宽度固定，而中间的列是“流动的”，即它会自动填充可用空间。重点是，三列的高度相等，该高度取决于它们的内容。尽管浮动也能实现这种布局，但需要用一些既晦涩又脆弱的技巧。你可以使用不同的弹性子元素，想出很多不同的方式来组合以上的布局。
+
+
+## 5.3 弹性方向
+
+如何切换主主副轴方向，可以使用`flex-direction: column`，指定flex-direction: column能控制弹性子元素沿垂直方向排列（从上到下）。Flexbox还支持row-reverse让元素从右到左排列，column-reverse让元素从下到上排列
+
+### 5.3.1 改变弹性方向
+
+```css
+.column-sidebar { （以下5行）对外面的弹性盒子来说是弹性子元素，对内部的元素而言是弹性容器
+flex: 1;
+display: flex;
+flex-direction: column;
+}
+```
+内部的弹性盒子的弹性方向为column，因此主轴发生了旋转，现在变成了从上到下（副轴变成了从左到右）。也就是对于弹性子元素而言，flex-basis、flex-grow和flex-shrink现在作用于元素的高度而不是宽度。
+
+水平弹性盒子的大部分概念同样适用于垂直的弹性盒子（column或column-reverse），但是有一点不同：在CSS中处理高度的方式与处理宽度的方式在本质上不一样。弹性容器会占据100%的可用宽度，而高度则由自身的内容来决定。即使改变主轴方向，也不会影响这一本质。
+
+### 5.3.2 登录表单的样式
+
+详情请学习[代码清单5-10](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.10.html)
+
+## 5.4 对齐，间距等细节
+
+通常情况下，创建一个弹性盒子需要用到前面提及的这些方法。
+- 选择一个容器及其子元素，给容器设置display: flex
+- 如有必要，给容器设置flex-direction
+- 给弹性子元素设置外边距和/或flex值，用来控制它们的大小
+
+### 5.4.1 理解弹性容器的属性
+
+
+|属性|值|
+| --- | --- |
+|flex-direction|row是水平方向<p>row-reverse是水平反方向<p>column是默认向下<p>column-reverse是主轴反过来|
+|flex-wrap折叠显示|no-wrap就不会折叠<p>wrap是折叠<p>wrap-reverse是反向折叠。flex-wrap的叠着跟主轴的方向有关|
+|flex-flow|< flex-direction > < flex-wrap >的简写|
+|justify-content控制子元素在主轴上的位置|flex-start <p> flex-end <p> center <p> space-between <p> space-around |
+|align-items控制子元素在副轴上的位置| flex-start <p> flex-end <p> center <p> stretch <p> baseline <p>|
+|align-content如果开启了flex-wrap，align-content就会控制弹性子元素在副轴上的间距。如果子元素没有换行，就会忽略align-content| flex-start <p> flex-end <p> center <p> stretch <p> space-between <p> space-around|
+
+
+### 5.4.2 理解弹性子元素的属性
+
+前面已经介绍了弹性子元素的flex-grow、flex-shrink、flex-basis以及它们的简写属性flex（参见5.2节）。接下来再介绍两个弹性子元素的属性：align-self和order。
+- 1. align-self属性
+该属性控制弹性子元素沿着容器副轴方向的对齐方式。它跟弹性容器的align-items属性效果相同，但是它能单独给弹性子元素设定不同的对齐方式。auto为初始值，会以容器的align-items值为
+准。其他值会覆盖容器的设置。align-self属性支持的关键字与align-items一样：flex-start、flex-end、center、stretch以及baseline。
+- 2.  order属性
+正常情况下，弹性子元素按照在HTML源码中出现的顺序排列。它们沿着主轴方向，从主轴的起点开始排列。使用order属性能改变子元素排列的顺序。还可以将其指定为任意正负整数。如果多个弹
+性子元素有一样的值，它们就会按照源码顺序出现。初始状态下，所有的弹性子元素的order都为0。指定一个元素的值为-1，它会移动到列表的最前面；指定为1，则会移动到最后。可以按照需要给每个子元素指定order以便重新编排它们。这些值不一定要连续。
+
+### 5.4.3 使用对齐属性
+
+用span而不是div来放置文字，因为span默认就是行内元素。如果因为某些原因CSS加载失败，或者浏览器不支持Flexbox，那么$20.00仍然会在一行显示。下面的代码清单里，使用justify-content让弹性子元素在弹性容器里水平居中，然后用align-items和align-self控制文字的垂直对齐。将[代码清单5-11](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.11.html)添加到样式表。
+```css
+.
+centered {
+text-align: center;
+}
+.
+cost {
+display: flex;
+justify-content: center; （以下2行）让弹性子元素在主轴和副轴方向上均居中
+align-items: center;
+line-height: .7;
+}
+.cost > span {
+margin-top: 0;    ←----覆盖猫头鹰选择器设置的外边距
+}
+.cost-currency {
+font-size: 2rem; （以下7行）给价格的各个部分设置不同的字号
+}
+.cost-dollars {
+font-size: 4rem;
+}
+.cost-cents {
+font-size: 1.5rem;
+align-self: flex-start; ←---- 覆盖这个子元素的align-items，将其与容器顶部而不是中间对
+}
+.cta-button {
+display: block;
+background-color: #cc6b5a;
+color: white;
+padding: .5em 1em;
+text-decoration: none;
+}
+```
+## 5.5 值得注意的地方
+并不是所有浏览器都完美地实现了Flexbox，尤其是IE10和IE11。Flexbox在大多数情况下可以正常工作，但是可能会在一些环境下遇到bug。一定要确保在你想要支持的旧版浏览器上充分测试它。
+与其花费时间讨论你可能或者永远不会遇到的bug，我更愿意推荐一个特别棒的资源，叫Flexbugs。它的GitHub页面维护了所有已知的Flexbox的浏览器bug（本书写作时总共有14个），解释了哪些环境下会导致这些bug，并大部分情况下给出了解决方案。如果你发现在某个浏览器下Flexbox布局表现得不太一样，请访问这个页面看看是不是遇到了其中的浏览器bug。
+
+
+# 6 网格布局
+
+就像是坐标系或者是写字用的田字格，可以设计和做出很复杂的页面
+
+## 6.1 网页布局开始新纪元
+
+构建基础网格
+
+首先我们定义一个容器，然后设置元素`display：grid` 这样该元素变成了某种容器，表现的像个块级元素，100%填充可用宽度，你也可以使用`inline-grid`，虽然书中没写
+```css
+
+.grid {
+display: grid; ←---- 将元素设为网格容器
+grid-template-columns: 1fr 1fr 1fr; ←---- 定义等宽的三列
+grid-template-rows: 1fr 1fr; ←---- 定义等高的两行
+grid-gap: 0.5em;
+}
+.grid > * {
+background-color: darkgray;
+color: white;
+padding: 2em;
+border-radius: 0.5em;
+}
+```
+`rid-template-columns`是渲染三列，然后长度为1fr是分数单位，三列就是1fr等分，`grid-template-rows`定义等高的三列，不一定非得用分数单位，可以使用其他的单位，比如px、em或百分数。也可以混搭这几种单位，例如，`grid-template-columns:300px 1fr`定义了一个固定宽度为300px的列，后面跟着一个会填满剩余可用空间的列。2fr的列宽是1fr的两倍,grid-gap属性定义了每个网格单元之间的间距。也可以用两个值分别指定垂直和水平方向的间距（比如grid-gap: 0.5em 1em）。
+
+
+## 6.2 网格刨析
+
+- 网格线（grid line）——网格线构成了网格的框架。一条网格线可以水平或垂直，也可以位于一行或一列的任意一侧。如果指定了grid-gap的话，它就位于网格线上。
+- 网格轨道（grid track）——一个网格轨道是两条相邻网格线之间的 空间。网格有水平轨道（行）和垂直轨道（列）。
+- 网格单元（grid cell）——网格上的单个空间，水平和垂直的网格 轨道交叉重叠的部分。
+- 网格区域 (grid area）——网格上的矩形区域，由一个到多个网格单元组成。该区域位于两条垂直网格线和两条水平网格线之间
+
+[代码清单6-3](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.4.html)
+
+`repeat()`函数是重复设置的列宽，例如`repeat(3，2fr,1fr)`
+
+## 6.2.1 网格线的编号
+
+网格编号在主轴上是从左向右递增，负轴是自上而下递增
+`grid-column: 1 / 3` 是从编号1的网格线跨域到网格线3，下面的同理 
+`grid-row: 3 / 5`
+
+说明 这些属性实际上是简写属性：grid-column是grid-column-start和grid-column-end的简写；grid-row是grid-row-start和grid-row-end的简写。中间的斜线只在简写属性里用于区分两个值，斜线前后的空格不作要求。
+
+### 6.2.2 与flexbox配合
+
+网格布局和flex布局是互补关系，不是互相独立的关系。
+1. flex本质上是一维，而网格是二维的
+2. flex是以内容为切入点，网格布局是以整体为布局
+
+当设计要求元素在两个维度上都对齐时，使用网格。当只关心一维的元素排列时，使用Flexbox。在实践中，这通常（并非总是）意味着网格更适合用于整体的网页布局，而Flexbox更适合对网格区域内的特定元素布局。继续用网格和Flexbox，你就会对不同情况下该用哪种布局方式得心应手。
+
+
+## 6.3 替代语法
+
+### 6.3.1 命名的网格线
+
+1. 常规声明方式
+```css
+grid-template-columns: [start] 2fr [center] 1fr [end];
+```
+下面方式没有
+```css
+grid-column: start / center;
+```
+repeat()里声明了一条命名的水平网格线，于是每条水平网格线被命名为row（除了最后一条）。这看起来很不可思议，但是重复使用同一个名称完全合法。将网格元素放在第二个“col”网格线处，跨越两个轨道`（col 2 /span 2）`
+
+2. 多命名声明方式
+
+[代码清单6-6](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.6.html)
+```css
+
+grid-template-columns:  [left-start] 2fr
+                        [left-end right-start] 1fr
+                        [right-end];
+grid-template-rows: repeat(4, [row] auto);
+```
+
+
+### 6.3.2 命名网格区域
+
+不知可以命名网格线，我们还可以命名网格区域，`grid-template`属性和网格元素的`grid-area`属性。`grid-template-areas`属性使用了一种ASCII art的语法，可以直接在CSS中画一个可视化的网格形象。该声明给出了一系列加引号字符串，每一个字符串代表网格的一行，字符串内用空格区分每一列。
+[代码清单6-7](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.7.html)
+
+## 6.4 显式和隐式网格
+
+使用grid-template-* 属性定义网格轨道时， 创建的是显式网格
+[代码清单6-9](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.9.html)
+访问Grid by Example网站的文章auto-fill vs. auto-fit可以看到两者区别的示例。
+
+### 6.4.1 添加变化
+
+我们想1X1的图片变成2X2的网格区域。
+
+`grid-auto-flow`它可以控制布局算法的行为。 它的初始值是row， 上一段描述的就是这个值的行为。如果值为column， 它就会将元素优先放在网格列中， 只有当一列填满了， 才会移动到下一行。
+
+`grid-auto-flow: column dense`
+
+[代码清单6-10](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.10.html)
+
+子网格
+网格有一个限制是要求用特定的DOM结构， 也就是说， 所有的网格元素必须是网格容器的直接子节点。 因此， 不能将深层嵌套的元素在网格上对齐
+
+
+### 6.4.2 让网格元素填满网格轨道
+
+`object-fit`控制图片在盒子内渲染的方式
+[代码清单6-11](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.11.html)
+
+
+## 6.5 特性查询
+
+
+
+## 6.6 对齐
+
+`justify-content`
+`justifyitems`
+`justify-self`
+
+
+start——将网格轨道放到网格容器的上/左（Flexbox里则是flexstart）
+end——将网格轨道放在网格容器的下/右（Flexbox里则是flexend)
+center——将网格轨道放在网格容器的中间。
+stretch——将网格轨道拉伸至填满网格容器。
+space-between——将剩余空间平均分配到每个网格轨道之间（它
+能覆盖任何grid-gap值。
+space-around——将空间分配到每个网格轨道之间， 且在两端各
+加上一半的间距。
+space-evenly——将空间分配到每个网格轨道之间， 且在两端各
+加上同等大小的间距（Flexbox规范不支持。
+
+# 7 定位和层叠上下文
+
+## 7.1 固定定位
+
+固定定位让元素相对视口定位.元素`position: fixed`就能将元素放在视口的任意位置,是相对于视口为坐标系然后进行定位,用： `top,right,bottom,left` 这些属性的值决定了固定定位的元素与浏览器视口边缘的距离
+
+
+### 7.1.1 用固定定位创建一个模态框
+
+`display`属性的用法与区别
+```css
+{display: none;}
+{display: inline;}
+{display: block;}
+{display: inline-block;}
+```
+
+
+[代码清单7-2](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.2.html)
+
+
+### 7.1.2 控制定位元素的大小
+
+我们通过下面的属性控制元素的大小
+```css
+position: fixed;
+top: 1em;
+right: 1em;
+width: 20%   /*width是视口的20%*/
+/* right-margin: 20%。 是外边距是视口的20% */
+```
+
+## 7.2 绝对定位
+
+绝对定位的行为是相对最近的**祖先定位**元素跟固定元素一样， 属性top、 right、 bottom和left决定了元素的边缘在包含块里的位置。
+这里边最近的祖先元素是坐标轴
+
+
+### 7.2.1 让Close按钮绝对定位
+
+[代码清单7-3](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.3.html)
+因为`.modal-body`是`.modal-close`的直接父元素，这时候你调节`.modal-close`会发现那个close按钮会相对直接父元素进行定位
+
+说明 如果祖先元素都没有定位， 那么绝对定位的元素会基于初始包含块（initial containing block） 来定位。 初始包含块跟视口一样大， 固定在网页的顶部。
+
+### 7.2.2 定位伪元素
+
+1. 在使用CSS之前， HTML本身必须有意义
+2. `text-indent`属性将文字推到右边， 溢出元素
+
+[代码清单7-4](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.4.html)
+
+
+## 7.3 相对定位
+给元素加上相对定位也不会影响旁边的元素
+
+说明 跟固定或者绝对定位不一样， 不能用top、 right、 bottom
+和left改变相对定位元素的大小。 这些值只能让元素在上、 下、
+左、 右方向移动。 可以用top或者bottom， 但它们不能一起用
+（bottom会被忽略） 。 同理， 可以用left或right， 但它们也不
+能一起用（right会被忽略） 。
+
+### 7.3.1 创建一个下拉菜单
+
+下拉菜单容器包含两个子元素： 一个始终显示的灰色矩形标签以及一个下拉菜单。 下拉菜单用显示和隐藏表示菜单展开和收起。 因为它会是绝对定位的， 所以当下拉菜单显示时不会改变网页的布局， 这意味着它显示时会出现在其他内容前面。
+
+[代码清单7-6](https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.6.html)
+
+
+### 7.3.2 创建一个css三角形
+
+
+
+## 7.4 层叠上下文和z-index
+
+z-index值越大在Z轴上就越靠上，也就是离屏幕观察者越近。最后才发现这个认识存在很大的问题
+
+### 7.4.1 理解渲染过程和层叠顺序
+
+浏览器将HTML解析为DOM的同时还创建了另一个树形结构，叫作渲染树（render tree)
+
+定位元素时， 这种行为会改变。 浏览器会先绘制所有非定位的元素， 然后绘制定位元素。 默认情况下， 所有的定位元素会出现在非定位元素前面.
+我们使用相对定位之后，会改变元素的渲染顺序
+
+### 7.4.2 用z-index控制层叠顺序
+
+z-index属性的值可以是任意整数（正负都行） 。 表示的是笛卡儿x-y-z坐标系里的深度方向。拥有较高z-index的元素出现在拥有较低z-index的元素前面。z-index的行为很好理解， 但是使用它时要注意两个小陷阱。 第一， zindex只在定位元素上生效， 不能用它控制静态元素。 第二， 给一个定位元素加上z-index可以创建层叠上下文。
+
+### 7.4.3 理解层叠上下文
+什么是层叠上下文？其实就是判断元素在Z轴上的堆叠顺序，不仅仅是直接比较两个元素的z-index值的大小，这个堆叠顺序实际由元素的层叠上下文、层叠等级共同决定。
+
+- 什么是“层叠等级”
+  1. 普通元素的层叠等级优先由其所在的层叠上下文决定。
+  2. 层叠等级的比较只有在当前层叠上下文元素中才有意义。不同层叠上下文中比较层叠等级是没有意义的。
+- 如何产生“层叠上下文”
+  1. HTML中的根元素< html >< /html >本身就具有层叠上下文，称为“根层叠上下文”。
+  2. 普通元素设置position属性为非static值并设置z-index属性为具体数值，产生层叠上下文。
+  3. CSS3中的新属性也可以产生层叠上下文。
+- 什么是“层叠顺序”
+  1. 左上角"层叠上下文background/border"指的是层叠上下文元素的背景和边框。
+  2. inline/inline-block元素的层叠顺序要高于block(块级)/float(浮动)元素。
+  3. 单纯考虑层叠顺序，z-index: auto和z-index: 0在同一层级，但这两个属性值本身是有根本区别的。
+
+
+## 7.5 粘性定位
+
+流盒：粘性定位中有一个“流盒”（flow box）的概念，指的是粘性定位元素最近的可滚动元素（overflow 属性值不是 visible 的元素）的尺寸盒子，如果没有可滚动元素，则表示浏览器视窗盒子。
