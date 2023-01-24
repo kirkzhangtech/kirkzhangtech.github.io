@@ -28,8 +28,6 @@ Lua is free software, and is provided as usual with no guarantees, as stated in 
 
 Like any other reference manual, this document is dry in places. For a discussion of the decisions(n.决定) behind the design of Lua, see the technical papers available at Lua's web site. For a detailed introduction to programming in Lua, see Roberto's book, Programming in Lua.
 
-<text style="font-family:Courier New;color:red">
 summary:</br>
 1. lua is dynamic, interprete language.with a register-based virtual machine,automatic memory management, GC,making it ideal for configuration, scripting, and rapid prototyping </br>
 2. no main function,embeded a host client that host program which execute lua code, lua could call C function(code)
-</text>
