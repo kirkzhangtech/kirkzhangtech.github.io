@@ -1462,3 +1462,58 @@ meta标签的content属性里包含两个选项
 - SMACSS——可扩展的、 模块化CSS架构， 由Jonathan Snook创建。
 - BEM——块（Block） 、 元素（Element） 和修饰符（Modifier） ，由Yandex公司提出。
 - ITCSS——倒三角形CSS， 由Harry Roberts创建。
+
+# 10 模式库
+
+- 创建模式库， 收录模块
+- 开发过程中引入模式库
+- 使用CSS优先的方案书写样式
+- 安全地编辑和删除CSS
+- 使用Bootstrap之类的CSS框架
+
+## 10.1 KSS简介
+
+虽然创建模式库的时候不使用任何工具也可以， 但有了工具的帮助会容易很多。 有不少相关功能的工具库可以使用， 在搜索引擎里搜索“styleguide generator”， 就可以找到大量结果。 无法确定这些工具里最好的是哪个， 但是KSS确实是其中的佼佼者。 KSS是Knyle Style Sheets的简写（“Knyle” 来源于作者的名字Kyle Neath）
+
+### 10.1.1 配置KSS
+
+1. 初始化项目`npm init -y`
+2. 安装依赖`npm install --save-dev kss`
+3. 添加KSS配置
+   1. 在项目目录下新建一个名为kss-config.json的文件
+    ```css
+    {
+    "title": "My pattern library",
+    "source": [               ←---- CSS源文件的目录路径（ KSS将要扫描的）
+    "./css"
+      ],
+    "destination": "docs/",   ←---- 生成的模式库文件将写入的路径
+    "css": [
+    "../css/styles.css"       ←---- 样式表文件路径（ 相对于destination目录）
+      ],
+    "js": [
+    "../js/docs.js"           ←---- 一些JavaScript文件路径（ 相对于destination目录）
+      ]
+    },
+    "scripts": {
+    "build": "kss --config kss-config.json", ←---- 定义构建命令
+    "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    ```
+    2. css和js字段里列出的每个文件都会被添加到模式库页面。 我们已经为它们各自配置了一个css和js目录， 现在就可以去创建这两个目录和里面的源文件（ css/styles.css和js/docs.js） 。 文件目前是空的，很快就会向里面添加内容
+
+
+### 10.1.2 编写KSS文档
+
+
+## 10.2 改变编写CSS的方式
+
+### 10.2.1 CSS优先的工作流程
+
+1. 页面开发时， 先有一个草图或者原型图或者其他可以展示页面的设计方式
+2. 看看模式库。 找找现有模块， 如果有满足页面需求的模块就直接使用。 然后从页面的外层（主页面布局和容器） 开始， 按自己熟悉的方式编写CSS。 如果使用现有模块可以构建整个页面， 就不需要写新的CSS
+3. 你会发现有时候需要用到一些模式库提供不了的功能。 项目开发早期这种情况很常见， 到后面就会少很多。 这时候就需要开发一个或几个新模块， 或者现有模块的新变体
+
+### 10.2.2 像API一样使用模式库
+
+这节还需要再看看
