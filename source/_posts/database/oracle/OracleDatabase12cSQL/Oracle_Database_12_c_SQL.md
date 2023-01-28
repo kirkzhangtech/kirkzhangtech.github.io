@@ -209,6 +209,132 @@ revoke somebody select privileges for some one of schema
 connect store/store_password
 revoke select on store.customers from steve;
 ```
+
+## 10.4 Roles
+
+A role is a group of privileges that you can assign to a user or to another role.The following points summarize the benefits of roles:
+- Rather than assigning privileges one at a time directly to a user, you can create a role, assign privileges to that role, and then grant that role to multiple users and roles.
+- When you add or delete a privilege from a role, all users and roles assigned that role automatically receive or lose that privileg
+- You can assign multiple roles to a user or role
+- You can assign a password to a role.
+
+### 10.4.1 create roles
+baisc , if you want create role , also you need get right, more like below
+```sql
+connect system/oracle
+grant create role to store
+grant create user to store with admin option
+--login user store
+
+connect store/store_password
+grant create role product_manager;
+grant create role hr_manager;
+grant create role overall_manager IDENTIFIED by manager_password;
+```
+
+### 10.4.2 grant privileges to roles
+
+```sql
+system -> role
+            |
+object -> role -> role
+
+grant select ,insert,update,delete on product_types to product_manager;
+grant select ,insert,update,delete on products to product_manager;
+grant select ,insert,update,delete on salary_grades to hr_manager;
+grant select ,insert,update,delete on employees to hr_manager;
+grant create,user to hr_manager;
+grant product_manager,hr_manager to overall_manager;
+
+```
+
+### 10.4.3 Granting Roles to a User
+
+general procedure to create user and assign right
+```sql
+connect system/oracle
+grant user john IDENTIFIED by brown;
+grant user harry IDENTIFIED by blue;
+grant create session to john;
+grant create session to harry;
+```
+now you can use current good way 
+```sql
+
+grant hr_manager to john;
+grant overall_manager to harry;
+```
+
+### 10.4.4 Checking Roles Granted to a User
+
+table `user_role_privs` is the key
+
+![10-7](./../../../../img/10-7.jpg)
+
+This role is password protected. Before the user can use the role, the user must enter the role password.
+
+### 10.4.5 Checking System Privileges Granted to a Role
+
+table `role_sys_privs` is the key 
+
+![10-8](./../../../../img/10-8.jpg)
+
+### 10.4.6 Checking Object Privileges Granted to a Role
+
+table `role_tab_privs` is the key
+
+![10-9](./10-../../../../img/10-9.jpg)
+
+### 10.4.7 Making Use of Privileges Granted to a Role
+
+For a non-password-protected role, the user can immediately use the privileges assigned to the role when they connect to the database
+```sql
+connect john/brown
+select employee_id , last_name from store.amployees where salary<any ( select low_salary from store_grades order by employee_id)
+
+```
+For example, the **harry** user has the password-protected overall_manager role. Before **harry** is able to use the overall_manager role, he must enable the role and provide the role password using the `SET ROLE` command
+```sql
+connect harry/blue
+set role overall_manager IDENTIFIED by manager_password;
+
+```
+Then, **harry** can use the privileges granted to the role. For example:
+
+### 10.4.8 Enabling and Disabling Roles
+
+```sql
+connect system/oracle
+-- disable
+alter user john default role all except hr_manager;
+--enable
+set role hr_manager;
+-- set default role
+connect system/oracle
+alter user john default role hr_manager;
+-- set none for role
+connect john/brown
+set role NONE;
+-- sets the role to all roles except hr_manager
+set role all except hr_manager;
+```
+### 10.4.9 Revoking a Role and Privileges and drop a role
+
+```sql
+-- Revoking a Role
+connect store/store_password
+revoke overall_manager from harry;
+-- revoke Privileges
+connect store/store_password
+revoke all on products from product_manager;
+revoke all on product_types from product_manager;
+-- drop role
+connect store/store_password
+drop role overall_manager;
+drop role product_manager;
+drop role hr_manager;
+```
+
 # 12.Creating Tables, Sequences, Indexes, and Views
 
 In this chapter, you will learn how to perform the following tasks:
