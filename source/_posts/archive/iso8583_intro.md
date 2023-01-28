@@ -12,8 +12,8 @@ categories:
 
 ISO8583报文格式
 
-![iso报文说明](./../../picture/ISO8583/MTI.png)
+![iso报文说明](./../../img/ISO8583/MTI.png)
 
 
 
-![bitmap](./../../picture/ISO8583/bitmap.png)
+![bitmap](./../../img/ISO8583/bitmap.png)

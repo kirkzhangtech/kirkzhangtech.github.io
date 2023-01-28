@@ -66,7 +66,7 @@ drop user jason
 ## 10.2 System privileges
 
 
-![10-1](./img/10-1.png)
+![10-1](./../../../../img/OracleDatabase12cSQL/10-1.jpg)
 
 for all the reference ,please refer oracle published manual
 
@@ -111,7 +111,7 @@ revoke execute any procedure fron steve
 
 ## 10.3 Object Privileges
 
-![10-6](./img/10-6.jpg)
+![10-6](./../../../../img/OracleDatabase12cSQL/10-6.jpg)
 
 ### 10.3.1  Granting Object Privileges to a User
 
@@ -132,23 +132,23 @@ grant select on store.customers to gail;
 ### 10.3.2  check object privileges made
 
 table `user_tab_privs_mad` could get all object privileges made
-![10-2](./img/10-2.jpg)
+![10-2](./../../../../img/OracleDatabase12cSQL/10-2.jpg)
 ```sql
 select * from user_tab_privs_mad where table_name = 'products'
 ```
 You can check which column object privileges a user has made by querying
 user_col_privs_made
-![10-3](./img/10-3.jpg)
+![10-3](./../../../../img/OracleDatabase12cSQL/10-3.jpg)
 
 You can check which object privileges on a table a user has received by
 querying the `user_tab_privs_recd` table
 
-![10-4](./img/10-4.jpg)
+![10-4](./../../../../img/OracleDatabase12cSQL/10-4.jpg)
 
 You can check which column object privileges a user has received by
 querying `user_col_privs_recd` 
 
-![10-5](./img/10-5.jpg)
+![10-5](./../../../../img/OracleDatabase12cSQL/10-5.jpg)
 
 when we got corresponding privileges you can do statement by below with schema ahead of table name
 ## 10.3.3 creating synonyms

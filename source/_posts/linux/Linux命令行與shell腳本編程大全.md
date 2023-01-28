@@ -17,7 +17,7 @@ categories:
 
 linux是一款开源操作系统统称，其有很多发行版本，像ubuntu..，它的核心是其`内核`，早期由linus torvalds开发
 
-![linus本人](./../picture/linux_命令行与shell脚本/linus.png)
+![linus本人](./../../img/linux_命令行与shell脚本/linus.png)
 
 内核主要负责以下四种功能:
 
@@ -99,7 +99,7 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   |/usr |用户二进制目录，大量用户级的GNU工具和数据文件都存储在这里|
   |/var |可变目录，用以存放经常变化的文件，比如日志文件|
   
-  ![linux文件系统图](./../picture/linux_命令行与shell脚本/linux_folder_setup.jpg)
+  ![linux文件系统图](./../../img/linux_命令行与shell脚本/linux_folder_setup.jpg)
 
 - 遍历目录(cd命令)
   需要你知道文件树状结构,这样才能知道你将访问文件的具体位置，无论是`相对路径`还是`绝对路径`
@@ -563,8 +563,11 @@ linux自带命令手册，方便用户查看相关命令的具体选项和参数
   - `unset my_variable`删除环境变量,这条规则的一个例外就是使用 printenv 显示某个变量的值)
   - 默认的环境变量，直接使用就好了
 
-    ![linux_default_variables](./../picture/linux_命令行与shell脚本/linux_default_variables.png)
-    ![linux_default_variables_1](./../picture/linux_命令行与shell脚本/linux_default_variables_1.png)
+
+    
+    ![linux_default_variables](./../../img/linux_命令行与shell脚本/linux_default_variables.png)
+
+    ![linux_default_variables_1](./../../img/linux_命令行与shell脚本/linux_default_variables_1.png)
   - 设置`path`环境变量,当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序.`PATH`环境变量定义了用于进行命令和程序查找的目录
   - 定位环境变量
     - 登录式shell  
