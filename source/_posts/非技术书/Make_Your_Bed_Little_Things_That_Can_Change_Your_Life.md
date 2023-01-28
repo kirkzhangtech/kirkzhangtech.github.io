@@ -298,3 +298,34 @@ summary:
 ## chapter 3 Only the Size of Your Heart Matters
 
 I ran to the beach with my black, rubber flippers tucked underneath my right arm and my mask in my left hand. Coming to parade rest, I anchored the flippers in the soft sand, leaning them against each other to form a teepee. Standing to my right and left were other students. Dressed in green tee shirts, khaki swim trunks, neoprene booties, and a small life jacket, we were preparing for our morning two-mile swim.
+`flippers` ['flipə] / 脚蹼
+`parade` [pə'red] / n.阅兵场
+`anchored` ['æŋkɚ] / adj. 固定的；抛锚的 v. 固定；抛锚；主持
+`teepee` ['tipi] /n. （美）圆锥形帐篷
+`trunk` [trʌŋk] / n. 树干；躯干；象鼻；汽车车尾的行李箱 vt. 把…放入旅行箱内
+`neoprene` ['niəprin] / n. [橡胶] 氯丁橡胶
+`life jacket` / 救生衣
+
+The life jacket was a small, rubberized bladder that inflated only when you pulled the handle. Among the students, it was considered shameful if you had to use your life jacket. Still, the SEAL instructors were required to inspect every life jacket before each swim. This inspection also gave the instructors an opportunity for more harassment.
+`inspect` [ɪn'spɛkt] /  vt. 检查；视察；检阅
+`harassment` [hə'ræsmənt] / n. 骚扰；烦恼
+`rubberized` ['rʌbəraɪzd] / adj. 涂上胶的；橡胶处理的
+`bladder` ['blædɚ] / n. 膀胱；囊状物，可充气的囊袋
+
+The surf off Coronado that day was about eight feet high. The waves were coming in lines of three, plunging with a roaring sound that made each student’s heart beat a bit faster. As the instructor slowly moved down the line he came to the man directly to my right. The student, a seaman recruit and brand-new to the Navy, was about five foot four in height. The SEAL instructor, a highly decorated Vietnam vet, was well above six foot two and towered over the smaller man.
+`decorated` ['dekəreɪtɪd] / adj. 装饰的，修饰的
+`roaring` 美 ['rɔrɪŋ] / adj. 喧闹的；兴胜的；狂风暴雨的 n. 咆哮；怒吼；吼声
+
+After inspecting the student’s life jacket, the instructor looked over his left shoulder toward the pounding surf and then reached down and grabbed the student’s flippers. Holding them close to the young sailor’s face, he said quietly, “Do you really want to be a frogman?”
+`look over` 检查，察看；从……上面看；原谅
+`pounding`  汹涌澎湃的
+
+The sailor stood up straight, with a look of defiance in his eyes. “Yes, instructor, I do!” he shouted.
+“You’re a tiny little man,” the instructor said, waving the flippers in his face. “Those waves out there could break you in half.” He paused and glanced toward the ocean. “You should think about quitting now before you get hurt.”
+`defiance` [dɪ'faɪəns] / n. 蔑视；挑战；反抗
+
+Even out of the corner of my eye I could see the student’s jaw begin to tighten.
+“I won’t quit!” the sailor replied, drawing out each word. Then the instructor leaned in and whispered something in the student’s ear. I couldn’t make out the words over the breaking waves.
+`jaw` [dʒɔ] / n. 颌；下巴；狭窄入口；唠叨
+`tighten` ['taɪtn] / vt. 变紧；使变紧
+`drawin out` 拉出
