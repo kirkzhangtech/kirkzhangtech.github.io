@@ -70,33 +70,41 @@ drop user jason
 
 for all the reference ,please refer oracle published manual
 
-### 10.2.1 grant system privileges to a users
+### 10.2.1 grant system privileges to a user
 
 
 ```sql
-GRANT CREATE SEESON,CREATE USER,CREATE TABLE to jason
+connect system/oracle
+GRANT CREATE SEESON,CREATE USER,CREATE TABLE to steve
 ```
-or allow a user to grant a privilege to another user
+You can also use WITH ADMIN OPTION to allow a user to grant a privilege to another user.
 ```sql
-grant execute any procedure to jason wth admin option
+grant execute any procedure to steve wth admin option
+```
+EXECUTE ANY PROCEDURE can then be granted to another user by steve .The following example connects as steve and grants EXECUTE ANY PROCEDURE to gail :
+```sql
+connect steve/brown
+grant execute any procedure to gail
 ```
 You can grant a privilege to all users by granting to PUBLIC
 ```sql
+connect system/oracle
 grant execute any procedure to public
-```
-DBA grants EXECUTE ANY PROCEDURE to gail 
-```sql
-grant execute any procedure to gail
 ```
 
 ### 10.2.2 Checking System Privileges Granted to a User
 
 `data dictionary` stores information about the database itself.
+
 table `user_sys_privs` stores current user privileges that it has
-`username` indicates current user,
-`privileges` indicates that user owned privileges,
-`admin_option`indicate whether the user is able to grant privileges to another user.
+- `username` indicates current user,
+- `privileges` indicates that user owned privileges,
+- `admin_option`indicate whether the user is able to grant privileges to another user.
 if steve had create user privileges , so he could create user. 
+```sql
+connect steve/brown
+create user roy IDENTIFIED by red;
+```
 
 ### 10.2.3 Revoking System Privileges from a User
 you could also revoke user privileges bby below sql.
@@ -116,17 +124,24 @@ revoke execute any procedure fron steve
 ### 10.3.1  Granting Object Privileges to a User
 
 ```sql
+connect store/store_password
 grant select , insert , update on store.products to steve
 ```
 or narrow table privileges for certainly columns.
 ```sql
 grant update (last_name,salary) on store.employees to steve
 ```
-note: You use the GRANT option to allow a user to grant an object privilege toanother user, and you use the ADMIN option to allow a user to grant a system privilege to another user.\
 
-connect as **steve** to grant privileges to **gail**
+note: You use the GRANT option to allow a user to grant an object privilege to another user, and you use the ADMIN option to allow a user to grant a system privilege to another user.
+
 ```sql
-connect steve/brows
+grant select on store.customers to steve with grant option;
+```
+
+connect as steve to grant privileges to gail
+
+```sql
+connect steve/brown
 grant select on store.customers to gail;
 ```
 ### 10.3.2  check object privileges made
@@ -137,7 +152,7 @@ table `user_tab_privs_mad` could get all object privileges made
 select * from user_tab_privs_mad where table_name = 'products'
 ```
 You can check which column object privileges a user has made by querying
-user_col_privs_made
+`user_col_privs_made`
 ![10-3](./../../../../img/OracleDatabase12cSQL/10-3.jpg)
 
 You can check which object privileges on a table a user has received by
