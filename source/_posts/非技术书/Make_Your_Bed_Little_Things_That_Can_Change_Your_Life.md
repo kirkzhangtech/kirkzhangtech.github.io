@@ -414,3 +414,45 @@ In the middle of our conversation, Lieutenant Huth suddenly stopped talking, loo
 In 1969, Tommy Norris was almost booted out of SEAL training. They said he was too small, too thin, and not strong enough. But much like the young sailor in my class, Norris proved them all wrong and once again showed that it’s not the size of your flippers that count, just the size of your heart.
 
 ## chapter 4 drive on!
+
+get over being a sugar cookie and keep moving forward.
+`get over` 克服；恢复；熬过；原谅
+
+I ran to the top of the sand dune and without hesitation sprinted down the other side, heading full speed toward the Pacific Ocean. Fully clothed in my green utilities, short-billed hat, and combat boots, I dove headfirst into the waves as they pounded the beach off Coronado, California.
+
+`sprint` 美 [sprɪnt] vi. 冲刺，全速跑
+`utilities` 美 [ju'tɪlətiz] n. 公用事业；实用工具，[计] 实用程序 (这里应该是指战斗服)
+`short-bill hat` 鸭舌帽
+`dove` n.鸽子；鸽派人 v.跳水；潜水
+
+Emerging soaking wet from the water, I saw the SEAL instructor standing on the dune. With his arms folded and a piercing glare that cut through the morning haze, I heard him yell, “You know what to do, Mr. Mac!”
+Indeed I did.
+With feigned enthusiasm, I screamed a hearty “hooyah” at the top of my lungs and fell facedown into the soft sand, rolling from side to side to ensure that no part of my uniform was left uncovered. Then, for good measure, I sat up, reached deep into the ground, and tossed sand into the air to guarantee it found its way into every crevice in my body.
+`emerging` 英/美 [ɪ'mɝdʒɪŋ] adj. 新兴的；出现的；形成的v. 形成；浮现；显露（emerge的ing形式）；由…中脱出
+`soaking`  ['sokɪŋ] n. 浸湿，浸透
+`wet` 美 [wɛt] adj. [气象][物] 潮湿的；有雨的
+`folded` [fold] v. 折叠；交叉合拢
+`piercing` ['pɪrsɪŋ] adj. 刺穿的；敏锐的；尖刻的
+`haze` n.薄雾
+`glare`  [ɡlɛr] n. 刺眼；耀眼的光 vi. 瞪眼表示
+`feign` [feɪnd] adj. 假的；做作的
+`scream` [skri:m]（因疼痛、惊恐、兴奋等）尖声大叫
+`hearty` ['hɑrti] adj. 衷心的；丰盛的；健壮的；精神饱满的
+`facedown` ['fes,daʊn] n. （美）直接对抗；摊牌 adv. 面向下地
+`crevice` ['krɛvɪs] n. 裂缝；裂隙
+`toss`  美 [tɔs] n. 投掷；摇荡；vt. 投掷
+
+Somewhere during the morning’s physical training I had “committed a violation of the SEAL training rules.” My punishment was to jump into the surf zone, roll around in the sand, and make myself a “sugar cookie.”
+`somewhere` 在某处
+`violation` [,vaɪə'leʃən] n. 违反；妨碍
+
+In all of SEAL training there was nothing more uncomfortable than being a sugar cookie. There were a lot of things more painful and more exhausting, but being a sugar cookie tested your patience and your determination. Not just because you spent the rest of the day with sand down your neck, under your arms, and between your legs, but because the act of becoming a sugar cookie was completely indiscriminate. There was no rhyme or reason. You became a sugar cookie at the whim of the instructor.
+`neck` n.脖子 v.变窄 
+`indiscriminate` [ɪndɪ'skrɪmɪnət] adj. 任意的；无差别的；
+`rhyme` [raɪm] n. 韵律；韵脚 v 使押韵
+`whim`  美 [wɪm]n. 奇想；一时的兴致；怪念头；幻想
+
+To many of the SEAL trainees this was hard to accept. Those that strived to be the very best expected that they would be rewarded for their stellar performance. Sometimes they were and, then again, sometimes they were not. Sometimes the only thing they got for all their effort was wet and sandy.
+`reward`  美 [rɪ'wɔrd] n. [劳经] 报酬；报答；酬谢
+`stellar` [ˈstelər] adj. 星的；星球的；主要的；一流的
+`strived`  [straɪv] v. 努力，力争；斗争，反抗
