@@ -329,3 +329,88 @@ Even out of the corner of my eye I could see the student’s jaw begin to tighte
 `jaw` [dʒɔ] / n. 颌；下巴；狭窄入口；唠叨
 `tighten` ['taɪtn] / vt. 变紧；使变紧
 `drawin out` 拉出
+
+After all the trainees were inspected the instructors ordered us into the water, and we began our swim. An hour later, I crawled out of the surf zone, and standing on the beach was the young seaman recruit. He had finished the swim near the head of the class. Later that day, I pulled him aside and asked what the instructor had whispered to him. He smiled and said proudly, “Prove me wrong!”
+`near` [nɪr] / adv.距离不远，在附近；不久，很快；差不多，几乎 prep.在......附近，靠近；接近（某时间、某事件）；（用于数字前）接近；
+
+SEAL training was always about proving something. Proving that size didn’t matter. Proving that the color of your skin wasn’t important. Proving that money didn’t make you better. Proving that determination and grit were always more important than talent. I was fortunate to learn that lesson a year before training began.
+`grit` [ɡrɪt] / n.粗砂，砂砾砂砾，粗砂石；勇气；决心 vt. 研磨；在…上铺砂砾，覆以砂砾；咬紧牙关
+
+As I boarded the city bus in downtown San Diego I was excited about the prospect of visiting the basic SEAL training facility across the bay in Coronado. I was a first-class midshipman attending my summer cruise as part of the Naval Reserve Officers Training Corp (ROTC) program. As a first-class midshipman I was between my junior and senior years in college, and if all went well, I hoped to be commissioned the following summer and head off to SEAL training. It was the middle of the week and I had received permission from my ROTC instructor to deviate from the planned training aboard one of the ships in port and make my way to Coronado.
+`prospect` ['prɑspɛkt] / n. 前途；预期；景色
+`cruise` [krʊz] vi. 巡航，巡游；漫游
+`midshipman` n.海军学生
+`reserve` [rɪ'zɝv] n. 储备，储存；自然保护区；
+`commissioned` adj. 受委任的，受任命的；服役的，现役的
+`deviate` ['divɪet] v.偏离
+`port` 港口
+
+I got off the bus outside the famed Hotel del Coronado and walked about a mile down the road to the beach side of the Naval Amphibious Base. I passed by several Korean War–vintage buildings that housed Underwater Demolition Teams Eleven and Twelve. Outside the one-story rambling brick building was a large wooden sign depicting Freddy the Frog, a large green web-footed amphibian carrying a stick of TNT and smoking a cigar. This was the home of the West Coast frogmen, those intrepid mask-and-fin warriors whose military ancestors had cleared the beaches of Iwo Jima, Tarawa, Guam, and Inchon. My heart began to beat a little faster. This was exactly where I wanted to be in a year.
+`famed` 著名的
+`Amphibious` [æm'fɪbɪəs] adj. [生物] 两栖的，水陆两用的；具有双重性的
+`Demolition ` [dimə'lɪʃən] n. 拆除（等于demolishment）；破坏；毁坏
+`depicte` v 描绘
+`rambling` adj. 漫步的；闲聊的；蔓生的 v. 漫步（ramble的ing形式）
+`wooden sign` 木制公告牌
+`a stick of TNT` 一捆
+`ancestor` ['ænsɛstɚ] n. [生物] 祖先，上代；先祖
+`intrepid`mask-and-fin warriors [ɪn'trɛpɪd] adj. 无畏的；勇敢的；勇猛的
+
+As I passed the Underwater Demolition Teams the next building belonged to SEAL Team One, at the time a new breed of jungle fighters who had earned their reputation in Vietnam as some of the toughest men in the military. Another large wooden sign showed Sammy the Seal, a dagger in one hand and a dark cloak wrapped around his shoulders. As I would later learn, the frogmen and the SEALs were one and the same. All the men were graduates of SEAL training, all frogmen at heart.
+`breed` [brid] n. [生物] 品种；种类，类型
+`dagger` 美 ['dæɡɚ] n. 匕首，短剑
+`cloak` 美 [klok] n. 斗蓬；宽大外衣；托词vt. 遮掩；隐匿
+
+Finally, I approached the last government building on the beach side of the naval base. On the outer facade of the building it read, BASIC UNDERWATER DEMOLITION SEAL TRAINING. Standing outside the main entrance were two SEAL instructors surrounded by some young high school sea cadets. The two SEALs towered over the high school students. Senior Chief Petty Officer Dick Ray stood six foot three with broad shoulders, a thin waist, a deep tan, and a dark pencil-thin mustache. He was everything I expected a SEAL to look like. Standing next to him was Chief Petty Officer Gene Wence. Well over six feet, Wence was built like a linebacker, with imposing biceps and a steely-eyed glare that cautioned everyone not to get too close.
+`facade` 美 [fə'sɑd] n. 正面；表面；外观
+`entrance` [ˈɛntrəns] n. 入口；进入
+`cadet` [kə'det] n. 学员；士官生；受军训的学生
+`tower` ['taʊɚ] n. 塔；高楼；堡垒 vi. 高耸；超越
+`broad` [brɔd] adj. 宽的，辽阔的；显著的；大概的
+`waist` 美 [west] n. 腰，腰部
+`tan` n.棕色
+`linebacker` n.后卫
+`steely-eyed` n.坚定的眼神
+`imposing biceps` 美 [ɪm'pozɪŋ] adj.(建筑物等)壮观的；威风的；（仪表）堂堂的；给人深刻印象的 ['baɪsɛps] n. [解剖] 二头肌，强健的筋肉； 臂力
+`caution`  美 ['kɔʃən] n. 小心，谨慎；警告，警示 v.警告
+
+The sea cadets were ushered into the building. With some trepidation, I followed them and stopped at the front desk. I told the young sailor manning the desk my story. I was a midshipman from the University of Texas and hoped to talk with someone about SEAL training. The sailor left his desk momentarily, returning to inform me that the first phase officer, Lieutenant Doug Huth, would be glad to talk with me in a few minutes.
+`usher` 美 ['ʌʃɚ] n. 引座员，带位员；接待员；门房 vt. 引导，招待；迎接；开辟
+`trepidation` 美 [ˌtrɛpəˈdeʃən] n. 恐惧；惊恐；忧虑；颤抖
+`I told the young sailor manning the desk my story` manning是定语从句修饰那个sailor
+`momentarily` 美 [,momən'tɛrəli] adv. 随时地；暂时地；立刻
+
+As I waited to be called into Lieutenant Huth’s office I slowly walked up and down the hall, looking at the pictures that adorned the walls. They were photos of SEALs in Vietnam, guys rising out of the waist-deep mud along the Mekong Delta. Pictures of camouflaged SEAL platoons returning from a night mission. Men loaded with automatic weapons and bandoliers of ammunition (who)boarding a Swift boat heading into the jungle.
+`mud` n. 泥；诽谤的话；无价值的东西
+`platnoon` 美 [plə'tun] n. 排，团；一组
+`bandolier` 美 [ˌbændəˈlɪr] n. 子弹带，弹药带
+`camouflaged` ['kæmuflɑ:ʒ] adj. 伪装的 vt. 伪装；
+`ammunition` [,æmju'nɪʃən] n. 弹药；军火 vt. 装弹药于
+
+Down the long hall I saw another man looking at the photos. A civilian by his attire, he was slightly built, almost frail, and a mop of dark hair hung Beatle-like over his ears. He seemed to be staring in awe at the incredible warriors whose actions were portrayed in the photos. In my mind, I wondered if he thought he had what it took to be a Navy SEAL. Looking at those pictures, did he really think he was tough enough to endure the training? Did he think his small frame could carry a heavy rucksack and a thousand rounds of ammunition? Hadn’t he seen the two SEAL instructors who were just at the front door? Massive men who clearly had the right stuff? I felt a pang of sorrow that someone had misled this fellow, maybe encouraged him to leave his comfortable life as a civilian and try SEAL training.
+`attire` /美 [ə'taɪə] n. 服装；盛装
+`frail`  美 [frel] adj. 脆弱的；虚弱的
+`a mop of dark hair`  短头发
+`beatle-like` ['bi:təl] n. 小妞；有男子气概的新女性
+`portray` 美 [pɔr'tre] vt. 描绘；扮演
+`sorrow`  美 [sɑro] n. 悲伤；懊悔；伤心事
+
+A few minutes later, the sailor from the front desk calmly walked down the corridor and escorted me to Lieutenant Huth’s office. Doug Huth was also a recruiting poster for the SEALs; tall, muscular, with brown, wavy hair, he looked very sharp in his Navy khaki uniform.
+`wavy` 美 ['wevi] adj. 多浪的；波动起伏的
+`look very sharp` 非常醒目
+
+I sat in a chair across from Huth’s desk, and we talked about SEAL training and the demands of the program. Huth told me about his experience in Vietnam and what life would be like in the Teams if I graduated from SEAL training. Out of the corner of my eye, I could see the thin man in civilian clothes as he continued to gaze at the photos on the wall. Like me, he must have been waiting to see Lieutenant Huth in hopes of learning more about SEAL training. It made me feel good about myself knowing that I was clearly stronger and more prepared than another man who thought he could survive the rigors of being a SEAL.
+`gaze` 美 [ɡeɪz] vi. 凝视；注视
+`in hopes of` - `in favor of`
+`rigor` 美 ['rɪgɚ] n. 严厉；精确；苛刻；僵硬
+
+In the middle of our conversation, Lieutenant Huth suddenly stopped talking, looked up from his desk, and yelled to the man in the hall. I stood up as Huth motioned the thin man to come into his office.
+“Bill, this is Tommy Norris,” he said, giving the thin man a big bear hug. “Tommy was the last SEAL Medal of Honor recipient from Vietnam,” Huth added. Norris smiled, somewhat embarrassed by the introduction. I smiled back, shook his hand, and laughed at myself. This seemingly frail, mop-haired man who I doubted could make it through training was Lieutenant Tom Norris. Tom Norris, who had served in Vietnam, had on successive nights gone deep behind enemy lines to rescue two downed airmen. This was Tom Norris who, on another mission, was shot in the face by North Vietnamese forces and left for dead only to be rescued by Petty Officer Mike Thornton, who would later receive the Medal of Honor for those actions. This was Tom Norris, who battled back from his injury to be accepted into the FBI’s first Hostage Rescue Team. This quiet, reserved, humble man was one of the toughest SEALs in the long history of the Teams.
+`recipient` [rɪ'sɪpɪənt] n. 容器，接受者；容纳者
+`somewhat` 美 ['sʌmwʌt] n. 几分；某物
+`toughest` 美 [tʌf] adj. 最坚强的；最坚韧的
+`reserved`  美 [rɪ'zɝvd] adj. 保留的，预订的；
+
+In 1969, Tommy Norris was almost booted out of SEAL training. They said he was too small, too thin, and not strong enough. But much like the young sailor in my class, Norris proved them all wrong and once again showed that it’s not the size of your flippers that count, just the size of your heart.
+
+## chapter 4 drive on!
