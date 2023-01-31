@@ -24,10 +24,35 @@ And to my wife, Georgeann, my best friend, who made all of my dreams possible. W
 `perseverance` ： n. 坚持不懈；不屈不挠
 
 ## chapter 1 Start Your Day with a Task Completed
+The barracks at basic SEAL training is a nondescript three-story building located on the beach at Coronado, California, just one hundred yards from the Pacific Ocean. There is no air-conditioning in the building, and at night, with the windows open, you can hear the tide roll in and the surf pounding against the sand.
 
+Rooms in the barracks are spartan. In the officers’ room, where I berthed with three other classmates, there were four beds, a closet to hang your uniforms, and nothing else. Those mornings that I stayed in the barracks I would roll out of my Navy “rack” and immediately begin the process of making my bed. It was the first task of the day. A day that I knew would be filled with uniform inspections, long swims, longer runs, obstacle courses, and constant harassment from the SEAL instructors.
 
-**单词句式学习**
+“Attention!” shouted the class leader, Lieutenant Junior Grade Dan’l Steward, as the instructor entered the room. Standing at the foot of the bed, I snapped my heels together and stood up straight as a chief petty officer approached my position. The instructor, stern and expressionless, began the inspection by checking the starch in my green uniform hat to ensure the eight-sided “cover” was crisp and correctly blocked. Moving from top to bottom, his eyes looked over every inch of my uniform. Were the creases in the blouse and trousers aligned? Was the brass on the belt shined to a mirrorlike radiance? Were my boots polished bright enough so he could see his fingers in their reflection? Satisfied that I met the high standards expected of a SEAL trainee, he moved to inspect the bed.
 
+The bed was as simple as the room, nothing but a steel frame and a single mattress. A bottom sheet covered the mattress, and over that was a top sheet. A gray wool blanket tucked tightly under the mattress provided warmth from the cool San Diego evenings. A second blanket was expertly folded into a rectangle at the foot of the bed. A single pillow, made by the Lighthouse for the Blind, was centered at the top of the bed and intersected at a ninety-degree angle with the blanket at the bottom. This was the standard. Any deviation from this exacting requirement would be cause for me to “hit the surf” and then roll around on the beach until I was covered head to toe with wet sand—referred to as a “sugar cookie.”
+
+Standing motionless, I could see the instructor out of the corner of my eye. He wearily looked at my bed. Bending over, he checked the hospital corners and then surveyed the blanket and the pillow to ensure they were correctly aligned. Then, reaching into his pocket, he pulled out a quarter and flipped it into the air several times to ensure I knew the final test of the bed was coming. With one final flip the quarter flew high into the air and came down on the mattress with a light bounce. It jumped several inches off the bed, high enough for the instructor to catch it in his hand.
+
+Swinging around to face me, the instructor looked me in the eye and nodded. He never said a word. Making my bed correctly was not going to be an opportunity for praise. It was expected of me. It was my first task of the day, and doing it right was important. It demonstrated my discipline. It showed my attention to detail, and at the end of the day it would be a reminder that I had done something well, something to be proud of, no matter how small the task.
+
+Throughout my life in the Navy, making my bed was the one constant that I could count on every day. As a young SEAL ensign aboard the USS Grayback, a special operation submarine, I was berthed in sick bay, where the beds were stacked four high. The salty old doctor who ran sick bay insisted that I make my rack every morning. He often remarked that if the beds were not made and the room was not clean, how could the sailors expect the best medical care? As I later found out, this sentiment of cleanliness and order applied to every aspect of military life.
+
+Thirty years later, the Twin Towers came down in New York City. The Pentagon was struck, and brave Americans died in an airplane over Pennsylvania.
+
+At the time of the attacks, I was recuperating in my home from a serious parachute accident. A hospital bed had been wheeled into my government quarters, and I spent most of the day lying on my back, trying to recover. I wanted out of that bed more than anything else. Like every SEAL I longed to be with my fellow warriors in the fight.
+
+When I was finally well enough to lift myself unaided from the bed, the first thing I did was pull the sheets up tight, adjust the pillow, and make sure the hospital bed looked presentable to all those who entered my home. It was my way of showing that I had conquered the injury and was moving forward with my life.
+
+Within four weeks of 9/11, I was transferred to the White House, where I spent the next two years in the newly formed Office of Combatting Terrorism. By October 2003, I was in Iraq at our makeshift headquarters on the Baghdad airfield. For the first few months we slept on Army cots. Nevertheless, I would wake every morning, roll up my sleeping bag, place the pillow at the head of the cot, and get ready for the day.
+
+In December 2003, U.S. forces captured Saddam Hussein. He was held in confinement during which time we kept him in a small room. He also slept on an Army cot, but with the luxury of sheets and a blanket. Once a day I would visit Saddam to ensure my soldiers were properly caring for him. I noticed, with some sense of amusement, that Saddam did not make his bed. The covers were always crumpled at the foot of his cot and he rarely seemed inclined to straighten them.
+
+During the ensuing ten years, I had the honor of working with some of the finest men and women this nation has ever produced—from generals to privates, from admirals to seamen recruits, from ambassadors to clerk typists. The Americans who deployed overseas in support of the war effort came willingly, sacrificing much to protect this great nation.
+
+They all understood that life is hard and that sometimes there is little you can do to affect the outcome of your day. In battle soldiers die, families grieve, your days are long and filled with anxious moments. You search for something that can give you solace, that can motivate you to begin your day, that can be a sense of pride in an oftentimes ugly world. But it is not just combat. It is daily life that needs this same sense of structure. Nothing can replace the strength and comfort of one’s faith, but sometimes the simple act of making your bed can give you the lift you need to start your day and provide you the satisfaction to end it right.
+
+If you want to change your life and maybe the world—start off by making your bed!
 `barracks` ['bærəks] / n. 兵营，营房
 `nondescript` ['nɑndɪskrɪpt] / adj. 平凡的，没有特色的 n. 不属任何类型的人
 `three-story building` / 三层
@@ -35,8 +60,7 @@ And to my wife, Georgeann, my best friend, who made all of my dreams possible. W
 `surf` [sɝf] / n. 海浪，拍岸浪 vt. 在…冲浪
 `spartan` ['spɑːt(ə)n] / adj. 斯巴达的；斯巴达式的；（生活方式）简朴的
 `uniform` [junəˌfɔrm] inspections / adj. 统一的；一致的；相同的 n.制服 n. 检查；视察；安全检测
-eg : A day that I knew would **be filled with** uniform inspections, long swims, longer runs(为什么加s / n. 奔跑；赛跑；趋向；奔跑的路程)。
-obstacle courses ['kɔrsɪz] 
+
 `constant harassment` [hə'ræsmənt] / n. 骚扰；烦恼
 `closet` ['klɑzət] / n. 壁橱；议事室，密室；小房间
 `rack`  / n. [机] 齿条；架子；拷问台.在这里指床位
@@ -53,103 +77,61 @@ eg : the brass on the belt
 `brass` [bræs] / n.黄铜；铜管乐器；黄铜器，黄铜饰品；<非正式>高级官员，高级军官
 `boots` [buːts] polished [ˈpɑːlɪʃt] / n 靴子（boot的复数）  adj.擦亮的；优美的；圆滑的
 
-eg : A gray wool blanket tucked tightly under the mattress provided warmth from the cool San Diego evenings
 `trainee` [ˌtreɪˈniː] / n.接受培训者，实习生，见习生
 `mattress` [ˈmætrəs] / n 床垫，褥垫
-gray wool blanket [wʊl] [ˈblæŋkɪt] / 羊毛毯子 
 `trucked` [tʌkt] / 盘（腿）；盘（头发）；使有褶裥；使折叠；收拢
-
-
-eg : A single pillow  intersected at a ninety-degree angle with the blanket at the bottom
 `crease` [kriːs] / {服饰}皱纹,褶皱
 `blouse` [blaʊs] / n 衬衫
 `trousers` [ˈtraʊzərz] / 裤子，长裤； 裤子
-eg : Were the creases in the blouse and trousers aligned?
 `folded` [ˈfoʊldɪd] / v.折叠；交叉合拢
 `pillow` [ˈpɪloʊ] / 枕头；蕾丝枕头 <美>坐垫，靠垫
 `blind` / 聋子
 `angle` [ˈæŋɡ(ə)l] /  n 角；倾斜，斜角
 `intersected` [ˌɪntərˈsekt] / v 相交，交叉；横穿，横断
-
-
-
-eg : Any deviation from this exacting requirement would be cause for me to "hit the surf" and then roll around on the beach
 `roll around` / 打滚
 `deviation` [ˌdiːviˈeɪʃ(ə)n] / n 偏离，违背；离差，偏差
-
-eg : He wearily looked at my bed
 `toe` [toʊ]  / n (人的）脚趾，（兽、鸟的）趾
-eg : cover head to toe
 `motionless` [ˈmoʊʃnləs] / adj 静止不动
 `wearily` [ˈwɪrəli] / adj 疲倦地；无聊地；厌倦地
-
-
-eg ： he pulled out a quarter and flipped it into the air several times
 `bending` [ˈbendɪŋ] /  v.n. 弯曲（bend 的现在分词）
 `quarter` ['kwɔːrtər] / n.四分之一；一刻钟，十五分钟；（美国和加拿大的）二十五分硬币；（重量单位）夸特，四分之一磅（常衡等于四盎司）；四分之一英担（英国为28磅，美国为25磅）；<英>八蒲式耳谷量；（尤指财务往来）季度，三个月；<美>学季，四分之一学年；（城镇中的）区，地区；（做出反应或行动的）某位人士，某个团体；（士兵、服务人员等的）营房，宿舍（quarters）；上弦（或下弦）月；（某些分四节进行的体育比赛的）一节，一局；<文>（对掌控中的敌人或对手的）慈悲，同情；（包括一条腿或一个翅膀的）四分之一畜体（或鸟身）；（马的）腰腿，臀部及后腿（quarters）；（罗盘上四个点之一所指的）方向，方位；船侧后部，船舷后部；（纹章）盾的四分之一（或更小的部分）；（盾的）上部侧面方形图记-
-
 `flipped` [flɪpt] / v（使）翻转；快速翻阅，翻动 n. 轻抛，轻掷，轻击；
 `flew` [fluː] / v.飞，飞翔（fly 的过去式）
 `bounce` [baʊns] / v. 弹起，反弹；跳动，蹦 n. 弹跳，跳动；弹性，弹力
 `noded` [nɑːd] / v.点头；打瞌睡
 `swing` [] / v.摆动；纵身跃向 n.
-
-eg : It demonstrated my discipline. It showed my attention to detail, and at the end of the day it would be a reminder that I had done something well
 `discipline` ['dɪsəplɪn] / n.纪律，风纪；惩罚，处分
 `demonstrate` [ˈdemənstreɪtɪd] / v.证明，证实；展示
-
-eg : Throughout my life in the Navy, making my bed was the one constant that I could count on every day. As a young SEAL ensign aboard the USS Grayback, a special operation submarine, I was berthed in sick bay, where the beds were stacked four high. 
 `ensign` [ˈensən] / 旗；海军少尉；徽章
 `aboard` [əˈbɔːrd] / 在（船、飞机、火车等）上
 `berthed` [bɜːθt] / adj.泊位上的 v.使……停泊；为……提供铺位
 `stack` []  / n.（整齐的）一堆；<英> 垛，堆；大量，许多
-
-eg : The salty old doctor who ran sick bay insisted that I make my rack every morning
 `salty man` [ˈsɔːlti] / adj.咸的，含盐的；<旧>有趣而略显粗俗的；<非正式>粗鲁的，爱闹事的
 `sick bay`  /  船上的医务室 bay有海湾的意思
-
-eg : He often remarked that if the beds were not made and the room was not clean, how could the sailors expect the best medical care? As I later found out, this sentiment of cleanliness and order applied to every aspect of military life.
 `sentiment` [ˈsentɪmənt] / n.观点，看法，情绪
 `cleanliness` [ˈklenlinəs] / n.清洁
-
-eg : Thirty years later, the Twin Towers came down in New York City. The Pentagon was struck, and brave Americans died in an airplane over Pennsylvania.
 `Pentagon` 五角大楼
 `Pennsylvania` 宾夕法尼亚
-
-eg : At the time of the attacks, I was recuperating in my home from a serious parachute accident. A hospital bed had been wheeled into my government quarters, and I spent most of the day lying on my back, trying to recover. I wanted out of that bed more than anything else. Like every SEAL I longed to be with my fellow warriors in the fight.
 `recuperate`  [rɪˈkuːpəreɪt] / vi.恢复，复原；挽回损失 vt.恢复，使恢复健康
 `parachute` [ˈpærəʃuːt] / n. 降落伞 v.跳伞；伞降，空投；紧急任命，临危受命
 `wheel` [] / adj.轮式的；有轮的 v.滚动；装轮子（wheel 的过去分词）
 `longed` [lɒŋd] / v.渴望，很想（long 的过去式和过去分词）
-
-eg : When I was finally well enough to lift myself unaided from the bed, the first thing I did was pull the sheets up tight, adjust the pillow, and make sure the hospital bed looked presentable to all those who entered my home. It was my way of showing that I had conquered the injury and was moving forward with my life.
 `lift` [lɪft] /v.提起，举起；抬起（身体某一部位）
 `unaided` [ʌnˈeɪdɪd ] / adj.（通常用于动词后修饰主语）未受协助的；无助的 adv.无外援地；独立地
 `presentable` [prɪˈzentəbl] / adj.漂亮的；可见人的；有规矩的
 `injury` [ˈɪndʒəri] / n.(身体上的）伤，损害；<法律>（对感情的）伤害，挫伤
-
-eg : Within four weeks of 9/11, I was transferred to the White House, where I spent the next two years in the newly formed Office of Combatting Terrorism. By October 2003, I was in Iraq at our makeshift headquarters on the Baghdad airfield. For the first few months we slept on Army cots. Nevertheless, I would wake every morning, roll up my sleeping bag, place the pillow at the head of the cot, and get ready for the day.
 `formed` [fɔːrmd] / adj.成形的v.构成；创立；使成形；制作
 `makeshift headquarters`  / n.总部，总公司；司令部，指挥部
 `cot` [kɑːt] / <英>（有围栏的）幼儿床；<美>行军床，折叠床；（航海）帆布吊铺；（家畜的）栏，篷；  at all cots 不惜任何代价 ; 无论如何 ; 不惜一切代价
-
-eg : In December 2003, U.S. forces captured Saddam Hussein. He was held in confinement during which time we kept him in a small room. He also slept on an Army cot, but with the luxury of sheets and a blanket. Once a day I would visit Saddam to ensure my soldiers were properly caring for him. I noticed, with some sense of amusement, that Saddam did not make his bed. The covers were always crumpled at the foot of his cot and he rarely seemed inclined to straighten them.
 `confinement` [kənˈfaɪnmənt] / n 监禁，关押；分娩，生产
 `amusement` [əˈmjuːzmənt] / n.开心，娱乐；娱乐活动，娱乐设施
 `crumpled` [ˈkrʌmpld] / v.弄皱，起皱 adj.摺皱的，弄皱的；（人倒地后）身体扭曲的
 `inclined` [ɪnˈklaɪnd] / adj.有……意向，倾向于……；对……有兴趣的，有天赋的；倾斜的，有坡度的 v.点头；（使）倾向于；（使）倾斜（incline 的过去式和过去分词形式）
-
-eg : During the ensuing ten years, I had the honor of working with some of the finest men and women this nation has ever produced—from generals to privates, from admirals to seamen recruits, from ambassadors to clerk typists. The Americans who deployed overseas in support of the war effort came willingly, sacrificing much to protect this great nation.
 `ensuing` [ɪnˈsuːɪŋ] / adj. 接着发生的 v
 `war effort`
 `admirals` [ˈædmərəlz] 
 `ambassadors` [æmˈbæsədərz] / n.大使
 `clerk typists` [] / 文书打字员；
-
-eg : They all understood that life is hard and that sometimes there is little you can do to affect the outcome of your day. In battle soldiers die, families grieve, your days are long and filled with anxious moments. You search for something that can give you solace, that can motivate you to begin your day, that can be a sense of pride in an oftentimes ugly world. But it is not just combat. It is daily life that needs this same sense of structure. Nothing can replace the strength and comfort of one’s faith, but sometimes the simple act of making your bed can give you the lift , you need to start your day and provide you the satisfaction to end it right.
-
-If you want to change your life and maybe the world—start off by making your bed!
-
 `grieve` [ɡriːv] / vi vt .感到悲痛；使伤心
 `anxious` [ˈæŋkʃəs] / adj.焦虑的，担心的；渴望的，急切的
 `solace` [ˈsɑːləs] / n. 安慰；慰藉；安慰之物 vt.安慰；抚慰；使快乐
@@ -456,3 +438,52 @@ To many of the SEAL trainees this was hard to accept. Those that strived to be t
 `reward`  美 [rɪ'wɔrd] n. [劳经] 报酬；报答；酬谢
 `stellar` [ˈstelər] adj. 星的；星球的；主要的；一流的
 `strived`  [straɪv] v. 努力，力争；斗争，反抗
+
+Feeling like I was sufficiently coated with sand, I ran to the instructor, yelled “hooyah” again, and came to attention. Looking me over to see if I met his standard of excellence in sugar cookies was Lieutenant Phillip L. Martin, known to his friends as Moki. I, however, was not on a first-name basis with Lieutenant Martin.
+`basis`['besɪs] n. 基础；底部；主要成分
+`first-name` ['fə:stneim] adj. 熟悉的；直呼其名的
+
+Moki Martin was the quintessential frogman. Born and raised in Hawaii, he was everything I strived to be as a SEAL officer. An experienced Vietnam veteran, he was expert with every weapon in the SEAL inventory. He was one of the finest skydivers in the Teams, and being a native Hawaiian, he was so skilled in the water that there were few, if any, who could match him.
+`quintessential` [,kwɪntɪ'sɛnʃəl] adj. 精髓的，精萃的
+`veteran` ['vɛtərən] n. 老兵；老手；富有经验的人；老运动员 adj. 经验丰富的
+
+“Mr. Mac, do you have any idea why you are a sugar cookie this morning?” Martin said in a very calm but questioning manner.
+
+“No, Instructor Martin,” I dutifully responded.
+`dutifully` ['du:tɪfəli] adv. 忠实地；忠贞地
+“Because, Mr. Mac, life isn’t fair and the sooner you learn that the better off you will be.”
+因为，麦克先生，生活是不公平的，你越早知道，你就会越好
+
+A year later, Lieutenant Martin and I were on a first-name basis. I had completed basic SEAL training, and he had been reassigned from the training center to Underwater Demolition Team Eleven in Coronado.
+
+The more I got to know Moki, the deeper my respect grew for him. In addition to being a superb SEAL operator, Moki was also a phenomenal athlete. In the early 1980s, he was on the leading edge of the triathlon craze. He had a beautiful freestyle stroke in the open ocean. His calves and thighs were strong and moved him effortlessly on the long runs, but his real advantage was the bicycle. He and the bike were made for each other.
+`phenomenal` [fɪ'nɒmɪn(ə)l] adj. 现象的；显著的；异常的
+`triathlon craze` 铁人三项
+`freestyle stroke` 自由泳
+`calves` [kævz] n. 小牛；小腿
+`thigh`  美 [θaɪ] n. 大腿，股
+
+Every morning he would mount the bike and go for a thirty-mile ride up and down the Coronado Silver Strand. There was a flat stretch of paved bike path that paralleled the Pacific Ocean. It ran from the city of Coronado to the city of Imperial Beach. With the ocean on one side and the bay on the other, it was one of the most beautiful sections of beach in California.
+`flat` 平的
+`paved` [peiv] 铺砌面
+
+Early one Saturday morning, Moki was out on a training ride along the Silver Strand. Head down, pedaling fast, he never saw the oncoming bicycle. At roughly twenty-five miles an hour the two bikes collided head-on. The bikes crumpled from the impact, slamming the riders together, leaving both men facedown on the asphalt path. The first rider rolled over, dusted himself off, and struggled to his feet. He was banged up but otherwise fine.
+`collided`[kə'laid] v. 碰撞，冲突
+`crumpled` ['krʌmpld] adj. 摺皱的，弄皱的
+`slamming`['slæmiŋ]  n. 砰击
+`banged up` 伤痕累累 
+
+Moki remained facedown, unable to move. The paramedics arrived within minutes, stabilized Moki, and transported him to the hospital. Initially there was hope that the paralysis was temporary, but as the days, months, and years passed, Moki never regained the use of his legs. The crash left him paralyzed from the waist down with limited movement in his arms.
+`paralyzed` 英/美 ['pærəlaizd] adj. 瘫痪的；麻痹的 v. 使麻痹；使无力
+`regained` [rɪ'ɡen] vt. 恢复；重新获得
+
+For the past thirty-five years, Moki has been in a wheelchair. In all those years I never once heard him complain about his misfortune in life. Never once did I hear him ask, “Why me?” Never once did he display an ounce of pity for himself.
+`pity`  美 ['pɪti] n. 怜悯，同情；遗憾 vt. 对……表示怜悯
+
+In fact, after his accident, Moki went on to be an accomplished painter. He fathered a beautiful young girl. He founded and continues to oversee the Super Frog Triathlon that is held every year in Coronado.
+`father` v
+`oversee` 监督
+`Triathlon` 三项全能运动
+It is easy to blame your lot in life on some outside force, to stop trying because you believe fate is against you. It is easy to think that where you were raised, how your parents treated you, or what school you went to is all that determines your future. Nothing could be further from the truth. The common people and the great men and women are all defined by how they deal with life’s unfairness: Helen Keller, Nelson Mandela, Stephen Hawking, Malala Yousafzai, and—Moki Martin.
+很容易认为，你在哪里长大
+Sometimes no matter how hard you try, no matter how good you are, you still end up as a sugar cookie. Don’t complain. Don’t blame it on your misfortune. Stand tall, look to the future, and drive on!
