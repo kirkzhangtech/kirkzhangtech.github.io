@@ -1,5 +1,5 @@
 ---
-title: 《javascrip高级程序设计》
+title: javascrip高级程序设计
 categories: 
 - js
 thumbnailImagePosition: bottom
