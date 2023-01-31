@@ -166,6 +166,35 @@ querying `user_col_privs_recd`
 ![10-5](./../../../../img/OracleDatabase12cSQL/10-5.jpg)
 
 when we got corresponding privileges you can do statement by below with schema ahead of table name
+```sql
+DBA_SYS_PRIVS:      查询某个用户所拥有的系统权限
+
+USER_SYS_PRIVS:     当前用户所拥有的系统权限
+
+SESSION_PRIVS:      当前用户所拥有的全部权限
+
+ROLE_SYS_PRIVS:     某个角色所拥有的系统权限  
+
+注意: 要以SYS用户登陆查询这个视图,否则返回空.
+
+ROLE_ROLE_PRIVS:    当前角色被赋予的角色
+
+SESSION_ROLES:      当前用户被激活的角色
+
+USER_ROLE_PRIVS:    当前用户被授予的角色
+
+另外还有针对表的访问权限的视图:
+
+TABLE_PRIVILEGES
+
+ALL_TAB_PRIVS   
+
+ROLE_TAB_PRIVS:     某个角色被赋予的相关表的权限
+-----------------------------------
+©著作权归作者所有：来自51CTO博客作者day_day_up_cium的原创作品，请联系作者获取转载授权，否则将追究法律责任
+Oracle中用户角色权限管理
+https://blog.51cto.com/lwc0329/3000521
+```
 ## 10.3.3 creating synonyms
 
 across schemas you want query data , then you could use synonym to connect schema.
