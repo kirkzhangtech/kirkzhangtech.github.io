@@ -15,8 +15,7 @@ And to my wife, Georgeann, my best friend, who made all of my dreams possible. W
 
 ## Preface
 
-**单词句式学习**
-- The ten lessons I learned from Navy SEAL training, which were the basis for my remarks, seemed to have a universal appeal.
+The ten lessons I learned from Navy SEAL training, which were the basis for my remarks, seemed to have a universal appeal.
 在海军海豹突击队训练中，我学到的十条经验教训，成为了我发言的基础，似乎有着普遍的吸引力。
 
 `remarks` ：评论（remark的复数）；摘要；附注
