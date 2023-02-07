@@ -486,3 +486,110 @@ In fact, after his accident, Moki went on to be an accomplished painter. He fath
 It is easy to blame your lot in life on some outside force, to stop trying because you believe fate is against you. It is easy to think that where you were raised, how your parents treated you, or what school you went to is all that determines your future. Nothing could be further from the truth. The common people and the great men and women are all defined by how they deal with life’s unfairness: Helen Keller, Nelson Mandela, Stephen Hawking, Malala Yousafzai, and—Moki Martin.
 很容易认为，你在哪里长大
 Sometimes no matter how hard you try, no matter how good you are, you still end up as a sugar cookie. Don’t complain. Don’t blame it on your misfortune. Stand tall, look to the future, and drive on!
+
+# chapter 5 failure can make you stronger
+
+The waves off Coronado Island were choppy, the small whitecaps slapping us in the face as we sidestroked back toward the beach. As usual, my swim buddy and I were struggling to keep up with the rest of the SEAL training class. The instructors on the safety boat were yelling for us to pick up the pace, but it seemed like the harder we swam the farther we fell behind.
+`choppy` 美 ['tʃɑpi] adj. 波涛汹涌的；波浪起伏的；不断改变方向的 n. (Choppy)人名；(法)肖皮
+`slapping`  ['slæpiŋ] adj. 非常快的；非常大的；极好的 adv. 极快地；非常地 v. 拍打（slap的ing形式）
+`sidestoked` 美 [ˈsaɪdstroʊk] n. 侧泳 vi. 游侧泳
+My swim buddy that day was Ensign Marc Thomas. Like me, Marc had received his commission through the Reserve Officers Training Corps (ROTC). He was a graduate of the Virginia Military Institute and one of the best long-distance runners in the class.
+`commiission` 美 [kə'mɪʃən] n. 委员会；佣金；犯；委任；委任状 vt. 委任；使服役；委托制作
+`reserve` [rɪ'zɝv] n. 储备，储存；自然保护区；预备队；缄默；[金融] 储备金 vt. 储备；保留；预约
+`dive` 美 [daɪv] vi. 潜水；跳水；俯冲；急剧下降 n. 潜水；跳水；俯冲；扑
+In SEAL training your swim buddy was the person you relied on to have your back. It was your swim buddy who you were physically tied to on the underwater dives. It was your swim buddy who you were partnered with (who) on the long swims. Your swim buddy helped you study, kept you motivated, and became your closest ally throughout training. And, as swim buddies, if one of you failed an event, both of you suffered the consequences. It was the instructors’ way of reinforcing the importance of teamwork.
+`ally` 美 ['ælaɪ] n. 同盟国；伙伴；同盟者；助手 vt. 使联盟；使联合
+
+As we finished the swim and crossed onto the beach, a SEAL instructor was waiting for us.
+
+“Drop down!” the instructor yelled. This was the command to fall into the push-up position: back straight, arms fully extended, and head up.
+
+“You two call yourselves officers?” There was no point in answering. We both knew he would continue.
+
+“Officers in the SEAL Teams lead the way. They don’t come in last on the swims. They don’t embarrass their class.”
+他们不会在游泳比赛中排在最后。他们不会让他们的班级难堪
+The instructor moved around us, kicking sand in our faces as he circled.
+
+“I don’t think you gentlemen are going to make it. I don’t think you have what it takes to be SEAL officers.”
+
+Pulling a small black notebook from his back pocket, he looked at us with disgust and jotted something in the book. “You two just made The Circus list.” He shook his head. “You’ll be lucky if you survive another week.”
+`disgust` 美 [dɪs'ɡʌst] n. 厌恶，嫌恶 vt. 使厌恶；使作呕
+`jotted` 美 ['dʒɔtid] v. 摘记下来
+`circus` 美 ['sɝkəs] n. 马戏；马戏团
+The Circus. It was the last thing either Marc or I wanted. The Circus was held every afternoon at the end of training. The Circus was another two hours of additional calisthenics, combined with nonstop harassment by SEAL combat veterans who wanted only the strong to survive training. If you failed to meet the standard on any event that day—calisthenics, the obstacle course, the timed runs, or the swims—your name was on the list. In the eyes of the instructors, you were a failure.
+`calisthenics` 美 [,kælɪs'θɛnɪks] n. 健美体操
+`veterans` 美 ['vetərənz] n. 老兵；退伍军人
+What made The Circus so feared by the students was not just the additional pain but also the knowledge that the day after The Circus you would be exhausted from the extra workout and so fatigued that you would fail to meet the standards again. Another Circus would follow, then another and another. It was a death spiral, a cycle of failure that caused many students to quit training.
+`fatigued` 美 [fə'tiɡd] adj. 疲乏的
+`exhausted` 美 [ɪɡ'zɔstɪd] adj. 疲惫的；耗尽的
+`workout` 锻炼
+As the rest of the students completed the day’s events, Marc and I, along with several others, assembled on the asphalt grinder to begin another long session of calisthenics.
+
+Because we had come in last on the swim, the instructors had tailored The Circus just for us that day. Flutter kicks. Lots and lots of flutter kicks. The flutter kicks were designed to strengthen your abdominals and thighs so you could power your way through the long open ocean swims. They were also designed to break you.
+
+The flutter kick exercise called for you to lie on your back, with legs extended directly in front of you, and your hands behind your head. As the instructor counted repetitions, you alternated moving your legs up and down in a kicking motion. At no time during the exercise were you allowed to bend your knees. Bending your knees was considered weakness among frogmen.
+
+The Circus was punishing. Hundreds of flutter kicks as well as push-ups, pull-ups, sit-ups, and eight-count body builders. By the time the sun went down Marc and I could barely move. Failure had a price.
+
+The next day brought more calisthenics, another run, another obstacle course, another swim, and unfortunately another Circus. More sit-ups, more push-ups, and a lot more flutter kicks. But as The Circuses continued a funny thing happened. Our swims got better, and Marc and I began to move up in the pack.
+
+The Circus, which had started as a punishment for failure, was making us stronger, faster, and more confident in the water. While other students quit, unable to handle the occasional failure and the pain   it brought, Marc and I were determined not to allow The Circus to beat us.
+`occasional` 美 [ə'keʒənl] adj. 偶然的；临时的；特殊场合的
+
+As training was coming to an end, there was one final open ocean swim, a five-miler off the coast of San Clemente Island. Completing it in the allowable time was essential to graduating from SEAL training.
+
+The water was bitterly cold as we jumped off the pier and into the ocean. Fifteen swim pairs entered the water and began the long trek out of the small bay, around the peninsula, and over the kelp beds. After about two hours, the swim pairs were so spread out you couldn’t tell where you were in the pack. Four hours into the swim, numb, exhausted, and on the verge of hypothermia, Marc Thomas and I crossed the beach. There waiting at the surf’s edge was the instructor.
+`pier`  [pɪr] n. 码头，直码头；桥墩；窗间壁
+`trek` 美 [trɛk] n. 艰苦跋涉 vt. （牛）拉（货车）；搬运 vi. 艰苦跋涉
+`verge` 美 [vɝdʒ] vi. 濒临，接近；处在边缘 n. 边缘
+`numb` 麻木
+`hypothermia` 美 [,haɪpə'θɝmɪə] n. 降低体温；低体温症
+“Drop down,” he yelled.
+
+My hands and feet were so cold I couldn’t feel the sand beneath my fingers and toes. With my head straining to keep upright, all I could see was the instructor’s boots as he walked around Marc and me.
+
+“Once again you two officers have embarrassed your class.” Another set of boots appeared in my view and then another. Several instructors were now surrounding us. “You have made all your teammates look bad.” He paused. “Recover, gentlemen!”
+
+As Marc and I got to our feet we looked around the beach and suddenly realized we were the first swim pair to finish.
+
+“You embarrassed them all right.” The instructor smiled. “The second pair isn’t even in sight.”
+`sight`  美 [saɪt] n. 视力；景象；眼界；见解 vt. 看见；瞄准 vi. 瞄准；观看 adj. 见票即付的
+Marc and I turned to look toward the ocean, and sure enough, there was no one in view.
+
+“Well done, gentlemen. It looks like all that extra pain and suffering paid off.” The instructor paused, stepped over, and shook our hands. “I’ll be honored to serve with you when you get to the Teams.”
+
+We had made it. The long swim was the final tough event of training. Several days later Marc and I graduated.
+
+Marc went on to have a distinguished career in the SEAL Teams and we remain close friends to this day.
+
+In life you will face a lot of Circuses. You will pay for your failures. But, if you persevere, if you let those failures teach you and strengthen you, then you will be prepared to handle life’s toughest moments.
+
+
+July 1983 was one of those tough moments. As I stood before the commanding officer, I thought my career as a Navy SEAL was over. I had just been relieved of my SEAL squadron, fired for trying to change the way my squadron was organized, trained, and conducted missions. There were some magnificent officers and enlisted men in the organization, some of the most professional warriors I had ever been around. However, much of the culture was still rooted in the Vietnam era, and I thought it was time for a change. As I was to find out, change is never easy, particularly for the person in charge.
+`squadron` n. 空军中队；一群；骑兵中队；分遣队；小舰队
+`magnificent` 美 [mæg'nɪfəsnt] adj. 高尚的；壮丽的；华丽的；宏伟的
+`era` 时代
+`enlisted` 美 [ɪn'lɪstɪd] adj. 应募入伍的 v. 征募；参军
+Fortunately, even though I was fired, my commanding officer allowed me to transfer to another SEAL Team, but my reputation as a SEAL officer was severely damaged. Everywhere I went, other officers and enlisted men knew I had failed, and every day there were whispers and subtle reminders that maybe I wasn’t up to the task of being a SEAL.
+`severly` 严重的
+`subtle`  美 ['sʌtl] adj. 微妙的；精细的；敏感的；狡猾的；稀薄的
+也许我不能胜任海豹突击队的任务
+
+At that point in my career I had two options: quit and move on to civilian life, which seemed like the logical choice in light of my recent Officer Fitness Report, or weather the storm and prove to others and myself that I was a good SEAL officer. I chose the latter.
+`weather` 美 ['wɛðɚ] n. 天气；气象；气候；处境 vt. 经受住；使风化；侵蚀；使受风吹雨打 vi. 风化；受侵蚀；经受风雨
+Soon after being fired, I was given a second chance, an opportunity to deploy overseas as the Officer in Charge of a SEAL platoon. Most of the time on that overseas deployment we were in remote locations, isolated and on our own. I took advantage of the opportunity to show that I could still lead. When you live in close quarters with twelve SEALs there isn’t anywhere to hide. They know if you are giving 100 percent on the morning workout. They see when you are first in line to jump out of the airplane and last in line to get the chow. They watch you clean your weapon, check your radio, read the intelligence, and prepare your mission briefs. They know when you have worked all night preparing for tomorrow’s training.
+`in charge of` 管理
+`in favor of` 有利于 
+`chow` 美 [tʃaʊ] n. 食物；中国狗（体壮，有褐或黑色厚毛，舌为深蓝色） vi. 吃
+As month after month of the overseas deployment wore on, I used my previous failure as motivation to outwork, outhustle, and outperform everyone in the platoon. I sometimes fell short of being the best, but I never fell short of giving it my best.
+随着海外部署的月复一月的进行，我把以前的失败作为动力，在排里比别人更努力、更勤奋、更出色。我有时没有成为最好的，但我从来没有忘记付出我的努力。
+In time, I regained the respect of my men. Several years later I was selected to command a SEAL Team of my own. Eventually I would go on to command all the SEALs on the West Coast.
+
+By 2003, I found myself in combat in Iraq and Afghanistan. Now that I was a one-star admiral leading troops in a war zone, every decision I made had its consequences. Over the next several years, I stumbled often. But, for every failure, for every mistake, there were hundreds of successes: hostages rescued, suicide bombers stopped, pirates captured, terrorists killed, and countless lives saved.
+`stumble` 美 ['stʌmbl] 绊倒 蹒跚
+`rescued` 
+I realized that the past failures had strengthened me, taught me that no one is immune from mistakes. True leaders must learn from their failures, use the lessons to motivate themselves, and not be afraid to try again or make the next tough decision.
+`immune` 英 [ɪ'mjuːn]  美 [ɪ'mjʊn] adj. 免疫的；免于……的，免除的 n. 免疫者；免除者
+You can’t avoid The Circus. At some point we all make the list. Don’t be afraid of The Circus.
+我们都会被列入名单
+

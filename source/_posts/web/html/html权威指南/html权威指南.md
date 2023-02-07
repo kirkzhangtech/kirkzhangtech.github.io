@@ -29,35 +29,6 @@ categories:
 
 ## 3.1.1 本章用的元素
 
-```html
-a
-body
-button
-code
-DOCTYPE
-head
-hr
-html
-input
-label
-p
-style
-table
-td
-textarea
-th
-title
-tr
-```
-一个网页的基本布局
-```html
-<!DDOCTYPE html>
-<html>
-<head></head>
-<body></body>
-<html>
-```
-
 **空元素**：有标签但是没内容交空元素
 **自闭合标签**：
 ```html
@@ -69,7 +40,7 @@ tr
 <input />	表单标签
 ```
 
-**需元素**： 只能使用一个标签，中间放置任何内容都不符合html规范，这类元素成为需元素。`<hr>`元素表示一段的结束，还有另外一种表示方式`<hr />`
+**虚元素**： 只能使用一个标签，中间放置任何内容都不符合html规范，这类元素成为需元素。`<hr>`元素表示一段的结束，还有另外一种表示方式`<hr />`
 
 
 ## 3.2 使用元素属性
@@ -337,7 +308,7 @@ framename	Opens the linked document in the named iframe
     <button id="voteform" ></buton>
     ```
 
-# 第十三章 定制inout元素
+# 第十三章 定制input元素
 
 ## 13.1 使用input输入文字
 ```html
@@ -417,11 +388,218 @@ value
    <form method="POST" action="www" enctype="multipart/form-data">
    </form>
    ```
-# 第十三章 理解DOM
+# 13 理解DOM
 DOM就是一组对象的集合，这些对象代表了HTML文档里的各个元素，所以DOM就是个模型，由众多文档对象组成，它保存了文档对象之间的关系
 很重要:文档模型里任何代表某个元素的对象都至少能支持HTMLEement功能，其中一些还支持额外的功能。
 不是所有可供使用的对象都代表了HTML元素。正如你即将看到的，一些对象代表元素的集合，另一些则代表DOM自身的信息，当然还有Document这个对象，它是我们探索DOM的人口也是第26章的主题。
 
 
 
+1. 理解dom对象模型
+2. 理解dom level和兼容性，level1,level2,level3
+3. DOM快速查询，操作DOM更多的是使用js语法
 
+
+# 14 使用DOM对象
+
+1. 获取Document元数据
+```html
+characterSet   返回文档的字符集编码。这是一个只读属性
+charset        获取或设置文档的字符集编码
+compatMode     获取文档的兼容性模式
+cookie         获取或设置当前文档的cookie
+defaultCharsetdefaultView     获取浏览器所使用的默认字符编码返回当前文档的window对象
+dir            获取或设置文档的文本方向
+domain         获取或设置当前文档的域名
+implementation 提供可用DOM功能的信息
+lastModified   返回文档的最后修改时间
+location       提供当前文档的URL信息
+readyState     返回当前文档的状态。这是一个只读属性，可以使用defer属性推迟脚本的执行
+referrer       返回链接到当前文档的文档URL
+title          获取或设置当前文档的标题(即title元素的内容
+```
+- 全局变量document获取文档全局变量
+- 使用location对象获取位置相关信息
+  ```html
+   protocol 获取文档协议
+   host     获取主机和端口号
+   href     获取当前文档链接
+   hostname
+   port
+   pathname
+   search
+   hash     获取当前url的锚也就是井号部分
+   assign() 导航到指定url
+   replace()清除当前文档并导航到指定文档
+   reload() 将指定的相对url解析成url
+   document.location.reload()
+  ```
+- 使用cookie
+  ```html
+   path=<path>
+   domain=<domain>
+   max-age=<seconds>
+   expires=<date>
+   secure
+  ```
+  这些额外的项目可以被附加到名称/值对的后面，以分号分隔，就像这样:`document.cookie ="MyCookie=MyValue;max-age=10"`;
+- 理解网页就绪状态
+  ```html
+   loading
+   interactive
+   complete
+  ```
+- 判断DOM的实现情况
+
+2. 获取HTML元素对象
+
+- 获取元素对象
+  - 通过标签名获取元素
+  ```html
+   activeElement
+   body
+   Embeds
+   plugins
+   forms
+   head
+   images
+   links
+   scripts
+  ```
+- 通过数组访问方式获取标签
+  `var ele = document["apple"]`
+- 搜索元素
+  ```html
+   document.getElementById(<id>)
+   document.getElementsByClassName(<class>)
+   document.getElementsByName(<name>)
+   document.getElementsByTagName(<tag>)
+   document.querySelector(<selector>)
+   document.querySelectorAll(<selector>)
+  ```
+  - 使用css选择器进行搜索
+  `document.querySelectorAll("p,img#apple")`他会匹配所有p元素和id值为apple的img元素
+  - 合并链式搜索
+
+3. 在DOM种导航
+   ```html
+   childNodes
+   firstChild
+   hasChildNodes()
+   lastChild
+   nextSibling
+   parentNode
+   previousSibling
+   ```
+
+# 15 使用window对象
+
+1. 获取windows对象
+2. 获取窗口信息
+```html
+innerHeight
+innerWidth
+outerHeight
+outerwidth
+pageXOffset
+pageYOffset
+screen
+screenLeft
+screenX
+screenTop
+screenY
+```
+3. 与窗口进行交互
+```html
+blur()   让窗口失去键盘焦点
+close()   关闭窗口
+focus()  让窗口获得键盘焦点
+print()  提示用户打印页面
+scrollBy(<x>，<y>) 让文档相对于当前位置进行滚动
+scrollTo(<x>，<y>)   滚动到指定的位置
+stop     停止载入文档
+```
+4. 对用户进行提示
+```html
+alert()
+confirm() 显示一个带有确认和取消提示的对话框窗口
+prompt(< msg >, < val >) 显示对话框提示用户输入一个值
+showModalDialog(<>) 显示一个指定的url
+```
+5. 获取基本信息
+```html
+document
+history
+location
+```
+6. 使用浏览器历史
+```html
+back()
+forward()
+go(<index>)
+length
+pushState(<state>,<title>， <url>)
+replaceState(<state>,<title>， <url>)
+state
+```
+- 在浏览历史中导航
+- 在浏览历史里插入条目
+- 为不同文档插入不同条目
+- 在浏览器保存负责状态
+
+7. 跨文档消息传递
+8. 计时器
+   1. 该功能有点像golang中的after函数
+
+# 16 使用DOM元素
+
+# 17 为DOM设置样式
+
+# 18 使用事件
+1. 使用简单的事件处理器
+```html
+<p onmouseover="this,style.background='write'; this.style.color='black'" >
+<!-- 绑定多个事件 -->
+<p onmouseover="this,style.background='write'; this.style.color='black'" onmouseout="this.style.removeProperty('color')">
+
+```
+2. 给元素绑定事件处理函数
+<p onmouseover="handleMouseOver(this)" >
+
+3. 使用DOM和事件对象
+
+```html
+for (var i = 0; i< pElement.length ; i++){
+   pElem[i].onmouseover = handleMouseOver;
+}
+function handleMouseOver(e){
+   e.target.style.background='white'
+}
+```
+用target属性来获取触发事件的HTMLElement
+
+```html
+for (var i = 0; i< pElement.length ; i++){
+   pElem[i].addEvenListener("mouseover","handleMoueOver");
+}
+function handleMouseOver(e){
+   e.target.style.background='white'
+}
+document.getElementById("pressme").onclick=function (){
+      e.target.style.background='white'
+
+}
+```
+
+
+
+
+# 19 使用元素专属对象
+
+# 20 使用agax
+
+# 21 使用多媒体
+
+# 22 使用canvas
+
+# 23 使用拖放
