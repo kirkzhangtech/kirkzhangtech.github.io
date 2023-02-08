@@ -593,3 +593,74 @@ I realized that the past failures had strengthened me, taught me that no one is 
 You can’t avoid The Circus. At some point we all make the list. Don’t be afraid of The Circus.
 我们都会被列入名单
 
+## chapter 6 You Must Dare Greatly
+你必须大无畏（how dare you）
+slide down the obstacle headfirst.
+
+Standing at the edge of the thirty-foot tower, I grabbed the thick nylon rope. One end of the rope was attached to the tower and the other end anchored on the ground to a pole one hundred feet away. I was halfway through the SEAL obstacle course and I was on a record pace. Swinging my legs over the top of the line and holding on for dear life, I began to inch my way off the platform. My body hung underneath the rope, and with a caterpillar-like motion I slowly made my way, foot by foot, to the other end.
+`grabbe` /美 [græbd] v. 攫取；捕获；强夺；匆忙地做
+`rope`  美 [rop] n. 绳，绳索 vt. 捆，  vi. 拧成绳状
+`thick` 英 [θɪk]  美 [θɪk]n. 最拥挤部分；活动最多部分；事物的粗大浓密部分adj. 厚的；浓的；粗大的adv. 密集地；浓浓地，厚厚地
+`anchored` 美 ['æŋkɚ] adj. 固定的；抛锚的 v. 固定；抛锚；主持
+`pole` 美 [pol] n. 杆；极点；电极 vt. 用竿支撑
+`swing`  美 [swɪŋ]n. 摇摆；摆动；秋千；音律；涨落vi. 摇摆；转向；悬挂
+`caterpillar`  美 ['kætɚpɪlɚ] n. [无脊椎] 毛虫；履带车 adj. 有履带装置的
+`motion` n,v 运动
+
+As I reached the end, I released my grip on the line, dropped into the soft sand, and ran to the next obstacle. The other students in my class were yelling encouragement, but I could hear the SEAL instructor calling out the minutes. I had lost a lot of time on the Slide for Life. My “possum-style” technique of negotiating the long rope was just too slow, but somehow I couldn’t bring myself to slide down the rope headfirst. Going headfirst off the tower, using a method called Commando Style, was much faster but also much riskier. You were less stable on the top of the rope than hanging underneath, and if you fell and injured yourself, you would be washed out of the class.
+`grip` 美 [ɡrɪp] n. 紧握；柄；支配；握拍方式；拍柄绷带 vt. 紧握；夹紧 vi. 抓住
+`encouragement`  美 [ɪn'kɝɪdʒmənt] n. 鼓励
+`possum-style` 负鼠式
+`negotiating` 美 [nɪ'goʃɪ,etɪŋ] n. 谈判 v. 谈判
+`somewhere` 美 ['sʌmhaʊ] adv. 以某种方法；莫名其妙地
+`wash` 美 [wɔʃ] n. 洗涤；洗的衣服；化妆水；冲积物 vt. 洗涤；洗刷；冲走；拍打 vi. 洗澡；被冲蚀
+
+I crossed the finish line with a disappointing time. As I was doubled over, trying to catch my breath, a grizzled old Vietnam vet with highly polished boots and a heavily starched green uniform stood hunched over me. “When are you going to learn, Mr. Mac?” he said with an unmistakable tone of contempt. “That obstacle course is going to beat you every time unless you start taking some risks.”  
+试图喘口气时
+`grizzed` 英 ['grɪz(ə)ld] adj. 灰色的；头发斑白的 v. 变成灰色；发脾气（grizzle的过去分词）
+`polished`  美 ['pɑlɪʃt] adj. 擦亮的；优美的；圆滑的 v. 擦亮（polish的过去式和过去分词）
+`starched` 美 [stɑrtʃt] adj. 僵硬的；拘泥刻板的；硬挺的 vi. 给…上浆
+`contempt`  美 [kən'tɛmpt] n. 轻视，蔑视；耻辱
+`unmistakable`  美 [,ʌnmɪ'stekəbl] adj. 明显的；不会弄错的
+`tone` 美 [ton] n. 语气；色调；音调；音色 vt. 增强；用某种调子说 vi. 颜色调和；呈现悦目色调 n. (Tone)人名；(罗、塞、乍)托内
+
+One week later, I pushed my fears aside, mounted the top of the rope, and thrust my body headfirst down the Slide for Life. As I crossed the finish line in a personal best, I could see the old Vietnam SEAL nodding his approval. It was a simple lesson in overcoming your anxieties and trusting your abilities to get the job done. The lesson would serve me well in the years to come.
+`anxieties` 美 [æŋ'zaɪətiz] 担心 渴望
+
+It was Iraq in 2004. The voice on the other end of the radio was calm but had an unmistakable sense of urgency. The three hostages we were searching for had been located. Al Qaeda terrorists were holding them in a walled compound on the outskirts of Baghdad. Unfortunately, intelligence indicated that terrorists were about to move the men, and we had to act quickly.
+`urgency` 美 ['ɝdʒənsi] n. 紧急；催促；紧急的事
+`outskirt`  美 ['aʊt'skɝts] n. 市郊，郊区
+`compound`  美 ['kɑmpaʊnd] n. [化学] 化合物；混合物；复合词 adj. 复合的；混合的 v. 合成；混合；恶化，加重；和解，妥协
+
+The Army lieutenant colonel in charge of the rescue mission informed me that they would have to conduct a dangerous daylight raid. To make matters worse, the only way to be successful was to land three Black Hawk helicopters, carrying the assault force, into the middle of the small compound. We talked through other tactical options, but it was clear the colonel was right. It was always preferable to conduct a rescue mission at night, when the element of surprise was on your side, but this was a fleeting opportunity, and if we didn’t act now the hostages would be moved and possibly killed.
+`in charge of` 负责
+`colonel` 美 ['kɝnl] n. 陆军上校
+`conduct` 美 [kən'dʌkt] vi. 导电；带领 vt. 管理；引导；表现 n. 进行；行为；实施
+`preferable` 美 ['prɛfrəbl] adj. 更好的，更可取的；更合意的
+`fleeting`  美 ['flitɪŋ] adj. 飞逝的；转瞬间的
+`assault` 美 [ə'sɔlt] n. 攻击；袭击 vt. 攻击；袭击 vi. 袭击；动武
+
+I approved the mission and within minutes the rescue force had boarded the three Black Hawk helicopters and was on its way to the compound. High above the Black Hawks, another helicopter was providing video surveillance back to my headquarters. I watched in silence as the three helicopters skimmed across the desert, just a few feet above the ground to hide their approach.
+`surveillance` 美 [sɝ'veləns] n. 监督；监视
+
+Inside the open courtyard, I could see one man, armed with an automatic weapon, moving in and out of the building, seemingly preparing to leave. The helos were five minutes out and all I could do from my headquarters was listen to the internal communications as the rescue force made final preparations.
+`helos` n. 直升机
+
+This was not the first hostage rescue I had overseen, nor would it be the last, but it was clearly the most daring, in light of the need to gain surprise by landing inside the compound. While the pilots from the Army aviation unit were the best in the world, this was still a high-risk mission. Three helicopters, with blades extending beyond sixty feet, were going to land in a space with only inches to spare. Adding to the level of difficulty was an eight-foot-high brick wall that surrounded the compound, forcing the pilots to dramatically alter their approach angle. It was going to be a hard landing, and over the radio I could hear the rescue force preparing for impact.
+`aviation` 航空
+`blades` 美 [bledz] n. [机] 刀片（blade的复数）
+`inches` n. 英寸
+`brick` 美 [brɪk] n. 砖，砖块；砖形物；心肠好的人 vt. 用砖砌 adj. 用砖做的；似砖的
+`angle` 美 ['æŋɡl] vi. 钓鱼；谋取 n. 角度，角，方面
+
+From the overhead surveillance, I could see the helicopters’ final approach. The first aircraft flew flat and level and then as it crossed over the wall the helo flared upward, settling into the tiny courtyard. Immediately the rescue force exited the Black Hawk and began surging into the building. The second helo, right on the tail of the first, landed within a few feet of his companion. Dirt from the downwash of the helicopters caused a cloud of dust to encircle the landing area. As the third helo approached the compound, a giant plume of dust temporarily blinded the pilot. The front of the third helo inched over the wall, but the rear wheel clipped the eight-foot-high barricade, throwing bricks everywhere. With no room to spare, the pilot forced the helo to the ground with a thud, but everyone inside was unharmed.
+`flat` 英 [flæt]  美 [flæt]adj. 平的；单调的；不景气的；干脆的；平坦的；扁平的；浅的adv. （尤指贴着另一表面）平直地；断然地；水平地；直接地，完全地n. 平地；公寓；平面vt. 使变平；[音乐]使（音调）下降，尤指降半音vi. 逐渐变平；[音乐]以降调唱（或奏）n. （法）弗拉特（人名）；（英）弗莱特（人名）
+`companion` n. 同伴；朋友；指南；手册 vt. 陪伴
+
+Minutes later, I received word that all the hostages were safe. Within thirty minutes the rescue force and the freed men were on their way back to safety. The gamble had paid off.
+
+Over the course of the next decade I would come to realize that assuming risk was typical of our special operations forces. They always pushed the limits of themselves and their machines in order to be successful. In many ways this is what set them apart from everyone else. However, contrary to what outsiders saw, the risk was usually calculated, thoughtful, and well planned. Even if it was spontaneous, the operators knew their limits but believed in themselves enough to try.
+
+Throughout my career, I always had great respect for the British Special Air Service, the famed SAS. The SAS motto was “Who Dares Wins.” The motto was so widely admired that even moments before the bin Laden raid, my Command Sergeant Major, Chris Faris, quoted it to the SEALs preparing for the mission. To me the motto was more than about how the British special forces operated as a unit; it was about how each of us should approach our lives.
+
+Life is a struggle and the potential for failure is ever present, but those who live in fear of failure, or hardship, or embarrassment will never achieve their potential. Without pushing your limits, without occasionally sliding down the rope headfirst, without daring greatly, you will never know what is truly possible in your life.
