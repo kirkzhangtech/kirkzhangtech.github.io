@@ -591,12 +591,11 @@ document.getElementById("pressme").onclick=function (){
 }
 ```
 
-
-
-
 # 19 使用元素专属对象
+[参考w3school](https://www.w3school.com.cn/tags/tag_a.asp)
 
-# 20 使用agax
+
+# 20 使用ajax
 
 # 21 使用多媒体
 

@@ -487,7 +487,7 @@ It is easy to blame your lot in life on some outside force, to stop trying becau
 很容易认为，你在哪里长大
 Sometimes no matter how hard you try, no matter how good you are, you still end up as a sugar cookie. Don’t complain. Don’t blame it on your misfortune. Stand tall, look to the future, and drive on!
 
-# chapter 5 failure can make you stronger
+## chapter 5 failure can make you stronger
 
 The waves off Coronado Island were choppy, the small whitecaps slapping us in the face as we sidestroked back toward the beach. As usual, my swim buddy and I were struggling to keep up with the rest of the SEAL training class. The instructors on the safety boat were yelling for us to pick up the pace, but it seemed like the harder we swam the farther we fell behind.
 `choppy` 美 ['tʃɑpi] adj. 波涛汹涌的；波浪起伏的；不断改变方向的 n. (Choppy)人名；(法)肖皮
@@ -585,7 +585,7 @@ As month after month of the overseas deployment wore on, I used my previous fail
 随着海外部署的月复一月的进行，我把以前的失败作为动力，在排里比别人更努力、更勤奋、更出色。我有时没有成为最好的，但我从来没有忘记付出我的努力。
 In time, I regained the respect of my men. Several years later I was selected to command a SEAL Team of my own. Eventually I would go on to command all the SEALs on the West Coast.
 
-By 2003, I found myself in combat in Iraq and Afghanistan. Now that I was a one-star admiral leading troops in a war zone, every decision I made had its consequences. Over the next several years, I stumbled often. But, for every failure, for every mistake, there were hundreds of successes: hostages rescued, suicide bombers stopped, pirates captured, terrorists killed, and countless lives saved.
+By 2003, I found myself in combat in Iraq/伊拉克/ and Afghanistan/阿富汗/. Now that I was a one-star admiral leading troops in a war zone, every decision I made had its consequences. Over the next several years, I stumbled often. But, for every failure, for every mistake, there were hundreds of successes: hostages rescued, suicide bombers stopped, pirates captured, terrorists killed, and countless lives saved.
 `stumble` 美 ['stʌmbl] 绊倒 蹒跚
 `rescued` 
 I realized that the past failures had strengthened me, taught me that no one is immune from mistakes. True leaders must learn from their failures, use the lessons to motivate themselves, and not be afraid to try again or make the next tough decision.
