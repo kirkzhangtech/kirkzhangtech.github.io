@@ -655,12 +655,29 @@ This was not the first hostage rescue I had overseen, nor would it be the last, 
 
 From the overhead surveillance, I could see the helicopters’ final approach. The first aircraft flew flat and level and then as it crossed over the wall the helo flared upward, settling into the tiny courtyard. Immediately the rescue force exited the Black Hawk and began surging into the building. The second helo, right on the tail of the first, landed within a few feet of his companion. Dirt from the downwash of the helicopters caused a cloud of dust to encircle the landing area. As the third helo approached the compound, a giant plume of dust temporarily blinded the pilot. The front of the third helo inched over the wall, but the rear wheel clipped the eight-foot-high barricade, throwing bricks everywhere. With no room to spare, the pilot forced the helo to the ground with a thud, but everyone inside was unharmed.
 `flat` 英 [flæt]  美 [flæt]adj. 平的；单调的；不景气的；干脆的；平坦的；扁平的；浅的adv. （尤指贴着另一表面）平直地；断然地；水平地；直接地，完全地n. 平地；公寓；平面vt. 使变平；[音乐]使（音调）下降，尤指降半音vi. 逐渐变平；[音乐]以降调唱（或奏）n. （法）弗拉特（人名）；（英）弗莱特（人名）
-`companion` n. 同伴；朋友；指南；手册 vt. 陪伴
+`companion` 美 [kəm'pænɪən] n. 同伴；朋友；指南；手册 vt. 陪伴
+`Dirt`  美 [dɝt] n. 污垢，泥土；灰尘，尘土；下流话
+`encircle` 美 [ɪn'sɝkl] vt. 包围；围绕；环绕
+`plume` 英 [pluːm]  美 [plum] vt. 用羽毛装饰 n. 羽毛vi. 骚首弄姿
+`barricade` 美 ['bærɪ'ked] n. 街垒；路障；争论之处
+`rear` 美 [rɪr] vt. 培养；树立；栽种vi. 暴跳；高耸adv. 向后；在后面adj. 后方的；后面的；背面的
+`inched` [intʃt] adj. 有英寸刻度的；英寸的
+`clipped` 英 [klɪpt]  美 [klɪpt] adj. 省略一部分的；发音清楚的 v. 剪除（clip的过去分词）
+`thud` 英 [θʌd]  美 [θʌd] n. 砰的一声；重击 vi. 砰的一声掉下；发出砰声 vt. 砰地击中
 
 Minutes later, I received word that all the hostages were safe. Within thirty minutes the rescue force and the freed men were on their way back to safety. The gamble had paid off.
+`gamble` 赌博
 
-Over the course of the next decade I would come to realize that assuming risk was typical of our special operations forces. They always pushed the limits of themselves and their machines in order to be successful. In many ways this is what set them apart from everyone else. However, contrary to what outsiders saw, the risk was usually calculated, thoughtful, and well planned. Even if it was spontaneous, the operators knew their limits but believed in themselves enough to try.
+Over the course of the next decade I would come to realize that assuming risk was typical of our special operations forces. **They always pushed the limits of themselves and their machines in order to be successful. In many ways this is what set them apart from everyone else**. However, contrary to what outsiders saw, the risk was usually calculated, thoughtful, and well planned. Even if it was spontaneous, the operators knew their limits but believed in themselves enough to try.
+`apart` 英 [ə'pɑːt]  美 [ə'pɑrt] adv. 相距；与众不同地；分离着 adj. 分离的；与众不同的
+`contrary` 英 ['kɒntrərɪ]  美 ['kɑntrɛri] adj. 相反的；对立的 adv. 相反地 n. 相反；反面
+`spontaneous` 英 [spɒn'teɪnɪəs]  美 [spɑn'tenɪəs] adj. 自发的；自然的；无意识的
 
 Throughout my career, I always had great respect for the British Special Air Service, the famed SAS. The SAS motto was “Who Dares Wins.” The motto was so widely admired that even moments before the bin Laden raid, my Command Sergeant Major, Chris Faris, quoted it to the SEALs preparing for the mission. To me the motto was more than about how the British special forces operated as a unit; it was about how each of us should approach our lives.
+`motto` n. 座右铭，格言；箴言
+`admired` 英 [əd'maɪəd]  美 [əd'maɪəd] adj. 受人钦佩的；感到羡慕的
 
 Life is a struggle and the potential for failure is ever present, but those who live in fear of failure, or hardship, or embarrassment will never achieve their potential. Without pushing your limits, without occasionally sliding down the rope headfirst, without daring greatly, you will never know what is truly possible in your life.
+`hardship` 英 ['hɑːdʃɪp]  美 ['hɑrdʃɪp] n. 困苦；苦难；艰难险阻
+`embarrassment` 英 [ɪm'bærəsmənt; em-]  美 [ɪm'bærəsmənt] n. 窘迫，难堪；使人为难的人或事物；拮据
+`potential` 潜力
