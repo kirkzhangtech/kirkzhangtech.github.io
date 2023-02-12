@@ -778,44 +778,100 @@ BS:这种勇气存在于我们所有人之中。深入挖掘，你会发现它�
 If you want to change the world… be your very best in the darkest moments.
 
 I stood on the small sandy spit of land, looking across the bay at the line of warships that were moored at 32nd Street Naval Base. In between the ships and our starting point was a small vessel anchored in San Diego Bay that would be this evening’s “target.” Our training class had spent the last several months learning to dive the basic SCUBA and the more advanced, bubbleless, Emerson closed-circuit diving rig. Tonight was the culmination of Dive Phase, the most technically difficult part of basic SEAL training.
+`circuit` 美 ['sɝkɪt] n. [电子] 电路，回路；巡回；一圈；环道 vi. 环行 vt. 绕回…环行
+`moored` 英/美 [muəd] adj. 停泊的；系泊的 v. 停泊
+`vessel` 美 ['vɛsl] n. 船，舰；[组织] 脉管，血管；容器，器皿
+`scuba`   美 ['skjʊbə] n. 水肺；水中呼吸器
+`rig` n. 装备；钻探设备；服装；[船] 帆装 vt. 操纵；装配；装扮；装上索具
+`culmination` 美 ['kʌlmə'neʃən] n. 顶点；高潮
 
 Our objective was to swim the two thousand meters underwater from the starting point across the bay to the anchored vessel. Once underneath the ship, we were to place our practice limpet mine on the keel and then, without being detected, return to the beach. The Emerson diving apparatus was morbidly referred to as the “death rig.” It was known to malfunction occasionally, and according to SEAL folklore a number of trainees had died over the years using the Emerson.
+`anchored` 英/美 ['æŋkɚ] adj. 固定的；抛锚的 v. 固定；抛锚；主持
+`keel` 美 [kil] vt. 给…装龙骨；把…翻转 n. 龙骨；平底船；龙骨脊 vi. 翻倒；倾覆
+`morbidly` 英/美 ['mɔrbɪdli] adv. 病态地
+`apparatus` 美 [ˌæpəˈrætəs] n. 装置，设备；仪器；器官
+`malfunction` 美 [,mæl'fʌŋkʃən] vi. 发生故障；不起作用 n. 故障；失灵；疾病
+`folklore` 美 ['foklɔr] n. 民俗学；民间传说；民间风俗
 
 At night the visibility in San Diego Bay was so bad that you couldn’t see your hand in front of your face. All you had was a small green chemical light to illuminate your underwater compass. To make matters worse the fog was rolling in. The haze hung low over the bay, making it difficult to take an initial compass bearing on our target. If you missed the target you would find yourself in the shipping channel, never a good place to be when a Navy destroyer was pulling into port.
+`illuminate` 美 [ɪ'lumɪnet] vt. 阐明，说明；照亮；使灿烂；用灯装饰 vi. 照亮
+`compass` 美 ['kʌmpəs]n. 指南针，罗盘；圆规 vt. 包围
+`haze` 美 [hez] n. 阴霾；薄雾；疑惑 vt. 使变朦胧；使变糊涂 vi. 变朦胧；变糊涂
+`hung` 美 [hʌŋ] v. 悬挂；垂落
 
 The SEAL instructors paced back and forth in front of the twenty-five pairs of divers preparing for the night’s dive. The instructors seemed as nervous as we were. They knew that this training event had the highest potential for someone to get hurt or die.
+`forth` 美 [fɔrθ] adv. 向前，向外；自…以后
 
 The chief petty officer in charge of the event summoned all the divers into a small circle. “Gentlemen,” he said. “Tonight we find out which of you sailors really want to be frogmen.” He paused for effect. “It’s cold and dark out there. It will be darker under the ship. So dark that you can get disoriented. So dark that if you get separated from your swim buddy, he will not be able to find you.” The fog was now closing in around us and the mist encircled even the spit of land on which we stood. “Tonight, you will have to be your very best. You must rise above your fears, your doubts, and your fatigue. No matter how dark it gets, you must complete the mission. This is what separates you from everyone else. Somehow those words stayed with me for the next thirty years.
-
+`encircled` 英/美 [ɪn'sɝrkld] 环绕的
+`fatigue` 美 [fə'tig] n. 疲劳，疲乏；杂役 vt. 使疲劳；使心智衰弱 vi. 疲劳 adj. 疲劳的
+`disoriented` 美 [dɪs'ɔrɪɛntɪd] adj. 无判断力的；分不清方向或目标的 v. 使…迷惑（disorient的过去时和过去分词）
+`fog` 美 [fɔɡ] n. 雾；烟雾，尘雾；迷惑 vt. 使模糊；使困惑；以雾笼罩 vi. 被雾笼罩；变模糊
 
 As I watched the fog encircle the airfield at Bagram Air Base in Afghanistan, another dark moment was unfolding in front of me. A massive C-17 aircraft was parked on the tarmac, its ramp lowered, standing by to receive the remains of a fallen warrior.
+`unfolding` 英/美 [ʌn'fold] n. 演变；[生化] 伸展；[生物物理] 解折叠 v. 展开（unfold的ing形式）
+`tarmac` 英/美 ['tɑrmæk] n. 柏油碎石路面；铺有柏油碎石的飞机跑道
+`ramp` 美 [ræmp] n. 斜坡，坡道；敲诈 vi. 蔓延；狂跳乱撞；敲诈 vt. 敲诈；使有斜面
 
 This was a Ramp Ceremony. It was one of the most solemn and yet unquestionably inspiring aspects of the wars in Iraq and Afghanistan. It was America at its finest. Every man, every woman, regardless of their background, regardless of how heroic their final moments, was treated with incredible dignity and honor. It was our nation’s way of recognizing their sacrifice. It was our last salute, our final thanks, and a prayer to send them on their way home.
-
-Extending out from the ramp were two parallel lines of soldiers. Standing at parade rest, they formed the honor guard. Off to the right of the airplane was a small three-piece band softly playing “Amazing Grace.”
+`solemn` 庄严的
+`finest` 美 [ˈfaɪnɪst] n. 警方（美） adj. 好的，出色的
+```
+这是一个坡道仪式。这是伊拉克和阿富汗战争中最庄严但又无疑是最鼓舞人心的一个方面。
+这是美国最好的一面。每一个男人，每一个女人，无论他们的背景如何，无论他们的最后时刻多么英勇，
+都被赋予了令人难以置信的尊严和荣誉。这是我们国家对他们的牺牲的认可方式。这是我们最后的敬意，
+我们最后的感谢，以及送他们回家的祈祷。
+```
+Extending out from the ramp were two parallel lines of soldiers. Standing at parade rest, they formed the honor guard. Off to the right of the airplane was a small three-piece band softly playing "Amazing Grace"
 
 A few others, myself included, were gathered to the left, and all along hangar row stood hundreds of other soldiers, sailors, airmen, Marines, civilians, and our allies. They had all come to pay their last respects.
-
+`hangar`美 ['hæŋɚ] n. 飞机库；飞机棚
+`row stood`
 The HUMVEE tactical vehicle carrying the remains arrived right on time. Six men from the fallen heroes unit acted as pallbearers. Off-loading the flag-draped casket, they slowly marched through the honor guard, up the ramp, and onto the plane.
-
-They positioned the casket in the middle of the cargo bay, turned smartly, came to attention, and saluted. At the head of the casket, the pastor bowed his head and read from Isaiah 6:8.
-
+`pallbearer` 美 ['pɔl,bɛrɚ]n. 护柩者
+`casket` 美 ['kæskɪt] n. 棺材；骨灰盒；小箱vt. 把……装进小箱；入殓
+They positioned the casket in the middle of the cargo bay, turned smartly, came to attention, and saluted. At the head of the casket, the pastor bowed his head and read from Isaiah 6:8
+`isaiah` 英/美 [aɪ'zer] n. 以赛亚
+`smartly` 英/美 ['sma:tli] adv. 刺痛地；漂亮地；潇洒地；火辣辣地
+`saluted` 美 [sɑ:'lu:te] v. 赞扬
+`pastor` 美 ['pæstɚ] n. 牧师 vt. 作……的牧师
+`bowed`
 “And I heard the voice of the Lord saying, Whom shall I send and who will go for us? And I said, Here I am. Send me!”
 
 As “Taps” was played, tears rolled down the soldiers’ faces. There was no attempt to hide their pain.
 
 As the pallbearers departed, those lined up outside came through one by one, saluting, and kneeling by the casket for one last thought.
+`kneeling` 英/美 [ni:l] n. 跪着，跪下 v. 跪着（kneel的ing形式）；跪下
 
 The C-17 would depart later that morning, refueling along the way and arriving at Dover Air Force Base. There, another honor guard, along with the family of the fallen soldier, would meet the casket and escort it home.
+`escort` 美 [ˈeskɔːrt] n. 陪同；护航舰；护卫队；护送者 vt. 护送；陪同；为…护航
 
 There is no darker moment in life than losing someone you love, and yet I watched time and again as families, as military units, as towns, as cities, and as a nation, how we came together to be our best during those tragic times.
-
+`tragic` adj. 悲剧的；悲痛的，不幸的
+```
+生命中最黑暗的时刻莫过于失去你所爱的人，然而，我一次又一次地看到，作为家庭、
+作为军事单位、作为城镇、作为城市、作为国家，我们如何在这些悲惨的时刻团结起来，发挥我们的最大作用。
+```
 When a seasoned Army special operator was killed in Iraq, his twin brother stood tall, comforting the soldier’s friends, holding the family together, and ensuring that his lost brother would be proud of his strength in this time of need.
-
+`seasoned` 美 ['siznd] adj. 经验丰富的；老练的；调过味的
 When a fallen Ranger was returned home to his base in Savannah, Georgia, his entire unit, dressed in their finest uniforms, marched from the church to the Ranger’s favorite bar on River Street. All along the route, the town of Savannah turned out. Firefighters, police officers, veterans, civilians from all walks of life, were there to salute the young soldier who had died heroically in Afghanistan.
+`marched` 美 [mɑrtʃ] n. 行军，进军；进行曲；示威游行 vi. 进军；走过 vt. 迫使……前进
+`veterans` 英/美 ['vetərənz] n. 老兵；退伍军人
 
 When a CV-22 aircraft crashed in Afghanistan, killing the pilot and several crewmen, the airmen from the same unit came together, paid their respects, and flew the next day—knowing that their fallen brothers would want them in the air, continuing the mission.
-
+`crewman` 美 ['krumən] n. 机组成员
+```
+当一架CV-22飞机在阿富汗坠毁，飞行员和几名机组人员丧生时，来自同一单位的飞行员聚集在一起，
+表达了他们的敬意，并在第二天飞行，因为他们知道，他们死去的兄弟会希望他们在空中继续执行任务。
+```
 When a helicopter crash took the lives of twenty-five special operators and six National Guard soldiers, the entire nation mourned but also took incredible pride in the courage, patriotism, and valor of the fallen warriors.
+`mourned` 美 [mɔrn] v. 哀悼；忧伤；服丧
+`incredible` 美 [ɪn'krɛdəbl] adj. 难以置信的，惊人的
 
 At some point we will all confront a dark moment in life. If not the passing of a loved one, then something else that crushes your spirit and leaves you wondering about your future. In that dark moment, reach deep inside yourself and be your very best.
+`confront` 美 [kən'frʌnt] vt. 面对；遭遇；比较
+`spirit` 美 ['spɪrɪt]n. 精神；心灵；情绪；志气；烈酒vt. 鼓励；鼓舞；诱拐
+```
+在某些时候，我们都会面对生活中的一个黑暗时刻。如果不是所爱之人的去世，那就是其他事情压垮了你的精神，
+让你对自己的未来感到疑惑。在那个黑暗的时刻，要深入到自己的内心，做最好的自己。
+```
