@@ -681,3 +681,141 @@ Life is a struggle and the potential for failure is ever present, but those who 
 `hardship` 英 ['hɑːdʃɪp]  美 ['hɑrdʃɪp] n. 困苦；苦难；艰难险阻
 `embarrassment` 英 [ɪm'bærəsmənt; em-]  美 [ɪm'bærəsmənt] n. 窘迫，难堪；使人为难的人或事物；拮据
 `potential` 潜力
+
+## chapter 7 Stand Up to the Bullies
+`bullies` 英/美 ['buli] 地痞
+
+don’t **back down from** the sharks.
+
+The water off San Clemente Island was choppy and cold as we began our four-mile night swim. Ensign Marc Thomas was matching my sidestrokes one for one. With nothing but a loose-fitting wet suit top, a mask, and a pair of fins, we swam hard against the current that was pushing southward around the small peninsula. The lights of the naval base from which we had started began to fade as we made our way out into the open ocean(公海). Within an hour we were about a mile off the beach and seemingly all alone in the water. Whatever swimmers were around us were cloaked in darkness.
+`fins` 英/美 [fɪn] n. 鳍片，散热翅片；五元纸币（fin的复数形式） v. 切除鳍；装上翅
+`peninsula` 半岛
+`naval` 英 ['neɪv(ə)l]  美 ['nevl] adj. 海军的；军舰的
+`cloak` 英 [kləʊk]  美 [klok]n. 斗蓬；宽大外衣；托词vt. 遮掩；隐匿
+`sidestrokes` 侧击
+`current` 英 ['kʌr(ə)nt]  美 [kɝ​ənt]adj. 现在的；流通的，通用的；最近的；草写的n. （水，气，电）流；趋势；涌流
+
+I could see Marc’s eyes through the glass in his face mask. His expression must have mirrored mine. We both knew that the waters off San Clemente were filled with sharks. Not just any sharks, but great white sharks, the largest, most aggressive man-eater in the ocean. Prior to our swim, the SEAL instructors had given us a briefing on all the potential threats we might encounter that night. There were leopard sharks, mako sharks, hammerhead sharks, thresher sharks, but the one we feared the most was the great white.
+`Not just any sharks, but great white sharks` 不是... 而是...
+`prior` 英 ['praɪə]  美 ['praɪɚ] adj. 优先的；在先的，在前的 adv. 在前，居先
+
+
+There was something a little unnerving about being alone, at night, in the middle of the ocean, knowing that lurking beneath the surface was a prehistoric creature just waiting to bite you in half.
+`unnerving` 英/美 [,ʌn'nə:viŋ] adj. 使人紧张不安的 n. 除神经法 v. 使失去气力，使丧失勇气，使焦躁
+`lurking` 潜伏
+`prehistoric` 
+
+But we both wanted to be SEALs so badly that nothing in the water that night was going to stop us. If we had to fight off the sharks, then we were both prepared to do so. Our goal, which we believed to be honorable and noble, gave us courage, and courage is a remarkable quality. Nothing and nobody can stand in your way. Without it, others will define your path forward. Without it, you are at the mercy of life’s temptations. Without courage, men will be ruled by tyrants and despots. Without courage, no great society can flourish. Without courage, the bullies of the world rise up. With it, you can accomplish any goal. With it, you can defy and defeat evil.
+`noble` 英 ['nəʊb(ə)l]  美 ['nobl] adj. 高尚的；贵族的；惰性的；宏伟的
+`temptations` 英/美 [temp'teiʃən] n. 诱惑物；引诱物
+你受生活诱惑的摆布。
+`tyrant` 美 ['taɪrənt] n. 暴君
+`despot` 美 ['dɛspɑt] n. 专制君主，暴君；独裁者
+`flourish` 美 [ˈflɜːrɪʃ] n. 兴旺；茂盛；挥舞；炫耀；华饰 vt. 夸耀；挥舞 vi. 繁荣，兴旺；茂盛；
+`defy` 美 ['difaɪ] vt. 藐视；公然反抗；挑衅；使落空 n. 挑战；对抗
+`defeat` 美 [dɪ'fit] vt. 击败，战胜；挫败；使…失败 n. 失败的事实；击败的行为
+
+Saddam Hussein, the now former president of Iraq, sat on the edge of an old Army cot clad only in an orange jumpsuit. Having been captured by U.S. forces twenty-four hours earlier, he was now a prisoner of the United States.
+`cot` 英 [kɒt]  美 [kɑt] n. 简易床；小屋；轻便小床
+`clad` 英 [klæd]  美 [klæd] adj. 穿衣的；覆盖的 vt. 在金属外覆以另一种金属
+`jumpsuit` 美 ['dʒʌmp'sʊt] n. 跳伞装；连身衣裤
+
+As I opened the door to allow the new Iraqi government leaders into the room, Saddam remained seated. A smirk crossed his face, and there was no sign of remorse or submission in his attitude. Immediately, the four Iraqi leaders began to yell at Saddam, but from a safe distance. With a look of contempt, Saddam gave them a deadly smile and motioned them to sit down. Still fearful of the former dictator, they each grabbed a folding chair and took their seats. The screaming and finger-pointing continued but slowly subsided as the former dictator began to talk.
+`smirk` 美 [smɝk] n. 傻笑；假笑；得意的笑 vi. 傻笑；假笑 vt. 以假笑表示
+`contempt`  美 [kən'tɛmpt] n. 轻视，蔑视；耻辱
+`remorse` 美 [rɪ'mɔrs] n. 懊悔；同情
+`submission` 美 [səb'mɪʃən] n. 投降；提交（物）；服从；（向法官提出的）意见；谦恭
+`motion` 运动，移动
+`subside` 美 [səb'saɪd] vi. 平息；减弱；沉淀；坐下
+`dictator` 美 ['dɪktetɚ] n. 独裁者；命令者
+
+Under Saddam Hussein, the Baath Party was responsible for the deaths of thousands of Shia Iraqis and tens of thousands of Kurds. Saddam had personally executed a number of his own generals whom he felt were disloyal.
+`executed` 处决
+`disloyal` 不忠的
+
+Although I was positive Saddam would no longer be a threat to the other men in the room, the Iraqi leaders were not so certain. The fear in their eyes was unmistakable. This man, the Butcher of Baghdad, had for decades terrorized an entire nation. His cult of personality had drawn to him followers of the worst sort. His murderous thugs had brutalized the innocent and forced thousands to flee the country. No one in Iraq had mustered the courage to challenge the tyrant. There was no doubt in my mind that these new leaders were still terrified of what Saddam might be able to do—even from behind bars.
+`unmistakable` 毋庸置疑的
+`drawn` 美 [drɔn] adj. 拔出的 v. 画，绘图
+`murderous` 英 ['mɜːd(ə)rəs]  美 ['mɝdərəs] adj. 杀人的，残忍的；凶残的；蓄意谋杀的
+`thugs` 英/美 [θʌɡ] 暴徒
+`innocent` adj. 无辜的；无罪的；无知的 n. 天真的人；笨蛋
+`brutalized` 美 ['brutəlaɪz] vt. 残酷地对待；使像野兽般残忍，使变得残酷无情 vi. 变粗暴；变残忍
+`flee` 美 [fli] vi. 逃走；消失，消散 vt. 逃跑，逃走；逃避
+`muster` 美 ['mʌstɚ]vt. 召集；对…进行点名；使振作 n. 集合；检阅；点名册；集合人员 vi. 召集；聚集
+
+If the purpose of the meeting was to show Saddam that he was no longer in power—it had failed. In those brief moments, Saddam had managed to intimidate and frighten the new regime leadership. He seemed more confident than ever.
+`intimidate` 美 [ɪn'tɪmɪdet] vt. 恐吓，威胁；胁迫
+`frighten` 美 ['fraɪtn] vt. 使惊吓；吓唬… vi. 害怕，惊恐
+As the Iraqi leaders left, I instructed my guards to isolate the former president in a small room. There would be no visitors, and the guards in the room were ordered not to talk with Saddam.
+
+Over the next month, I visited the small room every day. And every day Saddam rose to greet me(而每天萨达姆都会起来迎接我), and every day without speaking, I motioned him back to his cot. The message was clear. He was no longer important. He could no longer intimidate those around him. He could no longer instill fear into his subjects. Gone was the gleaming palace. Gone were the handmaidens, the servants, and the generals. Gone was the power. The arrogance and oppressiveness that had defined his rule had ended. Courageous young American soldiers had stood up to his tyranny, and now he was no longer a threat to anyone.
+`instill` 英/美 [ɪn'stɪl] vt. 徐徐滴入；逐渐灌输
+`subjects` 臣民
+`palace` 美 [ˈpælɪs] n. 宫殿；宅邸；豪华住宅
+`gleaming` 美 ['ɡlimɪŋ] n. 微弱的闪光，瞬息的一现 adj. 闪闪发光的 v. 闪烁， 隐约地闪现
+`handmaidens` 美 [ˈhændmeɪdn] n. 侍女；女仆（
+`servants`  美 ['sɝvənt] n. 仆人；服务员
+`arrogance` 美 ['ærəgəns] n. 自大；傲慢态度
+`oppressiveness` 美 [ə'presiv] 压迫
+`tyranny` 美 ['tɪrəni] n. 暴政；专横；严酷；残暴的行为
+`courageous` 美 [kə'redʒəs] adj. 有胆量的，勇敢的
+
+Thirty days later, I transferred Saddam Hussein to a proper military police unit, and a year later the Iraqis hanged him for his crimes against the nation.
+`proper` 美 ['prɑpɚ] adj. 适当的；本身的；特有的；正派的 adv. 完全地
+`而一年后，伊拉克人因他对国家犯下的罪行而将他绞死。`
+
+Bullies are all the same; whether they are in the school yard, in the workplace, or ruling a country through terror. They thrive on fear and intimidation. Bullies gain their strength through the timid and faint of heart. They are like sharks that sense fear in the water. They will circle to see if their prey is struggling. They will probe to see if their victim is weak. If you don’t find the courage to stand your ground, they will strike. In life, to achieve your goals, to complete the night swim, you will have to be men and women of great courage. That courage is within all of us. Dig deep, and you will find it in abundance.
+`prey` 猎物
+`dig` 挖掘
+`abundance` 美 [ə'bʌndəns] n. 充裕，丰富
+`timid` 美 ['tɪmɪd] adj. 胆小的；羞怯的
+`faint` 美 [fent]adj. 模糊的；头晕的；虚弱的；[医] 衰弱的vi. 昏倒；变得微弱；变得没气力 n. [中医] 昏厥，昏倒
+`victim` 受害人
+`probe` 美 [prob] n. 探针；调查 vi. 调查；探测 vt. 探查；用探针探测
+BS:这种勇气存在于我们所有人之中。深入挖掘，你会发现它的大量存在。
+
+## CHAPTER 8 Rise to the Occasion
+If you want to change the world… be your very best in the darkest moments.
+
+I stood on the small sandy spit of land, looking across the bay at the line of warships that were moored at 32nd Street Naval Base. In between the ships and our starting point was a small vessel anchored in San Diego Bay that would be this evening’s “target.” Our training class had spent the last several months learning to dive the basic SCUBA and the more advanced, bubbleless, Emerson closed-circuit diving rig. Tonight was the culmination of Dive Phase, the most technically difficult part of basic SEAL training.
+
+Our objective was to swim the two thousand meters underwater from the starting point across the bay to the anchored vessel. Once underneath the ship, we were to place our practice limpet mine on the keel and then, without being detected, return to the beach. The Emerson diving apparatus was morbidly referred to as the “death rig.” It was known to malfunction occasionally, and according to SEAL folklore a number of trainees had died over the years using the Emerson.
+
+At night the visibility in San Diego Bay was so bad that you couldn’t see your hand in front of your face. All you had was a small green chemical light to illuminate your underwater compass. To make matters worse the fog was rolling in. The haze hung low over the bay, making it difficult to take an initial compass bearing on our target. If you missed the target you would find yourself in the shipping channel, never a good place to be when a Navy destroyer was pulling into port.
+
+The SEAL instructors paced back and forth in front of the twenty-five pairs of divers preparing for the night’s dive. The instructors seemed as nervous as we were. They knew that this training event had the highest potential for someone to get hurt or die.
+
+The chief petty officer in charge of the event summoned all the divers into a small circle. “Gentlemen,” he said. “Tonight we find out which of you sailors really want to be frogmen.” He paused for effect. “It’s cold and dark out there. It will be darker under the ship. So dark that you can get disoriented. So dark that if you get separated from your swim buddy, he will not be able to find you.” The fog was now closing in around us and the mist encircled even the spit of land on which we stood. “Tonight, you will have to be your very best. You must rise above your fears, your doubts, and your fatigue. No matter how dark it gets, you must complete the mission. This is what separates you from everyone else. Somehow those words stayed with me for the next thirty years.
+
+
+As I watched the fog encircle the airfield at Bagram Air Base in Afghanistan, another dark moment was unfolding in front of me. A massive C-17 aircraft was parked on the tarmac, its ramp lowered, standing by to receive the remains of a fallen warrior.
+
+This was a Ramp Ceremony. It was one of the most solemn and yet unquestionably inspiring aspects of the wars in Iraq and Afghanistan. It was America at its finest. Every man, every woman, regardless of their background, regardless of how heroic their final moments, was treated with incredible dignity and honor. It was our nation’s way of recognizing their sacrifice. It was our last salute, our final thanks, and a prayer to send them on their way home.
+
+Extending out from the ramp were two parallel lines of soldiers. Standing at parade rest, they formed the honor guard. Off to the right of the airplane was a small three-piece band softly playing “Amazing Grace.”
+
+A few others, myself included, were gathered to the left, and all along hangar row stood hundreds of other soldiers, sailors, airmen, Marines, civilians, and our allies. They had all come to pay their last respects.
+
+The HUMVEE tactical vehicle carrying the remains arrived right on time. Six men from the fallen heroes unit acted as pallbearers. Off-loading the flag-draped casket, they slowly marched through the honor guard, up the ramp, and onto the plane.
+
+They positioned the casket in the middle of the cargo bay, turned smartly, came to attention, and saluted. At the head of the casket, the pastor bowed his head and read from Isaiah 6:8.
+
+“And I heard the voice of the Lord saying, Whom shall I send and who will go for us? And I said, Here I am. Send me!”
+
+As “Taps” was played, tears rolled down the soldiers’ faces. There was no attempt to hide their pain.
+
+As the pallbearers departed, those lined up outside came through one by one, saluting, and kneeling by the casket for one last thought.
+
+The C-17 would depart later that morning, refueling along the way and arriving at Dover Air Force Base. There, another honor guard, along with the family of the fallen soldier, would meet the casket and escort it home.
+
+There is no darker moment in life than losing someone you love, and yet I watched time and again as families, as military units, as towns, as cities, and as a nation, how we came together to be our best during those tragic times.
+
+When a seasoned Army special operator was killed in Iraq, his twin brother stood tall, comforting the soldier’s friends, holding the family together, and ensuring that his lost brother would be proud of his strength in this time of need.
+
+When a fallen Ranger was returned home to his base in Savannah, Georgia, his entire unit, dressed in their finest uniforms, marched from the church to the Ranger’s favorite bar on River Street. All along the route, the town of Savannah turned out. Firefighters, police officers, veterans, civilians from all walks of life, were there to salute the young soldier who had died heroically in Afghanistan.
+
+When a CV-22 aircraft crashed in Afghanistan, killing the pilot and several crewmen, the airmen from the same unit came together, paid their respects, and flew the next day—knowing that their fallen brothers would want them in the air, continuing the mission.
+
+When a helicopter crash took the lives of twenty-five special operators and six National Guard soldiers, the entire nation mourned but also took incredible pride in the courage, patriotism, and valor of the fallen warriors.
+
+At some point we will all confront a dark moment in life. If not the passing of a loved one, then something else that crushes your spirit and leaves you wondering about your future. In that dark moment, reach deep inside yourself and be your very best.
