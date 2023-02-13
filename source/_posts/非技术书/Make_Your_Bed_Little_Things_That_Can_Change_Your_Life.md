@@ -774,7 +774,7 @@ Bullies are all the same; whether they are in the school yard, in the workplace,
 `probe` 美 [prob] n. 探针；调查 vi. 调查；探测 vt. 探查；用探针探测
 BS:这种勇气存在于我们所有人之中。深入挖掘，你会发现它的大量存在。
 
-## CHAPTER 8 Rise to the Occasion
+## chapter 8 Rise to the Occasion
 If you want to change the world… be your very best in the darkest moments.
 
 I stood on the small sandy spit of land, looking across the bay at the line of warships that were moored at 32nd Street Naval Base. In between the ships and our starting point was a small vessel anchored in San Diego Bay that would be this evening’s “target.” Our training class had spent the last several months learning to dive the basic SCUBA and the more advanced, bubbleless, Emerson closed-circuit diving rig. Tonight was the culmination of Dive Phase, the most technically difficult part of basic SEAL training.
@@ -847,7 +847,7 @@ The C-17 would depart later that morning, refueling along the way and arriving a
 `escort` 美 [ˈeskɔːrt] n. 陪同；护航舰；护卫队；护送者 vt. 护送；陪同；为…护航
 
 There is no darker moment in life than losing someone you love, and yet I watched time and again as families, as military units, as towns, as cities, and as a nation, how we came together to be our best during those tragic times.
-`tragic` adj. 悲剧的；悲痛的，不幸的
+`tragic` ['trædʒɪk] adj. 悲剧的；悲痛的，不幸的
 ```
 生命中最黑暗的时刻莫过于失去你所爱的人，然而，我一次又一次地看到，作为家庭、
 作为军事单位、作为城镇、作为城市、作为国家，我们如何在这些悲惨的时刻团结起来，发挥我们的最大作用。
@@ -875,3 +875,59 @@ At some point we will all confront a dark moment in life. If not the passing of 
 在某些时候，我们都会面对生活中的一个黑暗时刻。如果不是所爱之人的去世，那就是其他事情压垮了你的精神，
 让你对自己的未来感到疑惑。在那个黑暗的时刻，要深入到自己的内心，做最好的自己。
 ```
+
+## chapter 9 Give People Hope
+start singing when you’re up to your neck in mud.
+`mud` 美 [mʌd] vt. 弄脏；用泥涂 vi. 钻入泥中n. 泥；诽谤的话；无价值的东西
+
+The night wind coming off the ocean was gusting to twenty miles an hour. There was no moon out, and an evening layer of low clouds obscured the stars. I was sitting in chest-deep mud, covered from head to toe with a layer of grime. My vision blurred by the caked-on clay, I could see only the outline of my fellow students lined up in the pit beside me.
+```
+The night wind coming off the ocean 描述从什么从某一地点来不一定使用from，可以使用off
+```
+`gusting` 美 [ɡʌst] n. 风味；一阵狂风；趣味 vi. 一阵阵地劲吹
+`obscured` 英/美 [əb'skjuəd] adj. 遮蔽的；湮没的 v. 掩盖；使含混；变得模糊
+
+It was Wednesday of Hell Week, and my SEAL training class was down at the infamous Tijuana mudflats. Hell Week was the seminal event for the First Phase of SEAL training. It was six days of no sleep and unrelenting harassment by the instructors. There were long runs, open ocean swims, obstacle courses, rope climbs, endless sessions of calisthenics, and constant paddling of the inflatable boat small (IBS). The purpose of Hell Week was to eliminate the weak, those not tough enough to be SEALs.
+
+Statistically speaking, more students quit during Hell Week than at any other time in training, and the mudflats were the toughest part of the week. Located between South San Diego and Mexico, the mudflats were a low-lying area where drainage from San Diego created a large swath of deep, thick mud that had the consistency of wet clay.
+
+Earlier that afternoon, our class had paddled our rubber boats from Coronado down to the mudflats. Soon after arriving we were ordered into the mud and began a series of races and individual competitions designed to keep us cold, wet, and miserable. The mud clung to every part of your body. It was so dense that moving through it exhausted you and tested your will to carry on.
+
+For hours the races continued. By the evening, we could barely move from the bone-chilling coldness and the fatigue. As the sun went down the temperature dropped, the wind picked up, and everything seemed to get even harder.
+
+Morale was declining rapidly. It was only Wednesday, and we all knew that another three days of pain and exhaustion lay ahead. This was the moment of truth for a lot of the students. Shaking uncontrollably, with hands and feet swollen from nonstop use and skin so tender that even the slightest movement brought discomfort, our hope for completing the training was fading fast.
+
+Silhouetted against the distant lights of the city, a SEAL instructor walked purposefully to the edge of the mudflats. Sounding like an old friend, he softly talked into a bullhorn and offered comfort to the suffering trainees. We could join him and the other instructors by the fire, he said. He had hot coffee and chicken soup. We could relax until the sun came up. Get off our feet. Take it easy.
+
+I could sense that some of the students were ready to accept his offer. After all, how much longer could we survive in the mud? A warm fire, hot coffee, and chicken soup sure sounded good. But then came the catch. All he needed was for five of us to quit. Just five quitters and the rest of the class could have some relief from the pain.
+
+The student beside me started to move toward the instructor. I grabbed his arm and held him tight, but the urge to leave the mud was too great. He broke free of my grasp and began to lunge for dry ground. I could see the instructor smiling. He knew that once one man quit, others would follow.
+
+Suddenly, above the howl of the wind came a voice. Singing. It was tired and raspy, but loud enough to be heard by all. The lyrics were not meant for tender ears, but everyone knew the tune. One voice became two and two became three and then before long everyone was singing.
+
+The student rushing for the dry ground turned around and came back beside me. Looping his arm around mine, he began to sing as well. The instructor grabbed the bullhorn and shouted for the class to quit singing. No one did. He yelled at the class leader to get control of the trainees. The singing continued. With each threat from the instructor, the voices got louder, the class got stronger, and the will to continue on in the face of adversity became unbreakable. In the darkness, with the fire reflecting on the face of the instructor, I could see him smile. Once again, we had learned an important lesson: the power of one person to unite the group, the power of one person to inspire those around him, to give them hope. If that one person could sing while neck deep in mud, then so could we. If that one person could endure the freezing cold, then so could we. If that one person could hold on, then so could we.
+
+
+The large room at Dover Air Force Base was filled with grieving families—inconsolable children sobbing in their mothers’ arms, parents holding hands hoping to gain strength from each other, and wives with a far-off look of disbelief. Just five days earlier, a helicopter carrying Navy SEALs and their Afghan Special Operations partners, and flown by Army aviators had been shot down in Afghanistan. All thirty-eight men on board were killed. It was the single greatest loss in the War on Terror.
+
+In less than an hour, a large C-17 transport aircraft was scheduled to land at Dover, and the families of the fallen heroes would be escorted to the flight line to meet the flag-draped coffins. But as the families waited, the President of the United States, the Secretary of Defense, the service secretaries, and senior military leaders filed into the waiting room to pay their respects and give comfort where they could.
+
+I had attended dozens of services for fallen soldiers. It was never easy, and I often wondered whether my words of solace made any difference to those who lost loved ones or whether the shock of their loss made everything I said incomprehensible.
+
+As my wife, Georgeann, and I began to talk with the families I struggled with the right words. How could I truly empathize with their pain? How could I tell them that the sacrifice of their son, their husband, their father, their brother, their friend, was worth it? I did my best to console each one. I hugged them. I prayed with them. I tried to remain strong for them, but somehow I knew my words fell short.
+
+Then, as I knelt down beside an elderly woman, I noticed the family next to me talking with Marine Lieutenant General John Kelly. The military assistant to the Secretary of Defense, Kelly was tall, lean, with close-cropped gray hair and dressed in an immaculate Marine uniform. The family was gathered around him, and I could sense that his words of sympathy and encouragement in the face of this tragedy were having a profound effect on the grief-stricken parents and their children. He smiled and they smiled. He hugged and they hugged back. He reached out his hand and they grasped it tightly.
+
+After embracing the parents one last time and thanking the family for their sacrifice, Kelly moved on to the next group of heartbroken survivors. During the next hour, John Kelly touched almost every family in the room. More than any other visitor that day Kelly’s words resonated with every parent, every wife, every brother and sister, and every friend. His words were words of understanding. His were words of compassion, and above all, his were words of hope.
+
+Only John Kelly could have made a difference that day. Only John Kelly could have given them hope, because only John Kelly knew what it was like to lose a son in combat.
+
+Marine First Lieutenant Robert Kelly was killed in Afghanistan in 2010 while serving with the Third Battalion, Fifth Marines. General Kelly and his family had struggled with the tragedy, just like the families at Dover that day. But the Kelly family had survived. They had endured through the pain, the heartache, and the inconsolable sense of loss.
+
+As I watched him that day he also gave me strength. The truth is, when you lose a soldier you grieve for the families, but you also fear that the same fate may someday befall you. You wonder whether you could survive the loss of a child. Or you wonder how your family would get along without you by their side. You hope and pray that God will be merciful and not have you shoulder this unthinkable burden.
+
+Over the course of the next three years, John Kelly and I became close friends. He was a remarkable officer, a strong husband to his wife, Karen, and a loving father to his daughter, Kate, and oldest son, Marine Major John Kelly. But more than that, without ever knowing it, John Kelly gave all those around him hope. Hope that in the very worst of times we could rise above the pain, the disappointment, and the agony and be strong. That we each had within us the ability to carry on and not only to survive but also to inspire others.
+
+Hope is the most powerful force in the universe. With hope you can inspire nations to greatness. With hope you can raise up the downtrodden. With hope you can ease the pain of unbearable loss. Sometimes all it takes is one person to make a difference.
+
+We will all find ourselves neck deep in mud someday. That is the time to sing loudly, to smile broadly, to lift up those around you and give them hope that tomorrow will be a better day.
