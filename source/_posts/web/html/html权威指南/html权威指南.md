@@ -16,7 +16,6 @@ categories:
 # 第二章
 
 # 第三章
-
 ## 3.1 使用元素(标签)
 在现代html元素中，我们应该使用具有代表含义，因为会影响呈现方式
 ```html
@@ -596,7 +595,8 @@ document.getElementById("pressme").onclick=function (){
 
 ## 19.1 基础标签
 ```html
-<!DOCTYPE>  <!-- 文档类型 --->
+<!DOCTYPE> 声明对大小写不敏感。  <!-- 文档类型 --->
+<!DOCTYPE html>
 <html>
    <head></head>
    <body>
@@ -606,16 +606,37 @@ document.getElementById("pressme").onclick=function (){
       <h4>h4</h4>
       <h5>h5</h5>
       <h6>h6</h6>
-      <p>段落</p> <!--段落-->
-      <br />      <!--定义简单的折行-->
+      <p>段落</p> <!--段落-->换行<br />      <!--定义简单的折行-->
       <hr />      <!--定义水平线-->
    </body>
 
 </html>
 ```
+
+<head></head>
+<body>
+<h1>h1</h1>
+<h2>h2</h2>
+<h3>h3</h3>
+<h4>h4</h4>
+<h5>h5</h5>
+<h6>h6</h6>
+<p>段落</p> <!--段落-->换行<br />      <!--定义简单的折行-->
+<hr />      <!--定义水平线-->
+</body>
+
+
 # 19.2 格式化标签
+
 ```html
+<abbr>
+```
 <abbr title="People's Republic of China">PRC</abbr> <!-- 鼠标悬浮上去会显示标签的中具体说明-->
+<hr>
+
+```html
+<address>   <!-- 定义文档作者或拥有者的联系信息。 -->
+```
 <address>   <!-- 定义文档作者或拥有者的联系信息。 -->
 Written by <a href="mailto:webmaster@example.com">Donald Duck</a>.<br> 
 Visit us at:<br>
@@ -623,48 +644,284 @@ Example.com<br>
 Box 564, Disneyland<br>
 USA
 </address>
+<hr>
+
+```html
 <b>	      定义粗体文本。
 <bdi>	      定义文本的文本方向，使其脱离其周围文本的方向设置。
 <bdo>	      定义文字方向。
+```
+Username <bdi dir="rtl">Bill</bdi>   :80 point <br>
+<bdo>	      定义文字方向。
    <bdo dir="rtl">
    Here is some Hebrew text
-   </bdo>
+</bdo>
+<hr>
+
+```html
 <blockquote>定义长的引用。
 <cite>	   定义引用(citation)。
 <code>	   定义计算机代码文本。
-<hr />
-<del>	      定义被删除文本。
-   <p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
-<hr />
-
-<dfn>	      定义定义项目。
-<em>	      定义强调文本。
-<font>	   定义大号文本。HTML5 中不支持。请使用 CSS 代替。
-<i>	      定义斜体文本。
-<ins>	      定义被插入文本。
-<kbd>	      定义键盘文本。
-<mark>	   定义有记号的文本。
-<meter>	   定义预定义范围内的度量。
-<pre>	      定义预格式文本。
-<progress>	定义任何类型的任务的进度。
-<q>	      定义短的引用。
-<rp>	      定义若浏览器不支持 ruby 元素显示的内容。
-<rt>	      定义 ruby 注释的解释。
-<ruby>	   定义 ruby 注释。
-<s>	      定义加删除线的文本。
-<samp>	   定义计算机代码样本。
-<small>	   定义小号文本。
-<strike>	   定义加删除线文本。HTML5 中不支持。请使用 <del> 或 <s> 代替。
-<strong>	   定义语气更为强烈的强调文本。
-<sup>	      定义上标文本。
-<sub>	      定义下标文本。
-<template>	定义用作容纳页面加载时隐藏内容的容器。
-<time>	   定义日期/时间。
-<tt>	      定义打字机文本。HTML5 中不支持。请使用 CSS 代替。
-<u>	      定义下划线文本。
-<var>	      定义文本的变量部分。
-<wbr>	      定义可能的换行符。
+<del>	      定义被删除文本线。
 ```
+<p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
+<hr>
+
+```html
+<dfn>	      定义项目。
+<em>	      定义强调文本。斜体</em>
+<i>	      定义斜体文本。</i>
+<ins>	      定义被插入文本。下划线
+<kbd>	      定义键盘文本。
+
+<ins>	 定义被插入文本。下划线</ins><br>
+<kbd>Cmd</kbd> + <kbd>C</kbd>
+```
+<i>	      定义斜体文本。</i><br>
+<em>	      定义强调文本。斜体</em><br>
+<ins>	 定义被插入文本。下划线</ins><br>
+<kbd>Cmd</kbd> + <kbd>C</kbd>
+<hr>
+
+```html
+<mark>	   定义有记号的文本。
+<p>Do not forget to buy <mark>milk</mark> today.</p>
+```
+
+<p>Do not forget to buy <mark>milk</mark> today.</p>
+<hr>
+
+```html
+<meter>	   定义预定义范围内的度量。
+<meter value="3" min="0" max="10">十分之三</meter><br>
+
+```
+
+<meter value="3" min="0" max="10">十分之三</meter><br>
+<hr>
+
+```html
+<pre>	      定义预格式文本。
+```
+
+<pre>
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    xmlDoc=<a href="dom_loadxmldoc.asp">loadXMLDoc</a>(&quot;books.xml&quot;);
+    document.write(&quot;xmlDoc is loaded, ready for use&quot;);
+  &lt;/script&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;
+</pre>
+<hr>
+
+```html
+<progress>	定义任何类型的任务的进度。
+<progress value="22" max="100"></progress> <br>
+```
+
+<progress value="22" max="100"></progress> <br>
+<hr>
+
+```html
+<q>	      定义短的引用。
+<q>Here is a short quotation here is a short quotation</q><br>
+
+```
+
+<q>Here is a short quotation here is a short quotation</q><br>
+<hr>
+
+```html
+<rp>	      定义若浏览器不支持 ruby 元素显示的内容。
+<ruby>
+漢 <rt><rp>(</rp>ㄏㄢˋ<rp>)</rp></rt>
+</ruby>
+```
+<ruby>
+漢 <rt><rp>(</rp>ㄏㄢˋ<rp>)</rp></rt>
+</ruby>
+<hr>
+
+```html
+<rt>	      定义 ruby 注释的解释
+<ruby>
+漢 <rt> ㄏㄢˋ </rt>
+</ruby>
+```
+<ruby>
+漢 <rt> ㄏㄢˋ </rt>
+</ruby>
+<hr>
+
+```html
+<ruby>	   定义 ruby 注释。
+<ruby>
+漢 <rt><rp>(</rp>ㄏㄢˋ<rp>)</rp></rt>
+</ruby>
+```
+<ruby>
+漢 <rt><rp>(</rp>ㄏㄢˋ<rp>)</rp></rt>
+</ruby>
+<hr>
+
+```html
+<s>	      定义加删除线的文本。
+在 HTML 5 中，<s>仍然支持</s>已经不支持这个标签了。
+```
+在 HTML 5 中，<s>仍然支持</s>已经不支持这个标签了。
+<hr>
+
+```html
+<samp>	   定义文本样本。
+```
+<samp>
+kirkzhang, what you have done before? what was you doing on younth
+</samp>
+<hr>
+
+```html
+<small>	   定义小号文本。
+<small>定义小号文本</small>
+```
+<small>定义小号文本</small>
+<hr>
+
+```html
+<strike>	   定义加删除线文本。HTML5 中不支持。请使用 <del> 或 <s> 代替。
+```
+<hr>
+
+```html
+<strong>	   定义语气更为强烈的强调文本。
+<strong>定义语气更为强烈的强调文本。</strong>
+```
+<strong>定义语气更为强烈的强调文本。</strong>
+<hr>
+
+```html
+<sup>	      定义上标文本。
+这段文本包含 <sup>上标</sup>
+```
+这段文本包含 <sup>上标</sup>
+<hr>
+
+```html
+<sub>	      定义下标文本。
+这段文本包含 <sub>下标</sub>
+```
+这段文本包含 <sub>下标</sub>
+<hr>
+
+```html
+<template>	定义用作容纳页面加载时隐藏内容的容器。
+<button onclick="showContent()">显示被隐藏的内容</button>
+
+<template>
+  <h2>Flower</h2>
+  <img src="img_white_flower.jpg" width="214" height="204">
+</template>
+
+<script>
+function showContent() {
+  var temp = document.getElementsByTagName("template")[0];
+  var clon = temp.content.cloneNode(true);
+  document.body.appendChild(clon);
+}
+</script>
+```
+<button onclick="showContent()">显示被隐藏的内容</button>
+
+<template>
+  <h2>Flower</h2>
+  <img src="img_white_flower.jpg" width="214" height="204">
+</template>
+
+<script>
+function showContent() {
+  var temp = document.getElementsByTagName("template")[0];
+  var clon = temp.content.cloneNode(true);
+  document.body.appendChild(clon);
+}
+</script>
+<hr>
+
+```html
+<time>	   定义日期/时间。
+<p>我在 <time datetime="2008-02-14">情人节</time> 有个约会。</p>
+```
+<p>我在 <time datetime="2008-02-14">情人节</time> 有个约会。</p>
+<hr>
+
+```html
+<tt>	      定义打字机文本。HTML5 中不支持。请使用 CSS 代替。
+```
+<hr>
+
+```html
+<u>	      定义下划线文本。
+<p>如果文本不是超链接，就不要<u>对其使用下划线</u>。</p>
+类似于单词under的缩写
+```
+<p>如果文本不是超链接，就不要<u>对其使用下划线</u>。</p>
+<hr>
+
+```html
+<var>	      定义文本的变量部分。
+<code>
+<var>person</var>
+</code>
+<hr>
+```
+<code>
+<var>person</var>
+</code>
+<hr>
+
+```html
+<wbr>	定义可能的换行符。（单词换行时机）
+<p>
+如果想学习 AJAX，那么您必须熟悉 XML<wbr>Http<wbr>Request 对象。
+</p>
+```
+<samp>this is a new sentence </samp>
+<p>
+如果想学习 AJAX，那么您必须熟悉 XML<wbr>Http<wbr>Request 对象。
+</p>
+<hr>
+
+## 19.3 表单和输入
+
+```html
+<form action="form_action.asp" method="get">
+  <p>First name: <input type="text" name="fname" /></p>
+  <p>Last name: <input type="text" name="lname" /></p>
+  <input type="submit" value="Submit" />
+</form>
+```
+
+说明
+enctype 属性可能的值:
+- application/x-www-form-urlencoded
+- multipart/form-data
+- text/plain  
+
+<form action="/" method="get">
+  <p>First name: <input type="text" name="fname" /></p>
+  <p>Last name: <input type="text" name="lname" /></p>
+  <input type="submit" value="Submit" />
+</form>
+
 # 20 使用ajax
 
 # 21 使用多媒体
@@ -672,3 +929,6 @@ USA
 # 22 使用canvas
 
 # 23 使用拖放
+- [x] Write the press release
+  - [x] asdasdasdasdasd
+- [x] Update the website
