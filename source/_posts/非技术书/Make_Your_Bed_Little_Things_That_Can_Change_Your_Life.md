@@ -888,12 +888,26 @@ The night wind coming off the ocean 描述从什么从某一地点来不一定�
 `obscured` 英/美 [əb'skjuəd] adj. 遮蔽的；湮没的 v. 掩盖；使含混；变得模糊
 
 It was Wednesday of Hell Week, and my SEAL training class was down at the infamous Tijuana mudflats. Hell Week was the seminal event for the First Phase of SEAL training. It was six days of no sleep and unrelenting harassment by the instructors. There were long runs, open ocean swims, obstacle courses, rope climbs, endless sessions of calisthenics, and constant paddling of the inflatable boat small (IBS). The purpose of Hell Week was to eliminate the weak, those not tough enough to be SEALs.
+`infamous` 美 ['ɪnfəməs] adj. 声名狼藉的；无耻的；邪恶的；不名誉的
+`mudflat` 英/美 ['mʌdflæt] n. 泥滩
+`Tijuana` 英/美 [ti:'hwɑ:nə; -nɑ:] n. 提华纳（墨西哥西北部城市）
+`unrelenting` 美 [,ʌnrɪ'lɛntɪŋ] adj. 无情的；不屈不挠的；不松懈的
+`calisthenics` 美 [,kælɪs'θɛnɪks] n. 健美体操
+`constant`  adj. 不变的；恒定的；经常的 n. [数] 常数；恒量
+`inflatable` 美 [ɪn'fletəbl] adj. 膨胀的，可充气的；得意的
 
-Statistically speaking, more students quit during Hell Week than at any other time in training, and the mudflats were the toughest part of the week. Located between South San Diego and Mexico, the mudflats were a low-lying area where drainage from San Diego created a large swath of deep, thick mud that had the consistency of wet clay.
+Statistically speaking, more students quit during Hell Week than at any other time in training, and the mudflats were the toughest part of the week. Located between South San Diego and Mexico, the mudflats were a low-lying area（低洼地区） where drainage from San Diego created a large swath of deep, thick mud that had the consistency of wet clay.
+`drainage` 美 ['drenɪdʒ] n. 排水；排水系统；污水；排水面积
+`swath` 美 [sweð] n. 细长的列；收割的刈痕；收割的宽度
+`clay` 美 [kle] n. [土壤] 粘土；泥土；肉体；似黏土的东西 vt. 用黏土处理
 
-Earlier that afternoon, our class had paddled our rubber boats from Coronado down to the mudflats. Soon after arriving we were ordered into the mud and began a series of races and individual competitions designed to keep us cold, wet, and miserable. The mud clung to every part of your body. It was so dense that moving through it exhausted you and tested your will to carry on.
+Earlier that afternoon, our class had paddled our rubber boats from Coronado down to the mudflats. Soon after arriving we were ordered into the mud and began a series of races and individual competitions designed to keep us cold, wet, and miserable. The mud(泥；诽谤的话) clung(紧握；贴近) to every part of your body. It was so dense that moving through it exhausted you and tested your will to carry on.
+`miserable` 美 ['mɪzrəbl] adj. 悲惨的；痛苦的；卑鄙的
+`exhausted`
 
 For hours the races continued. By the evening, we could barely move from the bone-chilling coldness and the fatigue. As the sun went down the temperature dropped, the wind picked up, and everything seemed to get even harder.
+`fatigue` 美 [fə'tig] n. 疲劳，疲乏；杂役 vt. 使疲劳；使心智衰弱 vi. 疲劳 adj. 疲劳的
+`the bone-chilling` 刺骨的
 
 Morale was declining rapidly. It was only Wednesday, and we all knew that another three days of pain and exhaustion lay ahead. This was the moment of truth for a lot of the students. Shaking uncontrollably, with hands and feet swollen from nonstop use and skin so tender that even the slightest movement brought discomfort, our hope for completing the training was fading fast.
 
