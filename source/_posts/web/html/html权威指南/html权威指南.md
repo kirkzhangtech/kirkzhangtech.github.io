@@ -4,19 +4,16 @@ categories:
 - js
 ---
 
-摘要： 这本写的是真垃圾
+摘要： 系统的补一下相关知识,这本写的是真垃圾
 
 <!--more -->
 
 <!--toc -->
-摘要：系统的补一下相关知识
 
-# 第一章
 
-# 第二章
 
-# 第三章
-## 3.1 使用元素(标签)
+# 1. html基础
+## 1.1 使用元素(标签)
 在现代html元素中，我们应该使用具有代表含义，因为会影响呈现方式
 ```html
 <code> apple </code> 
@@ -26,27 +23,24 @@ categories:
 
 `code`是标签或者教元素，特别注意的是`<code>`是语义元素 ， apple是内容。注意，浏览器不会显示元素的标签，它的任务是解读HTML文档，然后向用户呈现一个体现了HTML元素作用的视图
 
-## 3.1.1 本章用的元素
+## 1.2 本章用的元素
 
 **空元素**：有标签但是没内容交空元素
 **自闭合标签**：
 ```html
-<meta />	定义网页的信息（供搜索引擎查看）
-<link />	引入“外部CSS文件”
-<br />	    换行标签
-<hr />	    水平线标签
-<img />	    图片标签
-<input />	表单标签
+<meta/>	定义网页的信息（供搜索引擎查看）
+<link/>	引入“外部CSS文件”
+<br/>	    换行标签
+<hr/>	    水平线标签
+<img/>	    图片标签
+<input/>	表单标签
 ```
 
 **虚元素**： 只能使用一个标签，中间放置任何内容都不符合html规范，这类元素成为需元素。`<hr>`元素表示一段的结束，还有另外一种表示方式`<hr />`
 
 
-## 3.2 使用元素属性
 
-这一节通常是设计到css的知识
-
-## 3.3 创建html文档
+## 1.3 创建html文档
 
 1. 基本结构请参考[3.1.1](#311-本章用的元素)
 2. `<head>`通常放元数据内容，比如
@@ -57,75 +51,9 @@ categories:
    - *流元素*(lowelement) 流元素是短语元素的超集。这就是说，所有短语元素都是流元素
    - *短语元素*(phrasingelement )。。另外两种元素略有不同，它们的用途是确定一个元素合法的父元素和子元素范围。短语元素是HTML的基本成分。但并非所有流元素都是短语元素
 
-## 3.4 使用html实体
-实体就是浏览器替代特殊字符的一种代码
-|字符|实体名称|实体编号|
-|---|----|---|
-|	|空格	|`&nbsp;	&#160;`|
-|<|	小于号	|`&lt;	&#60;`|
-|>|	大于号	|`&gt;	&#62;`|
-|&|	和号	|`&amp;	&#38;`|
-|"|	引号	|`&quot;	&#34;`|
-|'|	撇号 	|`&apos; (IE不支持)	&#39;`|
-|￠|	分（cent）|	`&cent;	&#162;`|
-|£|	镑（pound）|	`&pound;	&#163;`|
-|¥|	元（yen）	|`&yen;	&#165;`|
-|€|	欧元（euro）	|`&euro;	&#8364;`|
-|§|	小节	|`&sect;	&#167;`|
-|©|	版权（copyright）	|`&copy;	&#169;`|
-|®|	注册商标	|`&reg;	&#174;`|
-|™|	商标	|`&trade;	&#8482;`|
-|×|	乘号	|`&times;	&#215;`|
-|÷|	除号	|`&divide;	&#247;`|
-
-## 3.5 全局属性
-
-### 3.5.1 accesskey设置快捷键
-`alt+n`就会聚焦到第一个input标签
-`alt+p`聚焦到第二个input标签
-`alt+s`聚焦到第三个input标签
-```html
-<!DOCTYPE HTML>
-<html>
-head>
-<title>Example</title>
-</head><body>
-<form>
-Name: <input type="text” name="name” accesskey="n"/>
-
-Password: <input type="password” name="password” accesskey="p"/>
-
-<input type="submit”value="Log In” accesskey="s"/>
-
-</form>
-</body>
-</html>
-```
-### 3.5.2 标签的属性
-1. `class`属性在设计css样式时使用,一个元素可以定义多个class元素
-2. `contenteditable`允许用户修改页面内容
-3. `contextmenu` 没有浏览器支持这种属性
-4. `dir`属性规定内容方向即从左往右读，还是从右往左读
-5. `draggable`支持拖放操作
-6. `dropzone`支持拖放操作
-7. `hidden` 把hidden属性应用到一个元素之后，浏览器干脆不去显示该元素
-8. `id`属性是元素唯一标识符
-9. `lang` lang属性还可以用来选择指定语言的内容，以便只显示用户所选语言的内容或对其应用样式。
-10. `spellcheck`属性用来表明浏览器是否应该对元素的内容进行拼写检查。这个属性只有用在用户可以编辑的元素上时才有意义
-11. `style` 一般不用，因为样式等级太高
-12. `tabindex` HTML页面上的键盘焦点可以通过按Tab键在各元素之间切换。用tabindex属性可以改变默认的转移顺序。代码清单3-25示范了其用法。
-13. `title` 提供元素的额外信息，比如鼠标悬停到元素上就会显示其他信息
 
 
-# 第四章 css
-
-这章与css书对应
-
-# 第五章 初探javascript
-
-这章与js书对应
-
-# 第六章 语义与呈现分离
+# 2 语义与呈现分离
 
 我的建议是:在语义方面要求严格点不为过，只要有条件，尽量避用那些具有浓重呈现意味或纯粹起呈现作用的元素。定义一个自定义类然后借助它应用所需样式并不复杂。只要做到样式的采用是以内容类型为依据而不是随心所欲，你至少也保持了一颗向着语义的心。
 
@@ -134,463 +62,10 @@ Password: <input type="password” name="password” accesskey="p"/>
 2. 切记不要乱用标记
 3. 别误用标记
 
-**HTML元素集合**
-
-# 第七章 创建HTML文档
-
-本章介绍的是最基础的HTML5元素:文档元素和元数据元素。它们是用来创建HTML文档和说明其内容的元素。
-
-## 7.1 head基本元素
-
-## 7.2 用元数据说明文档
-
-`title` 正式反应网络页上那个文字
-
-`<base href="" />` base元素可用来设置一个基准URL，让HTML文档中的相对链接在此基础上进行解析。相对链接省略了URL中的协议、主机和端口部分，需要根据别的URL(要么是base元素中指定的URL，要么是用以加载当前文档的URL)得出其完整形式。base元素还能设定链接在用户点击时的打开方式，以及提交表单时浏览器如何反应,提示如果不用base元素，或不用其href属性设置一个基准URL，那么浏览器会将当前文档的URL认定为所有相对URL的解析基准。
-
-`<target>` 告诉浏览器打开哪个网页
-
-
-`meta` 元素定义文档各种元数据(元素具体详情要谷歌)
-1. `<meta name="" content=""/>`预定义的几种元数据类型![扩展元数据](https://zh.wikipedia.org/wiki/Meta%E5%85%83%E7%B4%A0)
-   1. `<meta name="robots" content="nofollow"/>` 不让机器人继续搜索后面网页`noindex`和`noarchive`
-   2. `<meta name="author" content=""/>`           网页作者
-   3. `<meta name="application name" content=""/>` 当前application系统的名称
-   4. `<meta name="description" content=""/>`      页面说明
-   5. `<meta name="keywords" content=""/>`         一些描述页面的内容
-   6. `<meta name="generator" content=""/>`        描述生成html的软件名称
-2. `<meta charset="utf-8">`
-3. `<meta http-equiv="refresh" content="5">`meta元素的最后一种用途是改写HTTP(超文本传输协议)标头字段的值。服务器和浏览器之间传输HTML数据时一般用的就是HTTP
-   1. `default-style`指定页面优先使用的样式表。对应的content属性值应与同一文档中某个style元素或link元素的title属性值相同
-   2. <meta http-equiv="content-type"” content="text/htm" charset="UTF-8"/>这是另一种声明HTML页面所用字符编码的方法
-4. `style`属性,不指定scoped值，就会作用所有整个页面
-   ```html
-    <style media="screen" type="text/css"> </style>
-    
-    <style media="print"> </style> 指定的是打印时候的样式
-    /*
-    all         将样式用于所有设备
-    aural       语音合成器
-    braille     盲文设备
-    handheld
-    projection
-    print
-    screen
-    tty
-    tv          将样式用于电视机
-    */
-   ```
-   具体的响应式布局，，可以参考css相关书籍
-5. 指定外部资源
-   ```html
-   <link rel="stylesheet" type="text/css" href="style.css">
-   ```
-   为网页设置icon
-   ```html
-   <link rel="shortcut" href="favicon.ico" type="image/x-icon">
-   ```
-   预先获取关联的数据
-   ```html
-   <link rel="prefetch" href="/page2.html"
-   ```
-
-## 7.3 使用脚本
-   1. 使用script元素
-   2. 定义内嵌脚本
-   3. 载入外部脚本库
-   4. 推迟脚本的执行，可以使用defer和async的对脚本的执行加以控制，defer会将脚本加载推迟到所有元素加载完成之后
-   5. 异步执行脚本,async属性解决的是另一类问题。前面说过，浏览器遇到script元素时的默认行为是在加载和执行脚本的同时暂停处理页面。各个script元素依次(即按其定义的次序)同步(即在脚本加载和执行进程中不再管别的事情) 执行。使用了async属性后，浏览器将在继续解析HTML文档中其他元素(包括其他script元素)的同时异步加载和执行脚本。如果运用得当，这可以大大提高整体加载性能。代码清单7-24示范了async属性的用法。
-   6. `<noscript>` this javascript is required`<noscript/>`
-
-# 第八章 标记文字
-
-## 8.1 生成超链接
-
-`<a href="https:// " >`如果指定http协议就会认为是互联网资源，如果不指定协议就会当成是相对路径认为在同一路径下
-`<a href="#fruit">` 这个超链接就会跳转到id为`fruit`的元素，如果找不到就会通过name查找
-`<a>`标签的target属性  
-```html
-_blank      Opens the linked document in a new window or tab
-_self	      Opens the linked document in the same frame as it was clicked (this is default)
-_parent	   Opens the linked document in the parent frame
-_top	      Opens the linked document in the full body of the window
-framename	Opens the linked document in the named iframe
-```
-
-## 8.2 用基本的文字元素标记内容
-
-`<b>`          加粗
-`<em>`         斜体
-`<i>`
-`<strong>`
-`<u>`          为文字加下划线
-`<small>`      小号字体
-`<sub><sup>`   下标，上标
-`<br>`         换行 
-`wbr`
-
-## 8.3 输入输出
-`<code>`
-`var`
-`samp`
-`kdd`
-`<abbr title=Florida>`
-`dfn`
-`<q>`
-`<cite>`
-`<ruby>`
-`<rt>`
-`<rp>`
-`<bdo>`
-`<bdi>`
-`<span>`
-
-# 第九章 组织内容
-`p`元素使用div元素
-`pre`元素
-`blockquote`元素
-`hr`元素
-`ol`元素和li元素
-`ul`元素和li元素
-`ol`元素和li元素，并设置l元素的value属性
-`dl`、
-`dt`和
-`dd`元素
-`ul`元素，并配合使用CSS的 :before选择器和counter特性
-`figure`
-`figcaption`
-
-
-# 第十章 文档分节
-`h1-h3`
-`hgroup`
-`section`
-`header`
-`footer`
-`nav`
-`artical`
-`<aside`
-`<adress`
-`<details`
-`<summary>`
-
-# 第十一章 表格元素
-`<table>`
-`<th>`
-`<thead>`
-`<tbody>`
-`<tfoot>`
-
-
-# 第十二章 表单
-`<form>`
-`<input>`
-`<button>`
-1. 配置表单的action属性，action属性是，此处还可以配合使用`<base>`
-2. method属性配置http的传输方式，POST，GET
-3. 配置数据编码`enctype`
-   1. `application/x-www-form-urlencoded`不能用来上传文件到服务器上，但是和任何表单
-   2. `multipart/form-data`用来上传文件
-   3. `text/plain` 要谨慎
-4. 在`input`标签控制表单自动完成功能`autocomplete`
-5. `name`属性，不发给服务器，仅限于dom使用
-6. 在表单中添加标签`<p><label for="fav"><input name="fav" /> </label><p>`
-7. 自动聚焦input标签使用autofocus
-8. `<input disable id="name" />`
-9. 对表单分组`<fieldset>`,`<legend>`为fieldset标签添加说明，`<fieldset disable>`禁用掉input元素
-10. 使用<button type="reset/submit/button">元素
-11. 使用表单外元素
-    ```html
-    <form id="voteform">
-    <input >
-    </form>
-    <button id="voteform" ></buton>
-    ```
-
-# 第十三章 定制input元素
-
-## 13.1 使用input输入文字
-```html
-dirname     指定文字方向
-maxlength   文字最大长度
-pattern     指定用户输入验证的正则表达式
-placeholder 关于所需数据类型的提示
-readonly    只读
-required    表明用户必须输入一个值否则无法通过验证
-size        通过之地不过文本框中可见字符数目设定其宽度
-value       这是文本框初始值
-disable     禁用
-```
-1. 使用数据列表
-```html
-<input list="fruitlist">
-<datils id="fruitlist">
-   <option value-"apple">lovely apple</option>
-</datails>
-```
-
-## 13.2 为input输入密码
-type类型设置为password的元素用于输入密码
-```html
-<input type="password">
-
-maxlength
-pattern
-placeholder
-readonly
-required
-size
-value
-```
-## 13.3 用input生成按钮
-
-```html
-<input type="submit/reset/button"/>
-
-```
-# 13.4 用input元素为输入数据把关
-
-```html
-<input type="button">
-<input type="checkbox">
-<input type="color">
-<input type="date">
-<input type="datetime-local">
-<input type="email">
-<input type="file">
-<input type="hidden">
-<input type="image">
-<input type="month">
-<input type="number">
-<input type="password">
-<input type="radio">
-<input type="range">
-<input type="reset">
-<input type="search">
-<input type="submit">
-<input type="tel">
-<input type="text">
-<input type="time">
-<input type="url">
-<input type="week">
-```
-1. 用input元素获取值
-   ```html
-   <input type="email/tel/url">
-   <input type="hidden"> 用户提交表单时，浏览器会将那个hidden型input元素的name和value属性值作为一个数据项纳人发送内容。上图中的表单提交后来自Nodejs脚本的反馈信息如图
-   ```
-2. 用图片展示按钮
-   `<inpput type="img" src="" name="submit">`
-3. 用input标签上传文件
-   ``
-   ```html
-   <form method="POST" action="www" enctype="multipart/form-data">
-   </form>
-   ```
-# 13 理解DOM
-DOM就是一组对象的集合，这些对象代表了HTML文档里的各个元素，所以DOM就是个模型，由众多文档对象组成，它保存了文档对象之间的关系
-很重要:文档模型里任何代表某个元素的对象都至少能支持HTMLEement功能，其中一些还支持额外的功能。
-不是所有可供使用的对象都代表了HTML元素。正如你即将看到的，一些对象代表元素的集合，另一些则代表DOM自身的信息，当然还有Document这个对象，它是我们探索DOM的人口也是第26章的主题。
 
 
 
-1. 理解dom对象模型
-2. 理解dom level和兼容性，level1,level2,level3
-3. DOM快速查询，操作DOM更多的是使用js语法
-
-
-# 14 使用DOM对象
-
-1. 获取Document元数据
-```html
-characterSet   返回文档的字符集编码。这是一个只读属性
-charset        获取或设置文档的字符集编码
-compatMode     获取文档的兼容性模式
-cookie         获取或设置当前文档的cookie
-defaultCharsetdefaultView     获取浏览器所使用的默认字符编码返回当前文档的window对象
-dir            获取或设置文档的文本方向
-domain         获取或设置当前文档的域名
-implementation 提供可用DOM功能的信息
-lastModified   返回文档的最后修改时间
-location       提供当前文档的URL信息
-readyState     返回当前文档的状态。这是一个只读属性，可以使用defer属性推迟脚本的执行
-referrer       返回链接到当前文档的文档URL
-title          获取或设置当前文档的标题(即title元素的内容
-```
-- 全局变量document获取文档全局变量
-- 使用location对象获取位置相关信息
-  ```html
-   protocol 获取文档协议
-   host     获取主机和端口号
-   href     获取当前文档链接
-   hostname
-   port
-   pathname
-   search
-   hash     获取当前url的锚也就是井号部分
-   assign() 导航到指定url
-   replace()清除当前文档并导航到指定文档
-   reload() 将指定的相对url解析成url
-   document.location.reload()
-  ```
-- 使用cookie
-  ```html
-   path=<path>
-   domain=<domain>
-   max-age=<seconds>
-   expires=<date>
-   secure
-  ```
-  这些额外的项目可以被附加到名称/值对的后面，以分号分隔，就像这样:`document.cookie ="MyCookie=MyValue;max-age=10"`;
-- 理解网页就绪状态
-  ```html
-   loading
-   interactive
-   complete
-  ```
-- 判断DOM的实现情况
-
-2. 获取HTML元素对象
-
-- 获取元素对象
-  - 通过标签名获取元素
-  ```html
-   activeElement
-   body
-   Embeds
-   plugins
-   forms
-   head
-   images
-   links
-   scripts
-  ```
-- 通过数组访问方式获取标签
-  `var ele = document["apple"]`
-- 搜索元素
-  ```html
-   document.getElementById(<id>)
-   document.getElementsByClassName(<class>)
-   document.getElementsByName(<name>)
-   document.getElementsByTagName(<tag>)
-   document.querySelector(<selector>)
-   document.querySelectorAll(<selector>)
-  ```
-  - 使用css选择器进行搜索
-  `document.querySelectorAll("p,img#apple")`他会匹配所有p元素和id值为apple的img元素
-  - 合并链式搜索
-
-3. 在DOM种导航
-   ```html
-   childNodes
-   firstChild
-   hasChildNodes()
-   lastChild
-   nextSibling
-   parentNode
-   previousSibling
-   ```
-
-# 15 使用window对象
-
-1. 获取windows对象
-2. 获取窗口信息
-```html
-innerHeight
-innerWidth
-outerHeight
-outerwidth
-pageXOffset
-pageYOffset
-screen
-screenLeft
-screenX
-screenTop
-screenY
-```
-3. 与窗口进行交互
-```html
-blur()   让窗口失去键盘焦点
-close()   关闭窗口
-focus()  让窗口获得键盘焦点
-print()  提示用户打印页面
-scrollBy(<x>，<y>) 让文档相对于当前位置进行滚动
-scrollTo(<x>，<y>)   滚动到指定的位置
-stop     停止载入文档
-```
-4. 对用户进行提示
-```html
-alert()
-confirm() 显示一个带有确认和取消提示的对话框窗口
-prompt(< msg >, < val >) 显示对话框提示用户输入一个值
-showModalDialog(<>) 显示一个指定的url
-```
-5. 获取基本信息
-```html
-document
-history
-location
-```
-6. 使用浏览器历史
-```html
-back()
-forward()
-go(<index>)
-length
-pushState(<state>,<title>， <url>)
-replaceState(<state>,<title>， <url>)
-state
-```
-- 在浏览历史中导航
-- 在浏览历史里插入条目
-- 为不同文档插入不同条目
-- 在浏览器保存负责状态
-
-7. 跨文档消息传递
-8. 计时器
-   1. 该功能有点像golang中的after函数
-
-# 16 使用DOM元素
-
-# 17 为DOM设置样式
-
-# 18 使用事件
-1. 使用简单的事件处理器
-```html
-<p onmouseover="this,style.background='write'; this.style.color='black'" >
-<!-- 绑定多个事件 -->
-<p onmouseover="this,style.background='write'; this.style.color='black'" onmouseout="this.style.removeProperty('color')">
-
-```
-2. 给元素绑定事件处理函数
-<p onmouseover="handleMouseOver(this)" >
-
-3. 使用DOM和事件对象
-
-```html
-for (var i = 0; i< pElement.length ; i++){
-   pElem[i].onmouseover = handleMouseOver;
-}
-function handleMouseOver(e){
-   e.target.style.background='white'
-}
-```
-用target属性来获取触发事件的HTMLElement
-
-```html
-for (var i = 0; i< pElement.length ; i++){
-   pElem[i].addEvenListener("mouseover","handleMoueOver");
-}
-function handleMouseOver(e){
-   e.target.style.background='white'
-}
-document.getElementById("pressme").onclick=function (){
-      e.target.style.background='white'
-
-}
-```
-
-# 19 使用元素专属对象
+# 3 HTML元素
 [参考w3school](https://www.w3school.com.cn/tags/tag_a.asp)
 
 ## 19.1 基础标签
@@ -626,7 +101,7 @@ document.getElementById("pressme").onclick=function (){
 </body>
 
 
-# 19.2 格式化标签
+## 19.2 格式化标签
 
 ```html
 <abbr>
@@ -902,33 +377,245 @@ function showContent() {
 
 ## 19.3 表单和输入
 
+[表单的输入详情](https://www.w3school.com.cn/tags/tag_form.asp)
+
+enctype 属性可能的值：
+- application/x-www-form-urlencoded在发送前编码所有字符（默认）（空格被编码为’+’，特殊字符被编码为ASCII十六进制字符）
+- multipart/form-data不对字符编码。在使用包含文件上传控件的表单时，必须使用该值。有附件时候需指定
+- text/plain空格转换为 “+” 加号，但不对特殊字符编码
+
+
+[input属性](https://www.w3school.com.cn/tags/tag_input.asp)
+[textarea定义多行的文本输入控件](https://www.w3school.com.cn/tags/tag_textarea.asp)
+[button](https://www.w3school.com.cn/tags/tag_button.asp)
+[select](https://www.w3school.com.cn/tags/tag_select.asp)
+[optgroup](https://www.w3school.com.cn/tags/tag_optgroup.asp)
+[option定义选择列表中的选项](https://www.w3school.com.cn/tags/tag_option.asp)
+[label定义input元素标注](https://www.w3school.com.cn/tags/tag_label.asp)
+[fieldset定义围绕表单中元素的边框](https://www.w3school.com.cn/tags/tag_fieldset.asp)
+[legend](https://www.w3school.com.cn/tags/tag_legend.asp)
+[datalist](https://www.w3school.com.cn/tags/tag_datalist.asp)
+[keygen](https://www.w3school.com.cn/tags/tag_keygen.asp)
+[output](https://www.w3school.com.cn/tags/tag_output.asp)
+
+## 19.4 框架
+
+[frame]()	定义框架集的窗口或框架。HTML5 中不支持。
+[frameset]()	定义框架集。HTML5 中不支持。
+[noframes]()	定义针对不支持框架的用户的替代内容。HTML5 中不支持。
+[iframe](https://www.w3school.com.cn/tags/tag_iframe.asp)	定义内联框架。
+
+## 19.5 图像
+[img定义图像](https://www.w3school.com.cn/tags/tag_img.asp)。
+[map定义图像映射](https://www.w3school.com.cn/tags/tag_map.asp)	。
+[area定义图像地图内部的区域]
+[canvas]	定义图形。
+[figcaption]	定义 figure 元素的标题。
+[figure]	定义媒介内容的分组，以及它们的标题。
+[svg]	定义 SVG 图形的容器。
+
+## 19.6 音视频
 ```html
-<form action="form_action.asp" method="get">
-  <p>First name: <input type="text" name="fname" /></p>
-  <p>Last name: <input type="text" name="lname" /></p>
-  <input type="submit" value="Submit" />
-</form>
+<audio>	定义声音内容。
+<source>	定义媒介源。
+<track>	定义用在媒体播放器中的文本轨道。
+<video>	定义视频。
+```
+## 19.7 链接
+```html
+<a>	   定义锚。
+<link>	定义文档与外部资源的关系。
+<nav>	   定义导航链接。
 ```
 
-说明
-enctype 属性可能的值:
-- application/x-www-form-urlencoded
-- multipart/form-data
-- text/plain  
+## 19.8 链接
+```html
+<ul>	定义无序列表。
+<ol>	定义有序列表。
+<li>	定义列表的项目。
+<dir>	定义大号文本。HTML5 中不支持。请使用 CSS 代替。
+<dl>	定义定义列表。
+<dt>	定义定义列表中的项目。
+<dd>	定义定义列表中项目的描述。
+<menu>	定义命令的菜单/列表。
+<menuitem>	定义用户可以从弹出菜单调用的命令/菜单项目。
+<command>	定义命令按钮。
+```
 
-<form action="/" method="get">
-  <p>First name: <input type="text" name="fname" /></p>
-  <p>Last name: <input type="text" name="lname" /></p>
-  <input type="submit" value="Submit" />
-</form>
+## 19.9 表格
+```
+<table>	定义表格
+<caption>	定义表格标题。
+<th>	定义表格中的表头单元格。
+<tr>	定义表格中的行。
+<td>	定义表格中的单元。
+<thead>	定义表格中的表头内容。
+<tbody>	定义表格中的主体内容。
+<tfoot>	定义表格中的表注内容（脚注）。
+<col>	定义表格中一个或多个列的属性值。
+<colgroup>	定义表格中供格式化的列组。
+```
 
-# 20 使用ajax
+## 19.10 样式和语义
+```
+<style>	定义文档的样式信息。
+<div>	定义文档中的节。
+<span>	定义文档中的节。
+<header>	定义 section 或 page 的页眉。
+<footer>	定义 section 或 page 的页脚。
+<main>	定义文档的主要内容。
+<section>	定义 section。
+<article>	定义文章。
+<aside>	定义页面内容之外的内容。
+<details>	定义元素的细节。
+<dialog>	定义对话框或窗口。
+<summary>	为 <details> 元素定义可见的标题。
+<data>	添加给定内容的机器可读翻译。
+```
 
-# 21 使用多媒体
+## 19.11 元信息
+```
+<head>	定义关于文档的信息。
+<meta>	定义关于 HTML 文档的元信息。
+<base>	定义页面中所有链接的默认地址或默认目标。
+<basefont>	定义页面中文本的默认字体、颜色或尺寸。HTML5 中不支持。请使用 CSS 代替。
+```
+## 19.12 编程
 
-# 22 使用canvas
+```html
+<script>	定义客户端脚本。
+```
+1. 使用script元素
+2. 定义内嵌脚本
+3. 载入外部脚本库
+4. 推迟脚本的执行，可以使用defer和async的对脚本的执行加以控制，defer会将脚本加载推迟到所有元加载完成之后
+5. 异步执行脚本,async属性解决的是另一类问题。前面说过，浏览器遇到script元素时的默认行为是在加和执行脚本的同时暂停处理页面。各个script元素依次(即按其定义的次序)同步(即在脚本加载和执行进程不再管别的事情) 执行。使用了async属性后，浏览器将在继续解析HTML文档中其他元素(包括其他script素)的同时异步加载和执行脚本。如果运用得当，这可以大大提高整体加载性能。代码清单7-24示范了asyn属性的用法。
+6. `<noscript>` this javascript is required`<noscript/>`
 
-# 23 使用拖放
-- [x] Write the press release
-  - [x] asdasdasdasdasd
-- [x] Update the website
+```html
+<noscript>	定义针对不支持客户端脚本的用户的替代内容。
+<applet>	定义嵌入的 applet。HTML5 中不支持。请使用 <embed> 和 <object> 代替。
+<embed>	为外部应用程序（非 HTML）定义容器。
+<object>	定义嵌入的对象。
+<param>	定义对象的参数。
+```
+
+# 20 使用DOM元素
+
+# 20 浏览器支持情况
+[w3school](https://www.w3school.com.cn/tags/html_ref_html_browsersupport.asp)
+
+# 21 全局属性
+```
+accesskey	      规定激活元素的快捷键。
+class	            规定元素的一个或多个类名（引用样式表中的类）。
+contenteditable	规定元素内容是否可编辑。
+contextmenu	      规定元素的上下文菜单。上下文菜单在用户点击元素时显示。
+data-*	         用于存储页面或应用程序的私有定制数据。
+dir	            规定元素中内容的文本方向。
+draggable	      规定元素是否可拖动。-- 这个可以在网页做出很酷的东西
+dropzone	         规定在拖动被拖动数据时是否进行复制、移动或链接。
+hidden	         规定元素仍未或不再相关。
+id	               规定元素的唯一 id。
+lang	            规定元素内容的语言。
+spellcheck	      规定是否对元素进行拼写和语法检查。
+style	            规定元素的行内 CSS 样式。
+tabindex	         规定元素的 tab 键次序。
+title	            规定有关元素的额外信息。
+translate	      规定是否应该翻译元素内容。
+```
+
+# 22 事件
+[事件参考手册](https://www.w3school.com.cn/tags/html_ref_eventattributes.asp)
+1. Window 事件属性
+
+```
+onafterprint	script	文档打印之后运行的脚本。
+onbeforeprint	script	文档打印之前运行的脚本。
+onbeforeunload	script	文档卸载之前运行的脚本。
+onerror	script	      在错误发生时运行的脚本。
+onhaschange	script	   当文档已改变时运行的脚本。
+onload	script	      页面结束加载之后触发。
+onmessage	script	   在消息被触发时运行的脚本。
+onoffline	script	   当文档离线时运行的脚本。
+ononline	script	      当文档上线时运行的脚本。
+onpagehide	script	   当窗口隐藏时运行的脚本。
+onpageshow	script	   当窗口成为可见时运行的脚本。
+onpopstate	script	   当窗口历史记录改变时运行的脚本。
+onredo	script	      当文档执行撤销（redo）时运行的脚本。
+onresize	script	      当浏览器窗口被调整大小时触发。
+onstorage	script	   在 Web Storage 区域更新后运行的脚本。
+onundo	script	      在文档执行 undo 时运行的脚本。
+onunload	script	      一旦页面已下载时触发（或者浏览器窗口已被关闭）。
+```
+
+2. Form 事件
+```
+onblur	script	元素失去焦点时运行的脚本。
+onchange	script	在元素值被改变时运行的脚本。
+oncontextmenu	script	当上下文菜单被触发时运行的脚本。
+onfocus	script	当元素获得焦点时运行的脚本。
+onformchange	script	在表单改变时运行的脚本。
+onforminput	script	当表单获得用户输入时运行的脚本。
+oninput	script	当元素获得用户输入时运行的脚本。
+oninvalid	script	当元素无效时运行的脚本。
+onreset	script	当表单中的重置按钮被点击时触发。HTML5 中不支持。
+onselect	script	在元素中文本被选中后触发。
+onsubmit	script	在提交表单时触发。
+```
+
+3. 鼠标事件
+```html
+onkeydown	script	在用户按下按键时触发。
+onkeypress	script	在用户敲击按钮时触发。
+onkeyup	script	当用户释放按键时触发。
+```
+4. Mouse事件
+```html
+onclick	script	元素上发生鼠标点击时触发。
+ondblclick	script	元素上发生鼠标双击时触发。
+ondrag	script	元素被拖动时运行的脚本。
+ondragend	script	在拖动操作末端运行的脚本。
+ondragenter	script	当元素元素已被拖动到有效拖放区域时运行的脚本。
+ondragleave	script	当元素离开有效拖放目标时运行的脚本。
+ondragover	script	当元素在有效拖放目标上正在被拖动时运行的脚本。
+ondragstart	script	在拖动操作开端运行的脚本。
+ondrop	script	   当被拖元素正在被拖放时运行的脚本。
+onmousedown	script	当元素上按下鼠标按钮时触发。
+onmousemove	script	当鼠标指针移动到元素上时触发。
+onmouseout	script	当鼠标指针移出元素时触发。
+onmouseover	script	当鼠标指针移动到元素上时触发。
+onmouseup	script	当在元素上释放鼠标按钮时触发。
+onmousewheel	script	当鼠标滚轮正在被滚动时运行的脚本。
+onscroll	script	   当元素滚动条被滚动时运行的脚本。
+```
+5. Media 事件
+```html
+onabort	script	在退出时运行的脚本。
+oncanplay	script	当文件就绪可以开始播放时运行的脚本（缓冲已足够开始时）。
+oncanplaythrough	script	当媒介能够无需因缓冲而停止即可播放至结尾时运行的脚本。
+ondurationchange	script	当媒介长度改变时运行的脚本。
+onemptied	script	当发生故障并且文件突然不可用时运行的脚本（比如连接意外断开时）。
+onended	script	当媒介已到达结尾时运行的脚本（可发送类似“感谢观看”之类的消息）。
+onerror	script	当在文件加载期间发生错误时运行的脚本。
+onloadeddata	script	当媒介数据已加载时运行的脚本。
+onloadedmetadata	script	当元数据（比如分辨率和时长）被加载时运行的脚本。
+onloadstart	script	在文件开始加载且未实际加载任何数据前运行的脚本。
+onpause	script	当媒介被用户或程序暂停时运行的脚本。
+onplay	script	当媒介已就绪可以开始播放时运行的脚本。
+onplaying	script	当媒介已开始播放时运行的脚本。
+onprogress	script	当浏览器正在获取媒介数据时运行的脚本。
+onratechange	script	每当回放速率改变时运行的脚本（比如当用户切换到慢动作或快进模式）。
+onreadystatechange	script	每当就绪状态改变时运行的脚本（就绪状态监测媒介数据的状态）。
+onseeked	script	当 seeking 属性设置为 false（指示定位已结束）时运行的脚本。
+onseeking	script	当 seeking 属性设置为 true（指示定位是活动的）时运行的脚本。
+onstalled	script	在浏览器不论何种原因未能取回媒介数据时运行的脚本。
+onsuspend	script	在媒介数据完全加载之前不论何种原因终止取回媒介数据时运行的脚本。
+ontimeupdate	script	当播放位置改变时（比如当用户快进到媒介中一个不同的位置时）运行的脚本。
+onvolumechange	script	每当音量改变时（包括将音量设置为静音）时运行的脚本。
+onwaiting	script	当媒介已停止播放但打算继续播放时（比如当媒介暂停已缓冲更多数据）运行脚本
+```
+# 23 HTML Canvas 参考手册
+
+# 24 HTML 音频/视频参考手册
+

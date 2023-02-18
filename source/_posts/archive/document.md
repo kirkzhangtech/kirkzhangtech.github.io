@@ -4,7 +4,7 @@ categories:
 - archive
 ---
 
-Abstract： mainly record some IT document page site
+Abstract： mainly record some IT document of page site
 
 | name | url |
 |------|-----|
