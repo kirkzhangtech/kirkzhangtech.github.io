@@ -594,6 +594,25 @@ document.getElementById("pressme").onclick=function (){
 # 19 使用元素专属对象
 [参考w3school](https://www.w3school.com.cn/tags/tag_a.asp)
 
+## 19.1 基础标签
+```html
+<!DOCTYPE>  <!-- 文档类型 --->
+<html>
+   <head></head>
+   <body>
+      <h1>h1</h1>
+      <h2>h2</h2>
+      <h3>h3</h3>
+      <h4>h4</h4>
+      <h5>h5</h5>
+      <h6>h6</h6>
+      <p>段落</p> <!--段落-->
+      <br />      <!--定义简单的折行-->
+      <hr />      <!--定义水平线-->
+   </body>
+
+</html>
+```
 
 # 20 使用ajax
 
