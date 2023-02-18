@@ -613,7 +613,58 @@ document.getElementById("pressme").onclick=function (){
 
 </html>
 ```
+# 19.2 格式化标签
+```html
+<abbr title="People's Republic of China">PRC</abbr> <!-- 鼠标悬浮上去会显示标签的中具体说明-->
+<address>   <!-- 定义文档作者或拥有者的联系信息。 -->
+Written by <a href="mailto:webmaster@example.com">Donald Duck</a>.<br> 
+Visit us at:<br>
+Example.com<br>
+Box 564, Disneyland<br>
+USA
+</address>
+<b>	      定义粗体文本。
+<bdi>	      定义文本的文本方向，使其脱离其周围文本的方向设置。
+<bdo>	      定义文字方向。
+   <bdo dir="rtl">
+   Here is some Hebrew text
+   </bdo>
+<blockquote>定义长的引用。
+<cite>	   定义引用(citation)。
+<code>	   定义计算机代码文本。
+<hr />
+<del>	      定义被删除文本。
+   <p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
+<hr />
 
+<dfn>	      定义定义项目。
+<em>	      定义强调文本。
+<font>	   定义大号文本。HTML5 中不支持。请使用 CSS 代替。
+<i>	      定义斜体文本。
+<ins>	      定义被插入文本。
+<kbd>	      定义键盘文本。
+<mark>	   定义有记号的文本。
+<meter>	   定义预定义范围内的度量。
+<pre>	      定义预格式文本。
+<progress>	定义任何类型的任务的进度。
+<q>	      定义短的引用。
+<rp>	      定义若浏览器不支持 ruby 元素显示的内容。
+<rt>	      定义 ruby 注释的解释。
+<ruby>	   定义 ruby 注释。
+<s>	      定义加删除线的文本。
+<samp>	   定义计算机代码样本。
+<small>	   定义小号文本。
+<strike>	   定义加删除线文本。HTML5 中不支持。请使用 <del> 或 <s> 代替。
+<strong>	   定义语气更为强烈的强调文本。
+<sup>	      定义上标文本。
+<sub>	      定义下标文本。
+<template>	定义用作容纳页面加载时隐藏内容的容器。
+<time>	   定义日期/时间。
+<tt>	      定义打字机文本。HTML5 中不支持。请使用 CSS 代替。
+<u>	      定义下划线文本。
+<var>	      定义文本的变量部分。
+<wbr>	      定义可能的换行符。
+```
 # 20 使用ajax
 
 # 21 使用多媒体
