@@ -1,5 +1,5 @@
 ---
-title: document
+title: Document
 categories: 
 - archive
 ---
