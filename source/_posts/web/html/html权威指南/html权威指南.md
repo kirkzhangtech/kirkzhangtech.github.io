@@ -406,8 +406,9 @@ enctype 属性可能的值：
 [iframe](https://www.w3school.com.cn/tags/tag_iframe.asp)	定义内联框架。
 
 ## 19.5 图像
-[img定义图像](https://www.w3school.com.cn/tags/tag_img.asp)。
-[map定义图像映射](https://www.w3school.com.cn/tags/tag_map.asp)	。
+
+[img定义图像](https://www.w3school.com.cn/tags/tag_img.asp)
+[map定义图像映射](https://www.w3school.com.cn/tags/tag_map.asp)
 [area定义图像地图内部的区域]
 [canvas]	定义图形。
 [figcaption]	定义 figure 元素的标题。
@@ -416,7 +417,7 @@ enctype 属性可能的值：
 
 ## 19.6 音视频
 ```html
-<audio>	定义声音内容。
+[<audio>](sdasd)	定义声音内容。
 <source>	定义媒介源。
 <track>	定义用在媒体播放器中的文本轨道。
 <video>	定义视频。
@@ -443,7 +444,7 @@ enctype 属性可能的值：
 ```
 
 ## 19.9 表格
-```
+```html
 <table>	定义表格
 <caption>	定义表格标题。
 <th>	定义表格中的表头单元格。

@@ -913,35 +913,68 @@ Morale was declining rapidly. It was only Wednesday, and we all knew that anothe
 
 Silhouetted against the distant lights of the city, a SEAL instructor walked purposefully to the edge of the mudflats. Sounding like an old friend, he softly talked into a bullhorn and offered comfort to the suffering trainees. We could join him and the other instructors by the fire, he said. He had hot coffee and chicken soup. We could relax until the sun came up. Get off our feet. Take it easy.
 
-I could sense that some of the students were ready to accept his offer. After all, how much longer could we survive in the mud? A warm fire, hot coffee, and chicken soup sure sounded good. But then came the catch. All he needed was for five of us to quit. Just five quitters and the rest of the class could have some relief from the pain.
+I could sense that some of the students were ready to accept his offer. After all, how much longer could we survive in the mud? A warm fire, hot coffee, and chicken soup sure sounded good. **But then came the catch**. All he needed was for five of us to quit. Just five quitters and the rest of the class could have some relief from the pain.
 
 The student beside me started to move toward the instructor. I grabbed his arm and held him tight, but the urge to leave the mud was too great. He broke free of my grasp and began to lunge for dry ground. I could see the instructor smiling. He knew that once one man quit, others would follow.
-
+`grabbed` 英/美 [græbd] v. 攫取；捕获；强夺；匆忙地做
+`grasp`美 [ɡræsp] n. 抓住；理解；控制 vt. 抓住；领会 vi. 抓
+`urge` 美 [ɝdʒ] vt. 力劝，催促；驱策，推进n. 强烈的欲望，迫切要求；推动力vi. 强烈要求
+`lunge` 美 [lʌndʒ] n. 刺；跃进；刺进；套马索 vt. 刺；戳；使前冲 vi. 刺；突进
 Suddenly, above the howl of the wind came a voice. Singing. It was tired and raspy, but loud enough to be heard by all. The lyrics were not meant for tender ears, but everyone knew the tune. One voice became two and two became three and then before long everyone was singing.
 
 The student rushing for the dry ground turned around and came back beside me. Looping his arm around mine, he began to sing as well. The instructor grabbed the bullhorn and shouted for the class to quit singing. No one did. He yelled at the class leader to get control of the trainees. The singing continued. With each threat from the instructor, the voices got louder, the class got stronger, and the will to continue on in the face of adversity became unbreakable. In the darkness, with the fire reflecting on the face of the instructor, I could see him smile. Once again, we had learned an important lesson: the power of one person to unite the group, the power of one person to inspire those around him, to give them hope. If that one person could sing while neck deep in mud, then so could we. If that one person could endure the freezing cold, then so could we. If that one person could hold on, then so could we.
+`endure`
 
 
 The large room at Dover Air Force Base was filled with grieving families—inconsolable children sobbing in their mothers’ arms, parents holding hands hoping to gain strength from each other, and wives with a far-off look of disbelief. Just five days earlier, a helicopter carrying Navy SEALs and their Afghan Special Operations partners, and flown by Army aviators had been shot down in Afghanistan. All thirty-eight men on board were killed. It was the single greatest loss in the War on Terror.
 
-In less than an hour, a large C-17 transport aircraft was scheduled to land at Dover, and the families of the fallen heroes would be escorted to the flight line to meet the flag-draped coffins. But as the families waited, the President of the United States, the Secretary of Defense, the service secretaries, and senior military leaders filed into the waiting room to pay their respects and give comfort where they could.
+In less than an hour, a large C-17 transport aircraft was scheduled to land at Dover(多佛), and the families of the fallen heroes would be escorted to the flight line to meet the flag-draped coffins. But as the families waited, the President of the United States, the Secretary of Defense, the service secretaries, and senior military leaders filed into the waiting room to pay their respects and give comfort where they could.
+`comfort` 美 ['kʌmfɚt]n. 安慰；舒适；安慰者vt. 安慰；使（痛苦等）缓和
+`escorted` 英/美 ['eskɔ:t; i'skɔ:t] 护送 社交陪同 护送者 在护送下
+`draped` 英/美 [drep] adj. 垂褶袖；打褶形 vt. 用布帘覆盖
+`coffins` 英/美 ['kɔfin] 棺材 断送
 
 I had attended dozens of services for fallen soldiers. It was never easy, and I often wondered whether my words of solace made any difference to those who lost loved ones or whether the shock of their loss made everything I said incomprehensible.
+`attended`[əˈtɛndɪd] v. 参加；注意；照料
+`solace` 英/美 ['sɒlɪs] n. 安慰；慰藉；安慰之物 vt. 安慰；抚慰；使快乐
+`incomprehensible` 美 [ɪn,kɑmprɪ'hɛnsəbl] adj. 费解的；不可思议的；无限的
+
 
 As my wife, Georgeann, and I began to talk with the families I struggled with the right words. How could I truly empathize with their pain? How could I tell them that the sacrifice of their son, their husband, their father, their brother, their friend, was worth it? I did my best to console each one. I hugged them. I prayed with them. I tried to remain strong for them, but somehow I knew my words fell short.
+`empathize` 美 ['ɛmpəθaɪz] vt. 移情；神会
+`console` 美 ['kɑnsol] n. [计] 控制台；[电] 操纵台 vt. 安慰；慰藉
+`somehow` 美 ['sʌmhaʊ] adv. 以某种方法；莫名其妙地
 
-Then, as I knelt down beside an elderly woman, I noticed the family next to me talking with Marine Lieutenant General John Kelly. The military assistant to the Secretary of Defense, Kelly was tall, lean, with close-cropped gray hair and dressed in an immaculate Marine uniform. The family was gathered around him, and I could sense that his words of sympathy and encouragement in the face of this tragedy were having a profound effect on the grief-stricken parents and their children. He smiled and they smiled. He hugged and they hugged back. He reached out his hand and they grasped it tightly.
+Then, as I knelt down beside an elderly woman, I noticed the family next to me talking with Marine Lieutenant General John Kelly. The military assistant to the Secretary of Defense, Kelly was tall, ww, with close-cropped gray hair and dressed in an immaculate Marine uniform. The family was gathered around him, and I could sense that his words of sympathy and encouragement in the face of this tragedy were having a profound effect on the grief-stricken parents and their children. He smiled and they smiled. He hugged and they hugged back. He reached out his hand and they grasped it tightly.
+`knelt` 美 [nɛlt] v. 跪下
+`beside` 在一旁
+`lean` 美 [lin]vi. 倾斜；倚靠；倾向；依赖adj. 瘦的；贫乏的，歉收的vt. 使倾斜n. 瘦肉；倾斜；倾斜度
+`close-cropped` 英/美 ['kləus'krɔpt] adj. 剪短的；短发的
+`immaculate` 美 [ɪ'mækjələt] adj. 完美的；洁净的；无瑕疵的
+`sympathy` 美 ['sɪmpəθi] n. 同情；慰问；赞同
+`encouragement` 美 [ɪn'kɝɪdʒmənt] n. 鼓励
+`tragedy` 美 ['trædʒədi] n. 悲剧；灾难；惨案
+`profound` 美 [prə'faʊnd] adj. 深厚的；意义深远的；渊博的
+`grief-stricken` 英/美 ['ɡri:f,strikən] adj. 极度悲伤的
 
 After embracing the parents one last time and thanking the family for their sacrifice, Kelly moved on to the next group of heartbroken survivors. During the next hour, John Kelly touched almost every family in the room. More than any other visitor that day Kelly’s words resonated with every parent, every wife, every brother and sister, and every friend. His words were words of understanding. His were words of compassion, and above all, his were words of hope.
+`compassion` 美 [kəm'pæʃən] n. 同情；怜悯
 
 Only John Kelly could have made a difference that day. Only John Kelly could have given them hope, because only John Kelly knew what it was like to lose a son in combat.
 
 Marine First Lieutenant Robert Kelly was killed in Afghanistan in 2010 while serving with the Third Battalion, Fifth Marines. General Kelly and his family had struggled with the tragedy, just like the families at Dover that day. But the Kelly family had survived. They had endured through the pain, the heartache, and the inconsolable sense of loss.
+`inconsolable` 美 ['ɪnkən'soləbl] adj. 无法安慰的
 
 As I watched him that day he also gave me strength. The truth is, when you lose a soldier you grieve for the families, but you also fear that the same fate may someday befall you. You wonder whether you could survive the loss of a child. Or you wonder how your family would get along without you by their side. You hope and pray that God will be merciful and not have you shoulder this unthinkable burden.
+`merciful` 美 ['mɝsɪfl] adj. 仁慈的；慈悲的；宽容的
+`unthinkable` 美 [ʌn'θɪŋkəbl] adj. 不能想象的；过分的
+`burden` 美 ['bɝdn] n. 负担；责任；船的载货量 vt. 使负担；烦扰；装货于
 
 Over the course of the next three years, John Kelly and I became close friends. He was a remarkable officer, a strong husband to his wife, Karen, and a loving father to his daughter, Kate, and oldest son, Marine Major John Kelly. But more than that, without ever knowing it, John Kelly gave all those around him hope. Hope that in the very worst of times we could rise above the pain, the disappointment, and the agony and be strong. That we each had within us the ability to carry on and not only to survive but also to inspire others.
+`agony`美 ['æɡəni] n. 苦恼；极大的痛苦；临死的挣扎
 
 Hope is the most powerful force in the universe. With hope you can inspire nations to greatness. With hope you can raise up the downtrodden. With hope you can ease the pain of unbearable loss. Sometimes all it takes is one person to make a difference.
+`downtrodden` 美 ['daʊntrɑdn] adj. 被践踏的，被蹂躏的；受压迫的
 
 We will all find ourselves neck deep in mud someday. That is the time to sing loudly, to smile broadly, to lift up those around you and give them hope that tomorrow will be a better day.
+`broadly` 美 ['brɔdli] adv. 明显地；宽广地；概括地；露骨地；粗鄙地
