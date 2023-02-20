@@ -978,3 +978,60 @@ Hope is the most powerful force in the universe. With hope you can inspire natio
 
 We will all find ourselves neck deep in mud someday. That is the time to sing loudly, to smile broadly, to lift up those around you and give them hope that tomorrow will be a better day.
 `broadly` 美 ['brɔdli] adv. 明显地；宽广地；概括地；露骨地；粗鄙地
+
+
+## CHAPTER 10 Never, Ever Quit!
+don’t ever, ever ring the bell.
+
+I stood at attention along with the other 150 students beginning the first day of SEAL training. The instructor, dressed in combat boots, khaki shorts, and a blue and gold tee shirt, walked across the large asphalt courtyard to a brass bell hanging in full view of all the trainees.
+`asphalt` 美 ['æsfɔlt] n. 沥青；柏油 vt. 以沥青铺 adj. 用柏油铺成的
+
+"Gentlemen," he began. “Today is the first day of SEAL training. For the next six months you will undergo the toughest course of instruction in the United States military.”
+
+I glanced around and could see some looks of apprehension on the faces of my fellow students.
+
+The instructor continued. “You will be tested like no time in your life.” Pausing, he looked around the class of new “tadpoles.” “Most of you will not make it through. I will see to that.” He smiled. “I will do everything in my power to make you quit!” He emphasized the last three words. “I will harass you unmercifully. I will embarrass you in front of your teammates. I will push you beyond your limits.” Then a slight grin crossed his face. “And there will be pain. Lots and lots of pain.”
+
+Grabbing the bell, he pulled the rope hard and a loud clanging noise echoed across the courtyard. “But if you don’t like the pain, if you don’t like all the harassment, then there is an easy way out.” He pulled the rope again and another wave of deep metallic sound reverberated off the buildings. “All you have to do to quit is ring this bell three times.”
+
+He let go of the rope tied to the bell’s clapper. “Ring the bell and you won’t have to get up early. Ring the bell and you won’t have to do the long runs, the cold swims, or the obstacle course. Ring the bell and you can avoid all this pain.”
+
+Then the instructor glanced down at the asphalt and seemed to break from his prepared monologue. “But let me tell you something,” he said. “If you quit, you will regret it for the rest of your life. Quitting never makes anything easier.”
+
+Six months later, there were only thirty-three of us standing at graduation. Some had taken the easy way out. They had quit, and my guess is the instructor was right, they would regret it for the rest of their lives.
+
+Of all the lessons I learned in SEAL training, this was the most important. Never quit. It doesn’t sound particularly profound, but life constantly puts you in situations where quitting seems so much easier than continuing on. Where the odds are so stacked against you that giving up seems the rational thing to do.
+
+Throughout my career, I was constantly inspired by men and women who refused to quit, who refused to feel sorry for themselves, but none more so than a young Army Ranger I met in a hospital in Afghanistan.
+
+
+It was late one evening when I received word that one of my soldiers had stepped on a pressure plate mine and had been MEDEVACed to the combat hospital near my headquarters. The Ranger regimental commander, Colonel Erik Kurilla, and I quickly made our way to the hospital and into the soldier’s room.
+
+The soldier lay in the hospital bed, tubes extending from his mouth and chest; blast burns streaked up his arms and across his face. The blanket covering his body lay flat to the bed where his legs would normally have been. His life was now changed forever.
+
+I had made countless visits to the combat hospital in Afghanistan. As a wartime leader you try not to internalize the human suffering. You know that it is part of combat. Soldiers get wounded. Soldiers die. If you allow every decision you make to be predicated on the possible loss of life you will struggle mightily to be effective.
+
+Somehow though this night seemed different. The Ranger lying in front of me was so very young: younger than my two boys. He was nineteen years old and his name was Adam Bates. He had arrived in Afghanistan just a week earlier and this had been his first combat mission. I leaned over and touched my hand to his shoulder. He appeared to be sedated and unconscious. I reflected for a minute, said a little prayer, and was starting to leave when the nurse came in to check on my soldier.
+
+She smiled, looked at his vitals, and asked me if I had any questions regarding his status. She informed me that both of his legs had been amputated and that he had serious blast injuries, but that his chance for survival was good.
+
+I thanked her for taking such great care of Ranger Bates and told her I would return when he was conscious. “Oh, he’s conscious,” she stated. “In fact it would be good for you to talk with him.” She gently shook the young Ranger, who opened his eyes slightly and acknowledged my presence.
+
+“He can’t speak right now,” the nurse said. “But his mother was deaf and he knows how to sign.” The nurse handed me a sheet of paper with the various sign language symbols displayed on it.
+
+I talked for a minute, trying to find the strength to say the right thing. What do you tell a young man who has lost both his legs serving his country? How do you make him feel better about his future?
+
+Bates, his face swollen from the blast, his eyes barely visible through the redness and the bandages, stared at me momentarily. He must have sensed the pity in my expression.
+
+Raising his hand, he began to sign.
+
+I looked at each symbol on the sheet of paper before me. Slowly, painfully, he signed, “I—will—be—OK.” And then he fell back asleep.
+
+As I left the hospital that evening I could not help but cry. Of the hundreds of men I talked with in the hospital, never once did anyone complain. Never once! They were proud of their service. They were accepting of their fate, and all they wanted was to get back to their unit, to be with the men that they had left behind. Somehow Adam Bates personified all those men who had come before him.
+
+A year after my hospital visit in Afghanistan, I was at the Seventy-fifth Ranger Regimental Change of Command. There in the stands was Ranger Bates, looking sharp in his dress uniform and standing tall on his new prosthetic legs. I overheard him challenge a number of his fellow Rangers to a pull-up contest. With all he had been through—the multiple surgeries, the painful rehab, and adjusting to a new life—he never quit. He was laughing, joking, smiling—and just as he promised me—he was okay!
+
+Life is full of difficult times. But someone out there always has it worse than you do. If you fill your days with pity, sorrowful for the way you have been treated, bemoaning your lot in life, blaming your circumstances on someone or something else, then life will be long and hard. If, on the other hand, you refuse to give up on your dreams, stand tall and strong against the odds—then life will be what you make of it—and you can make it great. Never, ever, ring the bell!
+
+
+Remember… start each day with a task completed. Find someone to help you through life. Respect everyone. Know that life is not fair and that you will fail often. But if you take some risks, step up when times are toughest, face down the bullies, lift up the downtrodden, and never, ever give up—if you do these things, then you can change your life for the better… and maybe the world!
