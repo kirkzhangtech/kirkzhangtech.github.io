@@ -1,0 +1,75 @@
+---
+title: Readness list
+categories: 
+- archive
+---
+
+摘要：记录些平时阅读的资料和对应的总结
+
+<!--more -->
+
+## 2022
+
+### 为什么使用rust而非C++构建流数据库
+> https://www.singularity-data.com/blog/building-a-cloud-database-from-scratch-why-we-moved-from-cpp-to-rust/
+ 
+[优点]易于使用,内存安全的,学习简单,可管理的不安全性
+
+[缺点]碎片化的异步子系统,笨重的error处理机制,缺少泛型. 
+
+[学习到的经验] 用新的语言或者新的架构成为必然.有相关方面的专家.快速壮大自己的队伍。
+
+[总结]底层编程,性能,内存安全,友好的包管理工具是你项目主要考虑的问题。有没有专家帮到你,时间时间时间上的安排,有没有内部自用的培训程序在rust上
+
+### 安装pyspark和spark
+
+pyspark=3.2.2,spark=3.2.2,jdk=11,python3=3.8,scala=2.11.12.最重要的是版本保持一致
+
+### 英语中 in which 用法
+
+in which 是relative pronoun(关系代词)，用来引导定语从句,在which前加介词显得正式，省去which就不正式.<br>[1] This is the car in which I travelled to Beijing. <br>[2] This is the house in which I grew up. <br>[3] This is the pitch on which I played football all those years ago. <br>[4] ack at school, the name by which I was known was Charlie. <br>[5] And these are the friends with whom I played every day. 这里的frinends是指代后面从句的宾语，故用whome<br>在英语语法中，「in which」是一种连词，它用来引导非限制性定语从句。非限制性定语从句是指那些不必要的从句，它们可以提供有关主句主语的额外信息，但不会对主句造成影响。例如：The house, in which we used to live, has been sold.<br>The book, in which I found the information I needed, is on the shelf<br>在这两个例子中，「in which」都用来引导非限制性定语从句，它们提供了有关主句主语的额外信息。但是，如果我们把「in which」去掉，主句仍然能够正常运行，这就表明非限制性定语从句不是必须的。|
+
+### wsl切换默认user
+ubuntu2004.exe config --default-user root|
+
+### Excel函数大全
+http://hanshu.xuewps.com/|
+
+### 母语非英语者如何快速写一篇满意的英文文章？可尝试用如下pipeline
+1. 用母语写下梗概，用#ChatGPT 扩充 
+2. chatGPT 译成英文，将英
+3. 用#quillbot 润色加工最后
+4. 用 #grammerly定稿|
+
+# 2023
+
+## 在 Heptabase 中构建第二大脑
+整理和维护是思考过程，这是个持续的功夫。所以会贯穿整个工程和人生
+
+> https://justgoidea.com/blog/post-024#43b68e3c6edb433c91544cd528e767d4
+
+**第二大脑的功能**
+
+功能自然不言而喻，个人主要是想扩展自己的思想边界，并且持久化以前学过的东西，避免后面接触的时候感觉以前没学过。可能以后这些东西会有心东西进来，会进行补充
+
+**指导理论-CODE**
+
+1. capture 以音乐视频等集中记录信息。对于捕捉到的信息，要客观，怀疑，做出有意识和有战略性的决定。捕获产生灵感与创意的信息
+2. organize 组织我们的笔记，我们需要思考如何将一些东西应用到我们的生活、工作和学习中，这将使我们的笔记更有价值
+3. Distill 
+   1. 记住什么，信息来源的共鸣是什么？这里对这个人要对很多信息要能客观批判和审视，并且要保持多元的，开化的理解别人的想法
+   2. 这些学到的知识能帮到我们什么？
+   3. 留在脑海里最重要的是什么
+   4. 扔掉无关的东西，这里有个问题"什么才是不想干的东西"
+4. Express 将自己学到的转化为创造性输出，这里我们要定期的回顾知识。或者试着分享这些知识
+
+
+**第二大脑，共有六个组成部分**
+
+一个完整的第二大脑，共有六个组成部分，笔记系统、稍后读系统、灵感系统、存储系统和日历工具、任务管理工具。这六个部分相互配合，互为表里
+
+**用发散与聚敛的思维进行创作**
+
+发散性思维是指探索让我们感到好奇的东西，从外部信息来源中获取知识资产。例如，阅读书籍、听播客、收看在线视频课程都是不同类型的发散性思维。
+
+聚敛性思维是指利用知识资产在我们的想法之间建立联系，并将外部知识与个人洞察力相结合，以产生新的知识。
