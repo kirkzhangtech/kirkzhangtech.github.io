@@ -598,7 +598,7 @@ You can’t avoid The Circus. At some point we all make the list. Don’t be afr
 slide down the obstacle headfirst.
 
 Standing at the edge of the thirty-foot tower, I grabbed the thick nylon rope. One end of the rope was attached to the tower and the other end anchored on the ground to a pole one hundred feet away. I was halfway through the SEAL obstacle course and I was on a record pace. Swinging my legs over the top of the line and holding on for dear life, I began to inch my way off the platform. My body hung underneath the rope, and with a caterpillar-like motion I slowly made my way, foot by foot, to the other end.
-`grabbe` /美 [græbd] v. 攫取；捕获；强夺；匆忙地做
+`grabb` /美 [græbd] v. 攫取；捕获；强夺；匆忙地做
 `rope`  美 [rop] n. 绳，绳索 vt. 捆，  vi. 拧成绳状
 `thick` 英 [θɪk]  美 [θɪk]n. 最拥挤部分；活动最多部分；事物的粗大浓密部分adj. 厚的；浓的；粗大的adv. 密集地；浓浓地，厚厚地
 `anchored` 美 ['æŋkɚ] adj. 固定的；抛锚的 v. 固定；抛锚；主持
@@ -989,25 +989,40 @@ I stood at attention along with the other 150 students beginning the first day o
 "Gentlemen," he began. “Today is the first day of SEAL training. For the next six months you will undergo the toughest course of instruction in the United States military.”
 
 I glanced around and could see some looks of apprehension on the faces of my fellow students.
+`apprehension` 美 [,æprɪ'hɛnʃən] n. 理解；恐惧；逮捕；忧惧
+<samp>
+这里的looks是名词
+</samp>
 
-The instructor continued. “You will be tested like no time in your life.” Pausing, he looked around the class of new “tadpoles.” “Most of you will not make it through. I will see to that.” He smiled. “I will do everything in my power to make you quit!” He emphasized the last three words. “I will harass you unmercifully. I will embarrass you in front of your teammates. I will push you beyond your limits.” Then a slight grin crossed his face. “And there will be pain. Lots and lots of pain.”
+The instructor continued. “You will be tested like no time in your life.” Pausing, he looked around the class of new “tadpoles.” “Most of you will not make it through. I will see to that.” He smiled. “I will do everything in my power to make you quit!” He emphasized the last three words. “I will harass you unmercifully. I will embarrass you in front of your teammates. I will push you beyond your limits.” Then a slight grin crossed his face. "And there will be pain. Lots and lots of pain"
+`tadpoles` 英/美 ['tæd,pol] n. [脊椎] 蝌蚪（tadpole的复数形式）
 
 Grabbing the bell, he pulled the rope hard and a loud clanging noise echoed across the courtyard. “But if you don’t like the pain, if you don’t like all the harassment, then there is an easy way out.” He pulled the rope again and another wave of deep metallic sound reverberated off the buildings. “All you have to do to quit is ring this bell three times.”
+`Grabbing` 英/美 [græb] v. 抓；夺走；强烈吸引
+`clanging` 英/美 [klæŋɪŋ] adj. 发出叮当声的
+`metallic` 美 [mə'tælɪk] adj. 金属的，含金属的
+`reverberate` 美 [rɪ'vɝbə'ret] vt. 使回响；使反射；使弹回 vi. 回响；反响；弹回；不断发生后效 adj. 回响的；反射的
 
-He let go of the rope tied to the bell’s clapper. “Ring the bell and you won’t have to get up early. Ring the bell and you won’t have to do the long runs, the cold swims, or the obstacle course. Ring the bell and you can avoid all this pain.”
+He let go of the rope tied to the bell’s clapper. "Ring the bell and you won’t have to get up early. Ring the bell and you won’t have to do the long runs, the cold swims, or the obstacle course. Ring the bell and you can avoid all this pain"
+`clapper` 英 ['klæpə]  美 ['klæpɚ] n. 拍手者；铃舌；响板；唠唠叨叨的嘴巴
 
 Then the instructor glanced down at the asphalt and seemed to break from his prepared monologue. “But let me tell you something,” he said. “If you quit, you will regret it for the rest of your life. Quitting never makes anything easier.”
+`monologue` 美 ['mɑnəlɔɡ] n. 独白
 
 Six months later, there were only thirty-three of us standing at graduation. Some had taken the easy way out. They had quit, and my guess is the instructor was right, they would regret it for the rest of their lives.
 
 Of all the lessons I learned in SEAL training, this was the most important. Never quit. It doesn’t sound particularly profound, but life constantly puts you in situations where quitting seems so much easier than continuing on. Where the odds are so stacked against you that giving up seems the rational thing to do.
 
 Throughout my career, I was constantly inspired by men and women who refused to quit, who refused to feel sorry for themselves, but none more so than a young Army Ranger I met in a hospital in Afghanistan.
-
+<samp>
+在我的整个职业生涯中，我不断受到那些拒绝放弃、不屈不挠、不自怨自艾的男女的启发。然而，在阿富汗的一家医院里，我遇到了一位年轻的陆军突击队员，他让我感到无比的钦佩和敬意。
+</samp>
 
 It was late one evening when I received word that one of my soldiers had stepped on a pressure plate mine and had been MEDEVACed to the combat hospital near my headquarters. The Ranger regimental commander, Colonel Erik Kurilla, and I quickly made our way to the hospital and into the soldier’s room.
+`plate` 美 [pleɪt] n. 碟；金属板；金属牌；感光底片 vt. 电镀；给…装甲
 
 The soldier lay in the hospital bed, tubes extending from his mouth and chest; blast burns streaked up his arms and across his face. The blanket covering his body lay flat to the bed where his legs would normally have been. His life was now changed forever.
+`blast` 美 [blæst] n. 爆炸；冲击波；一阵 vi. 猛攻 vt. 爆炸；损害；使枯萎
 
 I had made countless visits to the combat hospital in Afghanistan. As a wartime leader you try not to internalize the human suffering. You know that it is part of combat. Soldiers get wounded. Soldiers die. If you allow every decision you make to be predicated on the possible loss of life you will struggle mightily to be effective.
 
@@ -1028,7 +1043,12 @@ Raising his hand, he began to sign.
 I looked at each symbol on the sheet of paper before me. Slowly, painfully, he signed, “I—will—be—OK.” And then he fell back asleep.
 
 As I left the hospital that evening I could not help but cry. Of the hundreds of men I talked with in the hospital, never once did anyone complain. Never once! They were proud of their service. They were accepting of their fate, and all they wanted was to get back to their unit, to be with the men that they had left behind. Somehow Adam Bates personified all those men who had come before him.
-
+`complain` vi. 投诉；发牢骚；诉说 vt. 抱怨；控诉
+`complaint` 美 [kəm'plent] n. 抱怨；诉苦；疾病；委屈
+`personified` 英/美 [pə:'sɔnifai; pə] 表现
+<samp>
+当晚我离开医院时，不禁落泪。在医院里，我与数百名士兵交谈过，从来没有人抱怨过。从未！他们为自己的服务感到骄傲，接受了自己的命运，只希望回到他们的部队，与留在身后的战友们再次并肩作战。亚当·贝茨在某种程度上代表了之前所有那些士兵的形象。
+</samp>
 A year after my hospital visit in Afghanistan, I was at the Seventy-fifth Ranger Regimental Change of Command. There in the stands was Ranger Bates, looking sharp in his dress uniform and standing tall on his new prosthetic legs. I overheard him challenge a number of his fellow Rangers to a pull-up contest. With all he had been through—the multiple surgeries, the painful rehab, and adjusting to a new life—he never quit. He was laughing, joking, smiling—and just as he promised me—he was okay!
 
 Life is full of difficult times. But someone out there always has it worse than you do. If you fill your days with pity, sorrowful for the way you have been treated, bemoaning your lot in life, blaming your circumstances on someone or something else, then life will be long and hard. If, on the other hand, you refuse to give up on your dreams, stand tall and strong against the odds—then life will be what you make of it—and you can make it great. Never, ever, ring the bell!
