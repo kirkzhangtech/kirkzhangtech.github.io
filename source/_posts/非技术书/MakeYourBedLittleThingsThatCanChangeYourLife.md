@@ -634,11 +634,14 @@ It was Iraq in 2004. The voice on the other end of the radio was calm but had an
 
 The Army lieutenant colonel in charge of the rescue mission informed me that they would have to conduct a dangerous daylight raid. To make matters worse, the only way to be successful was to land three Black Hawk helicopters, carrying the assault force, into the middle of the small compound. We talked through other tactical options, but it was clear the colonel was right. It was always preferable to conduct a rescue mission at night, when the element of surprise was on your side, but this was a fleeting opportunity, and if we didn’t act now the hostages would be moved and possibly killed.
 `in charge of` 负责
+`in favor of`
 `colonel` 美 ['kɝnl] n. 陆军上校
 `conduct` 美 [kən'dʌkt] vi. 导电；带领 vt. 管理；引导；表现 n. 进行；行为；实施
 `preferable` 美 ['prɛfrəbl] adj. 更好的，更可取的；更合意的
 `fleeting`  美 ['flitɪŋ] adj. 飞逝的；转瞬间的
 `assault` 美 [ə'sɔlt] n. 攻击；袭击 vt. 攻击；袭击 vi. 袭击；动武
+`compound` 美 ['kɑmpaʊnd] n. [化学] 化合物；混合物；复合词 adj. 复合的；混合的 v. 合成；混合；恶化，加重；和解，妥协
+
 
 I approved the mission and within minutes the rescue force had boarded the three Black Hawk helicopters and was on its way to the compound. High above the Black Hawks, another helicopter was providing video surveillance back to my headquarters. I watched in silence as the three helicopters skimmed across the desert, just a few feet above the ground to hide their approach.
 `surveillance` 美 [sɝ'veləns] n. 监督；监视

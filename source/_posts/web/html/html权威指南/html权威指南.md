@@ -527,30 +527,32 @@ translate	      规定是否应该翻译元素内容。
 ```
 
 # 22 事件
+
 [事件参考手册](https://www.w3school.com.cn/tags/html_ref_eventattributes.asp)
+
 1. Window 事件属性
 
-```
-onafterprint	script	文档打印之后运行的脚本。
-onbeforeprint	script	文档打印之前运行的脚本。
-onbeforeunload	script	文档卸载之前运行的脚本。
-onerror	script	      在错误发生时运行的脚本。
-onhaschange	script	   当文档已改变时运行的脚本。
-onload	script	      页面结束加载之后触发。
-onmessage	script	   在消息被触发时运行的脚本。
-onoffline	script	   当文档离线时运行的脚本。
-ononline	script	      当文档上线时运行的脚本。
-onpagehide	script	   当窗口隐藏时运行的脚本。
-onpageshow	script	   当窗口成为可见时运行的脚本。
-onpopstate	script	   当窗口历史记录改变时运行的脚本。
-onredo	script	      当文档执行撤销（redo）时运行的脚本。
-onresize	script	      当浏览器窗口被调整大小时触发。
-onstorage	script	   在 Web Storage 区域更新后运行的脚本。
-onundo	script	      在文档执行 undo 时运行的脚本。
-onunload	script	      一旦页面已下载时触发（或者浏览器窗口已被关闭）。
-```
+|事件名|类型|说明|
+|---|---|---|
+|onafterprint	 | script	  |文档打印之后运行的脚本。|
+|onbeforeprint	|  script	|文档打印之前运行的脚本。|
+|onbeforeunload|	script	|文档卸载之前运行的脚本。|
+|onerror	      |  script	|在错误发生时运行的脚本。|
+|onhaschange	  |  script	|当文档已改变时运行的脚本|
+|onload	       | script	  |页面结束加载之后触发。|
+|onmessage	    |  script	|在消息被触发时运行的脚本|
+|onoffline	    |  script	|当文档离线时运行的脚本。|
+|ononline	     | script	  |当文档上线时运行的脚本。|
+|onpagehide	   | script	  |当窗口隐藏时运行的脚本。|
+|onpageshow	   | script	  |当窗口成为可见时运行的脚本。|
+|onpopstate	   | script	  |当窗口历史记录改变时运行的脚本。|
+|onredo	       | script	  |当文档执行撤销（redo）时运行的脚本。|
+|onresize	     | script	  |当浏览器窗口被调整大小时触发。|
+|onstorage	    |  script	|在 Web Storage 区域更新后运行的脚本。|
+|onundo	       | script	  |在文档执行 undo 时运行的脚本。|
+|onunload	     | script	  |一旦页面已下载时触发（或者浏览器窗口已被关闭|
 
-2. Form 事件
+1. Form 事件
 ```
 onblur	script	元素失去焦点时运行的脚本。
 onchange	script	在元素值被改变时运行的脚本。
@@ -565,13 +567,13 @@ onselect	script	在元素中文本被选中后触发。
 onsubmit	script	在提交表单时触发。
 ```
 
-3. 鼠标事件
+1. 鼠标事件
 ```html
 onkeydown	script	在用户按下按键时触发。
 onkeypress	script	在用户敲击按钮时触发。
 onkeyup	script	当用户释放按键时触发。
 ```
-4. Mouse事件
+1. Mouse事件
 ```html
 onclick	script	元素上发生鼠标点击时触发。
 ondblclick	script	元素上发生鼠标双击时触发。
@@ -590,7 +592,7 @@ onmouseup	script	当在元素上释放鼠标按钮时触发。
 onmousewheel	script	当鼠标滚轮正在被滚动时运行的脚本。
 onscroll	script	   当元素滚动条被滚动时运行的脚本。
 ```
-5. Media 事件
+1. Media 事件
 ```html
 onabort	script	在退出时运行的脚本。
 oncanplay	script	当文件就绪可以开始播放时运行的脚本（缓冲已足够开始时）。
