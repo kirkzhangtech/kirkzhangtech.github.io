@@ -471,16 +471,21 @@ enctype 属性可能的值：
 <basefont>	定义页面中文本的默认字体、颜色或尺寸。HTML5 中不支持。请使用 CSS 代替。
 ```
 ## 19.12 编程
-
+[script标签说明](https://www.w3school.com.cn/tags/tag_script.asp)
 ```html
 <script>	定义客户端脚本。
 ```
-1. 使用script元素
-2. 定义内嵌脚本
-3. 载入外部脚本库
-4. 推迟脚本的执行，可以使用defer和async的对脚本的执行加以控制，defer会将脚本加载推迟到所有元加载完成之后
-5. 异步执行脚本,async属性解决的是另一类问题。前面说过，浏览器遇到script元素时的默认行为是在加和执行脚本的同时暂停处理页面。各个script元素依次(即按其定义的次序)同步(即在脚本加载和执行进程不再管别的事情) 执行。使用了async属性后，浏览器将在继续解析HTML文档中其他元素(包括其他script素)的同时异步加载和执行脚本。如果运用得当，这可以大大提高整体加载性能。代码清单7-24示范了asyn属性的用法。
-6. `<noscript>` this javascript is required`<noscript/>`
+|属性  | 值 |   描述|
+|---|----|---|
+|async|	async	|规定异步执行脚本（仅适用于外部脚本）。|
+|charset|	charset	|规定在外部脚本文件中使用的字符编码。|
+|crossorigin	| anonymous/use-credentials 将请求模式设置为 |HTTP CORS 请求。|
+|defer|	defer	|规定是否对脚本执行进行延迟，直到页面加载为止。|
+|language	|script|	不赞成使用。规定脚本语言。请使用 type 属性代替它。|
+|referrepolicy|	 no-referrer/no-referrer-when-downgrade/origin/origin-when-cross-origin/same-origin/strict-origin/strict-origin-when-cross-origin/unsafe-url | 规定外部脚本文件的 URL。|
+|src|	URL	| 规定外部脚本文件的 URL。|
+|xml:space|	preserve|	规定是否保留代码中的空白。|
+|type|	MIME-type application/javascript 如果这个值是module，则代码会被当成ES6模块，而且只有这时候代码中才能出现import和export关键字	| 指示脚本的 MIME 类型。|
 
 ```html
 <noscript>	定义针对不支持客户端脚本的用户的替代内容。
@@ -493,6 +498,7 @@ enctype 属性可能的值：
 # 20 使用DOM元素
 
 # 20 浏览器支持情况
+
 [w3school](https://www.w3school.com.cn/tags/html_ref_html_browsersupport.asp)
 
 # 21 全局属性
