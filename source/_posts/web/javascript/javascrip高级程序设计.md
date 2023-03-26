@@ -302,8 +302,8 @@ if (!age) { // 这个块会执行
       2. 数值，直接返回。
       3. null，返回0
       4. undefined，返回NaN
-      5. 如果字符串包含数值字符，包括数值字符前面带加、减号 的情况，则转换为一个十进制数值。因此，Number("1") 返回1，Number("123")返回123，Number("011")返回11（忽略前面的零）。
-      6. 如果字符串包含有效的浮点值格式如"1.1"，则会转换为 相应的浮点值（同样，忽略前面的零）
+      5. 如果字符串包含数值字符，包括数值字符前面带加、减号的情况，则转换为一个十进制数值。因此，Number("1") 返回1，Number("123")返回123，Number("011")返回11（忽略前面的零）。
+      6. 如果字符串包含有效的浮点值格式如"1.1"，则会转换为相应的浮点值（同样，忽略前面的零）
       7. 如果字符串包含有效的十六进制格式如"0xf"，则会转换为与该十六进制值对应的十进制整数值。
       8. 如果是空字符串（不包含字符），则返回0。
       9. 对象，调用valueOf()方法，并按照上述规则转换返回的值。 如果转换结果是NaN，则调用toString()方法，再按照转换字符串的规则转换。
@@ -420,28 +420,127 @@ let lastName = `Jingleheimerschmidt`
    }
   ```
 
-"function"表示值为函数；
-"symbol"表示值为符号。
+- function表示值为函数；
+- symbol表示值为符号
 
-## 3.3 数据类型
+## 3.3 操作符
 
-- 一元操作符++age,--age,age++,age--跟其他静态语言特性一样和一些规则
-  ```js
-   let s1 = "2"; 
-   let s2 = "z"; 
-   let b = false; 
-   let f = 1.1; 
-   let o = { 
-      valueOf() { 
-         return -1;
-      }
-   };
-  ```
-- 一元加减
-- 位操作符好
-  这里的学位有点大
-- 布尔操作符好
-- 乘/除/加/减法
+- 一元操作符
+  - 递进操作符 ++age,--age,age++,age--跟其他静态语言特性一样和一些规则
+  - 一元加减操作符
+   
+      把负号放在数字前面就变成响应的负值，放在非数值前面就会进行转换然后取负值
+      ```js
+      let s1 = "01"; 
+      let s2 = "1.1"; 
+      let s3 = "z"; 
+      let b = false; 
+      let f = 1.1; 
+      let o = { 
+         valueOf() { 
+            return -1;
+         } 
+      };
+      s1 = +s1; // 值变成数值1 
+      s2 = +s2; // 值变成数值1.1 
+      s3 = +s3; // 值变成NaN ，根本原因是不能转换为shuzhi
+      b = +b;   // 值变成数值0
+      f = +f;   // 不变，还是1.1
+      o = +o;   // 值变成数值-1
+      ```
+
+- 位操作符顾好
+  
+  如单字节的5的原码为：0000 0101；-5的原码为1000 0101。
+  反码：正数的反码就是其原码；负数的反码是将原码中，除符号位以外，每一位取反。如单字节的5的反码为：0000 0101；-5的反码为1111 1010。
+  补码：正数的补码就是其原码；负数的`反码`+1就是补码。如单字节的5的补码为：0000 0101；-5的补码为1111 1011。
+  - 按位非：就是取这个数的补数
+
+      ```js
+         let num1 = 25; // 二进制00000000000000000000000000011001
+         let num2 = ~num1; // 二进制11111111111111111111111111100110 
+         console.log(num2); // -26
+      ```
+  - 按位与
+
+      按位与操作符用和号（&）表示，有两个操作数。本质上，按位与 就是将两个数的每一个位对齐，然后基于真值表中的规则，对每一位执行相应的与操作。如何快速计算
+      |第一位置数值的位|第二位数值的位|结果|
+      |---|---|---|
+      |1|1|1|
+      |1|0|0|
+      |0|1|0|
+      |0|0|0|
+  - 按位或
+
+      按位或操作符用管道符（|）表示，同样有两个操作数。按位或操作在至少一位是1时返回1，两位都是0时返回0，按位或遵循如下真值表：
+      |第一位置数值的位|第二位数值的位|结果|
+      |---|---|---|
+      |1|1|1|
+      |1|0|1|
+      |0|1|1|
+      |0|0|0|
+  - 按位异或
+
+      按位异或与按位或的区别是，它只在一位上是1的时候返回1（两位 都是1或0，则返回0。
+  - 左移
+
+      ```js
+      let oldValue = 2; // 等于二进制10
+      let newValue = oldValue << 5; // 等于二进制1000000，即十进制64
+      ```
+      注意在移位后，数值右端会空出5位。左移会以0填充这些空位，左移会保留它所操作数值的符号。比如，如果-2左移5位， 将得到-64，而不是正64
+  - 有符号右移
+
+      有符号右移由两个大于号（>>）表示，会将数值的所有32位都向右 移，同时保留符号（正或负）。有符号右移实际上是左移的逆运算。比如，如果将64右移5位，那就是2同样，移位后就会出现空位。不过，右移后空位会出现在左侧，且 在符号位之后（见图3-3）。ECMAScript会用符号位的值来填充这些空位，以得到完整的数值
+  - 无符号右移
+
+      如果是正数与上面有符号右移一样，这里面的无符号意思是指把最高位的符号位当成数值位对待也进行右移
+- 布尔操作符
+      <samp>
+      如果操作数是对象，则返回false。 
+      如果操作数是空字符串，则返回true。 
+      如果操作数是非空字符串，则返回false。 
+      如果操作数是数值0，则返回true。 
+      如果操作数是非0数值（包括Infinity），则返回false。 
+      如果操作数是null，则返回true。 
+      如果操作数是NaN，则返回true。
+      如果操作数是undefined，则返回true。
+      </samp>
+- 乘/除/加/减法/指数操作符
+  `console.log(3**2)`和`Math.pow()`
+  - 乘法
+      ```
+      如果操作数都是数值，则执行常规的乘法运算，即两个正值相 乘是正值，两个负值相乘也是正值，正负符号不同的值相乘得 到负值。
+      如果ECMAScript不能表示乘积，则返回Infinity 或-Infinity。
+      如果有任一操作数是NaN，则返回NaN。 
+      如果是Infinity乘以0，则返回NaN。 
+      如果是Infinity乘以非0的有限数值，则根据第二个操作数的符号返回Infinity或-Infinity。 
+      如果是Infinity乘以Infinity，则返回Infinity。 
+      如果有不是数值的操作数，则先在后台用Number()将其转换为数值，然后再应用上述规则。
+      ```
+  - 除法
+      ```
+      如果操作数都是数值，则执行常规的除法运算，即两个正值相 除是正值，两个负值相除也是正值，符号不同的值相除得到负 值。
+      如果ECMAScript不能表示商，则返回Infinity或Infinity。
+      如果有任一操作数是NaN，则返回NaN。
+      如果是Infinity除以Infinity，则返回NaN。 
+      如果是0除以0，则返回NaN。 
+      如果是非0的有限值除以0，则根据第一个操作数的符号返回 Infinity或-Infinity。
+      如果是Infinity除以任何数值，则根据第二个操作数的符号 返回Infinity或-Infinity。 
+      如果有不是数值的操作数，则先在后台用Number()函数将其转换为数值，然后再应用上述规则。
+      ```
+  - 取模
+      ```
+      如果操作数是数值，则执行常规除法运算，返回余数。 
+      如果被除数是无限值，除数是有限值，则返回NaN。 
+      如果被除数是有限值，除数是0，则返回NaN。 
+      如果是Infinity除以Infinity，则返回NaN。 
+      如果被除数是有限值，除数是无限值，则返回被除数。 
+      如果被除数是0，除数不是0，则返回0。 
+      如果有不是数值的操作数，则先在后台用Number()函数将其转换为数值，然后再应用上述规则。
+      ```
+   - 加法
+   - 减法
 - 全等与不全等
   ```js
    let result1 = ("55" == 55); // true，转换后相等 
@@ -456,3 +555,132 @@ let lastName = `Jingleheimerschmidt`
   let num1 = 1, num2 = 2, num3 = 3;
   let num = (5, 1, 4, 8, 0); // num的值为0
   ```
+
+## 3.4 语句
+
+- if 语句
+- do-while
+- while
+- for
+- for in
+```js
+for (const propName in window) {
+    document.write(propName);
+}
+```
+这个例子使用for-in循环显示了BOM对象window的所有属性,这里控制语句中的const也不是必需的。但为了确保这个局部变量不被修改，推荐使用const。
+
+- for of
+
+for-in和for-of的区别
+
+for-in语句和for-of语句是 JavaScript 中的两种循环语句，用于遍历对象和数组等集合类型。
+
+区别如下：
+
+for-in循环语句遍历的是对象的可枚举属性，而for-of循环语句遍历的是集合对象的可迭代元素，例如数组中的元素。
+
+for-in循环语句不仅可以遍历对象自身的属性，也可以遍历继承自原型链上的属性，而for-of循环语句只能遍历集合对象自身的元素。
+
+for-in循环语句的遍历顺序是不确定的，而for-of循环语句的遍历顺序是按照元素在集合对象中的顺序进行遍历。
+
+for-in循环语句遍历的是对象的键名，而for-of循环语句遍历的是对象的键值。
+
+例如，下面的示例代码演示了如何使用for-in循环语句和for-of循环语句遍历数组中的元素：
+```js
+const arr = ['apple', 'banana', 'orange'];
+
+// 使用 for-in 循环遍历数组
+for (const index in arr) {
+  console.log(index); // 0, 1, 2
+}
+
+// 使用 for-of 循环遍历数组
+for (const value of arr) {
+  console.log(value); // 'apple', 'banana', 'orange'
+}
+```
+- 标签语句
+- break 和 continue语句
+- with语句
+with语句的用途是将代码作用域设置为特定的对象，
+```js
+let qs = location.search.substring(1); 
+let hostName = location.hostname;
+let url = location.href;
+```
+就可以改为
+```js
+with(location) { 
+   let qs = search.substring(1); 
+   let hostName = hostname; 
+   let url = href;
+}
+```
+严格模式不允许使用with语句，否则会抛出错误。with语句影响性能且难于调试其中的代码，通常不推 荐在产品代码中使用with语句
+- switch语句
+- 函数
+
+# 4.变量，作用域与内存
+
+## 4.1 原始值与引用值
+
+原始数据类型就是js自定义的数据那6种类型，JavaScript不允许直接 访问内存位置，因此也就不能直接操作对象所在的内存空间。在操作对 象时，实际上操作的是对该对象的引用（reference）而非实际的对象本身
+
+## 4.1.1 动态类型
+
+引用值：可以随时添加、修改和删除其属性和方法，原始值不能添加属性，尽管尝试给属性值添加属性不会报错会出现undefined的情况
+原始数据类型： 可以直接用字面量创建变量（对象），也可以使用`new`关键字初始化
+```js
+let name1 = "Nicholas"; 
+let name2 = new String("Matt"); 
+name1.age = 27;
+name2.age = 26;
+console.log(name1.age); // undefined 
+console.log(name2.age); // 26
+console.log(typeof name1); // string
+console.log(typeof name2); // object
+```
+
+### 4.1.2 复制
+原始值的复制是值的复制在内存中生成两个独立对象，而引用类型的复制是地址
+
+### 4.1.3 传递参数
+
+```js
+function setName(obj) { 
+   obj.name = "Nicholas"; 
+   obj = new Object(); 
+   obj.name = "Greg";
+   console.log(obj.name)
+}
+let person = new Object(); 
+setName(person);
+console.log(person.name); // "Nicholas"
+```
+这表明函数中参数的值改变之后，原始的引用仍然没变。当obj在函数内部被重写时， 它变成了一个指向本地对象的指针。而那个本地对象在函数执行结束时就被销毁了。那么这时指针是不是指向了已经不存在的对象？
+
+### 4.1.4 确定类型
+typeof关键字可以用来判断原始数据类型，但是用来判断null或者对象就会返回object
+```js
+let s = "Nicholas"; 
+let b = true; 
+let i = 22; 
+let u; 
+let n = null;
+let o = new Object(); 
+console.log(typeof s); // string 
+console.log(typeof i); // number 
+console.log(typeof b); // boolean 
+console.log(typeof u); // undefined 
+console.log(typeof n); // object
+console.log(typeof o); // object
+```
+可以使用instanceof关键字判断对象，在这里重申一件事情所有的对象都是object.所以所有的对于object的判断都是true,instanceof检测原始值，则始终会返回false
+```js
+console.log(person instanceof Object); // 变量person是Object吗？
+console.log(colors instanceof Array); // 变量colors是Array吗？ 
+console.log(pattern instanceof RegExp); // 变量pattern是RegExp吗？
+```
+
+## 4.2
