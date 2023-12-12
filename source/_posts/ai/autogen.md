@@ -4,6 +4,12 @@ categories:
 - ai
 ---
 
+build from microsoft
+
+<!--more -->
+
+<!--toc-->
+
 # autogen tool
 
 ## quick start

@@ -2,11 +2,7 @@
 title: java编程思想
 categories: 
 - java
-thumbnailImagePosition: bottom
-# thumbnailImage: http://d1u9biwaxjngwg.cloudfront.net/cover-image-showcase/city-750.jpg
-coverImage: https://user-images.githubusercontent.com/46363359/201714705-5cfdfabf-a3a1-47c1-891a-00fd73a9f211.jpg
-metaAlignment: center
-coverMeta: out
+
 ---
 
 > "我的语言极限,即是我的世界的极限" ——路德维希·维特根斯坦（Wittgenstein）
