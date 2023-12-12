@@ -1,0 +1,751 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>MIT6.824之lab2_raft_lock_advice - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要: 这是一篇mit6.824 raft所结构实验指南\n\n\n\nrule 1whenever you have one more goroutine gonna modify data , you should use lock to prevent data andavoid multip-goroutine change data ,go race is a good tool , that is enable to detect data race ,but without any helpful on below rules\nrule 2whenever your code make a sequence of modification on shared code.if they looked at thedata midway through the sequence,other goroutines might malfunction, you should use lockto pretect code block which gonna be change and other routine read data midway, for example\nrf.mu.Lock()\nrf.currentTerm +&#x3D; 1\nrf.state &#x3D; Candidate\nrf.mu.Unlock()\n\none more goroutine could not read any of above temp updates, so A goroutine should hold locking over the critical section.on the other hand , if B goroutine using r.currenTerm or r.state, ,who must hold locking when access r.currenTerm at somewhere\nrule 3Whenever code does a sequence of reads of shared data (orreads and writes), and would malfunction if another goroutine modifiedthe data midway through the sequence, you should use a lock around thewhole sequence.\nplease must take care and review the multi-goroutine change data at the same time.and must aware if another goroutine modifiedthe data midway through the sequence, you should use a lock around the whole sequence.\n\nrf.mu.Lock()\n  if args.Term &gt; rf.currentTerm &#123;\n   rf.currentTerm &#x3D; args.Term\n  &#125;\n  rf.mu.Unlock()\n\n\nrule 4this rule just only apply to lab2, it announces that It’s usually a bad idea to hold a lock while doing anything that might wait: reading a Go channel, sending on a channel, waiting for a timer, calling time.Sleep(), or sending an RPC (and waiting for thereply).\nrule 5this rule is also apply for lab2 specifical case.Be careful about assumptions across a drop and re-acquire of alock. One place this can arise is when avoiding waiting with locksheld.\nBe careful about assumptions across a drop and re-acquire of alock. One place this can arise is when avoiding waiting with locksheld. For example, this code to send vote RPCs is incorrect:\nrf.mu.Lock()\nrf.currentTerm +&#x3D; 1\nrf.state &#x3D; Candidate\nfor &lt;each peer&gt; &#123;\n  go func() &#123;\n    rf.mu.Lock()\n    args.Term &#x3D; rf.currentTerm\n    rf.mu.Unlock()\n    Call(&quot;Raft.RequestVote&quot;, &amp;args, ...)\n    &#x2F;&#x2F; handle the reply...\n  &#125; ()\n&#125;\nrf.mu.Unlock()\n\nThe code sends each RPC in a separate goroutine. It’s incorrectbecause args.Term may not be the same as the rf.currentTerm at whichthe surrounding code decided to become a Candidate. Lots of time maypass between when the surrounding code creates the goroutine and whenthe goroutine reads rf.currentTerm; for example, multiple terms maycome and go, and the peer may no longer be a candidate. One way to fixthis is for the created goroutine to use a copy of rf.currentTerm madewhile the outer code holds the lock. Similarly, reply-handling codeafter the Call() must re-check all relevant assumptions afterre-acquiring the lock; for example, it should check thatrf.currentTerm hasn’t changed since the decision to become acandidate.\nIt can be difficult to interpret and apply these rules. Perhaps mostpuzzling is the notion in Rules 2 and 3 of code sequences thatshouldn’t be interleaved with other goroutines’ reads or writes. Howcan one recognize such sequences? How should one decide where asequence ought to start and end?\nOne approach is to start with code that has no locks, and thinkcarefully about where one needs to add locks to attain correctness.This approach can be difficult since it requires reasoning about thecorrectness of concurrent code.\n一个更务实的方法是从观察开始的，如果没有没有并发性（没有同时执行的goroutine），你就根本不需要锁。就根本不需要锁了。但是，当RPC系统创建goroutines来执行RPC时，你的并发性被强加于你当RPC系统创建goroutines来执行RPC处理程序时，你的并发性是被迫的，并且因为你需要在不同的goroutine中发送RPC以避免等待。你可以有效地消除这种并发，方法是确定所有的地方（RPC处理程序、你在Make()中创建的后台goroutine中创建的后台goroutines，等等），在每个goroutine的开始时获取锁，并且只释放锁。锁，并且只有在该程序完全结束并返回时才释放锁。完全结束并返回时才释放锁。这个锁协议确保没有任何重要的东西是并行执行的；锁保证了每个goroutine在任何其他goroutine被允许启动之前执行完毕。允许启动。由于没有并行执行，所以很难违反规则1、2、3或5。如果每个goroutine的代码在孤立情况下是正确的(当单独执行时，没有并发的goroutine)，那么当你使用锁时，它很可能当你使用锁来抑制并发性时，它仍然是正确的。所以你可以避免对正确性进行明确的推理，或者明确的识别关键部分。\n\n通过www.DeepL.com/Translator（免费版）翻译\n\nHowever, Rule 4 is likely to be a problem. So the next step is to findplaces where the code waits, and to add lock releases and re-acquires(and&#x2F;or goroutine creation) as needed, being careful to re-establishassumptions after each re-acquire. You may find this process easier toget right than directly identifying sequences that must be locked forcorrectness.\n(As an aside, what this approach sacrifices is any opportunity forbetter performance via parallel execution on multiple cores: your codeis likely to hold locks when it doesn’t need to, and may thusunnecessarily prohibit parallel execution of goroutines. On the otherhand, there is not much opportunity for CPU parallelism within asingle Raft peer.)\n原文\n原文\n\nRaft Locking Advice\n\nIf you are wondering how to use locks in the 6.824 Raft labs, here aresome rules and ways of thinking that might be helpful.\nRule 1: Whenever you have data that more than one goroutine uses, andat least one goroutine might modify the data, the goroutines shoulduse locks to prevent simultaneous use of the data. The Go racedetector is pretty good at detecting violations of this rule (thoughit won’t help with any of the rules below).\nRule 2: Whenever code makes a sequence of modifications to shareddata, and other goroutines might malfunction if they looked at thedata midway through the sequence, you should use a lock around thewhole sequence.\nAn example:\n  rf.mu.Lock()  rf.currentTerm +&#x3D; 1  rf.state &#x3D; Candidate  rf.mu.Unlock()\nIt would be a mistake for another goroutine to see either of theseupdates alone (i.e. the old state with the new term, or the new termwith the old state). So we need to hold the lock continuously over thewhole sequence of updates. All other code that uses rf.currentTerm orrf.state must also hold the lock, in order to ensure exclusive accessfor all uses.\nThe code between Lock() and Unlock() is often called a “criticalsection.” The locking rules a programmer chooses (e.g. “a goroutinemust hold rf.mu when using rf.currentTerm or rf.state”) are oftencalled a “locking protocol”.\nRule 3: Whenever code does a sequence of reads of shared data (orreads and writes), and would malfunction if another goroutine modifiedthe data midway through the sequence, you should use a lock around thewhole sequence.\nAn example that could occur in a Raft RPC handler:\n  rf.mu.Lock()  if args.Term &gt; rf.currentTerm {   rf.currentTerm &#x3D; args.Term  }  rf.mu.Unlock()\nThis code needs to hold the lock continuously for the whole sequence.Raft requires that currentTerm only increases, and never decreases.Another RPC handler could be executing in a separate goroutine; if itwere allowed to modify rf.currentTerm between the if statement and theupdate to rf.currentTerm, this code might end up decreasingrf.currentTerm. Hence the lock must be held continuously over thewhole sequence. In addition, every other use of currentTerm must holdthe lock, to ensure that no other goroutine modifies currentTermduring our critical section.\nReal Raft code would need to use longer critical sections than theseexamples; for example, a Raft RPC handler should probably hold thelock for the entire handler.\nRule 4: It’s usually a bad idea to hold a lock while doing anythingthat might wait: reading a Go channel, sending on a channel, waitingfor a timer, calling time.Sleep(), or sending an RPC (and waiting for thereply). One reason is that you probably want other goroutines to makeprogress during the wait. Another reason is deadlock avoidance. Imaginetwo peers sending each other RPCs while holding locks; both RPChandlers need the receiving peer’s lock; neither RPC handler can evercomplete because it needs the lock held by the waiting RPC call.\nCode that waits should first release locks. If that’s not convenient,sometimes it’s useful to create a separate goroutine to do the wait.\nRule 5: Be careful about assumptions across a drop and re-acquire of alock. One place this can arise is when avoiding waiting with locksheld. For example, this code to send vote RPCs is incorrect:\n  rf.mu.Lock()  rf.currentTerm +&#x3D; 1  rf.state &#x3D; Candidate  for  {    go func() {      rf.mu.Lock()      args.Term &#x3D; rf.currentTerm      rf.mu.Unlock()      Call(“Raft.RequestVote”, &amp;args, …)      &#x2F;&#x2F; handle the reply…    } ()  }  rf.mu.Unlock()\nThe code sends each RPC in a separate goroutine. It’s incorrectbecause args.Term may not be the same as the rf.currentTerm at whichthe surrounding code decided to become a Candidate. Lots of time maypass between when the surrounding code creates the goroutine and whenthe goroutine reads rf.currentTerm; for example, multiple terms maycome and go, and the peer may no longer be a candidate. One way to fixthis is for the created goroutine to use a copy of rf.currentTerm madewhile the outer code holds the lock. Similarly, reply-handling codeafter the Call() must re-check all relevant assumptions afterre-acquiring the lock; for example, it should check thatrf.currentTerm hasn’t changed since the decision to become acandidate.\nIt can be difficult to interpret and apply these rules. Perhaps mostpuzzling is the notion in Rules 2 and 3 of code sequences thatshouldn’t be interleaved with other goroutines’ reads or writes. Howcan one recognize such sequences? How should one decide where asequence ought to start and end?\nOne approach is to start with code that has no locks, and thinkcarefully about where one needs to add locks to attain correctness.This approach can be difficult since it requires reasoning about thecorrectness of concurrent code.\nA more pragmatic approach starts with the observation that if therewere no concurrency (no simultaneously executing goroutines), youwould not need locks at all. But you have concurrency forced on youwhen the RPC system creates goroutines to execute RPC handlers, andbecause you need to send RPCs in separate goroutines to avoid waiting.You can effectively eliminate this concurrency by identifying allplaces where goroutines start (RPC handlers, background goroutines youcreate in Make(), &amp;c), acquiring the lock at the very start of eachgoroutine, and only releasing the lock when that goroutine hascompletely finished and returns. This locking protocol ensures thatnothing significant ever executes in parallel; the locks ensure thateach goroutine executes to completion before any other goroutine isallowed to start. With no parallel execution, it’s hard to violateRules 1, 2, 3, or 5. If each goroutine’s code is correct in isolation(when executed alone, with no concurrent goroutines), it’s likely tostill be correct when you use locks to suppress concurrency. So youcan avoid explicit reasoning about correctness, or explicitlyidentifying critical sections.\nHowever, Rule 4 is likely to be a problem. So the next step is to findplaces where the code waits, and to add lock releases and re-acquires(and&#x2F;or goroutine creation) as needed, being careful to re-establishassumptions after each re-acquire. You may find this process easier toget right than directly identifying sequences that must be locked forcorrectness.\n(As an aside, what this approach sacrifices is any opportunity forbetter performance via parallel execution on multiple cores: your codeis likely to hold locks when it doesn’t need to, and may thusunnecessarily prohibit parallel execution of goroutines. On the otherhand, there is not much opportunity for CPU parallelism within asingle Raft peer.)\n","dateCreated":"2023-12-12T19:30:59+08:00","dateModified":"2023-12-12T19:30:59+08:00","datePublished":"2023-12-12T19:30:59+08:00","description":"摘要: 这是一篇mit6.824 raft所结构实验指南","headline":"MIT6.824之lab2_raft_lock_advice","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/MIT6.824/lab2b/lab2_lock_advice/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/MIT6.824/lab2b/lab2_lock_advice/"}</script>
+    <meta name="description" content="摘要: 这是一篇mit6.824 raft所结构实验指南">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="MIT6.824之lab2_raft_lock_advice">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/MIT6.824/lab2b/lab2_lock_advice/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要: 这是一篇mit6.824 raft所结构实验指南">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-12T11:30:59.015Z">
+<meta property="article:modified_time" content="2023-12-12T11:30:59.015Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-6282fdnvziozzvtprbntzupxyhc5mlkphbaevboelgvnx2vnnspamitnamq7.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            MIT6.824之lab2_raft_lock_advice
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>, <a class="category-link" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/MIT6-824/">MIT6.824</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要: 这是一篇mit6.824 raft所结构实验指南</p>
+<span id="more"></span>
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-1"><span class="toc-text">rule 1</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-2"><span class="toc-text">rule 2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-3"><span class="toc-text">rule 3</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-4"><span class="toc-text">rule 4</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rule-5"><span class="toc-text">rule 5</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8E%9F%E6%96%87"><span class="toc-text">原文</span></a></li></ol>
+
+<h1 id="rule-1"><a href="#rule-1" class="headerlink" title="rule 1"></a>rule 1</h1><p>whenever you have one more goroutine gonna modify data , you should use lock to prevent data and<br>avoid multip-goroutine change data ,go race is a good tool , that is enable to detect data race ,<br>but without any helpful on below rules</p>
+<h1 id="rule-2"><a href="#rule-2" class="headerlink" title="rule 2"></a>rule 2</h1><p>whenever your code make a sequence of modification on shared code.if they looked at the<br>data midway through the sequence,other goroutines might malfunction, you should use lock<br>to pretect code block which gonna be change and other routine read data midway, for example</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">rf.mu.Lock()
+rf.currentTerm +&#x3D; 1
+rf.state &#x3D; Candidate
+rf.mu.Unlock()</code></pre>
+
+<p>one more goroutine could not read any of above temp updates, so A goroutine should hold locking over the critical section.<br>on the other hand , if B goroutine using r.currenTerm or r.state, ,who must hold locking when access r.currenTerm at somewhere</p>
+<h1 id="rule-3"><a href="#rule-3" class="headerlink" title="rule 3"></a>rule 3</h1><p>Whenever code does a sequence of reads of shared data (or<br>reads and writes), and would malfunction if another goroutine modified<br>the data midway through the sequence, you should use a lock around the<br>whole sequence.</p>
+<p>please must take care and review the multi-goroutine change data at the same time.and must aware if another goroutine modified<br>the data midway through the sequence, you should use a lock around the whole sequence.</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">
+rf.mu.Lock()
+  if args.Term &gt; rf.currentTerm &#123;
+   rf.currentTerm &#x3D; args.Term
+  &#125;
+  rf.mu.Unlock()
+</code></pre>
+
+<h1 id="rule-4"><a href="#rule-4" class="headerlink" title="rule 4"></a>rule 4</h1><p>this rule just only apply to lab2, it announces that It’s usually a bad idea to hold a lock while doing anything that might wait: reading a Go channel, sending on a channel, waiting for a timer, calling time.Sleep(), or sending an RPC (and waiting for the<br>reply).</p>
+<h1 id="rule-5"><a href="#rule-5" class="headerlink" title="rule 5"></a>rule 5</h1><p>this rule is also apply for lab2 specifical case.<br>Be careful about assumptions across a drop and re-acquire of a<br>lock. One place this can arise is when avoiding waiting with locks<br>held.</p>
+<p>Be careful about assumptions across a drop and re-acquire of a<br>lock. One place this can arise is when avoiding waiting with locks<br>held. For example, this code to send vote RPCs is incorrect:</p>
+<pre class="language-golang" data-language="golang"><code class="language-golang">rf.mu.Lock()
+rf.currentTerm +&#x3D; 1
+rf.state &#x3D; Candidate
+for &lt;each peer&gt; &#123;
+  go func() &#123;
+    rf.mu.Lock()
+    args.Term &#x3D; rf.currentTerm
+    rf.mu.Unlock()
+    Call(&quot;Raft.RequestVote&quot;, &amp;args, ...)
+    &#x2F;&#x2F; handle the reply...
+  &#125; ()
+&#125;
+rf.mu.Unlock()</code></pre>
+
+<p>The code sends each RPC in a separate goroutine. It’s incorrect<br>because args.Term may not be the same as the rf.currentTerm at which<br>the surrounding code decided to become a Candidate. Lots of time may<br>pass between when the surrounding code creates the goroutine and when<br>the goroutine reads rf.currentTerm; for example, multiple terms may<br>come and go, and the peer may no longer be a candidate. One way to fix<br>this is for the created goroutine to use a copy of rf.currentTerm made<br>while the outer code holds the lock. Similarly, reply-handling code<br>after the Call() must re-check all relevant assumptions after<br>re-acquiring the lock; for example, it should check that<br>rf.currentTerm hasn’t changed since the decision to become a<br>candidate.</p>
+<p>It can be difficult to interpret and apply these rules. Perhaps most<br>puzzling is the notion in Rules 2 and 3 of code sequences that<br>shouldn’t be interleaved with other goroutines’ reads or writes. How<br>can one recognize such sequences? How should one decide where a<br>sequence ought to start and end?</p>
+<p>One approach is to start with code that has no locks, and think<br>carefully about where one needs to add locks to attain correctness.<br>This approach can be difficult since it requires reasoning about the<br>correctness of concurrent code.</p>
+<p>一个更务实的方法是从观察开始的，如果没有<br>没有并发性（没有同时执行的goroutine），你就根本不需要锁。<br>就根本不需要锁了。但是，当RPC系统创建goroutines来执行RPC时，你的并发性被强加于你<br>当RPC系统创建goroutines来执行RPC处理程序时，你的并发性是被迫的，并且<br>因为你需要在不同的goroutine中发送RPC以避免等待。<br>你可以有效地消除这种并发，方法是确定所有<br>的地方（RPC处理程序、你在Make()中创建的后台goroutine<br>中创建的后台goroutines，等等），在每个goroutine的开始时获取锁，并且只释放锁。<br>锁，并且只有在该程序完全结束并返回时才释放锁。<br>完全结束并返回时才释放锁。这个锁协议确保<br>没有任何重要的东西是并行执行的；锁保证了<br>每个goroutine在任何其他goroutine被允许启动之前执行完毕。<br>允许启动。由于没有并行执行，所以很难违反<br>规则1、2、3或5。如果每个goroutine的代码在孤立情况下是正确的<br>(当单独执行时，没有并发的goroutine)，那么当你使用锁时，它很可能<br>当你使用锁来抑制并发性时，它仍然是正确的。所以你<br>可以避免对正确性进行明确的推理，或者明确的<br>识别关键部分。</p>
+<blockquote>
+<p>通过<a target="_blank" rel="noopener" href="http://www.deepl.com/Translator%EF%BC%88%E5%85%8D%E8%B4%B9%E7%89%88%EF%BC%89%E7%BF%BB%E8%AF%91">www.DeepL.com/Translator（免费版）翻译</a></p>
+</blockquote>
+<p>However, Rule 4 is likely to be a problem. So the next step is to find<br>places where the code waits, and to add lock releases and re-acquires<br>(and&#x2F;or goroutine creation) as needed, being careful to re-establish<br>assumptions after each re-acquire. You may find this process easier to<br>get right than directly identifying sequences that must be locked for<br>correctness.</p>
+<p>(As an aside, what this approach sacrifices is any opportunity for<br>better performance via parallel execution on multiple cores: your code<br>is likely to hold locks when it doesn’t need to, and may thus<br>unnecessarily prohibit parallel execution of goroutines. On the other<br>hand, there is not much opportunity for CPU parallelism within a<br>single Raft peer.)</p>
+<h1 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h1><details>
+<summary>原文</summary>
+<pre>
+Raft Locking Advice
+
+<p>If you are wondering how to use locks in the 6.824 Raft labs, here are<br>some rules and ways of thinking that might be helpful.</p>
+<p>Rule 1: Whenever you have data that more than one goroutine uses, and<br>at least one goroutine might modify the data, the goroutines should<br>use locks to prevent simultaneous use of the data. The Go race<br>detector is pretty good at detecting violations of this rule (though<br>it won’t help with any of the rules below).</p>
+<p>Rule 2: Whenever code makes a sequence of modifications to shared<br>data, and other goroutines might malfunction if they looked at the<br>data midway through the sequence, you should use a lock around the<br>whole sequence.</p>
+<p>An example:</p>
+<p>  rf.mu.Lock()<br>  rf.currentTerm +&#x3D; 1<br>  rf.state &#x3D; Candidate<br>  rf.mu.Unlock()</p>
+<p>It would be a mistake for another goroutine to see either of these<br>updates alone (i.e. the old state with the new term, or the new term<br>with the old state). So we need to hold the lock continuously over the<br>whole sequence of updates. All other code that uses rf.currentTerm or<br>rf.state must also hold the lock, in order to ensure exclusive access<br>for all uses.</p>
+<p>The code between Lock() and Unlock() is often called a “critical<br>section.” The locking rules a programmer chooses (e.g. “a goroutine<br>must hold rf.mu when using rf.currentTerm or rf.state”) are often<br>called a “locking protocol”.</p>
+<p>Rule 3: Whenever code does a sequence of reads of shared data (or<br>reads and writes), and would malfunction if another goroutine modified<br>the data midway through the sequence, you should use a lock around the<br>whole sequence.</p>
+<p>An example that could occur in a Raft RPC handler:</p>
+<p>  rf.mu.Lock()<br>  if args.Term &gt; rf.currentTerm {<br>   rf.currentTerm &#x3D; args.Term<br>  }<br>  rf.mu.Unlock()</p>
+<p>This code needs to hold the lock continuously for the whole sequence.<br>Raft requires that currentTerm only increases, and never decreases.<br>Another RPC handler could be executing in a separate goroutine; if it<br>were allowed to modify rf.currentTerm between the if statement and the<br>update to rf.currentTerm, this code might end up decreasing<br>rf.currentTerm. Hence the lock must be held continuously over the<br>whole sequence. In addition, every other use of currentTerm must hold<br>the lock, to ensure that no other goroutine modifies currentTerm<br>during our critical section.</p>
+<p>Real Raft code would need to use longer critical sections than these<br>examples; for example, a Raft RPC handler should probably hold the<br>lock for the entire handler.</p>
+<p>Rule 4: It’s usually a bad idea to hold a lock while doing anything<br>that might wait: reading a Go channel, sending on a channel, waiting<br>for a timer, calling time.Sleep(), or sending an RPC (and waiting for the<br>reply). One reason is that you probably want other goroutines to make<br>progress during the wait. Another reason is deadlock avoidance. Imagine<br>two peers sending each other RPCs while holding locks; both RPC<br>handlers need the receiving peer’s lock; neither RPC handler can ever<br>complete because it needs the lock held by the waiting RPC call.</p>
+<p>Code that waits should first release locks. If that’s not convenient,<br>sometimes it’s useful to create a separate goroutine to do the wait.</p>
+<p>Rule 5: Be careful about assumptions across a drop and re-acquire of a<br>lock. One place this can arise is when avoiding waiting with locks<br>held. For example, this code to send vote RPCs is incorrect:</p>
+<p>  rf.mu.Lock()<br>  rf.currentTerm +&#x3D; 1<br>  rf.state &#x3D; Candidate<br>  for <each peer> {<br>    go func() {<br>      rf.mu.Lock()<br>      args.Term &#x3D; rf.currentTerm<br>      rf.mu.Unlock()<br>      Call(“Raft.RequestVote”, &amp;args, …)<br>      &#x2F;&#x2F; handle the reply…<br>    } ()<br>  }<br>  rf.mu.Unlock()</p>
+<p>The code sends each RPC in a separate goroutine. It’s incorrect<br>because args.Term may not be the same as the rf.currentTerm at which<br>the surrounding code decided to become a Candidate. Lots of time may<br>pass between when the surrounding code creates the goroutine and when<br>the goroutine reads rf.currentTerm; for example, multiple terms may<br>come and go, and the peer may no longer be a candidate. One way to fix<br>this is for the created goroutine to use a copy of rf.currentTerm made<br>while the outer code holds the lock. Similarly, reply-handling code<br>after the Call() must re-check all relevant assumptions after<br>re-acquiring the lock; for example, it should check that<br>rf.currentTerm hasn’t changed since the decision to become a<br>candidate.</p>
+<p>It can be difficult to interpret and apply these rules. Perhaps most<br>puzzling is the notion in Rules 2 and 3 of code sequences that<br>shouldn’t be interleaved with other goroutines’ reads or writes. How<br>can one recognize such sequences? How should one decide where a<br>sequence ought to start and end?</p>
+<p>One approach is to start with code that has no locks, and think<br>carefully about where one needs to add locks to attain correctness.<br>This approach can be difficult since it requires reasoning about the<br>correctness of concurrent code.</p>
+<p>A more pragmatic approach starts with the observation that if there<br>were no concurrency (no simultaneously executing goroutines), you<br>would not need locks at all. But you have concurrency forced on you<br>when the RPC system creates goroutines to execute RPC handlers, and<br>because you need to send RPCs in separate goroutines to avoid waiting.<br>You can effectively eliminate this concurrency by identifying all<br>places where goroutines start (RPC handlers, background goroutines you<br>create in Make(), &amp;c), acquiring the lock at the very start of each<br>goroutine, and only releasing the lock when that goroutine has<br>completely finished and returns. This locking protocol ensures that<br>nothing significant ever executes in parallel; the locks ensure that<br>each goroutine executes to completion before any other goroutine is<br>allowed to start. With no parallel execution, it’s hard to violate<br>Rules 1, 2, 3, or 5. If each goroutine’s code is correct in isolation<br>(when executed alone, with no concurrent goroutines), it’s likely to<br>still be correct when you use locks to suppress concurrency. So you<br>can avoid explicit reasoning about correctness, or explicitly<br>identifying critical sections.</p>
+<p>However, Rule 4 is likely to be a problem. So the next step is to find<br>places where the code waits, and to add lock releases and re-acquires<br>(and&#x2F;or goroutine creation) as needed, being careful to re-establish<br>assumptions after each re-acquire. You may find this process easier to<br>get right than directly identifying sequences that must be locked for<br>correctness.</p>
+<p>(As an aside, what this approach sacrifices is any opportunity for<br>better performance via parallel execution on multiple cores: your code<br>is likely to hold locks when it doesn’t need to, and may thus<br>unnecessarily prohibit parallel execution of goroutines. On the other<br>hand, there is not much opportunity for CPU parallelism within a<br>single Raft peer.)<br></pre></p>
+</details>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/cpp/C++_Primer/"
+                    data-tooltip="C++ Primer Plus"
+                    aria-label="PREVIOUS: C++ Primer Plus"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT6.824/lab2b/lab2_raft_paper/"
+                    data-tooltip="raft paper (extend)"
+                    aria-label="NEXT: raft paper (extend)"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT6.824/lab2b/lab2_lock_advice/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/cpp/C++_Primer/"
+                    data-tooltip="C++ Primer Plus"
+                    aria-label="PREVIOUS: C++ Primer Plus"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT6.824/lab2b/lab2_raft_paper/"
+                    data-tooltip="raft paper (extend)"
+                    aria-label="NEXT: raft paper (extend)"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT6.824/lab2b/lab2_lock_advice/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT6.824/lab2b/lab2_lock_advice/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-2mrdgre6o8oumjyqh1gawnnqlakhnetes6k3qnahlvgvfzutbbznavmu0avb.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/MIT6.824/lab2b/lab2_lock_advice/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

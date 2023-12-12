@@ -1,0 +1,860 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>react快速上手开发 - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要：这本书讲的太和宽泛了，没有完整和详细的例子做支撑，学起来，尤其是自己二次加工时候会很吃力\n\n\n\nhello worldReact.DOM 对象是React框架帮我们初始化了浏览器的DOM对象。借由react框架我们可以操作各种html元素，可以通过 React.DOM 对象把各种各样的 HTML 元素当作 React 组件使用。在例子中我们看到React.DOM.h1()函数的第一次参数是可以传入html元素的属性\n      ReactDOM.render(\n        React.DOM.h1(\n          &#123;\n            style: &#123;\n              background: \"black\",\n              color: \"white\",\n              fontFamily: \"Verdana\",\n            &#125;,\n            className: \"pretty\",\n            htmlFor: \"me\",\n          &#125;,\n\n          \"Hello world!\"\n        ),      \n        \n        document.getElementById('app')\n      );\n\nbrowser:\n&lt;h1 data-reactroot=\"\" class=\"pretty\" for=\"me\" style=\"background: black; color: white; font-family: Verdana;\">Hello world!&lt;/h1>\n\n组件的声明周期\n自定义组件我们要实现render方法\nvar Component = React.createClass(&#123;\n  render: function() &#123;\n    return React.DOM.span(null, \"My name is \");\n  &#125;\n&#125;);\n\n然后我们在应用中使用自定义组件\nReactDOM.render(\n React.createElement(Component), \n document.getElementById(\"app\") \n);\n\n属性 this.props属性props属性可以获得所有的属性，请把 this.props 视作只读属性。从父组件传递配置到子组件时，属性非常重要。\n      var Component = React.createClass(&#123;\n        render: function() &#123;\n          return React.DOM.span(null, \"My name is \" + this.props.name);\n        &#125;\n      &#125;);\n&lt;!-- 在应用中使用 -->\n\nReactDOM.render( \n    React.createElement(Component, &#123; \n        name: \"Bob\", \n        &#125;), \n    document.getElementById(\"app\") \n);\n\npropTypes优点：\n\n通过预先声明组件期望接收的参数，让使用组件的用户不需要在 render() 方法的源代码中到处寻找该组件可配置的属性\nReact 会在运行时验证属性值的有效性。这使得你可以放心编写 render() 函数，而不需要对组件接收的数据类型有所顾虑\n\n\n\n&lt;script>\n  var Component = React.createClass(&#123;\n    propTypes: &#123;\n      name: React.PropTypes.string.isRequired,\n    &#125;,\n    render: function() &#123;\n      return React.DOM.span(null, \"My name is \" + this.props.name);\n    &#125;\n  &#125;);\n  ReactDOM.render(\n    React.createElement(Component, &#123;\n      name: \"Bob\",\n      // name: 123,\n    &#125;),\n    document.getElementById(\"app\")\n  );\n&lt;/script>\n默认值，如果我们不小心提供属性的情况，还要保证正确运行，这样难免会导致一些防御性代码\n&lt;script>\n     var TextAreaCounter = React.createClass(&#123;\n\n       propTypes: &#123;\n         text: React.PropTypes.string,\n       &#125;,\n       \n       getDefaultProps: function() &#123;\n         return &#123;\n           text: '',\n         &#125;;\n       &#125;,\n\n       render: function() &#123;\n         return React.DOM.div(null,\n           React.DOM.textarea(&#123;\n             defaultValue: this.props.text,\n           &#125;),\n           React.DOM.h3(null, this.props.text.length)\n         );\n       &#125;\n     &#125;);\n\n     ReactDOM.render(\n       React.createElement(TextAreaCounter, &#123;\n         text: \"Bob\",\n       &#125;),\n       document.getElementById(\"app\")\n     );\n   &lt;/script>\n\n\nstate与带状态的文本框组件\n\n&lt;script>\n    var TextAreaCounter = React.createClass(&#123;\n\n      propTypes: &#123;\n        text: React.PropTypes.string,\n      &#125;,\n\n      getDefaultProps: function() &#123;\n        return &#123;\n          text: '',\n        &#125;;\n      &#125;,\n\n      getInitialState: function() &#123;\n        return &#123;\n          text: this.props.text,\n        &#125;;\n      &#125;,\n\n      _textChange: function(ev) &#123;\n        this.setState(&#123;\n          text: ev.target.value,\n        &#125;);\n      &#125;,\n\n      render: function() &#123;\n        return React.DOM.div(null,\n          React.DOM.textarea(&#123;\n            value: this.state.text,\n            onChange: this._textChange,\n          &#125;),\n          React.DOM.h3(null, this.state.text.length)\n        );\n      &#125;\n    &#125;);\n\n    ReactDOM.render(\n      React.createElement(TextAreaCounter, &#123;\n        text: \"Bob\",\n      &#125;),\n      document.getElementById(\"app\")\n    );\n  &lt;/script>\n\n\n\n关于DOM事件的说明\n\n传统的事件处理\n\nReact合成事件\n\nprops和state当你知道render()方法中显示组件的时候，可以访问this.props和this.state ，属性是一种给外部世界设置组件的机制，而状态则负责组建内部数据的维护，如果与面向对象编程进行类比的话，this.props就像是传递给类构造函数的参数，而this.state则包含了你的私有属性\n\n在初始化state时候使用props:一种反模式在 render() 方法中将 this.state 和 this.props 任意组合，以进行界面构建。但有时候，你想要传递一个值到组件中，用于构造初始状态。这种想法本身没什么不对，但如果组件的调用者以为属性（在之前的例子中是 text 属性）总是能保持最新，这种写法就有歧义了。\n\n从外部访问组件\n\n\n","dateCreated":"2023-12-12T19:30:59+08:00","dateModified":"2023-12-12T19:30:59+08:00","datePublished":"2023-12-12T19:30:59+08:00","description":"摘要：这本书讲的太和宽泛了，没有完整和详细的例子做支撑，学起来，尤其是自己二次加工时候会很吃力","headline":"react快速上手开发","image":[null,"https://user-images.githubusercontent.com/46363359/209441599-8240edd3-c8b8-437e-93df-ef48502cb631.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/web/react/react_quicker/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/web/react/react_quicker/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/209441599-8240edd3-c8b8-437e-93df-ef48502cb631.jpg"}</script>
+    <meta name="description" content="摘要：这本书讲的太和宽泛了，没有完整和详细的例子做支撑，学起来，尤其是自己二次加工时候会很吃力">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="react快速上手开发">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/web/react/react_quicker/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要：这本书讲的太和宽泛了，没有完整和详细的例子做支撑，学起来，尤其是自己二次加工时候会很吃力">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:modified_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/209441599-8240edd3-c8b8-437e-93df-ef48502cb631.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/209441599-8240edd3-c8b8-437e-93df-ef48502cb631.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-6282fdnvziozzvtprbntzupxyhc5mlkphbaevboelgvnx2vnnspamitnamq7.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/209441599-8240edd3-c8b8-437e-93df-ef48502cb631.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            react快速上手开发
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/js/">js</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要：这本书讲的太和宽泛了，没有完整和详细的例子做支撑，学起来，尤其是自己二次加工时候会很吃力</p>
+<span id="more"></span>
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#hello-world"><span class="toc-text">hello world</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%84%E4%BB%B6%E7%9A%84%E5%A3%B0%E6%98%8E%E5%91%A8%E6%9C%9F"><span class="toc-text">组件的声明周期</span></a></li></ol>
+
+<h2 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h2><p>React.DOM 对象是React框架帮我们初始化了浏览器的DOM对象。借由react框架我们可以操作各种html元素，可以通过 React.DOM 对象把各种各样的 HTML 元素当作 React 组件使用。在例子中我们看到React.DOM.h1()函数的第一次参数是可以传入html元素的属性</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">      ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+        React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">h1</span><span class="token punctuation">(</span>
+          <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">style</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+              <span class="token literal-property property">background</span><span class="token operator">:</span> <span class="token string">"black"</span><span class="token punctuation">,</span>
+              <span class="token literal-property property">color</span><span class="token operator">:</span> <span class="token string">"white"</span><span class="token punctuation">,</span>
+              <span class="token literal-property property">fontFamily</span><span class="token operator">:</span> <span class="token string">"Verdana"</span><span class="token punctuation">,</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">className</span><span class="token operator">:</span> <span class="token string">"pretty"</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">htmlFor</span><span class="token operator">:</span> <span class="token string">"me"</span><span class="token punctuation">,</span>
+          <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+          <span class="token string">"Hello world!"</span>
+        <span class="token punctuation">)</span><span class="token punctuation">,</span>      
+        
+        document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span>
+      <span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token literal-property property">browser</span><span class="token operator">:</span>
+<span class="token operator">&lt;</span>h1 data<span class="token operator">-</span>reactroot<span class="token operator">=</span><span class="token string">""</span> <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"pretty"</span> <span class="token keyword">for</span><span class="token operator">=</span><span class="token string">"me"</span> style<span class="token operator">=</span><span class="token string">"background: black; color: white; font-family: Verdana;"</span><span class="token operator">></span>Hello world<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">></span></code></pre>
+
+<h2 id="组件的声明周期"><a href="#组件的声明周期" class="headerlink" title="组件的声明周期"></a>组件的声明周期</h2><ol>
+<li><p>自定义组件<br>我们要实现render方法</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">var</span> Component <span class="token operator">=</span> React<span class="token punctuation">.</span><span class="token function">createClass</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+  <span class="token function-variable function">render</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">span</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token string">"My name is "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>然后我们在应用中使用自定义组件</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+ React<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span>Component<span class="token punctuation">)</span><span class="token punctuation">,</span> 
+ document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"app"</span><span class="token punctuation">)</span> 
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+</li>
+<li><p>属性 this.props属性<br>props属性可以获得所有的属性，请把 this.props 视作只读属性。从父组件传递配置到子组件时，属性非常重<br>要。</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">      <span class="token keyword">var</span> Component <span class="token operator">=</span> React<span class="token punctuation">.</span><span class="token function">createClass</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+        <span class="token function-variable function">render</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+          <span class="token keyword">return</span> React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">span</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token string">"My name is "</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> 在应用中使用 <span class="token operator">--</span><span class="token operator">></span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span> 
+    React<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span>Component<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> 
+        <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">"Bob"</span><span class="token punctuation">,</span> 
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
+    document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"app"</span><span class="token punctuation">)</span> 
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+</li>
+<li><p>propTypes<br>优点：</p>
+<ol>
+<li>通过预先声明组件期望接收的参数，让使用组件的用户不需要在 render() 方法的源代码中到处寻找该组件可配置的属性</li>
+<li>React 会在运行时验证属性值的有效性。这使得你可以放心编写 render() 函数，而不需要对组件接收的数据类型有所顾虑</li>
+</ol>
+</li>
+</ol>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>script<span class="token operator">></span>
+  <span class="token keyword">var</span> Component <span class="token operator">=</span> React<span class="token punctuation">.</span><span class="token function">createClass</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">propTypes</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">name</span><span class="token operator">:</span> React<span class="token punctuation">.</span>PropTypes<span class="token punctuation">.</span>string<span class="token punctuation">.</span>isRequired<span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token function-variable function">render</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">return</span> React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">span</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token string">"My name is "</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+    React<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span>Component<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">"Bob"</span><span class="token punctuation">,</span>
+      <span class="token comment">// name: 123,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"app"</span><span class="token punctuation">)</span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span></code></pre>
+<p>默认值，如果我们不小心提供属性的情况，还要保证正确运行，这样难免会导致一些防御性代码</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>script<span class="token operator">></span>
+     <span class="token keyword">var</span> TextAreaCounter <span class="token operator">=</span> React<span class="token punctuation">.</span><span class="token function">createClass</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+
+       <span class="token literal-property property">propTypes</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+         <span class="token literal-property property">text</span><span class="token operator">:</span> React<span class="token punctuation">.</span>PropTypes<span class="token punctuation">.</span>string<span class="token punctuation">,</span>
+       <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+       
+       <span class="token function-variable function">getDefaultProps</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+         <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+           <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+         <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+       <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+       <span class="token function-variable function">render</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+         <span class="token keyword">return</span> React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">div</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span>
+           React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">textarea</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+             <span class="token literal-property property">defaultValue</span><span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>text<span class="token punctuation">,</span>
+           <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+           React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">h3</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>text<span class="token punctuation">.</span>length<span class="token punctuation">)</span>
+         <span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token punctuation">&#125;</span>
+     <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+     ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+       React<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span>TextAreaCounter<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+         <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">"Bob"</span><span class="token punctuation">,</span>
+       <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+       document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"app"</span><span class="token punctuation">)</span>
+     <span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span></code></pre>
+
+<ol start="4">
+<li>state与带状态的文本框组件</li>
+</ol>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>script<span class="token operator">></span>
+    <span class="token keyword">var</span> TextAreaCounter <span class="token operator">=</span> React<span class="token punctuation">.</span><span class="token function">createClass</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+
+      <span class="token literal-property property">propTypes</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">text</span><span class="token operator">:</span> React<span class="token punctuation">.</span>PropTypes<span class="token punctuation">.</span>string<span class="token punctuation">,</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+      <span class="token function-variable function">getDefaultProps</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+          <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+      <span class="token function-variable function">getInitialState</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+          <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>text<span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+      <span class="token function-variable function">_textChange</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">ev</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+          <span class="token literal-property property">text</span><span class="token operator">:</span> ev<span class="token punctuation">.</span>target<span class="token punctuation">.</span>value<span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+      <span class="token function-variable function">render</span><span class="token operator">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">div</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span>
+          React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">textarea</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">value</span><span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>text<span class="token punctuation">,</span>
+            <span class="token literal-property property">onChange</span><span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_textChange<span class="token punctuation">,</span>
+          <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+          React<span class="token punctuation">.</span><span class="token constant">DOM</span><span class="token punctuation">.</span><span class="token function">h3</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>text<span class="token punctuation">.</span>length<span class="token punctuation">)</span>
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+      React<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span>TextAreaCounter<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">"Bob"</span><span class="token punctuation">,</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"app"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span></code></pre>
+
+
+<ol start="5">
+<li><p>关于DOM事件的说明</p>
+</li>
+<li><p>传统的事件处理</p>
+</li>
+<li><p>React合成事件</p>
+</li>
+<li><p>props和state<br>当你知道render()方法中显示组件的时候，可以访问this.props和this.state ，属性是一种给外部世界设置组件的机制，而状态则负责组建内部数据的维护，如果与面向对象编程进行类比的话，this.props就像是传递给类构造函数的参数，而this.state则包含了你的<code>私有属性</code></p>
+</li>
+<li><p>在初始化state时候使用props:一种反模式<br>在 render() 方法中将 this.state 和 this.props 任意组合，以进行界面构建。但有时候，你想要传递一个值到组件中，用于构造初始状态。这种想法本身没什么不对，但如果组件的调用者以为属性（在之前的例子中是 text 属性）总是能保持最新，这种写法就有歧义了。</p>
+</li>
+<li><p>从外部访问组件</p>
+</li>
+</ol>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/react/fullstack_react/"
+                    data-tooltip="React全家桶 前端开发与实例详解"
+                    aria-label="PREVIOUS: React全家桶 前端开发与实例详解"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"
+                    data-tooltip="html权威指南"
+                    aria-label="NEXT: html权威指南"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/react/react_quicker/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/react/fullstack_react/"
+                    data-tooltip="React全家桶 前端开发与实例详解"
+                    aria-label="PREVIOUS: React全家桶 前端开发与实例详解"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"
+                    data-tooltip="html权威指南"
+                    aria-label="NEXT: html权威指南"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/react/react_quicker/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/react/react_quicker/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-2mrdgre6o8oumjyqh1gawnnqlakhnetes6k3qnahlvgvfzutbbznavmu0avb.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/web/react/react_quicker/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

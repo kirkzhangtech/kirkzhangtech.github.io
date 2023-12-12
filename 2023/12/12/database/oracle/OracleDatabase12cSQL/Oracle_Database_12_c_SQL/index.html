@@ -1,0 +1,1021 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Oracle Database 12c SQL - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"作者寄语:This book is dedicated to my family.Even though you’re far away, you are still in my heart.\nAbout the Author: Jason Price is a freelance consultant and former product manager of Oracle Corporation. He has contributed to many of Oracle’s products\n\n\n10 User Priviledges and Roles\ncreate users\nSee how privileges enable users to access data and perform database tasks\nExplore the two types of privileges: system privileges and object privileges\nLearn how system privileges enable actions such as executing DDL statements\nSee how object privileges enable actions such as executing DML statements\nGroup privileges together into roles\nAudit the execution of SQL statements\n\ntablespace Tablespaces are stored in datafiles , which are files stored in the file system of a database server. A datafile stores data for one tablespace The Oracle database software creates a datafile for a tablespace by allocating the specified amount of disk space plus the overhead for a file header ,including tables , types ,PLSQL code\n10.1 User10.1.1 Create a UserCREATE USER user_name IDENTIFIED BY password\n[ DEFAULT TABLESPACE default_tablespace ]\n[ TEMPOARY TABLESPACE tempoary_tablespace ];\nuser_name is name of database userpassword is the password for the database userdefault_tablespace If you omit a default tablespace, the default SYSTEM tablespace, which always exists in a database, is usedtempoary_tablespace include temporary tables If you omit a temporary tablespace, the default SYSTEM tablespace is usedso the example as below\nCREATE USER jason IDENTIFIED by price\nand grant user basic privileges like create session\ngrant create session to jason;\nhere have so many extend privileges\n10.1.2 change passwordALTER USER jason IDENTIFIED BY marcus\n---or another way\nCONNECT jason&#x2F;marcus PASSWORD\n\n10.1.3 delete userdrop user jason\n\n10.2 System privileges\nfor all the reference ,please refer oracle published manual\n10.2.1 grant system privileges to a userconnect system&#x2F;oracle\nGRANT CREATE SEESON,CREATE USER,CREATE TABLE to steve\nYou can also use WITH ADMIN OPTION to allow a user to grant a privilege to another user.\ngrant execute any procedure to steve wth admin option\nEXECUTE ANY PROCEDURE can then be granted to another user by steve .The following example connects as steve and grants EXECUTE ANY PROCEDURE to gail :\nconnect steve&#x2F;brown\ngrant execute any procedure to gail\nYou can grant a privilege to all users by granting to PUBLIC\nconnect system&#x2F;oracle\ngrant execute any procedure to public\n\n10.2.2 Checking System Privileges Granted to a Userdata dictionary stores information about the database itself.\ntable user_sys_privs stores current user privileges that it has\n\nusername indicates current user,\nprivileges indicates that user owned privileges,\nadmin_optionindicate whether the user is able to grant privileges to another user.if steve had create user privileges , so he could create user. connect steve&#x2F;brown\ncreate user roy IDENTIFIED by red;\n\n10.2.3 Revoking System Privileges from a Useryou could also revoke user privileges bby below sql.\nconnect system&#x2F;oracle\nrevoke create table from steve\nif you want revoke user execute procedure\nrevoke execute any procedure fron steve\n\n10.3 Object Privileges\n10.3.1  Granting Object Privileges to a Userconnect store&#x2F;store_password\ngrant select , insert , update on store.products to steve\nor narrow table privileges for certainly columns.\ngrant update (last_name,salary) on store.employees to steve\n\nnote: You use the GRANT option to allow a user to grant an object privilege to another user, and you use the ADMIN option to allow a user to grant a system privilege to another user.\ngrant select on store.customers to steve with grant option;\n\nconnect as steve to grant privileges to gail\nconnect steve&#x2F;brown\ngrant select on store.customers to gail;\n10.3.2  check object privileges madetable user_tab_privs_mad could get all object privileges made\nselect * from user_tab_privs_mad where table_name &#x3D; &#39;products&#39;\nYou can check which column object privileges a user has made by queryinguser_col_privs_made\nYou can check which object privileges on a table a user has received byquerying the user_tab_privs_recd table\n\nYou can check which column object privileges a user has received byquerying user_col_privs_recd \n\nwhen we got corresponding privileges you can do statement by below with schema ahead of table name\nDBA_SYS_PRIVS:      查询某个用户所拥有的系统权限\n\nUSER_SYS_PRIVS:     当前用户所拥有的系统权限\n\nSESSION_PRIVS:      当前用户所拥有的全部权限\n\nROLE_SYS_PRIVS:     某个角色所拥有的系统权限  \n\n注意: 要以SYS用户登陆查询这个视图,否则返回空.\n\nROLE_ROLE_PRIVS:    当前角色被赋予的角色\n\nSESSION_ROLES:      当前用户被激活的角色\n\nUSER_ROLE_PRIVS:    当前用户被授予的角色\n\n另外还有针对表的访问权限的视图:\n\nTABLE_PRIVILEGES\n\nALL_TAB_PRIVS   \n\nROLE_TAB_PRIVS:     某个角色被赋予的相关表的权限\n-----------------------------------\n©著作权归作者所有：来自51CTO博客作者day_day_up_cium的原创作品，请联系作者获取转载授权，否则将追究法律责任\nOracle中用户角色权限管理\nhttps:&#x2F;&#x2F;blog.51cto.com&#x2F;lwc0329&#x2F;3000521\n10.3.3 creating synonymsacross schemas you want query data , then you could use synonym to connect schema.\n--1. \nconnect system&#x2F;oracle\ngrant create synonym to steve\n--2.\nconnect steve&#x2F;brown\ncreate synonym customers for store.customers\n--3. login user steve\nselect * from customer\n\n10.3.4 Creating Public SynonymsYou can also create a public synonym for a table. When you do this, all the users see the synonym. this is key \nconnect system&#x2F;oracle\ngrant create public synonym to store\nconnect store&#x2F;store_possword\ngrant public synonym products for store.products;\n-- now you can connect as steve and retrive rows from store.products\nconnect steve\nselect * from products;\n\n\n\n\nthere is another question need to be claimed,even you had created public synonym , but you still need to grant privileges. for example\n-- gail can see store public synonym ,but jail do not have objects privileges on &#96;store.products&#96; table\nconnect gail\ngrant select to store\nconnect system&#x2F;oracle\ngrant create public synonym to store\nconnect store&#x2F;store_possword\ngrant public synonym products for store.products;\n-- now you can connect as steve and retrive rows from store.products\nconnect gail\nselect * from products;\n\nIf a user has other object privileges, that user can exercise those object privileges through a synonym. For example, if gail had the INSERT object privilege on the store.products table, then gail would be able to add a row to store.products through the products synonym.\n10.3.5 revoke object privilegesrevoke store.products INSERT privileges\nconnect store&#x2F;store_password\nrevoke insert on products from steve;\nrevoke somebody select privileges for some one of schema \nconnect store&#x2F;store_password\nrevoke select on store.customers from steve;\n\n10.4 RolesA role is a group of privileges that you can assign to a user or to another role.The following points summarize the benefits of roles:\n\nRather than assigning privileges one at a time directly to a user, you can create a role, assign privileges to that role, and then grant that role to multiple users and roles.\nWhen you add or delete a privilege from a role, all users and roles assigned that role automatically receive or lose that privileg\nYou can assign multiple roles to a user or role\nYou can assign a password to a role.\n\n10.4.1 create rolesbaisc , if you want create role , also you need get right, more like below\nconnect system&#x2F;oracle\ngrant create role to store\ngrant create user to store with admin option\n--login user store\n\nconnect store&#x2F;store_password\ngrant create role product_manager;\ngrant create role hr_manager;\ngrant create role overall_manager IDENTIFIED by manager_password;\n\n10.4.2 grant privileges to rolessystem -&gt; role\n            |\nobject -&gt; role -&gt; role\n\ngrant select ,insert,update,delete on product_types to product_manager;\ngrant select ,insert,update,delete on products to product_manager;\ngrant select ,insert,update,delete on salary_grades to hr_manager;\ngrant select ,insert,update,delete on employees to hr_manager;\ngrant create,user to hr_manager;\ngrant product_manager,hr_manager to overall_manager;\n\n\n10.4.3 Granting Roles to a Usergeneral procedure to create user and assign right\nconnect system&#x2F;oracle\ngrant user john IDENTIFIED by brown;\ngrant user harry IDENTIFIED by blue;\ngrant create session to john;\ngrant create session to harry;\nnow you can use current good way \n\ngrant hr_manager to john;\ngrant overall_manager to harry;\n\n10.4.4 Checking Roles Granted to a Usertable user_role_privs is the key\n\nThis role is password protected. Before the user can use the role, the user must enter the role password.\n10.4.5 Checking System Privileges Granted to a Roletable role_sys_privs is the key \n\n10.4.6 Checking Object Privileges Granted to a Roletable role_tab_privs is the key\n\n10.4.7 Making Use of Privileges Granted to a RoleFor a non-password-protected role, the user can immediately use the privileges assigned to the role when they connect to the database\nconnect john&#x2F;brown\nselect employee_id , last_name from store.amployees where salary&lt;any ( select low_salary from store_grades order by employee_id)\n\nFor example, the harry user has the password-protected overall_manager role. Before harry is able to use the overall_manager role, he must enable the role and provide the role password using the SET ROLE command\nconnect harry&#x2F;blue\nset role overall_manager IDENTIFIED by manager_password;\n\nThen, harry can use the privileges granted to the role. For example:\n10.4.8 Enabling and Disabling Rolesconnect system&#x2F;oracle\n-- disable\nalter user john default role all except hr_manager;\n--enable\nset role hr_manager;\n-- set default role\nconnect system&#x2F;oracle\nalter user john default role hr_manager;\n-- set none for role\nconnect john&#x2F;brown\nset role NONE;\n-- sets the role to all roles except hr_manager\nset role all except hr_manager;\n10.4.9 Revoking a Role and Privileges and drop a role-- Revoking a Role\nconnect store&#x2F;store_password\nrevoke overall_manager from harry;\n-- revoke Privileges\nconnect store&#x2F;store_password\nrevoke all on products from product_manager;\nrevoke all on product_types from product_manager;\n-- drop role\nconnect store&#x2F;store_password\ndrop role overall_manager;\ndrop role product_manager;\ndrop role hr_manager;\n\n12.Creating Tables, Sequences, Indexes, and ViewsIn this chapter, you will learn how to perform the following tasks:\n\nCreate,modify, and drop tables\nCreate and use sequences, which generate a series of numbers\nCreate and use indexes,which can improve the performance of queries\nCreate and use views, which are predefined(adj.[计]预先定义的) queries\nExamine flashback data archives,which store row changes made over a period of time\n\n12.1 Tablespurpose: In this section,you’ll learn about creating a table. You’ll see how to modify and drop a table as well as how to retrieve information about a table from the data dictionary. The data dictionary contains information about all the database items such as tables sequences, indexes, and so on.\n12.1.1 Creating a TableCREATE [GLOBALTEMPORARY] TABLE table_name (\n    column_name     type [CONSTRAINT constraint_def DEFAULT default_exp]\n    [, column_name  type [CONSTRAINT constraint_def DEFAULT default_exp] ...] )\n\n    [ON COMMIT &#123; DELETE | PRESERVE&#125; ROWS ]\nTABLESPACE tab_space;\n\n\nGLOBAL TEMPORARY specifies that the table’s rows are temporary (this type of table is known as a temporary table). The rows in a temporary table are specific to a user session, and how long the rows persist is set using the ON COMMIT clause.\ntable name is the name of the table.\ncolumn name is the name of a column.\ntype is the type of a column.\nconstraint_def is a constraint on a column.\nON COMMIT controls the duration of the rows in a temporary table. DELETE specifies that the rows are deleted at the end of a transaction. PRESERVE specifies that the rows are kept until the end of a user session,at which point the rows are deleted. If you omit ON COMMIT for a temporary table, then the default of DELETE is used.\ntab_space is the tablespace for the table. If you omit a tablespace,then the table is stored in the user’s default tablespace.\n\nor using another clause\nCONNECT store&#x2F;store_password CREATE TABLE order_status2(\n    id INTEGER CONSTRAINT order_statue2_pk PRIMARY KEY,\n    status VARCHAR2(10),\n    last_modified DATE DEFAULT SYSDATE\n) ;\n\ncreating a temporary table:\nCREATE GLORAL TEMPORARY TABLE order_status_temp (\nid INTBGER,\nstatus VARCHAR2(10) ,\nlast_modified DATE DEPAULT SYSDATE\nON COMMIT PRESERVE ROWS;\n\ntemporary table performs the following tasks:\n\nAdds a row to order_status_temp\nDisconnects from the database to end the session row in order_status_temp to be deleted\nReconnects as store account and queries order_status_temp , which shows there are no rows in this table\n\n12.1.2 Getting Information on Tables\nRunning a DESCRIBE command for the table(desc table_name)\nQuerying the user_tables view, which forms part of the data dictionary\n\n# Some Columns in the `user_tables` View\nColumn              lype                Description\ntable_name          VARCHAR2 (128)      Name of the table.\ntablespace_name     VARCHAR2(30)        Name of the tablespace in which the table isstored.A tablespace is an area used by thedatabase to store objects such as tables.\ntemporary           VARCHAR2(1)         Whether the table is temporary. This is set toY if temporary or N if not temporary.\n\nselect * from user_tables会查到相关用户的信息\nNotice: the order_status_temp table is temporary, as indicated by the Y in the last column.You can retrieve information on all the tables you have access to by querying the all_tables view\n12.1.3 Getting Information on Columns in TablesYou can retrieve information about the columns in a table from the user_tab_columns view. Table 11-2 describes some of the columns in user_tab_columns\nColumn              Type                Description\ntable_name          VARCHAR2(128)       Name of the table\ncolumn_name         VARCHAR2(128)       Name of the column\ndata_type           VARCHAR2 (128)      Data type of the column\ndata_length         NUMBER              Length of the data\ndata _precision     NUMBER              Precision of a numeric columnif a precision was specified\ndata_scale          NUMBER              Scale of a numeric column\n\nThe following example queries user_tab_columns for the products table:\nCOLUMN colunn_nane FORMAT a15\nCOLUMN data_type FORMAT a10\nSELECT column_name, data_type, data_length,data_precision,data_s FROM uaer_tab_columns WHERE table_name &#x3D; &#39;PRODUCTs&#39;;\nCOLUMN_NAME     DATA_TYPE       DATA_LENGTH     DATA_PRECISION      DATA_SCALE\nPRODUcTID       NUMBER          22                                  0\nPRODUCT_TYPEID  NUMBER          22                                  0\nNAME            VARCHAR2        30\nDESCRIPTION     VARCHAR2        50\nPRICE           NUMEER          22              5                   2\nnote:You can retrieve information on all the columns in tables you have access to by querying the all_tab_columns view\n12.1.4 Altering a TableYou alter a table using the ALTER TABLE statement. You can use ALTER TABLEto perform tasks such as the following:\n\nAdding, modifying, or dropping a column\nAdding or dropping a constraint\nEnabling or disabling a constraint\n\nIn the following sections, you’ll learn how to use ALTER TABLE to perform each of these tasks. You’ll also learn how to obtain information about constraints.\nAdding a ColumnThe following example uses ALTER TABLE to add an INTEGER column named modified by to the order_status2 table:\nalter table order_status2\nadd modified_by INTEGER\nThe next example adds a column named initially_created to order_status2 :\nalter table order_status2\nadd initially_created date default sysdate not null;\nYou can verify the addition of the new column by running a DESCRIBE command on order_status2 :\ndescribe order_status2;\n\n\nAdding a Virtual ColumnOracle Database 11g introduced virtual columns. A virtual column is a column that refers only to other columns already in the table. For example,the following ALTER TABLE statement adds a virtual column named average_salary to the salary_grades table:\nalter table salary_grades add (average_salary as ( (low_salary + high_salary)&#x2F;2 ));\n\n","dateCreated":"2023-12-12T19:30:59+08:00","dateModified":"2023-12-12T19:30:59+08:00","datePublished":"2023-12-12T19:30:59+08:00","description":"作者寄语:This book is dedicated to my family.Even though you’re far away, you are still in my heart.\nAbout the Author: Jason Price is a freelance consultant and former product manager of Oracle Corporation. He has contributed to many of Oracle’s products","headline":"Oracle Database 12c SQL","image":[null,"https://user-images.githubusercontent.com/46363359/201714685-eb48eab8-93a3-4c3f-8d8c-0a0587c735c9.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/201714685-eb48eab8-93a3-4c3f-8d8c-0a0587c735c9.jpg"}</script>
+    <meta name="description" content="作者寄语:This book is dedicated to my family.Even though you’re far away, you are still in my heart. About the Author: Jason Price is a freelance consultant and former product manager of Oracle Corporatio">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Oracle Database 12c SQL">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="作者寄语:This book is dedicated to my family.Even though you’re far away, you are still in my heart. About the Author: Jason Price is a freelance consultant and former product manager of Oracle Corporatio">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/OracleDatabase12cSQL/10-1.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/OracleDatabase12cSQL/10-6.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/OracleDatabase12cSQL/10-2.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/OracleDatabase12cSQL/10-3.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/OracleDatabase12cSQL/10-4.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/OracleDatabase12cSQL/10-5.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/10-7.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/10-8.jpg">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/10-9.jpg">
+<meta property="article:published_time" content="2023-12-12T11:30:59.015Z">
+<meta property="article:modified_time" content="2023-12-12T11:30:59.015Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kirk-zhang58.github.io/img/OracleDatabase12cSQL/10-1.jpg">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/201714685-eb48eab8-93a3-4c3f-8d8c-0a0587c735c9.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/201714685-eb48eab8-93a3-4c3f-8d8c-0a0587c735c9.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-6282fdnvziozzvtprbntzupxyhc5mlkphbaevboelgvnx2vnnspamitnamq7.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/201714685-eb48eab8-93a3-4c3f-8d8c-0a0587c735c9.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Oracle Database 12c SQL
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>作者寄语:This book is dedicated to my family.Even though you’re far away, you are still in my heart.</p>
+<p>About the Author: Jason Price is a freelance consultant and former product manager of Oracle Corporation. He has contributed to many of Oracle’s products</p>
+<span id="more"></span>
+
+<h1 id="10-User-Priviledges-and-Roles"><a href="#10-User-Priviledges-and-Roles" class="headerlink" title="10 User Priviledges and Roles"></a>10 User Priviledges and Roles</h1><ul>
+<li>create users</li>
+<li>See how privileges enable users to access data and perform database tasks</li>
+<li>Explore the two types of privileges: system privileges and object privileges</li>
+<li>Learn how system privileges enable actions such as executing DDL statements</li>
+<li>See how object privileges enable actions such as executing DML statements</li>
+<li>Group privileges together into roles</li>
+<li>Audit the execution of SQL statements</li>
+</ul>
+<p><code>tablespace</code> Tablespaces are stored in datafiles , which are files stored in the file system of a database server. A datafile stores data for one tablespace The Oracle database software creates a datafile for a tablespace by allocating the specified amount of disk space plus the overhead for a file header ,including tables , types ,PLSQL code</p>
+<h2 id="10-1-User"><a href="#10-1-User" class="headerlink" title="10.1 User"></a>10.1 User</h2><h3 id="10-1-1-Create-a-User"><a href="#10-1-1-Create-a-User" class="headerlink" title="10.1.1 Create a User"></a>10.1.1 Create a User</h3><pre class="language-sql" data-language="sql"><code class="language-sql">CREATE USER user_name IDENTIFIED BY password
+[ DEFAULT TABLESPACE default_tablespace ]
+[ TEMPOARY TABLESPACE tempoary_tablespace ];</code></pre>
+<p><code>user_name</code> is name of database user<br><code>password</code> is the password for the database user<br><code>default_tablespace</code> If you omit a default tablespace, the default <code>SYSTEM tablespace</code>, which always exists in a database, is used<br><code>tempoary_tablespace</code> include temporary tables If you omit a temporary tablespace, the default <code>SYSTEM tablespace</code> is used<br>so the example as below</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE USER jason IDENTIFIED by price</code></pre>
+<p>and grant user basic privileges like create session</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">grant create session to jason;</code></pre>
+<p>here have so many extend privileges</p>
+<h3 id="10-1-2-change-password"><a href="#10-1-2-change-password" class="headerlink" title="10.1.2 change password"></a>10.1.2 change password</h3><pre class="language-sql" data-language="sql"><code class="language-sql">ALTER USER jason IDENTIFIED BY marcus
+---or another way
+CONNECT jason&#x2F;marcus PASSWORD</code></pre>
+
+<h3 id="10-1-3-delete-user"><a href="#10-1-3-delete-user" class="headerlink" title="10.1.3 delete user"></a>10.1.3 delete user</h3><pre class="language-sql" data-language="sql"><code class="language-sql">drop user jason</code></pre>
+
+<h2 id="10-2-System-privileges"><a href="#10-2-System-privileges" class="headerlink" title="10.2 System privileges"></a>10.2 System privileges</h2><p><img src="/./../../../../img/OracleDatabase12cSQL/10-1.jpg" alt="10-1"></p>
+<p>for all the reference ,please refer oracle published manual</p>
+<h3 id="10-2-1-grant-system-privileges-to-a-user"><a href="#10-2-1-grant-system-privileges-to-a-user" class="headerlink" title="10.2.1 grant system privileges to a user"></a>10.2.1 grant system privileges to a user</h3><pre class="language-sql" data-language="sql"><code class="language-sql">connect system&#x2F;oracle
+GRANT CREATE SEESON,CREATE USER,CREATE TABLE to steve</code></pre>
+<p>You can also use WITH ADMIN OPTION to allow a user to grant a privilege to another user.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">grant execute any procedure to steve wth admin option</code></pre>
+<p>EXECUTE ANY PROCEDURE can then be granted to another user by steve .The following example connects as steve and grants EXECUTE ANY PROCEDURE to gail :</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect steve&#x2F;brown
+grant execute any procedure to gail</code></pre>
+<p>You can grant a privilege to all users by granting to PUBLIC</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect system&#x2F;oracle
+grant execute any procedure to public</code></pre>
+
+<h3 id="10-2-2-Checking-System-Privileges-Granted-to-a-User"><a href="#10-2-2-Checking-System-Privileges-Granted-to-a-User" class="headerlink" title="10.2.2 Checking System Privileges Granted to a User"></a>10.2.2 Checking System Privileges Granted to a User</h3><p><code>data dictionary</code> stores information about the database itself.</p>
+<p>table <code>user_sys_privs</code> stores current user privileges that it has</p>
+<ul>
+<li><code>username</code> indicates current user,</li>
+<li><code>privileges</code> indicates that user owned privileges,</li>
+<li><code>admin_option</code>indicate whether the user is able to grant privileges to another user.<br>if steve had create user privileges , so he could create user. <pre class="language-sql" data-language="sql"><code class="language-sql">connect steve&#x2F;brown
+create user roy IDENTIFIED by red;</code></pre></li>
+</ul>
+<h3 id="10-2-3-Revoking-System-Privileges-from-a-User"><a href="#10-2-3-Revoking-System-Privileges-from-a-User" class="headerlink" title="10.2.3 Revoking System Privileges from a User"></a>10.2.3 Revoking System Privileges from a User</h3><p>you could also revoke user privileges bby below sql.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect system&#x2F;oracle
+revoke create table from steve</code></pre>
+<p>if you want revoke user execute procedure</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">revoke execute any procedure fron steve</code></pre>
+
+<h2 id="10-3-Object-Privileges"><a href="#10-3-Object-Privileges" class="headerlink" title="10.3 Object Privileges"></a>10.3 Object Privileges</h2><p><img src="/./../../../../img/OracleDatabase12cSQL/10-6.jpg" alt="10-6"></p>
+<h3 id="10-3-1-Granting-Object-Privileges-to-a-User"><a href="#10-3-1-Granting-Object-Privileges-to-a-User" class="headerlink" title="10.3.1  Granting Object Privileges to a User"></a>10.3.1  Granting Object Privileges to a User</h3><pre class="language-sql" data-language="sql"><code class="language-sql">connect store&#x2F;store_password
+grant select , insert , update on store.products to steve</code></pre>
+<p>or narrow table privileges for certainly columns.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">grant update (last_name,salary) on store.employees to steve</code></pre>
+
+<p>note: You use the GRANT option to allow a user to grant an object privilege to another user, and you use the ADMIN option to allow a user to grant a system privilege to another user.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">grant select on store.customers to steve with grant option;</code></pre>
+
+<p>connect as steve to grant privileges to gail</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect steve&#x2F;brown
+grant select on store.customers to gail;</code></pre>
+<h3 id="10-3-2-check-object-privileges-made"><a href="#10-3-2-check-object-privileges-made" class="headerlink" title="10.3.2  check object privileges made"></a>10.3.2  check object privileges made</h3><p>table <code>user_tab_privs_mad</code> could get all object privileges made<br><img src="/./../../../../img/OracleDatabase12cSQL/10-2.jpg" alt="10-2"></p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">select * from user_tab_privs_mad where table_name &#x3D; &#39;products&#39;</code></pre>
+<p>You can check which column object privileges a user has made by querying<br><code>user_col_privs_made</code><br><img src="/./../../../../img/OracleDatabase12cSQL/10-3.jpg" alt="10-3"></p>
+<p>You can check which object privileges on a table a user has received by<br>querying the <code>user_tab_privs_recd</code> table</p>
+<p><img src="/./../../../../img/OracleDatabase12cSQL/10-4.jpg" alt="10-4"></p>
+<p>You can check which column object privileges a user has received by<br>querying <code>user_col_privs_recd</code> </p>
+<p><img src="/./../../../../img/OracleDatabase12cSQL/10-5.jpg" alt="10-5"></p>
+<p>when we got corresponding privileges you can do statement by below with schema ahead of table name</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">DBA_SYS_PRIVS:      查询某个用户所拥有的系统权限
+
+USER_SYS_PRIVS:     当前用户所拥有的系统权限
+
+SESSION_PRIVS:      当前用户所拥有的全部权限
+
+ROLE_SYS_PRIVS:     某个角色所拥有的系统权限  
+
+注意: 要以SYS用户登陆查询这个视图,否则返回空.
+
+ROLE_ROLE_PRIVS:    当前角色被赋予的角色
+
+SESSION_ROLES:      当前用户被激活的角色
+
+USER_ROLE_PRIVS:    当前用户被授予的角色
+
+另外还有针对表的访问权限的视图:
+
+TABLE_PRIVILEGES
+
+ALL_TAB_PRIVS   
+
+ROLE_TAB_PRIVS:     某个角色被赋予的相关表的权限
+-----------------------------------
+©著作权归作者所有：来自51CTO博客作者day_day_up_cium的原创作品，请联系作者获取转载授权，否则将追究法律责任
+Oracle中用户角色权限管理
+https:&#x2F;&#x2F;blog.51cto.com&#x2F;lwc0329&#x2F;3000521</code></pre>
+<h2 id="10-3-3-creating-synonyms"><a href="#10-3-3-creating-synonyms" class="headerlink" title="10.3.3 creating synonyms"></a>10.3.3 creating synonyms</h2><p>across schemas you want query data , then you could use synonym to connect schema.</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">--1. 
+connect system&#x2F;oracle
+grant create synonym to steve
+--2.
+connect steve&#x2F;brown
+create synonym customers for store.customers
+--3. login user steve
+select * from customer</code></pre>
+
+<h3 id="10-3-4-Creating-Public-Synonyms"><a href="#10-3-4-Creating-Public-Synonyms" class="headerlink" title="10.3.4 Creating Public Synonyms"></a>10.3.4 Creating Public Synonyms</h3><p>You can also create a public synonym for a table. When you do this, all the users see the synonym. this is key </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect system&#x2F;oracle
+grant create public synonym to store
+connect store&#x2F;store_possword
+grant public synonym products for store.products;
+-- now you can connect as steve and retrive rows from store.products
+connect steve
+select * from products;
+</code></pre>
+
+
+
+<p>there is another question need to be claimed,even you had created public synonym , but you still need to grant privileges. for example</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- gail can see store public synonym ,but jail do not have objects privileges on &#96;store.products&#96; table
+connect gail
+grant select to store
+connect system&#x2F;oracle
+grant create public synonym to store
+connect store&#x2F;store_possword
+grant public synonym products for store.products;
+-- now you can connect as steve and retrive rows from store.products
+connect gail
+select * from products;
+</code></pre>
+<p>If a user has other object privileges, that user can exercise those object privileges through a synonym. For example, if <strong>gail</strong> had the <code>INSERT</code> object privilege on the <code>store.products</code> table, then gail would be able to add a row to <code>store.products</code> through the products synonym.</p>
+<h3 id="10-3-5-revoke-object-privileges"><a href="#10-3-5-revoke-object-privileges" class="headerlink" title="10.3.5 revoke object privileges"></a>10.3.5 revoke object privileges</h3><p>revoke <code>store.products</code> INSERT privileges</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect store&#x2F;store_password
+revoke insert on products from steve;</code></pre>
+<p>revoke somebody select privileges for some one of schema </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect store&#x2F;store_password
+revoke select on store.customers from steve;</code></pre>
+
+<h2 id="10-4-Roles"><a href="#10-4-Roles" class="headerlink" title="10.4 Roles"></a>10.4 Roles</h2><p>A role is a group of privileges that you can assign to a user or to another role.The following points summarize the benefits of roles:</p>
+<ul>
+<li>Rather than assigning privileges one at a time directly to a user, you can create a role, assign privileges to that role, and then grant that role to multiple users and roles.</li>
+<li>When you add or delete a privilege from a role, all users and roles assigned that role automatically receive or lose that privileg</li>
+<li>You can assign multiple roles to a user or role</li>
+<li>You can assign a password to a role.</li>
+</ul>
+<h3 id="10-4-1-create-roles"><a href="#10-4-1-create-roles" class="headerlink" title="10.4.1 create roles"></a>10.4.1 create roles</h3><p>baisc , if you want create role , also you need get right, more like below</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect system&#x2F;oracle
+grant create role to store
+grant create user to store with admin option
+--login user store
+
+connect store&#x2F;store_password
+grant create role product_manager;
+grant create role hr_manager;
+grant create role overall_manager IDENTIFIED by manager_password;</code></pre>
+
+<h3 id="10-4-2-grant-privileges-to-roles"><a href="#10-4-2-grant-privileges-to-roles" class="headerlink" title="10.4.2 grant privileges to roles"></a>10.4.2 grant privileges to roles</h3><pre class="language-sql" data-language="sql"><code class="language-sql">system -&gt; role
+            |
+object -&gt; role -&gt; role
+
+grant select ,insert,update,delete on product_types to product_manager;
+grant select ,insert,update,delete on products to product_manager;
+grant select ,insert,update,delete on salary_grades to hr_manager;
+grant select ,insert,update,delete on employees to hr_manager;
+grant create,user to hr_manager;
+grant product_manager,hr_manager to overall_manager;
+</code></pre>
+
+<h3 id="10-4-3-Granting-Roles-to-a-User"><a href="#10-4-3-Granting-Roles-to-a-User" class="headerlink" title="10.4.3 Granting Roles to a User"></a>10.4.3 Granting Roles to a User</h3><p>general procedure to create user and assign right</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect system&#x2F;oracle
+grant user john IDENTIFIED by brown;
+grant user harry IDENTIFIED by blue;
+grant create session to john;
+grant create session to harry;</code></pre>
+<p>now you can use current good way </p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">
+grant hr_manager to john;
+grant overall_manager to harry;</code></pre>
+
+<h3 id="10-4-4-Checking-Roles-Granted-to-a-User"><a href="#10-4-4-Checking-Roles-Granted-to-a-User" class="headerlink" title="10.4.4 Checking Roles Granted to a User"></a>10.4.4 Checking Roles Granted to a User</h3><p>table <code>user_role_privs</code> is the key</p>
+<p><img src="/./../../../../img/10-7.jpg" alt="10-7"></p>
+<p>This role is password protected. Before the user can use the role, the user must enter the role password.</p>
+<h3 id="10-4-5-Checking-System-Privileges-Granted-to-a-Role"><a href="#10-4-5-Checking-System-Privileges-Granted-to-a-Role" class="headerlink" title="10.4.5 Checking System Privileges Granted to a Role"></a>10.4.5 Checking System Privileges Granted to a Role</h3><p>table <code>role_sys_privs</code> is the key </p>
+<p><img src="/./../../../../img/10-8.jpg" alt="10-8"></p>
+<h3 id="10-4-6-Checking-Object-Privileges-Granted-to-a-Role"><a href="#10-4-6-Checking-Object-Privileges-Granted-to-a-Role" class="headerlink" title="10.4.6 Checking Object Privileges Granted to a Role"></a>10.4.6 Checking Object Privileges Granted to a Role</h3><p>table <code>role_tab_privs</code> is the key</p>
+<p><img src="/./10-../../../../img/10-9.jpg" alt="10-9"></p>
+<h3 id="10-4-7-Making-Use-of-Privileges-Granted-to-a-Role"><a href="#10-4-7-Making-Use-of-Privileges-Granted-to-a-Role" class="headerlink" title="10.4.7 Making Use of Privileges Granted to a Role"></a>10.4.7 Making Use of Privileges Granted to a Role</h3><p>For a non-password-protected role, the user can immediately use the privileges assigned to the role when they connect to the database</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect john&#x2F;brown
+select employee_id , last_name from store.amployees where salary&lt;any ( select low_salary from store_grades order by employee_id)
+</code></pre>
+<p>For example, the <strong>harry</strong> user has the password-protected overall_manager role. Before <strong>harry</strong> is able to use the overall_manager role, he must enable the role and provide the role password using the <code>SET ROLE</code> command</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">connect harry&#x2F;blue
+set role overall_manager IDENTIFIED by manager_password;
+</code></pre>
+<p>Then, <strong>harry</strong> can use the privileges granted to the role. For example:</p>
+<h3 id="10-4-8-Enabling-and-Disabling-Roles"><a href="#10-4-8-Enabling-and-Disabling-Roles" class="headerlink" title="10.4.8 Enabling and Disabling Roles"></a>10.4.8 Enabling and Disabling Roles</h3><pre class="language-sql" data-language="sql"><code class="language-sql">connect system&#x2F;oracle
+-- disable
+alter user john default role all except hr_manager;
+--enable
+set role hr_manager;
+-- set default role
+connect system&#x2F;oracle
+alter user john default role hr_manager;
+-- set none for role
+connect john&#x2F;brown
+set role NONE;
+-- sets the role to all roles except hr_manager
+set role all except hr_manager;</code></pre>
+<h3 id="10-4-9-Revoking-a-Role-and-Privileges-and-drop-a-role"><a href="#10-4-9-Revoking-a-Role-and-Privileges-and-drop-a-role" class="headerlink" title="10.4.9 Revoking a Role and Privileges and drop a role"></a>10.4.9 Revoking a Role and Privileges and drop a role</h3><pre class="language-sql" data-language="sql"><code class="language-sql">-- Revoking a Role
+connect store&#x2F;store_password
+revoke overall_manager from harry;
+-- revoke Privileges
+connect store&#x2F;store_password
+revoke all on products from product_manager;
+revoke all on product_types from product_manager;
+-- drop role
+connect store&#x2F;store_password
+drop role overall_manager;
+drop role product_manager;
+drop role hr_manager;</code></pre>
+
+<h1 id="12-Creating-Tables-Sequences-Indexes-and-Views"><a href="#12-Creating-Tables-Sequences-Indexes-and-Views" class="headerlink" title="12.Creating Tables, Sequences, Indexes, and Views"></a>12.Creating Tables, Sequences, Indexes, and Views</h1><p>In this chapter, you will learn how to perform the following tasks:</p>
+<ul>
+<li>Create,modify, and drop tables</li>
+<li>Create and use sequences, which generate a series of numbers</li>
+<li>Create and use indexes,which can improve the performance of queries</li>
+<li>Create and use views, which are predefined(adj.[计]预先定义的) queries</li>
+<li>Examine flashback data archives,which store row changes made over a period of time</li>
+</ul>
+<h2 id="12-1-Tables"><a href="#12-1-Tables" class="headerlink" title="12.1 Tables"></a>12.1 Tables</h2><p>purpose: In this section,you’ll learn about creating a table. You’ll see how to modify and drop a table as well as how to retrieve information about a table from the data dictionary. The data dictionary contains information about all the database items such as <code>tables</code> <code>sequences</code>, <code>indexes</code>, and so on.</p>
+<h3 id="12-1-1-Creating-a-Table"><a href="#12-1-1-Creating-a-Table" class="headerlink" title="12.1.1 Creating a Table"></a>12.1.1 Creating a Table</h3><pre class="language-sql" data-language="sql"><code class="language-sql">CREATE [GLOBALTEMPORARY] TABLE table_name (
+    column_name     type [CONSTRAINT constraint_def DEFAULT default_exp]
+    [, column_name  type [CONSTRAINT constraint_def DEFAULT default_exp] ...] )
+
+    [ON COMMIT &#123; DELETE | PRESERVE&#125; ROWS ]
+TABLESPACE tab_space;</code></pre>
+
+<ul>
+<li><code>GLOBAL TEMPORARY</code> specifies that the table’s rows are temporary (this type of table is known as a temporary table). The rows in a temporary table are specific to a user session, and how long the rows persist is set using the ON <code>COMMIT</code> clause.</li>
+<li><code>table name</code> is the name of the table.</li>
+<li><code>column name</code> is the name of a column.</li>
+<li><code>type</code> is the type of a column.</li>
+<li><code>constraint_def</code> is a constraint on a column.</li>
+<li><code>ON COMMIT</code> controls the duration of the rows in a temporary table. <code>DELETE</code> specifies that the rows are deleted at the end of a transaction. <code>PRESERVE</code> specifies that the rows are kept until the end of a user session,at which point the rows are deleted. If you omit <code>ON COMMIT</code> for a temporary table, then the default of <code>DELETE</code> is used.</li>
+<li><code>tab_space</code> is the tablespace for the table. If you omit a tablespace,then the table is stored in the user’s default tablespace.</li>
+</ul>
+<p>or using another clause</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CONNECT store&#x2F;store_password CREATE TABLE order_status2(
+    id INTEGER CONSTRAINT order_statue2_pk PRIMARY KEY,
+    status VARCHAR2(10),
+    last_modified DATE DEFAULT SYSDATE
+) ;</code></pre>
+
+<p>creating a temporary table:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE GLORAL TEMPORARY TABLE order_status_temp (
+id INTBGER,
+status VARCHAR2(10) ,
+last_modified DATE DEPAULT SYSDATE
+ON COMMIT PRESERVE ROWS;</code></pre>
+
+<p>temporary table performs the following tasks:</p>
+<ul>
+<li>Adds a row to order_status_temp</li>
+<li>Disconnects from the database to end the session row in <code>order_status_temp</code> to be deleted</li>
+<li>Reconnects as <code>store</code> account and queries order_status_temp , which shows there are no rows in this table</li>
+</ul>
+<h3 id="12-1-2-Getting-Information-on-Tables"><a href="#12-1-2-Getting-Information-on-Tables" class="headerlink" title="12.1.2 Getting Information on Tables"></a>12.1.2 Getting Information on Tables</h3><ul>
+<li>Running a <code>DESCRIBE</code> command for the table(desc table_name)</li>
+<li>Querying the <code>user_tables</code> view, which forms part of the data dictionary</li>
+</ul>
+<pre class="language-text" data-language="text"><code class="language-text"># Some Columns in the `user_tables` View
+Column              lype                Description
+table_name          VARCHAR2 (128)      Name of the table.
+tablespace_name     VARCHAR2(30)        Name of the tablespace in which the table isstored.A tablespace is an area used by thedatabase to store objects such as tables.
+temporary           VARCHAR2(1)         Whether the table is temporary. This is set toY if temporary or N if not temporary.</code></pre>
+
+<p><code>select * from user_tables</code>会查到相关用户的信息</p>
+<p>Notice: the <code>order_status_temp</code> table is temporary, as indicated by the Y in the last column.You can retrieve information on all the tables you have access to by querying the <code>all_tables</code> view</p>
+<h3 id="12-1-3-Getting-Information-on-Columns-in-Tables"><a href="#12-1-3-Getting-Information-on-Columns-in-Tables" class="headerlink" title="12.1.3 Getting Information on Columns in Tables"></a>12.1.3 Getting Information on Columns in Tables</h3><p>You can retrieve information about the columns in a table from the <code>user_tab_columns</code> view. Table 11-2 describes some of the columns in user_tab_columns</p>
+<pre class="language-text" data-language="text"><code class="language-text">Column              Type                Description
+table_name          VARCHAR2(128)       Name of the table
+column_name         VARCHAR2(128)       Name of the column
+data_type           VARCHAR2 (128)      Data type of the column
+data_length         NUMBER              Length of the data
+data _precision     NUMBER              Precision of a numeric columnif a precision was specified
+data_scale          NUMBER              Scale of a numeric column</code></pre>
+
+<p>The following example queries <code>user_tab_columns</code> for the <code>products</code> table:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">COLUMN colunn_nane FORMAT a15
+COLUMN data_type FORMAT a10
+SELECT column_name, data_type, data_length,data_precision,data_s FROM uaer_tab_columns WHERE table_name &#x3D; &#39;PRODUCTs&#39;;
+COLUMN_NAME     DATA_TYPE       DATA_LENGTH     DATA_PRECISION      DATA_SCALE
+PRODUcTID       NUMBER          22                                  0
+PRODUCT_TYPEID  NUMBER          22                                  0
+NAME            VARCHAR2        30
+DESCRIPTION     VARCHAR2        50
+PRICE           NUMEER          22              5                   2</code></pre>
+<p>note:You can retrieve information on all the columns in tables you have access to by querying the <code>all_tab_columns</code> view</p>
+<h3 id="12-1-4-Altering-a-Table"><a href="#12-1-4-Altering-a-Table" class="headerlink" title="12.1.4 Altering a Table"></a>12.1.4 Altering a Table</h3><p>You alter a table using the ALTER TABLE statement. You can use ALTER TABLE<br>to perform tasks such as the following:</p>
+<ul>
+<li>Adding, modifying, or dropping a column</li>
+<li>Adding or dropping a constraint</li>
+<li>Enabling or disabling a constraint</li>
+</ul>
+<p>In the following sections, you’ll learn how to use <code>ALTER TABLE</code> to perform each of these tasks. You’ll also learn how to obtain information about constraints.</p>
+<h4 id="Adding-a-Column"><a href="#Adding-a-Column" class="headerlink" title="Adding a Column"></a>Adding a Column</h4><p>The following example uses ALTER TABLE to add an <code>INTEGER</code> column named modified by to the order_status2 table:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">alter table order_status2
+add modified_by INTEGER</code></pre>
+<p>The next example adds a column named <strong>initially_created</strong> to <code>order_status2</code> :</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">alter table order_status2
+add initially_created date default sysdate not null;</code></pre>
+<p>You can verify the addition of the new column by running a <code>DESCRIBE</code> command on <code>order_status2</code> :</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">describe order_status2;
+</code></pre>
+
+<h4 id="Adding-a-Virtual-Column"><a href="#Adding-a-Virtual-Column" class="headerlink" title="Adding a Virtual Column"></a>Adding a Virtual Column</h4><p>Oracle Database 11g introduced virtual columns. A virtual column is a column that refers only to other columns already in the table. For example,the following ALTER TABLE statement adds a virtual column named <strong>average_salary</strong> to the <strong>salary_grades</strong> table:</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">alter table salary_grades add (average_salary as ( (low_salary + high_salary)&#x2F;2 ));</code></pre>
+
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/database/oracle/Oracle_EBR/"
+                    data-tooltip="Edition-Based Redefinition Technical Deep Dive"
+                    aria-label="PREVIOUS: Edition-Based Redefinition Technical Deep Dive"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/database/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes/"
+                    data-tooltip="Oracle PLSQL Recipes PL/SQL Fundamentals"
+                    aria-label="NEXT: Oracle PLSQL Recipes PL/SQL Fundamentals"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/database/oracle/Oracle_EBR/"
+                    data-tooltip="Edition-Based Redefinition Technical Deep Dive"
+                    aria-label="PREVIOUS: Edition-Based Redefinition Technical Deep Dive"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/database/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes/"
+                    data-tooltip="Oracle PLSQL Recipes PL/SQL Fundamentals"
+                    aria-label="NEXT: Oracle PLSQL Recipes PL/SQL Fundamentals"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-2mrdgre6o8oumjyqh1gawnnqlakhnetes6k3qnahlvgvfzutbbznavmu0avb.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

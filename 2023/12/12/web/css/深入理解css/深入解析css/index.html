@@ -1,0 +1,1941 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>深入解析css - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要：重新学下css,学完了能很快做出东西，而且是看的见东西\n\n\n\n1. 层叠，优先级和继承1.1 层叠css样式是声明式的，也存在着结构概念。这背后有很多的问题要讨论，首先我们需要理解浏览器如何解析样式规则。每条规则单独来看很简单，但是当两条规则提供了冲突的样式时会发生什么呢？也就是说对同一个元素使用多个规则会出现冲突\n\n&lt;!-- listing-1.2.html -->\n\n&lt;!doctype html>\n&lt;head>\n  &lt;style>\nh1 &#123;\n  font-family: serif;\n&#125;\n\n#page-title &#123;\n  font-family: sans-serif;\n&#125;\n\n.title &#123;\n  font-family: monospace;\n&#125;\n  &lt;/style>\n&lt;/head>\n&lt;body>\n  &lt;header class=\"page-header\">\n    &lt;h1 id=\"page-title\" class=\"title\">\n      Wombat Coffee Roasters\n    &lt;/h1>\n    &lt;nav>\n      &lt;ul id=\"main-nav\" class=\"nav\">\n        &lt;li>&lt;a href=\"/\">Home&lt;/a>&lt;/li>\n        &lt;li>&lt;a href=\"/coffees\">Coffees&lt;/a>&lt;/li>\n        &lt;li>&lt;a href=\"/brewers\">Brewers&lt;/a>&lt;/li>\n        &lt;li>&lt;a href=\"/specials\" class=\"featured\">Specials&lt;/a>&lt;/li>\n      &lt;/ul>\n    &lt;/nav>\n  &lt;/header>\n&lt;/body>\n最终ID选择器生效，层叠指的就是这一系列规则。它决定了如何解决冲突，是CSS语言的基础。层叠的规则：\n\n样式表的来源：样式是从哪里来的，包括你的样式和浏览器默认样式等.\n使用优先级更高的声明，作者样式大于默认样式\n\n\n选择器优先级：哪些选择器比另一些选择器更重要.\n使用更高优先级的声明,是不是内联样式，使用内联样式\n\n\n源码顺序：样式在样式表里的声明顺序.\n\n术语解释描述问题时候尽量加上html属性和css属性，避免混淆选择器和生命块组成了一个规则集\nbody &#123;\n    color: back;\n    font-family: Helvetica;\n&#125;\n\n\n1.1.1 样式表的来源\n程序员编写的样式表属于作者样式表，可以覆盖浏览器默认样式\n用户代理样式表&#x3D;浏览器默认样式，用户代理样式表优先级低正如上面示例代码1.2所示，这个css主要是修饰h1元素的，然后css代码listing-1.2.html中作者样式覆盖了原先的默认样式\n\n!important声明,标记了!important的声明会被当作更高优先级的来源,它的优先级大于作者样式优先级\n1.1.2 理解优先级如果无法用来源解决冲突声明，浏览器会尝试检查它们的优先级。\n\n行内样式实际上行内元素属于“带作用域的”声明，它会覆盖任何来自样式表或者 &lt; style &gt; 标签的样式。行内样式没有选择器，因为它们直接作用于所在的元素。为了在样式表里覆盖行内声明，需要为声明添加!important，这样能将它提升到一个更高优先级的来源。但如果行内样式也被标记为!important，就无法覆盖它了。最好是只在样式表内用!important。将以上修改撤销，我们来看看更好的方式。!important作用更像是将样式级别提升到最高\n\n选择器优先级\n 如果设置相同属性，那么即使应用了两个选择器，那么ID选择器的样式会生效\n#main-nav a &#123;\n    color: white;\n    background-color: #13a4a4;  // id选择器的样式会生效\n    padding: 5px;\n    border-radius: 2px;\n    text-decoration: none;\n&#125;\n\n.featured &#123;\n    background-color: orange;   // 类选择器不生效，优先级不高\n&#125;\n优先级的准确规则如下。\n\nid选择器 &gt; 类选择器 &gt; 标签选择器 \n如果选择器的ID数量更多，则它会胜出（即它更明确）。\n如果ID数量一致，那么拥有最多类的选择器胜出。\n如果以上两次比较都一致，那么拥有最多标签名的选择器胜出。\n\n 比如下面例子，判断哪些属性会生效 html body header h1 &#123;    ←---- ❶ 4个标签\n    color: blue;\n&#125;\nbody header.page-header h1 &#123;  ←---- ❷ 3个标签和1个类\n    color: orange;\n&#125;\n.page-header .title &#123;       ←---- ❸ 2个类\n    color: green;\n&#125;\n#page-title &#123;           ←---- ❹ 1个ID\n    color: red;\n&#125; 4的id选择器优先级最高，因此标题是红色，3有两个类选择器，删除4,就会展示3的样式，两个类选择器比一个类选择器更明确\n 说明 伪类选择器（如:hover）和属性选择器（如[type&#x3D;”input”]）与一个类选择器的优先级相同。通用选择器（*）和组合器（&gt;、+、~）对优先级没有影响。\n 如果你在CSS里写了一个声明，但是没有生效，一般是因为被更高优先级的规则覆盖了。很多时候开发人员使用ID选择器，却不知道它会创建更高的优先级，之后就很难覆盖它。如果要覆盖一个ID选择器的样式，就必须要用另一个ID选择器。\n\n优先级标记\n 也可以说是优先级表达式，选择器#page-header #page-title有2个ID,所以是[2.0.0],如果加上行内样式则就是[1.2.0.0]\n\n关于优先级的思考\n\n\n1.1.3 源码顺序代码清单1-10\n如果两个声明所影响的元素相同和优先级相同，那么源码(html的源码,不是样式源码)后出现的就会起作用\na.featured &#123;\n  background-color: orange;\n&#125;\n\n但是这样的写法，会出现如果其他位置也有a标签和featured的类属性，那么就会渲染到其他地方，所以要设计好html元素和选择器\n代码清单1-11\n\n链接样式和源码顺序正如之前所说，在CSS中最好的答案通常是“这得看情况”。实现相同的效果有很多途径。多想些实现方法，并思考每一种方法的利弊，这是很有价值的。面对一个样式问题时，我经常分两个步骤来解决它。首先确定哪些声明可以实现效果。其次，思考可以用哪些选择器结构，然后选择最符合需求的那个。\n\n代码清单1-12\n&lt;!doctype html>\n&lt;head>\n  &lt;style>\na:link &#123;\n  color: blue;\n  text-decoration: none;\n&#125;\n\na:visited &#123;\n  color: purple;\n&#125;\n\na:hover &#123;\n  text-decoration: underline;\n&#125;\n\na:active &#123;\n  color: red;\n&#125;\n\nh1 &#123;\n  color: #2f4f4f;\n  margin-bottom: 10px;\n&#125;\n\n.nav &#123;\n  margin-top: 10px;\n  list-style: none;\n  padding-left: 0;\n&#125;\n\n.nav li &#123;\n  display: inline-block;\n&#125;\n\n.nav a &#123;\n  color: white;\n  background-color: #13a4a4;\n  padding: 5px;\n  border-radius: 2px;\n  text-decoration: none;\n&#125;\n\n.nav .featured &#123;\n  background-color: orange;\n&#125;\n  &lt;/style>\n&lt;/head>\n&lt;body>\n  &lt;header class=\"page-header\">\n    &lt;h1 id=\"page-title\" class=\"title\">Wombat Coffee Roasters&lt;/h1>\n    &lt;nav>\n      &lt;ul id=\"main-nav\" class=\"nav\">\n        &lt;li>&lt;a href=\"/\">Home&lt;/a>&lt;/li>\n        &lt;li>&lt;a href=\"/coffees\">Coffees&lt;/a>&lt;/li>\n        &lt;li>&lt;a href=\"/brewers\">Brewers&lt;/a>&lt;/li>\n        &lt;li>&lt;a href=\"/specials\" class=\"featured\">Specials&lt;/a>&lt;/li>\n      &lt;/ul>\n    &lt;/nav>\n  &lt;/header>\n&lt;/body>\n\n\n书写顺序之所以很重要，是因为层叠。优先级相同时，后出现的样式会覆盖先出现的样式。如果一个元素同时处于两个或者更多状态，最后一个状态就能覆盖其他状态。如果用户将鼠标悬停在一个访问过的链接上，悬停效果会生效。如果用户在鼠标悬停时激活了链接（即点击了它），激活的样式会生效。\n这个顺序的记忆口诀是“LoVe&#x2F;HAte”（“爱&#x2F;恨”），即link（链接）、visited（访问）、hover（悬停）、active（激活）。注意，如果将一个选择器的优先级改得跟其他的选择器不一样，这个规则就会遭到破坏，可能会带来意想不到的结果。\n\n层叠值\n\n浏览器遵循三个步骤，即来源、优先级、源码顺序，来解析网页上每个元素的每个属性。在 CSS 中指的是多个样式规则对同一个元素的样式属性进行规定时，会发生的覆盖和继承的现象。每个样式规则都有一个权值，样式规则的权值越大，则该规则对元素的样式属性的影响越大。当多个样式规则同时作用于同一个元素时，系统会根据规则的权值进行排序，将权值大的规则应用到元素上，而权值小的规则会被忽略\n1.1.4 两个经验法则\n在选择器中不要使用ID。就算只用一个ID，也会大幅提升优先级\n不要使用!important。它比ID更难覆盖，一旦用了它，想要覆盖原先的声明，就需要再加上一个!important，而且依然要处理优先级的问题。\n关于重要性的一个重要提醒当创建一个用于分发的JavaScript模块（比如NPM包）时，强烈建议尽量不要在JavaScript里使用行内样式。如果这样做了，就是在强迫使用该包的开发人员要么全盘接受包里的样式，要么给每个想修改的属性加上!important\n\n1.1.5 选择器种类\n\n\n选择器\n例子\n例子描述\n\n\n\n.class\n.intro\n选择 class&#x3D;”intro” 的所有元素。\n\n\n.class1.class2\n.name1.name2\n选择 class 属性中同时有 name1 和 name2 的所有元素。\n\n\n.class1 .class2\n.name1 .name2\n选择作为类名 name1 元素后代的所有类名 name2 元素。\n\n\n#id\n#firstname\n选择 id&#x3D;”firstname” 的元素。\n\n\n*\n*\n选择所有元素。\n\n\nelement\np\n选择所有  元素。\n\n\nelement.class\np.intro\n选择 class&#x3D;”intro” 的所有  元素。\n\n\nelement,element\ndiv, p\n选择所有  元素和所有  元素。\n\n\nelement element\ndiv p\n选择  元素内的所有  元素。\n\n\nelement&gt;element\ndiv &gt; p\n选择父元素是  的所有  元素。\n\n\nelement+element\ndiv + p\n选择紧跟  元素的首个  元素。\n\n\nelement1~element2\np ~ ul\n选择前面有  元素的每个  元素。\n\n\n[attribute]\n[target]\n选择带有 target 属性的所有元素。\n\n\n[attribute&#x3D;value]\n[target&#x3D;_blank]\n选择带有 target&#x3D;”_blank” 属性的所有元素。\n\n\n[attribute~&#x3D;value]\n[title~&#x3D;flower]\n选择 title 属性包含单词 “flower” 的所有元素。\n\n\n[attribute\n&#x3D;value]\n[lang\n\n\n[attribute^&#x3D;value]\na[href^&#x3D;”https”]\n选择其 src 属性值以 “https” 开头的每个  元素。\n\n\n[attribute$&#x3D;value]\na[href$&#x3D;”.pdf”]\n选择其 src 属性以 “.pdf” 结尾的所有  元素。\n\n\n[attribute*&#x3D;value]\na[href*&#x3D;”w3schools”]\n选择其 href 属性值中包含 “abc” 子串的每个  元素。\n\n\n:active\na:active\n选择活动链接。\n\n\n::after\np::after\n在每个  的内容之后插入内容。\n\n\n::before\np::before\n在每个  的内容之前插入内容。\n\n\n:checked\ninput:checked\n选择每个被选中的  元素。\n\n\n:default\ninput:default\n选择默认的  元素。\n\n\n:disabled\ninput:disabled\n选择每个被禁用的  元素。\n\n\n:empty\np:empty\n选择没有子元素的每个  元素（包括文本节点）。\n\n\n:enabled\ninput:enabled\n选择每个启用的  元素。\n\n\n:first-child\np:first-child\n选择属于父元素的第一个子元素的每个  元素。\n\n\n::first-letter\np::first-letter\n选择每个  元素的首字母。\n\n\n::first-line\np::first-line\n选择每个  元素的首行。\n\n\n:first-of-type\np:first-of-type\n选择属于其父元素的首个  元素的每个  元素。\n\n\n:focus\ninput:focus\n选择获得焦点的 input 元素。\n\n\n:fullscreen\n:fullscreen\n选择处于全屏模式的元素。\n\n\n:hover\na:hover\n选择鼠标指针位于其上的链接。\n\n\n:in-range\ninput:in-range\n选择其值在指定范围内的 input 元素。\n\n\n:indeterminate\ninput:indeterminate\n选择处于不确定状态的 input 元素。\n\n\n:invalid\ninput:invalid\n选择具有无效值的所有 input 元素。\n\n\n:lang(language)\np:lang(it)\n选择 lang 属性等于 “it”（意大利）的每个  元素。\n\n\n:last-child\np:last-child\n选择属于其父元素最后一个子元素每个  元素。\n\n\n:last-of-type\np:last-of-type\n选择属于其父元素的最后  元素的每个  元素。\n\n\n:link\na:link\n选择所有未访问过的链接。\n\n\n:not(selector)\n:not(p)\n选择非  元素的每个元素。\n\n\n:nth-child(n)\np:nth-child(2)\n选择属于其父元素的第二个子元素的每个  元素。\n\n\n:nth-last-child(n)\np:nth-last-child(2)\n同上，从最后一个子元素开始计数。\n\n\n:nth-of-type(n)\np:nth-of-type(2)\n选择属于其父元素第二个  元素的每个  元素。\n\n\n:nth-last-of-type(n)\np:nth-last-of-type(2)\n同上，但是从最后一个子元素开始计数。\n\n\n:only-of-type\np:only-of-type\n选择属于其父元素唯一的  元素的每个  元素。\n\n\n:only-child\np:only-child\n选择属于其父元素的唯一子元素的每个  元素。\n\n\n:optional\ninput:optional\n选择不带 “required” 属性的 input 元素。\n\n\n:out-of-range\ninput:out-of-range\n选择值超出指定范围的 input 元素。\n\n\n::placeholder\ninput::placeholder\n选择已规定 “placeholder” 属性的 input 元素。\n\n\n:read-only\ninput:read-only\n选择已规定 “readonly” 属性的 input 元素。\n\n\n:read-write\ninput:read-write\n选择未规定 “readonly” 属性的 input 元素。\n\n\n:required\ninput:required\n选择已规定 “required” 属性的 input 元素。\n\n\n:root\n:root\n选择文档的根元素。\n\n\n::selection\n::selection\n选择用户已选取的元素部分。\n\n\n:target\n#news:target\n选择当前活动的 #news 元素。\n\n\n:valid\ninput:valid\n选择带有有效值的所有 input 元素。\n\n\n:visited\na:visited\n选择所有已访问的链接。\n\n\n1.2 继承某些元素，在我们不指定属性值（没有层叠值）时候，他就会考虑从父标签中继承。但并不是所有的标签属性都会被进程，只有些特定的。主要是跟文本相关的属性会被继承\ncolor\nfont\nfont-family\nfont-size\nfont-weight\nfont-variant\nfont-style\nline-height\nletter-spacing\ntext-align\ntext-indent\ntext-transform\nwhite-space\nword-spacing\nlist-style、list-style-type、list-style-position以及list-style-image。表格的边框属性border-collapse和border-spacing也能被继承。注意，这些属性控制的是表格的边框行为，而不是常用于指定非表格元素边框的属性\n代码1-13在body元素上修改了字体属性，子元素如果没有修改对应元素，那么就会继承body元素中的关于字体的定义\n1.3 特殊值有两个特殊值可以赋给任意属性，用于控制层叠：inherit和 initial。\n1.3.1 使用inherit代码1-15\n通常会给页面的所有链接的字体加一个醒目的蓝色，但是有个有需求说要让页脚的链接字体跟页脚一个颜色。那么我们就可以使用继承就可以解决问题\n1.3.2 initial关键字每一个CSS属性都有初始（默认）值。如果将initial值赋给某个属性，那么就会有效地将其重置为默认值，这种操作相当于硬复位了该值。这么做的好处是不需要思考太多。如果想删除一个元素的边框，设置border: initial即可。如果想让一个元素恢复到默认宽度，设置width: initial即可。\n正如代码1-15所以，如果不指定inherit的话，那么也就会使用后面的样式值，因为它的样式表达式值权重更高\nauto不是所有属性的默认值，对很多属性来说甚至不是合法的值。比如border-width: auto和padding: auto是非法的，因此不会生效。可以花点时间研究一下这些属性的初始值，不过使用initial更简单。\n1.4 简写属性比如font: italic bold 18px/1.2 &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;就指定了font-style、font-weight、font-size、font-height以及font-family更多的还有\n\nbackground是多个背景属性的简写属性：background-color、background-image、background-size、background-repeat、background-position、background-origin、background-chip以及background-attachment。\nborder是border-width、border-style以及border-color的简写属性，而这几个属性也都是简写属性。\nborder-width是上、右、下、左四个边框宽度的简写属性。\n\n简写属性会设置省略值为其初始值\ntitle &#123;\nfont: 32px Helvetica, Arial, sans-serif;\n&#125;\n代码展开来写就是\n\nh1 &#123;\n  font-weight: bold;\n&#125;\n\n.title &#123;\n  font-style: normal;\n  font-variant: normal;\n  font-weight: normal;\n  font-stretch: normal;\n  line-height: normal;\n  font-size: 32px;\n  font-family: Helvetica, Arial, sans-serif;\n&#125;\n\n在所有的简写属性里，font的问题最严重，因为它设置的属性值太多了。因此，要避免在元素的通用样式以外使用font。当然，其他简写属性也可能会遇到一样的问题，因此要当心。\n1.4.1 理解简写样式的顺序简写属性会尽量包容指定的属性值的顺序。可以设置border: 1px solid black或者border: black 1px solid，两者都会生效。这是因为浏览器知道宽度、颜色、边框样式分别对应什么类型的值\n\n上、右、下、左\n\n.\nnav a &#123;\ncolor: white;\nbackground-color: #13a4a4;\npadding: 10px 15px 0 5px; ←---- 上、右、下、左内边距\nborder-radius: 2px;\ntext-decoration: none;\n&#125;\n这种模式下的属性值还可以缩写。如果声明结束时四个属性值还剩一个没指定，没有指定的一边会取其对边的值。指定三个值时，左边和右边都会使用第二个值。指定两个值时，上边和下边会使用第一个值。如果只指定一个值，那么四个方向都会使用这个值。因此下面的声明都是等价的。\npadding: 1em 2em;\npadding: 1em 2em 1em;\npadding: 1em 2em 1em 2em;\n但是下面代码就是上，下，左，右\npadding: 1em ;\n\n\n水平、垂直\n\n有些属性包括background-position、box-shadow、text-shadow，比如background-position: 25% 75%则先指定水平方向的右&#x2F;左属性值，然后才是垂直方向的上&#x2F;下属性值。虽然看起来顺序相反的定义违背了直觉，原因却很简单：这两个值代表了一个笛卡儿网格。笛卡儿网格的测量值一般是按照 （水平，垂直）的顺序来的。比如，如图1-15所示，要给元素加上一个阴影，就要先指定 （水平）值。\n.nav .featured &#123;\nbackground-color: orange;\nbox-shadow: 10px 2px #6f9090; ←---- 阴影向右偏移10px，向下偏移2px\n&#125;\n如果属性需要指定从一个点出发的两个方向的值，就想想“笛卡儿网格”。如果属性需要指定一个元素四个方向的值，就想想”时钟”。\n2. 相对单位em的单位难以把握，像素单位相对简单\n2.1 相对值的好处2.1.1 那些年追求的像素级完美2.1.2 像素级完美的时代终结了响应式：根据浏览器大小有不同的响应\n2.2 em和remem是一种计算单位，它的单位是根据所修饰元素的字体大小进行计算。比如代码2-1如上代码设置的16px，那么padding的内边距也是16px,那么如果你的字体是32px，那么内边距就会是32px.\n当计算padding,heigh,width,border-radius.使用em会非常方便。这因为当元素的字体改变时就会更改em的单位。\n代码2-3\n2.2.1 使用em定义字号如果定义字体的的单位是em,那么那么实际上这个字体的结果是从继承的字号进行计算的。如代码2-5所展示的也就是 继承父元素字号*em &#x3D; 子元素像素值，那么也就是css中的em单位是子除父字号，大多数浏览器来说，默认的字号为16px。\n\nem同时作用于字体和其他属性\n\n浏览器要先计算字号，然后再计算，然后再根据这个结算后的字号值，再去计算其他值\n\n字体缩小的问题\n\n想象这一种场景，我们说em就是一种权重，那么如果DOM中是嵌套的，然后子元素的字体大小通过继承父元素大小计算。如果em是小于0的值，就会变成子元素逐级变小。代码2-9 展示出用选择器优先级来覆盖我们碰到的问题。ul ul选择出所有的ul元素\n2.2.2 使用rem设置字号当浏览器解析HTML文档时，会在内存里将页面的所有元素表示为DOM（文档对象模型）。它是一个树结构，其中每个元素都由一个节点表示。&lt; html &gt;元素是顶级（根）节点。它下面是子节点，&lt; head &gt;和&lt; body &gt;。再下面是逐级嵌套的后代节点。在文档中，根节点是所有其他元素的祖先节点。根节点有一个伪类选择器:root，可以用来选中它自己。这等价于类型选择器html &#123;&#125;\nrem是root em的缩写，rem不是相对于当前元素，还是相对根元素，不管其他元素位于网页的任何位置，都只是计算根元素的字体大小代码清单2-10\n在CSS里，设置位置通常是“看情况”。rem只是你工具包中的一种工具。掌握CSS很重要的一点是学会在适当的场景使用适当的工具。我一般会用rem设置字号，用px设置边框，用em设置其他大部分属性，尤其是内边距、外边距和圆角（不过我有时用百分比设置容器宽度）。\n2.3停止像素思考很很多程序员会设置html标签字体的大小。这也的确能计算子元素的相对值，但是这回有2种弊端\n\n这会写很多覆盖的代码\n这本质上还是像素思想，这样不利于写响应式网页\n\n自适应布局：是指网页能够在不同大小的终端设备上自行适应显示，也就是让一个网站在不同大小的设备上显示同一样的页面，让同一个页面适应不同大小屏幕，根据屏幕的大小，自动缩放。自适应布局的几个标志：\n\n比如单终端（手机）的N主流产品\n当网页缩写到一定程度时，界面会出现显示不全，并且出现横向滑动条；\n总体框架不变，横线布局的版块太多会有所减少。\n\n响应式布局： 就是一个网站能够兼容多个终端，可以根据屏幕的大小自动调整页面的的展示方式以及布局，我们不用为每一个终端做一个特定的版本。响应式网站的几个标志：\n\n同时适配PC + 平板 + 手机等；\n标签导航在接近手持终端设备时改变为经典的抽屉式导航；\n网站的布局会根据视口来调整模块的大小和位置；\n\n2.3.1 设置一个合理的默认的字号在写css样式代码中，不应该采用新的字号值覆盖父值的办法，这样效率非常低下，要采用相对单位来实现字体大小的调整。可设置root元素的字体值然后在其基础上进行计算。\n:root &#123;\n  font-size:0.875em \n&#125;\n--公式是父/子=em\n在代码2-14中使用了em设置边距和圆角，使用rem设置标题和字号\n2.3.2 构建响应式面板在构建响应式web之前需要设置响应式面板，可以根据不同媒体媒介进行设置。及@media可以指定屏幕尺寸和媒体类型。\n:root &#123;\n\nfont-size: 0.75em;              （以下3行）作用到所有的屏幕，但是在大屏上会被覆盖\n&#125;\n@media (min-width: 800px) &#123;     （以下5行）仅作用到宽度800px及其以上的屏幕，覆盖之前的值\n:root &#123;\nfont-size: 0.875em;\n&#125;\n&#125;\n@media (min-width: 1200px) &#123;  （以下5行）仅作用到宽度1200px及其以上的屏幕，覆盖前面两个值\n:root &#123;\nfont-size: 1em;\n&#125;\n&#125;\n\n上卖弄代码不难看出，第一个规则集在大屏幕会被覆盖，当屏幕大于800px然后第二个规则集会生效。大于1200px则第三个规则会生效具体代码如2-15\n2.3.3 缩放单个组件假如我们有个需求是对屏幕中某个组件进行缩放，那么我们可以采用覆盖值的但是正如代码2-16所示。\n采用高权重样式值覆盖的策略\n2.4 视口的相对单位\nvh：视口高度的1&#x2F;100。\nvw：视口宽度的1&#x2F;100。\nvmin：视口宽、高中较小的一方的1&#x2F;100（IE9中叫vm，而不是vmin）。\nvmax：视口宽、高中较大的一方的1&#x2F;100（本书写作时IE和Edge均不支持vmax\n\n代码清单2-18\n2.4.1 使用vw定义字号如果给一个元素加上font-size: 2vw会发生什么？在一个1200px的桌面显示器上，计算值为24px（1200的2%）。在一个768px宽的平板上，计算值约为15px（768的2%）。这样做的好处在于元素能够在这两种大小之间平滑地过渡，这意味着不会在某个断点突然改变。当视口大小改变时，元素会逐渐过渡。\n2.4.2 使用calc()定义字号calc()函数内可以对两个及其以上的值进行基本运算。当要结合不同单位的值时，calc()特别实用。它支持的运算包括：加（+）、减（-）、乘（×）、除（÷）。加号和减号两边必须有空白，因此我建议大家养成在每个操作符前后都加上一个空格的习惯，比如calc(1em +10px)。代码清单2-19用calc()结合了em和vw两种单位。删除之前样式表的基础字号（以及相关的媒体查询），换成如下代码。代码2-19，现在打开网页，慢慢缩放浏览器，字体会平滑地缩放。0.5em保证了最小字号，1vw则确保了字体会随着视口缩放。这段代码保证基础字号从iPhone 6里的11.75px一直过渡到1200px的浏览器窗口里的20px。可以按照自己的喜好调整这个值。我们不用媒体查询就实现了大部分的响应式策略。省掉三四个硬编码的断点，网页上的内容也能根据视口流畅地缩放。\n2.5 无单位的数值和行高\n如果父级的line-height属性值有单位或百分比，那么子级继承的值则是换算后的一个具体的px级别的值；\n而如果父级的line-height属性值没有单位，则子级会直接继承这个“数值”，而非计算后的具体值，此时子级的line-height会根据本身的font-size值重新计算得到新的line-height值。\n\n每个元素使用相同的font-size，但使用不同的font-family，但渲染出来的line-height是不同的。\nCSS 权威指南基本视觉格式化一章中讲到：对于行内非替换元素或者匿名文本来说， font-size 指定了它们的 content area的高度，由于inline box 是由 content area 加上上下的 half-leading构成的，那么如果元素的leading为 0，在这种情况下，font-size 指定了inline box 的高度。\n英文字体有基线（baseline）和中线（meanline），这两条线之间就是所谓的x-height，即小写字母x的高度。基线之上的部分是上伸区域（ascent），基线之下的部分是下伸区域（descent).\n2.6 自定义属性(即css变量)在2015年新的css规范引入了层叠变量的自定义属性。也就是允许在css使用变量的概念。\n:root &#123;\n  --main-font: Helvetica, Arial, sans-serif;\n&#125;\n这相当于定义了一个全局的，在整个网页都可以使用的变量main-font,如果是在根节点定义变量，那么它下面的子元素都可以使用该变量，同理如果在某一节点元素内定义变量，那么它下面的子元素才可以使用，兄弟元素和它的父元素都无法使用，然后我们可以调用var()函数取出定义的值。\np &#123;\nfont-family: var(--main-font);\ncolor: var(--brand-color);\n&#125;\n思考一下如果第一个值未定义，那么就可以使用备用值.\np &#123;\n    font-family: var(--main-font, sans-serif);  ←---- 指定备用值为sans-serif\n    color: var(--secondary-color, blue);        ←---- secondary-color变量没有定义，因此会使\n&#125;\n如果定义的变量是个非法值就会使用属性的默认值\n2.6.1 动态改变自定义属性其实这节主要就是讲解自定义属性变量的作用域。有如下例子\n&lt;!doctype html>\n&lt;head>\n  &lt;style>\n    :root &#123;\n      font-size: calc(0.5em + 1vw);\n      --main-bg: #fff;\n      --main-color: #000;\n    &#125;\n\n    body &#123;\n      font-family: Helvetica, Arial, sans-serif;\n    &#125;\n\n    .dark &#123;\n      margin-top: 2em;\n      padding: 1em;\n      background-color: #999;\n      --main-bg: #333;\n      --main-color: #fff;\n    &#125;\n\n    .panel &#123;\n      font-size: 1rem;\n      padding: 1em;\n      border: 1px solid #999;\n      border-radius: 0.5em;\n      background-color: var(--main-bg);\n      color: var(--main-color);\n    &#125;\n\n    .panel > h2 &#123;\n      margin-top: 0;\n      font-size: 0.8em;\n      font-weight: bold;\n      text-transform: uppercase;\n    &#125;\n\n    .panel.large &#123;\n      font-size: 1.2em;\n    &#125;\n  &lt;/style>\n&lt;/head>\n\n&lt;body>\n  &lt;div class=\"panel\">\n    &lt;h2>Single-origin&lt;/h2>\n    &lt;div class=\"body\">\n      We have built partnerships with small farms\n      around the world to hand-select beans at the\n      peak of season. We then carefully roast in\n      small batches to maximize their potential.\n    &lt;/div>\n  &lt;/div>\n\n  &lt;aside class=\"dark\">\n    &lt;div class=\"panel\">\n      &lt;h2>Single-origin&lt;/h2>\n      &lt;div class=\"body\">\n        We have built partnerships with small farms\n        around the world to hand-select beans at the\n        peak of season. We then carefully roast in\n        small batches to maximize their potential.\n      &lt;/div>\n    &lt;/div>\n  &lt;/aside>\n&lt;/body>\n\n在上面例子中定义了两个属性。第一个在根属性上定义了属性，第二个在dark元素上定义了属性。但是第二个属性会覆盖掉第一个全局的属性，根语言中属性作用域很像\n2.6.2 使用js改变自定义属性具体实现不需要深究，只需要知道js可以改变属性的值，从而使网页设计更灵活\n2.6.3 探索自定义属性自定义属性是CSS中一个全新的领域，开发人员刚刚开始探索。因为浏览器支持有限，所以还没有出现“典型”的用法。我相信假以时日，会出现各种最佳实践和新的用法。这需要你持续关注。继续使用自定义属性，看看能用它做出什么效果。值得注意的是，在不支持自定义属性的浏览器上，任何使用var()的声明都会被忽略。请尽量为这些浏览器提供回退方案。然而这种做法不是万能的，比如当用到自定义属性的动态特性时，就很难有备用方案。关注 Can I Use网站，查看最新的浏览器支持情况。\n3 盒子模型3.1 元素宽度的问题这一节最重要的是盒子模型\n\n代码3-3设置的windth=30%为内容的宽度。在以上例子中（代码清单3-3），两列并没有并排出现，而是折行显示。虽然将两列宽度设置为70%和30%，但它们总共占据的宽度超过了可用空间的100%，侧边栏的宽度等于30%宽度加上各1.5em的左右内边距，主容器的宽度只占70%。两列宽度加起来等于100%宽度加上3em。因为放不下，所以两列便折行显示了。\n3.1.1 避免魔术数值替代魔术数值的一个方法是让浏览器帮忙计算。在本例中，因为加了内边距，两列的宽度总和超出了3em，所以可以使用calc()函数减去这个值，得到刚好100%的总和。比如设置侧边栏宽度为calc(30% - 3em)就能刚好并排放下两列，但是还有更好的解决办法。\n3.1.2 调整盒子模型默认的盒子模型的宽度的width是内容的宽度，box-sizing: border-box的盒子模型的width的宽度是边框和内容\n3.1.3 全局设置border-box*,::before,::after &#123;\nbox-sizing: border-box; ←---- 给页面上所有元素和伪元素设置border-box\n&#125;\n全部元素都采用border-box属性，但是引入第三方的css代码就会导致无法影响别人的代码，故采用\n:root &#123;\nbox-sizing: border-box; ←---- 根元素设置为border-box\n&#125;\n*,\n::before,\n::after &#123;\nbox-sizing: inherit; ←---- 告诉其他所有元素和伪元素继承其盒模型\n&#125;\n\n.third-party-component &#123;\nbox-sizing: content-box;\n&#125;\n这样就解决了潜在影响第三方库css代码(该书后面代码都是用box-sizing:border-box)\n3.1.4 给列之间加上间隔实现在两个元素之间添加间距的方法有很多，\n\n简单的就是通过计算width的值，在值上trade-off,但是间隔的宽度由外层容器的宽度决定.用em指定间距，因为em单位的一致性更好。\n使用calc()函数，如代码3-8\n\n3.2 元素高度的问题普通文档流——指的是网页元素的默认布局行为。行内元素跟随文字的方向从左到右排列，当到达容器边缘时会换行。块级元素会占据完整的一行，前后都有换行。\n3.2.1 控制溢出行为当明确设置一个元素的高度时，内容可能会溢出容器。当内容在限定区域放不下，渲染到父元素外面时，就会发生这种现象\n\nvisible（默认值）——所有内容可见，即使溢出容器边缘。\nhidden——溢出容器内边距边缘的内容被裁剪，无法看见。\nscroll——容器出现滚动条，用户可以通过滚动查看剩余内容。在一些操作系统上，会出现水平和垂直两种滚动条，即使所有内容都可见（不溢出）。不过，在这种情况下，滚动条不可滚动（置灰）。\nauto——只有内容溢出时容器才会出现滚动条。\n\n请谨慎地使用滚动条。浏览器给网页最外层加上了滚动条，如果网页内部再嵌套滚动区域，用户就会很反感。如果用户使用鼠标滚轮滚动网页，当鼠标到达一个较小的滚动区域，滚轮就会停止滚动网页，转而滚动较小的区域。\n水平方向的溢出除了垂直溢出，内容也可能在水平方向溢出。一个典型的场景就是在一个很窄的容器中放一条很长的URL。溢出的规则跟垂直方向上的一致。可以用overflow-x属性单独控制水平方向的溢出，或者用overflow-y控制垂直方向溢出。这些属性支持overflow的所有值，然而同时给x和y指定不同的值，往往会产生难以预料的结果。\n3.2.2 百分比高度的备选方案在实现页面的时候，通常是子元素的高度决定了父元素的高度。这样就会一直往上依赖.要想百分高度生效,需要给父元素设置一个高度\n\n等高列  在早期时候使用表格实现等高列但通常是通过内容来计算高度,现代浏览器解决这种问题.\ncss表格布局代码3-10\n首先要给容器设置display:table，然后给每一列设置display:table-cell.container &#123;\ndisplay: table; ←----让容器布局像表格一样\nwidth: 100%;    ←---- ❶让表格填充容器的宽度\n&#125;\n\n.main &#123;\ndisplay: table-cell;\nwidth: 70%;\nbackground-color: #fff;\nborder-radius: .5em;\n&#125;\n\n.sidebar &#123;\ndisplay: table-cell;\nwidth: 30%;\nmargin-left: 1.5em;  &lt;-----外边距不在生效\npadding: 1.5em;\nbackground-color: #fff;\nborder-radius: .5em;\n&#125;\n以上代码缺少间隔，这是因为外边距并不会因为table-cell元素，所以要修改代码，让间隔生效，可以使用table-spacing属性定义单元格的间距。该元素接收两个长度值，一个是水平间距一个是垂直间距。可以给容器加上border-spacing: 1.5em，0em ，但是这样有个副作用。就是左右没法对齐 。机制的你可能会想到父边距，然后我们在外面包上一层。然后指定左右负边距。\n\n\nFlexbox可以使用Flexbox实现等高列，我们可以给容器设置flex，就变成了一个弹性容器详情参考代码3-11\n\n3.2.3 使用min-height和max-heightmax-height允许元素自然地增高到一个特定界限。如果到达这个界限，元素就不再增高，内容会溢出\n3.2.4 垂直居中内容对于显示为table-cell的元素，vertical-align控制了内容在单元格内的对齐。如果你的页面用了CSS表格布局，那么可以用vertical-align来实现垂直居中。具体详情 参考代码3-12这个地方要在网上看看例子\n3.3 负边距如果设置左边或顶部的负外边距，元素就会相应地向左或向上移动，导致元素与它前面的元素重叠，如果设置右边或者底部的负外边距，并不会移动元素，而是将它后面的元素拉过来。给元素底部加上负外边距并不等同于给它下面的元素顶部加上负外边距。\n3.4 外边距折叠鸡儿的，元素的外边距是折叠的，产生单个外边距。这种现象被称为折叠。\n3.4.1 文字折叠折叠外边距的大小等于相邻外边距中的最大值\n3.4.2 多个外边距折叠在代码清单3-13中，有三个不同的外边距折叠到一块了：&lt; h2&gt;底部的外边距、&lt; div&gt;顶部的外边距、&lt; p&gt;顶部的外边距。计算值分别是19.92px ，0px、16px。因此最终间隔还是19.92px，也就是三者中最大的值。实际上，即使将段落放在多个div中嵌套，渲染结果都一样：所有的外边距都会折叠到一起。总之，所有相邻的顶部和底部外边距会折叠到一起。如果在页面中添加一个空的、无样式的div（没有高度、边框和内边距），它自己的顶部和底部外边距就会折叠。\n3.4.3 容器外部折叠容器内部元素跑出外与别的元素外边距折叠。可考虑在容器设置内边界还有如下方法防止外边距折叠\n\n对容器使用overflow: auto（或者非visible的值），防止内部元素的外边距跟容器外部的外边距折叠。这种方式副作用最小。\n在两个外边距之间加上边框或者内边距，防止它们折叠。\n如果容器为浮动元素、内联块、绝对定位或固定定位时，外边距不会在它外面折叠。\n当使用Flexbox布局时，弹性布局内的元素之间不会发生外边距折叠。网格布局（参见第6章）同理。\n当元素显示为table-cell时不具备外边距属性，因此它们不会折叠。此外还有table-row和大部分其他表格显示类型，但不包括table、table-inline、table-caption。\n\n3.5 容器内的元素间距详情在代码3-17 绘制了一个间距相同的两个按钮\n3.5.1 如果内容改变了如果在代码3-17中重新添加一个元素我又要重新编写样式\n3.5.2 更通用的方案：猫头鹰解决方案Web设计师Heydon Pickering曾表示外边距“就像是给一个物体的一侧涂了胶水，而你还没有决定是否要将它贴到某处，或者还没想好要贴到什么东西上”。不要给网页当前的内容固定外边距，而是应该采取更通用的方式，不管网页结构如何变化都能够生效。这就是Heydon Pickering所说的迟钝的猫头鹰选择器（lobotomized owl selector）（以下简称猫头鹰选择器），因为它长这样：* + * 。该选择器开头是一个通用选择器（*），它可以选中所有元素，后面是一个相邻兄弟组合器（+），最后是另一个通用选择器。它因形似一只眼神空洞的猫头鹰而得名。猫头鹰选择器功能接近此前介绍的选择器：.social-button + .social-button，但是它不会选中直接跟在其他按钮后面的按钮，而是会选中直接跟在其他元素后面的任何元素。也就是说，它会选中页面上有着相同父级的非第一个子元素代码3-22\n4 理解浮动说白了主要有三种方式影响文档流\n\n浮动\nFlexbox\n网格布局\n\n早些时候用的更多的是浮动布局，但是这种当时布局很难理解，在本章将会介绍双容器和媒体对象\n4.1 浮动的设计初衷浮动能将一个元素（通常是一张图片）拉到其容器的一侧，这样文档流就会包围它，也可以浮动到右侧，这时候文档流会重新排列，如果多个元素浮动，那么他们会挨着浮动。设计页面的时候通常是规划好外层容器，然后再设计内层。双容器模式：通过将内容放置到两个嵌套的容器中，然后给内层的容器设置外边距，让它在外层容器中居中，在本例中，&lt; body &gt;就是外层容器。因为它默认是100%的网页宽度，所以不用给它添加新的样式。在&lt; body &gt;内部，整个网页的内容放在了&lt; div class&#x3D;”container” &gt;，也就是内层容器中。对于内层容器，需要设置一个max-width，并将外边距设置为auto，使内容居中。将代码清单4-3添加到你的样式表中\n4.2 容器折叠和清除浮动4.2.1 理解容器折叠这一节一定要从代码上加以理解。代码4-4\n4.2.2 理解清除浮动暂时还不理解\n4.3 出乎意料的浮动陷阱浮动布局先放一放\n5 Flexboxflexbox算是现代的网页布局方式\n5.1 FLexbox的原则display:flex就可以使容器变成一个弹性容器，它里面的元素就是弹性子元素把他想象成一个罐子，里面装东西，子元素按照主轴线排列，主轴的方向为主起点（左）到主终点（右）。垂直于主轴的是副轴。方向从副起点（上）到副终点（下）。下面我们看个实际应用例子5-1\n\n我们还可以使用display:inline-flex其行为更像是inline--bolck,但是其长度不会自动加到100%。\n\n5.1.1 创建一个基础的Flexbox菜单这一节主要是介绍了，在不同浏览器我们是要使用不同的属性名来使用flexbox的定义，我们可以使用Autoprefixer的工具进行格式化批量更改\n\n旧版safari.site-nav &#123;\ndisplay: -webkit-flex;\ndisplay: flex;\n&#125;\n主要还是要学习下相关示例代码5-3\n\n5.1.2 添加内边距和间隔这节我们我们围绕示例代码5-4\n注意这里的链接被设置为块级元素。如果链接还是行内元素，那么它给父元素贡献的高度会根据行高计算，而不是根据内边距和内容，这样不符合预期\n代码5-5教我们如何实现最后一个元素移到右面\n如果希望菜单项等间距，那么justify-content属性会是更好的方式。\n5.2 弹性子元素的大小flexbox提供可比width设heigh功能更强大flex属性。flex控制主轴方向的大小，flex会被自动计算然后填满容器宽度\n5.2.1 使用flex-basis属性flex-basis定义了元素大小的基准值，即一个初始的“主尺寸”。flex-basis属性可以设置为任意的width值，包括px、em、百分比。它的初始值是auto，此时浏览器会检查元素是否设置了width属性值。如果有，则使用width 的值作为flex-basis的值；如果没有，则用元素内容自身的大小。如果flex-basis的值不是auto，width属性会被忽略\n5.2.2 使用flex-grow属性我们上面使用flex-basis属性会导致页面出现空白区域，但是我们可以使用flex-grow属性，来控制页面放缩时候的放缩权重，flex-grow值越大，子元素能分配剩余可用宽度的比例越大推荐使用简写属性flex，而不是分别声明flex-grow、flex-shrink、flex-basis。与大部分简写属性不一样，如果在flex中忽略某个子属性，那么子属性的值并不会被置为初始值。相反，如果某个子属性被省略，那么flex简写属性会给出有用的默认值：flex-grow为1、flex-shrink为1、flex-basis为0%。这些默认值正是大多数情况下所需要的值\n5.2.3 使用flex-shrink属性flex-shrink属性与flex-grow遵循相似的原则。计算出弹性子元素的初始主尺寸后，它们的累加值可能会超出弹性容器的可用宽度。如果不用flex-shrink，就会导致溢出，每个子元素的flex-shrink值代表了它是否应该收缩以防止溢出。如果某个子元素为flex-shrink: 0，则不会收缩；如果值大于0，则会收缩至不再溢出。按照 flex-shrink值的比例，值越大的元素收缩得越多。\n5.2.4 实际应用重点是如何实现圣杯布局，众所周知，用CSS实现这种布局非常困难。该布局中，两个侧边栏宽度固定，而中间的列是“流动的”，即它会自动填充可用空间。重点是，三列的高度相等，该高度取决于它们的内容。尽管浮动也能实现这种布局，但需要用一些既晦涩又脆弱的技巧。你可以使用不同的弹性子元素，想出很多不同的方式来组合以上的布局。\n5.3 弹性方向如何切换主主副轴方向，可以使用flex-direction: column，指定flex-direction: column能控制弹性子元素沿垂直方向排列（从上到下）。Flexbox还支持row-reverse让元素从右到左排列，column-reverse让元素从下到上排列\n5.3.1 改变弹性方向.column-sidebar &#123; （以下5行）对外面的弹性盒子来说是弹性子元素，对内部的元素而言是弹性容器\nflex: 1;\ndisplay: flex;\nflex-direction: column;\n&#125;\n内部的弹性盒子的弹性方向为column，因此主轴发生了旋转，现在变成了从上到下（副轴变成了从左到右）。也就是对于弹性子元素而言，flex-basis、flex-grow和flex-shrink现在作用于元素的高度而不是宽度。\n水平弹性盒子的大部分概念同样适用于垂直的弹性盒子（column或column-reverse），但是有一点不同：在CSS中处理高度的方式与处理宽度的方式在本质上不一样。弹性容器会占据100%的可用宽度，而高度则由自身的内容来决定。即使改变主轴方向，也不会影响这一本质。\n5.3.2 登录表单的样式详情请学习代码清单5-10\n5.4 对齐，间距等细节通常情况下，创建一个弹性盒子需要用到前面提及的这些方法。\n\n选择一个容器及其子元素，给容器设置display: flex\n如有必要，给容器设置flex-direction\n给弹性子元素设置外边距和&#x2F;或flex值，用来控制它们的大小\n\n5.4.1 理解弹性容器的属性\n\n\n属性\n值\n\n\n\nflex-direction\nrow是水平方向row-reverse是水平反方向column是默认向下column-reverse是主轴反过来\n\n\nflex-wrap折叠显示\nno-wrap就不会折叠wrap是折叠wrap-reverse是反向折叠。flex-wrap的叠着跟主轴的方向有关\n\n\nflex-flow\n&lt; flex-direction &gt; &lt; flex-wrap &gt;的简写\n\n\njustify-content控制子元素在主轴上的位置\nflex-start  flex-end  center  space-between  space-around\n\n\nalign-items控制子元素在副轴上的位置\nflex-start  flex-end  center  stretch  baseline \n\n\nalign-content如果开启了flex-wrap，align-content就会控制弹性子元素在副轴上的间距。如果子元素没有换行，就会忽略align-content\nflex-start  flex-end  center  stretch  space-between  space-around\n\n\n5.4.2 理解弹性子元素的属性前面已经介绍了弹性子元素的flex-grow、flex-shrink、flex-basis以及它们的简写属性flex（参见5.2节）。接下来再介绍两个弹性子元素的属性：align-self和order。\n\n\nalign-self属性该属性控制弹性子元素沿着容器副轴方向的对齐方式。它跟弹性容器的align-items属性效果相同，但是它能单独给弹性子元素设定不同的对齐方式。auto为初始值，会以容器的align-items值为准。其他值会覆盖容器的设置。align-self属性支持的关键字与align-items一样：flex-start、flex-end、center、stretch以及baseline。\n\n\n\norder属性正常情况下，弹性子元素按照在HTML源码中出现的顺序排列。它们沿着主轴方向，从主轴的起点开始排列。使用order属性能改变子元素排列的顺序。还可以将其指定为任意正负整数。如果多个弹性子元素有一样的值，它们就会按照源码顺序出现。初始状态下，所有的弹性子元素的order都为0。指定一个元素的值为-1，它会移动到列表的最前面；指定为1，则会移动到最后。可以按照需要给每个子元素指定order以便重新编排它们。这些值不一定要连续。\n\n\n\n5.4.3 使用对齐属性用span而不是div来放置文字，因为span默认就是行内元素。如果因为某些原因CSS加载失败，或者浏览器不支持Flexbox，那么$20.00仍然会在一行显示。下面的代码清单里，使用justify-content让弹性子元素在弹性容器里水平居中，然后用align-items和align-self控制文字的垂直对齐。将代码清单5-11添加到样式表。\n.\ncentered &#123;\ntext-align: center;\n&#125;\n.\ncost &#123;\ndisplay: flex;\njustify-content: center; （以下2行）让弹性子元素在主轴和副轴方向上均居中\nalign-items: center;\nline-height: .7;\n&#125;\n.cost > span &#123;\nmargin-top: 0;    ←----覆盖猫头鹰选择器设置的外边距\n&#125;\n.cost-currency &#123;\nfont-size: 2rem; （以下7行）给价格的各个部分设置不同的字号\n&#125;\n.cost-dollars &#123;\nfont-size: 4rem;\n&#125;\n.cost-cents &#123;\nfont-size: 1.5rem;\nalign-self: flex-start; ←---- 覆盖这个子元素的align-items，将其与容器顶部而不是中间对\n&#125;\n.cta-button &#123;\ndisplay: block;\nbackground-color: #cc6b5a;\ncolor: white;\npadding: .5em 1em;\ntext-decoration: none;\n&#125;\n5.5 值得注意的地方并不是所有浏览器都完美地实现了Flexbox，尤其是IE10和IE11。Flexbox在大多数情况下可以正常工作，但是可能会在一些环境下遇到bug。一定要确保在你想要支持的旧版浏览器上充分测试它。与其花费时间讨论你可能或者永远不会遇到的bug，我更愿意推荐一个特别棒的资源，叫Flexbugs。它的GitHub页面维护了所有已知的Flexbox的浏览器bug（本书写作时总共有14个），解释了哪些环境下会导致这些bug，并大部分情况下给出了解决方案。如果你发现在某个浏览器下Flexbox布局表现得不太一样，请访问这个页面看看是不是遇到了其中的浏览器bug。\n6 网格布局就像是坐标系或者是写字用的田字格，可以设计和做出很复杂的页面\n6.1 网页布局开始新纪元构建基础网格\n首先我们定义一个容器，然后设置元素display：grid 这样该元素变成了某种容器，表现的像个块级元素，100%填充可用宽度，你也可以使用inline-grid，虽然书中没写\n\n.grid &#123;\ndisplay: grid; ←---- 将元素设为网格容器\ngrid-template-columns: 1fr 1fr 1fr; ←---- 定义等宽的三列\ngrid-template-rows: 1fr 1fr; ←---- 定义等高的两行\ngrid-gap: 0.5em;\n&#125;\n.grid > * &#123;\nbackground-color: darkgray;\ncolor: white;\npadding: 2em;\nborder-radius: 0.5em;\n&#125;\nrid-template-columns是渲染三列，然后长度为1fr是分数单位，三列就是1fr等分，grid-template-rows定义等高的三列，不一定非得用分数单位，可以使用其他的单位，比如px、em或百分数。也可以混搭这几种单位，例如，grid-template-columns:300px 1fr定义了一个固定宽度为300px的列，后面跟着一个会填满剩余可用空间的列。2fr的列宽是1fr的两倍,grid-gap属性定义了每个网格单元之间的间距。也可以用两个值分别指定垂直和水平方向的间距（比如grid-gap: 0.5em 1em）。\n6.2 网格刨析\n网格线（grid line）——网格线构成了网格的框架。一条网格线可以水平或垂直，也可以位于一行或一列的任意一侧。如果指定了grid-gap的话，它就位于网格线上。\n网格轨道（grid track）——一个网格轨道是两条相邻网格线之间的 空间。网格有水平轨道（行）和垂直轨道（列）。\n网格单元（grid cell）——网格上的单个空间，水平和垂直的网格 轨道交叉重叠的部分。\n网格区域 (grid area）——网格上的矩形区域，由一个到多个网格单元组成。该区域位于两条垂直网格线和两条水平网格线之间\n\n代码清单6-3\nrepeat()函数是重复设置的列宽，例如repeat(3，2fr,1fr)\n6.2.1 网格线的编号网格编号在主轴上是从左向右递增，负轴是自上而下递增grid-column: 1 / 3 是从编号1的网格线跨域到网格线3，下面的同理grid-row: 3 / 5\n说明 这些属性实际上是简写属性：grid-column是grid-column-start和grid-column-end的简写；grid-row是grid-row-start和grid-row-end的简写。中间的斜线只在简写属性里用于区分两个值，斜线前后的空格不作要求。\n6.2.2 与flexbox配合网格布局和flex布局是互补关系，不是互相独立的关系。\n\nflex本质上是一维，而网格是二维的\nflex是以内容为切入点，网格布局是以整体为布局\n\n当设计要求元素在两个维度上都对齐时，使用网格。当只关心一维的元素排列时，使用Flexbox。在实践中，这通常（并非总是）意味着网格更适合用于整体的网页布局，而Flexbox更适合对网格区域内的特定元素布局。继续用网格和Flexbox，你就会对不同情况下该用哪种布局方式得心应手。\n6.3 替代语法6.3.1 命名的网格线\n常规声明方式\ngrid-template-columns: [start] 2fr [center] 1fr [end];\n下面方式没有\ngrid-column: start / center;\nrepeat()里声明了一条命名的水平网格线，于是每条水平网格线被命名为row（除了最后一条）。这看起来很不可思议，但是重复使用同一个名称完全合法。将网格元素放在第二个“col”网格线处，跨越两个轨道（col 2 /span 2）\n\n多命名声明方式\n\n\n代码清单6-6\n\ngrid-template-columns:  [left-start] 2fr\n                        [left-end right-start] 1fr\n                        [right-end];\ngrid-template-rows: repeat(4, [row] auto);\n\n\n6.3.2 命名网格区域不知可以命名网格线，我们还可以命名网格区域，grid-template属性和网格元素的grid-area属性。grid-template-areas属性使用了一种ASCII art的语法，可以直接在CSS中画一个可视化的网格形象。该声明给出了一系列加引号字符串，每一个字符串代表网格的一行，字符串内用空格区分每一列。代码清单6-7\n6.4 显式和隐式网格使用grid-template-* 属性定义网格轨道时， 创建的是显式网格代码清单6-9访问Grid by Example网站的文章auto-fill vs. auto-fit可以看到两者区别的示例。\n6.4.1 添加变化我们想1X1的图片变成2X2的网格区域。\ngrid-auto-flow它可以控制布局算法的行为。 它的初始值是row， 上一段描述的就是这个值的行为。如果值为column， 它就会将元素优先放在网格列中， 只有当一列填满了， 才会移动到下一行。\ngrid-auto-flow: column dense\n代码清单6-10\n子网格网格有一个限制是要求用特定的DOM结构， 也就是说， 所有的网格元素必须是网格容器的直接子节点。 因此， 不能将深层嵌套的元素在网格上对齐\n6.4.2 让网格元素填满网格轨道object-fit控制图片在盒子内渲染的方式代码清单6-11\n6.5 特性查询6.6 对齐justify-contentjustifyitemsjustify-self\nstart——将网格轨道放到网格容器的上&#x2F;左（Flexbox里则是flexstart）end——将网格轨道放在网格容器的下&#x2F;右（Flexbox里则是flexend)center——将网格轨道放在网格容器的中间。stretch——将网格轨道拉伸至填满网格容器。space-between——将剩余空间平均分配到每个网格轨道之间（它能覆盖任何grid-gap值。space-around——将空间分配到每个网格轨道之间， 且在两端各加上一半的间距。space-evenly——将空间分配到每个网格轨道之间， 且在两端各加上同等大小的间距（Flexbox规范不支持。\n7 定位和层叠上下文7.1 固定定位固定定位让元素相对视口定位.元素position: fixed就能将元素放在视口的任意位置,是相对于视口为坐标系然后进行定位,用： top,right,bottom,left 这些属性的值决定了固定定位的元素与浏览器视口边缘的距离\n7.1.1 用固定定位创建一个模态框display属性的用法与区别\n&#123;display: none;&#125;\n&#123;display: inline;&#125;\n&#123;display: block;&#125;\n&#123;display: inline-block;&#125;\n\n\n代码清单7-2\n7.1.2 控制定位元素的大小我们通过下面的属性控制元素的大小\nposition: fixed;\ntop: 1em;\nright: 1em;\nwidth: 20%   /*width是视口的20%*/\n/* right-margin: 20%。 是外边距是视口的20% */\n\n7.2 绝对定位绝对定位的行为是相对最近的祖先定位元素跟固定元素一样， 属性top、 right、 bottom和left决定了元素的边缘在包含块里的位置。这里边最近的祖先元素是坐标轴\n7.2.1 让Close按钮绝对定位代码清单7-3因为.modal-body是.modal-close的直接父元素，这时候你调节.modal-close会发现那个close按钮会相对直接父元素进行定位\n说明 如果祖先元素都没有定位， 那么绝对定位的元素会基于初始包含块（initial containing block） 来定位。 初始包含块跟视口一样大， 固定在网页的顶部。\n7.2.2 定位伪元素\n在使用CSS之前， HTML本身必须有意义\ntext-indent属性将文字推到右边， 溢出元素\n\n代码清单7-4\n7.3 相对定位给元素加上相对定位也不会影响旁边的元素\n说明 跟固定或者绝对定位不一样， 不能用top、 right、 bottom和left改变相对定位元素的大小。 这些值只能让元素在上、 下、左、 右方向移动。 可以用top或者bottom， 但它们不能一起用（bottom会被忽略） 。 同理， 可以用left或right， 但它们也不能一起用（right会被忽略） 。\n7.3.1 创建一个下拉菜单下拉菜单容器包含两个子元素： 一个始终显示的灰色矩形标签以及一个下拉菜单。 下拉菜单用显示和隐藏表示菜单展开和收起。 因为它会是绝对定位的， 所以当下拉菜单显示时不会改变网页的布局， 这意味着它显示时会出现在其他内容前面。\n代码清单7-6\n7.3.2 创建一个css三角形7.4 层叠上下文和z-indexz-index值越大在Z轴上就越靠上，也就是离屏幕观察者越近。最后才发现这个认识存在很大的问题\n7.4.1 理解渲染过程和层叠顺序浏览器将HTML解析为DOM的同时还创建了另一个树形结构，叫作渲染树（render tree)\n定位元素时， 这种行为会改变。 浏览器会先绘制所有非定位的元素， 然后绘制定位元素。 默认情况下， 所有的定位元素会出现在非定位元素前面.我们使用相对定位之后，会改变元素的渲染顺序\n7.4.2 用z-index控制层叠顺序z-index属性的值可以是任意整数（正负都行） 。 表示的是笛卡儿x-y-z坐标系里的深度方向。拥有较高z-index的元素出现在拥有较低z-index的元素前面。z-index的行为很好理解， 但是使用它时要注意两个小陷阱。 第一， zindex只在定位元素上生效， 不能用它控制静态元素。 第二， 给一个定位元素加上z-index可以创建层叠上下文。\n7.4.3 理解层叠上下文什么是层叠上下文？其实就是判断元素在Z轴上的堆叠顺序，不仅仅是直接比较两个元素的z-index值的大小，这个堆叠顺序实际由元素的层叠上下文、层叠等级共同决定。\n\n什么是“层叠等级”\n普通元素的层叠等级优先由其所在的层叠上下文决定。\n层叠等级的比较只有在当前层叠上下文元素中才有意义。不同层叠上下文中比较层叠等级是没有意义的。\n\n\n如何产生“层叠上下文”\nHTML中的根元素&lt; html &gt;&lt; &#x2F;html &gt;本身就具有层叠上下文，称为“根层叠上下文”。\n普通元素设置position属性为非static值并设置z-index属性为具体数值，产生层叠上下文。\nCSS3中的新属性也可以产生层叠上下文。\n\n\n什么是“层叠顺序”\n左上角”层叠上下文background&#x2F;border”指的是层叠上下文元素的背景和边框。\ninline&#x2F;inline-block元素的层叠顺序要高于block(块级)&#x2F;float(浮动)元素。\n单纯考虑层叠顺序，z-index: auto和z-index: 0在同一层级，但这两个属性值本身是有根本区别的。\n\n\n\n7.5 粘性定位流盒：粘性定位中有一个“流盒”（flow box）的概念，指的是粘性定位元素最近的可滚动元素（overflow 属性值不是 visible 的元素）的尺寸盒子，如果没有可滚动元素，则表示浏览器视窗盒子。\n8 响应式设计什么是响应式？就是使用一套前端代码能在不同的客户端上有不同的渲染效果。响应式设计三大原则：\n\n移动平台优先设计\n@media规则，也叫媒体查询，样式只会在特定条件下生效\n流式布局，允许根据视口宽度缩放尺寸\n\n8.1 移动优先一旦我们把移动端做好了，我们就可以“渐进式”的为更大屏幕设计。断点：是一个视口的临界值，超过或者小于这个视口临界值css样式就会改变。也就是我们根据视口的大小来决定哪些样式生效。考虑大视口：当我们完成移动端初步的构想之后，我们就要考虑大视口。代码示例清单8-2\n8.1.1 创建移动版的菜单代码清单8-3\n提示 当设计移动触屏设备的时候， 确保所有的关键动作元素都足够大， 能够用一个手指轻松点击。 千万不要让用户放大页面， 才能点中一个小小的按钮或者链接。\n8.1.2 给视口添加meta标签meta标签: 这个HTML标签告诉移动设备， 你已经特意将网页适配了小屏设备。 如果不加这个标签， 移动浏览器会假定网页不是响应式的， 并且会尝试模拟桌面浏览器meta标签的content属性里包含两个选项\n\n首先， 它告诉浏览器当解析CSS时将设备的宽度作为假定宽度， 而不是一个全屏的桌面浏览器的宽度\n其次当页面加载时， 它使用initial-scale将缩放比设置为100%\n\n其余meta标签属性，此处要具体查谷歌user-scalable=no阻止用户在移动设备上用两个手指缩放代码清单8-6\n8.2 媒体查询其实原理很简单，就是我们设计一个”断点”,大于这个”断点”就是另外一套样式。\n\n.title > h1 &#123;\n      color: #333;\n      text-transform: uppercase;\n      font-size: 1.5rem;\n      margin: .2em 0;\n&#125;\n\n@media (min-width: 35em) &#123;\n  .title > h1 &#123;\n  font-size: 2.25rem;\n  &#125;\n&#125;\n当视口小于35em时候现在根据视口大小， 网页标题有两种不同的字号。 当视口小于35em的时候是1.5rem， 大于35em的时候是2.25rem。\n560px这个临界值被称为断点。 大多数情况下， 整个样式表里的媒体查询只会复用少数几个断点\n8.2.1 媒体查询的类型\n联合媒体查询@media (min-width: 20em) and (max-width: 35em) &#123; ... &#125;min-width匹配视口大于特定宽度的设备， max-width匹配视口小于特定宽度的设备。 它们被统称为媒体特征（media feature）\n\n(min-height: 20em)——匹配高度大于等于20em的视口。(max-height: 20em)——匹配高度小于等于20em的视口。(orientation: landscape)——匹配宽度大于高度的视口。(orientation: portrait)——匹配高度大于宽度的视口。(min-resolution: 2dppx)——匹配屏幕分辨率大于等于2dppx（dppx指每个CSS像素里包含的物理像素点数） 的设备， 比如视网膜屏幕。(max-resolution: 2dppx)——匹配屏幕分辨率小于等于2dppx的设备。\n基于分辨率的媒体查询比较棘手， 因为该特征比较新， 浏览器支持得不太好。单位是dppx，因此需要使用dpi单位代替。因此使用带有前缀的媒体特征\n媒体查询放在标签里，比如&lt;linkrel=&quot;stylesheet&quot; media=&quot;(min-width: 45em)&quot;href=&quot;large-screen.css&quot; /&gt;\n\n媒体类型\n\n媒体类型（media type） 。 常见的两种媒体类型是screen和print\n@media print &#123;\n* &#123;\n  color: black !important;\n  background: none !important;\n  &#125;\n&#125;\n\n8.2.2 给网页添加断点总是确保每个媒体查询都位于它要覆盖的样式之后， 这样媒体查询内的样式就会有更高的优先级\n.title &#123; ←---- 移动端样式， 对所有的断点都生效\n&#125; \n@media (min-width: 35em) &#123; ←---- 中等屏幕的断点： 覆盖对应的移动端样式\n.title &#123;\n  &#125;\n&#125; \n@media (min-width: 50em) &#123; ←---- 大屏幕断点： 覆盖对应的小屏幕和中等屏幕断点的样式\n.title &#123;\n  &#125;\n&#125;\n\n8.2.3 添加响应式的列@media (min-width: 35em) &#123;\n .row &#123;\n   display: flex;\n   margin-left: -.75em;←---- 使用负的外边距将行容器扩大， 补偿列的外边距（参见第4章，\n   margin-right: -.75em;\n  &#125;\n\n  .column &#123;\n    flex: 1;\n    margin-right: 0.75em; ←---- 添加列间距\n    margin-left: 0.75em;\n  &#125;\n&#125;\n\n8.3 流式布局流式布局中， 主页面容器通常不会有明确宽度， 也不会给百分比宽度， 但可能会设置左右内边距， 或者设置左右外边距为auto， 让其与视口边缘之间产生留白。 也就是说容器可能比视口略窄， 但永远不会比视口宽\n任何列都用百分比来定义宽度（比如， 主列宽70%， 侧边栏宽30%） 。 这样无论屏幕宽度是多少都能放得下主容器。\n让元素能够始终填满屏幕。 要习惯将容器宽度设置为百分比， 而不是任何固定的值\n8.3.1 给大视口添加样式代码清单8-12 在大屏的断点处增加内边距\n8.3.2 处理表格代码清单8-14 在大屏的断点处增加内边距\n8.4 响应式图片8.4.1 不同视口大小使用不同的图片说白了就是在不同媒体查询中指定不同的图片\n8.4.2 使用srcset提供对用的图片这个属性是HTML的一个较新的特性。 它可以为一个标签指定不同的图片URL， 并指定相应的分辨率。 浏览器会根据自身需要决定加载哪一个图片（如代码清单8-16所示）代码清单8-16 在大屏的断点处增加内边距\n9 模块化css库模块化CSS（Modular CSS） 是指把页面分割成不同的组成部分， 这些组成部分可以在多种上下文中重复使用， 并且互相之间没有依赖关系。最终目的是， 当我们修改其中一部分CSS时， 不会对其他部分产生意料之外的影响.远离就像是组合家具\n9.1 基础样式： 打好基础每个样式表的开头都要写一些给整个页面使用的通用规则， 模块化CSS也不例外\nnormalize.css的库， 这个小样式表可以协助消除不同的客户端浏览器渲染上的不一致。 可以从\n选择器不应该使用类名或者ID来匹配元素， 应只用标签类型或者偶尔用用伪类选择器。 核心思想是这些基础样式提供了一些默认的渲染\n基础样式配置完成以后， 很少会再修改。 我们会在基础样式的稳定表现之上， 构建模块化CSS。 在样式表中， 基础样式后面的内容将主要由各种模块组成\n9.2 一个简单的模块解决办法就是把按钮重构成一个可复用的模块， 不受页面位置的限制。创建模块不但可以精简代码（减少重复） ， 还可以保证视觉一致性。 这样看上去更专业， 不会给人仓促堆砌的感觉。 用户在潜意识里也会更容易相信我们的应用程序\n9.2.1 模块的变体通过定义一个以模块名称开头的新类名来创建一个修饰符,例如， 消息模块的error修饰符应该叫作message-error。 通过包含模块名称， 可以清楚地表明这个类属于消息模块。\n搞不懂代码就意味着bug变得常见\n\n按钮模块的变体\n\n说白就是就是同一类型的组件，不同的颜色\n\n不要使用依赖语境的选择器\n\n如果没有模块化CSS， 我们可能会使用类似于.page-header .dropdown的选择器， 先选中要修改的下拉菜单， 然后通过选择器写一些样式， 覆盖dropdown类提供的默认颜色。 现在要写模块化CSS， 这样的选择器是严格禁用的。\n\n第一， 我们必须考虑把这段代码放在哪里， 是和网页头部的样式放在一起， 还是跟下拉菜单的样式放在一起？ \n第二， 这种做法提升了选择器优先级。 当下次需要修改代码的时候， 我们需要满足或者继续提升优先级\n第三， 后面我们可能需要在其他场景用到深色的下拉列表。 刚才创建的这个下拉列表是限定在网页头部使用的\n第四， 重复使用这种写法会产生越来越长的选择器， 将CSS跟特定的HTML结构绑定在一起。 例如， 如果有个#products-page.sidebar .social-media div:first-child h3这样的选择器， 样式集就会和指定页面的指定位置紧紧耦合\n\n9.2.2 多元素模块每个模块应该只做一件事情。 消息模块的职责是使消息提示醒目； 媒体模块的职责是在一段文本中配置一张图片。 我们可以简洁明了地概括出它们的目标。 有的模块是为了版面布局， 有的是为了编写体例\n一个组件一定是由多个元素构建\n9.3 把模块组合成更大的结构9.3.1 拆分不同模块的职责第二个模块叫作菜单， 是放置链接的列表。 把菜单模块的一个实例放入下拉模块的容器内， 就可以构成完整的界面了。\n\n在模块里使用定位\n状态类\nis-open类在下拉模块中有特定的用途。 我们在模块里使用JavaScript动态地添加或移除它。 它也是状态类（state class） 的一个示例， 因为它代表着模块在当前状态下的表现。\n预处理器和模块化CSS\n\n\n菜单模块\n\n9.3.2 模块命名模块的命名应该有意义， 无论使用场景是什么。 同时也要避免使用简单地描述视觉效果的名称。 \n比较好的模块名称包括面板（panel） 、 警告（alert） 、 可折叠的部分（collapsible-section） 、 表单控制项（form-control） 等。 如果你从一开始就对网站的整体设计有全面的了解， 会有助于命名。\n为模块的变体类命名的时候， 应该遵守同样的原则。 例如， 如果已经有按钮模块了， 就不应该使用button–red和button–blue命名红色和蓝色变体子类。 网站设计在将来有可能会改变， 你不知道这些按钮的颜色会不会也跟着变化。 应该使用一些更有意义的名称， 比如button–danger和button–success。\n9.4 工具类从某种意义上讲， 工具类有点像小号的模块。 工具类应该专注于某种功能， 一般只声明一次。 我通常把这些工具类放在样式表的底部， 模块代码的下面。\n工具类的作用立竿见影。 在页面上做点小事儿的时候不需要创建一个完整的模块， 这种情况下可以用一个工具类来实现。 但是不要滥用工具类。 对于大部分网站， 最多十几个工具类就够用了。\n常用工具类有哪些？如果书写自己工具类\n9.5 CSS方法论\nOOCSS——面向对象的CSS， 由Nicole Sullivan创建。\nSMACSS——可扩展的、 模块化CSS架构， 由Jonathan Snook创建。\nBEM——块（Block） 、 元素（Element） 和修饰符（Modifier） ，由Yandex公司提出。\nITCSS——倒三角形CSS， 由Harry Roberts创建。\n\n10 模式库\n创建模式库， 收录模块\n开发过程中引入模式库\n使用CSS优先的方案书写样式\n安全地编辑和删除CSS\n使用Bootstrap之类的CSS框架\n\n10.1 KSS简介虽然创建模式库的时候不使用任何工具也可以， 但有了工具的帮助会容易很多。 有不少相关功能的工具库可以使用， 在搜索引擎里搜索“styleguide generator”， 就可以找到大量结果。 无法确定这些工具里最好的是哪个， 但是KSS确实是其中的佼佼者。 KSS是Knyle Style Sheets的简写（“Knyle” 来源于作者的名字Kyle Neath）\n10.1.1 配置KSS\n初始化项目npm init -y\n安装依赖npm install --save-dev kss\n添加KSS配置\n在项目目录下新建一个名为kss-config.json的文件 &#123;\n\"title\": \"My pattern library\",\n\"source\": [               ←---- CSS源文件的目录路径（ KSS将要扫描的）\n\"./css\"\n  ],\n\"destination\": \"docs/\",   ←---- 生成的模式库文件将写入的路径\n\"css\": [\n\"../css/styles.css\"       ←---- 样式表文件路径（ 相对于destination目录）\n  ],\n\"js\": [\n\"../js/docs.js\"           ←---- 一些JavaScript文件路径（ 相对于destination目录）\n  ]\n&#125;,\n\"scripts\": &#123;\n\"build\": \"kss --config kss-config.json\", ←---- 定义构建命令\n\"test\": \"echo \\\"Error: no test specified\\\" &amp;&amp; exit 1\"\n&#125;,\ncss和js字段里列出的每个文件都会被添加到模式库页面。 我们已经为它们各自配置了一个css和js目录， 现在就可以去创建这两个目录和里面的源文件（ css&#x2F;styles.css和js&#x2F;docs.js） 。 文件目前是空的，很快就会向里面添加内容\n\n\n\n10.1.2 编写KSS文档10.2 改变编写CSS的方式10.2.1 CSS优先的工作流程\n页面开发时， 先有一个草图或者原型图或者其他可以展示页面的设计方式\n看看模式库。 找找现有模块， 如果有满足页面需求的模块就直接使用。 然后从页面的外层（主页面布局和容器） 开始， 按自己熟悉的方式编写CSS。 如果使用现有模块可以构建整个页面， 就不需要写新的CSS\n你会发现有时候需要用到一些模式库提供不了的功能。 项目开发早期这种情况很常见， 到后面就会少很多。 这时候就需要开发一个或几个新模块， 或者现有模块的新变体\n\n10.2.2 像API一样使用模式库这节还需要再看看\n11 背景、 阴影和混合模式\n线性渐变和径向渐变\n盒阴影和文字阴影\n调整背景图片的大小和位置\n使用混合模式， 让背景和内容相结合\n\n11.1 渐变\nbackground-image——指定一个文件或者生成的颜色渐变作为背景图片。\nbackground-position——设置背景图片的初始位置。\nbackground-size——指定元素内背景图片的渲染尺寸。\nbackground-repeat——决定在需要填充整个元素时， 是否平铺图片。\nbackground-origin——决定背景相对于元素的边框盒、 内边距框盒（初始值） 或内容盒子来定位。\nbackground-clip——指定背景是否应该填充边框盒（初始值） 、 内边距框盒或内容盒子。\nbackground-attachment——指定背景图片是随着元素上下滚动（初始值） ， 还是固定在视口区域。 注意， 使用fixed值会对页面性能产生负面影响。\nbackground-color——指定纯色背景， 渲染到背景图片下方。\n\n11.1.1 使用多个颜色点11.1.2 使用径向渐变11.2 阴影11.2.1 使用渐变喝阴影形成立体感11.2.2 使用扁平化设计创造元素11.2.3 让按钮看起来时尚11.3 混合模式11.3.1 为图片着色11.3.2 理解混合模式的类型11.3.3 为图片添加纹理11.3.4 使用混合模式12 对比，颜色和间距12.1 对比最重要12.1.1 建立模式这部分的工作更像是设计师的工作\n12.1.2 还原设计稿BEM风格来为类命名， 以便清楚地知道哪个元素属于哪个模块。 双下划线代表模块的子元素， 比如hero__inner； 双连字符代表模块变体， 比如button–cta\n12.2 颜色因为这些颜色会在CSS中多次重复出现， 所以将它们指定为变量可以节省很多时间。 另外， 如果总是一次次地输入十六进制值， 无法保证一定不出错\n我们先为页面统一添加一些基础样式， 也包括为调色板中的每种颜色指定变量\n代码清单12-2\n12.2.1 理解颜色表示法rgb()函数是一种描述红、 绿、 蓝彩色值的颜色表示法， 使用十进制而非十六进制。 它使用0-255取代了00-FF， 比如rgb(0, 0, 0)代表纯黑色（相当于#000） ， rgb(136, 0, 0)代表砖红色（相当于#800）。\nhsl()函数需要3个参数。 第一个参数表示色相， 是一个0~359的整数值。 这代表色相环上的360度， 从红色（0） 、 黄色（60） 、 绿色（120） 、 青色（180） 、 蓝色（240） 、 洋红色（300） 依次过渡， 最后回到红色。 第二个参数表示饱和度， 是一个代表色彩强度的百分数， 100%的时候颜色最鲜艳， 0%就意味着没有彩色， 只是一片灰色。第三个参数表示明度， 也是百分数， 代表颜色有多亮（或者多暗） 。 大部分鲜艳的颜色是使用50%的明度值。 明度值设置得越高， 颜色越浅， 100%就是纯白色； 设置得越低， 颜色越暗， 0%就是黑色。 例如， hsl(198, 73%, 46%)这个颜色值， 包含了青蓝色的色相、 偏高的饱和度（73%） 和接近50%的明度， 因此会生成一个比天蓝色稍深一些的蓝色\nHSL Color Picker这个网站提供了一个交互式颜色选择器\n12.2.2 添加新颜色到调色板为某种颜色寻找一个搭配的颜色， 最简单的方式是找到它的补色（complement） 。 补色位于色相环的对侧位置， 蓝色的补色是黄色； 绿色的补色是洋红色（或者紫色） ； 红色的补色是青色。\n使用HSL颜色值时， 计算补色非常简单， 为色相值加上或者减去180即可。 核心颜色品牌绿的色相值是162， 加上180得到342的新色相值， 这是个红色， 带一点点洋红。 我们也可以通过减去180来寻找补色， 得到了-18的色相值。 色相-18其实等同于色相342， 因此hsl(-18, 87%,21%)和hsl(342, 87%, 21%)会渲染成同样的颜色。 不过建议把色相值保持在0~360的范围内， 因为这个范围内的颜色与色相对应关系我们比较熟悉。\n如果你想更深入地研究颜色选择， 可以上网浏览颜色理论相关的文章。你可以从Natalya Shelburne所写的这篇著名的文章Practical Color Theory for People Who Code开始。\n12.2.3 思考字体颜色的对比效果12.3 间距12.3.1 使用em还是px使用像素， 短期内工作会比较轻松， 但这也意味着后面的设计将缺少弹性。可能会导致将来有更多的工作， 当然这也不一定。 如果决定使用相对单位， 前期就需要多做一些工作， 但是设计会更强大稳固。\n","dateCreated":"2023-12-12T19:30:59+08:00","dateModified":"2023-12-12T19:30:59+08:00","datePublished":"2023-12-12T19:30:59+08:00","description":"摘要：重新学下css,学完了能很快做出东西，而且是看的见东西","headline":"深入解析css","image":[null,"https://user-images.githubusercontent.com/46363359/211191244-88f4b395-7258-47ee-96d9-9b95d7158cb9.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/web/css/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3css/%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90css/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/web/css/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3css/%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90css/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/211191244-88f4b395-7258-47ee-96d9-9b95d7158cb9.jpg"}</script>
+    <meta name="description" content="摘要：重新学下css,学完了能很快做出东西，而且是看的见东西">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="深入解析css">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/web/css/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3css/%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90css/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要：重新学下css,学完了能很快做出东西，而且是看的见东西">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kirk-zhang58.github.io/img/3.1.png">
+<meta property="article:published_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:modified_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kirk-zhang58.github.io/img/3.1.png">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/211191244-88f4b395-7258-47ee-96d9-9b95d7158cb9.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/211191244-88f4b395-7258-47ee-96d9-9b95d7158cb9.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-6282fdnvziozzvtprbntzupxyhc5mlkphbaevboelgvnx2vnnspamitnamq7.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/211191244-88f4b395-7258-47ee-96d9-9b95d7158cb9.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            深入解析css
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/js/">js</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要：重新学下css,学完了能很快做出东西，而且是看的见东西</p>
+<span id="more"></span>
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%B1%82%E5%8F%A0%EF%BC%8C%E4%BC%98%E5%85%88%E7%BA%A7%E5%92%8C%E7%BB%A7%E6%89%BF"><span class="toc-text">1. 层叠，优先级和继承</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E5%B1%82%E5%8F%A0"><span class="toc-text">1.1 层叠</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-1-%E6%A0%B7%E5%BC%8F%E8%A1%A8%E7%9A%84%E6%9D%A5%E6%BA%90"><span class="toc-text">1.1.1 样式表的来源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-2-%E7%90%86%E8%A7%A3%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-text">1.1.2 理解优先级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-3-%E6%BA%90%E7%A0%81%E9%A1%BA%E5%BA%8F"><span class="toc-text">1.1.3 源码顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-4-%E4%B8%A4%E4%B8%AA%E7%BB%8F%E9%AA%8C%E6%B3%95%E5%88%99"><span class="toc-text">1.1.4 两个经验法则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-5-%E9%80%89%E6%8B%A9%E5%99%A8%E7%A7%8D%E7%B1%BB"><span class="toc-text">1.1.5 选择器种类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E7%BB%A7%E6%89%BF"><span class="toc-text">1.2 继承</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E7%89%B9%E6%AE%8A%E5%80%BC"><span class="toc-text">1.3 特殊值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1-%E4%BD%BF%E7%94%A8inherit"><span class="toc-text">1.3.1 使用inherit</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-2-initial%E5%85%B3%E9%94%AE%E5%AD%97"><span class="toc-text">1.3.2 initial关键字</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-%E7%AE%80%E5%86%99%E5%B1%9E%E6%80%A7"><span class="toc-text">1.4 简写属性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-1-%E7%90%86%E8%A7%A3%E7%AE%80%E5%86%99%E6%A0%B7%E5%BC%8F%E7%9A%84%E9%A1%BA%E5%BA%8F"><span class="toc-text">1.4.1 理解简写样式的顺序</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%9B%B8%E5%AF%B9%E5%8D%95%E4%BD%8D"><span class="toc-text">2. 相对单位</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E7%9B%B8%E5%AF%B9%E5%80%BC%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">2.1 相对值的好处</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E9%82%A3%E4%BA%9B%E5%B9%B4%E8%BF%BD%E6%B1%82%E7%9A%84%E5%83%8F%E7%B4%A0%E7%BA%A7%E5%AE%8C%E7%BE%8E"><span class="toc-text">2.1.1 那些年追求的像素级完美</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-%E5%83%8F%E7%B4%A0%E7%BA%A7%E5%AE%8C%E7%BE%8E%E7%9A%84%E6%97%B6%E4%BB%A3%E7%BB%88%E7%BB%93%E4%BA%86"><span class="toc-text">2.1.2 像素级完美的时代终结了</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-em%E5%92%8Crem"><span class="toc-text">2.2 em和rem</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E4%BD%BF%E7%94%A8em%E5%AE%9A%E4%B9%89%E5%AD%97%E5%8F%B7"><span class="toc-text">2.2.1 使用em定义字号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-%E4%BD%BF%E7%94%A8rem%E8%AE%BE%E7%BD%AE%E5%AD%97%E5%8F%B7"><span class="toc-text">2.2.2 使用rem设置字号</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3%E5%81%9C%E6%AD%A2%E5%83%8F%E7%B4%A0%E6%80%9D%E8%80%83"><span class="toc-text">2.3停止像素思考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E8%AE%BE%E7%BD%AE%E4%B8%80%E4%B8%AA%E5%90%88%E7%90%86%E7%9A%84%E9%BB%98%E8%AE%A4%E7%9A%84%E5%AD%97%E5%8F%B7"><span class="toc-text">2.3.1 设置一个合理的默认的字号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E6%9E%84%E5%BB%BA%E5%93%8D%E5%BA%94%E5%BC%8F%E9%9D%A2%E6%9D%BF"><span class="toc-text">2.3.2 构建响应式面板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-3-%E7%BC%A9%E6%94%BE%E5%8D%95%E4%B8%AA%E7%BB%84%E4%BB%B6"><span class="toc-text">2.3.3 缩放单个组件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-%E8%A7%86%E5%8F%A3%E7%9A%84%E7%9B%B8%E5%AF%B9%E5%8D%95%E4%BD%8D"><span class="toc-text">2.4 视口的相对单位</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-1-%E4%BD%BF%E7%94%A8vw%E5%AE%9A%E4%B9%89%E5%AD%97%E5%8F%B7"><span class="toc-text">2.4.1 使用vw定义字号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-2-%E4%BD%BF%E7%94%A8calc-%E5%AE%9A%E4%B9%89%E5%AD%97%E5%8F%B7"><span class="toc-text">2.4.2 使用calc()定义字号</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E6%97%A0%E5%8D%95%E4%BD%8D%E7%9A%84%E6%95%B0%E5%80%BC%E5%92%8C%E8%A1%8C%E9%AB%98"><span class="toc-text">2.5 无单位的数值和行高</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7-%E5%8D%B3css%E5%8F%98%E9%87%8F"><span class="toc-text">2.6 自定义属性(即css变量)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-1-%E5%8A%A8%E6%80%81%E6%94%B9%E5%8F%98%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7"><span class="toc-text">2.6.1 动态改变自定义属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-2-%E4%BD%BF%E7%94%A8js%E6%94%B9%E5%8F%98%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7"><span class="toc-text">2.6.2 使用js改变自定义属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-3-%E6%8E%A2%E7%B4%A2%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7"><span class="toc-text">2.6.3 探索自定义属性</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B"><span class="toc-text">3 盒子模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E5%85%83%E7%B4%A0%E5%AE%BD%E5%BA%A6%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">3.1 元素宽度的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-%E9%81%BF%E5%85%8D%E9%AD%94%E6%9C%AF%E6%95%B0%E5%80%BC"><span class="toc-text">3.1.1 避免魔术数值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-%E8%B0%83%E6%95%B4%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B"><span class="toc-text">3.1.2 调整盒子模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-%E5%85%A8%E5%B1%80%E8%AE%BE%E7%BD%AEborder-box"><span class="toc-text">3.1.3 全局设置border-box</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-4-%E7%BB%99%E5%88%97%E4%B9%8B%E9%97%B4%E5%8A%A0%E4%B8%8A%E9%97%B4%E9%9A%94"><span class="toc-text">3.1.4 给列之间加上间隔</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E5%85%83%E7%B4%A0%E9%AB%98%E5%BA%A6%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">3.2 元素高度的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-%E6%8E%A7%E5%88%B6%E6%BA%A2%E5%87%BA%E8%A1%8C%E4%B8%BA"><span class="toc-text">3.2.1 控制溢出行为</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-%E7%99%BE%E5%88%86%E6%AF%94%E9%AB%98%E5%BA%A6%E7%9A%84%E5%A4%87%E9%80%89%E6%96%B9%E6%A1%88"><span class="toc-text">3.2.2 百分比高度的备选方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-3-%E4%BD%BF%E7%94%A8min-height%E5%92%8Cmax-height"><span class="toc-text">3.2.3 使用min-height和max-height</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-4-%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD%E5%86%85%E5%AE%B9"><span class="toc-text">3.2.4 垂直居中内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E8%B4%9F%E8%BE%B9%E8%B7%9D"><span class="toc-text">3.3 负边距</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E5%A4%96%E8%BE%B9%E8%B7%9D%E6%8A%98%E5%8F%A0"><span class="toc-text">3.4 外边距折叠</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-1-%E6%96%87%E5%AD%97%E6%8A%98%E5%8F%A0"><span class="toc-text">3.4.1 文字折叠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-2-%E5%A4%9A%E4%B8%AA%E5%A4%96%E8%BE%B9%E8%B7%9D%E6%8A%98%E5%8F%A0"><span class="toc-text">3.4.2 多个外边距折叠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-3-%E5%AE%B9%E5%99%A8%E5%A4%96%E9%83%A8%E6%8A%98%E5%8F%A0"><span class="toc-text">3.4.3 容器外部折叠</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-%E5%AE%B9%E5%99%A8%E5%86%85%E7%9A%84%E5%85%83%E7%B4%A0%E9%97%B4%E8%B7%9D"><span class="toc-text">3.5 容器内的元素间距</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-1-%E5%A6%82%E6%9E%9C%E5%86%85%E5%AE%B9%E6%94%B9%E5%8F%98%E4%BA%86"><span class="toc-text">3.5.1 如果内容改变了</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-2-%E6%9B%B4%E9%80%9A%E7%94%A8%E7%9A%84%E6%96%B9%E6%A1%88%EF%BC%9A%E7%8C%AB%E5%A4%B4%E9%B9%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">3.5.2 更通用的方案：猫头鹰解决方案</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%90%86%E8%A7%A3%E6%B5%AE%E5%8A%A8"><span class="toc-text">4 理解浮动</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E6%B5%AE%E5%8A%A8%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%88%9D%E8%A1%B7"><span class="toc-text">4.1 浮动的设计初衷</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E5%AE%B9%E5%99%A8%E6%8A%98%E5%8F%A0%E5%92%8C%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8"><span class="toc-text">4.2 容器折叠和清除浮动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-%E7%90%86%E8%A7%A3%E5%AE%B9%E5%99%A8%E6%8A%98%E5%8F%A0"><span class="toc-text">4.2.1 理解容器折叠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2-%E7%90%86%E8%A7%A3%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8"><span class="toc-text">4.2.2 理解清除浮动</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E5%87%BA%E4%B9%8E%E6%84%8F%E6%96%99%E7%9A%84%E6%B5%AE%E5%8A%A8%E9%99%B7%E9%98%B1"><span class="toc-text">4.3 出乎意料的浮动陷阱</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-Flexbox"><span class="toc-text">5 Flexbox</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-FLexbox%E7%9A%84%E5%8E%9F%E5%88%99"><span class="toc-text">5.1 FLexbox的原则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1-%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%9F%BA%E7%A1%80%E7%9A%84Flexbox%E8%8F%9C%E5%8D%95"><span class="toc-text">5.1.1 创建一个基础的Flexbox菜单</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-2-%E6%B7%BB%E5%8A%A0%E5%86%85%E8%BE%B9%E8%B7%9D%E5%92%8C%E9%97%B4%E9%9A%94"><span class="toc-text">5.1.2 添加内边距和间隔</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-%E5%BC%B9%E6%80%A7%E5%AD%90%E5%85%83%E7%B4%A0%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="toc-text">5.2 弹性子元素的大小</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-1-%E4%BD%BF%E7%94%A8flex-basis%E5%B1%9E%E6%80%A7"><span class="toc-text">5.2.1 使用flex-basis属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-2-%E4%BD%BF%E7%94%A8flex-grow%E5%B1%9E%E6%80%A7"><span class="toc-text">5.2.2 使用flex-grow属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-3-%E4%BD%BF%E7%94%A8flex-shrink%E5%B1%9E%E6%80%A7"><span class="toc-text">5.2.3 使用flex-shrink属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-4-%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8"><span class="toc-text">5.2.4 实际应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-%E5%BC%B9%E6%80%A7%E6%96%B9%E5%90%91"><span class="toc-text">5.3 弹性方向</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-1-%E6%94%B9%E5%8F%98%E5%BC%B9%E6%80%A7%E6%96%B9%E5%90%91"><span class="toc-text">5.3.1 改变弹性方向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-2-%E7%99%BB%E5%BD%95%E8%A1%A8%E5%8D%95%E7%9A%84%E6%A0%B7%E5%BC%8F"><span class="toc-text">5.3.2 登录表单的样式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-%E5%AF%B9%E9%BD%90%EF%BC%8C%E9%97%B4%E8%B7%9D%E7%AD%89%E7%BB%86%E8%8A%82"><span class="toc-text">5.4 对齐，间距等细节</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-1-%E7%90%86%E8%A7%A3%E5%BC%B9%E6%80%A7%E5%AE%B9%E5%99%A8%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="toc-text">5.4.1 理解弹性容器的属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-2-%E7%90%86%E8%A7%A3%E5%BC%B9%E6%80%A7%E5%AD%90%E5%85%83%E7%B4%A0%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="toc-text">5.4.2 理解弹性子元素的属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-3-%E4%BD%BF%E7%94%A8%E5%AF%B9%E9%BD%90%E5%B1%9E%E6%80%A7"><span class="toc-text">5.4.3 使用对齐属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5-%E5%80%BC%E5%BE%97%E6%B3%A8%E6%84%8F%E7%9A%84%E5%9C%B0%E6%96%B9"><span class="toc-text">5.5 值得注意的地方</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E7%BD%91%E6%A0%BC%E5%B8%83%E5%B1%80"><span class="toc-text">6 网格布局</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1-%E7%BD%91%E9%A1%B5%E5%B8%83%E5%B1%80%E5%BC%80%E5%A7%8B%E6%96%B0%E7%BA%AA%E5%85%83"><span class="toc-text">6.1 网页布局开始新纪元</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2-%E7%BD%91%E6%A0%BC%E5%88%A8%E6%9E%90"><span class="toc-text">6.2 网格刨析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2-1-%E7%BD%91%E6%A0%BC%E7%BA%BF%E7%9A%84%E7%BC%96%E5%8F%B7"><span class="toc-text">6.2.1 网格线的编号</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-2-%E4%B8%8Eflexbox%E9%85%8D%E5%90%88"><span class="toc-text">6.2.2 与flexbox配合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3-%E6%9B%BF%E4%BB%A3%E8%AF%AD%E6%B3%95"><span class="toc-text">6.3 替代语法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-1-%E5%91%BD%E5%90%8D%E7%9A%84%E7%BD%91%E6%A0%BC%E7%BA%BF"><span class="toc-text">6.3.1 命名的网格线</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-2-%E5%91%BD%E5%90%8D%E7%BD%91%E6%A0%BC%E5%8C%BA%E5%9F%9F"><span class="toc-text">6.3.2 命名网格区域</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-4-%E6%98%BE%E5%BC%8F%E5%92%8C%E9%9A%90%E5%BC%8F%E7%BD%91%E6%A0%BC"><span class="toc-text">6.4 显式和隐式网格</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-1-%E6%B7%BB%E5%8A%A0%E5%8F%98%E5%8C%96"><span class="toc-text">6.4.1 添加变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-2-%E8%AE%A9%E7%BD%91%E6%A0%BC%E5%85%83%E7%B4%A0%E5%A1%AB%E6%BB%A1%E7%BD%91%E6%A0%BC%E8%BD%A8%E9%81%93"><span class="toc-text">6.4.2 让网格元素填满网格轨道</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-5-%E7%89%B9%E6%80%A7%E6%9F%A5%E8%AF%A2"><span class="toc-text">6.5 特性查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-6-%E5%AF%B9%E9%BD%90"><span class="toc-text">6.6 对齐</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E5%AE%9A%E4%BD%8D%E5%92%8C%E5%B1%82%E5%8F%A0%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-text">7 定位和层叠上下文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1-%E5%9B%BA%E5%AE%9A%E5%AE%9A%E4%BD%8D"><span class="toc-text">7.1 固定定位</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-1-%E7%94%A8%E5%9B%BA%E5%AE%9A%E5%AE%9A%E4%BD%8D%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%A8%A1%E6%80%81%E6%A1%86"><span class="toc-text">7.1.1 用固定定位创建一个模态框</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-2-%E6%8E%A7%E5%88%B6%E5%AE%9A%E4%BD%8D%E5%85%83%E7%B4%A0%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="toc-text">7.1.2 控制定位元素的大小</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2-%E7%BB%9D%E5%AF%B9%E5%AE%9A%E4%BD%8D"><span class="toc-text">7.2 绝对定位</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-1-%E8%AE%A9Close%E6%8C%89%E9%92%AE%E7%BB%9D%E5%AF%B9%E5%AE%9A%E4%BD%8D"><span class="toc-text">7.2.1 让Close按钮绝对定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-2-%E5%AE%9A%E4%BD%8D%E4%BC%AA%E5%85%83%E7%B4%A0"><span class="toc-text">7.2.2 定位伪元素</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-3-%E7%9B%B8%E5%AF%B9%E5%AE%9A%E4%BD%8D"><span class="toc-text">7.3 相对定位</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-1-%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E4%B8%8B%E6%8B%89%E8%8F%9C%E5%8D%95"><span class="toc-text">7.3.1 创建一个下拉菜单</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-2-%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAcss%E4%B8%89%E8%A7%92%E5%BD%A2"><span class="toc-text">7.3.2 创建一个css三角形</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-4-%E5%B1%82%E5%8F%A0%E4%B8%8A%E4%B8%8B%E6%96%87%E5%92%8Cz-index"><span class="toc-text">7.4 层叠上下文和z-index</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-4-1-%E7%90%86%E8%A7%A3%E6%B8%B2%E6%9F%93%E8%BF%87%E7%A8%8B%E5%92%8C%E5%B1%82%E5%8F%A0%E9%A1%BA%E5%BA%8F"><span class="toc-text">7.4.1 理解渲染过程和层叠顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-4-2-%E7%94%A8z-index%E6%8E%A7%E5%88%B6%E5%B1%82%E5%8F%A0%E9%A1%BA%E5%BA%8F"><span class="toc-text">7.4.2 用z-index控制层叠顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-4-3-%E7%90%86%E8%A7%A3%E5%B1%82%E5%8F%A0%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-text">7.4.3 理解层叠上下文</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-5-%E7%B2%98%E6%80%A7%E5%AE%9A%E4%BD%8D"><span class="toc-text">7.5 粘性定位</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-%E5%93%8D%E5%BA%94%E5%BC%8F%E8%AE%BE%E8%AE%A1"><span class="toc-text">8 响应式设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1-%E7%A7%BB%E5%8A%A8%E4%BC%98%E5%85%88"><span class="toc-text">8.1 移动优先</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-1-%E5%88%9B%E5%BB%BA%E7%A7%BB%E5%8A%A8%E7%89%88%E7%9A%84%E8%8F%9C%E5%8D%95"><span class="toc-text">8.1.1 创建移动版的菜单</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-2-%E7%BB%99%E8%A7%86%E5%8F%A3%E6%B7%BB%E5%8A%A0meta%E6%A0%87%E7%AD%BE"><span class="toc-text">8.1.2 给视口添加meta标签</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2-%E5%AA%92%E4%BD%93%E6%9F%A5%E8%AF%A2"><span class="toc-text">8.2 媒体查询</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-1-%E5%AA%92%E4%BD%93%E6%9F%A5%E8%AF%A2%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-text">8.2.1 媒体查询的类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-2-%E7%BB%99%E7%BD%91%E9%A1%B5%E6%B7%BB%E5%8A%A0%E6%96%AD%E7%82%B9"><span class="toc-text">8.2.2 给网页添加断点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-3-%E6%B7%BB%E5%8A%A0%E5%93%8D%E5%BA%94%E5%BC%8F%E7%9A%84%E5%88%97"><span class="toc-text">8.2.3 添加响应式的列</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3-%E6%B5%81%E5%BC%8F%E5%B8%83%E5%B1%80"><span class="toc-text">8.3 流式布局</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-1-%E7%BB%99%E5%A4%A7%E8%A7%86%E5%8F%A3%E6%B7%BB%E5%8A%A0%E6%A0%B7%E5%BC%8F"><span class="toc-text">8.3.1 给大视口添加样式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-2-%E5%A4%84%E7%90%86%E8%A1%A8%E6%A0%BC"><span class="toc-text">8.3.2 处理表格</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-4-%E5%93%8D%E5%BA%94%E5%BC%8F%E5%9B%BE%E7%89%87"><span class="toc-text">8.4 响应式图片</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-1-%E4%B8%8D%E5%90%8C%E8%A7%86%E5%8F%A3%E5%A4%A7%E5%B0%8F%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%90%8C%E7%9A%84%E5%9B%BE%E7%89%87"><span class="toc-text">8.4.1 不同视口大小使用不同的图片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-2-%E4%BD%BF%E7%94%A8srcset%E6%8F%90%E4%BE%9B%E5%AF%B9%E7%94%A8%E7%9A%84%E5%9B%BE%E7%89%87"><span class="toc-text">8.4.2 使用srcset提供对用的图片</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E6%A8%A1%E5%9D%97%E5%8C%96css%E5%BA%93"><span class="toc-text">9 模块化css库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1-%E5%9F%BA%E7%A1%80%E6%A0%B7%E5%BC%8F%EF%BC%9A-%E6%89%93%E5%A5%BD%E5%9F%BA%E7%A1%80"><span class="toc-text">9.1 基础样式： 打好基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%A8%A1%E5%9D%97"><span class="toc-text">9.2 一个简单的模块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-1-%E6%A8%A1%E5%9D%97%E7%9A%84%E5%8F%98%E4%BD%93"><span class="toc-text">9.2.1 模块的变体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-2-%E5%A4%9A%E5%85%83%E7%B4%A0%E6%A8%A1%E5%9D%97"><span class="toc-text">9.2.2 多元素模块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-3-%E6%8A%8A%E6%A8%A1%E5%9D%97%E7%BB%84%E5%90%88%E6%88%90%E6%9B%B4%E5%A4%A7%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-text">9.3 把模块组合成更大的结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-1-%E6%8B%86%E5%88%86%E4%B8%8D%E5%90%8C%E6%A8%A1%E5%9D%97%E7%9A%84%E8%81%8C%E8%B4%A3"><span class="toc-text">9.3.1 拆分不同模块的职责</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-2-%E6%A8%A1%E5%9D%97%E5%91%BD%E5%90%8D"><span class="toc-text">9.3.2 模块命名</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-4-%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">9.4 工具类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-5-CSS%E6%96%B9%E6%B3%95%E8%AE%BA"><span class="toc-text">9.5 CSS方法论</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E6%A8%A1%E5%BC%8F%E5%BA%93"><span class="toc-text">10 模式库</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#10-1-KSS%E7%AE%80%E4%BB%8B"><span class="toc-text">10.1 KSS简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-1-%E9%85%8D%E7%BD%AEKSS"><span class="toc-text">10.1.1 配置KSS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-2-%E7%BC%96%E5%86%99KSS%E6%96%87%E6%A1%A3"><span class="toc-text">10.1.2 编写KSS文档</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-2-%E6%94%B9%E5%8F%98%E7%BC%96%E5%86%99CSS%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="toc-text">10.2 改变编写CSS的方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-1-CSS%E4%BC%98%E5%85%88%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-text">10.2.1 CSS优先的工作流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-2-%E5%83%8FAPI%E4%B8%80%E6%A0%B7%E4%BD%BF%E7%94%A8%E6%A8%A1%E5%BC%8F%E5%BA%93"><span class="toc-text">10.2.2 像API一样使用模式库</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-%E8%83%8C%E6%99%AF%E3%80%81-%E9%98%B4%E5%BD%B1%E5%92%8C%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F"><span class="toc-text">11 背景、 阴影和混合模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#11-1-%E6%B8%90%E5%8F%98"><span class="toc-text">11.1 渐变</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-1-1-%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AA%E9%A2%9C%E8%89%B2%E7%82%B9"><span class="toc-text">11.1.1 使用多个颜色点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-1-2-%E4%BD%BF%E7%94%A8%E5%BE%84%E5%90%91%E6%B8%90%E5%8F%98"><span class="toc-text">11.1.2 使用径向渐变</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-2-%E9%98%B4%E5%BD%B1"><span class="toc-text">11.2 阴影</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-1-%E4%BD%BF%E7%94%A8%E6%B8%90%E5%8F%98%E5%96%9D%E9%98%B4%E5%BD%B1%E5%BD%A2%E6%88%90%E7%AB%8B%E4%BD%93%E6%84%9F"><span class="toc-text">11.2.1 使用渐变喝阴影形成立体感</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-2-%E4%BD%BF%E7%94%A8%E6%89%81%E5%B9%B3%E5%8C%96%E8%AE%BE%E8%AE%A1%E5%88%9B%E9%80%A0%E5%85%83%E7%B4%A0"><span class="toc-text">11.2.2 使用扁平化设计创造元素</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-3-%E8%AE%A9%E6%8C%89%E9%92%AE%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%97%B6%E5%B0%9A"><span class="toc-text">11.2.3 让按钮看起来时尚</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-3-%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F"><span class="toc-text">11.3 混合模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-3-1-%E4%B8%BA%E5%9B%BE%E7%89%87%E7%9D%80%E8%89%B2"><span class="toc-text">11.3.1 为图片着色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-3-2-%E7%90%86%E8%A7%A3%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-text">11.3.2 理解混合模式的类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-3-3-%E4%B8%BA%E5%9B%BE%E7%89%87%E6%B7%BB%E5%8A%A0%E7%BA%B9%E7%90%86"><span class="toc-text">11.3.3 为图片添加纹理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-3-4-%E4%BD%BF%E7%94%A8%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F"><span class="toc-text">11.3.4 使用混合模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%E5%AF%B9%E6%AF%94%EF%BC%8C%E9%A2%9C%E8%89%B2%E5%92%8C%E9%97%B4%E8%B7%9D"><span class="toc-text">12 对比，颜色和间距</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#12-1-%E5%AF%B9%E6%AF%94%E6%9C%80%E9%87%8D%E8%A6%81"><span class="toc-text">12.1 对比最重要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-1-1-%E5%BB%BA%E7%AB%8B%E6%A8%A1%E5%BC%8F"><span class="toc-text">12.1.1 建立模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-1-2-%E8%BF%98%E5%8E%9F%E8%AE%BE%E8%AE%A1%E7%A8%BF"><span class="toc-text">12.1.2 还原设计稿</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-2-%E9%A2%9C%E8%89%B2"><span class="toc-text">12.2 颜色</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#12-2-1-%E7%90%86%E8%A7%A3%E9%A2%9C%E8%89%B2%E8%A1%A8%E7%A4%BA%E6%B3%95"><span class="toc-text">12.2.1 理解颜色表示法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-2-2-%E6%B7%BB%E5%8A%A0%E6%96%B0%E9%A2%9C%E8%89%B2%E5%88%B0%E8%B0%83%E8%89%B2%E6%9D%BF"><span class="toc-text">12.2.2 添加新颜色到调色板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-2-3-%E6%80%9D%E8%80%83%E5%AD%97%E4%BD%93%E9%A2%9C%E8%89%B2%E7%9A%84%E5%AF%B9%E6%AF%94%E6%95%88%E6%9E%9C"><span class="toc-text">12.2.3 思考字体颜色的对比效果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-3-%E9%97%B4%E8%B7%9D"><span class="toc-text">12.3 间距</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#12-3-1-%E4%BD%BF%E7%94%A8em%E8%BF%98%E6%98%AFpx"><span class="toc-text">12.3.1 使用em还是px</span></a></li></ol></li></ol></li></ol>
+
+<h1 id="1-层叠，优先级和继承"><a href="#1-层叠，优先级和继承" class="headerlink" title="1. 层叠，优先级和继承"></a>1. 层叠，优先级和继承</h1><h2 id="1-1-层叠"><a href="#1-1-层叠" class="headerlink" title="1.1 层叠"></a>1.1 层叠</h2><p>css样式是声明式的，也存在着结构概念。这背后有很多的问题要讨论，首先我们需要理解浏览器如何解析样式规则。每条规则单独来看很简<br>单，但是当两条规则提供了冲突的样式时会发生什么呢？也就是说对同一个元素使用多个规则会出现冲突</p>
+<pre class="language-css" data-language="css"><code class="language-css">
+<span class="token selector">&lt;!-- listing-1.2.html -->
+
+&lt;!doctype html>
+&lt;head>
+  &lt;style>
+h1</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-family</span><span class="token punctuation">:</span> serif<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">#page-title</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-family</span><span class="token punctuation">:</span> sans-serif<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.title</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-family</span><span class="token punctuation">:</span> monospace<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+  &lt;/style>
+&lt;/head>
+&lt;body>
+  &lt;header class=<span class="token string">"page-header"</span>>
+    &lt;h1 id=<span class="token string">"page-title"</span> class=<span class="token string">"title"</span>>
+      Wombat Coffee Roasters
+    &lt;/h1>
+    &lt;nav>
+      &lt;ul id=<span class="token string">"main-nav"</span> class=<span class="token string">"nav"</span>>
+        &lt;li>&lt;a href=<span class="token string">"/"</span>>Home&lt;/a>&lt;/li>
+        &lt;li>&lt;a href=<span class="token string">"/coffees"</span>>Coffees&lt;/a>&lt;/li>
+        &lt;li>&lt;a href=<span class="token string">"/brewers"</span>>Brewers&lt;/a>&lt;/li>
+        &lt;li>&lt;a href=<span class="token string">"/specials"</span> class=<span class="token string">"featured"</span>>Specials&lt;/a>&lt;/li>
+      &lt;/ul>
+    &lt;/nav>
+  &lt;/header>
+&lt;/body></code></pre>
+<p>最终ID选择器生效，层叠指的就是这一系列规则。它决定了如何解决冲突，是CSS语言的基础。<br>层叠的规则：</p>
+<ol>
+<li>样式表的来源：样式是从哪里来的，包括你的样式和浏览器默认样式等.<ol>
+<li>使用优先级更高的声明，作者样式大于默认样式</li>
+</ol>
+</li>
+<li>选择器优先级：哪些选择器比另一些选择器更重要.<ol>
+<li>使用更高优先级的声明,是不是内联样式，使用内联样式</li>
+</ol>
+</li>
+<li>源码顺序：样式在样式表里的声明顺序.</li>
+</ol>
+<p><strong>术语解释</strong><br>描述问题时候尽量加上html属性和css属性，避免混淆<br>选择器和生命块组成了一个规则集</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">body</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">color</span><span class="token punctuation">:</span> back<span class="token punctuation">;</span>
+    <span class="token property">font-family</span><span class="token punctuation">:</span> Helvetica<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+
+<h3 id="1-1-1-样式表的来源"><a href="#1-1-1-样式表的来源" class="headerlink" title="1.1.1 样式表的来源"></a>1.1.1 样式表的来源</h3><ol>
+<li>程序员编写的样式表属于作者样式表，可以覆盖浏览器默认样式</li>
+<li>用户代理样式表&#x3D;浏览器默认样式，用户代理样式表优先级低<br>正如上面<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.2.html">示例代码1.2</a>所示，这个css主要是修饰<code>h1</code>元素的，然后css代码listing-1.2.html中作者样式覆盖了原先的默认样式</li>
+</ol>
+<p>!important声明,标记了!important的声明会被当作更高优先级的来源,它的优先级大于作者样式优先级</p>
+<h3 id="1-1-2-理解优先级"><a href="#1-1-2-理解优先级" class="headerlink" title="1.1.2 理解优先级"></a>1.1.2 理解优先级</h3><p>如果无法用来源解决冲突声明，浏览器会尝试检查它们的优先级。</p>
+<ol>
+<li><p>行内样式<br>实际上行内元素属于“带作用域的”声明，它会覆盖任何来自样式表或者 &lt; style &gt; 标签的样式。行内样式没有选择器，因为它们直接作用于所在的元素。<strong>为了在样式表里覆盖行内声明</strong>，需要为声明添加!important，这样能将它提升到一个更高优先级的来源。但如果行内样式也被标记为!important，就无法覆盖它了。最好是只在样式表内用!important。将以上修改撤销，我们来看看更好的方式。!important作用更像是将样式级别提升到最高</p>
+</li>
+<li><p>选择器优先级</p>
+<p> 如果设置相同属性，那么即使应用了两个选择器，那么ID选择器的样式会生效</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">#main-nav a</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">color</span><span class="token punctuation">:</span> white<span class="token punctuation">;</span>
+    <span class="token property">background-color</span><span class="token punctuation">:</span> #13a4a4<span class="token punctuation">;</span>  // id选择器的样式会生效
+    <span class="token property">padding</span><span class="token punctuation">:</span> 5px<span class="token punctuation">;</span>
+    <span class="token property">border-radius</span><span class="token punctuation">:</span> 2px<span class="token punctuation">;</span>
+    <span class="token property">text-decoration</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.featured</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">background-color</span><span class="token punctuation">:</span> orange<span class="token punctuation">;</span>   // 类选择器不生效，优先级不高
+<span class="token punctuation">&#125;</span></code></pre>
+<p>优先级的准确规则如下。</p>
+<ul>
+<li>id选择器 &gt; 类选择器 &gt; 标签选择器 </li>
+<li>如果选择器的ID数量更多，则它会胜出（即它更明确）。</li>
+<li>如果ID数量一致，那么拥有最多类的选择器胜出。</li>
+<li>如果以上两次比较都一致，那么拥有最多标签名的选择器胜出。</li>
+</ul>
+<p> 比如下面例子，判断哪些属性会生效<br> <pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">html body header h1</span> <span class="token punctuation">&#123;</span>    ←---- ❶ 4个标签
+    <span class="token property">color</span><span class="token punctuation">:</span> blue<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">body header.page-header h1</span> <span class="token punctuation">&#123;</span>  ←---- ❷ 3个标签和1个类
+    <span class="token property">color</span><span class="token punctuation">:</span> orange<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.page-header .title</span> <span class="token punctuation">&#123;</span>       ←---- ❸ 2个类
+    <span class="token property">color</span><span class="token punctuation">:</span> green<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">#page-title</span> <span class="token punctuation">&#123;</span>           ←---- ❹ 1个ID
+    <span class="token property">color</span><span class="token punctuation">:</span> red<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre><br> 4的id选择器优先级最高，因此标题是红色，3有两个类选择器，删除4,就会展示3的样式，两个类选择器比一个类选择器更明确</p>
+<p> 说明 伪类选择器（如:hover）和属性选择器（如[type&#x3D;”input”]）与一个类选择器的优先级相同。通用选择器（*）和组合器（&gt;、+、~）对优先级没有影响。</p>
+<p> 如果你在CSS里写了一个声明，但是没有生效，一般是因为被更高优先级的规则覆盖了。很多时候开发人员使用ID选择器，却不知道它会创建更高的优先级，之后就很难覆盖它。如果要覆盖一个ID选择器的样式，就必须要用另一个ID选择器。</p>
+</li>
+<li><p>优先级标记</p>
+<p> 也可以说是优先级表达式，选择器#page-header #page-title有2个ID,所以是[2.0.0],如果加上行内样式则就是[1.2.0.0]</p>
+</li>
+<li><p>关于优先级的思考</p>
+</li>
+</ol>
+<h3 id="1-1-3-源码顺序"><a href="#1-1-3-源码顺序" class="headerlink" title="1.1.3 源码顺序"></a>1.1.3 源码顺序</h3><p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.10.html">代码清单1-10</a></p>
+<p>如果两个声明所影响的元素相同和优先级相同，那么源码(html的源码,不是样式源码)后出现的就会起作用</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">a.featured</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background-color</span><span class="token punctuation">:</span> orange<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>但是这样的写法，会出现如果其他位置也有a标签和featured的类属性，那么就会渲染到其他地方，所以要设计好html元素和选择器</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.11.html">代码清单1-11</a></p>
+<ol>
+<li>链接样式和源码顺序<br>正如之前所说，在CSS中最好的答案通常是“这得看情况”。实现相同的<br>效果有很多途径。多想些实现方法，并思考每一种方法的利弊，这是很<br>有价值的。面对一个样式问题时，我经常分两个步骤来解决它。首先确<br>定哪些声明可以实现效果。其次，思考可以用哪些选择器结构，然后选<br>择最符合需求的那个。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.12.html">代码清单1-12</a></p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">&lt;!doctype html>
+&lt;head>
+  &lt;style>
+a:link</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> blue<span class="token punctuation">;</span>
+  <span class="token property">text-decoration</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">a:visited</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> purple<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">a:hover</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">text-decoration</span><span class="token punctuation">:</span> underline<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">a:active</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> red<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">h1</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> #2f4f4f<span class="token punctuation">;</span>
+  <span class="token property">margin-bottom</span><span class="token punctuation">:</span> 10px<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.nav</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">margin-top</span><span class="token punctuation">:</span> 10px<span class="token punctuation">;</span>
+  <span class="token property">list-style</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+  <span class="token property">padding-left</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.nav li</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">display</span><span class="token punctuation">:</span> inline-block<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.nav a</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> white<span class="token punctuation">;</span>
+  <span class="token property">background-color</span><span class="token punctuation">:</span> #13a4a4<span class="token punctuation">;</span>
+  <span class="token property">padding</span><span class="token punctuation">:</span> 5px<span class="token punctuation">;</span>
+  <span class="token property">border-radius</span><span class="token punctuation">:</span> 2px<span class="token punctuation">;</span>
+  <span class="token property">text-decoration</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.nav .featured</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background-color</span><span class="token punctuation">:</span> orange<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+  &lt;/style>
+&lt;/head>
+&lt;body>
+  &lt;header class=<span class="token string">"page-header"</span>>
+    &lt;h1 id=<span class="token string">"page-title"</span> class=<span class="token string">"title"</span>>Wombat Coffee Roasters&lt;/h1>
+    &lt;nav>
+      &lt;ul id=<span class="token string">"main-nav"</span> class=<span class="token string">"nav"</span>>
+        &lt;li>&lt;a href=<span class="token string">"/"</span>>Home&lt;/a>&lt;/li>
+        &lt;li>&lt;a href=<span class="token string">"/coffees"</span>>Coffees&lt;/a>&lt;/li>
+        &lt;li>&lt;a href=<span class="token string">"/brewers"</span>>Brewers&lt;/a>&lt;/li>
+        &lt;li>&lt;a href=<span class="token string">"/specials"</span> class=<span class="token string">"featured"</span>>Specials&lt;/a>&lt;/li>
+      &lt;/ul>
+    &lt;/nav>
+  &lt;/header>
+&lt;/body>
+</code></pre>
+
+<p>书写顺序之所以很重要，是因为层叠。优先级相同时，后出现的样式会覆盖先出现的样式。如果一个元素同时处于两个或者更多状态，最后一个状态就能覆盖其他状态。如果用户将鼠标悬停在一个访问过的链接上，悬停效果会生效。如果用户在鼠标悬停时激活了链接（即点击了它），激活的样式会生效。</p>
+<p>这个顺序的记忆口诀是“LoVe&#x2F;HAte”（“爱&#x2F;恨”），即link（链接）、visited（访问）、hover（悬停）、active（激活）。注意，如果将一个选择器的优先级改得跟其他的选择器不一样，这个规则就会遭到破坏，可能会带来意想不到的结果。</p>
+<ol start="2">
+<li>层叠值</li>
+</ol>
+<p>浏览器遵循三个步骤，即来源、优先级、源码顺序，来解析网页上每个元素的每个属性。在 CSS 中指的是多个样式规则对同一个元素的样式属性进行规定时，会发生的覆盖和继承的现象。每个样式规则都有一个权值，样式规则的权值越大，则该规则对元素的样式属性的影响越大。当多个样式规则同时作用于同一个元素时，系统会根据规则的权值进行排序，将权值大的规则应用到元素上，而权值小的规则会被忽略</p>
+<h3 id="1-1-4-两个经验法则"><a href="#1-1-4-两个经验法则" class="headerlink" title="1.1.4 两个经验法则"></a>1.1.4 两个经验法则</h3><ol>
+<li>在选择器中不要使用ID。就算只用一个ID，也会大幅提升优先级</li>
+<li>不要使用!important。它比ID更难覆盖，一旦用了它，想要覆盖原先的声明，就需要再加上一个!important，而且依然要处理优先级的问题。</li>
+<li>关于重要性的一个重要提醒当创建一个用于分发的JavaScript模块（比如NPM包）时，强烈建议尽量不要在JavaScript里使用行内样式。如果这样做了，就是在强迫使用该包的开发人员要么全盘接受包里的样式，要么给每个想修改的属性加上!important</li>
+</ol>
+<h3 id="1-1-5-选择器种类"><a href="#1-1-5-选择器种类" class="headerlink" title="1.1.5 选择器种类"></a>1.1.5 选择器种类</h3><table>
+<thead>
+<tr>
+<th>选择器</th>
+<th>例子</th>
+<th>例子描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.class</td>
+<td>.intro</td>
+<td>选择 class&#x3D;”intro” 的所有元素。</td>
+</tr>
+<tr>
+<td>.class1.class2</td>
+<td>.name1.name2</td>
+<td>选择 class 属性中同时有 name1 和 name2 的所有元素。</td>
+</tr>
+<tr>
+<td>.class1 .class2</td>
+<td>.name1 .name2</td>
+<td>选择作为类名 name1 元素后代的所有类名 name2 元素。</td>
+</tr>
+<tr>
+<td>#id</td>
+<td>#firstname</td>
+<td>选择 id&#x3D;”firstname” 的元素。</td>
+</tr>
+<tr>
+<td>*</td>
+<td>*</td>
+<td>选择所有元素。</td>
+</tr>
+<tr>
+<td>element</td>
+<td>p</td>
+<td>选择所有 <p> 元素。</td>
+</tr>
+<tr>
+<td>element.class</td>
+<td>p.intro</td>
+<td>选择 class&#x3D;”intro” 的所有 <p> 元素。</td>
+</tr>
+<tr>
+<td>element,element</td>
+<td>div, p</td>
+<td>选择所有 <div> 元素和所有 <p> 元素。</td>
+</tr>
+<tr>
+<td>element element</td>
+<td>div p</td>
+<td>选择 <div> 元素内的所有 <p> 元素。</td>
+</tr>
+<tr>
+<td>element&gt;element</td>
+<td>div &gt; p</td>
+<td>选择父元素是 <div> 的所有 <p> 元素。</td>
+</tr>
+<tr>
+<td>element+element</td>
+<td>div + p</td>
+<td>选择紧跟 <div> 元素的首个 <p> 元素。</td>
+</tr>
+<tr>
+<td>element1~element2</td>
+<td>p ~ ul</td>
+<td>选择前面有 <p> 元素的每个 <ul> 元素。</td>
+</tr>
+<tr>
+<td>[attribute]</td>
+<td>[target]</td>
+<td>选择带有 target 属性的所有元素。</td>
+</tr>
+<tr>
+<td>[attribute&#x3D;value]</td>
+<td>[target&#x3D;_blank]</td>
+<td>选择带有 target&#x3D;”_blank” 属性的所有元素。</td>
+</tr>
+<tr>
+<td>[attribute~&#x3D;value]</td>
+<td>[title~&#x3D;flower]</td>
+<td>选择 title 属性包含单词 “flower” 的所有元素。</td>
+</tr>
+<tr>
+<td>[attribute</td>
+<td>&#x3D;value]</td>
+<td>[lang</td>
+</tr>
+<tr>
+<td>[attribute^&#x3D;value]</td>
+<td>a[href^&#x3D;”https”]</td>
+<td>选择其 src 属性值以 “https” 开头的每个 <a> 元素。</td>
+</tr>
+<tr>
+<td>[attribute$&#x3D;value]</td>
+<td>a[href$&#x3D;”.pdf”]</td>
+<td>选择其 src 属性以 “.pdf” 结尾的所有 <a> 元素。</td>
+</tr>
+<tr>
+<td>[attribute*&#x3D;value]</td>
+<td>a[href*&#x3D;”w3schools”]</td>
+<td>选择其 href 属性值中包含 “abc” 子串的每个 <a> 元素。</td>
+</tr>
+<tr>
+<td>:active</td>
+<td>a:active</td>
+<td>选择活动链接。</td>
+</tr>
+<tr>
+<td>::after</td>
+<td>p::after</td>
+<td>在每个 <p> 的内容之后插入内容。</td>
+</tr>
+<tr>
+<td>::before</td>
+<td>p::before</td>
+<td>在每个 <p> 的内容之前插入内容。</td>
+</tr>
+<tr>
+<td>:checked</td>
+<td>input:checked</td>
+<td>选择每个被选中的 <input> 元素。</td>
+</tr>
+<tr>
+<td>:default</td>
+<td>input:default</td>
+<td>选择默认的 <input> 元素。</td>
+</tr>
+<tr>
+<td>:disabled</td>
+<td>input:disabled</td>
+<td>选择每个被禁用的 <input> 元素。</td>
+</tr>
+<tr>
+<td>:empty</td>
+<td>p:empty</td>
+<td>选择没有子元素的每个 <p> 元素（包括文本节点）。</td>
+</tr>
+<tr>
+<td>:enabled</td>
+<td>input:enabled</td>
+<td>选择每个启用的 <input> 元素。</td>
+</tr>
+<tr>
+<td>:first-child</td>
+<td>p:first-child</td>
+<td>选择属于父元素的第一个子元素的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>::first-letter</td>
+<td>p::first-letter</td>
+<td>选择每个 <p> 元素的首字母。</td>
+</tr>
+<tr>
+<td>::first-line</td>
+<td>p::first-line</td>
+<td>选择每个 <p> 元素的首行。</td>
+</tr>
+<tr>
+<td>:first-of-type</td>
+<td>p:first-of-type</td>
+<td>选择属于其父元素的首个 <p> 元素的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:focus</td>
+<td>input:focus</td>
+<td>选择获得焦点的 input 元素。</td>
+</tr>
+<tr>
+<td>:fullscreen</td>
+<td>:fullscreen</td>
+<td>选择处于全屏模式的元素。</td>
+</tr>
+<tr>
+<td>:hover</td>
+<td>a:hover</td>
+<td>选择鼠标指针位于其上的链接。</td>
+</tr>
+<tr>
+<td>:in-range</td>
+<td>input:in-range</td>
+<td>选择其值在指定范围内的 input 元素。</td>
+</tr>
+<tr>
+<td>:indeterminate</td>
+<td>input:indeterminate</td>
+<td>选择处于不确定状态的 input 元素。</td>
+</tr>
+<tr>
+<td>:invalid</td>
+<td>input:invalid</td>
+<td>选择具有无效值的所有 input 元素。</td>
+</tr>
+<tr>
+<td>:lang(language)</td>
+<td>p:lang(it)</td>
+<td>选择 lang 属性等于 “it”（意大利）的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:last-child</td>
+<td>p:last-child</td>
+<td>选择属于其父元素最后一个子元素每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:last-of-type</td>
+<td>p:last-of-type</td>
+<td>选择属于其父元素的最后 <p> 元素的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:link</td>
+<td>a:link</td>
+<td>选择所有未访问过的链接。</td>
+</tr>
+<tr>
+<td>:not(selector)</td>
+<td>:not(p)</td>
+<td>选择非 <p> 元素的每个元素。</td>
+</tr>
+<tr>
+<td>:nth-child(n)</td>
+<td>p:nth-child(2)</td>
+<td>选择属于其父元素的第二个子元素的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:nth-last-child(n)</td>
+<td>p:nth-last-child(2)</td>
+<td>同上，从最后一个子元素开始计数。</td>
+</tr>
+<tr>
+<td>:nth-of-type(n)</td>
+<td>p:nth-of-type(2)</td>
+<td>选择属于其父元素第二个 <p> 元素的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:nth-last-of-type(n)</td>
+<td>p:nth-last-of-type(2)</td>
+<td>同上，但是从最后一个子元素开始计数。</td>
+</tr>
+<tr>
+<td>:only-of-type</td>
+<td>p:only-of-type</td>
+<td>选择属于其父元素唯一的 <p> 元素的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:only-child</td>
+<td>p:only-child</td>
+<td>选择属于其父元素的唯一子元素的每个 <p> 元素。</td>
+</tr>
+<tr>
+<td>:optional</td>
+<td>input:optional</td>
+<td>选择不带 “required” 属性的 input 元素。</td>
+</tr>
+<tr>
+<td>:out-of-range</td>
+<td>input:out-of-range</td>
+<td>选择值超出指定范围的 input 元素。</td>
+</tr>
+<tr>
+<td>::placeholder</td>
+<td>input::placeholder</td>
+<td>选择已规定 “placeholder” 属性的 input 元素。</td>
+</tr>
+<tr>
+<td>:read-only</td>
+<td>input:read-only</td>
+<td>选择已规定 “readonly” 属性的 input 元素。</td>
+</tr>
+<tr>
+<td>:read-write</td>
+<td>input:read-write</td>
+<td>选择未规定 “readonly” 属性的 input 元素。</td>
+</tr>
+<tr>
+<td>:required</td>
+<td>input:required</td>
+<td>选择已规定 “required” 属性的 input 元素。</td>
+</tr>
+<tr>
+<td>:root</td>
+<td>:root</td>
+<td>选择文档的根元素。</td>
+</tr>
+<tr>
+<td>::selection</td>
+<td>::selection</td>
+<td>选择用户已选取的元素部分。</td>
+</tr>
+<tr>
+<td>:target</td>
+<td>#news:target</td>
+<td>选择当前活动的 #news 元素。</td>
+</tr>
+<tr>
+<td>:valid</td>
+<td>input:valid</td>
+<td>选择带有有效值的所有 input 元素。</td>
+</tr>
+<tr>
+<td>:visited</td>
+<td>a:visited</td>
+<td>选择所有已访问的链接。</td>
+</tr>
+</tbody></table>
+<h2 id="1-2-继承"><a href="#1-2-继承" class="headerlink" title="1.2 继承"></a>1.2 继承</h2><p>某些元素，在我们不指定属性值（没有层叠值）时候，他就会考虑从父标签中继承。但并不是所有的标签属性都会被进程，只有些特定的。主要是跟文本相关的属性会被继承</p>
+<pre class="language-css" data-language="css"><code class="language-css">color
+font
+font-family
+font-size
+font-weight
+font-variant
+font-style
+line-height
+letter-spacing
+text-align
+text-indent
+text-transform
+white-space
+word-spacing</code></pre>
+<p>list-style、list-style-type、list-style-position以及list-style-image。表格的边框属性border-collapse和border-spacing也能被继承。注意，这些属性控制的是表格的边框行为，而不是常用于指定非表格元素边框的属性</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.13.html">代码1-13</a><br>在body元素上修改了字体属性，子元素如果没有修改对应元素，那么就会继承body元素中的关于字体的定义</p>
+<h2 id="1-3-特殊值"><a href="#1-3-特殊值" class="headerlink" title="1.3 特殊值"></a>1.3 特殊值</h2><p>有两个特殊值可以赋给任意属性，用于控制层叠：inherit和 initial。</p>
+<h3 id="1-3-1-使用inherit"><a href="#1-3-1-使用inherit" class="headerlink" title="1.3.1 使用inherit"></a>1.3.1 使用inherit</h3><p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch01/listing-1.15.html">代码1-15</a></p>
+<p>通常会给页面的所有链接的字体加一个醒目的蓝色，但是有个有需求说要让页脚的链接字体跟页脚一个颜色。那么我们就可以使用继承就可以解决问题</p>
+<h3 id="1-3-2-initial关键字"><a href="#1-3-2-initial关键字" class="headerlink" title="1.3.2 initial关键字"></a>1.3.2 initial关键字</h3><p>每一个CSS属性都有初始（默认）值。如果将initial值赋给某个属性，那么就会有效地将其重置为默认值，这种操作相当于硬复位了该值。这么做的好处是不需要思考太多。如果想删除一个元素的边框，设置border: initial即可。如果想让一个元素恢复到默认宽度，设置width: initial即可。</p>
+<p>正如代码1-15所以，如果不指定inherit的话，那么也就会使用后面的样式值，因为它的样式表达式值权重更高</p>
+<p>auto不是所有属性的默认值，对很多属性来说甚至不是合法的值。比如border-width: auto和padding: auto是非法的，因此不会生效。可以花点时间研究一下这些属性的初始值，不过使用initial更简单。</p>
+<h2 id="1-4-简写属性"><a href="#1-4-简写属性" class="headerlink" title="1.4 简写属性"></a>1.4 简写属性</h2><p>比如<code>font: italic bold 18px/1.2 &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;</code>就指定了font-style、font-weight、font-size、font-height以及font-family<br>更多的还有</p>
+<ul>
+<li>background是多个背景属性的简写属性：background-color、background-image、background-size、background-repeat、background-position、background-origin、background-chip以及background-attachment。</li>
+<li>border是border-width、border-style以及border-color的简写属性，而这几个属性也都是简写属性。</li>
+<li>border-width是上、右、下、左四个边框宽度的简写属性。</li>
+</ul>
+<p>简写属性会设置省略值为其初始值</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">title</span> <span class="token punctuation">&#123;</span>
+<span class="token property">font</span><span class="token punctuation">:</span> 32px Helvetica<span class="token punctuation">,</span> Arial<span class="token punctuation">,</span> sans-serif<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>代码展开来写就是</p>
+<pre class="language-css" data-language="css"><code class="language-css">
+<span class="token selector">h1</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-weight</span><span class="token punctuation">:</span> bold<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.title</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-style</span><span class="token punctuation">:</span> normal<span class="token punctuation">;</span>
+  <span class="token property">font-variant</span><span class="token punctuation">:</span> normal<span class="token punctuation">;</span>
+  <span class="token property">font-weight</span><span class="token punctuation">:</span> normal<span class="token punctuation">;</span>
+  <span class="token property">font-stretch</span><span class="token punctuation">:</span> normal<span class="token punctuation">;</span>
+  <span class="token property">line-height</span><span class="token punctuation">:</span> normal<span class="token punctuation">;</span>
+  <span class="token property">font-size</span><span class="token punctuation">:</span> 32px<span class="token punctuation">;</span>
+  <span class="token property">font-family</span><span class="token punctuation">:</span> Helvetica<span class="token punctuation">,</span> Arial<span class="token punctuation">,</span> sans-serif<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+</code></pre>
+<p>在所有的简写属性里，font的问题最严重，因为它设置的属性值太多了。因此，要避免在<body>元素的通用样式以外使用font。当然，其他简写属性也可能会遇到一样的问题，因此要当心。</p>
+<h3 id="1-4-1-理解简写样式的顺序"><a href="#1-4-1-理解简写样式的顺序" class="headerlink" title="1.4.1 理解简写样式的顺序"></a>1.4.1 理解简写样式的顺序</h3><p>简写属性会尽量包容指定的属性值的顺序。可以设置<code>border: 1px solid black</code>或者<code>border: black 1px solid</code>，两者都会生效。这是因为浏览器知道宽度、颜色、边框样式分别对应什么类型的值</p>
+<ol>
+<li>上、右、下、左</li>
+</ol>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">.
+nav a</span> <span class="token punctuation">&#123;</span>
+<span class="token property">color</span><span class="token punctuation">:</span> white<span class="token punctuation">;</span>
+<span class="token property">background-color</span><span class="token punctuation">:</span> #13a4a4<span class="token punctuation">;</span>
+<span class="token property">padding</span><span class="token punctuation">:</span> 10px 15px 0 5px<span class="token punctuation">;</span> ←---- 上、右、下、左内边距
+<span class="token property">border-radius</span><span class="token punctuation">:</span> 2px<span class="token punctuation">;</span>
+<span class="token property">text-decoration</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>这种模式下的属性值还可以缩写。如果声明结束时四个属性值还剩一个没指定，没有指定的一边会取其对边的值。指定三个值时，左边和右边都会使用第二个值。指定两个值时，上边和下边会使用第一个值。如果只指定一个值，那么四个方向都会使用这个值。因此下面的声明都是等价的。</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token property">padding</span><span class="token punctuation">:</span> 1em 2em<span class="token punctuation">;</span>
+<span class="token property">padding</span><span class="token punctuation">:</span> 1em 2em 1em<span class="token punctuation">;</span>
+<span class="token property">padding</span><span class="token punctuation">:</span> 1em 2em 1em 2em<span class="token punctuation">;</span></code></pre>
+<p>但是下面代码就是上，下，左，右</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token property">padding</span><span class="token punctuation">:</span> 1em <span class="token punctuation">;</span></code></pre>
+
+<ol start="2">
+<li>水平、垂直</li>
+</ol>
+<p>有些属性包括background-position、box-shadow、text-shadow，比如background-position: 25% 75%则先指定水平方向的右&#x2F;左属性值，然后才是垂直方向的上&#x2F;下属性值。<br>虽然看起来顺序相反的定义违背了直觉，原因却很简单：这两个值代表了一个笛卡儿网格。笛卡儿网格的测量值一般是按照 （水平，垂直）的顺序来的。比如，如图1-15所示，要给元素加上一个阴影，就要先指定 （水平）值。</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">.nav .featured</span> <span class="token punctuation">&#123;</span>
+<span class="token property">background-color</span><span class="token punctuation">:</span> orange<span class="token punctuation">;</span>
+<span class="token property">box-shadow</span><span class="token punctuation">:</span> 10px 2px #6f9090<span class="token punctuation">;</span> ←---- 阴影向右偏移10px，向下偏移2px
+<span class="token punctuation">&#125;</span></code></pre>
+<p>如果属性需要指定从一个点出发的两个方向的值，就想想“笛卡儿网格”。如果属性需要指定一个元素四个方向的值，就想想”时钟”。</p>
+<h1 id="2-相对单位"><a href="#2-相对单位" class="headerlink" title="2. 相对单位"></a>2. 相对单位</h1><p>em的单位难以把握，像素单位相对简单</p>
+<h2 id="2-1-相对值的好处"><a href="#2-1-相对值的好处" class="headerlink" title="2.1 相对值的好处"></a>2.1 相对值的好处</h2><h3 id="2-1-1-那些年追求的像素级完美"><a href="#2-1-1-那些年追求的像素级完美" class="headerlink" title="2.1.1 那些年追求的像素级完美"></a>2.1.1 那些年追求的像素级完美</h3><h3 id="2-1-2-像素级完美的时代终结了"><a href="#2-1-2-像素级完美的时代终结了" class="headerlink" title="2.1.2 像素级完美的时代终结了"></a>2.1.2 像素级完美的时代终结了</h3><p>响应式：根据浏览器大小有不同的响应</p>
+<h2 id="2-2-em和rem"><a href="#2-2-em和rem" class="headerlink" title="2.2 em和rem"></a>2.2 em和rem</h2><p>em是一种计算单位，它的单位是根据所修饰元素的字体大小进行计算。<br>比如<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.1.html">代码2-1</a><br>如上代码设置的16px，那么padding的内边距也是16px,那么如果你的字体是32px，那么内边距就会是32px.</p>
+<p>当计算padding,heigh,width,border-radius.使用em会非常方便。这因为当元素的字体改变时就会更改em的单位。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.3.html">代码2-3</a></p>
+<h3 id="2-2-1-使用em定义字号"><a href="#2-2-1-使用em定义字号" class="headerlink" title="2.2.1 使用em定义字号"></a>2.2.1 使用em定义字号</h3><p>如果定义字体的的单位是em,那么那么实际上这个字体的结果是从继承的字号进行计算的。<br>如<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.5.html">代码2-5</a>所展示的<br>也就是 继承父元素字号*em &#x3D; 子元素像素值，那么也就是css中的em单位是子除父字号，大多数浏览器来说，默认的字号为16px。</p>
+<ol>
+<li>em同时作用于字体和其他属性</li>
+</ol>
+<p>浏览器要先计算字号，然后再计算，然后再根据这个结算后的字号值，再去计算其他值</p>
+<ol start="2">
+<li>字体缩小的问题</li>
+</ol>
+<p>想象这一种场景，我们说em就是一种权重，那么如果DOM中是嵌套的，然后子元素的字体大小通过继承父元素大小计算。如果em是小于0的值，就会变成子元素逐级变小。<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.9.html">代码2-9</a> 展示出用选择器优先级来覆盖我们碰到的问题。<code>ul ul</code>选择出所有的<code>ul</code>元素</p>
+<h3 id="2-2-2-使用rem设置字号"><a href="#2-2-2-使用rem设置字号" class="headerlink" title="2.2.2 使用rem设置字号"></a>2.2.2 使用rem设置字号</h3><p>当浏览器解析HTML文档时，会在内存里将页面的所有元素表示为DOM（文档对象模型）。它是一个树结构，其中每个元素都由一个节点表示。&lt; html &gt;元素是顶级（根）节点。它下面是子节点，&lt; head &gt;和&lt; body &gt;。再下面是逐级嵌套的后代节点。在文档中，根节点是所有其他元素的祖先节点。根节点有一个伪类选择器<code>:root</code>，可以用来选中它自己。这等价于类型选择器<code>html &#123;&#125;</code></p>
+<p>rem是root em的缩写，rem不是相对于当前元素，还是相对根元素，不管其他元素位于网页的任何位置，都只是计算根元素的字体大小代码清单<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.10.html">2-10</a></p>
+<p>在CSS里，设置位置通常是“看情况”。rem只是你工具包中的一种工具。掌握CSS很重要的一点是学会在适当的场景使用适当的工具。我一般会用rem设置字号，用px设置边框，用em设置其他大部分属性，尤其是内边距、外边距和圆角（不过我有时用百分比设置容器宽度）。</p>
+<h2 id="2-3停止像素思考"><a href="#2-3停止像素思考" class="headerlink" title="2.3停止像素思考"></a>2.3停止像素思考</h2><p>很很多程序员会设置html标签字体的大小。这也的确能计算子元素的相对值，但是这回有2种弊端</p>
+<ol>
+<li>这会写很多覆盖的代码</li>
+<li>这本质上还是像素思想，这样不利于写响应式网页</li>
+</ol>
+<p>自适应布局：是指网页能够在不同大小的终端设备上自行适应显示，也就是让一个网站在不同大小的设备上显示同一样的页面，让同一个页面适应不同大小屏幕，根据屏幕的大小，自动缩放。自适应布局的几个标志：</p>
+<ol>
+<li>比如单终端（手机）的N主流产品</li>
+<li>当网页缩写到一定程度时，界面会出现显示不全，并且出现横向滑动条；</li>
+<li>总体框架不变，横线布局的版块太多会有所减少。</li>
+</ol>
+<p>响应式布局： 就是一个网站能够兼容多个终端，可以根据屏幕的大小自动调整页面的的展示方式以及布局，我们不用为每一个终端做一个特定的版本。响应式网站的几个标志：</p>
+<ol>
+<li>同时适配PC + 平板 + 手机等；</li>
+<li>标签导航在接近手持终端设备时改变为经典的抽屉式导航；</li>
+<li>网站的布局会根据视口来调整模块的大小和位置；</li>
+</ol>
+<h3 id="2-3-1-设置一个合理的默认的字号"><a href="#2-3-1-设置一个合理的默认的字号" class="headerlink" title="2.3.1 设置一个合理的默认的字号"></a>2.3.1 设置一个合理的默认的字号</h3><p>在写css样式代码中，不应该采用新的字号值覆盖父值的办法，这样效率非常低下，要采用相对单位来实现字体大小的调整。可设置root元素的字体值然后在其基础上进行计算。</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">:root</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-size</span><span class="token punctuation">:</span>0.875em 
+<span class="token punctuation">&#125;</span>
+--公式是父/子=em</code></pre>
+<p>在<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.14.html">代码2-14</a>中使用了em设置边距和圆角，使用rem设置标题和字号</p>
+<h3 id="2-3-2-构建响应式面板"><a href="#2-3-2-构建响应式面板" class="headerlink" title="2.3.2 构建响应式面板"></a>2.3.2 构建响应式面板</h3><p>在构建响应式web之前需要设置响应式面板，可以根据不同媒体媒介进行设置。及@media可以指定屏幕尺寸和媒体类型。</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">:root</span> <span class="token punctuation">&#123;</span>
+
+<span class="token property">font-size</span><span class="token punctuation">:</span> 0.75em<span class="token punctuation">;</span>              （以下3行）作用到所有的屏幕，但是在大屏上会被覆盖
+<span class="token punctuation">&#125;</span>
+<span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">min-width</span><span class="token punctuation">:</span> 800px<span class="token punctuation">)</span></span> <span class="token punctuation">&#123;</span>     <span class="token selector">（以下5行）仅作用到宽度800px及其以上的屏幕，覆盖之前的值
+:root</span> <span class="token punctuation">&#123;</span>
+<span class="token property">font-size</span><span class="token punctuation">:</span> 0.875em<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">min-width</span><span class="token punctuation">:</span> 1200px<span class="token punctuation">)</span></span> <span class="token punctuation">&#123;</span>  <span class="token selector">（以下5行）仅作用到宽度1200px及其以上的屏幕，覆盖前面两个值
+:root</span> <span class="token punctuation">&#123;</span>
+<span class="token property">font-size</span><span class="token punctuation">:</span> 1em<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+</code></pre>
+<p>上卖弄代码不难看出，第一个规则集在大屏幕会被覆盖，当屏幕大于800px然后第二个规则集会生效。大于1200px则第三个规则会生效<br>具体代码如<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.15.html">2-15</a></p>
+<h3 id="2-3-3-缩放单个组件"><a href="#2-3-3-缩放单个组件" class="headerlink" title="2.3.3 缩放单个组件"></a>2.3.3 缩放单个组件</h3><p>假如我们有个需求是对屏幕中某个组件进行缩放，那么我们可以采用覆盖值的但是正如<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.16.html">代码2-16</a>所示。</p>
+<p>采用高权重样式值覆盖的策略</p>
+<h2 id="2-4-视口的相对单位"><a href="#2-4-视口的相对单位" class="headerlink" title="2.4 视口的相对单位"></a>2.4 视口的相对单位</h2><ul>
+<li>vh：视口高度的1&#x2F;100。</li>
+<li>vw：视口宽度的1&#x2F;100。</li>
+<li>vmin：视口宽、高中较小的一方的1&#x2F;100（IE9中叫vm，而不是vmin）。</li>
+<li>vmax：视口宽、高中较大的一方的1&#x2F;100（本书写作时IE和Edge均不支持vmax</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.18.html">代码清单2-18</a></p>
+<h3 id="2-4-1-使用vw定义字号"><a href="#2-4-1-使用vw定义字号" class="headerlink" title="2.4.1 使用vw定义字号"></a>2.4.1 使用vw定义字号</h3><p>如果给一个元素加上font-size: 2vw会发生什么？在一个1200px的桌面显示器上，计算值为24px（1200的2%）。在一个768px宽的平板上，计算值约为15px（768的2%）。这样做的好处在于元素能够在这两种大小之间平滑地过渡，这意味着不会在某个断点突然改变。当视口大小改变时，元素会逐渐过渡。</p>
+<h3 id="2-4-2-使用calc-定义字号"><a href="#2-4-2-使用calc-定义字号" class="headerlink" title="2.4.2 使用calc()定义字号"></a>2.4.2 使用calc()定义字号</h3><p>calc()函数内可以对两个及其以上的值进行基本运算。当要结合不同单位的值时，calc()特别实用。它支持的运算包括：加（+）、减（-）、乘（×）、除（÷）。加号和减号两边必须有空白，因此我建议大家养成在每个操作符前后都加上一个空格的习惯，比如calc(1em +10px)。代码清单2-19用calc()结合了em和vw两种单位。删除之前样式表的基础字号（以及相关的媒体查询），换成如下代码。<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch02/listing-2.19.html">代码2-19</a>，现在打开网页，慢慢缩放浏览器，字体会平滑地缩放。0.5em保证了最<br>小字号，1vw则确保了字体会随着视口缩放。这段代码保证基础字号从iPhone 6里的11.75px一直过渡到1200px的浏览器窗口里的20px。可以按照自己的喜好调整这个值。我们不用媒体查询就实现了大部分的响应式策略。省掉三四个硬编码的断点，网页上的内容也能根据视口流畅地缩放。</p>
+<h2 id="2-5-无单位的数值和行高"><a href="#2-5-无单位的数值和行高" class="headerlink" title="2.5 无单位的数值和行高"></a>2.5 无单位的数值和行高</h2><ul>
+<li>如果父级的line-height属性值有单位或百分比，那么子级继承的值则是换算后的一个具体的px级别的值；</li>
+<li>而如果父级的line-height属性值没有单位，则子级会直接继承这个“数值”，而非计算后的具体值，此时子级的line-height会根据本身的font-size值重新计算得到新的line-height值。</li>
+</ul>
+<p>每个元素使用相同的font-size，但使用不同的font-family，但渲染出来的line-height是不同的。</p>
+<p>CSS 权威指南基本视觉格式化一章中讲到：对于行内非替换元素或者匿名文本来说， font-size 指定了它们的 content area的高度，由于inline box 是由 content area 加上上下的 half-leading构成的，那么如果元素的leading为 0，在这种情况下，font-size 指定了inline box 的高度。</p>
+<p>英文字体有基线（baseline）和中线（meanline），这两条线之间就是所谓的<code>x-height</code>，即小写字母x的高度。基线之上的部分是上伸区域（ascent），基线之下的部分是下伸区域（descent).</p>
+<h2 id="2-6-自定义属性-即css变量"><a href="#2-6-自定义属性-即css变量" class="headerlink" title="2.6 自定义属性(即css变量)"></a>2.6 自定义属性(即css变量)</h2><p>在2015年新的css规范引入了层叠变量的自定义属性。也就是允许在css使用变量的概念。</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">:root</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">--main-font</span><span class="token punctuation">:</span> Helvetica<span class="token punctuation">,</span> Arial<span class="token punctuation">,</span> sans-serif<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>这相当于定义了一个全局的，在整个网页都可以使用的变量<code>main-font</code>,如果是在根节点定义变量，那么它下面的子元素都可以使用该变量，同理如果在某一节点元素内定义变量，那么它下面的子元素才可以使用，兄弟元素和它的父元素都无法使用，然后我们可以调用<code>var()</code>函数取出定义的值。</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">p</span> <span class="token punctuation">&#123;</span>
+<span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--main-font<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token property">color</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--brand-color<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>思考一下如果第一个值未定义，那么就可以使用备用值.</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">p</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--main-font<span class="token punctuation">,</span> sans-serif<span class="token punctuation">)</span><span class="token punctuation">;</span>  ←---- 指定备用值为sans-serif
+    <span class="token property">color</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--secondary-color<span class="token punctuation">,</span> blue<span class="token punctuation">)</span><span class="token punctuation">;</span>        ←---- secondary-color变量没有定义，因此会使
+<span class="token punctuation">&#125;</span></code></pre>
+<p>如果定义的变量是个非法值就会使用属性的<code>默认值</code></p>
+<h3 id="2-6-1-动态改变自定义属性"><a href="#2-6-1-动态改变自定义属性" class="headerlink" title="2.6.1 动态改变自定义属性"></a>2.6.1 动态改变自定义属性</h3><p>其实这节主要就是讲解自定义属性变量的作用域。有如下例子</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">&lt;!doctype html>
+&lt;head>
+  &lt;style>
+    :root</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">font-size</span><span class="token punctuation">:</span> <span class="token function">calc</span><span class="token punctuation">(</span>0.5em + 1vw<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token property">--main-bg</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+      <span class="token property">--main-color</span><span class="token punctuation">:</span> #000<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">body</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">font-family</span><span class="token punctuation">:</span> Helvetica<span class="token punctuation">,</span> Arial<span class="token punctuation">,</span> sans-serif<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">.dark</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">margin-top</span><span class="token punctuation">:</span> 2em<span class="token punctuation">;</span>
+      <span class="token property">padding</span><span class="token punctuation">:</span> 1em<span class="token punctuation">;</span>
+      <span class="token property">background-color</span><span class="token punctuation">:</span> #999<span class="token punctuation">;</span>
+      <span class="token property">--main-bg</span><span class="token punctuation">:</span> #333<span class="token punctuation">;</span>
+      <span class="token property">--main-color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">.panel</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">font-size</span><span class="token punctuation">:</span> 1rem<span class="token punctuation">;</span>
+      <span class="token property">padding</span><span class="token punctuation">:</span> 1em<span class="token punctuation">;</span>
+      <span class="token property">border</span><span class="token punctuation">:</span> 1px solid #999<span class="token punctuation">;</span>
+      <span class="token property">border-radius</span><span class="token punctuation">:</span> 0.5em<span class="token punctuation">;</span>
+      <span class="token property">background-color</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--main-bg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--main-color<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">.panel > h2</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">margin-top</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+      <span class="token property">font-size</span><span class="token punctuation">:</span> 0.8em<span class="token punctuation">;</span>
+      <span class="token property">font-weight</span><span class="token punctuation">:</span> bold<span class="token punctuation">;</span>
+      <span class="token property">text-transform</span><span class="token punctuation">:</span> uppercase<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">.panel.large</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">font-size</span><span class="token punctuation">:</span> 1.2em<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  &lt;/style>
+&lt;/head>
+
+&lt;body>
+  &lt;div class=<span class="token string">"panel"</span>>
+    &lt;h2>Single-origin&lt;/h2>
+    &lt;div class=<span class="token string">"body"</span>>
+      We have built partnerships with small farms
+      around the world to hand-select beans at the
+      peak of season. We then carefully roast in
+      small batches to maximize their potential.
+    &lt;/div>
+  &lt;/div>
+
+  &lt;aside class=<span class="token string">"dark"</span>>
+    &lt;div class=<span class="token string">"panel"</span>>
+      &lt;h2>Single-origin&lt;/h2>
+      &lt;div class=<span class="token string">"body"</span>>
+        We have built partnerships with small farms
+        around the world to hand-select beans at the
+        peak of season. We then carefully roast in
+        small batches to maximize their potential.
+      &lt;/div>
+    &lt;/div>
+  &lt;/aside>
+&lt;/body>
+</code></pre>
+<p>在上面例子中定义了两个属性。第一个在根属性上定义了属性，第二个在dark元素上定义了属性。但是第二个属性会覆盖掉第一个全局的属性，根语言中属性作用域很像</p>
+<h3 id="2-6-2-使用js改变自定义属性"><a href="#2-6-2-使用js改变自定义属性" class="headerlink" title="2.6.2 使用js改变自定义属性"></a>2.6.2 使用js改变自定义属性</h3><p>具体实现不需要深究，只需要知道js可以改变属性的值，从而使网页设计更灵活</p>
+<h3 id="2-6-3-探索自定义属性"><a href="#2-6-3-探索自定义属性" class="headerlink" title="2.6.3 探索自定义属性"></a>2.6.3 探索自定义属性</h3><p>自定义属性是CSS中一个全新的领域，开发人员刚刚开始探索。因为浏览器支持有限，所以还没有出现“典型”的用法。我相信假以时日，会出现各种最佳实践和新的用法。这需要你持续关注。继续使用自定义属性，看看能用它做出什么效果。值得注意的是，在不支持自定义属性的浏览器上，任何使用var()的声明都会被忽略。请尽量为这些浏览器提供回退方案。然而这种做法不是万能的，比如当用到自定义属性的动态特性时，就很难有备用方案。关注 Can I Use网站，查看最新的浏览器支持情况。</p>
+<h1 id="3-盒子模型"><a href="#3-盒子模型" class="headerlink" title="3 盒子模型"></a>3 盒子模型</h1><h2 id="3-1-元素宽度的问题"><a href="#3-1-元素宽度的问题" class="headerlink" title="3.1 元素宽度的问题"></a>3.1 元素宽度的问题</h2><p>这一节最重要的是盒子模型</p>
+<p><img src="/./img/3.1.png" alt="3.1"></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.3.html">代码3-3</a>设置的<code>windth=30%</code>为内容的宽度。在以上例子中（代码清单3-3），两列并没有并排出现，而是折行显示。虽然将两列宽度设置为70%和30%，但它们总共占据的宽度超过了可用空间的100%，侧边栏的宽度等于30%宽度加上各1.5em的左右内边距，主容器的宽度只占70%。两列宽度加起来等于100%宽度加上3em。因为放不下，所以两列便折行显示了。</p>
+<h3 id="3-1-1-避免魔术数值"><a href="#3-1-1-避免魔术数值" class="headerlink" title="3.1.1 避免魔术数值"></a>3.1.1 避免魔术数值</h3><p>替代魔术数值的一个方法是让浏览器帮忙计算。在本例中，因为加了内边距，两列的宽度总和超出了3em，所以可以使用calc()函数减去这个值，得到刚好100%的总和。比如设置侧边栏宽度为calc(30% - 3em)就能刚好并排放下两列，但是还有更好的解决办法。</p>
+<h3 id="3-1-2-调整盒子模型"><a href="#3-1-2-调整盒子模型" class="headerlink" title="3.1.2 调整盒子模型"></a>3.1.2 调整盒子模型</h3><p>默认的盒子模型的宽度的width是内容的宽度，<code>box-sizing: border-box</code>的盒子模型的width的宽度是边框和内容</p>
+<h3 id="3-1-3-全局设置border-box"><a href="#3-1-3-全局设置border-box" class="headerlink" title="3.1.3 全局设置border-box"></a>3.1.3 全局设置border-box</h3><pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">*,::before,::after</span> <span class="token punctuation">&#123;</span>
+<span class="token property">box-sizing</span><span class="token punctuation">:</span> border-box<span class="token punctuation">;</span> ←---- 给页面上所有元素和伪元素设置border-box
+<span class="token punctuation">&#125;</span></code></pre>
+<p>全部元素都采用border-box属性，但是引入第三方的css代码就会导致无法影响别人的代码，故采用</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">:root</span> <span class="token punctuation">&#123;</span>
+<span class="token property">box-sizing</span><span class="token punctuation">:</span> border-box<span class="token punctuation">;</span> ←---- 根元素设置为border-box
+<span class="token punctuation">&#125;</span>
+<span class="token selector">*,
+::before,
+::after</span> <span class="token punctuation">&#123;</span>
+<span class="token property">box-sizing</span><span class="token punctuation">:</span> inherit<span class="token punctuation">;</span> ←---- 告诉其他所有元素和伪元素继承其盒模型
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.third-party-component</span> <span class="token punctuation">&#123;</span>
+<span class="token property">box-sizing</span><span class="token punctuation">:</span> content-box<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>这样就解决了潜在影响第三方库css代码(该书后面代码都是用box-sizing:border-box)</p>
+<h3 id="3-1-4-给列之间加上间隔"><a href="#3-1-4-给列之间加上间隔" class="headerlink" title="3.1.4 给列之间加上间隔"></a>3.1.4 给列之间加上间隔</h3><p>实现在两个元素之间添加间距的方法有很多，</p>
+<ol>
+<li>简单的就是通过计算width的值，在值上trade-off,但是间隔的宽度由外层容器的宽度决定.用em指定间距，因为em单位的一致性更好。</li>
+<li>使用calc()函数，如<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.8.html">代码3-8</a></li>
+</ol>
+<h2 id="3-2-元素高度的问题"><a href="#3-2-元素高度的问题" class="headerlink" title="3.2 元素高度的问题"></a>3.2 元素高度的问题</h2><p>普通文档流——指的是网页元素的默认布局行为。行内元素跟随文字的方向从左到右排列，当到达容器边缘时会换行。块级元素会占据完整的一行，前后都有换行。</p>
+<h3 id="3-2-1-控制溢出行为"><a href="#3-2-1-控制溢出行为" class="headerlink" title="3.2.1 控制溢出行为"></a>3.2.1 控制溢出行为</h3><p>当明确设置一个元素的高度时，内容可能会溢出容器。当内容在限定区域放不下，渲染到父元素外面时，就会发生这种现象</p>
+<ul>
+<li>visible（默认值）——所有内容可见，即使溢出容器边缘。</li>
+<li>hidden——溢出容器内边距边缘的内容被裁剪，无法看见。</li>
+<li>scroll——容器出现滚动条，用户可以通过滚动查看剩余内容。在一些操作系统上，会出现水平和垂直两种滚动条，即使所有内容都可见（不溢出）。不过，在这种情况下，滚动条不可滚动（置灰）。</li>
+<li>auto——只有内容溢出时容器才会出现滚动条。</li>
+</ul>
+<p>请谨慎地使用滚动条。浏览器给网页最外层加上了滚动条，如果网页内部再嵌套滚动区域，用户就会很反感。如果用户使用鼠标滚轮滚动网页，当鼠标到达一个较小的滚动区域，滚轮就会停止滚动网页，转而滚动较小的区域。</p>
+<p>水平方向的溢出除了垂直溢出，内容也可能在水平方向溢出。一个典型的场景就是在一个很窄的容器中放一条很长的URL。溢出的规则跟垂直方向上的一致。可以用overflow-x属性单独控制水平方向的溢出，或者用overflow-y控制垂直方向溢出。这些属性支持overflow的所有值，然而同时给x和y指定不同的值，往往会产生难以预料的结果。</p>
+<h3 id="3-2-2-百分比高度的备选方案"><a href="#3-2-2-百分比高度的备选方案" class="headerlink" title="3.2.2 百分比高度的备选方案"></a>3.2.2 百分比高度的备选方案</h3><p>在实现页面的时候，通常是子元素的高度决定了父元素的高度。这样就会一直往上依赖.要想百分高度生效,需要给父元素设置一个高度</p>
+<ol>
+<li>等高列<br>  在早期时候使用表格实现等高列但通常是通过内容来计算高度,现代浏览器解决这种问题.</li>
+<li>css表格布局<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.10.html">代码3-10</a><ol>
+<li>首先要给容器设置<code>display:table</code>，然后给每一列设置<code>display:table-cell</code><pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">.container</span> <span class="token punctuation">&#123;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> table<span class="token punctuation">;</span> ←----让容器布局像表格一样
+<span class="token property">width</span><span class="token punctuation">:</span> 100%<span class="token punctuation">;</span>    ←---- ❶让表格填充容器的宽度
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.main</span> <span class="token punctuation">&#123;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> table-cell<span class="token punctuation">;</span>
+<span class="token property">width</span><span class="token punctuation">:</span> 70%<span class="token punctuation">;</span>
+<span class="token property">background-color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+<span class="token property">border-radius</span><span class="token punctuation">:</span> .5em<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.sidebar</span> <span class="token punctuation">&#123;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> table-cell<span class="token punctuation">;</span>
+<span class="token property">width</span><span class="token punctuation">:</span> 30%<span class="token punctuation">;</span>
+<span class="token property">margin-left</span><span class="token punctuation">:</span> 1.5em<span class="token punctuation">;</span>  &lt;-----外边距不在生效
+<span class="token property">padding</span><span class="token punctuation">:</span> 1.5em<span class="token punctuation">;</span>
+<span class="token property">background-color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+<span class="token property">border-radius</span><span class="token punctuation">:</span> .5em<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+以上代码缺少间隔，这是因为外边距并不会因为table-cell元素，所以要修改代码，让间隔生效，可以使用table-spacing属性定义单元格的间距。该元素接收两个长度值，一个是水平间距一个是垂直间距。可以给容器加上border-spacing: 1.5em，0em ，但是这样有个副作用。就是左右没法对齐 。机制的你可能会想到父边距，然后我们在外面包上一层。然后指定左右负边距。</li>
+</ol>
+</li>
+<li>Flexbox<br>可以使用Flexbox实现等高列，我们可以给容器设置flex，就变成了一个弹性容器详情参考<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.11.html">代码3-11</a></li>
+</ol>
+<h3 id="3-2-3-使用min-height和max-height"><a href="#3-2-3-使用min-height和max-height" class="headerlink" title="3.2.3 使用min-height和max-height"></a>3.2.3 使用min-height和max-height</h3><p>max-height允许元素自然地增高到一个特定界限。如果到达这个界限，元素就不再增高，内容会溢出</p>
+<h3 id="3-2-4-垂直居中内容"><a href="#3-2-4-垂直居中内容" class="headerlink" title="3.2.4 垂直居中内容"></a>3.2.4 垂直居中内容</h3><p>对于显示为table-cell的元素，vertical-align控制了内容在单元格内的对齐。如果你的页面用了CSS表格布局，那么可以用vertical-align来实现垂直居中。具体详情 参考<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.12.html">代码3-12</a><br>这个地方要在网上看看例子</p>
+<h3 id="3-3-负边距"><a href="#3-3-负边距" class="headerlink" title="3.3 负边距"></a>3.3 负边距</h3><p>如果设置左边或顶部的负外边距，元素就会相应地向左或向上移动，导致元素与它前面的元素重叠，如果设置右边或者底部的负外边距，并不会移动<br>元素，而是将它后面的元素拉过来。给元素底部加上负外边距并不等同于给它下面的元素顶部加上负外边距。</p>
+<h2 id="3-4-外边距折叠"><a href="#3-4-外边距折叠" class="headerlink" title="3.4 外边距折叠"></a>3.4 外边距折叠</h2><p>鸡儿的，元素的外边距是折叠的，产生单个外边距。这种现象被称为折叠。</p>
+<h3 id="3-4-1-文字折叠"><a href="#3-4-1-文字折叠" class="headerlink" title="3.4.1 文字折叠"></a>3.4.1 文字折叠</h3><p>折叠外边距的大小等于相邻外边距中的最大值</p>
+<h3 id="3-4-2-多个外边距折叠"><a href="#3-4-2-多个外边距折叠" class="headerlink" title="3.4.2 多个外边距折叠"></a>3.4.2 多个外边距折叠</h3><p>在代码清单3-13中，有三个不同的外边距折叠到一块了：&lt; h2&gt;底部的外边距、&lt; div&gt;顶部的外边距、&lt; p&gt;顶部的外边距。计算值分别是19.92px ，0px、16px。因此最终间隔还是19.92px，也就是三者中最大的值。实际上，即使将段落放在多个div中嵌套，渲染结果都一样：所有的外边距都会折叠到一起。总之，所有相邻的顶部和底部外边距会折叠到一起。如果在页面中添加一个空的、无样式的div（没有高度、边框和内边距），它自己的顶部和底部外边距就会折叠。</p>
+<h3 id="3-4-3-容器外部折叠"><a href="#3-4-3-容器外部折叠" class="headerlink" title="3.4.3 容器外部折叠"></a>3.4.3 容器外部折叠</h3><p>容器内部元素跑出外与别的元素外边距折叠。可考虑在容器设置内边界<br>还有如下方法防止外边距折叠</p>
+<ul>
+<li>对容器使用overflow: auto（或者非visible的值），防止内部元素的外边距跟容器外部的外边距折叠。这种方式副作用最小。</li>
+<li>在两个外边距之间加上边框或者内边距，防止它们折叠。</li>
+<li>如果容器为浮动元素、内联块、绝对定位或固定定位时，外边距不会在它外面折叠。</li>
+<li>当使用Flexbox布局时，弹性布局内的元素之间不会发生外边距折叠。网格布局（参见第6章）同理。</li>
+<li>当元素显示为table-cell时不具备外边距属性，因此它们不会折叠。此外还有table-row和大部分其他表格显示类型，但不包括table、table-inline、table-caption。</li>
+</ul>
+<h2 id="3-5-容器内的元素间距"><a href="#3-5-容器内的元素间距" class="headerlink" title="3.5 容器内的元素间距"></a>3.5 容器内的元素间距</h2><p>详情在<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.17.html">代码3-17</a> 绘制了一个间距相同的两个按钮</p>
+<h3 id="3-5-1-如果内容改变了"><a href="#3-5-1-如果内容改变了" class="headerlink" title="3.5.1 如果内容改变了"></a>3.5.1 如果内容改变了</h3><p>如果在代码3-17中重新添加一个元素我又要重新编写样式</p>
+<h3 id="3-5-2-更通用的方案：猫头鹰解决方案"><a href="#3-5-2-更通用的方案：猫头鹰解决方案" class="headerlink" title="3.5.2 更通用的方案：猫头鹰解决方案"></a>3.5.2 更通用的方案：猫头鹰解决方案</h3><p>Web设计师Heydon Pickering曾表示外边距“就像是给一个物体的一侧涂了胶水，而你还没有决定是否要将它贴到某处，或者还没想好要贴到什么东西上”。不要给网页当前的内容固定外边距，而是应该采取更通用的方式，不管网页结构如何变化都能够生效。这就是Heydon Pickering所说的迟钝的猫头鹰选择器（lobotomized owl selector）（以下简称猫头鹰选择器），因为它长这样：* + * 。该选择器开头是一个通用选择器（*），它可以选中所有元素，后面是一个相邻兄弟组合器（+），最后是另一个通用选择器。它因形似一只眼神空洞的猫头鹰而得名。猫头鹰选择器功能接近此前介绍的选择器：.social-button + .social-button，但是它不会选中直接跟在其他按钮后面的按钮，而是会选中直接跟在其他元素后面的任何元素。也就是说，它会选中页面上有着相同父级的非第一个子元素<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch03/listing-3.21.html">代码3-22</a></p>
+<h1 id="4-理解浮动"><a href="#4-理解浮动" class="headerlink" title="4 理解浮动"></a>4 理解浮动</h1><p>说白了主要有三种方式影响文档流</p>
+<ol>
+<li>浮动</li>
+<li>Flexbox</li>
+<li>网格布局</li>
+</ol>
+<p>早些时候用的更多的是浮动布局，但是这种当时布局很难理解，在本章将会介绍双容器和媒体对象</p>
+<h2 id="4-1-浮动的设计初衷"><a href="#4-1-浮动的设计初衷" class="headerlink" title="4.1 浮动的设计初衷"></a>4.1 浮动的设计初衷</h2><p>浮动能将一个元素（通常是一张图片）拉到其容器的一侧，这样文档流就会包围它，也可以浮动到右侧，这时候文档流会重新排列，如果多个元素浮动，那么他们会挨着浮动。设计页面的时候通常是规划好外层容器，然后再设计内层。<br>双容器模式：通过将内容放置到两个嵌套的容器中，然后给内层的容器设置外边距，让它在外层容器中居中，在本例中，&lt; body &gt;就是外层容器。因为它默认是100%的网页宽度，所以不用给它添加新的样式。在&lt; body &gt;内部，整个网页的内容放在了&lt; div class&#x3D;”container” &gt;，也就是内层容器中。对于内层容器，需要设置一个max-width，并将外边距设置为auto，使内容居中。将代码<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch04/listing-4.3.html">清单4-3</a>添加到你的样式表中</p>
+<h2 id="4-2-容器折叠和清除浮动"><a href="#4-2-容器折叠和清除浮动" class="headerlink" title="4.2 容器折叠和清除浮动"></a>4.2 容器折叠和清除浮动</h2><h3 id="4-2-1-理解容器折叠"><a href="#4-2-1-理解容器折叠" class="headerlink" title="4.2.1 理解容器折叠"></a>4.2.1 理解容器折叠</h3><p>这一节一定要从代码上加以理解。<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch04/listing-4.4.html">代码4-4</a></p>
+<h3 id="4-2-2-理解清除浮动"><a href="#4-2-2-理解清除浮动" class="headerlink" title="4.2.2 理解清除浮动"></a>4.2.2 理解清除浮动</h3><p>暂时还不理解</p>
+<h2 id="4-3-出乎意料的浮动陷阱"><a href="#4-3-出乎意料的浮动陷阱" class="headerlink" title="4.3 出乎意料的浮动陷阱"></a>4.3 出乎意料的浮动陷阱</h2><p>浮动布局先放一放</p>
+<h1 id="5-Flexbox"><a href="#5-Flexbox" class="headerlink" title="5 Flexbox"></a>5 Flexbox</h1><p>flexbox算是现代的网页布局方式</p>
+<h2 id="5-1-FLexbox的原则"><a href="#5-1-FLexbox的原则" class="headerlink" title="5.1 FLexbox的原则"></a>5.1 FLexbox的原则</h2><p><code>display:flex</code>就可以使容器变成一个弹性容器，它里面的元素就是弹性子元素把他想象成一个罐子，里面装东西，子元素按照主轴线排列，主轴的方向为主起点（左）到主终点（右）。垂直于主轴的是副轴。方向从副起点（上）到副终点（下）。下面我们看个实际应用例子<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.2.html">5-1</a></p>
+<blockquote>
+<p>我们还可以使用<code>display:inline-flex</code>其行为更像是<code>inline--bolck</code>,但是其长度不会自动加到100%。</p>
+</blockquote>
+<h3 id="5-1-1-创建一个基础的Flexbox菜单"><a href="#5-1-1-创建一个基础的Flexbox菜单" class="headerlink" title="5.1.1 创建一个基础的Flexbox菜单"></a>5.1.1 创建一个基础的Flexbox菜单</h3><p>这一节主要是介绍了，在不同浏览器我们是要使用不同的属性名来使用flexbox的定义，我们可以使用Autoprefixer的工具进行格式化批量更改</p>
+<ul>
+<li>旧版safari<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">.site-nav</span> <span class="token punctuation">&#123;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> -webkit-flex<span class="token punctuation">;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> flex<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+主要还是要学习下相关<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.3.html">示例代码5-3</a></li>
+</ul>
+<h3 id="5-1-2-添加内边距和间隔"><a href="#5-1-2-添加内边距和间隔" class="headerlink" title="5.1.2 添加内边距和间隔"></a>5.1.2 添加内边距和间隔</h3><p>这节我们我们围绕<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.4.html">示例代码5-4</a></p>
+<p>注意这里的链接被设置为块级元素。如果链接还是行内元素，那么它给父元素贡献的高度会根据行高计算，而不是根据内边距和内容，这样不符合预期</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.5.html">代码5-5</a>教我们如何实现最后一个元素移到右面</p>
+<p>如果希望菜单项等间距，那么justify-content属性会是更好的方式。</p>
+<h2 id="5-2-弹性子元素的大小"><a href="#5-2-弹性子元素的大小" class="headerlink" title="5.2 弹性子元素的大小"></a>5.2 弹性子元素的大小</h2><p>flexbox提供可比width设heigh功能更强大flex属性。flex控制主轴方向的大小，flex会被自动计算然后填满容器宽度</p>
+<h3 id="5-2-1-使用flex-basis属性"><a href="#5-2-1-使用flex-basis属性" class="headerlink" title="5.2.1 使用flex-basis属性"></a>5.2.1 使用flex-basis属性</h3><p>flex-basis定义了元素大小的基准值，即一个初始的“主尺寸”。flex-basis属性可以设置为任意的width值，包括px、em、百分比。它的初始值是auto，此时浏览器会检查元素是否设置了width属性值。如果有，则使用width 的值作为flex-basis的值；如果没有，则用元素内容自身的大小。如果flex-basis的值不是auto，width属性会被忽略</p>
+<h3 id="5-2-2-使用flex-grow属性"><a href="#5-2-2-使用flex-grow属性" class="headerlink" title="5.2.2 使用flex-grow属性"></a>5.2.2 使用flex-grow属性</h3><p>我们上面使用flex-basis属性会导致页面出现空白区域，但是我们可以使用flex-grow属性，来控制页面放缩时候的放缩权重，flex-grow值越大，子元素能分配剩余可用宽度的比例越大推荐使用简写属性flex，而不是分别声明flex-grow、flex-shrink、flex-basis。与大部分简写属性不一样，如果在flex中忽略某个子属性，那么子属性的值并不会被置为初始值。相反，如果某个子属性被省略，那么flex简写属性会给出有用的默认值：flex-grow为1、flex-shrink为1、flex-basis为0%。这些默认值正是大多数情况下所需要的值</p>
+<h3 id="5-2-3-使用flex-shrink属性"><a href="#5-2-3-使用flex-shrink属性" class="headerlink" title="5.2.3 使用flex-shrink属性"></a>5.2.3 使用flex-shrink属性</h3><p>flex-shrink属性与flex-grow遵循相似的原则。计算出弹性子元素的初始主尺寸后，它们的累加值可能会超出弹性容器的可用宽度。如果不用flex-shrink，就会导致溢出，每个子元素的flex-shrink值代表了它是否应该收缩以防止溢出。如果某个子元素为flex-shrink: 0，则不会收缩；如果值大于0，则会收缩至不再溢出。按照 flex-shrink值的比例，值越大的元素收缩得越<br>多。</p>
+<h3 id="5-2-4-实际应用"><a href="#5-2-4-实际应用" class="headerlink" title="5.2.4 实际应用"></a>5.2.4 实际应用</h3><p>重点是如何实现圣杯布局，众所周知，用CSS实现这种布局非常困难。该布局中，两个侧边栏宽度固定，而中间的列是“流动的”，即它会自动填充可用空间。重点是，三列的高度相等，该高度取决于它们的内容。尽管浮动也能实现这种布局，但需要用一些既晦涩又脆弱的技巧。你可以使用不同的弹性子元素，想出很多不同的方式来组合以上的布局。</p>
+<h2 id="5-3-弹性方向"><a href="#5-3-弹性方向" class="headerlink" title="5.3 弹性方向"></a>5.3 弹性方向</h2><p>如何切换主主副轴方向，可以使用<code>flex-direction: column</code>，指定flex-direction: column能控制弹性子元素沿垂直方向排列（从上到下）。Flexbox还支持row-reverse让元素从右到左排列，column-reverse让元素从下到上排列</p>
+<h3 id="5-3-1-改变弹性方向"><a href="#5-3-1-改变弹性方向" class="headerlink" title="5.3.1 改变弹性方向"></a>5.3.1 改变弹性方向</h3><pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">.column-sidebar</span> <span class="token punctuation">&#123;</span> （以下5行）对外面的弹性盒子来说是弹性子元素，对内部的元素而言是弹性容器
+<span class="token property">flex</span><span class="token punctuation">:</span> 1<span class="token punctuation">;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> flex<span class="token punctuation">;</span>
+<span class="token property">flex-direction</span><span class="token punctuation">:</span> column<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>内部的弹性盒子的弹性方向为column，因此主轴发生了旋转，现在变成了从上到下（副轴变成了从左到右）。也就是对于弹性子元素而言，flex-basis、flex-grow和flex-shrink现在作用于元素的高度而不是宽度。</p>
+<p>水平弹性盒子的大部分概念同样适用于垂直的弹性盒子（column或column-reverse），但是有一点不同：在CSS中处理高度的方式与处理宽度的方式在本质上不一样。弹性容器会占据100%的可用宽度，而高度则由自身的内容来决定。即使改变主轴方向，也不会影响这一本质。</p>
+<h3 id="5-3-2-登录表单的样式"><a href="#5-3-2-登录表单的样式" class="headerlink" title="5.3.2 登录表单的样式"></a>5.3.2 登录表单的样式</h3><p>详情请学习<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.10.html">代码清单5-10</a></p>
+<h2 id="5-4-对齐，间距等细节"><a href="#5-4-对齐，间距等细节" class="headerlink" title="5.4 对齐，间距等细节"></a>5.4 对齐，间距等细节</h2><p>通常情况下，创建一个弹性盒子需要用到前面提及的这些方法。</p>
+<ul>
+<li>选择一个容器及其子元素，给容器设置display: flex</li>
+<li>如有必要，给容器设置flex-direction</li>
+<li>给弹性子元素设置外边距和&#x2F;或flex值，用来控制它们的大小</li>
+</ul>
+<h3 id="5-4-1-理解弹性容器的属性"><a href="#5-4-1-理解弹性容器的属性" class="headerlink" title="5.4.1 理解弹性容器的属性"></a>5.4.1 理解弹性容器的属性</h3><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>flex-direction</td>
+<td>row是水平方向<p>row-reverse是水平反方向<p>column是默认向下<p>column-reverse是主轴反过来</td>
+</tr>
+<tr>
+<td>flex-wrap折叠显示</td>
+<td>no-wrap就不会折叠<p>wrap是折叠<p>wrap-reverse是反向折叠。flex-wrap的叠着跟主轴的方向有关</td>
+</tr>
+<tr>
+<td>flex-flow</td>
+<td>&lt; flex-direction &gt; &lt; flex-wrap &gt;的简写</td>
+</tr>
+<tr>
+<td>justify-content控制子元素在主轴上的位置</td>
+<td>flex-start <p> flex-end <p> center <p> space-between <p> space-around</td>
+</tr>
+<tr>
+<td>align-items控制子元素在副轴上的位置</td>
+<td>flex-start <p> flex-end <p> center <p> stretch <p> baseline <p></td>
+</tr>
+<tr>
+<td>align-content如果开启了flex-wrap，align-content就会控制弹性子元素在副轴上的间距。如果子元素没有换行，就会忽略align-content</td>
+<td>flex-start <p> flex-end <p> center <p> stretch <p> space-between <p> space-around</td>
+</tr>
+</tbody></table>
+<h3 id="5-4-2-理解弹性子元素的属性"><a href="#5-4-2-理解弹性子元素的属性" class="headerlink" title="5.4.2 理解弹性子元素的属性"></a>5.4.2 理解弹性子元素的属性</h3><p>前面已经介绍了弹性子元素的flex-grow、flex-shrink、flex-basis以及它们的简写属性flex（参见5.2节）。接下来再介绍两个弹性子元素的属性：align-self和order。</p>
+<ul>
+<li><ol>
+<li>align-self属性<br>该属性控制弹性子元素沿着容器副轴方向的对齐方式。它跟弹性容器的align-items属性效果相同，但是它能单独给弹性子元素设定不同的对齐方式。auto为初始值，会以容器的align-items值为<br>准。其他值会覆盖容器的设置。align-self属性支持的关键字与align-items一样：flex-start、flex-end、center、stretch以及baseline。</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>order属性<br>正常情况下，弹性子元素按照在HTML源码中出现的顺序排列。它们沿着主轴方向，从主轴的起点开始排列。使用order属性能改变子元素排列的顺序。还可以将其指定为任意正负整数。如果多个弹<br>性子元素有一样的值，它们就会按照源码顺序出现。初始状态下，所有的弹性子元素的order都为0。指定一个元素的值为-1，它会移动到列表的最前面；指定为1，则会移动到最后。可以按照需要给每个子元素指定order以便重新编排它们。这些值不一定要连续。</li>
+</ol>
+</li>
+</ul>
+<h3 id="5-4-3-使用对齐属性"><a href="#5-4-3-使用对齐属性" class="headerlink" title="5.4.3 使用对齐属性"></a>5.4.3 使用对齐属性</h3><p>用span而不是div来放置文字，因为span默认就是行内元素。如果因为某些原因CSS加载失败，或者浏览器不支持Flexbox，那么$20.00仍然会在一行显示。下面的代码清单里，使用justify-content让弹性子元素在弹性容器里水平居中，然后用align-items和align-self控制文字的垂直对齐。将<a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch05/listing-5.11.html">代码清单5-11</a>添加到样式表。</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">.
+centered</span> <span class="token punctuation">&#123;</span>
+<span class="token property">text-align</span><span class="token punctuation">:</span> center<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.
+cost</span> <span class="token punctuation">&#123;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> flex<span class="token punctuation">;</span>
+<span class="token property">justify-content</span><span class="token punctuation">:</span> center<span class="token punctuation">;</span> （以下2行）让弹性子元素在主轴和副轴方向上均居中
+<span class="token property">align-items</span><span class="token punctuation">:</span> center<span class="token punctuation">;</span>
+<span class="token property">line-height</span><span class="token punctuation">:</span> .7<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.cost > span</span> <span class="token punctuation">&#123;</span>
+<span class="token property">margin-top</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>    ←----覆盖猫头鹰选择器设置的外边距
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.cost-currency</span> <span class="token punctuation">&#123;</span>
+<span class="token property">font-size</span><span class="token punctuation">:</span> 2rem<span class="token punctuation">;</span> （以下7行）给价格的各个部分设置不同的字号
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.cost-dollars</span> <span class="token punctuation">&#123;</span>
+<span class="token property">font-size</span><span class="token punctuation">:</span> 4rem<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.cost-cents</span> <span class="token punctuation">&#123;</span>
+<span class="token property">font-size</span><span class="token punctuation">:</span> 1.5rem<span class="token punctuation">;</span>
+<span class="token property">align-self</span><span class="token punctuation">:</span> flex-start<span class="token punctuation">;</span> ←---- 覆盖这个子元素的align-items，将其与容器顶部而不是中间对
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.cta-button</span> <span class="token punctuation">&#123;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> block<span class="token punctuation">;</span>
+<span class="token property">background-color</span><span class="token punctuation">:</span> #cc6b5a<span class="token punctuation">;</span>
+<span class="token property">color</span><span class="token punctuation">:</span> white<span class="token punctuation">;</span>
+<span class="token property">padding</span><span class="token punctuation">:</span> .5em 1em<span class="token punctuation">;</span>
+<span class="token property">text-decoration</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<h2 id="5-5-值得注意的地方"><a href="#5-5-值得注意的地方" class="headerlink" title="5.5 值得注意的地方"></a>5.5 值得注意的地方</h2><p>并不是所有浏览器都完美地实现了Flexbox，尤其是IE10和IE11。Flexbox在大多数情况下可以正常工作，但是可能会在一些环境下遇到bug。一定要确保在你想要支持的旧版浏览器上充分测试它。<br>与其花费时间讨论你可能或者永远不会遇到的bug，我更愿意推荐一个特别棒的资源，叫Flexbugs。它的GitHub页面维护了所有已知的Flexbox的浏览器bug（本书写作时总共有14个），解释了哪些环境下会导致这些bug，并大部分情况下给出了解决方案。如果你发现在某个浏览器下Flexbox布局表现得不太一样，请访问这个页面看看是不是遇到了其中的浏览器bug。</p>
+<h1 id="6-网格布局"><a href="#6-网格布局" class="headerlink" title="6 网格布局"></a>6 网格布局</h1><p>就像是坐标系或者是写字用的田字格，可以设计和做出很复杂的页面</p>
+<h2 id="6-1-网页布局开始新纪元"><a href="#6-1-网页布局开始新纪元" class="headerlink" title="6.1 网页布局开始新纪元"></a>6.1 网页布局开始新纪元</h2><p>构建基础网格</p>
+<p>首先我们定义一个容器，然后设置元素<code>display：grid</code> 这样该元素变成了某种容器，表现的像个块级元素，100%填充可用宽度，你也可以使用<code>inline-grid</code>，虽然书中没写</p>
+<pre class="language-css" data-language="css"><code class="language-css">
+<span class="token selector">.grid</span> <span class="token punctuation">&#123;</span>
+<span class="token property">display</span><span class="token punctuation">:</span> grid<span class="token punctuation">;</span> ←---- 将元素设为网格容器
+<span class="token property">grid-template-columns</span><span class="token punctuation">:</span> 1fr 1fr 1fr<span class="token punctuation">;</span> ←---- 定义等宽的三列
+<span class="token property">grid-template-rows</span><span class="token punctuation">:</span> 1fr 1fr<span class="token punctuation">;</span> ←---- 定义等高的两行
+<span class="token property">grid-gap</span><span class="token punctuation">:</span> 0.5em<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.grid > *</span> <span class="token punctuation">&#123;</span>
+<span class="token property">background-color</span><span class="token punctuation">:</span> darkgray<span class="token punctuation">;</span>
+<span class="token property">color</span><span class="token punctuation">:</span> white<span class="token punctuation">;</span>
+<span class="token property">padding</span><span class="token punctuation">:</span> 2em<span class="token punctuation">;</span>
+<span class="token property">border-radius</span><span class="token punctuation">:</span> 0.5em<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p><code>rid-template-columns</code>是渲染三列，然后长度为1fr是分数单位，三列就是1fr等分，<code>grid-template-rows</code>定义等高的三列，不一定非得用分数单位，可以使用其他的单位，比如px、em或百分数。也可以混搭这几种单位，例如，<code>grid-template-columns:300px 1fr</code>定义了一个固定宽度为300px的列，后面跟着一个会填满剩余可用空间的列。2fr的列宽是1fr的两倍,grid-gap属性定义了每个网格单元之间的间距。也可以用两个值分别指定垂直和水平方向的间距（比如grid-gap: 0.5em 1em）。</p>
+<h2 id="6-2-网格刨析"><a href="#6-2-网格刨析" class="headerlink" title="6.2 网格刨析"></a>6.2 网格刨析</h2><ul>
+<li>网格线（grid line）——网格线构成了网格的框架。一条网格线可以水平或垂直，也可以位于一行或一列的任意一侧。如果指定了grid-gap的话，它就位于网格线上。</li>
+<li>网格轨道（grid track）——一个网格轨道是两条相邻网格线之间的 空间。网格有水平轨道（行）和垂直轨道（列）。</li>
+<li>网格单元（grid cell）——网格上的单个空间，水平和垂直的网格 轨道交叉重叠的部分。</li>
+<li>网格区域 (grid area）——网格上的矩形区域，由一个到多个网格单元组成。该区域位于两条垂直网格线和两条水平网格线之间</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.4.html">代码清单6-3</a></p>
+<p><code>repeat()</code>函数是重复设置的列宽，例如<code>repeat(3，2fr,1fr)</code></p>
+<h2 id="6-2-1-网格线的编号"><a href="#6-2-1-网格线的编号" class="headerlink" title="6.2.1 网格线的编号"></a>6.2.1 网格线的编号</h2><p>网格编号在主轴上是从左向右递增，负轴是自上而下递增<br><code>grid-column: 1 / 3</code> 是从编号1的网格线跨域到网格线3，下面的同理<br><code>grid-row: 3 / 5</code></p>
+<p>说明 这些属性实际上是简写属性：grid-column是grid-column-start和grid-column-end的简写；grid-row是grid-row-start和grid-row-end的简写。中间的斜线只在简写属性里用于区分两个值，斜线前后的空格不作要求。</p>
+<h3 id="6-2-2-与flexbox配合"><a href="#6-2-2-与flexbox配合" class="headerlink" title="6.2.2 与flexbox配合"></a>6.2.2 与flexbox配合</h3><p>网格布局和flex布局是互补关系，不是互相独立的关系。</p>
+<ol>
+<li>flex本质上是一维，而网格是二维的</li>
+<li>flex是以内容为切入点，网格布局是以整体为布局</li>
+</ol>
+<p>当设计要求元素在两个维度上都对齐时，使用网格。当只关心一维的元素排列时，使用Flexbox。在实践中，这通常（并非总是）意味着网格更适合用于整体的网页布局，而Flexbox更适合对网格区域内的特定元素布局。继续用网格和Flexbox，你就会对不同情况下该用哪种布局方式得心应手。</p>
+<h2 id="6-3-替代语法"><a href="#6-3-替代语法" class="headerlink" title="6.3 替代语法"></a>6.3 替代语法</h2><h3 id="6-3-1-命名的网格线"><a href="#6-3-1-命名的网格线" class="headerlink" title="6.3.1 命名的网格线"></a>6.3.1 命名的网格线</h3><ol>
+<li><p>常规声明方式</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token property">grid-template-columns</span><span class="token punctuation">:</span> [start] 2fr [center] 1fr [end]<span class="token punctuation">;</span></code></pre>
+<p>下面方式没有</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token property">grid-column</span><span class="token punctuation">:</span> start / center<span class="token punctuation">;</span></code></pre>
+<p>repeat()里声明了一条命名的水平网格线，于是每条水平网格线被命名为row（除了最后一条）。这看起来很不可思议，但是重复使用同一个名称完全合法。将网格元素放在第二个“col”网格线处，跨越两个轨道<code>（col 2 /span 2）</code></p>
+</li>
+<li><p>多命名声明方式</p>
+</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.6.html">代码清单6-6</a></p>
+<pre class="language-css" data-language="css"><code class="language-css">
+<span class="token property">grid-template-columns</span><span class="token punctuation">:</span>  [left-start] 2fr
+                        [left-end right-start] 1fr
+                        [right-end]<span class="token punctuation">;</span>
+<span class="token property">grid-template-rows</span><span class="token punctuation">:</span> <span class="token function">repeat</span><span class="token punctuation">(</span>4<span class="token punctuation">,</span> [row] auto<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+
+<h3 id="6-3-2-命名网格区域"><a href="#6-3-2-命名网格区域" class="headerlink" title="6.3.2 命名网格区域"></a>6.3.2 命名网格区域</h3><p>不知可以命名网格线，我们还可以命名网格区域，<code>grid-template</code>属性和网格元素的<code>grid-area</code>属性。<code>grid-template-areas</code>属性使用了一种ASCII art的语法，可以直接在CSS中画一个可视化的网格形象。该声明给出了一系列加引号字符串，每一个字符串代表网格的一行，字符串内用空格区分每一列。<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.7.html">代码清单6-7</a></p>
+<h2 id="6-4-显式和隐式网格"><a href="#6-4-显式和隐式网格" class="headerlink" title="6.4 显式和隐式网格"></a>6.4 显式和隐式网格</h2><p>使用grid-template-* 属性定义网格轨道时， 创建的是显式网格<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.9.html">代码清单6-9</a><br>访问Grid by Example网站的文章auto-fill vs. auto-fit可以看到两者区别的示例。</p>
+<h3 id="6-4-1-添加变化"><a href="#6-4-1-添加变化" class="headerlink" title="6.4.1 添加变化"></a>6.4.1 添加变化</h3><p>我们想1X1的图片变成2X2的网格区域。</p>
+<p><code>grid-auto-flow</code>它可以控制布局算法的行为。 它的初始值是row， 上一段描述的就是这个值的行为。如果值为column， 它就会将元素优先放在网格列中， 只有当一列填满了， 才会移动到下一行。</p>
+<p><code>grid-auto-flow: column dense</code></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.10.html">代码清单6-10</a></p>
+<p>子网格<br>网格有一个限制是要求用特定的DOM结构， 也就是说， 所有的网格元素必须是网格容器的直接子节点。 因此， 不能将深层嵌套的元素在网格上对齐</p>
+<h3 id="6-4-2-让网格元素填满网格轨道"><a href="#6-4-2-让网格元素填满网格轨道" class="headerlink" title="6.4.2 让网格元素填满网格轨道"></a>6.4.2 让网格元素填满网格轨道</h3><p><code>object-fit</code>控制图片在盒子内渲染的方式<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch06/listing-6.11.html">代码清单6-11</a></p>
+<h2 id="6-5-特性查询"><a href="#6-5-特性查询" class="headerlink" title="6.5 特性查询"></a>6.5 特性查询</h2><h2 id="6-6-对齐"><a href="#6-6-对齐" class="headerlink" title="6.6 对齐"></a>6.6 对齐</h2><p><code>justify-content</code><br><code>justifyitems</code><br><code>justify-self</code></p>
+<p>start——将网格轨道放到网格容器的上&#x2F;左（Flexbox里则是flexstart）<br>end——将网格轨道放在网格容器的下&#x2F;右（Flexbox里则是flexend)<br>center——将网格轨道放在网格容器的中间。<br>stretch——将网格轨道拉伸至填满网格容器。<br>space-between——将剩余空间平均分配到每个网格轨道之间（它<br>能覆盖任何grid-gap值。<br>space-around——将空间分配到每个网格轨道之间， 且在两端各<br>加上一半的间距。<br>space-evenly——将空间分配到每个网格轨道之间， 且在两端各<br>加上同等大小的间距（Flexbox规范不支持。</p>
+<h1 id="7-定位和层叠上下文"><a href="#7-定位和层叠上下文" class="headerlink" title="7 定位和层叠上下文"></a>7 定位和层叠上下文</h1><h2 id="7-1-固定定位"><a href="#7-1-固定定位" class="headerlink" title="7.1 固定定位"></a>7.1 固定定位</h2><p>固定定位让元素相对视口定位.元素<code>position: fixed</code>就能将元素放在视口的任意位置,是相对于视口为坐标系然后进行定位,用： <code>top,right,bottom,left</code> 这些属性的值决定了固定定位的元素与浏览器视口边缘的距离</p>
+<h3 id="7-1-1-用固定定位创建一个模态框"><a href="#7-1-1-用固定定位创建一个模态框" class="headerlink" title="7.1.1 用固定定位创建一个模态框"></a>7.1.1 用固定定位创建一个模态框</h3><p><code>display</code>属性的用法与区别</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token punctuation">&#123;</span><span class="token property">display</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#123;</span><span class="token property">display</span><span class="token punctuation">:</span> inline<span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#123;</span><span class="token property">display</span><span class="token punctuation">:</span> block<span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#123;</span><span class="token property">display</span><span class="token punctuation">:</span> inline-block<span class="token punctuation">;</span><span class="token punctuation">&#125;</span></code></pre>
+
+
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.2.html">代码清单7-2</a></p>
+<h3 id="7-1-2-控制定位元素的大小"><a href="#7-1-2-控制定位元素的大小" class="headerlink" title="7.1.2 控制定位元素的大小"></a>7.1.2 控制定位元素的大小</h3><p>我们通过下面的属性控制元素的大小</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token property">position</span><span class="token punctuation">:</span> fixed<span class="token punctuation">;</span>
+<span class="token property">top</span><span class="token punctuation">:</span> 1em<span class="token punctuation">;</span>
+<span class="token property">right</span><span class="token punctuation">:</span> 1em<span class="token punctuation">;</span>
+<span class="token property">width</span><span class="token punctuation">:</span> 20%   <span class="token comment">/*width是视口的20%*/</span>
+<span class="token comment">/* right-margin: 20%。 是外边距是视口的20% */</span></code></pre>
+
+<h2 id="7-2-绝对定位"><a href="#7-2-绝对定位" class="headerlink" title="7.2 绝对定位"></a>7.2 绝对定位</h2><p>绝对定位的行为是相对最近的<strong>祖先定位</strong>元素跟固定元素一样， 属性top、 right、 bottom和left决定了元素的边缘在包含块里的位置。<br>这里边最近的祖先元素是坐标轴</p>
+<h3 id="7-2-1-让Close按钮绝对定位"><a href="#7-2-1-让Close按钮绝对定位" class="headerlink" title="7.2.1 让Close按钮绝对定位"></a>7.2.1 让Close按钮绝对定位</h3><p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.3.html">代码清单7-3</a><br>因为<code>.modal-body</code>是<code>.modal-close</code>的直接父元素，这时候你调节<code>.modal-close</code>会发现那个close按钮会相对直接父元素进行定位</p>
+<p>说明 如果祖先元素都没有定位， 那么绝对定位的元素会基于初始包含块（initial containing block） 来定位。 初始包含块跟视口一样大， 固定在网页的顶部。</p>
+<h3 id="7-2-2-定位伪元素"><a href="#7-2-2-定位伪元素" class="headerlink" title="7.2.2 定位伪元素"></a>7.2.2 定位伪元素</h3><ol>
+<li>在使用CSS之前， HTML本身必须有意义</li>
+<li><code>text-indent</code>属性将文字推到右边， 溢出元素</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.4.html">代码清单7-4</a></p>
+<h2 id="7-3-相对定位"><a href="#7-3-相对定位" class="headerlink" title="7.3 相对定位"></a>7.3 相对定位</h2><p>给元素加上相对定位也不会影响旁边的元素</p>
+<p>说明 跟固定或者绝对定位不一样， 不能用top、 right、 bottom<br>和left改变相对定位元素的大小。 这些值只能让元素在上、 下、<br>左、 右方向移动。 可以用top或者bottom， 但它们不能一起用<br>（bottom会被忽略） 。 同理， 可以用left或right， 但它们也不<br>能一起用（right会被忽略） 。</p>
+<h3 id="7-3-1-创建一个下拉菜单"><a href="#7-3-1-创建一个下拉菜单" class="headerlink" title="7.3.1 创建一个下拉菜单"></a>7.3.1 创建一个下拉菜单</h3><p>下拉菜单容器包含两个子元素： 一个始终显示的灰色矩形标签以及一个下拉菜单。 下拉菜单用显示和隐藏表示菜单展开和收起。 因为它会是绝对定位的， 所以当下拉菜单显示时不会改变网页的布局， 这意味着它显示时会出现在其他内容前面。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch07/listing-7.6.html">代码清单7-6</a></p>
+<h3 id="7-3-2-创建一个css三角形"><a href="#7-3-2-创建一个css三角形" class="headerlink" title="7.3.2 创建一个css三角形"></a>7.3.2 创建一个css三角形</h3><h2 id="7-4-层叠上下文和z-index"><a href="#7-4-层叠上下文和z-index" class="headerlink" title="7.4 层叠上下文和z-index"></a>7.4 层叠上下文和z-index</h2><p>z-index值越大在Z轴上就越靠上，也就是离屏幕观察者越近。最后才发现这个认识存在很大的问题</p>
+<h3 id="7-4-1-理解渲染过程和层叠顺序"><a href="#7-4-1-理解渲染过程和层叠顺序" class="headerlink" title="7.4.1 理解渲染过程和层叠顺序"></a>7.4.1 理解渲染过程和层叠顺序</h3><p>浏览器将HTML解析为DOM的同时还创建了另一个树形结构，叫作渲染树（render tree)</p>
+<p>定位元素时， 这种行为会改变。 浏览器会先绘制所有非定位的元素， 然后绘制定位元素。 默认情况下， 所有的定位元素会出现在非定位元素前面.<br>我们使用相对定位之后，会改变元素的渲染顺序</p>
+<h3 id="7-4-2-用z-index控制层叠顺序"><a href="#7-4-2-用z-index控制层叠顺序" class="headerlink" title="7.4.2 用z-index控制层叠顺序"></a>7.4.2 用z-index控制层叠顺序</h3><p>z-index属性的值可以是任意整数（正负都行） 。 表示的是笛卡儿x-y-z坐标系里的深度方向。拥有较高z-index的元素出现在拥有较低z-index的元素前面。z-index的行为很好理解， 但是使用它时要注意两个小陷阱。 第一， zindex只在定位元素上生效， 不能用它控制静态元素。 第二， 给一个定位元素加上z-index可以创建层叠上下文。</p>
+<h3 id="7-4-3-理解层叠上下文"><a href="#7-4-3-理解层叠上下文" class="headerlink" title="7.4.3 理解层叠上下文"></a>7.4.3 理解层叠上下文</h3><p>什么是层叠上下文？其实就是判断元素在Z轴上的堆叠顺序，不仅仅是直接比较两个元素的z-index值的大小，这个堆叠顺序实际由元素的层叠上下文、层叠等级共同决定。</p>
+<ul>
+<li>什么是“层叠等级”<ol>
+<li>普通元素的层叠等级优先由其所在的层叠上下文决定。</li>
+<li>层叠等级的比较只有在当前层叠上下文元素中才有意义。不同层叠上下文中比较层叠等级是没有意义的。</li>
+</ol>
+</li>
+<li>如何产生“层叠上下文”<ol>
+<li>HTML中的根元素&lt; html &gt;&lt; &#x2F;html &gt;本身就具有层叠上下文，称为“根层叠上下文”。</li>
+<li>普通元素设置position属性为非static值并设置z-index属性为具体数值，产生层叠上下文。</li>
+<li>CSS3中的新属性也可以产生层叠上下文。</li>
+</ol>
+</li>
+<li>什么是“层叠顺序”<ol>
+<li>左上角”层叠上下文background&#x2F;border”指的是层叠上下文元素的背景和边框。</li>
+<li>inline&#x2F;inline-block元素的层叠顺序要高于block(块级)&#x2F;float(浮动)元素。</li>
+<li>单纯考虑层叠顺序，z-index: auto和z-index: 0在同一层级，但这两个属性值本身是有根本区别的。</li>
+</ol>
+</li>
+</ul>
+<h2 id="7-5-粘性定位"><a href="#7-5-粘性定位" class="headerlink" title="7.5 粘性定位"></a>7.5 粘性定位</h2><p>流盒：粘性定位中有一个“流盒”（flow box）的概念，指的是粘性定位元素最近的可滚动元素（overflow 属性值不是 visible 的元素）的尺寸盒子，如果没有可滚动元素，则表示浏览器视窗盒子。</p>
+<h1 id="8-响应式设计"><a href="#8-响应式设计" class="headerlink" title="8 响应式设计"></a>8 响应式设计</h1><p>什么是响应式？就是使用一套前端代码能在不同的客户端上有不同的渲染效果。<br>响应式设计三大原则：</p>
+<ol>
+<li>移动平台优先设计</li>
+<li>@media规则，也叫媒体查询，样式只会在特定条件下生效</li>
+<li>流式布局，允许根据视口宽度缩放尺寸</li>
+</ol>
+<h2 id="8-1-移动优先"><a href="#8-1-移动优先" class="headerlink" title="8.1 移动优先"></a>8.1 移动优先</h2><p>一旦我们把移动端做好了，我们就可以“渐进式”的为更大屏幕设计。<br>断点：是一个视口的临界值，超过或者小于这个视口临界值css样式就会改变。也就是我们根据视口的大小来决定哪些样式生效。<br>考虑大视口：当我们完成移动端初步的构想之后，我们就要考虑大视口。<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch08/listing-8.02.html">代码示例清单8-2</a></p>
+<h3 id="8-1-1-创建移动版的菜单"><a href="#8-1-1-创建移动版的菜单" class="headerlink" title="8.1.1 创建移动版的菜单"></a>8.1.1 创建移动版的菜单</h3><p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch08/listing-8.03.html">代码清单8-3</a></p>
+<p>提示 当设计移动触屏设备的时候， 确保所有的关键动作元素都足够大， 能够用一个手指轻松点击。 千万不要让用户放大页面， 才能点中一个小小的按钮或者链接。</p>
+<h3 id="8-1-2-给视口添加meta标签"><a href="#8-1-2-给视口添加meta标签" class="headerlink" title="8.1.2 给视口添加meta标签"></a>8.1.2 给视口添加meta标签</h3><p>meta标签: 这个HTML标签告诉移动设备， 你已经特意将网页适配了小屏设备。 如果不加这个标签， 移动浏览器会假定网页不是响应式的， 并且会尝试模拟桌面浏览器<br>meta标签的content属性里包含两个选项</p>
+<ol>
+<li>首先， 它告诉浏览器当解析CSS时将设备的宽度作为假定宽度， 而不是一个全屏的桌面浏览器的宽度</li>
+<li>其次当页面加载时， 它使用initial-scale将缩放比设置为100%</li>
+</ol>
+<p>其余meta标签属性，此处要具体查谷歌<br><code>user-scalable=no</code>阻止用户在移动设备上用两个手指缩放<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch08/listing-8.06.html">代码清单8-6</a></p>
+<h2 id="8-2-媒体查询"><a href="#8-2-媒体查询" class="headerlink" title="8.2 媒体查询"></a>8.2 媒体查询</h2><p>其实原理很简单，就是我们设计一个”断点”,大于这个”断点”就是另外一套样式。</p>
+<pre class="language-css" data-language="css"><code class="language-css">
+<span class="token selector">.title > h1</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> #333<span class="token punctuation">;</span>
+      <span class="token property">text-transform</span><span class="token punctuation">:</span> uppercase<span class="token punctuation">;</span>
+      <span class="token property">font-size</span><span class="token punctuation">:</span> 1.5rem<span class="token punctuation">;</span>
+      <span class="token property">margin</span><span class="token punctuation">:</span> .2em 0<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">min-width</span><span class="token punctuation">:</span> 35em<span class="token punctuation">)</span></span> <span class="token punctuation">&#123;</span>
+  <span class="token selector">.title > h1</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-size</span><span class="token punctuation">:</span> 2.25rem<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>当视口小于35em时候现在根据视口大小， 网页标题有两种不同的字号。 当视口小于35em的时候是1.5rem， 大于35em的时候是2.25rem。</p>
+<p>560px这个临界值被称为断点。 大多数情况下， 整个样式表里的媒体查询只会复用少数几个断点</p>
+<h3 id="8-2-1-媒体查询的类型"><a href="#8-2-1-媒体查询的类型" class="headerlink" title="8.2.1 媒体查询的类型"></a>8.2.1 媒体查询的类型</h3><ol>
+<li>联合媒体查询<br><code>@media (min-width: 20em) and (max-width: 35em) &#123; ... &#125;</code><br><code>min-width</code>匹配视口大于特定宽度的设备， <code>max-width</code>匹配视口小于特定宽度的设备。 它们被统称为媒体特征（media feature）</li>
+</ol>
+<p><code>(min-height: 20em)</code>——匹配高度大于等于20em的视口。<br><code>(max-height: 20em)</code>——匹配高度小于等于20em的视口。<br><code>(orientation: landscape)</code>——匹配宽度大于高度的视口。<br><code>(orientation: portrait)</code>——匹配高度大于宽度的视口。<br><code>(min-resolution: 2dppx)</code>——匹配屏幕分辨率大于等于2dppx（dppx指每个CSS像素里包含的物理像素点数） 的设备， 比如视网膜屏幕。<br><code>(max-resolution: 2dppx)</code>——匹配屏幕分辨率小于等于2dppx的设备。</p>
+<p>基于分辨率的媒体查询比较棘手， 因为该特征比较新， 浏览器支持得不太好。单位是dppx，因此需要使用dpi单位代替。因此使用带有前缀的媒体特征</p>
+<p>媒体查询放在标签里，比如<code>&lt;linkrel=&quot;stylesheet&quot; media=&quot;(min-width: 45em)&quot;href=&quot;large-screen.css&quot; /&gt;</code></p>
+<ol start="2">
+<li>媒体类型</li>
+</ol>
+<p>媒体类型（media type） 。 常见的两种媒体类型是screen和print</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token atrule"><span class="token rule">@media</span> print</span> <span class="token punctuation">&#123;</span>
+<span class="token selector">*</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> black <span class="token important">!important</span><span class="token punctuation">;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> none <span class="token important">!important</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<h3 id="8-2-2-给网页添加断点"><a href="#8-2-2-给网页添加断点" class="headerlink" title="8.2.2 给网页添加断点"></a>8.2.2 给网页添加断点</h3><p>总是确保每个媒体查询都位于它要覆盖的样式之后， 这样媒体查询内的样式就会有更高的优先级</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">.title</span> <span class="token punctuation">&#123;</span> ←---- 移动端样式， 对所有的断点都生效
+<span class="token punctuation">&#125;</span> 
+<span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">min-width</span><span class="token punctuation">:</span> 35em<span class="token punctuation">)</span></span> <span class="token punctuation">&#123;</span> <span class="token selector">←---- 中等屏幕的断点： 覆盖对应的移动端样式
+.title</span> <span class="token punctuation">&#123;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span> 
+<span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">min-width</span><span class="token punctuation">:</span> 50em<span class="token punctuation">)</span></span> <span class="token punctuation">&#123;</span> <span class="token selector">←---- 大屏幕断点： 覆盖对应的小屏幕和中等屏幕断点的样式
+.title</span> <span class="token punctuation">&#123;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<h3 id="8-2-3-添加响应式的列"><a href="#8-2-3-添加响应式的列" class="headerlink" title="8.2.3 添加响应式的列"></a>8.2.3 添加响应式的列</h3><pre class="language-css" data-language="css"><code class="language-css"><span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">min-width</span><span class="token punctuation">:</span> 35em<span class="token punctuation">)</span></span> <span class="token punctuation">&#123;</span>
+ <span class="token selector">.row</span> <span class="token punctuation">&#123;</span>
+   <span class="token property">display</span><span class="token punctuation">:</span> flex<span class="token punctuation">;</span>
+   <span class="token property">margin-left</span><span class="token punctuation">:</span> -.75em<span class="token punctuation">;</span>←---- 使用负的外边距将行容器扩大， 补偿列的外边距（参见第4章，
+   <span class="token property">margin-right</span><span class="token punctuation">:</span> -.75em<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token selector">.column</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">flex</span><span class="token punctuation">:</span> 1<span class="token punctuation">;</span>
+    <span class="token property">margin-right</span><span class="token punctuation">:</span> 0.75em<span class="token punctuation">;</span> ←---- 添加列间距
+    <span class="token property">margin-left</span><span class="token punctuation">:</span> 0.75em<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<h2 id="8-3-流式布局"><a href="#8-3-流式布局" class="headerlink" title="8.3 流式布局"></a>8.3 流式布局</h2><p>流式布局中， 主页面容器通常不会有明确宽度， 也不会给百分比宽度， 但可能会设置左右内边距， 或者设置左右外边距为auto， 让其与视口边缘之间产生留白。 也就是说容器可能比视口略窄， 但永远不会比视口宽</p>
+<p>任何列都用百分比来定义宽度（比如， 主列宽70%， 侧边栏宽30%） 。 这样无论屏幕宽度是多少都能放得下主容器。</p>
+<p>让元素能够始终填满屏幕。 要习惯将容器宽度设置为百分比， 而不是任何固定的值</p>
+<h3 id="8-3-1-给大视口添加样式"><a href="#8-3-1-给大视口添加样式" class="headerlink" title="8.3.1 给大视口添加样式"></a>8.3.1 给大视口添加样式</h3><p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch08/listing-8.12.html">代码清单8-12</a> 在大屏的断点处增加内边距</p>
+<h3 id="8-3-2-处理表格"><a href="#8-3-2-处理表格" class="headerlink" title="8.3.2 处理表格"></a>8.3.2 处理表格</h3><p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch08/listing-8.14.html">代码清单8-14</a> 在大屏的断点处增加内边距</p>
+<h2 id="8-4-响应式图片"><a href="#8-4-响应式图片" class="headerlink" title="8.4 响应式图片"></a>8.4 响应式图片</h2><h3 id="8-4-1-不同视口大小使用不同的图片"><a href="#8-4-1-不同视口大小使用不同的图片" class="headerlink" title="8.4.1 不同视口大小使用不同的图片"></a>8.4.1 不同视口大小使用不同的图片</h3><p>说白了就是在不同媒体查询中指定不同的图片</p>
+<h3 id="8-4-2-使用srcset提供对用的图片"><a href="#8-4-2-使用srcset提供对用的图片" class="headerlink" title="8.4.2 使用srcset提供对用的图片"></a>8.4.2 使用srcset提供对用的图片</h3><p>这个属性是HTML的一个较新的特性。 它可以为一个<img>标签指定不同的图片URL， 并指定相应的分辨率。 浏览器会根据自身需要决定加载哪一个图片（如代码清单8-16所示）<br><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch08/listing-8.16.html">代码清单8-16</a> 在大屏的断点处增加内边距</p>
+<h2 id="9-模块化css库"><a href="#9-模块化css库" class="headerlink" title="9 模块化css库"></a>9 模块化css库</h2><p>模块化CSS（Modular CSS） 是指把页面分割成不同的组成部分， 这些组成部分可以在多种上下文中重复使用， 并且互相之间没有依赖关系。最终目的是， 当我们修改其中一部分CSS时， 不会对其他部分产生意料之外的影响.远离就像是组合家具</p>
+<h2 id="9-1-基础样式：-打好基础"><a href="#9-1-基础样式：-打好基础" class="headerlink" title="9.1 基础样式： 打好基础"></a>9.1 基础样式： 打好基础</h2><p>每个样式表的开头都要写一些给整个页面使用的通用规则， 模块化CSS也不例外</p>
+<p><a target="_blank" rel="noopener" href="https://necolas.github.io/normalize.css/">normalize.css</a>的库， 这个小样式表可以协助消除不同的客户端浏览器渲染上的不一致。 可以从</p>
+<p>选择器不应该使用类名或者ID来匹配元素， 应只用标签类型或者偶尔用用伪类选择器。 核心思想是这些基础样式提供了一些默认的渲染</p>
+<p>基础样式配置完成以后， 很少会再修改。 我们会在基础样式的稳定表现之上， 构建模块化CSS。 在样式表中， 基础样式后面的内容将主要由各种模块组成</p>
+<h2 id="9-2-一个简单的模块"><a href="#9-2-一个简单的模块" class="headerlink" title="9.2 一个简单的模块"></a>9.2 一个简单的模块</h2><p>解决办法就是把按钮重构成一个可复用的模块， 不受页面位置的限制。创建模块不但可以精简代码（减少重复） ， 还可以保证视觉一致性。 这样看上去更专业， 不会给人仓促堆砌的感觉。 用户在潜意识里也会更容易相信我们的应用程序</p>
+<h3 id="9-2-1-模块的变体"><a href="#9-2-1-模块的变体" class="headerlink" title="9.2.1 模块的变体"></a>9.2.1 模块的变体</h3><p>通过定义一个以模块名称开头的新类名来创建一个修饰符,例如， 消息模块的error修饰符应该叫作message-error。 通过包含模块名称， 可以清楚地表明这个类属于消息模块。</p>
+<p>搞不懂代码就意味着bug变得常见</p>
+<ol>
+<li>按钮模块的变体</li>
+</ol>
+<p>说白就是就是同一类型的组件，不同的颜色</p>
+<ol start="2">
+<li>不要使用依赖语境的选择器</li>
+</ol>
+<p>如果没有模块化CSS， 我们可能会使用类似于.page-header .dropdown的选择器， 先选中要修改的下拉菜单， 然后通过选择器写一些样式， 覆盖dropdown类提供的默认颜色。 现在要写模块化CSS， 这样的选择器是严格禁用的。</p>
+<ul>
+<li>第一， 我们必须考虑把这段代码放在哪里， 是和网页头部的样式放在一起， 还是跟下拉菜单的样式放在一起？ </li>
+<li>第二， 这种做法提升了选择器优先级。 当下次需要修改代码的时候， 我们需要满足或者继续提升优先级</li>
+<li>第三， 后面我们可能需要在其他场景用到深色的下拉列表。 刚才创建的这个下拉列表是限定在网页头部使用的</li>
+<li>第四， 重复使用这种写法会产生越来越长的选择器， 将CSS跟特定的HTML结构绑定在一起。 例如， 如果有个#products-page.sidebar .social-media div:first-child h3这样的选择器， 样式集就会和指定页面的指定位置紧紧耦合</li>
+</ul>
+<h3 id="9-2-2-多元素模块"><a href="#9-2-2-多元素模块" class="headerlink" title="9.2.2 多元素模块"></a>9.2.2 多元素模块</h3><p>每个模块应该只做一件事情。 消息模块的职责是使消息提示醒目； 媒体模块的职责是在一段文本中配置一张图片。 我们可以简洁明了地概括出它们的目标。 有的模块是为了版面布局， 有的是为了编写体例</p>
+<p>一个组件一定是由多个元素构建</p>
+<h2 id="9-3-把模块组合成更大的结构"><a href="#9-3-把模块组合成更大的结构" class="headerlink" title="9.3 把模块组合成更大的结构"></a>9.3 把模块组合成更大的结构</h2><h3 id="9-3-1-拆分不同模块的职责"><a href="#9-3-1-拆分不同模块的职责" class="headerlink" title="9.3.1 拆分不同模块的职责"></a>9.3.1 拆分不同模块的职责</h3><p>第二个模块叫作菜单， 是放置链接的列表。 把菜单模块的一个实例放入下拉模块的容器内， 就可以构成完整的界面了。</p>
+<ol>
+<li>在模块里使用定位</li>
+<li>状态类<ol>
+<li>is-open类在下拉模块中有特定的用途。 我们在模块里使用JavaScript动态地添加或移除它。 它也是状态类（state class） 的一个示例， 因为它代表着模块在当前状态下的表现。</li>
+<li>预处理器和模块化CSS</li>
+</ol>
+</li>
+<li>菜单模块</li>
+</ol>
+<h3 id="9-3-2-模块命名"><a href="#9-3-2-模块命名" class="headerlink" title="9.3.2 模块命名"></a>9.3.2 模块命名</h3><p>模块的命名应该有意义， 无论使用场景是什么。 同时也要避免使用简单地描述视觉效果的名称。 </p>
+<p>比较好的模块名称包括面板（panel） 、 警告（alert） 、 可折叠的部分（collapsible-section） 、 表单控制项（form-control） 等。 如果你从一开始就对网站的整体设计有全面的了解， 会有助于命名。</p>
+<p>为模块的变体类命名的时候， 应该遵守同样的原则。 例如， 如果已经有按钮模块了， 就不应该使用button–red和button–blue命名红色和蓝色变体子类。 网站设计在将来有可能会改变， 你不知道这些按钮的颜色会不会也跟着变化。 应该使用一些更有意义的名称， 比如button–danger和button–success。</p>
+<h2 id="9-4-工具类"><a href="#9-4-工具类" class="headerlink" title="9.4 工具类"></a>9.4 工具类</h2><p>从某种意义上讲， 工具类有点像小号的模块。 工具类应该专注于某种功能， 一般只声明一次。 我通常把这些工具类放在样式表的底部， 模块代码的下面。</p>
+<p>工具类的作用立竿见影。 在页面上做点小事儿的时候不需要创建一个完整的模块， 这种情况下可以用一个工具类来实现。 但是不要滥用工具类。 对于大部分网站， 最多十几个工具类就够用了。</p>
+<p>常用工具类有哪些？如果书写自己工具类</p>
+<h2 id="9-5-CSS方法论"><a href="#9-5-CSS方法论" class="headerlink" title="9.5 CSS方法论"></a>9.5 CSS方法论</h2><ul>
+<li>OOCSS——面向对象的CSS， 由Nicole Sullivan创建。</li>
+<li>SMACSS——可扩展的、 模块化CSS架构， 由Jonathan Snook创建。</li>
+<li>BEM——块（Block） 、 元素（Element） 和修饰符（Modifier） ，由Yandex公司提出。</li>
+<li>ITCSS——倒三角形CSS， 由Harry Roberts创建。</li>
+</ul>
+<h1 id="10-模式库"><a href="#10-模式库" class="headerlink" title="10 模式库"></a>10 模式库</h1><ul>
+<li>创建模式库， 收录模块</li>
+<li>开发过程中引入模式库</li>
+<li>使用CSS优先的方案书写样式</li>
+<li>安全地编辑和删除CSS</li>
+<li>使用Bootstrap之类的CSS框架</li>
+</ul>
+<h2 id="10-1-KSS简介"><a href="#10-1-KSS简介" class="headerlink" title="10.1 KSS简介"></a>10.1 KSS简介</h2><p>虽然创建模式库的时候不使用任何工具也可以， 但有了工具的帮助会容易很多。 有不少相关功能的工具库可以使用， 在搜索引擎里搜索“styleguide generator”， 就可以找到大量结果。 无法确定这些工具里最好的是哪个， 但是KSS确实是其中的佼佼者。 KSS是Knyle Style Sheets的简写（“Knyle” 来源于作者的名字Kyle Neath）</p>
+<h3 id="10-1-1-配置KSS"><a href="#10-1-1-配置KSS" class="headerlink" title="10.1.1 配置KSS"></a>10.1.1 配置KSS</h3><ol>
+<li>初始化项目<code>npm init -y</code></li>
+<li>安装依赖<code>npm install --save-dev kss</code></li>
+<li>添加KSS配置<ol>
+<li>在项目目录下新建一个名为kss-config.json的文件 <pre class="language-css" data-language="css"><code class="language-css"><span class="token punctuation">&#123;</span>
+<span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"My pattern library"</span><span class="token punctuation">,</span>
+<span class="token string">"source"</span><span class="token punctuation">:</span> [               ←---- CSS源文件的目录路径（ KSS将要扫描的）
+<span class="token string">"./css"</span>
+  ]<span class="token punctuation">,</span>
+<span class="token string">"destination"</span><span class="token punctuation">:</span> <span class="token string">"docs/"</span><span class="token punctuation">,</span>   ←---- 生成的模式库文件将写入的路径
+<span class="token string">"css"</span><span class="token punctuation">:</span> [
+<span class="token string">"../css/styles.css"</span>       ←---- 样式表文件路径（ 相对于destination目录）
+  ]<span class="token punctuation">,</span>
+<span class="token string">"js"</span><span class="token punctuation">:</span> [
+<span class="token string">"../js/docs.js"</span>           ←---- 一些JavaScript文件路径（ 相对于destination目录）
+  ]
+<span class="token punctuation">&#125;</span><span class="token selector">,
+"scripts":</span> <span class="token punctuation">&#123;</span>
+<span class="token string">"build"</span><span class="token punctuation">:</span> <span class="token string">"kss --config kss-config.json"</span><span class="token punctuation">,</span> ←---- 定义构建命令
+<span class="token string">"test"</span><span class="token punctuation">:</span> <span class="token string">"echo \"Error: no test specified\" &amp;&amp; exit 1"</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">,</span></code></pre></li>
+<li>css和js字段里列出的每个文件都会被添加到模式库页面。 我们已经为它们各自配置了一个css和js目录， 现在就可以去创建这两个目录和里面的源文件（ css&#x2F;styles.css和js&#x2F;docs.js） 。 文件目前是空的，很快就会向里面添加内容</li>
+</ol>
+</li>
+</ol>
+<h3 id="10-1-2-编写KSS文档"><a href="#10-1-2-编写KSS文档" class="headerlink" title="10.1.2 编写KSS文档"></a>10.1.2 编写KSS文档</h3><h2 id="10-2-改变编写CSS的方式"><a href="#10-2-改变编写CSS的方式" class="headerlink" title="10.2 改变编写CSS的方式"></a>10.2 改变编写CSS的方式</h2><h3 id="10-2-1-CSS优先的工作流程"><a href="#10-2-1-CSS优先的工作流程" class="headerlink" title="10.2.1 CSS优先的工作流程"></a>10.2.1 CSS优先的工作流程</h3><ol>
+<li>页面开发时， 先有一个草图或者原型图或者其他可以展示页面的设计方式</li>
+<li>看看模式库。 找找现有模块， 如果有满足页面需求的模块就直接使用。 然后从页面的外层（主页面布局和容器） 开始， 按自己熟悉的方式编写CSS。 如果使用现有模块可以构建整个页面， 就不需要写新的CSS</li>
+<li>你会发现有时候需要用到一些模式库提供不了的功能。 项目开发早期这种情况很常见， 到后面就会少很多。 这时候就需要开发一个或几个新模块， 或者现有模块的新变体</li>
+</ol>
+<h3 id="10-2-2-像API一样使用模式库"><a href="#10-2-2-像API一样使用模式库" class="headerlink" title="10.2.2 像API一样使用模式库"></a>10.2.2 像API一样使用模式库</h3><p>这节还需要再看看</p>
+<h1 id="11-背景、-阴影和混合模式"><a href="#11-背景、-阴影和混合模式" class="headerlink" title="11 背景、 阴影和混合模式"></a>11 背景、 阴影和混合模式</h1><ul>
+<li>线性渐变和径向渐变</li>
+<li>盒阴影和文字阴影</li>
+<li>调整背景图片的大小和位置</li>
+<li>使用混合模式， 让背景和内容相结合</li>
+</ul>
+<h2 id="11-1-渐变"><a href="#11-1-渐变" class="headerlink" title="11.1 渐变"></a>11.1 渐变</h2><ul>
+<li>background-image——指定一个文件或者生成的颜色渐变作为背景图片。</li>
+<li>background-position——设置背景图片的初始位置。</li>
+<li>background-size——指定元素内背景图片的渲染尺寸。</li>
+<li>background-repeat——决定在需要填充整个元素时， 是否平铺图片。</li>
+<li>background-origin——决定背景相对于元素的边框盒、 内边距框盒（初始值） 或内容盒子来定位。</li>
+<li>background-clip——指定背景是否应该填充边框盒（初始值） 、 内边距框盒或内容盒子。</li>
+<li>background-attachment——指定背景图片是随着元素上下滚动（初始值） ， 还是固定在视口区域。 注意， 使用fixed值会对页面性能产生负面影响。</li>
+<li>background-color——指定纯色背景， 渲染到背景图片下方。</li>
+</ul>
+<h3 id="11-1-1-使用多个颜色点"><a href="#11-1-1-使用多个颜色点" class="headerlink" title="11.1.1 使用多个颜色点"></a>11.1.1 使用多个颜色点</h3><h3 id="11-1-2-使用径向渐变"><a href="#11-1-2-使用径向渐变" class="headerlink" title="11.1.2 使用径向渐变"></a>11.1.2 使用径向渐变</h3><h2 id="11-2-阴影"><a href="#11-2-阴影" class="headerlink" title="11.2 阴影"></a>11.2 阴影</h2><h3 id="11-2-1-使用渐变喝阴影形成立体感"><a href="#11-2-1-使用渐变喝阴影形成立体感" class="headerlink" title="11.2.1 使用渐变喝阴影形成立体感"></a>11.2.1 使用渐变喝阴影形成立体感</h3><h3 id="11-2-2-使用扁平化设计创造元素"><a href="#11-2-2-使用扁平化设计创造元素" class="headerlink" title="11.2.2 使用扁平化设计创造元素"></a>11.2.2 使用扁平化设计创造元素</h3><h3 id="11-2-3-让按钮看起来时尚"><a href="#11-2-3-让按钮看起来时尚" class="headerlink" title="11.2.3 让按钮看起来时尚"></a>11.2.3 让按钮看起来时尚</h3><h2 id="11-3-混合模式"><a href="#11-3-混合模式" class="headerlink" title="11.3 混合模式"></a>11.3 混合模式</h2><h3 id="11-3-1-为图片着色"><a href="#11-3-1-为图片着色" class="headerlink" title="11.3.1 为图片着色"></a>11.3.1 为图片着色</h3><h3 id="11-3-2-理解混合模式的类型"><a href="#11-3-2-理解混合模式的类型" class="headerlink" title="11.3.2 理解混合模式的类型"></a>11.3.2 理解混合模式的类型</h3><h3 id="11-3-3-为图片添加纹理"><a href="#11-3-3-为图片添加纹理" class="headerlink" title="11.3.3 为图片添加纹理"></a>11.3.3 为图片添加纹理</h3><h3 id="11-3-4-使用混合模式"><a href="#11-3-4-使用混合模式" class="headerlink" title="11.3.4 使用混合模式"></a>11.3.4 使用混合模式</h3><h2 id="12-对比，颜色和间距"><a href="#12-对比，颜色和间距" class="headerlink" title="12 对比，颜色和间距"></a>12 对比，颜色和间距</h2><h3 id="12-1-对比最重要"><a href="#12-1-对比最重要" class="headerlink" title="12.1 对比最重要"></a>12.1 对比最重要</h3><h3 id="12-1-1-建立模式"><a href="#12-1-1-建立模式" class="headerlink" title="12.1.1 建立模式"></a>12.1.1 建立模式</h3><p>这部分的工作更像是设计师的工作</p>
+<h3 id="12-1-2-还原设计稿"><a href="#12-1-2-还原设计稿" class="headerlink" title="12.1.2 还原设计稿"></a>12.1.2 还原设计稿</h3><p>BEM风格来为类命名， 以便清楚地知道哪个元素属于哪个模块。 双下划线代表模块的子元素， 比如hero__inner； 双连字符代表模块变体， 比如button–cta</p>
+<h2 id="12-2-颜色"><a href="#12-2-颜色" class="headerlink" title="12.2 颜色"></a>12.2 颜色</h2><p>因为这些颜色会在CSS中多次重复出现， 所以将它们指定为变量可以节省很多时间。 另外， 如果总是一次次地输入十六进制值， 无法保证一定不出错</p>
+<p>我们先为页面统一添加一些基础样式， 也包括为调色板中的每种颜色指定变量</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kirk-zhang58/CSS-In-Depth/blob/main/ch12/listing-12.2.html">代码清单12-2</a></p>
+<h3 id="12-2-1-理解颜色表示法"><a href="#12-2-1-理解颜色表示法" class="headerlink" title="12.2.1 理解颜色表示法"></a>12.2.1 理解颜色表示法</h3><p>rgb()函数是一种描述红、 绿、 蓝彩色值的颜色表示法， 使用十进制而非十六进制。 它使用0-255取代了00-FF， 比如rgb(0, 0, 0)代表纯黑色（相当于#000） ， rgb(136, 0, 0)代表砖红色（相当于#800）。</p>
+<p>hsl()函数需要3个参数。 第一个参数表示色相， 是一个0~359的整数值。 这代表色相环上的360度， 从红色（0） 、 黄色（60） 、 绿色（120） 、 青色（180） 、 蓝色（240） 、 洋红色（300） 依次过渡， 最后回到红色。 第二个参数表示饱和度， 是一个代表色彩强度的百分数， 100%的时候颜色最鲜艳， 0%就意味着没有彩色， 只是一片灰色。第三个参数表示明度， 也是百分数， 代表颜色有多亮（或者多暗） 。 大部分鲜艳的颜色是使用50%的明度值。 明度值设置得越高， 颜色越浅， 100%就是纯白色； 设置得越低， 颜色越暗， 0%就是黑色。 例如， hsl(198, 73%, 46%)这个颜色值， 包含了青蓝色的色相、 偏高的饱和度（73%） 和接近50%的明度， 因此会生成一个比天蓝色稍深一些的蓝色</p>
+<p>HSL Color Picker这个网站提供了一个交互式颜色选择器</p>
+<h3 id="12-2-2-添加新颜色到调色板"><a href="#12-2-2-添加新颜色到调色板" class="headerlink" title="12.2.2 添加新颜色到调色板"></a>12.2.2 添加新颜色到调色板</h3><p>为某种颜色寻找一个搭配的颜色， 最简单的方式是找到它的补色（complement） 。 补色位于色相环的对侧位置， 蓝色的补色是黄色； 绿<br>色的补色是洋红色（或者紫色） ； 红色的补色是青色。</p>
+<p>使用HSL颜色值时， 计算补色非常简单， 为色相值加上或者减去180即可。 核心颜色品牌绿的色相值是162， 加上180得到342的新色相值， 这是个红色， 带一点点洋红。 我们也可以通过减去180来寻找补色， 得到了-18的色相值。 色相-18其实等同于色相342， 因此hsl(-18, 87%,21%)和hsl(342, 87%, 21%)会渲染成同样的颜色。 不过建议把色相值保持在0~360的范围内， 因为这个范围内的颜色与色相对应关系我们比较熟悉。</p>
+<p>如果你想更深入地研究颜色选择， 可以上网浏览颜色理论相关的文章。你可以从Natalya Shelburne所写的这篇著名的文章Practical Color Theory for People Who Code开始。</p>
+<h3 id="12-2-3-思考字体颜色的对比效果"><a href="#12-2-3-思考字体颜色的对比效果" class="headerlink" title="12.2.3 思考字体颜色的对比效果"></a>12.2.3 思考字体颜色的对比效果</h3><h2 id="12-3-间距"><a href="#12-3-间距" class="headerlink" title="12.3 间距"></a>12.3 间距</h2><h3 id="12-3-1-使用em还是px"><a href="#12-3-1-使用em还是px" class="headerlink" title="12.3.1 使用em还是px"></a>12.3.1 使用em还是px</h3><p>使用像素， 短期内工作会比较轻松， 但这也意味着后面的设计将缺少弹性。可能会导致将来有更多的工作， 当然这也不一定。 如果决定使用相对单位， 前期就需要多做一些工作， 但是设计会更强大稳固。</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/vue/vue_up_and_run/vuejs_up_and_running/"
+                    data-tooltip="vue.js up and running"
+                    aria-label="PREVIOUS: vue.js up and running"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
+                    data-tooltip="The Go Programming Language"
+                    aria-label="NEXT: The Go Programming Language"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/css/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3css/%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90css/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/vue/vue_up_and_run/vuejs_up_and_running/"
+                    data-tooltip="vue.js up and running"
+                    aria-label="PREVIOUS: vue.js up and running"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/golang/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F/"
+                    data-tooltip="The Go Programming Language"
+                    aria-label="NEXT: The Go Programming Language"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/css/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3css/%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90css/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/css/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3css/%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90css/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-2mrdgre6o8oumjyqh1gawnnqlakhnetes6k3qnahlvgvfzutbbznavmu0avb.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/web/css/深入理解css/深入解析css/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

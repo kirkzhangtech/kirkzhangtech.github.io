@@ -1,0 +1,1497 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>React全家桶 前端开发与实例详解 - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要：讲react非常详细的一本书\n\n\n\n1 第一个react web应用1.1 构建product hunt项目整本书都是围绕着一个类product hunt网站的demo进行讲解\n如何初始化一个react项目\n\ncreate-react-app 是一个依赖6.14.11版本npm的脚手架react项目\nnpx create-react-app react-demo 创建项目，或者npm install -g create-react-app 全局安装create-react-app项目(但是不建议全局安装)\ncreate-react-app -V 查看版本\n\n\nyarn start 启动服务\n安装yarn on ubuntu\ncurl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -然后echo &quot;deb https://dl.yarnpkg.com/debian/ stable main&quot; | sudo tee /etc/apt/sources.list.d/yarn.list\nsudo apt update &amp;&amp; sudo apt install yarn\nyarn --version\n\n\nyarn基本使用\n初始化项目yarn init\n添加依赖包yarn add &#123;package&#125;和yarn add &#123;package&#125;@&#123;version&#125;\n添加依赖到不同的依赖项中yarn add &#123;package&#125; --dev和yarn add [package] --peer和yarn add [package] --optional\n升级依赖包yarn upgrade [package]和yarn upgrade [package]@[version]和yarn upgrade [package]@[tag]\n移除依赖包yarn remove [package]\n安装全部依赖关系yarn或者yarn install\n\n\n\n1.2 配置开发环境1.2.1 代码编辑器个人还是非常喜欢使用vscode作为代码编辑器来使用。相对neovim还是比较好上手，但是最后还是过渡到neovim编辑器上\n1.2.2 nodejs和npm的安装npm -v查看npm版本，在ubuntu上面装nodejs并适配hexo工具会要求装很高版本的nodejs这里就要换安装方式\n1.2.3 安装git安装简单，直接sudo apt install git,但是使用还不太清楚\n1.2.4 浏览器没什么好说的推荐使用chrome浏览器\n1.3 针对windows用户的特殊说明我用的ubuntu所以不涉及，直接跳过\n1.4 javascript ES6&#x2F;ES7不同浏览器具有不同的执行JavaScript代码的解释器JavaScript作为互联网的客户端脚本语言被广泛采用，从而形成了标准组织来管理它的规范。规范的名称就是ECMAScript或ES。ES6有时称为ES2015，2015即它最终完成的年份。相应地，ES7通常被称为ES2016。\n1.5 开始直接download源码，然后cd到对应目录下执行npm install安装相关依赖，npm start 启动服务器，http://localhost:3000来查看正在运行的应用程序\n1.6 什么组件构架react应用程序的的基础就是组件（一个class），可以将单独的react组件是为应用程序的一个UI组件，正如图中product hunt程序那样，包括了了一个父组件productList，和一个product子组件。\nReact组件可以清晰的映射到UI组件，而且是独立的，标记代码，试图逻辑以及组件的特定样式集中的在一个地方。比如父组件productList组件对应着一个product集合，然后是product组件对应着每一个UI中展示的组件，样式代码是不互相干扰的\n1.6.1 第一个组件示例代码 voting_app&#x2F;public&#x2F;js&#x2F;app-1.js\nclass ProductList extends React.Component &#123;\n  render() &#123;\n    return (\n      &lt;div className='ui unstackable items'>\n        Hello, friend! I am a basic React component.\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\n\nProductList组件继承了React.Component类的ES6库，index页面也引用了React框架库，ES6引入了类声明语法。ES6类是JavaScript基于原型的继承模型的语法糖\n声明组件有两种方式\n第一种就是上面那种，像是java创建类一样，但是render方式是固定要实现的\n第二种就是使用create-response-class库中createReactClass()方法import createReactClass from 'create-react-class';\n\nconst HelloWorld = createReactClass(&#123;\n    render() &#123; return(&lt;p>Hello, world!&lt;/p>) &#125;\n&#125;)\n返回值的语法看起来和传统的JavaScript有些不像。该语法称为JavaScript扩展语法JSX,JSX代码最后会编译成vanilla JavaScript（原生JavaScript）\n\n\n\n1.6.2 JSXReact组件最终渲染为浏览器中显示的HTML,这个是我一开始使用没想明白的，其实React在做的根本的动作就是将所有东西都组装成HTML展示出来，这里面就涉及虚拟DOM对象，建JSX的目的是使表示HTML的JavaScript看起来更像HTML常规js代码渲染\nReact.createElement('div', &#123;className: 'ui items'&#125;,\n'\nHello, friend! I am a basic React component.'\n)\nJSX代码渲染\n&lt;div className='ui items'>\nHello, friend! I am a basic React component.\n&lt;/div>\n后者的代码看起来更加的舒服，JSX在JavaScript版本上提供了轻量级抽象，虽然上面的JSX代码看起来与HTML几乎相同，但要记住JSX实际上是编译成了JavaScript\n1.6.3 开发者控制台可以与application进行交互\n1.6.4 BabelBabel是一个JavaScript转译器,可以将ES6代码转译为ES5代码，它的另一个使用功能就是理解JSX语法.在index页面我们带入babel\n&lt;head>\n&lt;!-- ... -->\n&lt;script src=\"vendor/babel-standalone.js\">&lt;/script>\n&lt;!-- ... -->\n&lt;/head>\n然后我们再告诉js运行时，代码需要由babel编译，通过设置如下选项\n&lt;script src=\"./js/seed.js\">&lt;/script>\n&lt;script\n  type=\"text/babel\"\n  data-plugins=\"transform-class-properties\"\n  src=\"./js/app.js\">\n&lt;/script>\n\nindex页面导入了相关的js代码和react代码，所以就在调用react相关的功能\n1.6.5 ReactDOM.render()方法voting_app&#x2F;public&#x2F;js&#x2F;app-1.js 。 我们要再特定的DOM节点渲染这个ProductList组件\nclass ProductList extends React.Component &#123;\n\nrender() &#123;\nreturn (\n    &lt;div className='ui unstackable items'>\n    Hello, friend! I am a basic React component.\n    &lt;/div>\n      );\n    &#125;\n&#125;\n\nReactDOM.render(\n&lt;ProductList />,\ndocument.getElementById('content')\n);\n这个ReactDOM.render继承自React库，其中有两个参数，一个是what，也就是你要渲染渲染哪个组件，第二个参数是where，也就是在哪个DOM节点进行渲染一般情况下我们自己编写的组件使用ProductList这样的名字，原生的HTML使用小写的。\n现在刷新页面我们发现整个流程是babel将JSX代码转译为ES5然后ReactDOM.render()将组件写入DOM\n1.7 构建Product组件代码样例是voting_app&#x2F;public&#x2F;js&#x2F;app-2.js,\n\nclass ProductList extends React.Component &#123;\n  render() &#123;\n    return (\n      &lt;div className='ui unstackable items'>\n        &lt;Product />\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nclass Product extends React.Component &#123;\n  render() &#123;\n    return (\n      &lt;div className='item'>\n        &lt;div className='image'>\n          &lt;img src='images/products/image-aqua.png' />\n        &lt;/div>\n        &lt;div className='middle aligned content'>\n          &lt;div className='description'>\n            &lt;a>Fort Knight&lt;/a>\n            &lt;p>Authentic renaissance actors, delivered in just two weeks.&lt;/p>\n          &lt;/div>\n          &lt;div className='extra'>\n            &lt;span>Submitted by:&lt;/span>\n            &lt;img\n              className='ui avatar image'\n              src='images/avatars/daniel.jpg'\n            />\n          &lt;/div>\n        &lt;/div>\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\n这里可以看到Product组件引用了外部的css样式，jsx代码会被转译为常规的js代码，所以我们不能在jsx中使用js保留字class是保留字，但是react让我们使用className作为属性名称如示例代码所示，jsx不是最终渲染到HTML的代码，要使用Product组件，我们要修改ProductList父组件的render()方法输出，换个思路想其实就是在父组件的render方法中渲染子组件的jsx代码，然后子组件在调用自己render()方法进行渲染\n1.8 让数据驱动Product组件1.8.1 数据模型这节也就是使用如何在使用seed.js这个预定义的数组数据，并定义了generateVoteCount()函数来模拟票数\n\nwindow.Seed = (function () &#123;\n  function generateVoteCount() &#123;\n    return Math.floor((Math.random() * 50) + 15);\n  &#125;\n\n  const products = [\n    &#123;\n      id: 1,\n      title: 'Yellow Pail',\n      description: 'On-demand sand castle construction expertise.',\n      url: '#',\n      votes: generateVoteCount(),\n      submitterAvatarUrl: 'images/avatars/daniel.jpg',\n      productImageUrl: 'images/products/image-aqua.png',\n    &#125;,\n    &#123;\n      id: 2,\n      title: 'Supermajority: The Fantasy Congress League',\n      description: 'Earn points when your favorite politicians pass legislation.',\n      url: '#',\n      votes: generateVoteCount(),\n      submitterAvatarUrl: 'images/avatars/kristy.png',\n      productImageUrl: 'images/products/image-rose.png',\n    &#125;,\n    &#123;\n      id: 3,\n      title: 'Tinfoild: Tailored tinfoil hats',\n      description: 'We already have your measurements and shipping address.',\n      url: '#',\n      votes: generateVoteCount(),\n      submitterAvatarUrl: 'images/avatars/veronika.jpg',\n      productImageUrl: 'images/products/image-steel.png',\n    &#125;,\n    &#123;\n      id: 4,\n      title: 'Haught or Naught',\n      description: 'High-minded or absent-minded? You decide.',\n      url: '#',\n      votes: generateVoteCount(),\n      submitterAvatarUrl: 'images/avatars/molly.png',\n      productImageUrl: 'images/products/image-yellow.png',\n    &#125;,\n  ];\n\n  return &#123; products: products &#125;;\n&#125;());\n\n\n1.8.2 使用props我们可以使用props属性在父组件和子组件中进行传递数据，这里就需要使用props属性示例代码voting_app&#x2F;public&#x2F;js&#x2F;app-3.js\n\nclass ProductList extends React.Component &#123;\n  render() &#123;\n    const product = Seed.products[0];\n    return (\n      &lt;div className='ui unstackable items'>\n        &lt;Product\n          id=&#123;product.id&#125;\n          title=&#123;product.title&#125;\n          description=&#123;product.description&#125;\n          url=&#123;product.url&#125;\n          votes=&#123;product.votes&#125;\n          submitterAvatarUrl=&#123;product.submitterAvatarUrl&#125;\n          productImageUrl=&#123;product.productImageUrl&#125;\n        />\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nclass Product extends React.Component &#123;\n  render() &#123;\n    return (\n      &lt;div className='item'>\n        &lt;div className='image'>\n          &lt;img src=&#123;this.props.productImageUrl&#125; />\n        &lt;/div>\n        &lt;div className='middle aligned content'>\n          &lt;div className='header'>\n            &lt;a>\n              &lt;i className='large caret up icon' />\n            &lt;/a>\n            &#123;this.props.votes&#125;\n          &lt;/div>\n          &lt;div className='description'>\n            &lt;a href=&#123;this.props.url&#125;>\n              &#123;this.props.title&#125;\n            &lt;/a>\n            &lt;p>\n              &#123;this.props.description&#125;\n            &lt;/p>\n          &lt;/div>\n          &lt;div className='extra'>\n            &lt;span>Submitted by:&lt;/span>\n            &lt;img\n              className='ui avatar image'\n              src= &#123;this.props.submitterAvatarUrl&#125;\n            />\n          &lt;/div>\n        &lt;/div>\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\n\n在JSX内部的任何地方插入一个变量，都需要用大括号（{}）来分隔变量,组件可以通过this.props对象访问所有的props. 这里注意到数组取了下标Seed.products[0]\n1.8.3 渲染多个产品Array对象的map()方法将函数作为参数。它使用数组内的每个子项,来调用此函数，并使用每个函数调用的返回值来构建一个新数组,因为Seed.products数组有四个子项，所以map()方法会调用此函数四次，每个子项一次。当map()方法调用此函数时，它将每个子项作为第一个参数传入。此函数调用的返回值将插入map()方法正在构建的新数组中。在处理完最后一个子项后，map()方法就会返回这个新数组。这里我们把这个新数组存储在productComponents变量中。示例代码 voting_app&#x2F;public&#x2F;js&#x2F;app-4.js\n\nclass ProductList extends React.Component &#123;\n  render() &#123;\n    // 对product进行排序\n\n    // const products = Seed.products.sort((a, b) => (\n    //   b.votes - a.votes\n    // ));\n    //这里其实是新数组\n    const productComponents = Seed.products.map((product) => (\n      &lt;Product\n        key=&#123;'product-' + product.id&#125;\n        id=&#123;product.id&#125;\n        title=&#123;product.title&#125;\n        description=&#123;product.description&#125;\n        url=&#123;product.url&#125;\n        votes=&#123;product.votes&#125;\n        submitterAvatarUrl=&#123;product.submitterAvatarUrl&#125;\n        productImageUrl=&#123;product.productImageUrl&#125;\n      />\n    ));\n    return (\n      &lt;div className='ui unstackable items'>\n        &#123;productComponents&#125;\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nclass Product extends React.Component &#123;\n  render() &#123;\n    return (\n      &lt;div className='item'>\n        &lt;div className='image'>\n          &lt;img src=&#123;this.props.productImageUrl&#125; />\n        &lt;/div>\n        &lt;div className='middle aligned content'>\n          &lt;div className='header'>\n            &lt;a>\n              &lt;i className='large caret up icon' />\n            &lt;/a>\n            &#123;this.props.votes&#125;\n          &lt;/div>\n          &lt;div className='description'>\n            &lt;a href=&#123;this.props.url&#125;>\n              &#123;this.props.title&#125;\n            &lt;/a>\n            &lt;p>\n              &#123;this.props.description&#125;\n            &lt;/p>\n          &lt;/div>\n          &lt;div className='extra'>\n            &lt;span>Submitted by:&lt;/span>\n            &lt;img\n              className='ui avatar image'\n              src=&#123;this.props.submitterAvatarUrl&#125;\n            />\n          &lt;/div>\n        &lt;/div>\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\n\n\n1.9 应用程序的第一次交互：投票事件的响应Product组件无法修改它的票数，因为this.props对象是不可变的。虽然子组件可以读取props但是无法修改它子组件不是props的所有者。也就是说父组件是props的拥有者，而子组件不拥有props。\nProduct组件需要有一个方法让ProductList组件知道它的向上投票图标被点击，接着可以让ProductList组件更新子组件的对应的票数，然后更新的数据从父组件流向子组件\n1.9.1 事件的传递我们知道父组件通过props向子组件传递数据。因为props是不可变的，所以子组件需要某种方式来向父组件传递事件。然后父组件可以进行任何必要的数据更改。记住是父组件拥有props。那么这些是如何运转的呢？ProductList组件中的handleProductUpVote函数只接收一个名为productId的参数。该函数会将产品的id记录到控制台：首先，html中记录鼠标的点击事件，并绑定到该组件的对应的函数上，然后函数在调用父组件的函数。如代码voting_app&#x2F;public&#x2F;js&#x2F;app-6.js所示\n\nclass ProductList extends React.Component &#123;\n  // 定义了函数\n  handleProductUpVote(productId) &#123;\n    console.log(productId + ' was upvoted.');\n  &#125;\n\n  render() &#123;\n    const products = Seed.products.sort((a, b) => (\n      b.votes - a.votes\n    ));\n    const productComponents = products.map((product) => (\n      &lt;Product\n        key=&#123;'product-' + product.id&#125;\n        id=&#123;product.id&#125;\n        title=&#123;product.title&#125;\n        description=&#123;product.description&#125;\n        url=&#123;product.url&#125;\n        votes=&#123;product.votes&#125;\n        submitterAvatarUrl=&#123;product.submitterAvatarUrl&#125;\n        productImageUrl=&#123;product.productImageUrl&#125;\n        // 属性名是onVote,然后将定义的函数handleProductUpVote赋值给onVote\n        onVote=&#123;this.handleProductUpVote&#125;\n      />\n    ));\n    return (\n      &lt;div className='ui unstackable items'>\n        &#123;productComponents&#125;\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nclass Product extends React.Component &#123;\n  constructor(props) &#123;\n    super(props);\n\n    this.handleUpVote = this.handleUpVote.bind(this);\n  &#125;\n\n  // Inside `Product`\n  handleUpVote() &#123;\n    //然后函数调用了父组件传递过来的函数，换句话说就是再次调用了父组件中方法\n    this.props.onVote(this.props.id);\n  &#125;\n\n  render() &#123;\n    return (\n      &lt;div className='item'>\n        &lt;div className='image'>\n          &lt;img src=&#123;this.props.productImageUrl&#125; />\n        &lt;/div>\n        &#123;/* Inside `render` for Product` */&#125;\n        &lt;div className='middle aligned content'>\n          &lt;div className='header'>\n            //onClick接收点击事件， 然后传递给该组件的handleUpVote函数。\n            &lt;a onClick=&#123;this.handleUpVote&#125;>\n              &lt;i className='large caret up icon' />\n            &lt;/a>\n            &#123;this.props.votes&#125;\n          &lt;/div>\n          &lt;div className='description'>\n            &lt;a href=&#123;this.props.url&#125;>\n              &#123;this.props.title&#125;\n            &lt;/a>\n            &lt;p>\n              &#123;this.props.description&#125;\n            &lt;/p>\n          &lt;/div>\n          &lt;div className='extra'>\n            &lt;span>Submitted by:&lt;/span>\n            &lt;img\n              className='ui avatar image'\n              src=&#123;this.props.submitterAvatarUrl&#125;\n            />\n          &lt;/div>\n        &lt;/div>\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\n\n这里是比较奇怪的部分：在render()函数中工作时，我们已目睹了this总是绑定到当前组件，但在自定义的组件方法handleUpVote()中，this的值实际上是null。\n1.9.2 绑定自定义组件方法原来自定义组件中的自定义方法的this指针不指向当前组件，见鬼！简而言之就是React的方法都已经绑定了this对于自定义组件的自定义方法，需要用些手段进行绑定。\n\nclass Product extends React.Component &#123;\n  \n  constructor(props) &#123;\n  super(props);\n  this.handleUpVote = this.handleUpVote.bind(this);\n&#125;\n\n那么上面代码是如何运行的，首先先到用constructor(props)函数来进行初始化，然受super(props)会调用父组件的constructor()函数this.handleUpVote = this.handleUpVote.bind(this);通过这行代码我们重新定义了组件的handleUpVote()方法，并将其赋值到相同的函数，但绑定到this变量（组件）下。现在，每当handleUpVote()函数执行时，this将引用当前组件而不是null。\n1.9.3 使用stateprops是不可变的并且由组件的父级所拥有，而state由组件拥有。this.state是组件私有的，我们将看到它可以使用this.setState()方法进行更改。当组件的state更新时就是重新渲染页面，每个React组件都是作为一个由this.props和this.state组成的函数来渲染的。这种渲染是确定性的。这意味着若给定一组props和一组state，React组件将始终以一种方式渲染。\nProductList组件将此状态的所有者，会将state作为props传递给Product组件\n接下来的例子将会进行初始化state初始值，voting_app&#x2F;public&#x2F;js&#x2F;app-7.js \n\nclass ProductList extends React.Component &#123;\n  constructor(props) &#123;\n    super(props);\n\n    this.state = &#123;\n      products: [],\n    &#125;;\n  &#125;\n\n  componentDidMount() &#123;\n    this.setState(&#123; products: Seed.products &#125;);\n  &#125;\n\n  handleProductUpVote(productId) &#123;\n    console.log(productId + ' was upvoted.');\n  &#125;\n\n  render() &#123;\n    const products = this.state.products.sort((a, b) => (\n      b.votes - a.votes\n    ));\n    const productComponents = products.map((product) => (\n      &lt;Product\n        key=&#123;'product-' + product.id&#125;\n        id=&#123;product.id&#125;\n        title=&#123;product.title&#125;\n        description=&#123;product.description&#125;\n        url=&#123;product.url&#125;\n        votes=&#123;product.votes&#125;\n        submitterAvatarUrl=&#123;product.submitterAvatarUrl&#125;\n        productImageUrl=&#123;product.productImageUrl&#125;\n        onVote=&#123;this.handleProductUpVote&#125;\n      />\n    ));\n\n    return (\n      &lt;div className='ui unstackable items'>\n        &#123;productComponents&#125;\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nclass Product extends React.Component &#123;\n  constructor(props) &#123;\n    super(props);\n\n    this.handleUpVote = this.handleUpVote.bind(this);\n  &#125;\n\n  handleUpVote() &#123;\n    this.props.onVote(this.props.id);\n  &#125;\n\n  render() &#123;\n    return (\n      &lt;div className='item'>\n        &lt;div className='image'>\n          &lt;img src=&#123;this.props.productImageUrl&#125; />\n        &lt;/div>\n        &lt;div className='middle aligned content'>\n          &lt;div className='header'>\n            &lt;a onClick=&#123;this.handleUpVote&#125;>\n              &lt;i className='large caret up icon' />\n            &lt;/a>\n            &#123;this.props.votes&#125;\n          &lt;/div>\n          &lt;div className='description'>\n            &lt;a href=&#123;this.props.url&#125;>\n              &#123;this.props.title&#125;\n            &lt;/a>\n            &lt;p>\n              &#123;this.props.description&#125;\n            &lt;/p>\n          &lt;/div>\n          &lt;div className='extra'>\n            &lt;span>Submitted by:&lt;/span>\n            &lt;img\n              className='ui avatar image'\n              src=&#123;this.props.submitterAvatarUrl&#125;\n            />\n          &lt;/div>\n        &lt;/div>\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\nProductList组件现在已由自己拥有的状态驱动了。如果现在保存并刷新，所有的产品都会消失。这是因为在ProductList组件中没有任何机制可以将产品添加到它的state中。\n1.9.4 使用this.setState()设置stateReact指定了一组生命周期方法。在组件挂载到页面之后，React会调用componentDidMount()生命周期方法。我们将在此方法中为ProductList组件的state赋值。React为组件提供了this.setState()方法，用于state初始化之后的所有修改操作。除此之外，该方法会触发React组件重新渲染，这在state更改后非常重要。\n\n永远不要在this.setState()方法之外修改state。它为state修改提供了重要的Hook，我们不能绕过它。\n\n该组件在挂载时state是一个空的this.state.products数组。挂载后，我们使用Seed对象的数据为state赋值。该组件将重新渲染，产品也将显示出来。这是以用户察觉不到的速度发生的。voting_app&#x2F;public&#x2F;js&#x2F;app-8.js \nclass ProductList extends React.Component &#123;\n  constructor(props) &#123;\n    super(props);\n\n    this.state = &#123;\n      products: [],\n    &#125;;\n  &#125;\n\n  componentDidMount() &#123;\n    this.setState(&#123; products: Seed.products &#125;);\n  &#125;\n\n  handleProductUpVote(productId) &#123;\n    console.log(productId + ' was upvoted.');\n  &#125;\n\n  render() &#123;\n    const products = this.state.products.sort((a, b) => (\n      b.votes - a.votes\n    ));\n    const productComponents = products.map((product) => (\n      &lt;Product\n        key=&#123;'product-' + product.id&#125;\n        id=&#123;product.id&#125;\n        title=&#123;product.title&#125;\n        description=&#123;product.description&#125;\n        url=&#123;product.url&#125;\n        votes=&#123;product.votes&#125;\n        submitterAvatarUrl=&#123;product.submitterAvatarUrl&#125;\n        productImageUrl=&#123;product.productImageUrl&#125;\n        onVote=&#123;this.handleProductUpVote&#125;\n      />\n    ));\n    return (\n      &lt;div className='ui unstackable items'>\n        &#123;productComponents&#125;\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nclass Product extends React.Component &#123;\n  constructor(props) &#123;\n    super(props);\n\n    this.handleUpVote = this.handleUpVote.bind(this);\n  &#125;\n\n  handleUpVote() &#123;\n    this.props.onVote(this.props.id);\n  &#125;\n\n  render() &#123;\n    return (\n      &lt;div className='item'>\n        &lt;div className='image'>\n          &lt;img src=&#123;this.props.productImageUrl&#125; />\n        &lt;/div>\n        &lt;div className='middle aligned content'>\n          &lt;div className='header'>\n            &lt;a onClick=&#123;this.handleUpVote&#125;>\n              &lt;i className='large caret up icon' />\n            &lt;/a>\n            &#123;this.props.votes&#125;\n          &lt;/div>\n          &lt;div className='description'>\n            &lt;a href=&#123;this.props.url&#125;>\n              &#123;this.props.title&#125;\n            &lt;/a>\n            &lt;p>\n              &#123;this.props.description&#125;\n            &lt;/p>\n          &lt;/div>\n          &lt;div className='extra'>\n            &lt;span>Submitted by:&lt;/span>\n            &lt;img\n              className='ui avatar image'\n              src=&#123;this.props.submitterAvatarUrl&#125;\n            />\n          &lt;/div>\n        &lt;/div>\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\n1.10 更新state和不变性我们刚刚讨论过只能使用this.setState()方法修改state。因此，虽然组件可以修改它的state，但我们应该将this.state对象视为不可变的。\nconst nextNums = this.state.nums;\nnextNums.push(4);\nconsole.log(nextNums);\n// [ 1, 2, 3, 4]\nconsole.log(this.state.nums);\n// [ 1, 2, 3, 4] &lt;-- Nope!\n新变量nextNums与this.state.nums引用的是内存中的相同数组\n不过可以使用Array对象的concat()方法代替。concat()方法创建了一个新数组，该数组包含调用它的数组元素，后面是作为参数传入的元素。\n\n将state对象视为不可变的，对于了解这些对象是被哪些Array和Object的方法调用并修改的非常重要。\n\nproducts初始化为this.state.products时，products与this.state.products都引用内存中相同的数组,如例子voting_app&#x2F;public&#x2F;js&#x2F;app-8.js 所示。Products和this.state.products两个变量都引用内存中的相同数组.因此，当我们通过forEach()方法增加某个product的票数来修改该product对象时，同时也修改了state中的原始product对象正确写法应该是voting_app&#x2F;public&#x2F;js&#x2F;app-9.js所示\n/* eslint-disable no-param-reassign, operator-assignment */\n\nclass ProductList extends React.Component &#123;\n  constructor(props) &#123;\n    super(props);\n\n    this.state = &#123;\n      products: [],\n    &#125;;\n\n    this.handleProductUpVote = this.handleProductUpVote.bind(this);\n  &#125;\n\n  componentDidMount() &#123;\n    this.setState(&#123; products: Seed.products &#125;);\n  &#125;\n\n  // Inside `ProductList`\n  handleProductUpVote(productId) &#123;\n    // map函数只是遍历数组\n    const nextProducts = this.state.products.map((product) => &#123;\n      if (product.id === productId) &#123;\n        return Object.assign(&#123;&#125;, product, &#123;\n          votes: product.votes + 1,\n        &#125;);\n      &#125; else &#123;\n        return product;\n      &#125;\n    &#125;);\n    this.setState(&#123;\n      products: nextProducts,\n    &#125;);\n  &#125;\n\n  render() &#123;\n    const products = this.state.products.sort((a, b) => (\n      b.votes - a.votes\n    ));\n    const productComponents = products.map((product) => (\n      &lt;Product\n        key=&#123;'product-' + product.id&#125;\n        id=&#123;product.id&#125;\n        title=&#123;product.title&#125;\n        description=&#123;product.description&#125;\n        url=&#123;product.url&#125;\n        votes=&#123;product.votes&#125;\n        submitterAvatarUrl=&#123;product.submitterAvatarUrl&#125;\n        productImageUrl=&#123;product.productImageUrl&#125;\n        onVote=&#123;this.handleProductUpVote&#125;\n      />\n    ));\n    return (\n      &lt;div className='ui unstackable items'>\n        &#123;productComponents&#125;\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nclass Product extends React.Component &#123;\n  constructor(props) &#123;\n    super(props);\n\n    this.handleUpVote = this.handleUpVote.bind(this);\n  &#125;\n\n  handleUpVote() &#123;\n    this.props.onVote(this.props.id);\n  &#125;\n\n  render() &#123;\n    return (\n      &lt;div className='item'>\n        &lt;div className='image'>\n          &lt;img src=&#123;this.props.productImageUrl&#125; />\n        &lt;/div>\n        &lt;div className='middle aligned content'>\n          &lt;div className='header'>\n            &lt;a onClick=&#123;this.handleUpVote&#125;>\n              &lt;i className='large caret up icon' />\n            &lt;/a>\n            &#123;this.props.votes&#125;\n          &lt;/div>\n          &lt;div className='description'>\n            &lt;a href=&#123;this.props.url&#125;>\n              &#123;this.props.title&#125;\n            &lt;/a>\n            &lt;p>\n              &#123;this.props.description&#125;\n            &lt;/p>\n          &lt;/div>\n          &lt;div className='extra'>\n            &lt;span>Submitted by:&lt;/span>\n            &lt;img\n              className='ui avatar image'\n              src=&#123;this.props.submitterAvatarUrl&#125;\n            />\n          &lt;/div>\n        &lt;/div>\n      &lt;/div>\n    );\n  &#125;\n&#125;\n\nReactDOM.render(\n  &lt;ProductList />,\n  document.getElementById('content')\n);\n\n首先，使用map()方法遍历products数组。重要的是，map()方法返回新数组，而不是修改this.state.products数组。其次，比较当前product是否与productId匹配。如果两者匹配，那么创建新对象并复制原始product对象的属性。然后重写新product对象上的votes属性，并将其赋值为增加后的票数。我们使用Object的assign()方法来执行这些操作：最后使用setState()方法来更新state。说白了就是这个例子做了change是在副本上做的change而没有更新元数据\nObject.assign()方法详解\n\n第四行代码为什么是true\nconst target = &#123; a: 1, b: 2 &#125;;\nconst source = &#123; b: 4, c: 5 &#125;;\nconst returnedTarget = Object.assign(target, source);\nconsole.log(target);\n// expected output: Object &#123; a: 1, b: 4, c: 5 &#125;\nconsole.log(returnedTarget === target);\n// expected output: true\n这是因为这样的写法Object.assign(target, source);是返回的修改的target，就是说并没有创建新的对象\n\nCloning an object\nconst obj = &#123; a: 1 &#125;;\nconst copy = Object.assign(&#123;&#125;, obj);\nconsole.log(copy); // &#123; a: 1 &#125;\n这种写法是创建了一个新对象\n\nMerging objects\nconst o1 = &#123; a: 1 &#125;;\nconst o2 = &#123; b: 2 &#125;;\nconst o3 = &#123; c: 3 &#125;;\nconst obj = Object.assign(o1, o2, o3);\nconsole.log(obj); // &#123; a: 1, b: 2, c: 3 &#125;\nIf the source value is a reference to an object, it only copies the reference value.只是merge\n\nmerging objects and create new reference\nconst o1 = &#123; a: 1, b: 1, c: 1 &#125;;\nconst o2 = &#123; b: 2, c: 2 &#125;;\nconst o3 = &#123; c: 3 &#125;;\nconst obj = Object.assign(&#123;&#125;, o1, o2, o3);\nconsole.log(obj); // &#123; a: 1, b: 2, c: 3 &#125;\n\n1.11 用Babel插件重构transform-class-properties1.11.2 属性初始化器1.11.3 重构Product组件如上文所讲，handleUpVote()方法是自定义组件的自定义方法，所以React不会将该方法内部的this绑定到组件。因此我们必须在构造函数中手动执行绑定：\nclass Product extends React.Component &#123;\nconstructor(props) &#123;\nsuper(props);\nthis.handleUpVote = this.handleUpVote.bind(this);\n&#125;\nhandleUpVote() &#123;\nthis.props.onVote(this.props.id);\n&#125;\nrender() &#123;&#125;\n使用transform-class-properties插件，我们可以将handleUpVote写为箭头函数。这会确保函数内部的this能绑定到当前组件，正如预期：\nclass Product extends React.Component &#123;\nhandleUpVote = () => (\nthis.props.onVote(this.props.id)\n);\nrender() &#123;&#125;\n使用此特性，可以删除constructor()函数，无须手动绑定调用。\n1.11.4 重构ProductList组件同样道理ProductList组件也可以使用箭头函数进行重构\n","dateCreated":"2023-12-12T19:30:59+08:00","dateModified":"2023-12-12T19:30:59+08:00","datePublished":"2023-12-12T19:30:59+08:00","description":"摘要：讲react非常详细的一本书","headline":"React全家桶 前端开发与实例详解","image":[null,"https://user-images.githubusercontent.com/46363359/209692120-121acd97-15cc-4d34-b007-a871f9ba79d7.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/web/react/fullstack_react/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/web/react/fullstack_react/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/209692120-121acd97-15cc-4d34-b007-a871f9ba79d7.jpg"}</script>
+    <meta name="description" content="摘要：讲react非常详细的一本书">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="React全家桶 前端开发与实例详解">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/web/react/fullstack_react/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要：讲react非常详细的一本书">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:modified_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/209692120-121acd97-15cc-4d34-b007-a871f9ba79d7.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/209692120-121acd97-15cc-4d34-b007-a871f9ba79d7.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-6282fdnvziozzvtprbntzupxyhc5mlkphbaevboelgvnx2vnnspamitnamq7.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/209692120-121acd97-15cc-4d34-b007-a871f9ba79d7.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            React全家桶 前端开发与实例详解
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/js/">js</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要：讲react非常详细的一本书</p>
+<span id="more"></span>
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E7%AC%AC%E4%B8%80%E4%B8%AAreact-web%E5%BA%94%E7%94%A8"><span class="toc-text">1 第一个react web应用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E6%9E%84%E5%BB%BAproduct-hunt%E9%A1%B9%E7%9B%AE"><span class="toc-text">1.1 构建product hunt项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E9%85%8D%E7%BD%AE%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83"><span class="toc-text">1.2 配置开发环境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-1-%E4%BB%A3%E7%A0%81%E7%BC%96%E8%BE%91%E5%99%A8"><span class="toc-text">1.2.1 代码编辑器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-2-nodejs%E5%92%8Cnpm%E7%9A%84%E5%AE%89%E8%A3%85"><span class="toc-text">1.2.2 nodejs和npm的安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-3-%E5%AE%89%E8%A3%85git"><span class="toc-text">1.2.3 安装git</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-4-%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="toc-text">1.2.4 浏览器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E9%92%88%E5%AF%B9windows%E7%94%A8%E6%88%B7%E7%9A%84%E7%89%B9%E6%AE%8A%E8%AF%B4%E6%98%8E"><span class="toc-text">1.3 针对windows用户的特殊说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-javascript-ES6-x2F-ES7"><span class="toc-text">1.4 javascript ES6&#x2F;ES7</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-%E5%BC%80%E5%A7%8B"><span class="toc-text">1.5 开始</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-6-%E4%BB%80%E4%B9%88%E7%BB%84%E4%BB%B6"><span class="toc-text">1.6 什么组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%BB%84%E4%BB%B6"><span class="toc-text">1.6.1 第一个组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-2-JSX"><span class="toc-text">1.6.2 JSX</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-3-%E5%BC%80%E5%8F%91%E8%80%85%E6%8E%A7%E5%88%B6%E5%8F%B0"><span class="toc-text">1.6.3 开发者控制台</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-4-Babel"><span class="toc-text">1.6.4 Babel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-5-ReactDOM-render-%E6%96%B9%E6%B3%95"><span class="toc-text">1.6.5 ReactDOM.render()方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-7-%E6%9E%84%E5%BB%BAProduct%E7%BB%84%E4%BB%B6"><span class="toc-text">1.7 构建Product组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-8-%E8%AE%A9%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8Product%E7%BB%84%E4%BB%B6"><span class="toc-text">1.8 让数据驱动Product组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-8-1-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-text">1.8.1 数据模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-8-2-%E4%BD%BF%E7%94%A8props"><span class="toc-text">1.8.2 使用props</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-8-3-%E6%B8%B2%E6%9F%93%E5%A4%9A%E4%B8%AA%E4%BA%A7%E5%93%81"><span class="toc-text">1.8.3 渲染多个产品</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-9-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E7%AC%AC%E4%B8%80%E6%AC%A1%E4%BA%A4%E4%BA%92%EF%BC%9A%E6%8A%95%E7%A5%A8%E4%BA%8B%E4%BB%B6%E7%9A%84%E5%93%8D%E5%BA%94"><span class="toc-text">1.9 应用程序的第一次交互：投票事件的响应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-1-%E4%BA%8B%E4%BB%B6%E7%9A%84%E4%BC%A0%E9%80%92"><span class="toc-text">1.9.1 事件的传递</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-2-%E7%BB%91%E5%AE%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%84%E4%BB%B6%E6%96%B9%E6%B3%95"><span class="toc-text">1.9.2 绑定自定义组件方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-3-%E4%BD%BF%E7%94%A8state"><span class="toc-text">1.9.3 使用state</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-4-%E4%BD%BF%E7%94%A8this-setState-%E8%AE%BE%E7%BD%AEstate"><span class="toc-text">1.9.4 使用this.setState()设置state</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-10-%E6%9B%B4%E6%96%B0state%E5%92%8C%E4%B8%8D%E5%8F%98%E6%80%A7"><span class="toc-text">1.10 更新state和不变性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-11-%E7%94%A8Babel%E6%8F%92%E4%BB%B6%E9%87%8D%E6%9E%84transform-class-properties"><span class="toc-text">1.11 用Babel插件重构transform-class-properties</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-11-2-%E5%B1%9E%E6%80%A7%E5%88%9D%E5%A7%8B%E5%8C%96%E5%99%A8"><span class="toc-text">1.11.2 属性初始化器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-11-3-%E9%87%8D%E6%9E%84Product%E7%BB%84%E4%BB%B6"><span class="toc-text">1.11.3 重构Product组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-11-4-%E9%87%8D%E6%9E%84ProductList%E7%BB%84%E4%BB%B6"><span class="toc-text">1.11.4 重构ProductList组件</span></a></li></ol></li></ol></li></ol>
+
+<h1 id="1-第一个react-web应用"><a href="#1-第一个react-web应用" class="headerlink" title="1 第一个react web应用"></a>1 第一个react web应用</h1><h2 id="1-1-构建product-hunt项目"><a href="#1-1-构建product-hunt项目" class="headerlink" title="1.1 构建product hunt项目"></a>1.1 构建product hunt项目</h2><p>整本书都是围绕着一个类product hunt网站的demo进行讲解</p>
+<p>如何初始化一个react项目</p>
+<ol>
+<li>create-react-app 是一个依赖6.14.11版本npm的脚手架react项目</li>
+<li><code>npx create-react-app react-demo</code> 创建项目，或者<code>npm install -g create-react-app</code> 全局安装create-react-app项目(但是不建议全局安装)<ol>
+<li><code>create-react-app -V</code> 查看版本</li>
+</ol>
+</li>
+<li><code>yarn start</code> 启动服务<ol>
+<li>安装yarn on ubuntu</li>
+<li><code>curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -</code>然后<code>echo &quot;deb https://dl.yarnpkg.com/debian/ stable main&quot; | sudo tee /etc/apt/sources.list.d/yarn.list</code></li>
+<li><code>sudo apt update &amp;&amp; sudo apt install yarn</code></li>
+<li><code>yarn --version</code></li>
+</ol>
+</li>
+<li>yarn基本使用<ol>
+<li>初始化项目<code>yarn init</code></li>
+<li>添加依赖包<code>yarn add &#123;package&#125;</code>和<code>yarn add &#123;package&#125;@&#123;version&#125;</code></li>
+<li>添加依赖到不同的依赖项中<code>yarn add &#123;package&#125; --dev</code>和<code>yarn add [package] --peer</code>和<code>yarn add [package] --optional</code></li>
+<li>升级依赖包<code>yarn upgrade [package]</code>和<code>yarn upgrade [package]@[version]</code>和<code>yarn upgrade [package]@[tag]</code></li>
+<li>移除依赖包<code>yarn remove [package]</code></li>
+<li>安装全部依赖关系<code>yarn</code>或者<code>yarn install</code></li>
+</ol>
+</li>
+</ol>
+<h2 id="1-2-配置开发环境"><a href="#1-2-配置开发环境" class="headerlink" title="1.2 配置开发环境"></a>1.2 配置开发环境</h2><h3 id="1-2-1-代码编辑器"><a href="#1-2-1-代码编辑器" class="headerlink" title="1.2.1 代码编辑器"></a>1.2.1 代码编辑器</h3><p>个人还是非常喜欢使用vscode作为代码编辑器来使用。相对neovim还是比较好上手，但是最后还是过渡到neovim编辑器上</p>
+<h3 id="1-2-2-nodejs和npm的安装"><a href="#1-2-2-nodejs和npm的安装" class="headerlink" title="1.2.2 nodejs和npm的安装"></a>1.2.2 nodejs和npm的安装</h3><p><code>npm -v</code>查看npm版本，在ubuntu上面装nodejs并适配hexo工具会要求装很高版本的nodejs这里就要换安装方式</p>
+<h3 id="1-2-3-安装git"><a href="#1-2-3-安装git" class="headerlink" title="1.2.3 安装git"></a>1.2.3 安装git</h3><p>安装简单，直接<code>sudo apt install git</code>,但是使用还不太清楚</p>
+<h3 id="1-2-4-浏览器"><a href="#1-2-4-浏览器" class="headerlink" title="1.2.4 浏览器"></a>1.2.4 浏览器</h3><p>没什么好说的推荐使用chrome浏览器</p>
+<h2 id="1-3-针对windows用户的特殊说明"><a href="#1-3-针对windows用户的特殊说明" class="headerlink" title="1.3 针对windows用户的特殊说明"></a>1.3 针对windows用户的特殊说明</h2><p>我用的ubuntu所以不涉及，直接跳过</p>
+<h2 id="1-4-javascript-ES6-x2F-ES7"><a href="#1-4-javascript-ES6-x2F-ES7" class="headerlink" title="1.4 javascript ES6&#x2F;ES7"></a>1.4 javascript ES6&#x2F;ES7</h2><p>不同浏览器具有不同的执行JavaScript代码的解释器JavaScript作为互联网的客户端脚本语言被广泛采用，从而形成了标准组织来管理它的规范。规范的名称就是ECMAScript或ES。ES6有时称为ES2015，2015即它最终完成的年份。相应地，ES7通常被称为ES2016。</p>
+<h2 id="1-5-开始"><a href="#1-5-开始" class="headerlink" title="1.5 开始"></a>1.5 开始</h2><p>直接download源码，然后<code>cd</code>到对应目录下执行<code>npm install</code>安装相关依赖，<code>npm start</code> 启动服务器，<a href="http://localhost:3000来查看正在运行的应用程序">http://localhost:3000来查看正在运行的应用程序</a></p>
+<h2 id="1-6-什么组件"><a href="#1-6-什么组件" class="headerlink" title="1.6 什么组件"></a>1.6 什么组件</h2><p>构架react应用程序的的基础就是组件（一个class），可以将单独的react组件是为应用程序的一个UI组件，正如图中product hunt程序那样，包括了了一个父组件productList，和一个product子组件。</p>
+<p>React组件可以清晰的映射到UI组件，而且是独立的，标记代码，试图逻辑以及组件的特定样式集中的在一个地方。<br>比如父组件productList组件对应着一个product集合，然后是product组件对应着每一个UI中展示的组件，样式代码是不互相干扰的</p>
+<h3 id="1-6-1-第一个组件"><a href="#1-6-1-第一个组件" class="headerlink" title="1.6.1 第一个组件"></a>1.6.1 第一个组件</h3><p>示例代码 voting_app&#x2F;public&#x2F;js&#x2F;app-1.js</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        Hello<span class="token punctuation">,</span> friend<span class="token operator">!</span> <span class="token constant">I</span> am a basic React component<span class="token punctuation">.</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<ul>
+<li>ProductList组件继承了React.Component类的ES6库，index页面也引用了React框架库，ES6引入了<code>类</code>声明语法。ES6类是JavaScript基于原型的继承模型的语法糖</li>
+<li>声明组件有两种方式<ul>
+<li>第一种就是上面那种，像是java创建类一样，但是render方式是固定要实现的</li>
+<li>第二种就是使用create-response-class库中createReactClass()方法<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> createReactClass <span class="token keyword">from</span> <span class="token string">'create-react-class'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> HelloWorld <span class="token operator">=</span> <span class="token function">createReactClass</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+    <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span><span class="token punctuation">(</span><span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token punctuation">,</span> world<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span></code></pre>
+返回值的语法看起来和传统的JavaScript有些不像。该语法称为JavaScript扩展语法JSX,JSX代码最后会编译成vanilla JavaScript（原生JavaScript）</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-6-2-JSX"><a href="#1-6-2-JSX" class="headerlink" title="1.6.2 JSX"></a>1.6.2 JSX</h3><p><strong>React组件最终渲染为浏览器中显示的HTML</strong>,这个是我一开始使用没想明白的，其实React在做的根本的动作就是将所有东西都组装成HTML展示出来，这里面就涉及虚拟DOM对象，建JSX的目的是使表示HTML的JavaScript看起来更像HTML<br>常规js代码渲染</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">React<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'div'</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span><span class="token literal-property property">className</span><span class="token operator">:</span> <span class="token string">'ui items'</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+'
+Hello<span class="token punctuation">,</span> friend<span class="token operator">!</span> <span class="token constant">I</span> am a basic React component<span class="token punctuation">.</span>'
+<span class="token punctuation">)</span></code></pre>
+<p>JSX代码渲染</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui items'</span><span class="token operator">></span>
+Hello<span class="token punctuation">,</span> friend<span class="token operator">!</span> <span class="token constant">I</span> am a basic React component<span class="token punctuation">.</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span></code></pre>
+<p>后者的代码看起来更加的舒服，JSX在JavaScript版本上提供了轻量级抽象，虽然上面的JSX代码看起来与HTML几乎相同，但要记住JSX实际上是编译成了JavaScript</p>
+<h3 id="1-6-3-开发者控制台"><a href="#1-6-3-开发者控制台" class="headerlink" title="1.6.3 开发者控制台"></a>1.6.3 开发者控制台</h3><p>可以与application进行交互</p>
+<h3 id="1-6-4-Babel"><a href="#1-6-4-Babel" class="headerlink" title="1.6.4 Babel"></a>1.6.4 Babel</h3><p>Babel是一个JavaScript转译器,可以将ES6代码转译为ES5代码，它的另一个使用功能就是理解JSX语法.<br>在index页面我们带入babel</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>head<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> <span class="token operator">...</span> <span class="token operator">--</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>script src<span class="token operator">=</span><span class="token string">"vendor/babel-standalone.js"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> <span class="token operator">...</span> <span class="token operator">--</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>head<span class="token operator">></span></code></pre>
+<p>然后我们再告诉js运行时，代码需要由babel编译，通过设置如下选项</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>script src<span class="token operator">=</span><span class="token string">"./js/seed.js"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+<span class="token operator">&lt;</span>script
+  type<span class="token operator">=</span><span class="token string">"text/babel"</span>
+  data<span class="token operator">-</span>plugins<span class="token operator">=</span><span class="token string">"transform-class-properties"</span>
+  src<span class="token operator">=</span><span class="token string">"./js/app.js"</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+</code></pre>
+<p>index页面导入了相关的js代码和react代码，所以就在调用react相关的功能</p>
+<h3 id="1-6-5-ReactDOM-render-方法"><a href="#1-6-5-ReactDOM-render-方法" class="headerlink" title="1.6.5 ReactDOM.render()方法"></a>1.6.5 ReactDOM.render()方法</h3><p>voting_app&#x2F;public&#x2F;js&#x2F;app-1.js 。 我们要再特定的DOM节点渲染这个ProductList组件</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+
+<span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+    Hello<span class="token punctuation">,</span> friend<span class="token operator">!</span> <span class="token constant">I</span> am a basic React component<span class="token punctuation">.</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+<span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>这个ReactDOM.render继承自React库，其中有两个参数，一个是what，也就是你要渲染渲染哪个组件，第二个参数是where，也就是在哪个DOM节点进行渲染<br>一般情况下我们自己编写的组件使用ProductList这样的名字，原生的HTML使用小写的。</p>
+<p>现在刷新页面我们发现整个流程是babel将JSX代码转译为ES5然后ReactDOM.render()将组件写入DOM</p>
+<h2 id="1-7-构建Product组件"><a href="#1-7-构建Product组件" class="headerlink" title="1.7 构建Product组件"></a>1.7 构建Product组件</h2><p>代码样例是voting_app&#x2F;public&#x2F;js&#x2F;app-2.js,</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">
+<span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>Product <span class="token operator">/</span><span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'item'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'image'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>img src<span class="token operator">=</span><span class="token string">'images/products/image-aqua.png'</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'middle aligned content'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'description'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a<span class="token operator">></span>Fort Knight<span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token operator">&lt;</span>p<span class="token operator">></span>Authentic renaissance actors<span class="token punctuation">,</span> delivered <span class="token keyword">in</span> just two weeks<span class="token punctuation">.</span><span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'extra'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>span<span class="token operator">></span>Submitted by<span class="token operator">:</span><span class="token operator">&lt;</span><span class="token operator">/</span>span<span class="token operator">></span>
+            <span class="token operator">&lt;</span>img
+              className<span class="token operator">=</span><span class="token string">'ui avatar image'</span>
+              src<span class="token operator">=</span><span class="token string">'images/avatars/daniel.jpg'</span>
+            <span class="token operator">/</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>这里可以看到Product组件引用了外部的css样式，jsx代码会被转译为常规的js代码，所以我们不能在jsx中使用js保留字<code>class</code>是保留字，但是react让我们使用className作为属性名称<br>如示例代码所示，jsx不是最终渲染到HTML的代码，要使用Product组件，我们要修改ProductList父组件的render()方法输出，换个思路想其实就是在父组件的render方法中渲染子组件的jsx代码，然后子组件在调用自己render()方法进行渲染</p>
+<h2 id="1-8-让数据驱动Product组件"><a href="#1-8-让数据驱动Product组件" class="headerlink" title="1.8 让数据驱动Product组件"></a>1.8 让数据驱动Product组件</h2><h3 id="1-8-1-数据模型"><a href="#1-8-1-数据模型" class="headerlink" title="1.8.1 数据模型"></a>1.8.1 数据模型</h3><p>这节也就是使用如何在使用seed.js这个预定义的数组数据，并定义了generateVoteCount()函数来模拟票数</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">
+window<span class="token punctuation">.</span>Seed <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">function</span> <span class="token function">generateVoteCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> Math<span class="token punctuation">.</span><span class="token function">floor</span><span class="token punctuation">(</span><span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">50</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">15</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">const</span> products <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">'Yellow Pail'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'On-demand sand castle construction expertise.'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'#'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">votes</span><span class="token operator">:</span> <span class="token function">generateVoteCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">submitterAvatarUrl</span><span class="token operator">:</span> <span class="token string">'images/avatars/daniel.jpg'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">productImageUrl</span><span class="token operator">:</span> <span class="token string">'images/products/image-aqua.png'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">'Supermajority: The Fantasy Congress League'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'Earn points when your favorite politicians pass legislation.'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'#'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">votes</span><span class="token operator">:</span> <span class="token function">generateVoteCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">submitterAvatarUrl</span><span class="token operator">:</span> <span class="token string">'images/avatars/kristy.png'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">productImageUrl</span><span class="token operator">:</span> <span class="token string">'images/products/image-rose.png'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">'Tinfoild: Tailored tinfoil hats'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'We already have your measurements and shipping address.'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'#'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">votes</span><span class="token operator">:</span> <span class="token function">generateVoteCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">submitterAvatarUrl</span><span class="token operator">:</span> <span class="token string">'images/avatars/veronika.jpg'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">productImageUrl</span><span class="token operator">:</span> <span class="token string">'images/products/image-steel.png'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">'Haught or Naught'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'High-minded or absent-minded? You decide.'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'#'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">votes</span><span class="token operator">:</span> <span class="token function">generateVoteCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">submitterAvatarUrl</span><span class="token operator">:</span> <span class="token string">'images/avatars/molly.png'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">productImageUrl</span><span class="token operator">:</span> <span class="token string">'images/products/image-yellow.png'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">products</span><span class="token operator">:</span> products <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+
+<h3 id="1-8-2-使用props"><a href="#1-8-2-使用props" class="headerlink" title="1.8.2 使用props"></a>1.8.2 使用props</h3><p>我们可以使用props属性在父组件和子组件中进行传递数据，这里就需要使用props属性<br>示例代码voting_app&#x2F;public&#x2F;js&#x2F;app-3.js</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">
+<span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> product <span class="token operator">=</span> Seed<span class="token punctuation">.</span>products<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>Product
+          id<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+          title<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+          description<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+          url<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span>
+          votes<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+          submitterAvatarUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+          productImageUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span>
+        <span class="token operator">/</span><span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'item'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'image'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>img src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'middle aligned content'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'header'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a<span class="token operator">></span>
+              <span class="token operator">&lt;</span>i className<span class="token operator">=</span><span class="token string">'large caret up icon'</span> <span class="token operator">/</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'description'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token operator">&lt;</span>p<span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'extra'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>span<span class="token operator">></span>Submitted by<span class="token operator">:</span><span class="token operator">&lt;</span><span class="token operator">/</span>span<span class="token operator">></span>
+            <span class="token operator">&lt;</span>img
+              className<span class="token operator">=</span><span class="token string">'ui avatar image'</span>
+              src<span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+            <span class="token operator">/</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+
+<p>在JSX内部的任何地方插入一个变量，都需要用大括号（{}）来分隔变量,组件可以通过this.props对象访问所有的props. 这里注意到数组取了下标<code>Seed.products[0]</code></p>
+<h3 id="1-8-3-渲染多个产品"><a href="#1-8-3-渲染多个产品" class="headerlink" title="1.8.3 渲染多个产品"></a>1.8.3 渲染多个产品</h3><p>Array对象的map()方法将函数作为参数。它使用数组内的每个子项,来调用此函数，并使用每个函数调用的返回值来构建一个新数组,因为Seed.products数组有四个子项，所以map()方法会调用此函数四次，每个子项一次。当map()方法调用此函数时，它将每个子项作为第一个参数传入。此函数调用的返回值将插入map()方法正在构建的新数组中。在处理完最后一个子项后，map()方法就会返回这个新数组。这里我们把这个新数组存储在productComponents变量中。<br>示例代码 voting_app&#x2F;public&#x2F;js&#x2F;app-4.js</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">
+<span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 对product进行排序</span>
+
+    <span class="token comment">// const products = Seed.products.sort((a, b) => (</span>
+    <span class="token comment">//   b.votes - a.votes</span>
+    <span class="token comment">// ));</span>
+    <span class="token comment">//这里其实是新数组</span>
+    <span class="token keyword">const</span> productComponents <span class="token operator">=</span> Seed<span class="token punctuation">.</span>products<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">product</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>Product
+        key<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'product-'</span> <span class="token operator">+</span> product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        id<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        title<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+        description<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+        url<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span>
+        votes<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+        submitterAvatarUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+        productImageUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span>
+      <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        <span class="token punctuation">&#123;</span>productComponents<span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'item'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'image'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>img src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'middle aligned content'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'header'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a<span class="token operator">></span>
+              <span class="token operator">&lt;</span>i className<span class="token operator">=</span><span class="token string">'large caret up icon'</span> <span class="token operator">/</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'description'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token operator">&lt;</span>p<span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'extra'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>span<span class="token operator">></span>Submitted by<span class="token operator">:</span><span class="token operator">&lt;</span><span class="token operator">/</span>span<span class="token operator">></span>
+            <span class="token operator">&lt;</span>img
+              className<span class="token operator">=</span><span class="token string">'ui avatar image'</span>
+              src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+            <span class="token operator">/</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code></pre>
+
+<h2 id="1-9-应用程序的第一次交互：投票事件的响应"><a href="#1-9-应用程序的第一次交互：投票事件的响应" class="headerlink" title="1.9 应用程序的第一次交互：投票事件的响应"></a>1.9 应用程序的第一次交互：投票事件的响应</h2><p>Product组件无法修改它的票数，因为this.props对象是不可变的。虽然子组件可以读取props但是无法修改它子组件不是props的所有者。<br>也就是说父组件是props的拥有者，而子组件不拥有props。</p>
+<p>Product组件需要有一个方法让ProductList组件知道它的向上投票图标被点击，接着可以让ProductList组件更新子组件的对应的票数，然后更新的数据从父组件流向子组件</p>
+<h3 id="1-9-1-事件的传递"><a href="#1-9-1-事件的传递" class="headerlink" title="1.9.1 事件的传递"></a>1.9.1 事件的传递</h3><p>我们知道父组件通过props向子组件传递数据。因为<strong>props是不可变的</strong>，所以子组件需要某种方式来向父组件传递事件。然后父组件可以进行任何必要的数据更改。记住是父组件拥有props。那么这些是如何运转的呢？ProductList组件中的handleProductUpVote函数只接收一个名为productId的参数。该函数会将产品的id记录到控制台：<br>首先，html中记录鼠标的点击事件，并绑定到该组件的对应的函数上，然后函数在调用父组件的函数。<br>如代码voting_app&#x2F;public&#x2F;js&#x2F;app-6.js所示</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">
+<span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 定义了函数</span>
+  <span class="token function">handleProductUpVote</span><span class="token punctuation">(</span><span class="token parameter">productId</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>productId <span class="token operator">+</span> <span class="token string">' was upvoted.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> products <span class="token operator">=</span> Seed<span class="token punctuation">.</span>products<span class="token punctuation">.</span><span class="token function">sort</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">a<span class="token punctuation">,</span> b</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      b<span class="token punctuation">.</span>votes <span class="token operator">-</span> a<span class="token punctuation">.</span>votes
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> productComponents <span class="token operator">=</span> products<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">product</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>Product
+        key<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'product-'</span> <span class="token operator">+</span> product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        id<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        title<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+        description<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+        url<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span>
+        votes<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+        submitterAvatarUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+        productImageUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span>
+        <span class="token comment">// 属性名是onVote,然后将定义的函数handleProductUpVote赋值给onVote</span>
+        onVote<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleProductUpVote<span class="token punctuation">&#125;</span>
+      <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        <span class="token punctuation">&#123;</span>productComponents<span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">handleUpVote</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// Inside `Product`</span>
+  <span class="token function">handleUpVote</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//然后函数调用了父组件传递过来的函数，换句话说就是再次调用了父组件中方法</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span><span class="token function">onVote</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'item'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'image'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>img src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token punctuation">&#123;</span><span class="token comment">/* Inside `render` for Product` */</span><span class="token punctuation">&#125;</span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'middle aligned content'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'header'</span><span class="token operator">></span>
+            <span class="token comment">//onClick接收点击事件， 然后传递给该组件的handleUpVote函数。</span>
+            <span class="token operator">&lt;</span>a onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token operator">&lt;</span>i className<span class="token operator">=</span><span class="token string">'large caret up icon'</span> <span class="token operator">/</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'description'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token operator">&lt;</span>p<span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'extra'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>span<span class="token operator">></span>Submitted by<span class="token operator">:</span><span class="token operator">&lt;</span><span class="token operator">/</span>span<span class="token operator">></span>
+            <span class="token operator">&lt;</span>img
+              className<span class="token operator">=</span><span class="token string">'ui avatar image'</span>
+              src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+            <span class="token operator">/</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code></pre>
+<p>这里是比较奇怪的部分：在render()函数中工作时，我们已目睹了this总是绑定到当前组件，但在自定义的组件方法handleUpVote()中，this的值实际上是null。</p>
+<h3 id="1-9-2-绑定自定义组件方法"><a href="#1-9-2-绑定自定义组件方法" class="headerlink" title="1.9.2 绑定自定义组件方法"></a>1.9.2 绑定自定义组件方法</h3><p>原来自定义组件中的自定义方法的this指针不指向当前组件，见鬼！简而言之就是React的方法都已经绑定了this<br>对于自定义组件的自定义方法，需要用些手段进行绑定。</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">handleUpVote</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+</code></pre>
+<p>那么上面代码是如何运行的，首先先到用constructor(props)函数来进行初始化，然受super(props)会调用父组件的constructor()函数<br><code>this.handleUpVote = this.handleUpVote.bind(this);</code>通过这行代码我们重新定义了组件的handleUpVote()方法，并将其赋值到相同的函数，但绑定到this变量（组件）下。现在，每当handleUpVote()函数执行时，this将引用当前组件而不是null。</p>
+<h3 id="1-9-3-使用state"><a href="#1-9-3-使用state" class="headerlink" title="1.9.3 使用state"></a>1.9.3 使用state</h3><p>props是不可变的并且由组件的父级所拥有，而state由组件拥有。this.state是组件私有的，我们将看到它可以使用this.setState()方法进行更改。<br>当组件的state更新时就是重新渲染页面，每个React组件都是作为一个由this.props和this.state组成的函数来渲染的。这种渲染是确定性的。这意味着若给定一组props和一组<br>state，React组件将始终以一种方式渲染。</p>
+<p>ProductList组件将此状态的所有者，会将state作为props传递给Product组件</p>
+<p>接下来的例子将会进行初始化state初始值，voting_app&#x2F;public&#x2F;js&#x2F;app-7.js </p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">
+<span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>state <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">products</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">products</span><span class="token operator">:</span> Seed<span class="token punctuation">.</span>products <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">handleProductUpVote</span><span class="token punctuation">(</span><span class="token parameter">productId</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>productId <span class="token operator">+</span> <span class="token string">' was upvoted.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> products <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>products<span class="token punctuation">.</span><span class="token function">sort</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">a<span class="token punctuation">,</span> b</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      b<span class="token punctuation">.</span>votes <span class="token operator">-</span> a<span class="token punctuation">.</span>votes
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> productComponents <span class="token operator">=</span> products<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">product</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>Product
+        key<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'product-'</span> <span class="token operator">+</span> product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        id<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        title<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+        description<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+        url<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span>
+        votes<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+        submitterAvatarUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+        productImageUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span>
+        onVote<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleProductUpVote<span class="token punctuation">&#125;</span>
+      <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        <span class="token punctuation">&#123;</span>productComponents<span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">handleUpVote</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">handleUpVote</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span><span class="token function">onVote</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'item'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'image'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>img src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'middle aligned content'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'header'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token operator">&lt;</span>i className<span class="token operator">=</span><span class="token string">'large caret up icon'</span> <span class="token operator">/</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'description'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token operator">&lt;</span>p<span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'extra'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>span<span class="token operator">></span>Submitted by<span class="token operator">:</span><span class="token operator">&lt;</span><span class="token operator">/</span>span<span class="token operator">></span>
+            <span class="token operator">&lt;</span>img
+              className<span class="token operator">=</span><span class="token string">'ui avatar image'</span>
+              src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+            <span class="token operator">/</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>ProductList组件现在已由自己拥有的状态驱动了。如果现在保存并刷<br>新，所有的产品都会消失。这是因为在ProductList组件中没有任何机<br>制可以将产品添加到它的state中。</p>
+<h3 id="1-9-4-使用this-setState-设置state"><a href="#1-9-4-使用this-setState-设置state" class="headerlink" title="1.9.4 使用this.setState()设置state"></a>1.9.4 使用this.setState()设置state</h3><p>React指定了一组生命周期方法。在组件挂载到页面之后，React会调用<code>componentDidMount()</code>生命周期方法。我们将在此方法中为ProductList组件的state赋值。React为组件提供了this.setState()方法，用于state初始化之后的所有修改操作。除此之外，该方法会触发React组件重新渲染，这在state更改后非常重要。</p>
+<blockquote>
+<p>永远不要在this.setState()方法之外修改state。它为state修改提供了重要的Hook，我们不能绕过它。</p>
+</blockquote>
+<p>该组件在挂载时state是一个空的this.state.products数组。挂载后，我们使用Seed对象的数据为state赋值。该组件将重新渲染，产品也将显示出来。这是以用户察觉不到的速度发生的。<br>voting_app&#x2F;public&#x2F;js&#x2F;app-8.js </p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>state <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">products</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">products</span><span class="token operator">:</span> Seed<span class="token punctuation">.</span>products <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">handleProductUpVote</span><span class="token punctuation">(</span><span class="token parameter">productId</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>productId <span class="token operator">+</span> <span class="token string">' was upvoted.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> products <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>products<span class="token punctuation">.</span><span class="token function">sort</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">a<span class="token punctuation">,</span> b</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      b<span class="token punctuation">.</span>votes <span class="token operator">-</span> a<span class="token punctuation">.</span>votes
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> productComponents <span class="token operator">=</span> products<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">product</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>Product
+        key<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'product-'</span> <span class="token operator">+</span> product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        id<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        title<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+        description<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+        url<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span>
+        votes<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+        submitterAvatarUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+        productImageUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span>
+        onVote<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleProductUpVote<span class="token punctuation">&#125;</span>
+      <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        <span class="token punctuation">&#123;</span>productComponents<span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">handleUpVote</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">handleUpVote</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span><span class="token function">onVote</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'item'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'image'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>img src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'middle aligned content'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'header'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token operator">&lt;</span>i className<span class="token operator">=</span><span class="token string">'large caret up icon'</span> <span class="token operator">/</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'description'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token operator">&lt;</span>p<span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'extra'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>span<span class="token operator">></span>Submitted by<span class="token operator">:</span><span class="token operator">&lt;</span><span class="token operator">/</span>span<span class="token operator">></span>
+            <span class="token operator">&lt;</span>img
+              className<span class="token operator">=</span><span class="token string">'ui avatar image'</span>
+              src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+            <span class="token operator">/</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<h2 id="1-10-更新state和不变性"><a href="#1-10-更新state和不变性" class="headerlink" title="1.10 更新state和不变性"></a>1.10 更新state和不变性</h2><p>我们刚刚讨论过只能使用this.setState()方法修改state。因此，虽然组件可以修改它的state，但我们应该将this.state对象视为不可变的。</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> nextNums <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>nums<span class="token punctuation">;</span>
+nextNums<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>nextNums<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// [ 1, 2, 3, 4]</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>nums<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// [ 1, 2, 3, 4] &lt;-- Nope!</span></code></pre>
+<p>新变量nextNums与this.state.nums引用的是内存中的相同数组</p>
+<p>不过可以使用Array对象的concat()方法代替。concat()方法创建了一个新数组，该数组包含调用它的数组元素，后面是作为参数传入的元素。</p>
+<blockquote>
+<p>将state对象视为不可变的，对于了解这些对象是被哪些Array和Object的方法调用并修改的非常重要。</p>
+</blockquote>
+<p>products初始化为this.state.products时，products与this.state.products都引用内存中相同的数组,如例子voting_app&#x2F;public&#x2F;js&#x2F;app-8.js 所示。Products和this.state.products两个变量都引用内存中的相同数组.因此，当我们通过forEach()方法增加某个product的票数来修改该product对象时，同时也修改了state中的原始product对象<br>正确写法应该是voting_app&#x2F;public&#x2F;js&#x2F;app-9.js所示</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">/* eslint-disable no-param-reassign, operator-assignment */</span>
+
+<span class="token keyword">class</span> <span class="token class-name">ProductList</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>state <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">products</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>handleProductUpVote <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">handleProductUpVote</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">products</span><span class="token operator">:</span> Seed<span class="token punctuation">.</span>products <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// Inside `ProductList`</span>
+  <span class="token function">handleProductUpVote</span><span class="token punctuation">(</span><span class="token parameter">productId</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// map函数只是遍历数组</span>
+    <span class="token keyword">const</span> nextProducts <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>products<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">product</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>product<span class="token punctuation">.</span>id <span class="token operator">===</span> productId<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> product<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+          <span class="token literal-property property">votes</span><span class="token operator">:</span> product<span class="token punctuation">.</span>votes <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> product<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">products</span><span class="token operator">:</span> nextProducts<span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> products <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>products<span class="token punctuation">.</span><span class="token function">sort</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">a<span class="token punctuation">,</span> b</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      b<span class="token punctuation">.</span>votes <span class="token operator">-</span> a<span class="token punctuation">.</span>votes
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> productComponents <span class="token operator">=</span> products<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">product</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>Product
+        key<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'product-'</span> <span class="token operator">+</span> product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        id<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>id<span class="token punctuation">&#125;</span>
+        title<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+        description<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+        url<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span>
+        votes<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+        submitterAvatarUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+        productImageUrl<span class="token operator">=</span><span class="token punctuation">&#123;</span>product<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span>
+        onVote<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleProductUpVote<span class="token punctuation">&#125;</span>
+      <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'ui unstackable items'</span><span class="token operator">></span>
+        <span class="token punctuation">&#123;</span>productComponents<span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">handleUpVote</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">handleUpVote</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span><span class="token function">onVote</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'item'</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'image'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>img src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>productImageUrl<span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'middle aligned content'</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'header'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token operator">&lt;</span>i className<span class="token operator">=</span><span class="token string">'large caret up icon'</span> <span class="token operator">/</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>votes<span class="token punctuation">&#125;</span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'description'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>url<span class="token punctuation">&#125;</span><span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>title<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+            <span class="token operator">&lt;</span>p<span class="token operator">></span>
+              <span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>description<span class="token punctuation">&#125;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+          <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token string">'extra'</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>span<span class="token operator">></span>Submitted by<span class="token operator">:</span><span class="token operator">&lt;</span><span class="token operator">/</span>span<span class="token operator">></span>
+            <span class="token operator">&lt;</span>img
+              className<span class="token operator">=</span><span class="token string">'ui avatar image'</span>
+              src<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>submitterAvatarUrl<span class="token punctuation">&#125;</span>
+            <span class="token operator">/</span><span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProductList <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>首先，使用map()方法遍历products数组。重要的是，map()方法返回新数组，而不是修改this.state.products数组。其次，比较当前product是否与productId匹配。如果两者匹配，那么创建新对象并复制原始product对象的属性。然后重写新product对象上的votes属性，并将其赋值为增加后的票数。我们使用Object的assign()方法来执行这些操作：最后使用setState()方法来更新state。说白了就是这个例子做了change是在副本上做的change而没有更新元数据</p>
+<p>Object.assign()方法详解</p>
+<ol>
+<li><p>第四行代码为什么是true</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> target <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">a</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token literal-property property">b</span><span class="token operator">:</span> <span class="token number">2</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> source <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">b</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token literal-property property">c</span><span class="token operator">:</span> <span class="token number">5</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> returnedTarget <span class="token operator">=</span> Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> source<span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// expected output: Object &#123; a: 1, b: 4, c: 5 &#125;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>returnedTarget <span class="token operator">===</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// expected output: true</span></code></pre>
+<p>这是因为这样的写法Object.assign(target, source);是返回的修改的target，就是说并没有创建新的对象</p>
+</li>
+<li><p>Cloning an object</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">a</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> copy <span class="token operator">=</span> Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>copy<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// &#123; a: 1 &#125;</span></code></pre>
+<p>这种写法是创建了一个新对象</p>
+</li>
+<li><p>Merging objects</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> o1 <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">a</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> o2 <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">b</span><span class="token operator">:</span> <span class="token number">2</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> o3 <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">c</span><span class="token operator">:</span> <span class="token number">3</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> obj <span class="token operator">=</span> Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span> o2<span class="token punctuation">,</span> o3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// &#123; a: 1, b: 2, c: 3 &#125;</span></code></pre>
+<p>If the source value is a reference to an object, it only copies the reference value.只是merge</p>
+</li>
+<li><p>merging objects and create new reference</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> o1 <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">a</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token literal-property property">b</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token literal-property property">c</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> o2 <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">b</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token literal-property property">c</span><span class="token operator">:</span> <span class="token number">2</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> o3 <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">c</span><span class="token operator">:</span> <span class="token number">3</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> obj <span class="token operator">=</span> Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> o1<span class="token punctuation">,</span> o2<span class="token punctuation">,</span> o3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// &#123; a: 1, b: 2, c: 3 &#125;</span></code></pre></li>
+</ol>
+<h2 id="1-11-用Babel插件重构transform-class-properties"><a href="#1-11-用Babel插件重构transform-class-properties" class="headerlink" title="1.11 用Babel插件重构transform-class-properties"></a>1.11 用Babel插件重构transform-class-properties</h2><h3 id="1-11-2-属性初始化器"><a href="#1-11-2-属性初始化器" class="headerlink" title="1.11.2 属性初始化器"></a>1.11.2 属性初始化器</h3><h3 id="1-11-3-重构Product组件"><a href="#1-11-3-重构Product组件" class="headerlink" title="1.11.3 重构Product组件"></a>1.11.3 重构Product组件</h3><p>如上文所讲，handleUpVote()方法是自定义组件的自定义方法，所以React不会将该方法内部的this绑定到组件。因此我们必须在构造函<br>数中手动执行绑定：</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+<span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">this</span><span class="token punctuation">.</span>handleUpVote <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">handleUpVote</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token function">handleUpVote</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span><span class="token function">onVote</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></code></pre>
+<p>使用transform-class-properties插件，我们可以将handleUpVote<br>写为箭头函数。这会确保函数内部的this能绑定到当前组件，正如预<br>期：</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+<span class="token function-variable function">handleUpVote</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+<span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span><span class="token function">onVote</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>id<span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></code></pre>
+<p>使用此特性，可以删除constructor()函数，无须手动绑定调用。</p>
+<h3 id="1-11-4-重构ProductList组件"><a href="#1-11-4-重构ProductList组件" class="headerlink" title="1.11.4 重构ProductList组件"></a>1.11.4 重构ProductList组件</h3><p>同样道理ProductList组件也可以使用箭头函数进行重构</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/javascript/javascrip%E9%AB%98%E7%BA%A7%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/"
+                    data-tooltip="javascrip高级程序设计"
+                    aria-label="PREVIOUS: javascrip高级程序设计"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/react/react_quicker/"
+                    data-tooltip="react快速上手开发"
+                    aria-label="NEXT: react快速上手开发"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/react/fullstack_react/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/javascript/javascrip%E9%AB%98%E7%BA%A7%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/"
+                    data-tooltip="javascrip高级程序设计"
+                    aria-label="PREVIOUS: javascrip高级程序设计"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/react/react_quicker/"
+                    data-tooltip="react快速上手开发"
+                    aria-label="NEXT: react快速上手开发"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/react/fullstack_react/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/react/fullstack_react/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-2mrdgre6o8oumjyqh1gawnnqlakhnetes6k3qnahlvgvfzutbbznavmu0avb.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/web/react/fullstack_react/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

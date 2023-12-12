@@ -1,0 +1,1191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>王道数据结构 - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"对付看吧,虽然打心眼里感觉不是什么好书\n\n\n\n2. 线性表2.1 线性表的定义和基本操作2.1.1. 线性表的定义线性表是具有相同数据类型的n个数据的有序序列，其中n为表长，出第一个元素外，只有唯一一个直接前驱，除最后一个元素外，只有唯一一个后继。故可总结:\n\n表中元素有限.\n表元素具有逻辑上的顺序,表中元素有先后顺序.\n表中元素都是数据元素，每个元素都是单个元素.\n表中元素的数据类型都相同，这意味着每个元素占有相同大小的存储空间.\n表中元素具有抽象性，即仅讨论元素间的逻辑关系，而不考虑元素究竞表示什么内容.\n\n2.1.2 线性表的基本操作InitList(&amp;L)        //初始化表，构建一个空的线性表\nLength(L)           //秋表长\nLocateElem(L,e)     //按值查找\nGetElem(L，i)       //按位查找操作。获取表L中第  个位置的元素的值。\nListInsert(&amp;l,i,e)  //插入操作。在表L中的第个位置上插入指定元素 e。\nListDelete(&amp;L,i,se) //删除操作。删除表中第 个位置的元素，并用e 返回删除元素的值。\nPrintList(L)        //输出操作。按前后顺序输出线性表工的所有元素值。\nEmpty(L)            //判空操作。若L为空表，则返 true，否则返回 false。\nDestroyList(&amp;L)     //销毁操作。销毁线件表，并释放线性表工所占用的内存空间\n\n2.2 线性表的顺序表示2.2.1 顺序表的定义线性表的顺序存储又称顺序表。它是用一组地址连续的存储单元依次存储线性表中的数据元素，从而使得逻辑上相邻的两个元素在物理位置上也相邻。第1个元素存储在线性表的起始位置,第i个元素的存储位置后面紧接着存储的是第i+1个元素，称为元素在线性表中的位序。因此，顺序表的特点是表中元素的逻辑顺序与其物理顺序相同。假设线性表 L存储的起始位置为 LOC(A)，sizeof(ElemType)是每个数据元素所占用存储空间的大小，则表L所对应的顺序存储如图 2.1 所示如下。\n\n\n\n数组下标\n顺序表\n内存地址\n\n\n\n0\n\nLOC(A)\n\n\n1\n\nLOC(A)+sizeof(ElemType)\n\n\n2\n\nLOC(A)+(i-1)sizeof(ElemType)\n\n\n每个数据元素的存储位置都和线性表的起始位置相差一个和该数据元素的位序成正比的常数，因此，线性表中的任一数据元素都可以随机存取，所以线性表的顺序存储结构是一种随机存取的存储结构。通常用高级程序设计语言中的数组来描述线性表的顺序存储结构。则线性表的顺序存储类型描述是\n#define MaxSize 50\ntypedef struct {P\n    ElemType data[Maxsize];\n    int length;\n} SqList\n一维数组可以是静态分配的，也可以是动态分配的。  \n\n在静态分配时，由于数组的大小和空问事先已经固定，一旦空间占满，再加入新的数据就会产生溢出，进而导致程序崩溃。\n而在动态分配时，存储数组的空间是在程序执行过程中通过动态存储分配语句分配的，一旦数据空间占满，就另外开辟一块更大的存储空间，用以替换原来的存储空间，从而达到扩充存储数组空间的目的，而不需要为线性表一次性地划分所有空间。比如高级语言当中的java的linkList，golang的slice\n\ntypedef struct(\n    ElemType *data //变量名的指针\n    int MaxSize,length;\n) SegList;\n\n// C的初始动态分配语句为\nL.data=(ElemType*)malloc(sizeof(ElemType)*InitSize);\n// C++的初始动态分配语何为\nL.data=new ElemType[Initsize] //初始化指定长度;\n顺序表最主要的特点是随机访问，即通过首地址和元素序号可在时间 O(1)内找到指定的元素。顺序表的存储密度高，每个结点只存储数据元素。顺序表逻辑上相邻的元素物理上也相邻，所以插入和删除操作需要移动大量元素\n2.2.2 顺序表上基本操作的实现\n插入数据在顺序表L的i位置插入元素e\n\n// 1,2,3,4,5,6\n// 0,1,2,3,4,5\npublic void insert(int[] *listArray, int index, Object obj) throws Exception {\n         // TODO Auto-generated method stub\n         //如果当前线性表已满，那就不允许插入数据\n         if (size == maxSize) {\n             throw new Exception(\"顺序表已满，无法插入！\");\n         }\n         //插入位置编号是否合法\n         if (index &lt; 0 || index &gt; size) {\n             throw new Exception(\"参数错误！\");\n         }\n         //移动元素\n         for (int j = size - 1; j &gt;= index; j--) {\n             listArray[j + 1] = listArray[j];\n         }\n \n         listArray[index] = obj;  //不管当前线性表的size是否为零，这句话都能正常执行，即都能正常插入\n         size++;\n}\n\n最好情况: 在表尾插入(i=n+1)，元素后移语句不执行最坏情况: 最表头插入(i=1),元素后移语句将被执行n次平均情况: 假设,则在长度为n的线性表中插入一个节点所需移动的平均次数\n\n\n删除操作\n\n删除顺序表 L中第 i (1&lt;=i&lt;=L.length)个位置的元素，用引用变量 e 返回。若i的输入不合法，则返回false，否则，将被删元素赋给引用变量 e，并将第 +1个元素及其后的所有元素依次往前移动一个位置，返回 true。\n// 注意L的数据结构\n\nbool ListDelete(SqList &amp;L , int i , Elementype &amp;e){\n    if (i&lt;1||i&gt;L.length){\n        return false\n    }\n    e=L.data[i-1]\n    for (int j=i;j&lt;L.length;j++){\n        L.data[j-1]=L.data[j]\n    }\n    L.length--\n    return true\n}\n\n\n最好情况:删除表尾元素(即i=n)，无须移动元素，时间复杂度为 O(1)。最坏情况:删除表头元素(即i= 1)，需移动除表头元素外的所有元素，时间复杂度为 O(n)平均情况:假设  是删除第i个位置上结点的概率，则在长度为n的线性表中删除一个结点时，所需移动结点的平均次数为\n\n因此，线性表删除算法的平均实践复杂度为O(n)\n\n按值查找\n\n查找第一个元素值等于e的元素\nint LocateElem(SqList L,ElemType e){\n    int i;\n    for (i=0;i&lt;L.length;i++){\n        if (L.data[i]==e){\n            return i+1\n        }\n    }\n}\n\n\n最好情况: 查找的元素就在表头，仅需比较一次，时间复杂度为 O(1)。最坏情况:查找的元素在表尾(或不存在) 时，需要比较 n 次，时间复杂度为 (O)平均情况:假设  是查的素在第 (1&lt;=i&lt;=L.length)个位置上的概率则在长度为 n 的线性表中查找值为 e 的元素所需比较的平均次数为\n\n因此线性查找算法的平均复杂度为O(n)\n2.3 线性表的链式表示顺序表可以随时存取表中的任意一个元素，它的存储位置可以用一个简单直观的公式表示。但是链式存储线性表时，不需要移动大量的元素，它通过建立起数据之间的逻辑链接关系，因而插入和删除不需要移动元素，而只需要修改指针。\n2.3.1 单链表的表示线性表的链式存储又叫单链表，它是通过一组任意的存储单元来存储线性表中的数据元素，为了建立数据元素之间的线性关系，对每个链表节点，除存放元素自身的信息外，还需要放一个指向后继几点的指针，单链表的结构如下图所示 [ data | next ]\n\ntypedef struct LNode{\n    ElemType data;\n    struct LNode *next;\n} *LinkList;\n\n利用单链表可以解决顺序表需要大量存储单元的缺点。但是但李娜表附加指针域，也存在浪费存储空间的缺点，由于单链表的元素离散地分布在存储空间中，所以单链表的非随机存取的存储结构，即不能直接找到表中某个特定的节点。当找到特定的节点时需要从表头依次遍历。头指针来标识一个单链表，如单链表L.头节点通常是data为空的节点，也可以记录些链表的长度信息等等头节点和头指针的区分:不管带不带头节点，头指针都始终指向链表的第一个节点，而头节点是带头结点的链表中的第一个节点，节点内通常不存储信息引入头节点，可以带来两个优点：\n\n由于第一个数据节点的位置被存放在头节点的指针域中，因此在链表的第一个位置上的操作和在表的其他位置上的操作一致，无须进行特殊处理\n无论链表是否为空，其头指针都指向头节点非空指针，因此空表和非空表的处理也就得到了统一\n\n2.3.2 单链表的操作\n采用头插法建立单链表\n\n该方法是从一个空表开始的，生成新节点，并将读取到的数据存储到新节点的数据域中，然后将新节点插入到当前链表的表头，即头节点之后头插法建立单链表的算法如下:\nLinkList List_HeadInsert(LinkList &amp;L){\n    LNode *s , int x;\n\n    L=(LinkList)malloc(sizeof(LNode)); //创建头节点\n    L-&gt;next=null; //初始化为空链表\n    scanf(\"%d\",&amp;x);\n    while(x!=9999){\n        s=(LNode*)malloc(sizeof(LNode));\n        s-&gt;data=x;\n        s-&gt;next=L-&gt;next; //说白了也就是把s的\n        L-&gt;next=s;\n        scanf(\"%d\",&amp;x);\n    }\n    return L;\n}\n\n采用头插法建立单链表的算法虽然简单，但是生成的链表中的节点的输入顺序和链表中元素的顺序是相反的，若希望一致可采用尾插法，插入时间复杂度O(1)，读取时间复杂度为O(n)\n\n尾插法建立单链表\n\n头插法建立单链表的算法虽然简单，但生成的链表中结点的次序和输入数据的顺序不一致。若希望两者次序一致，则可采用尾插法。该方法将新结点插入到当前链表的表尾，为此必须增加一个尾指针 r，使其始终指向当前链表的尾结点，如图 2.6 所示。采用尾插法的算法如下\nLinkList List_TailInsert(LinkList &amp;L){\n    int x;\n    L=(LinkList)malloc*(sizeof(LNode))\n    LNode *s,*r =L;\n    scanf(\"%d\",&amp;x);\n    while(x!=9999){\n        s=(LNode *)malloc(sizeof(LNode));\n        s-&gt;data=x;\n        r-&gt;next=s;\n        r=s;\n        scanf(\"%d\",&amp;x);\n    }\n    r-&gt;next=NULL;\n    return L;\n}\n\n\n\n按照序号查找节点值\n\n在单链表中从第一个结点出发，顺指针 next 域逐个往下搜索，直到找到第i个结点为止否则返回最后一个结点指针域 NULL。\nLNode *GetElem(LinkList L, int i ){\n    int j=1;\n    LNode *p=L-&gt;next;\n    if (i==0)\n        return L;\n    if (i&lt;1)\n        return NULL;\n    while(p&amp;&amp;j&lt;i){\n        p=p-&gt;next;\n        j++\n    }\n    return p;\n}\n\n\n\n按照值查找表节点\n\n从单链表的第一个结点开始，由前往后依次比较表中各结点数据域的值，若某结点数据域的值等于给定值e，则返回该结点的指针;若整个单链表中没有这样的结点，则返回 NULL。\nLNode *LocateElem(LinkList L,ElemType e){\n    LNode *p = L-&gt;next;\n    while(!p=NULL&amp;&amp;p-&gt;data!=e){\n        p=p-&gt;data;\n\n    }\n    return p\n}\n\n时间复杂度尾O(n)\n\n插入节点操作\n\n插入结点操作将值为 x 的新结点插入到单链表的第 i 个位置上。先检插入位的合法性然后找到待插入位置的前驱结点，即第 i-1 个结点，再在其后插入新结点。算法首先调用按序号查找算法 GetElem(L,i-1)，查找第 i-1 个结点。假设返回的第 i-1个结点为 *p，然后令新结点 *s 的指针域指向*p 的后继结点，再令结点*p 的指针域指新插入\n实现插入节点的代码片段如下\np=GetElem(L,i-1);\ns-&gt;next=p-&gt;next;\np-&gt;next=s;\n\n\n算法中，语句2和3的顺序不能颠倒，否则，当先执行 p-&gt;next=s 后，指向其原后继的指针就不存在，再执行 s-&gt;next=p-&gt;next 时，相当于执行了 s-&gt;next=s，显然是错误的。本算法主要的时间开销在于查找第 i-1 个元素，时间复杂度为 O(n)若在给定的结点后面插入新结点则时间复杂度仅为 0(1)。\n扩展:对某一结点进行前插操作。前插操作是指在某结点的前面插入一个新结点，后插操作的定义刚好与之相反。在单链表插入算法中，通常都采用后插操作。\n以上面的算法为例，首先调用函数 GetElem()找到第 i-1 个结点，即插入结点的前驱结点后，再对其执行后插操作。由此可知，对结点的前插操作均可转化为后插操作，前提是从单链表的头结点开始顺序查找到其前驱结点，时间复杂度为 O(n)。\n此外，可采用另一种方式将其转化为后插操作来实现，i设待插入结点为*s，将*s 插入到*p的前面。我们仍然将*s 插入到*p 的后面，然后将 p-&gt;data与 s-&gt;data 交换，这样既满足了逻辑关系，又能使得时间复杂度为 O(1)。算法的代码片段如下:\ns-&gt;next=p-&gt;next;\np-&gt;next=s;\ntemp=p-&gt;data;\np-&gt;data=s-&gt;data;\ns-&gt;data=temp;\n\n\n\n删除节点操作\n\n删除结点操作是将单链表的第i个结点删除。光检查删除位置的合法性，后查找表中第 i-1个结点，即被删结点的前驱结点，再将其删除。其操作过程如图 2.8 所示。假设结点*p 为找到的被删结点的前驱结点，为实现这一操作后的逻辑关系的变化，仅需修改*p的指针域，即将*p 的指针域 next 指向*q 的下一结点.\np=GetElem(L,i-1);//查找删除位置的前驱结点\nq=p-&gt;next;//令g 指向被删除结点\np-&gt;next=q-&gt;next; //将*q 结点从链中“断开”\nfree(q); //放结点的存储空间\n和插入算法一样，该算法的主要时间也耗费在查找操作上，时间复杂度为 O(n).扩展:删除结点*P。\n要删除某个给定结点*p，通常的做法是先从链表的头结点开始顺序找到其前驱结点，然后执行删除操作，算法的时间复杂度为 O(n)。\n其实，删除结点*p的操作可用删除*p 的后继结点操作来实现，实质就是将其后继结点的值赋予其自身，然后删除后继结点，也能使得时间复杂度为 O(1)。实现上述操作的代码片段如下:\nq=p-&gt;next;//令指向*p 的后继结点\np-&gt;data=p-&gt;next-&gt;data;//和后继结点交换数据域\np-&gt;next=q-&gt;next;//将*a 结点从链中“断开”\nfree(q);//释放后继结点的存储空间\n\n\n求表长的操作\n\n求表长操作就是计算单链表中数据结点(不含头结点)的个数，需要从第一个结点开始顺序依次访问表中的每个结点，为此需要设置一个计数器变量，每访问一个结点，计数器加 1，直到访问到空结点为止。算法的时间复杂度为 O(n)。需要注意的是，因为单链表的长度是不包括头结点的，因此不带头结点和带头结点的单链表在求表长操作上会略有不同。对不带头结点的单链表，当表为空时，要单独处理。单链表是整个链表的基础，读者一定要熟练掌握单链表的基本操作算法。在设计算法时，建议先通过图示的方法理清算法的思路，然后进行算法的编写.\n2.3.3 双链表定义及操作单链表结点中只有一个指向其后继的指针，使得单链表只能从头结点依次顺序地向后遍历。要访问某个结点的前驱结点(插入、删除操作时)，只能从头开始遍历，访问后继结点的时间复杂度为 0(1)，访问前驱结点的时间复杂度为 O(n)。为了克服单链表的上述缺点，引入了双链表，双链表结点中有两个指针 prior 利 next，分别指向其前驱结点和后继结点，如图 2.9所示。\n双链表中结点类型的描述如下\ntypedef struct DNodef{ //定义双链表结点类型\n    ElemType data; //数据域\n    struct DNode *prior,*next; //前驱和后继指针\n\n}DNode，*DLinklist; \n双链表在单链表的结点中增加了一个指向其前驱的 prior 指针，因此双链表中的按值查找利按位查找的操作与单链表的相同。但双链表在插入和删除操作的实现上，与单链表有着较大的不同这是因为“链”变化时也需要对 pror 指针做出修改，其关键是保证在修改的过程中不断链。此外，双链表可以很方便地找到其前驱结点，因此，插入、删除操作的时间复杂度仅为 O(1)。\n\n双链表的插入操作\n\ns-&gt;next=p-&gt;next; //将结点*s 插入到结点*p 之后\np-&gt;next-&gt;prior=s;\ns-&gt;prior=p;\np-&gt;next=s;\n上述代码的语句顺序不是唯一的，但也不是任意的，1和2两步必须在4步之前，否则*p的后继结点的指针就会丢掉，导致插入失败。为了加深理解，读者可以在纸上画出示意图。若问题改成要求在结点*p 之前插入结点*s，请读者思考具体的操作步骤.\n\n双链表的删除操作\n\n删除操作的代码片段如下\n\np-&gt;next=g-&gt;next; //图2.11中步骤1\ng-&gt;next-&gt;prior=p;//图2.11中步骤2\nfree(g) //释放结点空间;\n\n若问题改成要求删除结点*q 的前驱结点*p，请读者思考具体的操作步骤。在建立双链表的操作中，也可采用如同单链表的头插法和尾插法，但在操作上需要注意指针的变化和单链表有所不同。\n2.3.4 循环链表\n循环单链表\n\n循环单链表和单链表的区别在于，表中最后一个结点的指针不是 NULL，而改为指向头结点从而整个链表形成一个环，如图 2.12 所示。在循环单链表中，表尾结点*r 的 next 域指向L，故表中没有指针域为 NULL 的结点，因此循环单链表的判空条件不是头结点的指针是否为空，而是它是否等于头指针。\n循环单链表的插入、删除算法与单链表的几乎一样，所不同的是若操作是在表尾进行，则执行的操作不同，以让单链表继续保持循环的性质。当然，正是因为循环单链表是一个”环”，此在任何一个位置上的插入和删除操作都是等价的，无须判断是否是表尾。在单链表中只能从表头结点开始往后顺序遍历整个链表，而循环单链表可以从表中的任意一个结点开始遍历整个链表。有时对单链表常做的操作是在表头和表尾进行的，此时对循环单链表不设头指针而仅设尾指针，从而使得操作效率更高。其原因是，若设的是头指针，对表尾进行操作需要 0(n)的时间复杂度，而设的是尾指针 r，r-&gt;next 即为头指针，对表头与表尾进行操作都只需要 0(1)的时间复杂度。\n\n循环双链表\n\n由循环单链表的定义不难推出循环双链表。不同的是在循环双链表中，头结点的 prior 指针还要指向表尾结点，如图 2.13 所示。\n在循环双链表L中，某结点*p 为尾结点时，p-&gt;next==L:当循环双链表为空表时，其头结点的 prior 城和 next 域都等于L。\n2.3.5 静态链表静态链表借助数组来描述线性表的链式存储结构，结点也有数据域 data 和指针域 next与前面所讲的链表中的指针不同的是，这里的指针是结点的相对地址(数组下标)，又称游标。和顺序表一样，静态链表也要预先分配一块连续的内存空间。静态链表和单链表的对应关系如图 2.14 所示。\n#define MaxSize 50\ntypedef struct {\n    ElemType data;\n    int next;\n} SLinkList[MaxSize];\ni 存储的是下个节点的位置静态链表以next==-1 作为其结束的标志。静链表的插入、删除操作与动态链表的相同只需要修改指针，而不需要移动元素。总体来说，静态链表没有单链表使用起来方便，但在一些不支持指针的高级语言(如 Basic)中，这是一种非常巧妙的设计方法。\n2.3.6 顺序表和链表的比较\n存取(读写)方式顺序表可以顺序存取，也可以随机存取，链表只能从表头顺序存取元素。例如在第i个位置上执行存或取的操作，顺序表仅需一次访问，而链表则需从表头开始依次访问i次\n逻辑结构与物理结构采用顺序存储时，逻辑上相邻的元素，对应的物理存储位置也相邻。而采用链式存储时，逻辑上相邻的元素，物理存储位置不一定相邻，对应的逻辑关系是通过指针链接来表示的。\n查找、插入和删除操作对于按值查找，顺序表无序时，两者的时间复杂度均为 O(n):顺序表有序时，可采用折半查找，此时的时间复杂度为 O(log2n)。对于按序号查找，顺序表支持随机访问，时间复杂度仅为 0(1)，而链表的平均时间复杂度为O(n)。顺序表的插入、删除操作，平均需要移动半个表长的元素。链表的插入、删除操作，只需修改相关结点的指针域即可。由于链表的每个结点都带有指针域，故而存储密度不够大。\n空间分配顺序存储在静态存储分配情形下，一旦存储空间装满就不能扩充，若再加入新元素，则会出现内存溢出，因此需要预先分配足够大的存储空间。预先分配过大，可能会导致顺序表后部大量闲置;预先分配过小，又会造成溢出。动态存储分配虽然存储空间可以扩充，但需要移动大量元素，导致操作效率降低，而且若内存中没有更大块的连续存储空间，则会导致分配失败。链式存储的结点空间只在需要时申请分配，只要内存有空间就可以分配，操作灵活、高效。\n\n在实际中应该怎样选取存储结构呢?\n\n基于存储的考虑难以估计线性表的长度或存储规模时，不宜采用顺序表;链表不用事先估计存储规模，但链表的存储密度较低，显然链式存储结构的存储密度是小于1的。\n基于运算的考虑在顺序表中按序号访问a;的时间复杂度为 O(1)，而表中按序号访问的时间复杂度为O(n)因此若经常做的运算是按序号访问数据元素，则显然顺序表优于链表。在顺序表中进行插入、删除操作时，平均移动表中一半的元素，当数据元素的信息量较大日表较长时，这一点是不应忽视的:在链表中进行插入、删除操作时，虽然也要找插入位置，但操作主要是比较操作，从这个角度考虑显然后者优于前者。\n基于环境的考虑顺序表容易实现，任何高级语言中都有数组类型，链表的操作是基于指针的，相对来讲，前者实现较为简单，这也是用户考虑的一个因素。总之，两种存储结构各有长短，选择哪一种山实际问题的主要因素决定。通常较稳定的线性表选择顺序存储，而频繁进行插入、删除操作的线性表(即动态性较强)宜选择链式存储注意:只有熟练学握顺序存储和链式存储，才能深刻理解它们各自的优缺点.\n\n3 栈，队列和数组3.1 栈3.1.1 栈的基本概念\n栈的定义栈(Stack) 是只允许在–端进行插入或删除操作的线性表。首先栈是一种线性表，但限定这种线性表只能在某一端进行插入和删除操作栈顶(Top)。线性表允许进行插入删除的那端栈底(Bottom)。固定的，不允许进行插入和删除的另一端。空栈。不含任何元素的空表空栈是不含任何元素，栈的操作顺序是先进后出，我们每次接触到新的数据结构，从逻辑结构，存储结构，对数据的运算三方面着手。栈的数学性质：n个不同元素进栈，出栈元素不同排列的个数为 ，该公式叫卡特兰数，可采用数学归纳法证明\n\n栈的基本操作\n\n\n各种辅导书中给出的基本操作的名称不尽相同，但所表达的意思大致是一样的。这里我们以严蔚敏编写的教材为准给出栈的基本操作，希望读者能熟记下面的基本操作Initstack(&amp;s):初始化一个空栈 S。stackEmpty(S):判断一个栈是否为空，若S 为空则返回 true，否则返回 false。Push(&amp;s,x):进栈，若栈 S 未满，则将x 加入使之成为新栈顶。Pop(&amp;S，&amp;x):出栈，若伐 S 非空，则弹出栈顶元素，并用x 返回。GetTop(S，&amp;x): 读栈顶元素，若栈 S 非空，则用x返回栈顶元素。Destroystack(&amp;S):销毁，并释放栈S 占的存储空间(“&amp;”表示引用调用)在解答算法题时，若题干未做出限制，则可直接使用这些基本的操作函数。\n3.1.2 栈的顺序存储结构\n采用顺序存储的栈称为顺序栈，它利用一组地址连续的存储单元存放自栈底到栈顶的数据元素，同时附设一个指针(top) 指示当前栈顶元素的位置。\n\n#define Maxsize 50\ntypedef struct {\n        Elemtype data[Maxsize];\n        int top\n} SqStack;\n栈顶操作：S.top 在初始时候是S.top=-1, 栈顶元素S.data[S.top]进栈操作：栈不满时，栈顶指针先加1，再送值进来出栈操作：栈非空时候，先取栈顶元素值，再将栈顶指针减1栈空元素：S.top==-1栈满条件：S.top==Maxsize-1栈长：S.top+1由于顺序栈的入栈操作受数组上界的约束，当对栈的最大使用空间估计不足时，有可能发生栈上溢，此时应该即使像用户报告消息，及时处理消息\n\n顺序栈的基本运算\n\n初始化  void InitStack(SqStack &amp;S){\n    S.top = -1;\n}\n判断空 bool StackEmpty (SqStack S){\n    if(S.top==-1)\n        return true;\n    else\n        return false;\n}\n进栈 bool Push(SqStack &amp;S,ElemType x){\n    if (S.top==Maxsize-1){\n        return false;\n    }\n    S.data[++S.top]=x;\n    return true;\n}\n 当栈不满时，top先加1，再入栈，\n出栈 bool Pop(SqStack &amp;S,ElemType &amp;x){\n    if (S.top == -1){\n        return false;\n    }\n    x=S.data[S.top--]\n    return true;\n}\n读取栈顶元素 bool GetTop(SqStack &amp;S ,ElemType x){\n    if (S.top==-1){\n        return false;\n    }\n    x=S.data[S.top]\n    return true;\n}\n注意：如果栈的初始化是S.top =0，那么入栈和出栈操作都发生变化。\n\n\n共享栈\n\n\n就是开辟一个共享空间，然后从两边向中间操作，两端点是栈低。\n3.1.3 栈的链式存储结构采用链式存储结构的栈称为链栈,链栈的优点是便于多个栈共享存储空间提高存储效率，且不存在栈上溢的情况通常采用单链表实现，并规定所有才做在表头进行，我们规定链栈没有头节点，Lhead指向栈顶元素\n栈的链式存储结构数据结构描述\ntypedef struct Linknode{\n    ElemType data;\n    struct Linknode *next;\n}*LiStack;\n\n有一点要注意带头节点和不带头结点的链栈，具体实现会有不同\n3.2 队列3.2.1 队列的基本概念队列简称队，也是一种操作受限的线性表，只允许在表的一端出，另一端进。队头：允许删除的一端，又称队首。拿走删除的一端是队头队尾：允许插入的一端空队列，不包含任何元素队列的基本操作：\nInitQueue(&amp;Q)  //初始化一个空队列\nQueueEmpty(Q)  //判断队列是否为空\nEnQueue(&amp;Q,x)  // 清空队列\nDeQueue(&amp;Q,&amp;x) //出队\nGetHead(Q,&amp;x)  // 读取头元素   \n\n3.2.2 队列的顺序存储结构\n队列的顺序存储结构\n\n","dateCreated":"2023-12-12T19:30:59+08:00","dateModified":"2023-12-12T19:30:59+08:00","datePublished":"2023-12-12T19:30:59+08:00","description":"对付看吧,虽然打心眼里感觉不是什么好书","headline":"王道数据结构","image":[null,"https://user-images.githubusercontent.com/46363359/204004628-f2a1b8e5-1d4a-47bb-9b9b-e49dc87eee1c.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/algorithm/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/algorithm/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/","thumbnailUrl":"https://user-images.githubusercontent.com/46363359/204004628-f2a1b8e5-1d4a-47bb-9b9b-e49dc87eee1c.jpg"}</script>
+    <meta name="description" content="对付看吧,虽然打心眼里感觉不是什么好书">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="王道数据结构">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/algorithm/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="对付看吧,虽然打心眼里感觉不是什么好书">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:modified_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+        <meta property="og:image" content="https://user-images.githubusercontent.com/46363359/204004628-f2a1b8e5-1d4a-47bb-9b9b-e49dc87eee1c.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://user-images.githubusercontent.com/46363359/204004628-f2a1b8e5-1d4a-47bb-9b9b-e49dc87eee1c.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-6282fdnvziozzvtprbntzupxyhc5mlkphbaevboelgvnx2vnnspamitnamq7.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    "
+             style="background-image:url('https://user-images.githubusercontent.com/46363359/204004628-f2a1b8e5-1d4a-47bb-9b9b-e49dc87eee1c.jpg');"
+             data-behavior="2">
+            
+        </div>
+
+            <div id="main" data-behavior="2"
+                 class="hasCover
+                        hasCoverMetaOut
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            王道数据结构
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>对付看吧,虽然打心眼里感觉不是什么好书</p>
+<span id="more"></span>
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%BA%BF%E6%80%A7%E8%A1%A8"><span class="toc-text">2. 线性表</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="toc-text">2.1 线性表的定义和基本操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-text">2.1.1. 线性表的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="toc-text">2.1.2 线性表的基本操作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E9%A1%BA%E5%BA%8F%E8%A1%A8%E7%A4%BA"><span class="toc-text">2.2 线性表的顺序表示</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E9%A1%BA%E5%BA%8F%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-text">2.2.1 顺序表的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-%E9%A1%BA%E5%BA%8F%E8%A1%A8%E4%B8%8A%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.2.2 顺序表上基本操作的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E9%93%BE%E5%BC%8F%E8%A1%A8%E7%A4%BA"><span class="toc-text">2.3 线性表的链式表示</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E8%A1%A8%E7%A4%BA"><span class="toc-text">2.3.1 单链表的表示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">2.3.2 单链表的操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-3-%E5%8F%8C%E9%93%BE%E8%A1%A8%E5%AE%9A%E4%B9%89%E5%8F%8A%E6%93%8D%E4%BD%9C"><span class="toc-text">2.3.3 双链表定义及操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-4-%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8"><span class="toc-text">2.3.4 循环链表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-5-%E9%9D%99%E6%80%81%E9%93%BE%E8%A1%A8"><span class="toc-text">2.3.5 静态链表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-6-%E9%A1%BA%E5%BA%8F%E8%A1%A8%E5%92%8C%E9%93%BE%E8%A1%A8%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-text">2.3.6 顺序表和链表的比较</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%A0%88%EF%BC%8C%E9%98%9F%E5%88%97%E5%92%8C%E6%95%B0%E7%BB%84"><span class="toc-text">3 栈，队列和数组</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%A0%88"><span class="toc-text">3.1 栈</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-%E6%A0%88%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-text">3.1.1 栈的基本概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-%E6%A0%88%E7%9A%84%E9%A1%BA%E5%BA%8F%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="toc-text">3.1.2 栈的顺序存储结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-%E6%A0%88%E7%9A%84%E9%93%BE%E5%BC%8F%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="toc-text">3.1.3 栈的链式存储结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E9%98%9F%E5%88%97"><span class="toc-text">3.2 队列</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-%E9%98%9F%E5%88%97%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-text">3.2.1 队列的基本概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-%E9%98%9F%E5%88%97%E7%9A%84%E9%A1%BA%E5%BA%8F%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="toc-text">3.2.2 队列的顺序存储结构</span></a></li></ol></li></ol></li></ol>
+
+<h1 id="2-线性表"><a href="#2-线性表" class="headerlink" title="2. 线性表"></a>2. 线性表</h1><h2 id="2-1-线性表的定义和基本操作"><a href="#2-1-线性表的定义和基本操作" class="headerlink" title="2.1 线性表的定义和基本操作"></a>2.1 线性表的定义和基本操作</h2><h3 id="2-1-1-线性表的定义"><a href="#2-1-1-线性表的定义" class="headerlink" title="2.1.1. 线性表的定义"></a>2.1.1. 线性表的定义</h3><p>线性表是具有相同数据类型的n个数据的有序序列，其中n为表长，出第一个元素外，只有唯一一个直接前驱，除最后一个元素外，只有唯一一个后继。<br>故可总结:</p>
+<ol>
+<li>表中元素有限.</li>
+<li>表元素具有逻辑上的顺序,表中元素有先后顺序.</li>
+<li>表中元素都是数据元素，每个元素都是单个元素.</li>
+<li>表中元素的数据类型都相同，这意味着每个元素占有相同大小的存储空间.</li>
+<li>表中元素具有抽象性，即仅讨论元素间的逻辑关系，而不考虑元素究竞表示什么内容.</li>
+</ol>
+<h3 id="2-1-2-线性表的基本操作"><a href="#2-1-2-线性表的基本操作" class="headerlink" title="2.1.2 线性表的基本操作"></a>2.1.2 线性表的基本操作</h3><pre class="language-c" data-language="c"><code class="language-c">InitList(&amp;L)        //初始化表，构建一个空的线性表
+Length(L)           //秋表长
+LocateElem(L,e)     //按值查找
+GetElem(L，i)       //按位查找操作。获取表L中第  个位置的元素的值。
+ListInsert(&amp;l,i,e)  //插入操作。在表L中的第个位置上插入指定元素 e。
+ListDelete(&amp;L,i,se) //删除操作。删除表中第 个位置的元素，并用e 返回删除元素的值。
+PrintList(L)        //输出操作。按前后顺序输出线性表工的所有元素值。
+Empty(L)            //判空操作。若L为空表，则返 true，否则返回 false。
+DestroyList(&amp;L)     //销毁操作。销毁线件表，并释放线性表工所占用的内存空间</code></pre>
+
+<h2 id="2-2-线性表的顺序表示"><a href="#2-2-线性表的顺序表示" class="headerlink" title="2.2 线性表的顺序表示"></a>2.2 线性表的顺序表示</h2><h3 id="2-2-1-顺序表的定义"><a href="#2-2-1-顺序表的定义" class="headerlink" title="2.2.1 顺序表的定义"></a>2.2.1 顺序表的定义</h3><p>线性表的顺序存储又称顺序表。它是用一组地址连续的存储单元依次存储线性表中的数据元素，从而使得逻辑上相邻的两个元素在物理位置上也相邻。第1个元素存储在线性表的起始位置,第i个元素的存储位置后面紧接着存储的是第i+1个元素，称为元素在线性表中的位序。因此，顺序表的特点是表中元素的逻辑顺序与其物理顺序相同。假设线性表 L存储的起始位置为 LOC(A)，sizeof(ElemType)是每个数据元素所占用存储空间的大小，则表L所对应的顺序存储如图 2.1 所示如下。</p>
+<table>
+<thead>
+<tr>
+<th>数组下标</th>
+<th>顺序表</th>
+<th>内存地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.339ex;" xmlns="http://www.w3.org/2000/svg" width="2.185ex" height="1.337ex" role="img" focusable="false" viewBox="0 -441 965.6 591"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mn" transform="translate(562,-150) scale(0.707)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g></svg></mjx-container></td>
+<td>LOC(A)</td>
+</tr>
+<tr>
+<td>1</td>
+<td><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.339ex;" xmlns="http://www.w3.org/2000/svg" width="2.185ex" height="1.337ex" role="img" focusable="false" viewBox="0 -441 965.6 591"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mn" transform="translate(562,-150) scale(0.707)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></g></svg></mjx-container></td>
+<td>LOC(A)+sizeof(ElemType)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.375ex;" xmlns="http://www.w3.org/2000/svg" width="2.185ex" height="1.372ex" role="img" focusable="false" viewBox="0 -441 965.6 606.6"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mn" transform="translate(562,-150) scale(0.707)"><path data-c="33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path></g></g></g></g></svg></mjx-container></td>
+<td>LOC(A)+(i-1)sizeof(ElemType)</td>
+</tr>
+</tbody></table>
+<p>每个数据元素的存储位置都和线性表的起始位置相差一个和该数据元素的位序成正比的常数，因此，线性表中的任一数据元素都可以随机存取，所以线性表的顺序存储结构是一种随机存取的存储结构。通常用高级程序设计语言中的数组来描述线性表的顺序存储结构。则线性表的顺序存储类型描述是</p>
+<pre class="language-c" data-language="c"><code class="language-c">#define MaxSize 50
+typedef struct {P
+    ElemType data[Maxsize];
+    int length;
+} SqList</code></pre>
+<p>一维数组可以是静态分配的，也可以是动态分配的。  </p>
+<ul>
+<li>在静态分配时，由于数组的大小和空问事先已经固定，一旦空间占满，再加入新的数据就会产生溢出，进而导致程序崩溃。</li>
+<li>而在动态分配时，存储数组的空间是在程序执行过程中通过动态存储分配语句分配的，一旦数据空间占满，就另外开辟一块更大的存储空间，用以替换原来的存储空间，从而达到扩充存储数组空间的目的，而不需要为线性表一次性地划分所有空间。比如高级语言当中的java的linkList，golang的slice</li>
+</ul>
+<pre class="language-c" data-language="c"><code class="language-c">typedef struct(
+    ElemType *data //变量名的指针
+    int MaxSize,length;
+) SegList;
+
+// C的初始动态分配语句为
+L.data=(ElemType*)malloc(sizeof(ElemType)*InitSize);
+// C++的初始动态分配语何为
+L.data=new ElemType[Initsize] //初始化指定长度;</code></pre>
+<p>顺序表最主要的特点是随机访问，即通过首地址和元素序号可在时间 O(1)内找到指定的元素。<br>顺序表的存储密度高，每个结点只存储数据元素。顺序表逻辑上相邻的元素物理上也相邻，所以插入和删除操作需要移动大量元素</p>
+<h3 id="2-2-2-顺序表上基本操作的实现"><a href="#2-2-2-顺序表上基本操作的实现" class="headerlink" title="2.2.2 顺序表上基本操作的实现"></a>2.2.2 顺序表上基本操作的实现</h3><ol>
+<li>插入数据<br>在顺序表L的i位置插入元素e</li>
+</ol>
+<pre class="language-java" data-language="java"><code class="language-java">// 1,2,3,4,5,6
+// 0,1,2,3,4,5
+public void insert(int[] *listArray, int index, Object obj) throws Exception {
+         // TODO Auto-generated method stub
+         //如果当前线性表已满，那就不允许插入数据
+         if (size == maxSize) {
+             throw new Exception("顺序表已满，无法插入！");
+         }
+         //插入位置编号是否合法
+         if (index &lt; 0 || index &gt; size) {
+             throw new Exception("参数错误！");
+         }
+         //移动元素
+         for (int j = size - 1; j &gt;= index; j--) {
+             listArray[j + 1] = listArray[j];
+         }
+ 
+         listArray[index] = obj;  //不管当前线性表的size是否为零，这句话都能正常执行，即都能正常插入
+         size++;
+}
+</code></pre>
+<p>最好情况: 在表尾插入(i=n+1)，元素后移语句不执行<br>最坏情况: 最表头插入(i=1),元素后移语句将被执行n次<br>平均情况: 假设<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="14.172ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 6264 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mi" transform="translate(536,-150) scale(0.707)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mo" transform="translate(1107.7,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(2163.5,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(2663.5,0)"><g data-mml-node="mo"><path data-c="2F" d="M423 750Q432 750 438 744T444 730Q444 725 271 248T92 -240Q85 -250 75 -250Q68 -250 62 -245T56 -231Q56 -221 230 257T407 740Q411 750 423 750Z"></path></g></g><g data-mml-node="mo" transform="translate(3163.5,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(3552.5,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(4374.7,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(5375,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(5875,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>,则在长度为n的线性表中插入一个节点所需移动的平均次数</p>
+<p><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -1.9ex;" xmlns="http://www.w3.org/2000/svg" width="95.734ex" height="4.932ex" role="img" focusable="false" viewBox="0 -1340 42314.5 2180"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="munderover"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="TeXAtom" transform="translate(1089,477.1) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(600,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1378,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(1089,-285.4) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(345,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1123,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="msub" transform="translate(2633.6,0)"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mi" transform="translate(536,-150) scale(0.707)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mo" transform="translate(3463.6,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(3852.6,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(4674.8,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(5675,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(6397.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(7397.5,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(7742.5,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(8409.2,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="munderover" transform="translate(9465,0)"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="TeXAtom" transform="translate(1089,477.1) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(600,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1378,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(1089,-285.4) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(345,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1123,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="mfrac" transform="translate(12098.6,0)"><g data-mml-node="mrow" transform="translate(1520.2,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-590) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mo"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(389,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1211.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(2211.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(2711.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></g><rect width="3300.4" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(15639.1,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(16028.1,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(16850.3,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(17850.5,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(18417.7,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(19418,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(19918,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(20584.7,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(21640.5,0)"><g data-mml-node="mrow" transform="translate(1131.2,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(822.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1822.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><rect width="2522.4" height="60" x="120" y="220"></rect></g><g data-mml-node="munderover" transform="translate(24569.6,0)"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="TeXAtom" transform="translate(1089,477.1) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(600,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1378,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(1089,-285.4) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(345,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1123,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="mo" transform="translate(27036.6,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(27425.6,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(28247.8,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(29248,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(29815.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(30815.5,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(31315.5,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(31982.2,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(33038,0)"><g data-mml-node="mrow" transform="translate(1131.2,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(822.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1822.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><rect width="2522.4" height="60" x="120" y="220"></rect></g><g data-mml-node="mfrac" transform="translate(35800.5,0)"><g data-mml-node="mrow" transform="translate(220,590) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(600,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(989,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1811.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(2811.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(3311.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(1820.2,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></g><rect width="3900.4" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(40218.7,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(41274.5,0)"><g data-mml-node="mrow" transform="translate(220,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(270,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></g><rect width="800" height="60" x="120" y="220"></rect></g></g></g></svg></mjx-container></p>
+<ol start="2">
+<li>删除操作</li>
+</ol>
+<p>删除顺序表 L中第 i (1&lt;=i&lt;=L.length)个位置的元素，用引用变量 e 返回。若i的输入不合法，则返回false，否则，将被删元素赋给引用变量 e，并将第 +1个元素及其后的所有元素依次往前移动一个位置，返回 true。</p>
+<pre class="language-java" data-language="java"><code class="language-java">// 注意L的数据结构
+
+bool ListDelete(SqList &amp;L , int i , Elementype &amp;e){
+    if (i&lt;1||i&gt;L.length){
+        return false
+    }
+    e=L.data[i-1]
+    for (int j=i;j&lt;L.length;j++){
+        L.data[j-1]=L.data[j]
+    }
+    L.length--
+    return true
+}
+</code></pre>
+
+<p>最好情况:删除表尾元素(即i=n)，无须移动元素，时间复杂度为 O(1)。<br>最坏情况:删除表头元素(即i= 1)，需移动除表头元素外的所有元素，时间复杂度为 O(n)<br>平均情况:假设 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -1.494ex;" xmlns="http://www.w3.org/2000/svg" width="7.248ex" height="4.25ex" role="img" focusable="false" viewBox="0 -1218.1 3203.5 1878.4"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mi" transform="translate(536,-150) scale(0.707)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mo" transform="translate(1107.7,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(2163.5,0)"><g data-mml-node="mrow" transform="translate(270,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-448.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g><rect width="800" height="60" x="120" y="220"></rect></g></g></g></svg></mjx-container> 是删除第i个位置上结点的概率，则在长度为n的线性表中删除一个结点时，所需移动结点的平均次数为</p>
+<p><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -1.625ex;" xmlns="http://www.w3.org/2000/svg" width="53.328ex" height="4.656ex" role="img" focusable="false" viewBox="0 -1340 23571 2058.1"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="munderover"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="TeXAtom" transform="translate(1089,477.1) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(1089,-285.4) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(345,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1123,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="msub" transform="translate(2453.3,0)"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mi" transform="translate(536,-150) scale(0.707)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mo" transform="translate(3283.3,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(3672.3,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(4494.5,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(5494.7,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(5839.7,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(6506.5,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="munderover" transform="translate(7562.3,0)"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="TeXAtom" transform="translate(1089,477.1) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(1089,-285.4) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(345,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1123,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="mfrac" transform="translate(10015.6,0)"><g data-mml-node="mrow" transform="translate(270,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-448.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g><rect width="800" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(11055.6,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(11444.6,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(12266.8,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(13267,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(13612,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(14278.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(15334.6,0)"><g data-mml-node="mrow" transform="translate(220,590) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(600,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(989,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1811.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(2811.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(3311.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(1520.2,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="mi" transform="translate(500,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g><rect width="3900.4" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(19752.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(20808.6,0)"><g data-mml-node="mrow" transform="translate(220,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(822.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(1822.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(1131.2,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></g><rect width="2522.4" height="60" x="120" y="220"></rect></g></g></g></svg></mjx-container></p>
+<p>因此，线性表删除算法的平均实践复杂度为O(n)</p>
+<ol start="3">
+<li>按值查找</li>
+</ol>
+<p>查找第一个元素值等于e的元素</p>
+<pre class="language-java" data-language="java"><code class="language-java">int LocateElem(SqList L,ElemType e){
+    int i;
+    for (i=0;i&lt;L.length;i++){
+        if (L.data[i]==e){
+            return i+1
+        }
+    }
+}
+</code></pre>
+
+<p>最好情况: 查找的元素就在表头，仅需比较一次，时间复杂度为 O(1)。<br>最坏情况:查找的元素在表尾(或不存在) 时，需要比较 n 次，时间复杂度为 (O)<br>平均情况:假设 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -1.494ex;" xmlns="http://www.w3.org/2000/svg" width="7.248ex" height="4.25ex" role="img" focusable="false" viewBox="0 -1218.1 3203.5 1878.4"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mi" transform="translate(536,-150) scale(0.707)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mo" transform="translate(1107.7,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(2163.5,0)"><g data-mml-node="mrow" transform="translate(270,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-448.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g><rect width="800" height="60" x="120" y="220"></rect></g></g></g></svg></mjx-container> 是查的素在第 (1&lt;=i&lt;=L.length)个位置上的概率则在长度为 n 的线性表中查找值为 e 的元素所需比较的平均次数为</p>
+<p><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -1.625ex;" xmlns="http://www.w3.org/2000/svg" width="42.918ex" height="4.656ex" role="img" focusable="false" viewBox="0 -1340 18969.6 2058.1"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="munderover"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="TeXAtom" transform="translate(1089,477.1) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(1089,-285.4) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(345,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1123,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="msub" transform="translate(2453.3,0)"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mi" transform="translate(536,-150) scale(0.707)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mo" transform="translate(3505.5,0)"><path data-c="2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path></g><g data-mml-node="mi" transform="translate(4227.7,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(4850.5,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="munderover" transform="translate(5906.3,0)"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="TeXAtom" transform="translate(1089,477.1) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(1089,-285.4) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(345,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1123,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="mfrac" transform="translate(8359.6,0)"><g data-mml-node="mrow" transform="translate(347.5,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-448.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g><rect width="800" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(9677.3,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(10733.1,0)"><g data-mml-node="mrow" transform="translate(220,590) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(600,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(989,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1811.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(2811.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(3311.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(1520.2,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="mi" transform="translate(500,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g><rect width="3900.4" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(15151.3,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(16207.1,0)"><g data-mml-node="mrow" transform="translate(220,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(822.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1822.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(1131.2,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></g><rect width="2522.4" height="60" x="120" y="220"></rect></g></g></g></svg></mjx-container></p>
+<p>因此线性查找算法的平均复杂度为O(n)</p>
+<h2 id="2-3-线性表的链式表示"><a href="#2-3-线性表的链式表示" class="headerlink" title="2.3 线性表的链式表示"></a>2.3 线性表的链式表示</h2><p>顺序表可以随时存取表中的任意一个元素，它的存储位置可以用一个简单直观的公式表示。但是链式存储线性表时，不需要移动大量的元素，它通过建立起数据之间的逻辑链接关系，因而插入和删除不需要移动元素，而只需要修改指针。</p>
+<h3 id="2-3-1-单链表的表示"><a href="#2-3-1-单链表的表示" class="headerlink" title="2.3.1 单链表的表示"></a>2.3.1 单链表的表示</h3><p>线性表的链式存储又叫单链表，它是通过一组任意的存储单元来存储线性表中的数据元素，为了建立数据元素之间的线性关系，对每个链表节点，除存放元素自身的信息外，还需要放一个指向后继几点的指针，单链表的结构如下图所示 [ data | next ]</p>
+<pre class="language-c" data-language="c"><code class="language-c">
+typedef struct LNode{
+    ElemType data;
+    struct LNode *next;
+} *LinkList;
+</code></pre>
+<p>利用单链表可以解决顺序表需要大量存储单元的缺点。但是但李娜表附加指针域，也存在浪费存储空间的缺点，由于单链表的元素离散地分布在存储空间中，所以单链表的非<strong>随机存取</strong>的存储结构，即不能直接找到表中某个特定的节点。当找到特定的节点时需要从表头依次遍历。<br><strong>头指针</strong>来标识一个单链表，如单链表L.<br><strong>头节点</strong>通常是data为空的节点，也可以记录些链表的长度信息等等<br>头节点和头指针的区分:不管带不带头节点，头指针都始终指向链表的第一个节点，而头节点是带头结点的链表中的第一个节点，节点内通常不存储信息<br>引入头节点，可以带来两个优点：</p>
+<ol>
+<li>由于第一个数据节点的位置被存放在头节点的指针域中，因此在链表的第一个位置上的操作和在表的其他位置上的操作一致，无须进行特殊处理</li>
+<li>无论链表是否为空，其头指针都指向头节点非空指针，因此空表和非空表的处理也就得到了统一</li>
+</ol>
+<h3 id="2-3-2-单链表的操作"><a href="#2-3-2-单链表的操作" class="headerlink" title="2.3.2 单链表的操作"></a>2.3.2 单链表的操作</h3><ol>
+<li>采用头插法建立单链表</li>
+</ol>
+<p>该方法是从一个空表开始的，生成新节点，并将读取到的数据存储到新节点的数据域中，然后将新节点插入到当前链表的表头，即头节点之后<br>头插法建立单链表的算法如下:</p>
+<pre class="language-c" data-language="c"><code class="language-c">LinkList List_HeadInsert(LinkList &amp;L){
+    LNode *s , int x;
+
+    L=(LinkList)malloc(sizeof(LNode)); //创建头节点
+    L-&gt;next=null; //初始化为空链表
+    scanf("%d",&amp;x);
+    while(x!=9999){
+        s=(LNode*)malloc(sizeof(LNode));
+        s-&gt;data=x;
+        s-&gt;next=L-&gt;next; //说白了也就是把s的
+        L-&gt;next=s;
+        scanf("%d",&amp;x);
+    }
+    return L;
+}</code></pre>
+
+<p>采用头插法建立单链表的算法虽然简单，但是生成的链表中的节点的输入顺序和链表中元素的顺序是相反的，若希望一致可采用尾插法，插入时间复杂度O(1)，读取时间复杂度为O(n)</p>
+<ol start="2">
+<li>尾插法建立单链表</li>
+</ol>
+<p>头插法建立单链表的算法虽然简单，但生成的链表中结点的次序和输入数据的顺序不一致。若希望两者次序一致，则可采用尾插法。该方法将新结点插入到当前链表的表尾，为此必须增加一个尾指针 r，使其始终指向当前链表的尾结点，如图 2.6 所示。采用尾插法的算法如下</p>
+<pre class="language-c" data-language="c"><code class="language-c">LinkList List_TailInsert(LinkList &amp;L){
+    int x;
+    L=(LinkList)malloc*(sizeof(LNode))
+    LNode *s,*r =L;
+    scanf("%d",&amp;x);
+    while(x!=9999){
+        s=(LNode *)malloc(sizeof(LNode));
+        s-&gt;data=x;
+        r-&gt;next=s;
+        r=s;
+        scanf("%d",&amp;x);
+    }
+    r-&gt;next=NULL;
+    return L;
+}
+</code></pre>
+
+<ol start="3">
+<li>按照序号查找节点值</li>
+</ol>
+<p>在单链表中从第一个结点出发，顺指针 next 域逐个往下搜索，直到找到第i个结点为止否则返回最后一个结点指针域 NULL。</p>
+<pre class="language-c" data-language="c"><code class="language-c">LNode *GetElem(LinkList L, int i ){
+    int j=1;
+    LNode *p=L-&gt;next;
+    if (i==0)
+        return L;
+    if (i&lt;1)
+        return NULL;
+    while(p&amp;&amp;j&lt;i){
+        p=p-&gt;next;
+        j++
+    }
+    return p;
+}
+</code></pre>
+
+<ol start="4">
+<li>按照值查找表节点</li>
+</ol>
+<p>从单链表的第一个结点开始，由前往后依次比较表中各结点数据域的值，若某结点数据域的值等于给定值e，则返回该结点的指针;若整个单链表中没有这样的结点，则返回 NULL。</p>
+<pre class="language-c" data-language="c"><code class="language-c">LNode *LocateElem(LinkList L,ElemType e){
+    LNode *p = L-&gt;next;
+    while(!p=NULL&amp;&amp;p-&gt;data!=e){
+        p=p-&gt;data;
+
+    }
+    return p
+}
+</code></pre>
+<p>时间复杂度尾O(n)</p>
+<ol start="5">
+<li>插入节点操作</li>
+</ol>
+<p>插入结点操作将值为 x 的新结点插入到单链表的第 i 个位置上。先检插入位的合法性然后找到待插入位置的前驱结点，即第 i-1 个结点，再在其后插入新结点。算法首先调用按序号查找算法 GetElem(L,i-1)，查找第 i-1 个结点。假设返回的第 i-1个结点为 *p，然后令新结点 *s 的指针域指向*p 的后继结点，再令结点*p 的指针域指新插入</p>
+<p>实现插入节点的代码片段如下</p>
+<pre class="language-c" data-language="c"><code class="language-c">p=GetElem(L,i-1);
+s-&gt;next=p-&gt;next;
+p-&gt;next=s;
+</code></pre>
+
+<p>算法中，语句2和3的顺序不能颠倒，否则，当先执行 p-&gt;next=s 后，指向其原后继的指针就不存在，再执行 s-&gt;next=p-&gt;next 时，相当于执行了 s-&gt;next=s，显然是错误的。本算法主要的时间开销在于查找第 i-1 个元素，时间复杂度为 O(n)若在给定的结点后面插入新结点则时间复杂度仅为 0(1)。</p>
+<p>扩展:对某一结点进行前插操作。<br>前插操作是指在某结点的前面插入一个新结点，后插操作的定义刚好与之相反。在单链表插入算法中，通常都采用后插操作。</p>
+<p>以上面的算法为例，首先调用函数 GetElem()找到第 i-1 个结点，即插入结点的前驱结点后，再对其执行后插操作。由此可知，对结点的前插操作均可转化为后插操作，前提是从单链表的头结点开始顺序查找到其前驱结点，时间复杂度为 O(n)。</p>
+<p>此外，可采用另一种方式将其转化为后插操作来实现，i设待插入结点为*s，将*s 插入到*p的前面。我们仍然将*s 插入到*p 的后面，然后将 p-&gt;data与 s-&gt;data 交换，这样既满足了逻辑关系，又能使得时间复杂度为 O(1)。算法的代码片段如下:</p>
+<pre class="language-c" data-language="c"><code class="language-c">s-&gt;next=p-&gt;next;
+p-&gt;next=s;
+temp=p-&gt;data;
+p-&gt;data=s-&gt;data;
+s-&gt;data=temp;
+</code></pre>
+
+<ol start="6">
+<li>删除节点操作</li>
+</ol>
+<p>删除结点操作是将单链表的第i个结点删除。光检查删除位置的合法性，后查找表中第 i-1个结点，即被删结点的前驱结点，再将其删除。其操作过程如图 2.8 所示。<br>假设结点*p 为找到的被删结点的前驱结点，为实现这一操作后的逻辑关系的变化，仅需修改*p的指针域，即将*p 的指针域 next 指向*q 的下一结点.</p>
+<pre class="language-c" data-language="c"><code class="language-c">p=GetElem(L,i-1);//查找删除位置的前驱结点
+q=p-&gt;next;//令g 指向被删除结点
+p-&gt;next=q-&gt;next; //将*q 结点从链中“断开”
+free(q); //放结点的存储空间</code></pre>
+<p>和插入算法一样，该算法的主要时间也耗费在查找操作上，时间复杂度为 O(n).<br>扩展:删除结点*P。</p>
+<p>要删除某个给定结点*p，通常的做法是先从链表的头结点开始顺序找到其前驱结点，然后执行删除操作，算法的时间复杂度为 O(n)。</p>
+<p>其实，删除结点*p的操作可用删除*p 的后继结点操作来实现，实质就是将其后继结点的值赋予其自身，然后删除后继结点，也能使得时间复杂度为 O(1)。实现上述操作的代码片段如下:</p>
+<pre class="language-c" data-language="c"><code class="language-c">q=p-&gt;next;//令指向*p 的后继结点
+p-&gt;data=p-&gt;next-&gt;data;//和后继结点交换数据域
+p-&gt;next=q-&gt;next;//将*a 结点从链中“断开”
+free(q);//释放后继结点的存储空间</code></pre>
+
+<ol start="7">
+<li>求表长的操作</li>
+</ol>
+<p>求表长操作就是计算单链表中数据结点(不含头结点)的个数，需要从第一个结点开始顺序依次访问表中的每个结点，为此需要设置一个计数器变量，每访问一个结点，计数器加 1，直到访问到空结点为止。算法的时间复杂度为 O(n)。<br>需要注意的是，因为单链表的长度是不包括头结点的，因此不带头结点和带头结点的单链表在求表长操作上会略有不同。对不带头结点的单链表，当表为空时，要单独处理。单链表是整个链表的基础，读者一定要熟练掌握单链表的基本操作算法。在设计算法时，建议先通过图示的方法理清算法的思路，然后进行算法的编写.</p>
+<h3 id="2-3-3-双链表定义及操作"><a href="#2-3-3-双链表定义及操作" class="headerlink" title="2.3.3 双链表定义及操作"></a>2.3.3 双链表定义及操作</h3><p>单链表结点中只有一个指向其后继的指针，使得单链表只能从头结点依次顺序地向后遍历。要访问某个结点的前驱结点(插入、删除操作时)，只能从头开始遍历，访问后继结点的时间复杂度为 0(1)，访问前驱结点的时间复杂度为 O(n)。<br>为了克服单链表的上述缺点，引入了双链表，双链表结点中有两个指针 prior 利 next，分别指向其前驱结点和后继结点，如图 2.9所示。</p>
+<p>双链表中结点类型的描述如下</p>
+<pre class="language-c" data-language="c"><code class="language-c">typedef struct DNodef{ //定义双链表结点类型
+    ElemType data; //数据域
+    struct DNode *prior,*next; //前驱和后继指针
+
+}DNode，*DLinklist; </code></pre>
+<p>双链表在单链表的结点中增加了一个指向其前驱的 prior 指针，因此双链表中的按值查找利按位查找的操作与单链表的相同。但双链表在插入和删除操作的实现上，与单链表有着较大的不同这是因为“链”变化时也需要对 pror 指针做出修改，其关键是保证在修改的过程中不断链。此外，双链表可以很方便地找到其前驱结点，因此，插入、删除操作的时间复杂度仅为 O(1)。</p>
+<ol>
+<li>双链表的插入操作</li>
+</ol>
+<pre class="language-c" data-language="c"><code class="language-c">s-&gt;next=p-&gt;next; //将结点*s 插入到结点*p 之后
+p-&gt;next-&gt;prior=s;
+s-&gt;prior=p;
+p-&gt;next=s;</code></pre>
+<p>上述代码的语句顺序不是唯一的，但也不是任意的，1和2两步必须在4步之前，否则*p的后继结点的指针就会丢掉，导致插入失败。为了加深理解，读者可以在纸上画出示意图。若问题改成要求在结点*p 之前插入结点*s，请读者思考具体的操作步骤.</p>
+<ol start="2">
+<li>双链表的删除操作</li>
+</ol>
+<p>删除操作的代码片段如下</p>
+<pre class="language-c" data-language="c"><code class="language-c">
+p-&gt;next=g-&gt;next; //图2.11中步骤1
+g-&gt;next-&gt;prior=p;//图2.11中步骤2
+free(g) //释放结点空间;
+</code></pre>
+<p>若问题改成要求删除结点*q 的前驱结点*p，请读者思考具体的操作步骤。在建立双链表的操作中，也可采用如同单链表的头插法和尾插法，但在操作上需要注意指针的变化和单链表有所不同。</p>
+<h3 id="2-3-4-循环链表"><a href="#2-3-4-循环链表" class="headerlink" title="2.3.4 循环链表"></a>2.3.4 循环链表</h3><ol>
+<li>循环单链表</li>
+</ol>
+<p>循环单链表和单链表的区别在于，表中最后一个结点的指针不是 NULL，而改为指向头结点从而整个链表形成一个环，如图 2.12 所示。<br>在循环单链表中，表尾结点*r 的 next 域指向L，故表中没有指针域为 NULL 的结点，因此循环单链表的判空条件不是头结点的指针是否为空，而是它是否等于头指针。</p>
+<p>循环单链表的插入、删除算法与单链表的几乎一样，所不同的是若操作是在表尾进行，则执行的操作不同，以让单链表继续保持循环的性质。当然，正是因为循环单链表是一个”环”，<br>此在任何一个位置上的插入和删除操作都是等价的，无须判断是否是表尾。在单链表中只能从表头结点开始往后顺序遍历整个链表，而循环单链表可以从表中的任意一个结点开始遍历整个链表。有时对单链表常做的操作是在表头和表尾进行的，此时对循环单链表不设头指针而仅设尾指针，从而使得操作效率更高。其原因是，若设的是头指针，对表尾进行操作需要 0(n)的时间复杂度，而设的是尾指针 r，r-&gt;next 即为头指针，对表头与表尾进行操作都只需要 0(1)的时间复杂度。</p>
+<ol start="2">
+<li>循环双链表</li>
+</ol>
+<p>由循环单链表的定义不难推出循环双链表。不同的是在循环双链表中，头结点的 prior 指针还要指向表尾结点，如图 2.13 所示。</p>
+<p>在循环双链表L中，某结点*p 为尾结点时，p-&gt;next==L:当循环双链表为空表时，其头结点的 prior 城和 next 域都等于L。</p>
+<h3 id="2-3-5-静态链表"><a href="#2-3-5-静态链表" class="headerlink" title="2.3.5 静态链表"></a>2.3.5 静态链表</h3><p>静态链表借助数组来描述线性表的链式存储结构，结点也有数据域 data 和指针域 next与前面所讲的链表中的指针不同的是，这里的指针是结点的相对地址(数组下标)，又称游标。和顺序表一样，静态链表也要预先分配一块连续的内存空间。静态链表和单链表的对应关系如图 2.14 所示。</p>
+<pre class="language-c" data-language="c"><code class="language-c">#define MaxSize 50
+typedef struct {
+    ElemType data;
+    int next;
+} SLinkList[MaxSize];</code></pre>
+<p>i 存储的是下个节点的位置<br>静态链表以next==-1 作为其结束的标志。静链表的插入、删除操作与动态链表的相同只需要修改指针，而不需要移动元素。总体来说，静态链表没有单链表使用起来方便，但在一些不支持指针的高级语言(如 Basic)中，这是一种非常巧妙的设计方法。</p>
+<h3 id="2-3-6-顺序表和链表的比较"><a href="#2-3-6-顺序表和链表的比较" class="headerlink" title="2.3.6 顺序表和链表的比较"></a>2.3.6 顺序表和链表的比较</h3><ol>
+<li>存取(读写)方式<br>顺序表可以顺序存取，也可以随机存取，链表只能从表头顺序存取元素。例如在第i个位置上执行存或取的操作，顺序表仅需一次访问，而链表则需从表头开始依次访问i次</li>
+<li>逻辑结构与物理结构<br>采用顺序存储时，逻辑上相邻的元素，对应的物理存储位置也相邻。而采用链式存储时，逻辑上相邻的元素，物理存储位置不一定相邻，对应的逻辑关系是通过指针链接来表示的。</li>
+<li>查找、插入和删除操作<br>对于按值查找，顺序表无序时，两者的时间复杂度均为 O(n):顺序表有序时，可采用折半查找，此时的时间复杂度为 O(log2n)。<br>对于按序号查找，顺序表支持随机访问，时间复杂度仅为 0(1)，而链表的平均时间复杂度为O(n)。顺序表的插入、删除操作，平均需要移动半个表长的元素。链表的插入、删除操作，只需修改相关结点的指针域即可。由于链表的每个结点都带有指针域，故而存储密度不够大。</li>
+<li>空间分配<br>顺序存储在静态存储分配情形下，一旦存储空间装满就不能扩充，若再加入新元素，则会出现内存溢出，因此需要预先分配足够大的存储空间。预先分配过大，可能会导致顺序表后部大量闲置;预先分配过小，又会造成溢出。动态存储分配虽然存储空间可以扩充，但需要移动大量元素，导致操作效率降低，而且若内存中没有更大块的连续存储空间，则会导致分配失败。链式存储的结点空间只在需要时申请分配，只要内存有空间就可以分配，操作灵活、高效。</li>
+</ol>
+<p>在实际中应该怎样选取存储结构呢?</p>
+<ol>
+<li>基于存储的考虑<br>难以估计线性表的长度或存储规模时，不宜采用顺序表;链表不用事先估计存储规模，但链表的存储密度较低，显然链式存储结构的存储密度是小于1的。</li>
+<li>基于运算的考虑<br>在顺序表中按序号访问a;的时间复杂度为 O(1)，而表中按序号访问的时间复杂度为O(n)因此若经常做的运算是按序号访问数据元素，则显然顺序表优于链表。<br>在顺序表中进行插入、删除操作时，平均移动表中一半的元素，当数据元素的信息量较大日表较长时，这一点是不应忽视的:在链表中进行插入、删除操作时，虽然也要找插入位置，但操作主要是比较操作，从这个角度考虑显然后者优于前者。</li>
+<li>基于环境的考虑<br>顺序表容易实现，任何高级语言中都有数组类型，链表的操作是基于指针的，相对来讲，前者实现较为简单，这也是用户考虑的一个因素。<br>总之，两种存储结构各有长短，选择哪一种山实际问题的主要因素决定。通常较稳定的线性表选择顺序存储，而频繁进行插入、删除操作的线性表(即动态性较强)宜选择链式存储<br><strong>注意</strong>:只有熟练学握顺序存储和链式存储，才能深刻理解它们各自的优缺点.</li>
+</ol>
+<h1 id="3-栈，队列和数组"><a href="#3-栈，队列和数组" class="headerlink" title="3 栈，队列和数组"></a>3 栈，队列和数组</h1><h2 id="3-1-栈"><a href="#3-1-栈" class="headerlink" title="3.1 栈"></a>3.1 栈</h2><h3 id="3-1-1-栈的基本概念"><a href="#3-1-1-栈的基本概念" class="headerlink" title="3.1.1 栈的基本概念"></a>3.1.1 栈的基本概念</h3><ol>
+<li><p>栈的定义<br>栈(Stack) 是只允许在–端进行插入或删除操作的线性表。首先栈是一种线性表，但限定这种线性表只能在某一端进行插入和删除操作<br>栈顶(Top)。线性表允许进行插入删除的那端<br>栈底(Bottom)。固定的，不允许进行插入和删除的另一端。空栈。不含任何元素的空表<br>空栈是不含任何元素，栈的操作顺序是先进后出，我们每次接触到新的数据结构，从逻辑结构，存储结构，对数据的运算三方面着手。<br>栈的数学性质：n个不同元素进栈，出栈元素不同排列的个数为 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -1.625ex;" xmlns="http://www.w3.org/2000/svg" width="9.815ex" height="4.381ex" role="img" focusable="false" viewBox="0 -1218.1 4338.3 1936.3"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mfrac"><g data-mml-node="mrow" transform="translate(1131.2,552.1) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(220,-506) scale(0.707)"><g data-mml-node="mpadded"><g data-mml-node="mrow"></g></g><g data-mml-node="mstyle" transform="scale(1.414)"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(822.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1822.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><rect width="2522.4" height="60" x="120" y="220"></rect></g><g data-mml-node="msubsup" transform="translate(2762.4,0)"><g data-mml-node="mi"><path data-c="1D436" d="M50 252Q50 367 117 473T286 641T490 704Q580 704 633 653Q642 643 648 636T656 626L657 623Q660 623 684 649Q691 655 699 663T715 679T725 690L740 705H746Q760 705 760 698Q760 694 728 561Q692 422 692 421Q690 416 687 415T669 413H653Q647 419 647 422Q647 423 648 429T650 449T651 481Q651 552 619 605T510 659Q484 659 454 652T382 628T299 572T226 479Q194 422 175 346T156 222Q156 108 232 58Q280 24 350 24Q441 24 512 92T606 240Q610 253 612 255T628 257Q648 257 648 248Q648 243 647 239Q618 132 523 55T319 -22Q206 -22 128 53T50 252Z"></path></g><g data-mml-node="mi" transform="translate(845.3,363) scale(0.707)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="TeXAtom" transform="translate(748,-295.7) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="mi" transform="translate(500,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g></g></svg></mjx-container>，该公式叫卡特兰数，可采用数学归纳法证明</p>
+</li>
+<li><p>栈的基本操作</p>
+</li>
+</ol>
+<p>各种辅导书中给出的基本操作的名称不尽相同，但所表达的意思大致是一样的。这里我们以严蔚敏编写的教材为准给出栈的基本操作，希望读者能熟记下面的基本操作<br>Initstack(&amp;s):初始化一个空栈 S。<br>stackEmpty(S):判断一个栈是否为空，若S 为空则返回 true，否则返回 false。<br>Push(&amp;s,x):进栈，若栈 S 未满，则将x 加入使之成为新栈顶。<br>Pop(&amp;S，&amp;x):出栈，若伐 S 非空，则弹出栈顶元素，并用x 返回。<br>GetTop(S，&amp;x): 读栈顶元素，若栈 S 非空，则用x返回栈顶元素。<br>Destroystack(&amp;S):销毁，并释放栈S 占的存储空间(“&amp;”表示引用调用)在解答算法题时，若题干未做出限制，则可直接使用这些基本的操作函数。</p>
+<h3 id="3-1-2-栈的顺序存储结构"><a href="#3-1-2-栈的顺序存储结构" class="headerlink" title="3.1.2 栈的顺序存储结构"></a>3.1.2 栈的顺序存储结构</h3><ol>
+<li>采用顺序存储的栈称为顺序栈，它利用一组地址连续的存储单元存放自栈底到栈顶的数据元素，同时附设一个指针(top) 指示当前栈顶元素的位置。</li>
+</ol>
+<pre class="language-c" data-language="c"><code class="language-c">#define Maxsize 50
+typedef struct {
+        Elemtype data[Maxsize];
+        int top
+} SqStack;</code></pre>
+<p>栈顶操作：S.top 在初始时候是S.top=-1, 栈顶元素S.data[S.top]<br>进栈操作：栈不满时，栈顶指针先加1，再送值进来<br>出栈操作：栈非空时候，先取栈顶元素值，再将栈顶指针减1<br>栈空元素：S.top==-1<br>栈满条件：S.top==Maxsize-1<br>栈长：S.top+1<br>由于顺序栈的入栈操作受数组上界的约束，当对栈的最大使用空间估计不足时，有可能发生栈上溢，此时应该即使像用户报告消息，及时处理消息</p>
+<ol start="2">
+<li><p>顺序栈的基本运算</p>
+<ol>
+<li>初始化  <pre class="language-c" data-language="c"><code class="language-c">void InitStack(SqStack &amp;S){
+    S.top = -1;
+}</code></pre></li>
+<li>判断空 <pre class="language-c" data-language="c"><code class="language-c">bool StackEmpty (SqStack S){
+    if(S.top==-1)
+        return true;
+    else
+        return false;
+}</code></pre></li>
+<li>进栈 <pre class="language-c" data-language="c"><code class="language-c">bool Push(SqStack &amp;S,ElemType x){
+    if (S.top==Maxsize-1){
+        return false;
+    }
+    S.data[++S.top]=x;
+    return true;
+}</code></pre>
+ 当栈不满时，top先加1，再入栈，</li>
+<li>出栈 <pre class="language-c" data-language="c"><code class="language-c">bool Pop(SqStack &amp;S,ElemType &amp;x){
+    if (S.top == -1){
+        return false;
+    }
+    x=S.data[S.top--]
+    return true;
+}</code></pre></li>
+<li>读取栈顶元素 <pre class="language-c" data-language="c"><code class="language-c">bool GetTop(SqStack &amp;S ,ElemType x){
+    if (S.top==-1){
+        return false;
+    }
+    x=S.data[S.top]
+    return true;
+}</code></pre>
+注意：如果栈的初始化是S.top =0，那么入栈和出栈操作都发生变化。</li>
+</ol>
+</li>
+<li><p>共享栈</p>
+</li>
+</ol>
+<p>就是开辟一个共享空间，然后从两边向中间操作，两端点是栈低。</p>
+<h3 id="3-1-3-栈的链式存储结构"><a href="#3-1-3-栈的链式存储结构" class="headerlink" title="3.1.3 栈的链式存储结构"></a>3.1.3 栈的链式存储结构</h3><p>采用链式存储结构的栈称为<strong>链栈</strong>,链栈的优点是便于多个栈共享存储空间提高存储效率，且不存在栈上溢的情况<br>通常采用单链表实现，并规定所有才做在表头进行，我们规定链栈没有头节点，Lhead指向栈顶元素</p>
+<p>栈的链式存储结构数据结构描述</p>
+<pre class="language-c" data-language="c"><code class="language-c">typedef struct Linknode{
+    ElemType data;
+    struct Linknode *next;
+}*LiStack;
+</code></pre>
+<p>有一点要注意带头节点和不带头结点的链栈，具体实现会有不同</p>
+<h2 id="3-2-队列"><a href="#3-2-队列" class="headerlink" title="3.2 队列"></a>3.2 队列</h2><h3 id="3-2-1-队列的基本概念"><a href="#3-2-1-队列的基本概念" class="headerlink" title="3.2.1 队列的基本概念"></a>3.2.1 队列的基本概念</h3><p>队列简称队，也是一种操作受限的线性表，只允许在表的一端出，另一端进。<br>队头：允许删除的一端，又称队首。拿走删除的一端是队头<br>队尾：允许插入的一端<br>空队列，不包含任何元素<br>队列的基本操作：</p>
+<pre class="language-c" data-language="c"><code class="language-c">InitQueue(&amp;Q)  //初始化一个空队列
+QueueEmpty(Q)  //判断队列是否为空
+EnQueue(&amp;Q,x)  // 清空队列
+DeQueue(&amp;Q,&amp;x) //出队
+GetHead(Q,&amp;x)  // 读取头元素   </code></pre>
+
+<h3 id="3-2-2-队列的顺序存储结构"><a href="#3-2-2-队列的顺序存储结构" class="headerlink" title="3.2.2 队列的顺序存储结构"></a>3.2.2 队列的顺序存储结构</h3><ol>
+<li>队列的顺序存储结构</li>
+</ol>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/API_design%E5%8E%9F%E5%88%99/"
+                    data-tooltip="API Design Patterns"
+                    aria-label="PREVIOUS: API Design Patterns"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/algorithm/%E7%AE%97%E6%B3%954/%E7%AE%97%E6%B3%954/"
+                    data-tooltip="算法4"
+                    aria-label="NEXT: 算法4"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/algorithm/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/API_design%E5%8E%9F%E5%88%99/"
+                    data-tooltip="API Design Patterns"
+                    aria-label="PREVIOUS: API Design Patterns"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/algorithm/%E7%AE%97%E6%B3%954/%E7%AE%97%E6%B3%954/"
+                    data-tooltip="算法4"
+                    aria-label="NEXT: 算法4"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/algorithm/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/algorithm/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%8E%8B%E9%81%93%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-2mrdgre6o8oumjyqh1gawnnqlakhnetes6k3qnahlvgvfzutbbznavmu0avb.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/algorithm/王道数据结构/王道数据结构/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

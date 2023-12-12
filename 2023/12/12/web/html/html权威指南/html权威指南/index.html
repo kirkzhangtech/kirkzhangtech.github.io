@@ -1,0 +1,1245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>html权威指南 - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"摘要： 系统的补一下相关知识,这本写的是真垃圾\n\n\n\n\n\n\n1. html基础1.1 使用元素(标签)在现代html元素中，我们应该使用具有代表含义，因为会影响呈现方式\n&lt;code> apple &lt;/code> \n\n上面就是最简单的使用code元素的例子\ncode是标签或者教元素，特别注意的是&lt;code&gt;是语义元素 ， apple是内容。注意，浏览器不会显示元素的标签，它的任务是解读HTML文档，然后向用户呈现一个体现了HTML元素作用的视图\n1.2 本章用的元素空元素：有标签但是没内容交空元素自闭合标签：\n&lt;meta/>\t定义网页的信息（供搜索引擎查看）\n&lt;link/>\t引入“外部CSS文件”\n&lt;br/>\t    换行标签\n&lt;hr/>\t    水平线标签\n&lt;img/>\t    图片标签\n&lt;input/>\t表单标签\n\n虚元素： 只能使用一个标签，中间放置任何内容都不符合html规范，这类元素成为需元素。&lt;hr&gt;元素表示一段的结束，还有另外一种表示方式&lt;hr /&gt;\n1.3 创建html文档\n基本结构请参考3.1.1\n&lt;head&gt;通常放元数据内容，比如\n内容主要就是网页主要内容\n父元素，子元素，兄弟元素，元素间关系的重要性在HTML中随处可见。一个元素能以什么样的元素为父元素或子元素是有限制的，这些限制通过元素类型\n元素类型 HTML5规范将元素分为三大类:\n元数据元素(metadata element)、元数据元素用来构建HTML文档的基本结构，以及就如何处理文档向浏览器提供信息和指示\n流元素(lowelement) 流元素是短语元素的超集。这就是说，所有短语元素都是流元素\n短语元素(phrasingelement )。。另外两种元素略有不同，它们的用途是确定一个元素合法的父元素和子元素范围。短语元素是HTML的基本成分。但并非所有流元素都是短语元素\n\n\n\n2 语义与呈现分离我的建议是:在语义方面要求严格点不为过，只要有条件，尽量避用那些具有浓重呈现意味或纯粹起呈现作用的元素。定义一个自定义类然后借助它应用所需样式并不复杂。只要做到样式的采用是以内容类型为依据而不是随心所欲，你至少也保持了一颗向着语义的心。\n\n标记只对内容和语义使用，而呈现交给css\n切记不要乱用标记\n别误用标记\n\n3 HTML元素参考w3school\n19.1 基础标签&lt;!DOCTYPE> 声明对大小写不敏感。  &lt;!-- 文档类型 --->\n&lt;!DOCTYPE html>\n&lt;html>\n   &lt;head>&lt;/head>\n   &lt;body>\n      &lt;h1>h1&lt;/h1>\n      &lt;h2>h2&lt;/h2>\n      &lt;h3>h3&lt;/h3>\n      &lt;h4>h4&lt;/h4>\n      &lt;h5>h5&lt;/h5>\n      &lt;h6>h6&lt;/h6>\n      &lt;p>段落&lt;/p> &lt;!--段落-->换行&lt;br />      &lt;!--定义简单的折行-->\n      &lt;hr />      &lt;!--定义水平线-->\n   &lt;/body>\n\n&lt;/html>\n\n\n\n19.2 格式化标签&lt;abbr>\nPRC \n\n\n&lt;address>   &lt;!-- 定义文档作者或拥有者的联系信息。 -->\n   \nWritten by Donald Duck. \nVisit us at:\nExample.com\nBox 564, Disneyland\nUSA\n\n\n\n&lt;b>\t      定义粗体文本。\n&lt;bdi>\t      定义文本的文本方向，使其脱离其周围文本的方向设置。\n&lt;bdo>\t      定义文字方向。\nUsername Bill   :80 point \t      定义文字方向。      Here is some Hebrew text\n\n\n&lt;blockquote>定义长的引用。\n&lt;cite>\t   定义引用(citation)。\n&lt;code>\t   定义计算机代码文本。\n&lt;del>\t      定义被删除文本线。\n一打有 二十 十二 件。\n\n\n&lt;dfn>\t      定义项目。\n&lt;em>\t      定义强调文本。斜体&lt;/em>\n&lt;i>\t      定义斜体文本。&lt;/i>\n&lt;ins>\t      定义被插入文本。下划线\n&lt;kbd>\t      定义键盘文本。\n\n&lt;ins>\t 定义被插入文本。下划线&lt;/ins>&lt;br>\n&lt;kbd>Cmd&lt;/kbd> + &lt;kbd>C&lt;/kbd>\n\t      定义斜体文本。\t      定义强调文本。斜体\t 定义被插入文本。下划线Cmd + C\n\n\n&lt;mark>\t   定义有记号的文本。\n&lt;p>Do not forget to buy &lt;mark>milk&lt;/mark> today.&lt;/p>\n\nDo not forget to buy milk today.\n\n\n&lt;meter>\t   定义预定义范围内的度量。\n&lt;meter value=\"3\" min=\"0\" max=\"10\">十分之三&lt;/meter>&lt;br>\n\n\n十分之三\n\n\n&lt;pre>\t      定义预格式文本。\n\n\n&lt;html&gt;\n\n&lt;head&gt;\n  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;\n&lt;/script&gt;\n&lt;/head&gt;\n\n&lt;body&gt;\n\n  &lt;script type=&quot;text/javascript&quot;&gt;\n    xmlDoc=loadXMLDoc(&quot;books.xml&quot;);\n    document.write(&quot;xmlDoc is loaded, ready for use&quot;);\n  &lt;/script&gt;\n\n&lt;/body&gt;\n\n&lt;/html&gt;\n\n\n\n&lt;progress>\t定义任何类型的任务的进度。\n&lt;progress value=\"22\" max=\"100\">&lt;/progress> &lt;br>\n\n \n\n\n&lt;q>\t      定义短的引用。\n&lt;q>Here is a short quotation here is a short quotation&lt;/q>&lt;br>\n\n\nHere is a short quotation here is a short quotation\n\n\n&lt;rp>\t      定义若浏览器不支持 ruby 元素显示的内容。\n&lt;ruby>\n漢 &lt;rt>&lt;rp>(&lt;/rp>ㄏㄢˋ&lt;rp>)&lt;/rp>&lt;/rt>\n&lt;/ruby>\n\n漢 (ㄏㄢˋ)\n\n\n\n&lt;rt>\t      定义 ruby 注释的解释\n&lt;ruby>\n漢 &lt;rt> ㄏㄢˋ &lt;/rt>\n&lt;/ruby>\n\n漢  ㄏㄢˋ \n\n\n\n&lt;ruby>\t   定义 ruby 注释。\n&lt;ruby>\n漢 &lt;rt>&lt;rp>(&lt;/rp>ㄏㄢˋ&lt;rp>)&lt;/rp>&lt;/rt>\n&lt;/ruby>\n\n漢 (ㄏㄢˋ)\n\n\n\n&lt;s>\t      定义加删除线的文本。\n在 HTML 5 中，&lt;s>仍然支持&lt;/s>已经不支持这个标签了。\n在 HTML 5 中，仍然支持已经不支持这个标签了。\n\n\n&lt;samp>\t   定义文本样本。\n\nkirkzhang, what you have done before? what was you doing on younth\n\n\n\n&lt;small>\t   定义小号文本。\n&lt;small>定义小号文本&lt;/small>\n定义小号文本\n\n\n&lt;strike>\t   定义加删除线文本。HTML5 中不支持。请使用 &lt;del> 或 &lt;s> 代替。\n\n\n&lt;strong>\t   定义语气更为强烈的强调文本。\n&lt;strong>定义语气更为强烈的强调文本。&lt;/strong>\n定义语气更为强烈的强调文本。\n\n\n&lt;sup>\t      定义上标文本。\n这段文本包含 &lt;sup>上标&lt;/sup>\n这段文本包含 上标\n\n\n&lt;sub>\t      定义下标文本。\n这段文本包含 &lt;sub>下标&lt;/sub>\n这段文本包含 下标\n\n\n&lt;template>\t定义用作容纳页面加载时隐藏内容的容器。\n&lt;button onclick=\"showContent()\">显示被隐藏的内容&lt;/button>\n\n&lt;template>\n  &lt;h2>Flower&lt;/h2>\n  &lt;img src=\"img_white_flower.jpg\" width=\"214\" height=\"204\">\n&lt;/template>\n\n&lt;script>\nfunction showContent() &#123;\n  var temp = document.getElementsByTagName(\"template\")[0];\n  var clon = temp.content.cloneNode(true);\n  document.body.appendChild(clon);\n&#125;\n&lt;/script>\n显示被隐藏的内容\n\n  Flower\n  \n\n\n\nfunction showContent() {\n  var temp = document.getElementsByTagName(\"template\")[0];\n  var clon = temp.content.cloneNode(true);\n  document.body.appendChild(clon);\n}\n\n\n\n&lt;time>\t   定义日期/时间。\n&lt;p>我在 &lt;time datetime=\"2008-02-14\">情人节&lt;/time> 有个约会。&lt;/p>\n我在 情人节 有个约会。\n\n\n&lt;tt>\t      定义打字机文本。HTML5 中不支持。请使用 CSS 代替。\n\n\n&lt;u>\t      定义下划线文本。\n&lt;p>如果文本不是超链接，就不要&lt;u>对其使用下划线&lt;/u>。&lt;/p>\n类似于单词under的缩写\n如果文本不是超链接，就不要对其使用下划线。\n\n\n&lt;var>\t      定义文本的变量部分。\n&lt;code>\n&lt;var>person&lt;/var>\n&lt;/code>\n&lt;hr>\n\nperson\n\n\n\n&lt;wbr>\t定义可能的换行符。（单词换行时机）\n&lt;p>\n如果想学习 AJAX，那么您必须熟悉 XML&lt;wbr>Http&lt;wbr>Request 对象。\n&lt;/p>\nthis is a new sentence \n\n如果想学习 AJAX，那么您必须熟悉 XMLHttpRequest 对象。\n\n\n\n19.3 表单和输入表单的输入详情\nenctype 属性可能的值：\n\napplication&#x2F;x-www-form-urlencoded在发送前编码所有字符（默认）（空格被编码为’+’，特殊字符被编码为ASCII十六进制字符）\nmultipart&#x2F;form-data不对字符编码。在使用包含文件上传控件的表单时，必须使用该值。有附件时候需指定\ntext&#x2F;plain空格转换为 “+” 加号，但不对特殊字符编码\n\ninput属性textarea定义多行的文本输入控件buttonselectoptgroupoption定义选择列表中的选项label定义input元素标注fieldset定义围绕表单中元素的边框legenddatalistkeygenoutput\n19.4 框架frame\t定义框架集的窗口或框架。HTML5 中不支持。frameset\t定义框架集。HTML5 中不支持。noframes\t定义针对不支持框架的用户的替代内容。HTML5 中不支持。iframe\t定义内联框架。\n19.5 图像img定义图像map定义图像映射[area定义图像地图内部的区域][canvas]\t定义图形。[figcaption]\t定义 figure 元素的标题。[figure]\t定义媒介内容的分组，以及它们的标题。[svg]\t定义 SVG 图形的容器。\n19.6 音视频[&lt;audio>](sdasd)\t定义声音内容。\n&lt;source>\t定义媒介源。\n&lt;track>\t定义用在媒体播放器中的文本轨道。\n&lt;video>\t定义视频。\n19.7 链接&lt;a>\t   定义锚。\n&lt;link>\t定义文档与外部资源的关系。\n&lt;nav>\t   定义导航链接。\n\n19.8 链接&lt;ul>\t定义无序列表。\n&lt;ol>\t定义有序列表。\n&lt;li>\t定义列表的项目。\n&lt;dir>\t定义大号文本。HTML5 中不支持。请使用 CSS 代替。\n&lt;dl>\t定义定义列表。\n&lt;dt>\t定义定义列表中的项目。\n&lt;dd>\t定义定义列表中项目的描述。\n&lt;menu>\t定义命令的菜单/列表。\n&lt;menuitem>\t定义用户可以从弹出菜单调用的命令/菜单项目。\n&lt;command>\t定义命令按钮。\n\n19.9 表格&lt;table>\t定义表格\n&lt;caption>\t定义表格标题。\n&lt;th>\t定义表格中的表头单元格。\n&lt;tr>\t定义表格中的行。\n&lt;td>\t定义表格中的单元。\n&lt;thead>\t定义表格中的表头内容。\n&lt;tbody>\t定义表格中的主体内容。\n&lt;tfoot>\t定义表格中的表注内容（脚注）。\n&lt;col>\t定义表格中一个或多个列的属性值。\n&lt;colgroup>\t定义表格中供格式化的列组。\n\n19.10 样式和语义&lt;style&gt;\t定义文档的样式信息。\n&lt;div&gt;\t定义文档中的节。\n&lt;span&gt;\t定义文档中的节。\n&lt;header&gt;\t定义 section 或 page 的页眉。\n&lt;footer&gt;\t定义 section 或 page 的页脚。\n&lt;main&gt;\t定义文档的主要内容。\n&lt;section&gt;\t定义 section。\n&lt;article&gt;\t定义文章。\n&lt;aside&gt;\t定义页面内容之外的内容。\n&lt;details&gt;\t定义元素的细节。\n&lt;dialog&gt;\t定义对话框或窗口。\n&lt;summary&gt;\t为 &lt;details&gt; 元素定义可见的标题。\n&lt;data&gt;\t添加给定内容的机器可读翻译。\n\n19.11 元信息&lt;head&gt;\t定义关于文档的信息。\n&lt;meta&gt;\t定义关于 HTML 文档的元信息。\n&lt;base&gt;\t定义页面中所有链接的默认地址或默认目标。\n&lt;basefont&gt;\t定义页面中文本的默认字体、颜色或尺寸。HTML5 中不支持。请使用 CSS 代替。\n19.12 编程script标签说明\n&lt;script>\t定义客户端脚本。\n\n\n\n属性\n值\n描述\n\n\n\nasync\nasync\n规定异步执行脚本（仅适用于外部脚本）。\n\n\ncharset\ncharset\n规定在外部脚本文件中使用的字符编码。\n\n\ncrossorigin\nanonymous&#x2F;use-credentials 将请求模式设置为\nHTTP CORS 请求。\n\n\ndefer\ndefer\n规定是否对脚本执行进行延迟，直到页面加载为止。\n\n\nlanguage\nscript\n不赞成使用。规定脚本语言。请使用 type 属性代替它。\n\n\nreferrepolicy\nno-referrer&#x2F;no-referrer-when-downgrade&#x2F;origin&#x2F;origin-when-cross-origin&#x2F;same-origin&#x2F;strict-origin&#x2F;strict-origin-when-cross-origin&#x2F;unsafe-url\n规定外部脚本文件的 URL。\n\n\nsrc\nURL\n规定外部脚本文件的 URL。\n\n\nxml:space\npreserve\n规定是否保留代码中的空白。\n\n\ntype\nMIME-type application&#x2F;javascript 如果这个值是module，则代码会被当成ES6模块，而且只有这时候代码中才能出现import和export关键字\n指示脚本的 MIME 类型。\n\n\n&lt;noscript>\t定义针对不支持客户端脚本的用户的替代内容。\n&lt;applet>\t定义嵌入的 applet。HTML5 中不支持。请使用 &lt;embed> 和 &lt;object> 代替。\n&lt;embed>\t为外部应用程序（非 HTML）定义容器。\n&lt;object>\t定义嵌入的对象。\n&lt;param>\t定义对象的参数。\n\n20 使用DOM元素20 浏览器支持情况w3school\n21 全局属性accesskey\t      规定激活元素的快捷键。\nclass\t            规定元素的一个或多个类名（引用样式表中的类）。\ncontenteditable\t规定元素内容是否可编辑。\ncontextmenu\t      规定元素的上下文菜单。上下文菜单在用户点击元素时显示。\ndata-*\t         用于存储页面或应用程序的私有定制数据。\ndir\t            规定元素中内容的文本方向。\ndraggable\t      规定元素是否可拖动。-- 这个可以在网页做出很酷的东西\ndropzone\t         规定在拖动被拖动数据时是否进行复制、移动或链接。\nhidden\t         规定元素仍未或不再相关。\nid\t               规定元素的唯一 id。\nlang\t            规定元素内容的语言。\nspellcheck\t      规定是否对元素进行拼写和语法检查。\nstyle\t            规定元素的行内 CSS 样式。\ntabindex\t         规定元素的 tab 键次序。\ntitle\t            规定有关元素的额外信息。\ntranslate\t      规定是否应该翻译元素内容。\n\n22 事件事件参考手册\n\nWindow 事件属性\n\n\n\n\n事件名\n类型\n说明\n\n\n\nonafterprint\nscript\n文档打印之后运行的脚本。\n\n\nonbeforeprint\nscript\n文档打印之前运行的脚本。\n\n\nonbeforeunload\nscript\n文档卸载之前运行的脚本。\n\n\nonerror\nscript\n在错误发生时运行的脚本。\n\n\nonhaschange\nscript\n当文档已改变时运行的脚本\n\n\nonload\nscript\n页面结束加载之后触发。\n\n\nonmessage\nscript\n在消息被触发时运行的脚本\n\n\nonoffline\nscript\n当文档离线时运行的脚本。\n\n\nononline\nscript\n当文档上线时运行的脚本。\n\n\nonpagehide\nscript\n当窗口隐藏时运行的脚本。\n\n\nonpageshow\nscript\n当窗口成为可见时运行的脚本。\n\n\nonpopstate\nscript\n当窗口历史记录改变时运行的脚本。\n\n\nonredo\nscript\n当文档执行撤销（redo）时运行的脚本。\n\n\nonresize\nscript\n当浏览器窗口被调整大小时触发。\n\n\nonstorage\nscript\n在 Web Storage 区域更新后运行的脚本。\n\n\nonundo\nscript\n在文档执行 undo 时运行的脚本。\n\n\nonunload\nscript\n一旦页面已下载时触发（或者浏览器窗口已被关闭\n\n\n\nForm 事件\nonblur\tscript\t元素失去焦点时运行的脚本。\nonchange\tscript\t在元素值被改变时运行的脚本。\noncontextmenu\tscript\t当上下文菜单被触发时运行的脚本。\nonfocus\tscript\t当元素获得焦点时运行的脚本。\nonformchange\tscript\t在表单改变时运行的脚本。\nonforminput\tscript\t当表单获得用户输入时运行的脚本。\noninput\tscript\t当元素获得用户输入时运行的脚本。\noninvalid\tscript\t当元素无效时运行的脚本。\nonreset\tscript\t当表单中的重置按钮被点击时触发。HTML5 中不支持。\nonselect\tscript\t在元素中文本被选中后触发。\nonsubmit\tscript\t在提交表单时触发。\n\n鼠标事件\nonkeydown\tscript\t在用户按下按键时触发。\nonkeypress\tscript\t在用户敲击按钮时触发。\nonkeyup\tscript\t当用户释放按键时触发。\nMouse事件\nonclick\tscript\t元素上发生鼠标点击时触发。\nondblclick\tscript\t元素上发生鼠标双击时触发。\nondrag\tscript\t元素被拖动时运行的脚本。\nondragend\tscript\t在拖动操作末端运行的脚本。\nondragenter\tscript\t当元素元素已被拖动到有效拖放区域时运行的脚本。\nondragleave\tscript\t当元素离开有效拖放目标时运行的脚本。\nondragover\tscript\t当元素在有效拖放目标上正在被拖动时运行的脚本。\nondragstart\tscript\t在拖动操作开端运行的脚本。\nondrop\tscript\t   当被拖元素正在被拖放时运行的脚本。\nonmousedown\tscript\t当元素上按下鼠标按钮时触发。\nonmousemove\tscript\t当鼠标指针移动到元素上时触发。\nonmouseout\tscript\t当鼠标指针移出元素时触发。\nonmouseover\tscript\t当鼠标指针移动到元素上时触发。\nonmouseup\tscript\t当在元素上释放鼠标按钮时触发。\nonmousewheel\tscript\t当鼠标滚轮正在被滚动时运行的脚本。\nonscroll\tscript\t   当元素滚动条被滚动时运行的脚本。\nMedia 事件\nonabort\tscript\t在退出时运行的脚本。\noncanplay\tscript\t当文件就绪可以开始播放时运行的脚本（缓冲已足够开始时）。\noncanplaythrough\tscript\t当媒介能够无需因缓冲而停止即可播放至结尾时运行的脚本。\nondurationchange\tscript\t当媒介长度改变时运行的脚本。\nonemptied\tscript\t当发生故障并且文件突然不可用时运行的脚本（比如连接意外断开时）。\nonended\tscript\t当媒介已到达结尾时运行的脚本（可发送类似“感谢观看”之类的消息）。\nonerror\tscript\t当在文件加载期间发生错误时运行的脚本。\nonloadeddata\tscript\t当媒介数据已加载时运行的脚本。\nonloadedmetadata\tscript\t当元数据（比如分辨率和时长）被加载时运行的脚本。\nonloadstart\tscript\t在文件开始加载且未实际加载任何数据前运行的脚本。\nonpause\tscript\t当媒介被用户或程序暂停时运行的脚本。\nonplay\tscript\t当媒介已就绪可以开始播放时运行的脚本。\nonplaying\tscript\t当媒介已开始播放时运行的脚本。\nonprogress\tscript\t当浏览器正在获取媒介数据时运行的脚本。\nonratechange\tscript\t每当回放速率改变时运行的脚本（比如当用户切换到慢动作或快进模式）。\nonreadystatechange\tscript\t每当就绪状态改变时运行的脚本（就绪状态监测媒介数据的状态）。\nonseeked\tscript\t当 seeking 属性设置为 false（指示定位已结束）时运行的脚本。\nonseeking\tscript\t当 seeking 属性设置为 true（指示定位是活动的）时运行的脚本。\nonstalled\tscript\t在浏览器不论何种原因未能取回媒介数据时运行的脚本。\nonsuspend\tscript\t在媒介数据完全加载之前不论何种原因终止取回媒介数据时运行的脚本。\nontimeupdate\tscript\t当播放位置改变时（比如当用户快进到媒介中一个不同的位置时）运行的脚本。\nonvolumechange\tscript\t每当音量改变时（包括将音量设置为静音）时运行的脚本。\nonwaiting\tscript\t当媒介已停止播放但打算继续播放时（比如当媒介暂停已缓冲更多数据）运行脚本\n\n23 HTML Canvas 参考手册24 HTML 音频&#x2F;视频参考手册","dateCreated":"2023-12-12T19:30:59+08:00","dateModified":"2023-12-12T19:30:59+08:00","datePublished":"2023-12-12T19:30:59+08:00","description":"摘要： 系统的补一下相关知识,这本写的是真垃圾","headline":"html权威指南","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"}</script>
+    <meta name="description" content="摘要： 系统的补一下相关知识,这本写的是真垃圾">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="html权威指南">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="摘要： 系统的补一下相关知识,这本写的是真垃圾">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/img_white_flower.jpg">
+<meta property="article:published_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:modified_time" content="2023-12-12T11:30:59.075Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/img_white_flower.jpg">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-6282fdnvziozzvtprbntzupxyhc5mlkphbaevboelgvnx2vnnspamitnamq7.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            html权威指南
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/js/">js</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>摘要： 系统的补一下相关知识,这本写的是真垃圾</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-html%E5%9F%BA%E7%A1%80"><span class="toc-text">1. html基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E4%BD%BF%E7%94%A8%E5%85%83%E7%B4%A0-%E6%A0%87%E7%AD%BE"><span class="toc-text">1.1 使用元素(标签)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E6%9C%AC%E7%AB%A0%E7%94%A8%E7%9A%84%E5%85%83%E7%B4%A0"><span class="toc-text">1.2 本章用的元素</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E5%88%9B%E5%BB%BAhtml%E6%96%87%E6%A1%A3"><span class="toc-text">1.3 创建html文档</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E8%AF%AD%E4%B9%89%E4%B8%8E%E5%91%88%E7%8E%B0%E5%88%86%E7%A6%BB"><span class="toc-text">2 语义与呈现分离</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-HTML%E5%85%83%E7%B4%A0"><span class="toc-text">3 HTML元素</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#19-1-%E5%9F%BA%E7%A1%80%E6%A0%87%E7%AD%BE"><span class="toc-text">19.1 基础标签</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-2-%E6%A0%BC%E5%BC%8F%E5%8C%96%E6%A0%87%E7%AD%BE"><span class="toc-text">19.2 格式化标签</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">Flower</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-3-%E8%A1%A8%E5%8D%95%E5%92%8C%E8%BE%93%E5%85%A5"><span class="toc-text">19.3 表单和输入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-4-%E6%A1%86%E6%9E%B6"><span class="toc-text">19.4 框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-5-%E5%9B%BE%E5%83%8F"><span class="toc-text">19.5 图像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-6-%E9%9F%B3%E8%A7%86%E9%A2%91"><span class="toc-text">19.6 音视频</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-7-%E9%93%BE%E6%8E%A5"><span class="toc-text">19.7 链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-8-%E9%93%BE%E6%8E%A5"><span class="toc-text">19.8 链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-9-%E8%A1%A8%E6%A0%BC"><span class="toc-text">19.9 表格</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-10-%E6%A0%B7%E5%BC%8F%E5%92%8C%E8%AF%AD%E4%B9%89"><span class="toc-text">19.10 样式和语义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-11-%E5%85%83%E4%BF%A1%E6%81%AF"><span class="toc-text">19.11 元信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-12-%E7%BC%96%E7%A8%8B"><span class="toc-text">19.12 编程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#20-%E4%BD%BF%E7%94%A8DOM%E5%85%83%E7%B4%A0"><span class="toc-text">20 使用DOM元素</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#20-%E6%B5%8F%E8%A7%88%E5%99%A8%E6%94%AF%E6%8C%81%E6%83%85%E5%86%B5"><span class="toc-text">20 浏览器支持情况</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#21-%E5%85%A8%E5%B1%80%E5%B1%9E%E6%80%A7"><span class="toc-text">21 全局属性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#22-%E4%BA%8B%E4%BB%B6"><span class="toc-text">22 事件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#23-HTML-Canvas-%E5%8F%82%E8%80%83%E6%89%8B%E5%86%8C"><span class="toc-text">23 HTML Canvas 参考手册</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#24-HTML-%E9%9F%B3%E9%A2%91-x2F-%E8%A7%86%E9%A2%91%E5%8F%82%E8%80%83%E6%89%8B%E5%86%8C"><span class="toc-text">24 HTML 音频&#x2F;视频参考手册</span></a></li></ol>
+
+
+
+<h1 id="1-html基础"><a href="#1-html基础" class="headerlink" title="1. html基础"></a>1. html基础</h1><h2 id="1-1-使用元素-标签"><a href="#1-1-使用元素-标签" class="headerlink" title="1.1 使用元素(标签)"></a>1.1 使用元素(标签)</h2><p>在现代html元素中，我们应该使用具有代表含义，因为会影响呈现方式</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span> apple <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> </code></pre>
+
+<p>上面就是最简单的使用<code>code</code>元素的例子</p>
+<p><code>code</code>是标签或者教元素，特别注意的是<code>&lt;code&gt;</code>是语义元素 ， apple是内容。注意，浏览器不会显示元素的标签，它的任务是解读HTML文档，然后向用户呈现一个体现了HTML元素作用的视图</p>
+<h2 id="1-2-本章用的元素"><a href="#1-2-本章用的元素" class="headerlink" title="1.2 本章用的元素"></a>1.2 本章用的元素</h2><p><strong>空元素</strong>：有标签但是没内容交空元素<br><strong>自闭合标签</strong>：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span><span class="token punctuation">/></span></span>	定义网页的信息（供搜索引擎查看）
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span><span class="token punctuation">/></span></span>	引入“外部CSS文件”
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span>	    换行标签
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span><span class="token punctuation">/></span></span>	    水平线标签
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>img</span><span class="token punctuation">/></span></span>	    图片标签
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span><span class="token punctuation">/></span></span>	表单标签</code></pre>
+
+<p><strong>虚元素</strong>： 只能使用一个标签，中间放置任何内容都不符合html规范，这类元素成为需元素。<code>&lt;hr&gt;</code>元素表示一段的结束，还有另外一种表示方式<code>&lt;hr /&gt;</code></p>
+<h2 id="1-3-创建html文档"><a href="#1-3-创建html文档" class="headerlink" title="1.3 创建html文档"></a>1.3 创建html文档</h2><ol>
+<li>基本结构请参考<a href="#311-%E6%9C%AC%E7%AB%A0%E7%94%A8%E7%9A%84%E5%85%83%E7%B4%A0">3.1.1</a></li>
+<li><code>&lt;head&gt;</code>通常放元数据内容，比如</li>
+<li>内容主要就是网页主要内容</li>
+<li>父元素，子元素，兄弟元素，元素间关系的重要性在HTML中随处可见。一个元素能以什么样的元素为父元素或子元素是有限制的，这些限制通过<strong>元素类型</strong></li>
+<li>元素类型 HTML5规范将元素分为三大类:<ul>
+<li><em>元数据元素</em>(metadata element)、元数据元素用来构建HTML文档的基本结构，以及就如何处理文档向浏览器提供信息和指示</li>
+<li><em>流元素</em>(lowelement) 流元素是短语元素的超集。这就是说，所有短语元素都是流元素</li>
+<li><em>短语元素</em>(phrasingelement )。。另外两种元素略有不同，它们的用途是确定一个元素合法的父元素和子元素范围。短语元素是HTML的基本成分。但并非所有流元素都是短语元素</li>
+</ul>
+</li>
+</ol>
+<h1 id="2-语义与呈现分离"><a href="#2-语义与呈现分离" class="headerlink" title="2 语义与呈现分离"></a>2 语义与呈现分离</h1><p>我的建议是:在语义方面要求严格点不为过，只要有条件，尽量避用那些具有浓重呈现意味或纯粹起呈现作用的元素。定义一个自定义类然后借助它应用所需样式并不复杂。只要做到样式的采用是以内容类型为依据而不是随心所欲，你至少也保持了一颗向着语义的心。</p>
+<ol>
+<li>标记只对内容和语义使用，而呈现交给css</li>
+<li>切记不要乱用标记</li>
+<li>别误用标记</li>
+</ol>
+<h1 id="3-HTML元素"><a href="#3-HTML元素" class="headerlink" title="3 HTML元素"></a>3 HTML元素</h1><p><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_a.asp">参考w3school</a></p>
+<h2 id="19-1-基础标签"><a href="#19-1-基础标签" class="headerlink" title="19.1 基础标签"></a>19.1 基础标签</h2><pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>!DOCTYPE</span><span class="token punctuation">></span></span> 声明对大小写不敏感。  <span class="token comment">&lt;!-- 文档类型 ---></span>
+<span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span>h1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h2</span><span class="token punctuation">></span></span>h2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h2</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h3</span><span class="token punctuation">></span></span>h3<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h3</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h4</span><span class="token punctuation">></span></span>h4<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h4</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h5</span><span class="token punctuation">></span></span>h5<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h5</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h6</span><span class="token punctuation">></span></span>h6<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h6</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>段落<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span> <span class="token comment">&lt;!--段落--></span>换行<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span> <span class="token punctuation">/></span></span>      <span class="token comment">&lt;!--定义简单的折行--></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span> <span class="token punctuation">/></span></span>      <span class="token comment">&lt;!--定义水平线--></span>
+   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+
+
+
+<h2 id="19-2-格式化标签"><a href="#19-2-格式化标签" class="headerlink" title="19.2 格式化标签"></a>19.2 格式化标签</h2><pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>abbr</span><span class="token punctuation">></span></span></code></pre>
+<p><abbr title="People's Republic of China">PRC</abbr> <!-- 鼠标悬浮上去会显示标签的中具体说明--></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>address</span><span class="token punctuation">></span></span>   <span class="token comment">&lt;!-- 定义文档作者或拥有者的联系信息。 --></span></code></pre>
+<address>   <!-- 定义文档作者或拥有者的联系信息。 -->
+Written by <a href="mailto:webmaster@example.com">Donald Duck</a>.<br> 
+Visit us at:<br>
+Example.com<br>
+Box 564, Disneyland<br>
+USA
+</address>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>b</span><span class="token punctuation">></span></span>	      定义粗体文本。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>bdi</span><span class="token punctuation">></span></span>	      定义文本的文本方向，使其脱离其周围文本的方向设置。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>bdo</span><span class="token punctuation">></span></span>	      定义文字方向。</code></pre>
+<p>Username <bdi dir="rtl">Bill</bdi>   :80 point <br><br><bdo>	      定义文字方向。<br>   <bdo dir="rtl"><br>   Here is some Hebrew text<br></bdo></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>blockquote</span><span class="token punctuation">></span></span>定义长的引用。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>cite</span><span class="token punctuation">></span></span>	   定义引用(citation)。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>	   定义计算机代码文本。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>del</span><span class="token punctuation">></span></span>	      定义被删除文本线。</code></pre>
+<p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dfn</span><span class="token punctuation">></span></span>	      定义项目。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>	      定义强调文本。斜体<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>i</span><span class="token punctuation">></span></span>	      定义斜体文本。<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>i</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ins</span><span class="token punctuation">></span></span>	      定义被插入文本。下划线
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>kbd</span><span class="token punctuation">></span></span>	      定义键盘文本。
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ins</span><span class="token punctuation">></span></span>	 定义被插入文本。下划线<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ins</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>kbd</span><span class="token punctuation">></span></span>Cmd<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>kbd</span><span class="token punctuation">></span></span> + <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>kbd</span><span class="token punctuation">></span></span>C<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>kbd</span><span class="token punctuation">></span></span></code></pre>
+<p><i>	      定义斜体文本。</i><br><br><em>	      定义强调文本。斜体</em><br><br><ins>	 定义被插入文本。下划线</ins><br><br><kbd>Cmd</kbd> + <kbd>C</kbd></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mark</span><span class="token punctuation">></span></span>	   定义有记号的文本。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Do not forget to buy <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mark</span><span class="token punctuation">></span></span>milk<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mark</span><span class="token punctuation">></span></span> today.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></code></pre>
+
+<p>Do not forget to buy <mark>milk</mark> today.</p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meter</span><span class="token punctuation">></span></span>	   定义预定义范围内的度量。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meter</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>3<span class="token punctuation">"</span></span> <span class="token attr-name">min</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>0<span class="token punctuation">"</span></span> <span class="token attr-name">max</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>10<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>十分之三<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>meter</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>
+</code></pre>
+
+<p><meter value="3" min="0" max="10">十分之三</meter><br></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>pre</span><span class="token punctuation">></span></span>	      定义预格式文本。</code></pre>
+
+<pre>
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    xmlDoc=<a href="dom_loadxmldoc.asp">loadXMLDoc</a>(&quot;books.xml&quot;);
+    document.write(&quot;xmlDoc is loaded, ready for use&quot;);
+  &lt;/script&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;
+</pre>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>progress</span><span class="token punctuation">></span></span>	定义任何类型的任务的进度。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>progress</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>22<span class="token punctuation">"</span></span> <span class="token attr-name">max</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>100<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>progress</span><span class="token punctuation">></span></span> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span></code></pre>
+
+<p><progress value="22" max="100"></progress> <br></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>q</span><span class="token punctuation">></span></span>	      定义短的引用。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>q</span><span class="token punctuation">></span></span>Here is a short quotation here is a short quotation<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>q</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>
+</code></pre>
+
+<p><q>Here is a short quotation here is a short quotation</q><br></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rp</span><span class="token punctuation">></span></span>	      定义若浏览器不支持 ruby 元素显示的内容。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ruby</span><span class="token punctuation">></span></span>
+漢 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rt</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rp</span><span class="token punctuation">></span></span>(<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rp</span><span class="token punctuation">></span></span>ㄏㄢˋ<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rp</span><span class="token punctuation">></span></span>)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rp</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rt</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ruby</span><span class="token punctuation">></span></span></code></pre>
+<ruby>
+漢 <rt><rp>(</rp>ㄏㄢˋ<rp>)</rp></rt>
+</ruby>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rt</span><span class="token punctuation">></span></span>	      定义 ruby 注释的解释
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ruby</span><span class="token punctuation">></span></span>
+漢 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rt</span><span class="token punctuation">></span></span> ㄏㄢˋ <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rt</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ruby</span><span class="token punctuation">></span></span></code></pre>
+<ruby>
+漢 <rt> ㄏㄢˋ </rt>
+</ruby>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ruby</span><span class="token punctuation">></span></span>	   定义 ruby 注释。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ruby</span><span class="token punctuation">></span></span>
+漢 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rt</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rp</span><span class="token punctuation">></span></span>(<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rp</span><span class="token punctuation">></span></span>ㄏㄢˋ<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rp</span><span class="token punctuation">></span></span>)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rp</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rt</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ruby</span><span class="token punctuation">></span></span></code></pre>
+<ruby>
+漢 <rt><rp>(</rp>ㄏㄢˋ<rp>)</rp></rt>
+</ruby>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>s</span><span class="token punctuation">></span></span>	      定义加删除线的文本。
+在 HTML 5 中，<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>s</span><span class="token punctuation">></span></span>仍然支持<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>s</span><span class="token punctuation">></span></span>已经不支持这个标签了。</code></pre>
+<p>在 HTML 5 中，<s>仍然支持</s>已经不支持这个标签了。</p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>samp</span><span class="token punctuation">></span></span>	   定义文本样本。</code></pre>
+<samp>
+kirkzhang, what you have done before? what was you doing on younth
+</samp>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>small</span><span class="token punctuation">></span></span>	   定义小号文本。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>small</span><span class="token punctuation">></span></span>定义小号文本<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>small</span><span class="token punctuation">></span></span></code></pre>
+<p><small>定义小号文本</small></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strike</span><span class="token punctuation">></span></span>	   定义加删除线文本。HTML5 中不支持。请使用 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>del</span><span class="token punctuation">></span></span> 或 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>s</span><span class="token punctuation">></span></span> 代替。</code></pre>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>	   定义语气更为强烈的强调文本。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>定义语气更为强烈的强调文本。<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span></code></pre>
+<p><strong>定义语气更为强烈的强调文本。</strong></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sup</span><span class="token punctuation">></span></span>	      定义上标文本。
+这段文本包含 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sup</span><span class="token punctuation">></span></span>上标<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>sup</span><span class="token punctuation">></span></span></code></pre>
+<p>这段文本包含 <sup>上标</sup></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sub</span><span class="token punctuation">></span></span>	      定义下标文本。
+这段文本包含 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sub</span><span class="token punctuation">></span></span>下标<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>sub</span><span class="token punctuation">></span></span></code></pre>
+<p>这段文本包含 <sub>下标</sub></p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>	定义用作容纳页面加载时隐藏内容的容器。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">showContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>显示被隐藏的内容<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h2</span><span class="token punctuation">></span></span>Flower<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h2</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>img</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>img_white_flower.jpg<span class="token punctuation">"</span></span> <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>214<span class="token punctuation">"</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>204<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">function</span> <span class="token function">showContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">var</span> temp <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementsByTagName</span><span class="token punctuation">(</span><span class="token string">"template"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">var</span> clon <span class="token operator">=</span> temp<span class="token punctuation">.</span>content<span class="token punctuation">.</span><span class="token function">cloneNode</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  document<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>clon<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span></code></pre>
+<p><button onclick="showContent()">显示被隐藏的内容</button></p>
+<template>
+  <h2>Flower</h2>
+  <img src="img_white_flower.jpg" width="214" height="204">
+</template>
+
+<script>
+function showContent() {
+  var temp = document.getElementsByTagName("template")[0];
+  var clon = temp.content.cloneNode(true);
+  document.body.appendChild(clon);
+}
+</script>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>time</span><span class="token punctuation">></span></span>	   定义日期/时间。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>我在 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>time</span> <span class="token attr-name">datetime</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>2008-02-14<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>情人节<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>time</span><span class="token punctuation">></span></span> 有个约会。<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></code></pre>
+<p>我在 <time datetime="2008-02-14">情人节</time> 有个约会。</p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tt</span><span class="token punctuation">></span></span>	      定义打字机文本。HTML5 中不支持。请使用 CSS 代替。</code></pre>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>u</span><span class="token punctuation">></span></span>	      定义下划线文本。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>如果文本不是超链接，就不要<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>u</span><span class="token punctuation">></span></span>对其使用下划线<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>u</span><span class="token punctuation">></span></span>。<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+类似于单词under的缩写</code></pre>
+<p>如果文本不是超链接，就不要<u>对其使用下划线</u>。</p>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>var</span><span class="token punctuation">></span></span>	      定义文本的变量部分。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>var</span><span class="token punctuation">></span></span>person<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>var</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span><span class="token punctuation">></span></span></code></pre>
+<code>
+<var>person</var>
+</code>
+<hr>
+
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>wbr</span><span class="token punctuation">></span></span>	定义可能的换行符。（单词换行时机）
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>
+如果想学习 AJAX，那么您必须熟悉 XML<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>wbr</span><span class="token punctuation">></span></span>Http<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>wbr</span><span class="token punctuation">></span></span>Request 对象。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></code></pre>
+<p><samp>this is a new sentence </samp></p>
+<p>
+如果想学习 AJAX，那么您必须熟悉 XML<wbr>Http<wbr>Request 对象。
+</p>
+<hr>
+
+<h2 id="19-3-表单和输入"><a href="#19-3-表单和输入" class="headerlink" title="19.3 表单和输入"></a>19.3 表单和输入</h2><p><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_form.asp">表单的输入详情</a></p>
+<p>enctype 属性可能的值：</p>
+<ul>
+<li>application&#x2F;x-www-form-urlencoded在发送前编码所有字符（默认）（空格被编码为’+’，特殊字符被编码为ASCII十六进制字符）</li>
+<li>multipart&#x2F;form-data不对字符编码。在使用包含文件上传控件的表单时，必须使用该值。有附件时候需指定</li>
+<li>text&#x2F;plain空格转换为 “+” 加号，但不对特殊字符编码</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_input.asp">input属性</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_textarea.asp">textarea定义多行的文本输入控件</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_button.asp">button</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_select.asp">select</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_optgroup.asp">optgroup</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_option.asp">option定义选择列表中的选项</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_label.asp">label定义input元素标注</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_fieldset.asp">fieldset定义围绕表单中元素的边框</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_legend.asp">legend</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_datalist.asp">datalist</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_keygen.asp">keygen</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_output.asp">output</a></p>
+<h2 id="19-4-框架"><a href="#19-4-框架" class="headerlink" title="19.4 框架"></a>19.4 框架</h2><p><a href="">frame</a>	定义框架集的窗口或框架。HTML5 中不支持。<br><a href="">frameset</a>	定义框架集。HTML5 中不支持。<br><a href="">noframes</a>	定义针对不支持框架的用户的替代内容。HTML5 中不支持。<br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_iframe.asp">iframe</a>	定义内联框架。</p>
+<h2 id="19-5-图像"><a href="#19-5-图像" class="headerlink" title="19.5 图像"></a>19.5 图像</h2><p><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_img.asp">img定义图像</a><br><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_map.asp">map定义图像映射</a><br>[area定义图像地图内部的区域]<br>[canvas]	定义图形。<br>[figcaption]	定义 figure 元素的标题。<br>[figure]	定义媒介内容的分组，以及它们的标题。<br>[svg]	定义 SVG 图形的容器。</p>
+<h2 id="19-6-音视频"><a href="#19-6-音视频" class="headerlink" title="19.6 音视频"></a>19.6 音视频</h2><pre class="language-markup" data-language="markup"><code class="language-markup">[<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>audio</span><span class="token punctuation">></span></span>](sdasd)	定义声音内容。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>source</span><span class="token punctuation">></span></span>	定义媒介源。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>track</span><span class="token punctuation">></span></span>	定义用在媒体播放器中的文本轨道。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>video</span><span class="token punctuation">></span></span>	定义视频。</code></pre>
+<h2 id="19-7-链接"><a href="#19-7-链接" class="headerlink" title="19.7 链接"></a>19.7 链接</h2><pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span><span class="token punctuation">></span></span>	   定义锚。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span><span class="token punctuation">></span></span>	定义文档与外部资源的关系。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>nav</span><span class="token punctuation">></span></span>	   定义导航链接。</code></pre>
+
+<h2 id="19-8-链接"><a href="#19-8-链接" class="headerlink" title="19.8 链接"></a>19.8 链接</h2><pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ul</span><span class="token punctuation">></span></span>	定义无序列表。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ol</span><span class="token punctuation">></span></span>	定义有序列表。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>li</span><span class="token punctuation">></span></span>	定义列表的项目。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dir</span><span class="token punctuation">></span></span>	定义大号文本。HTML5 中不支持。请使用 CSS 代替。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dl</span><span class="token punctuation">></span></span>	定义定义列表。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dt</span><span class="token punctuation">></span></span>	定义定义列表中的项目。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dd</span><span class="token punctuation">></span></span>	定义定义列表中项目的描述。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>menu</span><span class="token punctuation">></span></span>	定义命令的菜单/列表。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>menuitem</span><span class="token punctuation">></span></span>	定义用户可以从弹出菜单调用的命令/菜单项目。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>command</span><span class="token punctuation">></span></span>	定义命令按钮。</code></pre>
+
+<h2 id="19-9-表格"><a href="#19-9-表格" class="headerlink" title="19.9 表格"></a>19.9 表格</h2><pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>table</span><span class="token punctuation">></span></span>	定义表格
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>caption</span><span class="token punctuation">></span></span>	定义表格标题。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>th</span><span class="token punctuation">></span></span>	定义表格中的表头单元格。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tr</span><span class="token punctuation">></span></span>	定义表格中的行。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span>	定义表格中的单元。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>thead</span><span class="token punctuation">></span></span>	定义表格中的表头内容。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tbody</span><span class="token punctuation">></span></span>	定义表格中的主体内容。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tfoot</span><span class="token punctuation">></span></span>	定义表格中的表注内容（脚注）。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>col</span><span class="token punctuation">></span></span>	定义表格中一个或多个列的属性值。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>colgroup</span><span class="token punctuation">></span></span>	定义表格中供格式化的列组。</code></pre>
+
+<h2 id="19-10-样式和语义"><a href="#19-10-样式和语义" class="headerlink" title="19.10 样式和语义"></a>19.10 样式和语义</h2><pre class="language-none"><code class="language-none">&lt;style&gt;	定义文档的样式信息。
+&lt;div&gt;	定义文档中的节。
+&lt;span&gt;	定义文档中的节。
+&lt;header&gt;	定义 section 或 page 的页眉。
+&lt;footer&gt;	定义 section 或 page 的页脚。
+&lt;main&gt;	定义文档的主要内容。
+&lt;section&gt;	定义 section。
+&lt;article&gt;	定义文章。
+&lt;aside&gt;	定义页面内容之外的内容。
+&lt;details&gt;	定义元素的细节。
+&lt;dialog&gt;	定义对话框或窗口。
+&lt;summary&gt;	为 &lt;details&gt; 元素定义可见的标题。
+&lt;data&gt;	添加给定内容的机器可读翻译。</code></pre>
+
+<h2 id="19-11-元信息"><a href="#19-11-元信息" class="headerlink" title="19.11 元信息"></a>19.11 元信息</h2><pre class="language-none"><code class="language-none">&lt;head&gt;	定义关于文档的信息。
+&lt;meta&gt;	定义关于 HTML 文档的元信息。
+&lt;base&gt;	定义页面中所有链接的默认地址或默认目标。
+&lt;basefont&gt;	定义页面中文本的默认字体、颜色或尺寸。HTML5 中不支持。请使用 CSS 代替。</code></pre>
+<h2 id="19-12-编程"><a href="#19-12-编程" class="headerlink" title="19.12 编程"></a>19.12 编程</h2><p><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/tag_script.asp">script标签说明</a></p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span>	定义客户端脚本。</code></pre>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>async</td>
+<td>async</td>
+<td>规定异步执行脚本（仅适用于外部脚本）。</td>
+</tr>
+<tr>
+<td>charset</td>
+<td>charset</td>
+<td>规定在外部脚本文件中使用的字符编码。</td>
+</tr>
+<tr>
+<td>crossorigin</td>
+<td>anonymous&#x2F;use-credentials 将请求模式设置为</td>
+<td>HTTP CORS 请求。</td>
+</tr>
+<tr>
+<td>defer</td>
+<td>defer</td>
+<td>规定是否对脚本执行进行延迟，直到页面加载为止。</td>
+</tr>
+<tr>
+<td>language</td>
+<td>script</td>
+<td>不赞成使用。规定脚本语言。请使用 type 属性代替它。</td>
+</tr>
+<tr>
+<td>referrepolicy</td>
+<td>no-referrer&#x2F;no-referrer-when-downgrade&#x2F;origin&#x2F;origin-when-cross-origin&#x2F;same-origin&#x2F;strict-origin&#x2F;strict-origin-when-cross-origin&#x2F;unsafe-url</td>
+<td>规定外部脚本文件的 URL。</td>
+</tr>
+<tr>
+<td>src</td>
+<td>URL</td>
+<td>规定外部脚本文件的 URL。</td>
+</tr>
+<tr>
+<td>xml:space</td>
+<td>preserve</td>
+<td>规定是否保留代码中的空白。</td>
+</tr>
+<tr>
+<td>type</td>
+<td>MIME-type application&#x2F;javascript 如果这个值是module，则代码会被当成ES6模块，而且只有这时候代码中才能出现import和export关键字</td>
+<td>指示脚本的 MIME 类型。</td>
+</tr>
+</tbody></table>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>noscript</span><span class="token punctuation">></span></span>	定义针对不支持客户端脚本的用户的替代内容。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>applet</span><span class="token punctuation">></span></span>	定义嵌入的 applet。HTML5 中不支持。请使用 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>embed</span><span class="token punctuation">></span></span> 和 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>object</span><span class="token punctuation">></span></span> 代替。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>embed</span><span class="token punctuation">></span></span>	为外部应用程序（非 HTML）定义容器。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>object</span><span class="token punctuation">></span></span>	定义嵌入的对象。
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>param</span><span class="token punctuation">></span></span>	定义对象的参数。</code></pre>
+
+<h1 id="20-使用DOM元素"><a href="#20-使用DOM元素" class="headerlink" title="20 使用DOM元素"></a>20 使用DOM元素</h1><h1 id="20-浏览器支持情况"><a href="#20-浏览器支持情况" class="headerlink" title="20 浏览器支持情况"></a>20 浏览器支持情况</h1><p><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/html_ref_html_browsersupport.asp">w3school</a></p>
+<h1 id="21-全局属性"><a href="#21-全局属性" class="headerlink" title="21 全局属性"></a>21 全局属性</h1><pre class="language-none"><code class="language-none">accesskey	      规定激活元素的快捷键。
+class	            规定元素的一个或多个类名（引用样式表中的类）。
+contenteditable	规定元素内容是否可编辑。
+contextmenu	      规定元素的上下文菜单。上下文菜单在用户点击元素时显示。
+data-*	         用于存储页面或应用程序的私有定制数据。
+dir	            规定元素中内容的文本方向。
+draggable	      规定元素是否可拖动。-- 这个可以在网页做出很酷的东西
+dropzone	         规定在拖动被拖动数据时是否进行复制、移动或链接。
+hidden	         规定元素仍未或不再相关。
+id	               规定元素的唯一 id。
+lang	            规定元素内容的语言。
+spellcheck	      规定是否对元素进行拼写和语法检查。
+style	            规定元素的行内 CSS 样式。
+tabindex	         规定元素的 tab 键次序。
+title	            规定有关元素的额外信息。
+translate	      规定是否应该翻译元素内容。</code></pre>
+
+<h1 id="22-事件"><a href="#22-事件" class="headerlink" title="22 事件"></a>22 事件</h1><p><a target="_blank" rel="noopener" href="https://www.w3school.com.cn/tags/html_ref_eventattributes.asp">事件参考手册</a></p>
+<ol>
+<li>Window 事件属性</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>事件名</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>onafterprint</td>
+<td>script</td>
+<td>文档打印之后运行的脚本。</td>
+</tr>
+<tr>
+<td>onbeforeprint</td>
+<td>script</td>
+<td>文档打印之前运行的脚本。</td>
+</tr>
+<tr>
+<td>onbeforeunload</td>
+<td>script</td>
+<td>文档卸载之前运行的脚本。</td>
+</tr>
+<tr>
+<td>onerror</td>
+<td>script</td>
+<td>在错误发生时运行的脚本。</td>
+</tr>
+<tr>
+<td>onhaschange</td>
+<td>script</td>
+<td>当文档已改变时运行的脚本</td>
+</tr>
+<tr>
+<td>onload</td>
+<td>script</td>
+<td>页面结束加载之后触发。</td>
+</tr>
+<tr>
+<td>onmessage</td>
+<td>script</td>
+<td>在消息被触发时运行的脚本</td>
+</tr>
+<tr>
+<td>onoffline</td>
+<td>script</td>
+<td>当文档离线时运行的脚本。</td>
+</tr>
+<tr>
+<td>ononline</td>
+<td>script</td>
+<td>当文档上线时运行的脚本。</td>
+</tr>
+<tr>
+<td>onpagehide</td>
+<td>script</td>
+<td>当窗口隐藏时运行的脚本。</td>
+</tr>
+<tr>
+<td>onpageshow</td>
+<td>script</td>
+<td>当窗口成为可见时运行的脚本。</td>
+</tr>
+<tr>
+<td>onpopstate</td>
+<td>script</td>
+<td>当窗口历史记录改变时运行的脚本。</td>
+</tr>
+<tr>
+<td>onredo</td>
+<td>script</td>
+<td>当文档执行撤销（redo）时运行的脚本。</td>
+</tr>
+<tr>
+<td>onresize</td>
+<td>script</td>
+<td>当浏览器窗口被调整大小时触发。</td>
+</tr>
+<tr>
+<td>onstorage</td>
+<td>script</td>
+<td>在 Web Storage 区域更新后运行的脚本。</td>
+</tr>
+<tr>
+<td>onundo</td>
+<td>script</td>
+<td>在文档执行 undo 时运行的脚本。</td>
+</tr>
+<tr>
+<td>onunload</td>
+<td>script</td>
+<td>一旦页面已下载时触发（或者浏览器窗口已被关闭</td>
+</tr>
+</tbody></table>
+<ol>
+<li><p>Form 事件</p>
+<pre class="language-none"><code class="language-none">onblur	script	元素失去焦点时运行的脚本。
+onchange	script	在元素值被改变时运行的脚本。
+oncontextmenu	script	当上下文菜单被触发时运行的脚本。
+onfocus	script	当元素获得焦点时运行的脚本。
+onformchange	script	在表单改变时运行的脚本。
+onforminput	script	当表单获得用户输入时运行的脚本。
+oninput	script	当元素获得用户输入时运行的脚本。
+oninvalid	script	当元素无效时运行的脚本。
+onreset	script	当表单中的重置按钮被点击时触发。HTML5 中不支持。
+onselect	script	在元素中文本被选中后触发。
+onsubmit	script	在提交表单时触发。</code></pre>
+</li>
+<li><p>鼠标事件</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup">onkeydown	script	在用户按下按键时触发。
+onkeypress	script	在用户敲击按钮时触发。
+onkeyup	script	当用户释放按键时触发。</code></pre></li>
+<li><p>Mouse事件</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup">onclick	script	元素上发生鼠标点击时触发。
+ondblclick	script	元素上发生鼠标双击时触发。
+ondrag	script	元素被拖动时运行的脚本。
+ondragend	script	在拖动操作末端运行的脚本。
+ondragenter	script	当元素元素已被拖动到有效拖放区域时运行的脚本。
+ondragleave	script	当元素离开有效拖放目标时运行的脚本。
+ondragover	script	当元素在有效拖放目标上正在被拖动时运行的脚本。
+ondragstart	script	在拖动操作开端运行的脚本。
+ondrop	script	   当被拖元素正在被拖放时运行的脚本。
+onmousedown	script	当元素上按下鼠标按钮时触发。
+onmousemove	script	当鼠标指针移动到元素上时触发。
+onmouseout	script	当鼠标指针移出元素时触发。
+onmouseover	script	当鼠标指针移动到元素上时触发。
+onmouseup	script	当在元素上释放鼠标按钮时触发。
+onmousewheel	script	当鼠标滚轮正在被滚动时运行的脚本。
+onscroll	script	   当元素滚动条被滚动时运行的脚本。</code></pre></li>
+<li><p>Media 事件</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup">onabort	script	在退出时运行的脚本。
+oncanplay	script	当文件就绪可以开始播放时运行的脚本（缓冲已足够开始时）。
+oncanplaythrough	script	当媒介能够无需因缓冲而停止即可播放至结尾时运行的脚本。
+ondurationchange	script	当媒介长度改变时运行的脚本。
+onemptied	script	当发生故障并且文件突然不可用时运行的脚本（比如连接意外断开时）。
+onended	script	当媒介已到达结尾时运行的脚本（可发送类似“感谢观看”之类的消息）。
+onerror	script	当在文件加载期间发生错误时运行的脚本。
+onloadeddata	script	当媒介数据已加载时运行的脚本。
+onloadedmetadata	script	当元数据（比如分辨率和时长）被加载时运行的脚本。
+onloadstart	script	在文件开始加载且未实际加载任何数据前运行的脚本。
+onpause	script	当媒介被用户或程序暂停时运行的脚本。
+onplay	script	当媒介已就绪可以开始播放时运行的脚本。
+onplaying	script	当媒介已开始播放时运行的脚本。
+onprogress	script	当浏览器正在获取媒介数据时运行的脚本。
+onratechange	script	每当回放速率改变时运行的脚本（比如当用户切换到慢动作或快进模式）。
+onreadystatechange	script	每当就绪状态改变时运行的脚本（就绪状态监测媒介数据的状态）。
+onseeked	script	当 seeking 属性设置为 false（指示定位已结束）时运行的脚本。
+onseeking	script	当 seeking 属性设置为 true（指示定位是活动的）时运行的脚本。
+onstalled	script	在浏览器不论何种原因未能取回媒介数据时运行的脚本。
+onsuspend	script	在媒介数据完全加载之前不论何种原因终止取回媒介数据时运行的脚本。
+ontimeupdate	script	当播放位置改变时（比如当用户快进到媒介中一个不同的位置时）运行的脚本。
+onvolumechange	script	每当音量改变时（包括将音量设置为静音）时运行的脚本。
+onwaiting	script	当媒介已停止播放但打算继续播放时（比如当媒介暂停已缓冲更多数据）运行脚本</code></pre></li>
+</ol>
+<h1 id="23-HTML-Canvas-参考手册"><a href="#23-HTML-Canvas-参考手册" class="headerlink" title="23 HTML Canvas 参考手册"></a>23 HTML Canvas 参考手册</h1><h1 id="24-HTML-音频-x2F-视频参考手册"><a href="#24-HTML-音频-x2F-视频参考手册" class="headerlink" title="24 HTML 音频&#x2F;视频参考手册"></a>24 HTML 音频&#x2F;视频参考手册</h1>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/react/react_quicker/"
+                    data-tooltip="react快速上手开发"
+                    aria-label="PREVIOUS: react快速上手开发"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/vue/vue_up_and_run/vuejs_up_and_running/"
+                    data-tooltip="vue.js up and running"
+                    aria-label="NEXT: vue.js up and running"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/react/react_quicker/"
+                    data-tooltip="react快速上手开发"
+                    aria-label="PREVIOUS: react快速上手开发"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/web/vue/vue_up_and_run/vuejs_up_and_running/"
+                    data-tooltip="vue.js up and running"
+                    aria-label="NEXT: vue.js up and running"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/web/html/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/html%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-2mrdgre6o8oumjyqh1gawnnqlakhnetes6k3qnahlvgvfzutbbznavmu0avb.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/web/html/html权威指南/html权威指南/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>
