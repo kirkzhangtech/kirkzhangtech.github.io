@@ -1,0 +1,749 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Course overview + the shell - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"MIT: The Missing Semester of Your CS Education\n\n\n\n\nCourse overview + the shellhttps://missing.csail.mit.edu/2020/course-shell/\nhttps://youtu.be/Z56Jmr9Z34Q\nMotivationAs computer scientists, we know that computers are great at aiding in repetitive tasks. However, far too often, we forget that this applies just as much to our use of the computer as it does to the computations we want our programs to perform. We have a vast range of tools available at our fingertips that enable us to be more productive and solve more complex problems when working on any computer-related problem. Yet many of us utilize only a small fraction of those tools; we only know enough magical incantations by rote to get by, and blindly copy-paste commands from the internet when we get stuck.\nThis class is an attempt to address this.\nWe want to teach you how to make the most of the tools you know, show you new tools to add to your toolbox, and hopefully instill in you some excitement for exploring (and perhaps building) more tools on your own. This is what we believe to be the missing semester from most Computer Science curricula.\nClass structureThe class consists of 11 1-hour lectures, each one centering on a particular topic. The lectures are largely independent, though as the semester goes on we will presume that you are familiar with the content from the earlier lectures. We have lecture notes online, but there will be a lot of content covered in class (e.g. in the form of demos) that may not be in the notes. We will be recording lectures and posting the recordings online.\nWe are trying to cover a lot of ground over the course of just 11 1-hour lectures, so the lectures are fairly dense. To allow you some time to get familiar with the content at your own pace, each lecture includes a set of exercises that guide you through the lecture’s key points. After each lecture, we are hosting office hours where we will be present to help answer any questions you might have. If you are attending the class online, you can send us questions at missing-semester@mit.edu.\nDue to the limited time we have, we won’t be able to cover all the tools in the same level of detail a full-scale class might. Where possible, we will try to point you towards resources for digging further into a tool or topic, but if something particularly strikes your fancy, don’t hesitate to reach out to us and ask for pointers!\nTopic 1: The ShellWhat is the shell?Computers these days have a variety of interfaces for giving them commands; fanciful graphical user interfaces, voice interfaces, and even AR&#x2F;VR are everywhere. These are great for 80% of use-cases, but they are often fundamentally restricted in what they allow you to do — you cannot press a button that isn’t there or give a voice command that hasn’t been programmed. To take full advantage of the tools your computer provides, we have to go old-school and drop down to a textual interface: The Shell.\nUsing the shell (ls)which 查看程序地址\n$PATH 文件位置\nNavigating in the shell (cd)文件权限问题，文件夹的x是可以，是指程序可不可以进去到该文件夹去search\nman 命令\nmkdir 命令\ncp 命令\n绝对路径和相对路径\nConnecting programs (管道)这个地方用途较广泛，需要多看，多练习\n这里主要是使用管道的功能,在完善下管道的使用\nA versatile and powerful tool （sys文件）sudo view&#x2F;delete&#x2F;update any files on linux\n/sys file control laptop system-level configuration, such as the state of various system LEDs (your path might be different):\n$ sudo find -L &#x2F;sys&#x2F;class&#x2F;backlight -maxdepth 2 -name &#39;*brightness*&#39;\n&#x2F;sys&#x2F;class&#x2F;backlight&#x2F;thinkpad_screen&#x2F;brightness\n$ cd &#x2F;sys&#x2F;class&#x2F;backlight&#x2F;thinkpad_screen\n$ sudo echo 3 &gt; brightness\nAn error occurred while redirecting file &#39;brightness&#39;\nopen: Permission denied\n\n$ echo 1 | sudo tee &#x2F;sys&#x2F;class&#x2F;leds&#x2F;input6::scrolllock&#x2F;brightness\n\n#双冒号 &quot;::&quot; 在Linux中通常用于表示名称空间或层次结构的分隔符。让我用更详细的示例来解释它的含义：\n#假设你有一个LED灯设备，命名为 &quot;input6::scrolllock&quot;。这个名字中的双冒号 &quot;::&quot; 表示设备名称的两个不同层次或命名空间的部分。\n#&quot;input6&quot; 可能表示设备的输入接口或编号。\n#&quot;scrolllock&quot; 可能表示设备的功能或状态，例如滚动锁定灯。\n#这种命名约定可以帮助人们更清晰地理解设备的性质和层次结构。例如，它告诉你这个LED设备与输入接口6有关，同时它是一个控制滚动锁定状态的LED。\n#当你执行 sudo tee &#x2F;sys&#x2F;class&#x2F;leds&#x2F;input6::scrolllock&#x2F;brightness 命令时，它在 &#x2F;sys&#x2F;class&#x2F;leds 路径下的 input6::scrolllock 设备的 brightness 文件中写入数据。这个文件通常用于控制LED的亮度或状态。所以，双冒号 &quot;::&quot; 在这里用于分隔设备的不同部分，以便更好地描述和管理设备。\n\ntee  将命令的输出写入文件并在终端显示\nNext steps下一章通过shell完成更复杂的自动化任务\nExercisesAll classes in this course are accompanied by a series of exercises. Some give you a specific task to do, while others are open-ended, like “try using X and Y programs”. We highly encourage you to try them out.\nWe have not written solutions for the exercises. If you are stuck on anything in particular, feel free to send us an email describing what you’ve tried so far, and we will try to help you out.\n\nFor this course, you need to be using a Unix shell like Bash or ZSH. If you are on Linux or macOS, you don’t have to do anything special. If you are on Windows, you need to make sure you are not running cmd.exe or PowerShell; you can use Windows Subsystem for Linux or a Linux virtual machine to use Unix-style command-line tools. To make sure you’re running an appropriate shell, you can try the command echo $SHELL. If it says something like /bin/bash or /usr/bin/zsh, that means you’re running the right program.\n\nCreate a new directory called missing under /tmp. \n\nLook up the touch program. The man program is your friend.\n\nUse touch to create a new file called semester in missing.\n\nWrite the following into that file, one line at a time:  \n #!&#x2F;bin&#x2F;sh\ncurl --head --silent https:&#x2F;&#x2F;missing.csail.mit.edu\n\n The first line might be tricky to get working. It’s helpful to know that # starts a comment in Bash, and ! has a special meaning even within double-quoted (&quot;) strings. Bash treats single-quoted strings (&#39;) differently: they will do the trick in this case. See the Bash quoting manual page for more information.\n\nTry to execute the file, i.e. type the path to the script (./semester) into your shell and press enter. Understand why it doesn’t work by consulting the output of ls (hint: look at the permission bits of the file).\n\nRun the command by explicitly starting the sh interpreter, and giving it the file semester as the first argument, i.e. sh semester. Why does this work, while ./semester didn’t?\n\nLook up the chmod program (e.g. use man chmod).\n\nUse chmod to make it possible to run the command ./semester rather than having to type sh semester. How does your shell know that the file is supposed to be interpreted using sh? See this page on the shebang line for more information.\n\nUse | and &gt; to write the “last modified” date output by semester into a file called last-modified.txt in your home directory.\n\nWrite a command that reads out your laptop battery’s power level or your desktop machine’s CPU temperature from /sys. Note: if you’re a macOS user, your OS doesn’t have sysfs, so you can skip this exercise.\n\n\n","dateCreated":"2023-12-12T21:25:52+08:00","dateModified":"2023-12-12T21:35:46+08:00","datePublished":"2023-12-12T21:25:52+08:00","description":"MIT: The Missing Semester of Your CS Education","headline":"Course overview + the shell","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Course%20overview/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Course%20overview/"}</script>
+    <meta name="description" content="MIT: The Missing Semester of Your CS Education">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Course overview + the shell">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Course%20overview/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="MIT: The Missing Semester of Your CS Education">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-12T13:25:52.993Z">
+<meta property="article:modified_time" content="2023-12-12T13:35:46.353Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-enqn8ywxdrgzxevdhlfqryyhvgcrb9sbhlwpkdlid2ghnaolwkvd1xdhq21k.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Course overview + the shell
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T21:25:52+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/linux/">linux</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>MIT: The Missing Semester of Your CS Education</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Course-overview-the-shell"><span class="toc-text">Course overview + the shell</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Motivation"><span class="toc-text">Motivation</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Class-structure"><span class="toc-text">Class structure</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Topic-1-The-Shell"><span class="toc-text">Topic 1: The Shell</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-the-shell"><span class="toc-text">What is the shell?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-the-shell-ls"><span class="toc-text">Using the shell (ls)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Navigating-in-the-shell-cd"><span class="toc-text">Navigating in the shell (cd)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Connecting-programs-%E7%AE%A1%E9%81%93"><span class="toc-text">Connecting programs (管道)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A-versatile-and-powerful-tool-%EF%BC%88sys%E6%96%87%E4%BB%B6%EF%BC%89"><span class="toc-text">A versatile and powerful tool （sys文件）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Next-steps"><span class="toc-text">Next steps</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Exercises"><span class="toc-text">Exercises</span></a></li></ol>
+
+<h1 id="Course-overview-the-shell"><a href="#Course-overview-the-shell" class="headerlink" title="Course overview + the shell"></a>Course overview + the shell</h1><p><a target="_blank" rel="noopener" href="https://missing.csail.mit.edu/2020/course-shell/">https://missing.csail.mit.edu/2020/course-shell/</a></p>
+<p><a target="_blank" rel="noopener" href="https://youtu.be/Z56Jmr9Z34Q">https://youtu.be/Z56Jmr9Z34Q</a></p>
+<h1 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h1><p>As computer scientists, we know that computers are great at aiding in repetitive tasks. However, far too often, we forget that this applies just as much to our <em>use</em> of the computer as it does to the computations we want our programs to perform. We have a vast range of tools available at our fingertips that enable us to be more productive and solve more complex problems when working on any computer-related problem. Yet many of us utilize only a small fraction of those tools; we only know enough magical incantations by rote to get by, and blindly copy-paste commands from the internet when we get stuck.</p>
+<p>This class is an attempt to address this.</p>
+<p>We want to teach you how to make the most of the tools you know, show you new tools to add to your toolbox, and hopefully instill in you some excitement for exploring (and perhaps building) more tools on your own. This is what we believe to be the missing semester from most Computer Science curricula.</p>
+<h1 id="Class-structure"><a href="#Class-structure" class="headerlink" title="Class structure"></a>Class structure</h1><p>The class consists of 11 1-hour lectures, each one centering on a <a target="_blank" rel="noopener" href="https://missing.csail.mit.edu/2020/">particular topic</a>. The lectures are largely independent, though as the semester goes on we will presume that you are familiar with the content from the earlier lectures. We have lecture notes online, but there will be a lot of content covered in class (e.g. in the form of demos) that may not be in the notes. We will be recording lectures and posting the recordings online.</p>
+<p>We are trying to cover a lot of ground over the course of just 11 1-hour lectures, so the lectures are fairly dense. To allow you some time to get familiar with the content at your own pace, each lecture includes a set of exercises that guide you through the lecture’s key points. After each lecture, we are hosting office hours where we will be present to help answer any questions you might have. If you are attending the class online, you can send us questions at <a href="mailto:missing-semester@mit.edu">missing-semester@mit.edu</a>.</p>
+<p>Due to the limited time we have, we won’t be able to cover all the tools in the same level of detail a full-scale class might. Where possible, we will try to point you towards resources for digging further into a tool or topic, but if something particularly strikes your fancy, don’t hesitate to reach out to us and ask for pointers!</p>
+<h1 id="Topic-1-The-Shell"><a href="#Topic-1-The-Shell" class="headerlink" title="Topic 1: The Shell"></a>Topic 1: The Shell</h1><h2 id="What-is-the-shell"><a href="#What-is-the-shell" class="headerlink" title="What is the shell?"></a>What is the shell?</h2><p>Computers these days have a variety of interfaces for giving them commands; fanciful graphical user interfaces, voice interfaces, and even AR&#x2F;VR are everywhere. These are great for 80% of use-cases, but they are often fundamentally restricted in what they allow you to do — you cannot press a button that isn’t there or give a voice command that hasn’t been programmed. To take full advantage of the tools your computer provides, we have to go old-school and drop down to <strong>a textual interface: The Shell.</strong></p>
+<h2 id="Using-the-shell-ls"><a href="#Using-the-shell-ls" class="headerlink" title="Using the shell (ls)"></a>Using the shell (ls)</h2><p><code>which</code> 查看程序地址</p>
+<p><code>$PATH</code> 文件位置</p>
+<h2 id="Navigating-in-the-shell-cd"><a href="#Navigating-in-the-shell-cd" class="headerlink" title="Navigating in the shell (cd)"></a>Navigating in the shell (cd)</h2><p>文件权限问题，文件夹的<code>x</code>是可以，是指程序可不可以进去到该文件夹去search</p>
+<p><code>man</code> 命令</p>
+<p><code>mkdir</code> 命令</p>
+<p><code>cp</code> 命令</p>
+<p>绝对路径和相对路径</p>
+<h2 id="Connecting-programs-管道"><a href="#Connecting-programs-管道" class="headerlink" title="Connecting programs (管道)"></a>Connecting programs (管道)</h2><p>这个地方用途较广泛，需要多看，多练习</p>
+<p>这里主要是使用管道的功能,在完善下管道的使用</p>
+<h2 id="A-versatile-and-powerful-tool-（sys文件）"><a href="#A-versatile-and-powerful-tool-（sys文件）" class="headerlink" title="A versatile and powerful tool （sys文件）"></a>A versatile and powerful tool （sys文件）</h2><p><code>sudo</code> view&#x2F;delete&#x2F;update any files on linux</p>
+<p><code>/sys</code> file control laptop system-level configuration, such as the state of various system LEDs (your path might be different):</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ sudo find -L &#x2F;sys&#x2F;class&#x2F;backlight -maxdepth 2 -name &#39;*brightness*&#39;
+&#x2F;sys&#x2F;class&#x2F;backlight&#x2F;thinkpad_screen&#x2F;brightness
+$ cd &#x2F;sys&#x2F;class&#x2F;backlight&#x2F;thinkpad_screen
+$ sudo echo 3 &gt; brightness
+An error occurred while redirecting file &#39;brightness&#39;
+open: Permission denied</code></pre>
+
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ echo 1 | sudo tee &#x2F;sys&#x2F;class&#x2F;leds&#x2F;input6::scrolllock&#x2F;brightness
+
+#双冒号 &quot;::&quot; 在Linux中通常用于表示名称空间或层次结构的分隔符。让我用更详细的示例来解释它的含义：
+#假设你有一个LED灯设备，命名为 &quot;input6::scrolllock&quot;。这个名字中的双冒号 &quot;::&quot; 表示设备名称的两个不同层次或命名空间的部分。
+#&quot;input6&quot; 可能表示设备的输入接口或编号。
+#&quot;scrolllock&quot; 可能表示设备的功能或状态，例如滚动锁定灯。
+#这种命名约定可以帮助人们更清晰地理解设备的性质和层次结构。例如，它告诉你这个LED设备与输入接口6有关，同时它是一个控制滚动锁定状态的LED。
+#当你执行 sudo tee &#x2F;sys&#x2F;class&#x2F;leds&#x2F;input6::scrolllock&#x2F;brightness 命令时，它在 &#x2F;sys&#x2F;class&#x2F;leds 路径下的 input6::scrolllock 设备的 brightness 文件中写入数据。这个文件通常用于控制LED的亮度或状态。所以，双冒号 &quot;::&quot; 在这里用于分隔设备的不同部分，以便更好地描述和管理设备。</code></pre>
+
+<p><code>tee</code>  将命令的输出写入文件并在终端显示</p>
+<h1 id="Next-steps"><a href="#Next-steps" class="headerlink" title="Next steps"></a>Next steps</h1><p>下一章通过shell完成更复杂的自动化任务</p>
+<h1 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h1><p>All classes in this course are accompanied by a series of exercises. Some give you a specific task to do, while others are open-ended, like “try using X and Y programs”. We highly encourage you to try them out.</p>
+<p>We have not written solutions for the exercises. If you are stuck on anything in particular, feel free to send us an email describing what you’ve tried so far, and we will try to help you out.</p>
+<ol>
+<li><p>For this course, you need to be using a Unix shell like Bash or ZSH. If you are on Linux or macOS, you don’t have to do anything special. If you are on Windows, you need to make sure you are not running cmd.exe or PowerShell; you can use <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/wsl/">Windows Subsystem for Linux</a> or a Linux virtual machine to use Unix-style command-line tools. To make sure you’re running an appropriate shell, you can try the command <code>echo $SHELL</code>. If it says something like <code>/bin/bash</code> or <code>/usr/bin/zsh</code>, that means you’re running the right program.</p>
+</li>
+<li><p>Create a new directory called <code>missing</code> under <code>/tmp</code>. </p>
+</li>
+<li><p>Look up the <code>touch</code> program. The <code>man</code> program is your friend.</p>
+</li>
+<li><p>Use <code>touch</code> to create a new file called <code>semester</code> in <code>missing</code>.</p>
+</li>
+<li><p>Write the following into that file, one line at a time:  </p>
+ <pre class="language-none"><code class="language-none">#!&#x2F;bin&#x2F;sh
+curl --head --silent https:&#x2F;&#x2F;missing.csail.mit.edu
+</code></pre>
+<p> The first line might be tricky to get working. It’s helpful to know that <code>#</code> starts a comment in Bash, and <code>!</code> has a special meaning even within double-quoted (<code>&quot;</code>) strings. Bash treats single-quoted strings (<code>&#39;</code>) differently: they will do the trick in this case. See the Bash <a target="_blank" rel="noopener" href="https://www.gnu.org/software/bash/manual/html_node/Quoting.html">quoting</a> manual page for more information.</p>
+</li>
+<li><p>Try to execute the file, i.e. type the path to the script (<code>./semester</code>) into your shell and press enter. Understand why it doesn’t work by consulting the output of <code>ls</code> (hint: look at the permission bits of the file).</p>
+</li>
+<li><p>Run the command by explicitly starting the <code>sh</code> interpreter, and giving it the file <code>semester</code> as the first argument, i.e. <code>sh semester</code>. Why does this work, while <code>./semester</code> didn’t?</p>
+</li>
+<li><p>Look up the <code>chmod</code> program (e.g. use <code>man chmod</code>).</p>
+</li>
+<li><p>Use <code>chmod</code> to make it possible to run the command <code>./semester</code> rather than having to type <code>sh semester</code>. How does your shell know that the file is supposed to be interpreted using <code>sh</code>? See this page on the <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Shebang_(Unix)">shebang</a> line for more information.</p>
+</li>
+<li><p>Use <code>|</code> and <code>&gt;</code> to write the “last modified” date output by <code>semester</code> into a file called <code>last-modified.txt</code> in your home directory.</p>
+</li>
+<li><p>Write a command that reads out your laptop battery’s power level or your desktop machine’s CPU temperature from <code>/sys</code>. Note: if you’re a macOS user, your OS doesn’t have sysfs, so you can skip this exercise.</p>
+</li>
+</ol>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Shell%20Tools%20and%20Scripting/"
+                    data-tooltip="Shell Tools and Scripting"
+                    aria-label="PREVIOUS: Shell Tools and Scripting"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Data%20Wrangling/"
+                    data-tooltip="Data Wrangling"
+                    aria-label="NEXT: Data Wrangling"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Course%20overview/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Shell%20Tools%20and%20Scripting/"
+                    data-tooltip="Shell Tools and Scripting"
+                    aria-label="PREVIOUS: Shell Tools and Scripting"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Data%20Wrangling/"
+                    data-tooltip="Data Wrangling"
+                    aria-label="NEXT: Data Wrangling"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Course%20overview/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Course%20overview/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-rejca0yeyo8jtv4zo5d19sxydkf6sqbqktdggflqfhvi7djqtgunc35t58di.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Course overview/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

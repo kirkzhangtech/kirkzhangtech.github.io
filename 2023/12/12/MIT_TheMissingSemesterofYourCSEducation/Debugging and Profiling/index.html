@@ -1,0 +1,1120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Debugging and Profiling - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"MIT: The Missing Semester of Your CS Education\n\n\n\nDebugging and Profilinghttps://missing.csail.mit.edu/2020/debugging-profiling/\nA golden rule in programming is that code does not do what you expect it to do, but what you tell it to do. Bridging that gap can sometimes be a quite difficult feat. In this lecture we are going to cover useful techniques for dealing with buggy and resource hungry code: debugging and profiling.\nDebuggingPrintf debugging and Logging“The most effective debugging tool is still careful thought, coupled with judiciously placed print statements” — Brian Kernighan, Unix for Beginners.\nA first approach to debug a program is to add print statements around where you have detected the problem, and keep iterating until you have extracted enough information to understand what is responsible for the issue.\nA second approach is to use logging in your program, instead of ad hoc print statements. Logging is better than regular print statements for several reasons:\n\nYou can log to files, sockets or even remote servers instead of standard output.\nLogging supports severity levels (such as INFO, DEBUG, WARN, ERROR, &amp;c), that allow you to filter the output accordingly.\nFor new issues, there’s a fair chance that your logs will contain enough information to detect what is going wrong.\n\nHere is an example code that logs messages:\n$ python logger.py\n# Raw output as with just prints\n$ python logger.py log\n# Log formatted output\n$ python logger.py log ERROR\n# Print only ERROR levels and above\n$ python logger.py color\n# Color formatted output\n\n\nOne of my favorite tips for making logs more readable is to color code them. By now you probably have realized that your terminal uses colors to make things more readable. But how does it do it? Programs like ls or grep are using ANSI escape codes, which are special sequences of characters to indicate your shell to change the color of the output. For example, executing echo -e &quot;\\e[38;2;255;0;0mThis is red\\e[0m&quot; prints the message This is red in red on your terminal, as long as it supports true color. If your terminal doesn’t support this (e.g. macOS’s Terminal.app), you can use the more universally supported escape codes for 16 color choices, for example echo -e &quot;\\e[31;1mThis is red\\e[0m&quot;.\nThe following script shows how to print many RGB colors into your terminal (again, as long as it supports true color).\n#!&#x2F;usr&#x2F;bin&#x2F;env bash\nfor R in $(seq 0 20 255); do\n    for G in $(seq 0 20 255); do\n        for B in $(seq 0 20 255); do\n            printf &quot;\\e[38;2;$&#123;R&#125;;$&#123;G&#125;;$&#123;B&#125;m█\\e[0m&quot;;\n        done\n    done\ndone\n\n\nThird party logsAs you start building larger software systems you will most probably run into dependencies that run as separate programs. Web servers, databases or message brokers are common examples of this kind of dependencies. When interacting with these systems it is often necessary to read their logs, since client side error messages might not suffice.\nLuckily, most programs write their own logs somewhere in your system. In UNIX systems, it is commonplace for programs to write their logs under /var/log. For instance, the NGINX webserver places its logs under /var/log/nginx. More recently, systems have started using a system log, which is increasingly where all of your log messages go. Most (but not all) Linux systems use systemd, a system daemon that controls many things in your system such as which services are enabled and running. systemd places the logs under /var/log/journal in a specialized format and you can use the [journalctl](https://www.man7.org/linux/man-pages/man1/journalctl.1.html) command to display the messages. Similarly, on macOS there is still /var/log/system.log but an increasing number of tools use the system log, that can be displayed with [log show](https://www.manpagez.com/man/1/log/). On most UNIX systems you can also use the [dmesg](https://www.man7.org/linux/man-pages/man1/dmesg.1.html) command to access the kernel log.\nFor logging under the system logs you can use the [logger](https://www.man7.org/linux/man-pages/man1/logger.1.html) shell program. Here’s an example of using logger and how to check that the entry made it to the system logs. Moreover, most programming languages have bindings logging to the system log.\nlogger &quot;Hello Logs&quot;\n# On macOS\nlog show --last 1m | grep Hello\n# On Linux\njournalctl --since &quot;1m ago&quot; | grep Hello\n\n\nAs we saw in the data wrangling lecture, logs can be quite verbose and they require some level of processing and filtering to get the information you want. If you find yourself heavily filtering through journalctl and log show you can consider using their flags, which can perform a first pass of filtering of their output. There are also some tools like [lnav](http://lnav.org/), that provide an improved presentation and navigation for log files.\nshell logger example\nDebuggerspython使用PDB.C++使用GDB,IPDB比PDB更棒\nWhen printf debugging is not enough you should use a debugger. Debuggers are programs that let you interact with the execution of a program, allowing the following:\n\nHalt execution of the program when it reaches a certain line.\nStep through the program one instruction at a time.\nInspect values of variables after the program crashed.\nConditionally halt the execution when a given condition is met.\nAnd many more advanced features\n\nMany programming languages come with some form of debugger. In Python this is the Python Debugger [pdb](https://docs.python.org/3/library/pdb.html).\nHere is a brief description of some of the commands pdb supports:\n\nl(ist) - Displays 11 lines around the current line or continue the previous listing.\ns(tep) - Execute the current line, stop at the first possible occasion.\nn(ext) - Continue execution until the next line in the current function is reached or it returns.\nb(reak) - Set a breakpoint (depending on the argument provided).\np(rint) - Evaluate the expression in the current context and print its value. There’s also pp to display using [pprint](https://docs.python.org/3/library/pprint.html) instead.\nr(eturn) - Continue execution until the current function returns.\nq(uit) - Quit the debugger.\n\nLet’s go through an example of using pdb to fix the following buggy python code. (See the lecture video).\ndef bubble_sort(arr):\n    n &#x3D; len(arr)\n    for i in range(n):\n        for j in range(n):\n            if arr[j] &gt; arr[j+1]:\n                arr[j] &#x3D; arr[j+1]\n                arr[j+1] &#x3D; arr[j]\n    return arr\n\nprint(bubble_sort([4, 2, 1, 8, 7, 6]))\n\n\nNote that since Python is an interpreted language we can use the pdb shell to execute commands and to execute instructions. [ipdb](https://pypi.org/project/ipdb/) is an improved pdb that uses the [IPython](https://ipython.org/) REPL enabling tab completion, syntax highlighting, better tracebacks, and better introspection while retaining the same interface as the pdb module.\nFor more low level programming you will probably want to look into [gdb](https://www.gnu.org/software/gdb/) (and its quality of life modification [pwndbg](https://github.com/pwndbg/pwndbg)) and [lldb](https://lldb.llvm.org/). They are optimized for C-like language debugging but will let you probe pretty much any process and get its current machine state: registers, stack, program counter, &amp;c.\nSpecialized Tools(dtrace dtruss tcpdump)Even if what you are trying to debug is a black box binary there are tools that can help you with that. Whenever programs need to perform actions that only the kernel can, they use System Calls. There are commands that let you trace the syscalls your program makes. In Linux there’s [strace](https://www.man7.org/linux/man-pages/man1/strace.1.html) and macOS and BSD have [dtrace](http://dtrace.org/blogs/about/). dtrace can be tricky to use because it uses its own D language, but there is a wrapper called [dtruss](https://www.manpagez.com/man/1/dtruss/) that provides an interface more similar to strace (more details here).\nBelow are some examples of using strace or dtruss to show [stat](https://www.man7.org/linux/man-pages/man2/stat.2.html) syscall traces for an execution of ls. For a deeper dive into strace, this article and this zine are good reads.\n# On Linux\nsudo strace -e lstat ls -l &gt; &#x2F;dev&#x2F;null\n# On macOS\nsudo dtruss -t lstat64_extended ls -l &gt; &#x2F;dev&#x2F;null\n\n\nUnder some circumstances, you may need to look at the network packets to figure out the issue in your program. Tools like [tcpdump](https://www.man7.org/linux/man-pages/man1/tcpdump.1.html) and Wireshark are network packet analyzers that let you read the contents of network packets and filter them based on different criteria.\nFor web development, the Chrome&#x2F;Firefox developer tools are quite handy. They feature a large number of tools, including:\n\nSource code - Inspect the HTML&#x2F;CSS&#x2F;JS source code of any website.\nLive HTML, CSS, JS modification - Change the website content, styles and behavior to test (you can see for yourself that website screenshots are not valid proofs).\nJavascript shell - Execute commands in the JS REPL.\nNetwork - Analyze the requests timeline.\nStorage - Look into the Cookies and local application storage.\n\nStatic Analysis各个语言有自己format tool和静态分析工具\nFor some issues you do not need to run any code. For example, just by carefully looking at a piece of code you could realize that your loop variable is shadowing an already existing variable or function name; or that a program reads a variable before defining it. Here is where static analysis tools come into play. Static analysis programs take source code as input and analyze it using coding rules to reason about its correctness.\nIn the following Python snippet there are several mistakes. First, our loop variable foo shadows the previous definition of the function foo. We also wrote baz instead of bar in the last line, so the program will crash after completing the sleep call (which will take one minute).\nimport time\n\ndef foo():\n    return 42\n\nfor foo in range(5):\n    print(foo)\nbar &#x3D; 1\nbar *&#x3D; 0.2\ntime.sleep(60)\nprint(baz)\n\n\nStatic analysis tools can identify these kinds of issues. When we run [pyflakes](https://pypi.org/project/pyflakes) on the code we get the errors related to both bugs. [mypy](http://mypy-lang.org/) is another tool that can detect type checking issues. Here, mypy will warn us that bar is initially an int and is then casted to a float. Again, note that all these issues were detected without having to run the code.\n$ pyflakes foobar.py\nfoobar.py:6: redefinition of unused &#39;foo&#39; from line 3\nfoobar.py:11: undefined name &#39;baz&#39;\n\n$ mypy foobar.py\nfoobar.py:6: error: Incompatible types in assignment (expression has type &quot;int&quot;, variable has type &quot;Callable[[], Any]&quot;)\nfoobar.py:9: error: Incompatible types in assignment (expression has type &quot;float&quot;, variable has type &quot;int&quot;)\nfoobar.py:11: error: Name &#39;baz&#39; is not defined\nFound 3 errors in 1 file (checked 1 source file)\n\n\nIn the shell tools lecture we covered [shellcheck](https://www.shellcheck.net/), which is a similar tool for shell scripts.\nMost editors and IDEs support displaying the output of these tools within the editor itself, highlighting the locations of warnings and errors. This is often called code linting and it can also be used to display other types of issues such as stylistic violations or insecure constructs.\nIn vim, the plugins [ale](https://vimawesome.com/plugin/ale) or [syntastic](https://vimawesome.com/plugin/syntastic) will let you do that. For Python, [pylint](https://github.com/PyCQA/pylint) and [pep8](https://pypi.org/project/pep8/) are examples of stylistic linters and [bandit](https://pypi.org/project/bandit/) is a tool designed to find common security issues. For other languages people have compiled comprehensive lists of useful static analysis tools, such as Awesome Static Analysis (you may want to take a look at the Writing section) and for linters there is Awesome Linters.\nA complementary tool to stylistic linting are code formatters such as [black](https://github.com/psf/black) for Python, gofmt for Go, rustfmt for Rust or [prettier](https://prettier.io/) for JavaScript, HTML and CSS. These tools autoformat your code so that it’s consistent with common stylistic patterns for the given programming language. Although you might be unwilling to give stylistic control about your code, standardizing code format will help other people read your code and will make you better at reading other people’s (stylistically standardized) code.\nProfiling可以使用time包或者更好用工具集这个就根据语言自行选用，但是linux环境下有个time command可以使用\nEven if your code functionally behaves as you would expect, that might not be good enough if it takes all your CPU or memory in the process. Algorithms classes often teach big O notation but not how to find hot spots in your programs. Since premature optimization is the root of all evil, you should learn about profilers and monitoring tools. They will help you understand which parts of your program are taking most of the time and&#x2F;or resources so you can focus on optimizing those parts.\nTimingSimilarly to the debugging case, in many scenarios it can be enough to just print the time it took your code between two points. Here is an example in Python using the [time](https://docs.python.org/3/library/time.html) module.\nimport time, random\nn &#x3D; random.randint(1, 10) * 100\n\n# Get current time\nstart &#x3D; time.time()\n\n# Do some work\nprint(&quot;Sleeping for &#123;&#125; ms&quot;.format(n))\ntime.sleep(n&#x2F;1000)\n\n# Compute time between start and now\nprint(time.time() - start)\n\n# Output\n# Sleeping for 500 ms\n# 0.5713930130004883\n\n\nHowever, wall clock time can be misleading since your computer might be running other processes at the same time or waiting for events to happen. It is common for tools to make a distinction between Real, User and Sys time. In general, User + Sys tells you how much time your process actually spent in the CPU (more detailed explanation here).\n\nReal - Wall clock elapsed time from start to finish of the program, including the time taken by other processes and time taken while blocked (e.g. waiting for I&#x2F;O or network)\nUser - Amount of time spent in the CPU running user code\nSys - Amount of time spent in the CPU running kernel code\n\nFor example, try running a command that performs an HTTP request and prefixing it with [time](https://www.man7.org/linux/man-pages/man1/time.1.html). Under a slow connection you might get an output like the one below. Here it took over 2 seconds for the request to complete but the process only took 15ms of CPU user time and 12ms of kernel CPU time.\n$ time curl https:&#x2F;&#x2F;missing.csail.mit.edu &amp;&gt; &#x2F;dev&#x2F;null\nreal    0m2.561s\nuser    0m0.015s\nsys     0m0.012s\n\n\nProfilersCPU具体到代码的cpu使用情况\nMost of the time when people refer to profilers they actually mean CPU profilers, which are the most common. There are two main types of CPU profilers: tracing and sampling profilers. Tracing profilers keep a record of every function call your program makes whereas sampling profilers probe your program periodically (commonly every millisecond) and record the program’s stack. They use these records to present aggregate statistics of what your program spent the most time doing. Here is a good intro article if you want more detail on this topic.\nMost programming languages have some sort of command line profiler that you can use to analyze your code. They often integrate with full fledged IDEs but for this lecture we are going to focus on the command line tools themselves.\nIn Python we can use the cProfile module to profile time per function call. Here is a simple example that implements a rudimentary grep in Python:\n#!&#x2F;usr&#x2F;bin&#x2F;env python\n\nimport sys, re\n\ndef grep(pattern, file):\n    with open(file, &#39;r&#39;) as f:\n        print(file)\n        for i, line in enumerate(f.readlines()):\n            pattern &#x3D; re.compile(pattern)\n            match &#x3D; pattern.search(line)\n            if match is not None:\n                print(&quot;&#123;&#125;: &#123;&#125;&quot;.format(i, line), end&#x3D;&quot;&quot;)\n\nif __name__ &#x3D;&#x3D; &#39;__main__&#39;:\n    times &#x3D; int(sys.argv[1])\n    pattern &#x3D; sys.argv[2]\n    for i in range(times):\n        for file in sys.argv[3:]:\n            grep(pattern, file)\n\n\nWe can profile this code using the following command. Analyzing the output we can see that IO is taking most of the time and that compiling the regex takes a fair amount of time as well. Since the regex only needs to be compiled once, we can factor it out of the for.\n$ python -m cProfile -s tottime grep.py 1000 &#39;^(import|\\s*def)[^,]*$&#39; *.py\n\n[omitted program output]\n\n ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     8000    0.266    0.000    0.292    0.000 &#123;built-in method io.open&#125;\n     8000    0.153    0.000    0.894    0.000 grep.py:5(grep)\n    17000    0.101    0.000    0.101    0.000 &#123;built-in method builtins.print&#125;\n     8000    0.100    0.000    0.129    0.000 &#123;method &#39;readlines&#39; of &#39;_io._IOBase&#39; objects&#125;\n    93000    0.097    0.000    0.111    0.000 re.py:286(_compile)\n    93000    0.069    0.000    0.069    0.000 &#123;method &#39;search&#39; of &#39;_sre.SRE_Pattern&#39; objects&#125;\n    93000    0.030    0.000    0.141    0.000 re.py:231(compile)\n    17000    0.019    0.000    0.029    0.000 codecs.py:318(decode)\n        1    0.017    0.017    0.911    0.911 grep.py:3(&lt;module&gt;)\n\n[omitted lines]\n\n\nA caveat of Python’s cProfile profiler (and many profilers for that matter) is that they display time per function call. That can become unintuitive really fast, especially if you are using third party libraries in your code since internal function calls are also accounted for. A more intuitive way of displaying profiling information is to include the time taken per line of code, which is what line profilers do.\nFor instance, the following piece of Python code performs a request to the class website and parses the response to get all URLs in the page:\n#!&#x2F;usr&#x2F;bin&#x2F;env python\nimport requests\nfrom bs4 import BeautifulSoup\n\n# This is a decorator that tells line_profiler\n# that we want to analyze this function\n@profile\ndef get_urls():\n    response &#x3D; requests.get(&#39;https:&#x2F;&#x2F;missing.csail.mit.edu&#39;)\n    s &#x3D; BeautifulSoup(response.content, &#39;lxml&#39;)\n    urls &#x3D; []\n    for url in s.find_all(&#39;a&#39;):\n        urls.append(url[&#39;href&#39;])\n\nif __name__ &#x3D;&#x3D; &#39;__main__&#39;:\n    get_urls()\n\n\nIf we used Python’s cProfile profiler we’d get over 2500 lines of output, and even with sorting it’d be hard to understand where the time is being spent. A quick run with [line_profiler](https://github.com/pyutils/line_profiler) shows the time taken per line:\n$ kernprof -l -v a.py\nWrote profile results to urls.py.lprof\nTimer unit: 1e-06 s\n\nTotal time: 0.636188 s\nFile: a.py\nFunction: get_urls at line 5\n\nLine #  Hits         Time  Per Hit   % Time  Line Contents\n&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;\n 5                                           @profile\n 6                                           def get_urls():\n 7         1     613909.0 613909.0     96.5      response &#x3D; requests.get(&#39;https:&#x2F;&#x2F;missing.csail.mit.edu&#39;)\n 8         1      21559.0  21559.0      3.4      s &#x3D; BeautifulSoup(response.content, &#39;lxml&#39;)\n 9         1          2.0      2.0      0.0      urls &#x3D; []\n10        25        685.0     27.4      0.1      for url in s.find_all(&#39;a&#39;):\n11        24         33.0      1.4      0.0          urls.append(url[&#39;href&#39;])\n\n\nMemoryIn languages like C or C++ memory leaks can cause your program to never release memory that it doesn’t need anymore. To help in the process of memory debugging you can use tools like Valgrind that will help you identify memory leaks.\nIn garbage collected languages like Python it is still useful to use a memory profiler because as long as you have pointers to objects in memory they won’t be garbage collected. Here’s an example program and its associated output when running it with memory-profiler (note the decorator like in line-profiler).\n@profile\ndef my_func():\n    a &#x3D; [1] * (10 ** 6)\n    b &#x3D; [2] * (2 * 10 ** 7)\n    del b\n    return a\n\nif __name__ &#x3D;&#x3D; &#39;__main__&#39;:\n    my_func()\n\n\n$ python -m memory_profiler example.py\nLine #    Mem usage  Increment   Line Contents\n&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;\n     3                           @profile\n     4      5.97 MB    0.00 MB   def my_func():\n     5     13.61 MB    7.64 MB       a &#x3D; [1] * (10 ** 6)\n     6    166.20 MB  152.59 MB       b &#x3D; [2] * (2 * 10 ** 7)\n     7     13.61 MB -152.59 MB       del b\n     8     13.61 MB    0.00 MB       return a\n\n\nEvent ProfilingAs it was the case for strace for debugging, you might want to ignore the specifics of the code that you are running and treat it like a black box when profiling. The [perf](https://www.man7.org/linux/man-pages/man1/perf.1.html) command abstracts CPU differences away and does not report time or memory, but instead it reports system events related to your programs. For example, perf can easily report poor cache locality, high amounts of page faults or livelocks. Here is an overview of the command:\n\nperf list - List the events that can be traced with perf\nperf stat COMMAND ARG1 ARG2 - Gets counts of different events related to a process or command\nperf record COMMAND ARG1 ARG2 - Records the run of a command and saves the statistical data into a file called perf.data\nperf report - Formats and prints the data collected in perf.data\n\nVisualizationProfiler output for real world programs will contain large amounts of information because of the inherent complexity of software projects. Humans are visual creatures and are quite terrible at reading large amounts of numbers and making sense of them. Thus there are many tools for displaying profiler’s output in an easier to parse way.\nOne common way to display CPU profiling information for sampling profilers is to use a Flame Graph, which will display a hierarchy of function calls across the Y axis and time taken proportional to the X axis. They are also interactive, letting you zoom into specific parts of the program and get their stack traces (try clicking in the image below).\n\nCall graphs or control flow graphs display the relationships between subroutines within a program by including functions as nodes and functions calls between them as directed edges. When coupled with profiling information such as the number of calls and time taken, call graphs can be quite useful for interpreting the flow of a program. In Python you can use the [pycallgraph](https://pycallgraph.readthedocs.io/) library to generate them.\n\nResource MonitoringSometimes, the first step towards analyzing the performance of your program is to understand what its actual resource consumption is. Programs often run slowly when they are resource constrained, e.g. without enough memory or on a slow network connection. There are a myriad of command line tools for probing and displaying different system resources like CPU usage, memory usage, network, disk usage and so on.\n\nGeneral Monitoring - Probably the most popular is [htop](https://htop.dev/), which is an improved version of [top](https://www.man7.org/linux/man-pages/man1/top.1.html). htop presents various statistics for the currently running processes on the system. htop has a myriad of options and keybinds, some useful ones are: &lt;F6&gt; to sort processes, t to show tree hierarchy and h to toggle threads. See also [glances](https://nicolargo.github.io/glances/) for similar implementation with a great UI. For getting aggregate measures across all processes, [dstat](http://dag.wiee.rs/home-made/dstat/) is another nifty tool that computes real-time resource metrics for lots of different subsystems like I&#x2F;O, networking, CPU utilization, context switches, &amp;c.\nI&#x2F;O operations - [iotop](https://www.man7.org/linux/man-pages/man8/iotop.8.html) displays live I&#x2F;O usage information and is handy to check if a process is doing heavy I&#x2F;O disk operations\nDisk Usage - [df](https://www.man7.org/linux/man-pages/man1/df.1.html) displays metrics per partitions and [du](http://man7.org/linux/man-pages/man1/du.1.html) displays disk usage per file for the current directory. In these tools the h flag tells the program to print with human readable format. A more interactive version of du is [ncdu](https://dev.yorhel.nl/ncdu) which lets you navigate folders and delete files and folders as you navigate.\nMemory Usage - [free](https://www.man7.org/linux/man-pages/man1/free.1.html) displays the total amount of free and used memory in the system. Memory is also displayed in tools like htop.\nOpen Files - [lsof](https://www.man7.org/linux/man-pages/man8/lsof.8.html) lists file information about files opened by processes. It can be quite useful for checking which process has opened a specific file.\nNetwork Connections and Config - [ss](https://www.man7.org/linux/man-pages/man8/ss.8.html) lets you monitor incoming and outgoing network packets statistics as well as interface statistics. A common use case of ss is figuring out what process is using a given port in a machine. For displaying routing, network devices and interfaces you can use [ip](http://man7.org/linux/man-pages/man8/ip.8.html). Note that netstat and ifconfig have been deprecated in favor of the former tools respectively.\nNetwork Usage - [nethogs](https://github.com/raboof/nethogs) and [iftop](http://www.ex-parrot.com/pdw/iftop/) are good interactive CLI tools for monitoring network usage.\n\nIf you want to test these tools you can also artificially impose loads on the machine using the [stress](https://linux.die.net/man/1/stress) command.\nSpecialized toolsSometimes, black box benchmarking is all you need to determine what software to use. Tools like [hyperfine](https://github.com/sharkdp/hyperfine) let you quickly benchmark command line programs. For instance, in the shell tools and scripting lecture we recommended fd over find. We can use hyperfine to compare them in tasks we run often. E.g. in the example below fd was 20x faster than find in my machine.\n$ hyperfine --warmup 3 &#39;fd -e jpg&#39; &#39;find . -iname &quot;*.jpg&quot;&#39;\nBenchmark #1: fd -e jpg\n  Time (mean ± σ):      51.4 ms ±   2.9 ms    [User: 121.0 ms, System: 160.5 ms]\n  Range (min … max):    44.2 ms …  60.1 ms    56 runs\n\nBenchmark #2: find . -iname &quot;*.jpg&quot;\n  Time (mean ± σ):      1.126 s ±  0.101 s    [User: 141.1 ms, System: 956.1 ms]\n  Range (min … max):    0.975 s …  1.287 s    10 runs\n\nSummary\n  &#39;fd -e jpg&#39; ran\n   21.89 ± 2.33 times faster than &#39;find . -iname &quot;*.jpg&quot;&#39;\n\n\nAs it was the case for debugging, browsers also come with a fantastic set of tools for profiling webpage loading, letting you figure out where time is being spent (loading, rendering, scripting, &amp;c). More info for Firefox and Chrome.\nExercisesDebugging\nUse journalctl on Linux or log show on macOS to get the super user accesses and commands in the last day. If there aren’t any you can execute some harmless commands such as sudo ls and check again.\n\njournalctl -r\njournalctl -f\njournalctl --output&#x3D;short\njournalctl -k  # 查看内核日志\njournalctl --since&#x3D;&quot;1 hour ago&quot; #查看过去的日志(时间可调整,如1 hour ago等)\njournalctl -n 10 # 显示尾部最新的10行日志\njournalctl -f   # 实时滚动显示最新日志\njournalctl -u nginx.service  显示指定服务的日志\njournalctl _PID&#x3D;1 显示指定进程的日志\njournalctl -t &quot;rsyncd&quot;  过滤包含指定关键词的日志\njournalctl -o json   输出日志为json格式\nsystemctl list-units --type&#x3D;service  使用 systemctl list-units 命令查看所有系统服务:\nps -aux | grep service-name   # 查看当前运行的服务进程:\n\n\nDo this hands on pdb tutorial to familiarize yourself with the commands. For a more in depth tutorial read this.\n\nInstall [shellcheck](https://www.shellcheck.net/) and try checking the following script. What is wrong with the code? Fix it. Install a linter plugin in your editor so you can get your warnings automatically.\n #!&#x2F;bin&#x2F;sh\n## Example: a typical script with several problems\nfor f in $(ls *.m3u)\ndo\n  grep -qi hq.*mp3 $f \\\n    &amp;&amp; echo -e &#39;Playlist $f contains a HQ file in mp3 format&#39;\ndone\n\n\nsudo apt install shellcheck\n\n\n(Advanced) Read about reversible debugging and get a simple example working using [rr](https://rr-project.org/) or [RevPDB](https://morepypy.blogspot.com/2016/07/reverse-debugging-for-python.html).\n\nProfiling\nHere are some sorting algorithm implementations. Use [cProfile](https://docs.python.org/3/library/profile.html) and [line_profiler](https://github.com/pyutils/line_profiler) to compare the runtime of insertion sort and quicksort. What is the bottleneck of each algorithm? Use then memory_profiler to check the memory consumption, why is insertion sort better? Check now the inplace version of quicksort. Challenge: Use perf to look at the cycle counts and cache hits and misses of each algorithm.\n 这个是专门针对python的\n\nHere’s some (arguably convoluted) Python code for computing Fibonacci numbers using a function for each number.\n #!&#x2F;usr&#x2F;bin&#x2F;env python\ndef fib0(): return 0\n\ndef fib1(): return 1\n\ns &#x3D; &quot;&quot;&quot;def fib&#123;&#125;(): return fib&#123;&#125;() + fib&#123;&#125;()&quot;&quot;&quot;\n\nif __name__ &#x3D;&#x3D; &#39;__main__&#39;:\n\n    for n in range(2, 10):\n        exec(s.format(n, n-1, n-2))\n    # from functools import lru_cache\n    # for n in range(10):\n    #     exec(&quot;fib&#123;&#125; &#x3D; lru_cache(1)(fib&#123;&#125;)&quot;.format(n, n))\n    print(eval(&quot;fib9()&quot;))\n\n Put the code into a file and make it executable. Install prerequisites: [pycallgraph](https://pycallgraph.readthedocs.io/) and [graphviz](http://graphviz.org/). (If you can run dot, you already have GraphViz.) Run the code as is with pycallgraph graphviz -- ./fib.py and check the pycallgraph.png file. How many times is fib0 called?. We can do better than that by memoizing the functions. Uncomment the commented lines and regenerate the images. How many times are we calling each fibN function now?\n\nA common issue is that a port you want to listen on is already taken by another process. Let’s learn how to discover that process pid. First execute python -m http.server 4444 to start a minimal web server listening on port 4444. On a separate terminal run lsof | grep LISTEN to print all listening processes and ports. Find that process pid and terminate it by running kill &lt;PID&gt;.\n\nLimiting a process’s resources can be another handy tool in your toolbox. Try running stress -c 3 and visualize the CPU consumption with htop. Now, execute taskset --cpu-list 0,2 stress -c 3 and visualize it. Is stress taking three CPUs? Why not? Read [man taskset](https://www.man7.org/linux/man-pages/man1/taskset.1.html). Challenge: achieve the same using [cgroups](https://www.man7.org/linux/man-pages/man7/cgroups.7.html). Try limiting the memory consumption of stress -m.\n\n限制进程使用资源范围\n\n\n(Advanced) The command curl ipinfo.io performs a HTTP request and fetches information about your public IP. Open Wireshark and try to sniff the request and reply packets that curl sent and received. (Hint: Use the http filter to just watch HTTP packets).\n\n\ncurl的使用\n\n发送HTTP请求获取网页:\n\ncurl http:&#x2F;&#x2F;www.example.com\n\n\n保存网页到文件:\n\ncurl http:&#x2F;&#x2F;www.example.com -o example.html\n\n\n显示请求头信息:\n\ncurl -I http:&#x2F;&#x2F;www.example.com\n\n\n以GET方式传送参数:\n\ncurl http:&#x2F;&#x2F;www.example.com?key1&#x3D;val1&amp;key2&#x3D;val2\n\n\n以POST方式传送参数:\n\ncurl -d &#39;param1&#x3D;value1&amp;param2&#x3D;value2&#39; http:&#x2F;&#x2F;www.example.com\n\n\n传送JSON数据:\n\ncurl -H &quot;Content-Type: application&#x2F;json&quot; -d &#39;&#123;&quot;key1&quot;:&quot;value1&quot;&#125;&#39; http:&#x2F;&#x2F;www.example.com\n\n\n上传文件:\n\ncurl -F &quot;file&#x3D;@photo.png&quot; http:&#x2F;&#x2F;www.example.com&#x2F;upload\n\n\n使用curl发送POST请求,传递登录的参数:\n\ncurl -X POST -d &#39;username&#x3D;myname&amp;password&#x3D;mypassword&#39; https:&#x2F;&#x2F;example.com&#x2F;login\n\n\n\nd用于指定表单数据,-X指定POST方法。\n\n\n若网站需要存储Cookies才能登录,可以指定cookie文件:\n\ncurl -c cookies.txt -d &#39;username&#x3D;myname&amp;password&#x3D;mypassword&#39; https:&#x2F;&#x2F;example.com&#x2F;login\n\n这样登录后的cookie会保存到cookies.txt。\n\n后续访问就可以带上这个cookie文件了:\n\ncurl -b cookies.txt https:&#x2F;&#x2F;example.com&#x2F;user\n\n\nb参数用来传递cookie。\n\n","dateCreated":"2023-12-12T21:25:52+08:00","dateModified":"2023-12-12T21:35:31+08:00","datePublished":"2023-12-12T21:25:52+08:00","description":"MIT: The Missing Semester of Your CS Education","headline":"Debugging and Profiling","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/"}</script>
+    <meta name="description" content="MIT: The Missing Semester of Your CS Education">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Debugging and Profiling">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="MIT: The Missing Semester of Your CS Education">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kirk-zhang58.github.io/Debugging%20and%20Profiling%20%C2%B7%20Missing%20Semester%2072b734814c9e4db08d05bbda7251af93/cpu-bash-flamegraph.svg">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/2/2f/A_Call_Graph_generated_by_pycallgraph.png">
+<meta property="article:published_time" content="2023-12-12T13:25:52.993Z">
+<meta property="article:modified_time" content="2023-12-12T13:35:31.893Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kirk-zhang58.github.io/Debugging%20and%20Profiling%20%C2%B7%20Missing%20Semester%2072b734814c9e4db08d05bbda7251af93/cpu-bash-flamegraph.svg">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-enqn8ywxdrgzxevdhlfqryyhvgcrb9sbhlwpkdlid2ghnaolwkvd1xdhq21k.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Debugging and Profiling
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T21:25:52+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/linux/">linux</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>MIT: The Missing Semester of Your CS Education</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Debugging-and-Profiling"><span class="toc-text">Debugging and Profiling</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Debugging"><span class="toc-text">Debugging</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Printf-debugging-and-Logging"><span class="toc-text">Printf debugging and Logging</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Third-party-logs"><span class="toc-text">Third party logs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debuggers"><span class="toc-text">Debuggers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Specialized-Tools-dtrace-dtruss-tcpdump"><span class="toc-text">Specialized Tools(dtrace dtruss tcpdump)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Static-Analysis"><span class="toc-text">Static Analysis</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Profiling"><span class="toc-text">Profiling</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Timing"><span class="toc-text">Timing</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Profilers"><span class="toc-text">Profilers</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU"><span class="toc-text">CPU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Memory"><span class="toc-text">Memory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Event-Profiling"><span class="toc-text">Event Profiling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Visualization"><span class="toc-text">Visualization</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Resource-Monitoring"><span class="toc-text">Resource Monitoring</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Specialized-tools"><span class="toc-text">Specialized tools</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Exercises"><span class="toc-text">Exercises</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Debugging-1"><span class="toc-text">Debugging</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Profiling-1"><span class="toc-text">Profiling</span></a></li></ol></li></ol>
+<h1 id="Debugging-and-Profiling"><a href="#Debugging-and-Profiling" class="headerlink" title="Debugging and Profiling"></a>Debugging and Profiling</h1><p><a target="_blank" rel="noopener" href="https://missing.csail.mit.edu/2020/debugging-profiling/">https://missing.csail.mit.edu/2020/debugging-profiling/</a></p>
+<p>A golden rule in programming is that code does not do what you expect it to do, but what you tell it to do. Bridging that gap can sometimes be a quite difficult feat. In this lecture we are going to cover useful techniques for dealing with buggy and resource hungry code: debugging and profiling.</p>
+<h1 id="Debugging"><a href="#Debugging" class="headerlink" title="Debugging"></a>Debugging</h1><h2 id="Printf-debugging-and-Logging"><a href="#Printf-debugging-and-Logging" class="headerlink" title="Printf debugging and Logging"></a>Printf debugging and Logging</h2><p>“The most effective debugging tool is still careful thought, coupled with judiciously placed print statements” — Brian Kernighan, <em>Unix for Beginners</em>.</p>
+<p>A first approach to debug a program is to add print statements around where you have detected the problem, and keep iterating until you have extracted enough information to understand what is responsible for the issue.</p>
+<p>A second approach is to use logging in your program, instead of ad hoc print statements. Logging is better than regular print statements for several reasons:</p>
+<ul>
+<li>You can log to files, sockets or even remote servers instead of standard output.</li>
+<li>Logging supports severity levels (such as INFO, DEBUG, WARN, ERROR, &amp;c), that allow you to filter the output accordingly.</li>
+<li>For new issues, there’s a fair chance that your logs will contain enough information to detect what is going wrong.</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://missing.csail.mit.edu/static/files/logger.py">Here</a> is an example code that logs messages:</p>
+<pre class="language-none"><code class="language-none">$ python logger.py
+# Raw output as with just prints
+$ python logger.py log
+# Log formatted output
+$ python logger.py log ERROR
+# Print only ERROR levels and above
+$ python logger.py color
+# Color formatted output
+</code></pre>
+
+<p>One of my favorite tips for making logs more readable is to color code them. By now you probably have realized that your terminal uses colors to make things more readable. But how does it do it? Programs like <code>ls</code> or <code>grep</code> are using <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/ANSI_escape_code">ANSI escape codes</a>, which are special sequences of characters to indicate your shell to change the color of the output. For example, executing <code>echo -e &quot;\e[38;2;255;0;0mThis is red\e[0m&quot;</code> prints the message <code>This is red</code> in red on your terminal, as long as it supports <a target="_blank" rel="noopener" href="https://github.com/termstandard/colors#truecolor-support-in-output-devices">true color</a>. If your terminal doesn’t support this (e.g. macOS’s Terminal.app), you can use the more universally supported escape codes for 16 color choices, for example <code>echo -e &quot;\e[31;1mThis is red\e[0m&quot;</code>.</p>
+<p>The following script shows how to print many RGB colors into your terminal (again, as long as it supports true color).</p>
+<pre class="language-none"><code class="language-none">#!&#x2F;usr&#x2F;bin&#x2F;env bash
+for R in $(seq 0 20 255); do
+    for G in $(seq 0 20 255); do
+        for B in $(seq 0 20 255); do
+            printf &quot;\e[38;2;$&#123;R&#125;;$&#123;G&#125;;$&#123;B&#125;m█\e[0m&quot;;
+        done
+    done
+done
+</code></pre>
+
+<h2 id="Third-party-logs"><a href="#Third-party-logs" class="headerlink" title="Third party logs"></a>Third party logs</h2><p>As you start building larger software systems you will most probably run into dependencies that run as separate programs. Web servers, databases or message brokers are common examples of this kind of dependencies. When interacting with these systems it is often necessary to read their logs, since client side error messages might not suffice.</p>
+<p>Luckily, most programs write their own logs somewhere in your system. In UNIX systems, it is commonplace for programs to write their logs under <code>/var/log</code>. For instance, the <a target="_blank" rel="noopener" href="https://www.nginx.com/">NGINX</a> webserver places its logs under <code>/var/log/nginx</code>. More recently, systems have started using a <strong>system log</strong>, which is increasingly where all of your log messages go. Most (but not all) Linux systems use <code>systemd</code>, a system daemon that controls many things in your system such as which services are enabled and running. <code>systemd</code> places the logs under <code>/var/log/journal</code> in a specialized format and you can use the <code>[journalctl](https://www.man7.org/linux/man-pages/man1/journalctl.1.html)</code> command to display the messages. Similarly, on macOS there is still <code>/var/log/system.log</code> but an increasing number of tools use the system log, that can be displayed with <code>[log show](https://www.manpagez.com/man/1/log/)</code>. On most UNIX systems you can also use the <code>[dmesg](https://www.man7.org/linux/man-pages/man1/dmesg.1.html)</code> command to access the kernel log.</p>
+<p>For logging under the system logs you can use the <code>[logger](https://www.man7.org/linux/man-pages/man1/logger.1.html)</code> shell program. Here’s an example of using <code>logger</code> and how to check that the entry made it to the system logs. Moreover, most programming languages have bindings logging to the system log.</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">logger &quot;Hello Logs&quot;
+# On macOS
+log show --last 1m | grep Hello
+# On Linux
+journalctl --since &quot;1m ago&quot; | grep Hello
+</code></pre>
+
+<p>As we saw in the data wrangling lecture, logs can be quite verbose and they require some level of processing and filtering to get the information you want. If you find yourself heavily filtering through <code>journalctl</code> and <code>log show</code> you can consider using their flags, which can perform a first pass of filtering of their output. There are also some tools like <code>[lnav](http://lnav.org/)</code>, that provide an improved presentation and navigation for log files.</p>
+<p>shell logger example</p>
+<h2 id="Debuggers"><a href="#Debuggers" class="headerlink" title="Debuggers"></a>Debuggers</h2><p>python使用PDB.C++使用GDB,IPDB比PDB更棒</p>
+<p>When printf debugging is not enough you should use a debugger. Debuggers are programs that let you interact with the execution of a program, allowing the following:</p>
+<ul>
+<li>Halt execution of the program when it reaches a certain line.</li>
+<li>Step through the program one instruction at a time.</li>
+<li>Inspect values of variables after the program crashed.</li>
+<li>Conditionally halt the execution when a given condition is met.</li>
+<li>And many more advanced features</li>
+</ul>
+<p>Many programming languages come with some form of debugger. In Python this is the Python Debugger <code>[pdb](https://docs.python.org/3/library/pdb.html)</code>.</p>
+<p>Here is a brief description of some of the commands <code>pdb</code> supports:</p>
+<ul>
+<li><strong>l</strong>(ist) - Displays 11 lines around the current line or continue the previous listing.</li>
+<li><strong>s</strong>(tep) - Execute the current line, stop at the first possible occasion.</li>
+<li><strong>n</strong>(ext) - Continue execution until the next line in the current function is reached or it returns.</li>
+<li><strong>b</strong>(reak) - Set a breakpoint (depending on the argument provided).</li>
+<li><strong>p</strong>(rint) - Evaluate the expression in the current context and print its value. There’s also <strong>pp</strong> to display using <code>[pprint](https://docs.python.org/3/library/pprint.html)</code> instead.</li>
+<li><strong>r</strong>(eturn) - Continue execution until the current function returns.</li>
+<li><strong>q</strong>(uit) - Quit the debugger.</li>
+</ul>
+<p>Let’s go through an example of using <code>pdb</code> to fix the following buggy python code. (See the lecture video).</p>
+<pre class="language-none"><code class="language-none">def bubble_sort(arr):
+    n &#x3D; len(arr)
+    for i in range(n):
+        for j in range(n):
+            if arr[j] &gt; arr[j+1]:
+                arr[j] &#x3D; arr[j+1]
+                arr[j+1] &#x3D; arr[j]
+    return arr
+
+print(bubble_sort([4, 2, 1, 8, 7, 6]))
+</code></pre>
+
+<p>Note that since Python is an interpreted language we can use the <code>pdb</code> shell to execute commands and to execute instructions. <code>[ipdb](https://pypi.org/project/ipdb/)</code> is an improved <code>pdb</code> that uses the <code>[IPython](https://ipython.org/)</code> REPL enabling tab completion, syntax highlighting, better tracebacks, and better introspection while retaining the same interface as the <code>pdb</code> module.</p>
+<p>For more low level programming you will probably want to look into <code>[gdb](https://www.gnu.org/software/gdb/)</code> (and its quality of life modification <code>[pwndbg](https://github.com/pwndbg/pwndbg)</code>) and <code>[lldb](https://lldb.llvm.org/)</code>. They are optimized for C-like language debugging but will let you probe pretty much any process and get its current machine state: registers, stack, program counter, &amp;c.</p>
+<h2 id="Specialized-Tools-dtrace-dtruss-tcpdump"><a href="#Specialized-Tools-dtrace-dtruss-tcpdump" class="headerlink" title="Specialized Tools(dtrace dtruss tcpdump)"></a>Specialized Tools(dtrace dtruss tcpdump)</h2><p>Even if what you are trying to debug is a black box binary there are tools that can help you with that. Whenever programs need to perform actions that only the kernel can, they use <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/System_call">System Calls</a>. There are commands that let you trace the syscalls your program makes. In Linux there’s <code>[strace](https://www.man7.org/linux/man-pages/man1/strace.1.html)</code> and macOS and BSD have <code>[dtrace](http://dtrace.org/blogs/about/)</code>. <code>dtrace</code> can be tricky to use because it uses its own <code>D</code> language, but there is a wrapper called <code>[dtruss](https://www.manpagez.com/man/1/dtruss/)</code> that provides an interface more similar to <code>strace</code> (more details <a target="_blank" rel="noopener" href="https://8thlight.com/blog/colin-jones/2015/11/06/dtrace-even-better-than-strace-for-osx.html">here</a>).</p>
+<p>Below are some examples of using <code>strace</code> or <code>dtruss</code> to show <code>[stat](https://www.man7.org/linux/man-pages/man2/stat.2.html)</code> syscall traces for an execution of <code>ls</code>. For a deeper dive into <code>strace</code>, <a target="_blank" rel="noopener" href="https://blogs.oracle.com/linux/strace-the-sysadmins-microscope-v2">this article</a> and <a target="_blank" rel="noopener" href="https://jvns.ca/strace-zine-unfolded.pdf">this zine</a> are good reads.</p>
+<pre class="language-none"><code class="language-none"># On Linux
+sudo strace -e lstat ls -l &gt; &#x2F;dev&#x2F;null
+# On macOS
+sudo dtruss -t lstat64_extended ls -l &gt; &#x2F;dev&#x2F;null
+</code></pre>
+
+<p>Under some circumstances, you may need to look at the network packets to figure out the issue in your program. Tools like <code>[tcpdump](https://www.man7.org/linux/man-pages/man1/tcpdump.1.html)</code> and <a target="_blank" rel="noopener" href="https://www.wireshark.org/">Wireshark</a> are network packet analyzers that let you read the contents of network packets and filter them based on different criteria.</p>
+<p>For web development, the Chrome&#x2F;Firefox developer tools are quite handy. They feature a large number of tools, including:</p>
+<ul>
+<li>Source code - Inspect the HTML&#x2F;CSS&#x2F;JS source code of any website.</li>
+<li>Live HTML, CSS, JS modification - Change the website content, styles and behavior to test (you can see for yourself that website screenshots are not valid proofs).</li>
+<li>Javascript shell - Execute commands in the JS REPL.</li>
+<li>Network - Analyze the requests timeline.</li>
+<li>Storage - Look into the Cookies and local application storage.</li>
+</ul>
+<h2 id="Static-Analysis"><a href="#Static-Analysis" class="headerlink" title="Static Analysis"></a>Static Analysis</h2><p>各个语言有自己format tool和静态分析工具</p>
+<p>For some issues you do not need to run any code. For example, just by carefully looking at a piece of code you could realize that your loop variable is shadowing an already existing variable or function name; or that a program reads a variable before defining it. Here is where <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Static_program_analysis">static analysis</a> tools come into play. Static analysis programs take source code as input and analyze it using coding rules to reason about its correctness.</p>
+<p>In the following Python snippet there are several mistakes. First, our loop variable <code>foo</code> shadows the previous definition of the function <code>foo</code>. We also wrote <code>baz</code> instead of <code>bar</code> in the last line, so the program will crash after completing the <code>sleep</code> call (which will take one minute).</p>
+<pre class="language-none"><code class="language-none">import time
+
+def foo():
+    return 42
+
+for foo in range(5):
+    print(foo)
+bar &#x3D; 1
+bar *&#x3D; 0.2
+time.sleep(60)
+print(baz)
+</code></pre>
+
+<p>Static analysis tools can identify these kinds of issues. When we run <code>[pyflakes](https://pypi.org/project/pyflakes)</code> on the code we get the errors related to both bugs. <code>[mypy](http://mypy-lang.org/)</code> is another tool that can detect type checking issues. Here, <code>mypy</code> will warn us that <code>bar</code> is initially an <code>int</code> and is then casted to a <code>float</code>. Again, note that all these issues were detected without having to run the code.</p>
+<pre class="language-none"><code class="language-none">$ pyflakes foobar.py
+foobar.py:6: redefinition of unused &#39;foo&#39; from line 3
+foobar.py:11: undefined name &#39;baz&#39;
+
+$ mypy foobar.py
+foobar.py:6: error: Incompatible types in assignment (expression has type &quot;int&quot;, variable has type &quot;Callable[[], Any]&quot;)
+foobar.py:9: error: Incompatible types in assignment (expression has type &quot;float&quot;, variable has type &quot;int&quot;)
+foobar.py:11: error: Name &#39;baz&#39; is not defined
+Found 3 errors in 1 file (checked 1 source file)
+</code></pre>
+
+<p>In the shell tools lecture we covered <code>[shellcheck](https://www.shellcheck.net/)</code>, which is a similar tool for shell scripts.</p>
+<p>Most editors and IDEs support displaying the output of these tools within the editor itself, highlighting the locations of warnings and errors. This is often called <strong>code linting</strong> and it can also be used to display other types of issues such as stylistic violations or insecure constructs.</p>
+<p>In vim, the plugins <code>[ale](https://vimawesome.com/plugin/ale)</code> or <code>[syntastic](https://vimawesome.com/plugin/syntastic)</code> will let you do that. For Python, <code>[pylint](https://github.com/PyCQA/pylint)</code> and <code>[pep8](https://pypi.org/project/pep8/)</code> are examples of stylistic linters and <code>[bandit](https://pypi.org/project/bandit/)</code> is a tool designed to find common security issues. For other languages people have compiled comprehensive lists of useful static analysis tools, such as <a target="_blank" rel="noopener" href="https://github.com/mre/awesome-static-analysis">Awesome Static Analysis</a> (you may want to take a look at the <em>Writing</em> section) and for linters there is <a target="_blank" rel="noopener" href="https://github.com/caramelomartins/awesome-linters">Awesome Linters</a>.</p>
+<p>A complementary tool to stylistic linting are code formatters such as <code>[black](https://github.com/psf/black)</code> for Python, <code>gofmt</code> for Go, <code>rustfmt</code> for Rust or <code>[prettier](https://prettier.io/)</code> for JavaScript, HTML and CSS. These tools autoformat your code so that it’s consistent with common stylistic patterns for the given programming language. Although you might be unwilling to give stylistic control about your code, standardizing code format will help other people read your code and will make you better at reading other people’s (stylistically standardized) code.</p>
+<h1 id="Profiling"><a href="#Profiling" class="headerlink" title="Profiling"></a>Profiling</h1><p>可以使用time包或者更好用工具集这个就根据语言自行选用，但是linux环境下有个time command可以使用</p>
+<p>Even if your code functionally behaves as you would expect, that might not be good enough if it takes all your CPU or memory in the process. Algorithms classes often teach big <em>O</em> notation but not how to find hot spots in your programs. Since <a target="_blank" rel="noopener" href="http://wiki.c2.com/?PrematureOptimization">premature optimization is the root of all evil</a>, you should learn about profilers and monitoring tools. They will help you understand which parts of your program are taking most of the time and&#x2F;or resources so you can focus on optimizing those parts.</p>
+<h2 id="Timing"><a href="#Timing" class="headerlink" title="Timing"></a>Timing</h2><p>Similarly to the debugging case, in many scenarios it can be enough to just print the time it took your code between two points. Here is an example in Python using the <code>[time](https://docs.python.org/3/library/time.html)</code> module.</p>
+<pre class="language-none"><code class="language-none">import time, random
+n &#x3D; random.randint(1, 10) * 100
+
+# Get current time
+start &#x3D; time.time()
+
+# Do some work
+print(&quot;Sleeping for &#123;&#125; ms&quot;.format(n))
+time.sleep(n&#x2F;1000)
+
+# Compute time between start and now
+print(time.time() - start)
+
+# Output
+# Sleeping for 500 ms
+# 0.5713930130004883
+</code></pre>
+
+<p>However, wall clock time can be misleading since your computer might be running other processes at the same time or waiting for events to happen. It is common for tools to make a distinction between <em>Real</em>, <em>User</em> and <em>Sys</em> time. In general, <em>User</em> + <em>Sys</em> tells you how much time your process actually spent in the CPU (more detailed explanation <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1">here</a>).</p>
+<ul>
+<li><em>Real</em> - Wall clock elapsed time from start to finish of the program, including the time taken by other processes and time taken while blocked (e.g. waiting for I&#x2F;O or network)</li>
+<li><em>User</em> - Amount of time spent in the CPU running user code</li>
+<li><em>Sys</em> - Amount of time spent in the CPU running kernel code</li>
+</ul>
+<p>For example, try running a command that performs an HTTP request and prefixing it with <code>[time](https://www.man7.org/linux/man-pages/man1/time.1.html)</code>. Under a slow connection you might get an output like the one below. Here it took over 2 seconds for the request to complete but the process only took 15ms of CPU user time and 12ms of kernel CPU time.</p>
+<pre class="language-none"><code class="language-none">$ time curl https:&#x2F;&#x2F;missing.csail.mit.edu &amp;&gt; &#x2F;dev&#x2F;null
+real    0m2.561s
+user    0m0.015s
+sys     0m0.012s
+</code></pre>
+
+<h2 id="Profilers"><a href="#Profilers" class="headerlink" title="Profilers"></a>Profilers</h2><h3 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h3><p>具体到代码的cpu使用情况</p>
+<p>Most of the time when people refer to <em>profilers</em> they actually mean <em>CPU profilers</em>, which are the most common. There are two main types of CPU profilers: <em>tracing</em> and <em>sampling</em> profilers. Tracing profilers keep a record of every function call your program makes whereas sampling profilers probe your program periodically (commonly every millisecond) and record the program’s stack. They use these records to present aggregate statistics of what your program spent the most time doing. <a target="_blank" rel="noopener" href="https://jvns.ca/blog/2017/12/17/how-do-ruby---python-profilers-work-">Here</a> is a good intro article if you want more detail on this topic.</p>
+<p>Most programming languages have some sort of command line profiler that you can use to analyze your code. They often integrate with full fledged IDEs but for this lecture we are going to focus on the command line tools themselves.</p>
+<p>In Python we can use the <code>cProfile</code> module to profile time per function call. Here is a simple example that implements a rudimentary grep in Python:</p>
+<pre class="language-python" data-language="python"><code class="language-python">#!&#x2F;usr&#x2F;bin&#x2F;env python
+
+import sys, re
+
+def grep(pattern, file):
+    with open(file, &#39;r&#39;) as f:
+        print(file)
+        for i, line in enumerate(f.readlines()):
+            pattern &#x3D; re.compile(pattern)
+            match &#x3D; pattern.search(line)
+            if match is not None:
+                print(&quot;&#123;&#125;: &#123;&#125;&quot;.format(i, line), end&#x3D;&quot;&quot;)
+
+if __name__ &#x3D;&#x3D; &#39;__main__&#39;:
+    times &#x3D; int(sys.argv[1])
+    pattern &#x3D; sys.argv[2]
+    for i in range(times):
+        for file in sys.argv[3:]:
+            grep(pattern, file)
+</code></pre>
+
+<p>We can profile this code using the following command. Analyzing the output we can see that IO is taking most of the time and that compiling the regex takes a fair amount of time as well. Since the regex only needs to be compiled once, we can factor it out of the for.</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ python -m cProfile -s tottime grep.py 1000 &#39;^(import|\s*def)[^,]*$&#39; *.py
+
+[omitted program output]
+
+ ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     8000    0.266    0.000    0.292    0.000 &#123;built-in method io.open&#125;
+     8000    0.153    0.000    0.894    0.000 grep.py:5(grep)
+    17000    0.101    0.000    0.101    0.000 &#123;built-in method builtins.print&#125;
+     8000    0.100    0.000    0.129    0.000 &#123;method &#39;readlines&#39; of &#39;_io._IOBase&#39; objects&#125;
+    93000    0.097    0.000    0.111    0.000 re.py:286(_compile)
+    93000    0.069    0.000    0.069    0.000 &#123;method &#39;search&#39; of &#39;_sre.SRE_Pattern&#39; objects&#125;
+    93000    0.030    0.000    0.141    0.000 re.py:231(compile)
+    17000    0.019    0.000    0.029    0.000 codecs.py:318(decode)
+        1    0.017    0.017    0.911    0.911 grep.py:3(&lt;module&gt;)
+
+[omitted lines]
+</code></pre>
+
+<p>A caveat of Python’s <code>cProfile</code> profiler (and many profilers for that matter) is that they display time per function call. That can become unintuitive really fast, especially if you are using third party libraries in your code since internal function calls are also accounted for. A more intuitive way of displaying profiling information is to include the time taken per line of code, which is what <em>line profilers</em> do.</p>
+<p>For instance, the following piece of Python code performs a request to the class website and parses the response to get all URLs in the page:</p>
+<pre class="language-none"><code class="language-none">#!&#x2F;usr&#x2F;bin&#x2F;env python
+import requests
+from bs4 import BeautifulSoup
+
+# This is a decorator that tells line_profiler
+# that we want to analyze this function
+@profile
+def get_urls():
+    response &#x3D; requests.get(&#39;https:&#x2F;&#x2F;missing.csail.mit.edu&#39;)
+    s &#x3D; BeautifulSoup(response.content, &#39;lxml&#39;)
+    urls &#x3D; []
+    for url in s.find_all(&#39;a&#39;):
+        urls.append(url[&#39;href&#39;])
+
+if __name__ &#x3D;&#x3D; &#39;__main__&#39;:
+    get_urls()
+</code></pre>
+
+<p>If we used Python’s <code>cProfile</code> profiler we’d get over 2500 lines of output, and even with sorting it’d be hard to understand where the time is being spent. A quick run with <code>[line_profiler](https://github.com/pyutils/line_profiler)</code> shows the time taken per line:</p>
+<pre class="language-none"><code class="language-none">$ kernprof -l -v a.py
+Wrote profile results to urls.py.lprof
+Timer unit: 1e-06 s
+
+Total time: 0.636188 s
+File: a.py
+Function: get_urls at line 5
+
+Line #  Hits         Time  Per Hit   % Time  Line Contents
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+ 5                                           @profile
+ 6                                           def get_urls():
+ 7         1     613909.0 613909.0     96.5      response &#x3D; requests.get(&#39;https:&#x2F;&#x2F;missing.csail.mit.edu&#39;)
+ 8         1      21559.0  21559.0      3.4      s &#x3D; BeautifulSoup(response.content, &#39;lxml&#39;)
+ 9         1          2.0      2.0      0.0      urls &#x3D; []
+10        25        685.0     27.4      0.1      for url in s.find_all(&#39;a&#39;):
+11        24         33.0      1.4      0.0          urls.append(url[&#39;href&#39;])
+</code></pre>
+
+<h3 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h3><p>In languages like C or C++ memory leaks can cause your program to never release memory that it doesn’t need anymore. To help in the process of memory debugging you can use tools like <a target="_blank" rel="noopener" href="https://valgrind.org/">Valgrind</a> that will help you identify memory leaks.</p>
+<p>In garbage collected languages like Python it is still useful to use a memory profiler because as long as you have pointers to objects in memory they won’t be garbage collected. Here’s an example program and its associated output when running it with <a target="_blank" rel="noopener" href="https://pypi.org/project/memory-profiler/">memory-profiler</a> (note the decorator like in <code>line-profiler</code>).</p>
+<pre class="language-none"><code class="language-none">@profile
+def my_func():
+    a &#x3D; [1] * (10 ** 6)
+    b &#x3D; [2] * (2 * 10 ** 7)
+    del b
+    return a
+
+if __name__ &#x3D;&#x3D; &#39;__main__&#39;:
+    my_func()
+</code></pre>
+
+<pre class="language-none"><code class="language-none">$ python -m memory_profiler example.py
+Line #    Mem usage  Increment   Line Contents
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+     3                           @profile
+     4      5.97 MB    0.00 MB   def my_func():
+     5     13.61 MB    7.64 MB       a &#x3D; [1] * (10 ** 6)
+     6    166.20 MB  152.59 MB       b &#x3D; [2] * (2 * 10 ** 7)
+     7     13.61 MB -152.59 MB       del b
+     8     13.61 MB    0.00 MB       return a
+</code></pre>
+
+<h3 id="Event-Profiling"><a href="#Event-Profiling" class="headerlink" title="Event Profiling"></a>Event Profiling</h3><p>As it was the case for <code>strace</code> for debugging, you might want to ignore the specifics of the code that you are running and treat it like a black box when profiling. The <code>[perf](https://www.man7.org/linux/man-pages/man1/perf.1.html)</code> command abstracts CPU differences away and does not report time or memory, but instead it reports system events related to your programs. For example, <code>perf</code> can easily report poor cache locality, high amounts of page faults or livelocks. Here is an overview of the command:</p>
+<ul>
+<li><code>perf list</code> - List the events that can be traced with perf</li>
+<li><code>perf stat COMMAND ARG1 ARG2</code> - Gets counts of different events related to a process or command</li>
+<li><code>perf record COMMAND ARG1 ARG2</code> - Records the run of a command and saves the statistical data into a file called <code>perf.data</code></li>
+<li><code>perf report</code> - Formats and prints the data collected in <code>perf.data</code></li>
+</ul>
+<h3 id="Visualization"><a href="#Visualization" class="headerlink" title="Visualization"></a>Visualization</h3><p>Profiler output for real world programs will contain large amounts of information because of the inherent complexity of software projects. Humans are visual creatures and are quite terrible at reading large amounts of numbers and making sense of them. Thus there are many tools for displaying profiler’s output in an easier to parse way.</p>
+<p>One common way to display CPU profiling information for sampling profilers is to use a <a target="_blank" rel="noopener" href="http://www.brendangregg.com/flamegraphs.html">Flame Graph</a>, which will display a hierarchy of function calls across the Y axis and time taken proportional to the X axis. They are also interactive, letting you zoom into specific parts of the program and get their stack traces (try clicking in the image below).</p>
+<p><img src="/Debugging%20and%20Profiling%20%C2%B7%20Missing%20Semester%2072b734814c9e4db08d05bbda7251af93/cpu-bash-flamegraph.svg" alt="Debugging%20and%20Profiling%20%C2%B7%20Missing%20Semester%2072b734814c9e4db08d05bbda7251af93/cpu-bash-flamegraph.svg"></p>
+<p>Call graphs or control flow graphs display the relationships between subroutines within a program by including functions as nodes and functions calls between them as directed edges. When coupled with profiling information such as the number of calls and time taken, call graphs can be quite useful for interpreting the flow of a program. In Python you can use the <code>[pycallgraph](https://pycallgraph.readthedocs.io/)</code> library to generate them.</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/A_Call_Graph_generated_by_pycallgraph.png" alt="https://upload.wikimedia.org/wikipedia/commons/2/2f/A_Call_Graph_generated_by_pycallgraph.png"></p>
+<h2 id="Resource-Monitoring"><a href="#Resource-Monitoring" class="headerlink" title="Resource Monitoring"></a>Resource Monitoring</h2><p>Sometimes, the first step towards analyzing the performance of your program is to understand what its actual resource consumption is. Programs often run slowly when they are resource constrained, e.g. without enough memory or on a slow network connection. There are a myriad of command line tools for probing and displaying different system resources like CPU usage, memory usage, network, disk usage and so on.</p>
+<ul>
+<li><strong>General Monitoring</strong> - Probably the most popular is <code>[htop](https://htop.dev/)</code>, which is an improved version of <code>[top](https://www.man7.org/linux/man-pages/man1/top.1.html)</code>. <code>htop</code> presents various statistics for the currently running processes on the system. <code>htop</code> has a myriad of options and keybinds, some useful ones are: <code>&lt;F6&gt;</code> to sort processes, <code>t</code> to show tree hierarchy and <code>h</code> to toggle threads. See also <code>[glances](https://nicolargo.github.io/glances/)</code> for similar implementation with a great UI. For getting aggregate measures across all processes, <code>[dstat](http://dag.wiee.rs/home-made/dstat/)</code> is another nifty tool that computes real-time resource metrics for lots of different subsystems like I&#x2F;O, networking, CPU utilization, context switches, &amp;c.</li>
+<li><strong>I&#x2F;O operations</strong> - <code>[iotop](https://www.man7.org/linux/man-pages/man8/iotop.8.html)</code> displays live I&#x2F;O usage information and is handy to check if a process is doing heavy I&#x2F;O disk operations</li>
+<li><strong>Disk Usage</strong> - <code>[df](https://www.man7.org/linux/man-pages/man1/df.1.html)</code> displays metrics per partitions and <code>[du](http://man7.org/linux/man-pages/man1/du.1.html)</code> displays <strong>d</strong>isk <strong>u</strong>sage per file for the current directory. In these tools the <code>h</code> flag tells the program to print with <strong>h</strong>uman readable format. A more interactive version of <code>du</code> is <code>[ncdu](https://dev.yorhel.nl/ncdu)</code> which lets you navigate folders and delete files and folders as you navigate.</li>
+<li><strong>Memory Usage</strong> - <code>[free](https://www.man7.org/linux/man-pages/man1/free.1.html)</code> displays the total amount of free and used memory in the system. Memory is also displayed in tools like <code>htop</code>.</li>
+<li><strong>Open Files</strong> - <code>[lsof](https://www.man7.org/linux/man-pages/man8/lsof.8.html)</code> lists file information about files opened by processes. It can be quite useful for checking which process has opened a specific file.</li>
+<li><strong>Network Connections and Config</strong> - <code>[ss](https://www.man7.org/linux/man-pages/man8/ss.8.html)</code> lets you monitor incoming and outgoing network packets statistics as well as interface statistics. A common use case of <code>ss</code> is figuring out what process is using a given port in a machine. For displaying routing, network devices and interfaces you can use <code>[ip](http://man7.org/linux/man-pages/man8/ip.8.html)</code>. Note that <code>netstat</code> and <code>ifconfig</code> have been deprecated in favor of the former tools respectively.</li>
+<li><strong>Network Usage</strong> - <code>[nethogs](https://github.com/raboof/nethogs)</code> and <code>[iftop](http://www.ex-parrot.com/pdw/iftop/)</code> are good interactive CLI tools for monitoring network usage.</li>
+</ul>
+<p>If you want to test these tools you can also artificially impose loads on the machine using the <code>[stress](https://linux.die.net/man/1/stress)</code> command.</p>
+<h3 id="Specialized-tools"><a href="#Specialized-tools" class="headerlink" title="Specialized tools"></a>Specialized tools</h3><p>Sometimes, black box benchmarking is all you need to determine what software to use. Tools like <code>[hyperfine](https://github.com/sharkdp/hyperfine)</code> let you quickly benchmark command line programs. For instance, in the shell tools and scripting lecture we recommended <code>fd</code> over <code>find</code>. We can use <code>hyperfine</code> to compare them in tasks we run often. E.g. in the example below <code>fd</code> was 20x faster than <code>find</code> in my machine.</p>
+<pre class="language-none"><code class="language-none">$ hyperfine --warmup 3 &#39;fd -e jpg&#39; &#39;find . -iname &quot;*.jpg&quot;&#39;
+Benchmark #1: fd -e jpg
+  Time (mean ± σ):      51.4 ms ±   2.9 ms    [User: 121.0 ms, System: 160.5 ms]
+  Range (min … max):    44.2 ms …  60.1 ms    56 runs
+
+Benchmark #2: find . -iname &quot;*.jpg&quot;
+  Time (mean ± σ):      1.126 s ±  0.101 s    [User: 141.1 ms, System: 956.1 ms]
+  Range (min … max):    0.975 s …  1.287 s    10 runs
+
+Summary
+  &#39;fd -e jpg&#39; ran
+   21.89 ± 2.33 times faster than &#39;find . -iname &quot;*.jpg&quot;&#39;
+</code></pre>
+
+<p>As it was the case for debugging, browsers also come with a fantastic set of tools for profiling webpage loading, letting you figure out where time is being spent (loading, rendering, scripting, &amp;c). More info for <a target="_blank" rel="noopener" href="https://profiler.firefox.com/docs/">Firefox</a> and <a target="_blank" rel="noopener" href="https://developers.google.com/web/tools/chrome-devtools/rendering-tools">Chrome</a>.</p>
+<h1 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h1><h2 id="Debugging-1"><a href="#Debugging-1" class="headerlink" title="Debugging"></a>Debugging</h2><ol>
+<li>Use <code>journalctl</code> on Linux or <code>log show</code> on macOS to get the super user accesses and commands in the last day. If there aren’t any you can execute some harmless commands such as <code>sudo ls</code> and check again.</li>
+</ol>
+<pre class="language-bash" data-language="bash"><code class="language-bash">journalctl -r
+journalctl -f
+journalctl --output&#x3D;short
+journalctl -k  # 查看内核日志
+journalctl --since&#x3D;&quot;1 hour ago&quot; #查看过去的日志(时间可调整,如1 hour ago等)
+journalctl -n 10 # 显示尾部最新的10行日志
+journalctl -f   # 实时滚动显示最新日志
+journalctl -u nginx.service  显示指定服务的日志
+journalctl _PID&#x3D;1 显示指定进程的日志
+journalctl -t &quot;rsyncd&quot;  过滤包含指定关键词的日志
+journalctl -o json   输出日志为json格式
+systemctl list-units --type&#x3D;service  使用 systemctl list-units 命令查看所有系统服务:
+ps -aux | grep service-name   # 查看当前运行的服务进程:</code></pre>
+
+<ol>
+<li><p>Do <a target="_blank" rel="noopener" href="https://github.com/spiside/pdb-tutorial">this</a> hands on <code>pdb</code> tutorial to familiarize yourself with the commands. For a more in depth tutorial read <a target="_blank" rel="noopener" href="https://realpython.com/python-debugging-pdb">this</a>.</p>
+</li>
+<li><p>Install <code>[shellcheck](https://www.shellcheck.net/)</code> and try checking the following script. What is wrong with the code? Fix it. Install a linter plugin in your editor so you can get your warnings automatically.</p>
+ <pre class="language-none"><code class="language-none">#!&#x2F;bin&#x2F;sh
+## Example: a typical script with several problems
+for f in $(ls *.m3u)
+do
+  grep -qi hq.*mp3 $f \
+    &amp;&amp; echo -e &#39;Playlist $f contains a HQ file in mp3 format&#39;
+done
+</code></pre></li>
+</ol>
+<pre class="language-bash" data-language="bash"><code class="language-bash">sudo apt install shellcheck</code></pre>
+
+<ol start="4">
+<li>(Advanced) Read about <a target="_blank" rel="noopener" href="https://undo.io/resources/reverse-debugging-whitepaper/">reversible debugging</a> and get a simple example working using <code>[rr](https://rr-project.org/)</code> or <code>[RevPDB](https://morepypy.blogspot.com/2016/07/reverse-debugging-for-python.html)</code>.</li>
+</ol>
+<h2 id="Profiling-1"><a href="#Profiling-1" class="headerlink" title="Profiling"></a>Profiling</h2><ol>
+<li><p><a target="_blank" rel="noopener" href="https://missing.csail.mit.edu/static/files/sorts.py">Here</a> are some sorting algorithm implementations. Use <code>[cProfile](https://docs.python.org/3/library/profile.html)</code> and <code>[line_profiler](https://github.com/pyutils/line_profiler)</code> to compare the runtime of insertion sort and quicksort. What is the bottleneck of each algorithm? Use then <code>memory_profiler</code> to check the memory consumption, why is insertion sort better? Check now the inplace version of quicksort. Challenge: Use <code>perf</code> to look at the cycle counts and cache hits and misses of each algorithm.</p>
+<p> 这个是专门针对python的</p>
+</li>
+<li><p>Here’s some (arguably convoluted) Python code for computing Fibonacci numbers using a function for each number.</p>
+ <pre class="language-python" data-language="python"><code class="language-python">#!&#x2F;usr&#x2F;bin&#x2F;env python
+def fib0(): return 0
+
+def fib1(): return 1
+
+s &#x3D; &quot;&quot;&quot;def fib&#123;&#125;(): return fib&#123;&#125;() + fib&#123;&#125;()&quot;&quot;&quot;
+
+if __name__ &#x3D;&#x3D; &#39;__main__&#39;:
+
+    for n in range(2, 10):
+        exec(s.format(n, n-1, n-2))
+    # from functools import lru_cache
+    # for n in range(10):
+    #     exec(&quot;fib&#123;&#125; &#x3D; lru_cache(1)(fib&#123;&#125;)&quot;.format(n, n))
+    print(eval(&quot;fib9()&quot;))
+</code></pre>
+<p> Put the code into a file and make it executable. Install prerequisites: <code>[pycallgraph](https://pycallgraph.readthedocs.io/)</code> and <code>[graphviz](http://graphviz.org/)</code>. (If you can run <code>dot</code>, you already have GraphViz.) Run the code as is with <code>pycallgraph graphviz -- ./fib.py</code> and check the <code>pycallgraph.png</code> file. How many times is <code>fib0</code> called?. We can do better than that by memoizing the functions. Uncomment the commented lines and regenerate the images. How many times are we calling each <code>fibN</code> function now?</p>
+</li>
+<li><p>A common issue is that a port you want to listen on is already taken by another process. Let’s learn how to discover that process pid. First execute <code>python -m http.server 4444</code> to start a minimal web server listening on port <code>4444</code>. On a separate terminal run <code>lsof | grep LISTEN</code> to print all listening processes and ports. Find that process pid and terminate it by running <code>kill &lt;PID&gt;</code>.</p>
+</li>
+<li><p>Limiting a process’s resources can be another handy tool in your toolbox. Try running <code>stress -c 3</code> and visualize the CPU consumption with <code>htop</code>. Now, execute <code>taskset --cpu-list 0,2 stress -c 3</code> and visualize it. Is <code>stress</code> taking three CPUs? Why not? Read <code>[man taskset](https://www.man7.org/linux/man-pages/man1/taskset.1.html)</code>. Challenge: achieve the same using <code>[cgroups](https://www.man7.org/linux/man-pages/man7/cgroups.7.html)</code>. Try limiting the memory consumption of <code>stress -m</code>.</p>
+<ol>
+<li>限制进程使用资源范围</li>
+</ol>
+</li>
+<li><p>(Advanced) The command <code>curl ipinfo.io</code> performs a HTTP request and fetches information about your public IP. Open <a target="_blank" rel="noopener" href="https://www.wireshark.org/">Wireshark</a> and try to sniff the request and reply packets that <code>curl</code> sent and received. (Hint: Use the <code>http</code> filter to just watch HTTP packets).</p>
+</li>
+</ol>
+<p>curl的使用</p>
+<ol>
+<li>发送HTTP请求获取网页:</li>
+</ol>
+<pre class="language-bash" data-language="bash"><code class="language-bash">curl http:&#x2F;&#x2F;www.example.com</code></pre>
+
+<ol start="2">
+<li>保存网页到文件:</li>
+</ol>
+<pre class="language-bash" data-language="bash"><code class="language-bash">curl http:&#x2F;&#x2F;www.example.com -o example.html</code></pre>
+
+<ol start="3">
+<li>显示请求头信息:</li>
+</ol>
+<pre class="language-none"><code class="language-none">curl -I http:&#x2F;&#x2F;www.example.com</code></pre>
+
+<ol start="4">
+<li>以GET方式传送参数:</li>
+</ol>
+<pre class="language-none"><code class="language-none">curl http:&#x2F;&#x2F;www.example.com?key1&#x3D;val1&amp;key2&#x3D;val2</code></pre>
+
+<ol start="5">
+<li>以POST方式传送参数:</li>
+</ol>
+<pre class="language-none"><code class="language-none">curl -d &#39;param1&#x3D;value1&amp;param2&#x3D;value2&#39; http:&#x2F;&#x2F;www.example.com</code></pre>
+
+<ol start="6">
+<li>传送JSON数据:</li>
+</ol>
+<pre class="language-bash" data-language="bash"><code class="language-bash">curl -H &quot;Content-Type: application&#x2F;json&quot; -d &#39;&#123;&quot;key1&quot;:&quot;value1&quot;&#125;&#39; http:&#x2F;&#x2F;www.example.com</code></pre>
+
+<ol start="7">
+<li>上传文件:</li>
+</ol>
+<pre class="language-none"><code class="language-none">curl -F &quot;file&#x3D;@photo.png&quot; http:&#x2F;&#x2F;www.example.com&#x2F;upload</code></pre>
+
+<ol>
+<li>使用curl发送POST请求,传递登录的参数:</li>
+</ol>
+<pre class="language-none"><code class="language-none">curl -X POST -d &#39;username&#x3D;myname&amp;password&#x3D;mypassword&#39; https:&#x2F;&#x2F;example.com&#x2F;login
+</code></pre>
+
+<ul>
+<li>d用于指定表单数据,-X指定POST方法。</li>
+</ul>
+<ol>
+<li>若网站需要存储Cookies才能登录,可以指定cookie文件:</li>
+</ol>
+<pre class="language-none"><code class="language-none">curl -c cookies.txt -d &#39;username&#x3D;myname&amp;password&#x3D;mypassword&#39; https:&#x2F;&#x2F;example.com&#x2F;login</code></pre>
+
+<p>这样登录后的cookie会保存到cookies.txt。</p>
+<ol>
+<li>后续访问就可以带上这个cookie文件了:</li>
+</ol>
+<pre class="language-none"><code class="language-none">curl -b cookies.txt https:&#x2F;&#x2F;example.com&#x2F;user</code></pre>
+
+<ul>
+<li>b参数用来传递cookie。</li>
+</ul>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Data%20Wrangling/"
+                    data-tooltip="Data Wrangling"
+                    aria-label="PREVIOUS: Data Wrangling"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/"
+                    data-tooltip="Version Control (Git)"
+                    aria-label="NEXT: Version Control (Git)"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Data%20Wrangling/"
+                    data-tooltip="Data Wrangling"
+                    aria-label="PREVIOUS: Data Wrangling"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/"
+                    data-tooltip="Version Control (Git)"
+                    aria-label="NEXT: Version Control (Git)"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-rejca0yeyo8jtv4zo5d19sxydkf6sqbqktdggflqfhvi7djqtgunc35t58di.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging and Profiling/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

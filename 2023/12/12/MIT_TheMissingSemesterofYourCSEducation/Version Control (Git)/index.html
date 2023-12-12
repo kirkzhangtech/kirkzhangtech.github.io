@@ -1,0 +1,874 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="CoffeeMan">
+    <title>Version Control (Git) - CoffeeMan</title>
+    <meta name="author" content="kirkzhang">
+    
+    
+        <link rel="icon" href="https://kirk-zhang58.github.io/assets/images/cover-v1.2.0.jpg">
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg"},"articleBody":"MIT: The Missing Semester of Your CS Education\n\n\n\nVersion Control (Git) · Missing Semesterhttps://missing.csail.mit.edu/2020/version-control/\nVersion control systems (VCSs) are tools used to track changes to source code (or other collections of files and folders). As the name implies, these tools help maintain a history of changes; furthermore, they facilitate collaboration. VCSs track changes to a folder and its contents in a series of snapshots, where each snapshot encapsulates the entire state of files&#x2F;folders within a top-level directory. VCSs also maintain metadata like who created each snapshot, messages associated with each snapshot, and so on.\nWhy is version control useful? Even when you’re working by yourself, it can let you look at old snapshots of a project, keep a log of why certain changes were made, work on parallel branches of development, and much more. When working with others, it’s an invaluable tool for seeing what other people have changed, as well as resolving conflicts in concurrent development.\nModern VCSs also let you easily (and often automatically) answer questions like:\n\nWho wrote this module?\nWhen was this particular line of this particular file edited? By whom? Why was it edited?\nOver the last 1000 revisions, when&#x2F;why did a particular unit test stop working?\n\nWhile other VCSs exist, Git is the de facto standard for version control. This XKCD comic captures Git’s reputation:\n\nBecause Git’s interface is a leaky abstraction, learning Git top-down (starting with its interface &#x2F; command-line interface) can lead to a lot of confusion. It’s possible to memorize a handful of commands and think of them as magic incantations, and follow the approach in the comic above whenever anything goes wrong.\nWhile Git admittedly has an ugly interface, its underlying design and ideas are beautiful. While an ugly interface has to be memorized, a beautiful design can be understood. For this reason, we give a bottom-up explanation of Git, starting with its data model and later covering the command-line interface. Once the data model is understood, the commands can be better understood in terms of how they manipulate the underlying data model.\nGit’s data modelThere are many ad-hoc approaches you could take to version control. Git has a well-thought-out model that enables all the nice features of version control, like maintaining history, supporting branches, and enabling collaboration.\nSnapshotsGit models the history of a collection of files and folders within some top-level directory as a series of snapshots. In Git terminology, a file is called a “blob”, and it’s just a bunch of bytes. A directory is called a “tree”, and it maps names to blobs or trees (so directories can contain other directories). A snapshot is the top-level tree that is being tracked. For example, we might have a tree as follows:\n&lt;root&gt; (tree)\n|\n+- foo (tree)\n|  |\n|  + bar.txt (blob, contents &#x3D; &quot;hello world&quot;)\n|\n+- baz.txt (blob, contents &#x3D; &quot;git is wonderful&quot;)\n\n\nThe top-level tree contains two elements, a tree “foo” (that itself contains one element, a blob “bar.txt”), and a blob “baz.txt”.\nModeling history: relating snapshotsHow should a version control system relate snapshots? One simple model would be to have a linear history. A history would be a list of snapshots in time-order. For many reasons, Git doesn’t use a simple model like this.\nIn Git, a history is a directed acyclic graph (DAG) of snapshots. That may sound like a fancy math word, but don’t be intimidated. All this means is that each snapshot in Git refers to a set of “parents”, the snapshots that preceded it. It’s a set of parents rather than a single parent (as would be the case in a linear history) because a snapshot might descend from multiple parents, for example, due to combining (merging) two parallel branches of development.\nGit calls these snapshots “commit”s. Visualizing a commit history might look something like this:\no &lt;-- o &lt;-- o &lt;-- o\n            ^\n             \\\n              --- o &lt;-- o\n\n\nIn the ASCII art above, the os correspond to individual commits (snapshots). The arrows point to the parent of each commit (it’s a “comes before” relation, not “comes after”). After the third commit, the history branches into two separate branches. This might correspond to, for example, two separate features being developed in parallel, independently from each other. In the future, these branches may be merged to create a new snapshot that incorporates both of the features, producing a new history that looks like this, with the newly created merge commit shown in bold:\n\no &lt;-- o &lt;-- o &lt;-- o &lt;----o\n            ^            &#x2F;\n             \\          v\n              --- o &lt;-- o\n\n\nCommits in Git are immutable. This doesn’t mean that mistakes can’t be corrected, however; it’s just that “edits” to the commit history are actually creating entirely new commits, and references (see below) are updated to point to the new ones.\nData model, as pseudocodeIt may be instructive to see Git’s data model written down in pseudocode:\n&#x2F;&#x2F; a file is a bunch of bytes\ntype blob &#x3D; array&lt;byte&gt;\n\n&#x2F;&#x2F; a directory contains named files and directories\ntype tree &#x3D; map&lt;string, tree | blob&gt;\n\n&#x2F;&#x2F; a commit has parents, metadata, and the top-level tree\ntype commit &#x3D; struct &#123;\n    parents: array&lt;commit&gt;\n    author: string\n    message: string\n    snapshot: tree\n&#125;\n\n\nIt’s a clean, simple model of history.\nObjects and content-addressingAn “object” is a blob, tree, or commit:\ntype object &#x3D; blob | tree | commit\n\n\nIn Git data store, all objects are content-addressed by their SHA-1 hash.\nobjects &#x3D; map&lt;string, object&gt;\n\ndef store(object):\n    id &#x3D; sha1(object)\n    objects[id] &#x3D; object\n\ndef load(id):\n    return objects[id]\n\n\nBlobs, trees, and commits are unified in this way: they are all objects. When they reference other objects, they don’t actually contain them in their on-disk representation, but have a reference to them by their hash.\nFor example, the tree for the example directory structure above (visualized using git cat-file -p 698281bc680d1995c5f4caaf3359721a5a58d48d), looks like this:\n100644 blob 4448adbf7ecd394f42ae135bbeed9676e894af85    baz.txt\n040000 tree c68d233a33c5c06e0340e4c224f0afca87c8ce87    foo\n\n\nThe tree itself contains pointers to its contents, baz.txt (a blob) and foo (a tree). If we look at the contents addressed by the hash corresponding to baz.txt with git cat-file -p 4448adbf7ecd394f42ae135bbeed9676e894af85, we get the following:\ngit is wonderful\n\n\nReferencesNow, all snapshots can be identified by their SHA-1 hashes. That’s inconvenient, because humans aren’t good at remembering strings of 40 hexadecimal characters.\nGit’s solution to this problem is human-readable names for SHA-1 hashes, called “references”. References are pointers to commits. Unlike objects, which are immutable, references are mutable (can be updated to point to a new commit). For example, the master reference usually points to the latest commit in the main branch of development.\nreferences &#x3D; map&lt;string, string&gt;\n\ndef update_reference(name, id):\n    references[name] &#x3D; id\n\ndef read_reference(name):\n    return references[name]\n\ndef load_reference(name_or_id):\n    if name_or_id in references:\n        return load(references[name_or_id])\n    else:\n        return load(name_or_id)\n\n\nWith this, Git can use human-readable names like “master” to refer to a particular snapshot in the history, instead of a long hexadecimal string.\nOne detail is that we often want a notion of “where we currently are” in the history, so that when we take a new snapshot, we know what it is relative to (how we set the parents field of the commit). In Git, that “where we currently are” is a special reference called “HEAD”.\nRepositoriesFinally, we can define what (roughly) is a Git repository: it is the data objects and references.\nOn disk, all Git stores are objects and references: that’s all there is to Git’s data model. All git commands map to some manipulation of the commit DAG by adding objects and adding&#x2F;updating references.\nWhenever you’re typing in any command, think about what manipulation the command is making to the underlying graph data structure. Conversely, if you’re trying to make a particular kind of change to the commit DAG, e.g. “discard uncommitted changes and make the ‘master’ ref point to commit 5d83f9e”, there’s probably a command to do it (e.g. in this case, git checkout master; git reset --hard 5d83f9e).\nStaging areaThis is another concept that’s orthogonal to the data model, but it’s a part of the interface to create commits.\nOne way you might imagine implementing snapshotting as described above is to have a “create snapshot” command that creates a new snapshot based on the current state of the working directory. Some version control tools work like this, but not Git. We want clean snapshots, and it might not always be ideal to make a snapshot from the current state. For example, imagine a scenario where you’ve implemented two separate features, and you want to create two separate commits, where the first introduces the first feature, and the next introduces the second feature. Or imagine a scenario where you have debugging print statements added all over your code, along with a bugfix; you want to commit the bugfix while discarding all the print statements.\nGit accommodates such scenarios by allowing you to specify which modifications should be included in the next snapshot through a mechanism called the “staging area”.\nGit command-line interfaceTo avoid duplicating information, we’re not going to explain the commands below in detail. See the highly recommended Pro Git for more information, or watch the lecture video.\nBasics\ngit help &lt;command&gt;: get help for a git command\ngit init: creates a new git repo, with data stored in the .git directory\ngit status: tells you what’s going on\ngit add &lt;filename&gt;: adds files to staging area\ngit commit: creates a new commit\nWrite good commit messages!\nEven more reasons to write good commit messages!\n\n\ngit log: shows a flattened log of history\ngit log --all --graph --decorate: visualizes history as a DAG\ngit diff &lt;filename&gt;: show changes you made relative to the staging area\ngit diff &lt;revision&gt; &lt;filename&gt;: shows differences in a file between snapshots\ngit checkout &lt;revision&gt;: updates HEAD and current branch\n\nBranching and merging\ngit branch: shows branches\ngit branch &lt;name&gt;: creates a branch\ngit checkout -b &lt;name&gt;: creates a branch and switches to it\nsame as git branch &lt;name&gt;; git checkout &lt;name&gt;\n\n\ngit merge &lt;revision&gt;: merges into current branch\ngit mergetool: use a fancy tool to help resolve merge conflicts\ngit rebase: rebase set of patches onto a new base\n\nRemotes\ngit remote: list remotes\ngit remote add &lt;name&gt; &lt;url&gt;: add a remote\ngit push &lt;remote&gt; &lt;local branch&gt;:&lt;remote branch&gt;: send objects to remote, and update remote reference\ngit branch --set-upstream-to=&lt;remote&gt;/&lt;remote branch&gt;: set up correspondence between local and remote branch\ngit fetch: retrieve objects&#x2F;references from a remote\ngit pull: same as git fetch; git merge\ngit clone: download repository from remote\n\nUndo\ngit commit --amend: edit a commit’s contents&#x2F;message\ngit reset HEAD &lt;file&gt;: unstage a file\ngit checkout -- &lt;file&gt;: discard changes\n\nAdvanced Git\ngit config: Git is highly customizable\ngit clone --depth=1: shallow clone, without entire version history\ngit add -p: interactive staging\ngit rebase -i: interactive rebasing\ngit blame: show who last edited which line\ngit stash: temporarily remove modifications to working directory\ngit bisect: binary search history (e.g. for regressions)\n.gitignore: specify intentionally untracked files to ignore\n\nMiscellaneous\nGUIs: there are many GUI clients out there for Git. We personally don’t use them and use the command-line interface instead.\nShell integration: it’s super handy to have a Git status as part of your shell prompt (zsh, bash). Often included in frameworks like Oh My Zsh.\nEditor integration: similarly to the above, handy integrations with many features. fugitive.vim is the standard one for Vim.\nWorkflows: we taught you the data model, plus some basic commands; we didn’t tell you what practices to follow when working on big projects (and there are many different approaches).\nGitHub: Git is not GitHub. GitHub has a specific way of contributing code to other projects, called pull requests.\nOther Git providers: GitHub is not special: there are many Git repository hosts, like GitLab and BitBucket.\n\nResources\nPro Git is highly recommended reading. Going through Chapters 1–5 should teach you most of what you need to use Git proficiently, now that you understand the data model. The later chapters have some interesting, advanced material.\nOh Shit, Git!?! is a short guide on how to recover from some common Git mistakes.\nGit for Computer Scientists is a short explanation of Git’s data model, with less pseudocode and more fancy diagrams than these lecture notes.\nGit from the Bottom Up is a detailed explanation of Git’s implementation details beyond just the data model, for the curious.\nHow to explain git in simple words\nLearn Git Branching is a browser-based game that teaches you Git.\n\nExercises\nIf you don’t have any past experience with Git, either try reading the first couple chapters of Pro Git or go through a tutorial like Learn Git Branching. As you’re working through it, relate Git commands to the data model.\nClone the repository for the class website. \nExplore the version history by visualizing it as a graph.\nWho was the last person to modify README.md? (Hint: use git log with an argument).\nWhat was the commit message associated with the last modification to the collections: line of _config.yml? (Hint: use git blame and git  show).\n\n\nOne common mistake when learning Git is to commit large files that should not be managed by Git or adding sensitive information. Try adding a file to a repository, making some commits and then deleting that file from history (you may want to look at this).\nClone some repository from GitHub, and modify one of its existing files. What happens when you do git stash? What do you see when running git log --all --oneline? Run git stash pop to undo what you did with git stash. In what scenario might this be useful?\nLike many command line tools, Git provides a configuration file (or dotfile) called ~/.gitconfig. Create an alias in ~/.gitconfig so that when you run git graph, you get the output of git log --all --graph --decorate --oneline. Information about git aliases can be found here.\nYou can define global ignore patterns in ~/.gitignore_global after running git config --global core.excludesfile ~/.gitignore_global. Do this, and set up your global gitignore file to ignore OS-specific or editor-specific temporary files, like .DS_Store.\nFork the repository for the class website, find a typo or some other improvement you can make, and submit a pull request on GitHub (you may want to look at this). Please only submit PRs that are useful (don’t spam us, please!). If you can’t find an improvement to make, you can skip this exercise.\n\n","dateCreated":"2023-12-12T21:25:52+08:00","dateModified":"2023-12-12T21:34:50+08:00","datePublished":"2023-12-12T21:25:52+08:00","description":"MIT: The Missing Semester of Your CS Education","headline":"Version Control (Git)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/"},"publisher":{"@type":"Organization","name":"kirkzhang","sameAs":["https://github.com/SimonTeo58","https://stackoverflow.com/users/11289672/simon-teo","https://twitter.com/shiming_kirk","https://www.linkedin.com/in/kirk-zhang-424935235/","zxc741208584@qq.com"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/"}</script>
+    <meta name="description" content="MIT: The Missing Semester of Your CS Education">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Version Control (Git)">
+<meta property="og:url" content="https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/index.html">
+<meta property="og:site_name" content="CoffeeMan">
+<meta property="og:description" content="MIT: The Missing Semester of Your CS Education">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kirk-zhang58.github.io/Version%20Control%20(Git)%20%C2%B7%20Missing%20Semester%20601f436a6ffb474e8ed8004f8bf3537c/git.png">
+<meta property="article:published_time" content="2023-12-12T13:25:52.993Z">
+<meta property="article:modified_time" content="2023-12-12T13:34:50.123Z">
+<meta property="article:author" content="kirkzhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kirk-zhang58.github.io/Version%20Control%20(Git)%20%C2%B7%20Missing%20Semester%20601f436a6ffb474e8ed8004f8bf3537c/git.png">
+<meta name="twitter:creator" content="@shiming_kirk">
+    
+        <link rel="publisher" href="https://plus.google.com/nil"/>
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://kirk-zhang58.github.io/assets/images/avatar.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-enqn8ywxdrgzxevdhlfqryyhvgcrb9sbhlwpkdlid2ghnaolwkvd1xdhq21k.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            CoffeeMan
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture open-algolia-search"
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+            <img class="header-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">kirkzhang</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/SimonTeo58"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://stackoverflow.com/users/11289672/simon-teo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/shiming_kirk"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/kirk-zhang-424935235/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/zxc741208584@qq.com"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Version Control (Git)
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-12-12T21:25:52+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/linux/">linux</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>MIT: The Missing Semester of Your CS Education</p>
+<span id="more"></span>
+
+<h1 id="table-of-contents">Table of Contents</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Version-Control-Git-%C2%B7-Missing-Semester"><span class="toc-text">Version Control (Git) · Missing Semester</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Git%E2%80%99s-data-model"><span class="toc-text">Git’s data model</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Snapshots"><span class="toc-text">Snapshots</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modeling-history-relating-snapshots"><span class="toc-text">Modeling history: relating snapshots</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-model-as-pseudocode"><span class="toc-text">Data model, as pseudocode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Objects-and-content-addressing"><span class="toc-text">Objects and content-addressing</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Repositories"><span class="toc-text">Repositories</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Staging-area"><span class="toc-text">Staging area</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Git-command-line-interface"><span class="toc-text">Git command-line interface</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Basics"><span class="toc-text">Basics</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Branching-and-merging"><span class="toc-text">Branching and merging</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Remotes"><span class="toc-text">Remotes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Undo"><span class="toc-text">Undo</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Advanced-Git"><span class="toc-text">Advanced Git</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Miscellaneous"><span class="toc-text">Miscellaneous</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Resources"><span class="toc-text">Resources</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Exercises"><span class="toc-text">Exercises</span></a></li></ol>
+<h1 id="Version-Control-Git-·-Missing-Semester"><a href="#Version-Control-Git-·-Missing-Semester" class="headerlink" title="Version Control (Git) · Missing Semester"></a>Version Control (Git) · Missing Semester</h1><p><a target="_blank" rel="noopener" href="https://missing.csail.mit.edu/2020/version-control/">https://missing.csail.mit.edu/2020/version-control/</a></p>
+<p>Version control systems (VCSs) are tools used to track changes to source code (or other collections of files and folders). As the name implies, these tools help maintain a history of changes; furthermore, they facilitate collaboration. VCSs track changes to a folder and its contents in a series of snapshots, where each snapshot encapsulates the entire state of files&#x2F;folders within a top-level directory. VCSs also maintain metadata like who created each snapshot, messages associated with each snapshot, and so on.</p>
+<p>Why is version control useful? Even when you’re working by yourself, it can let you look at old snapshots of a project, keep a log of why certain changes were made, work on parallel branches of development, and much more. When working with others, it’s an invaluable tool for seeing what other people have changed, as well as resolving conflicts in concurrent development.</p>
+<p>Modern VCSs also let you easily (and often automatically) answer questions like:</p>
+<ul>
+<li>Who wrote this module?</li>
+<li>When was this particular line of this particular file edited? By whom? Why was it edited?</li>
+<li>Over the last 1000 revisions, when&#x2F;why did a particular unit test stop working?</li>
+</ul>
+<p>While other VCSs exist, <strong>Git</strong> is the de facto standard for version control. This <a target="_blank" rel="noopener" href="https://xkcd.com/1597/">XKCD comic</a> captures Git’s reputation:</p>
+<p><img src="/Version%20Control%20(Git)%20%C2%B7%20Missing%20Semester%20601f436a6ffb474e8ed8004f8bf3537c/git.png" alt="Version%20Control%20(Git)%20%C2%B7%20Missing%20Semester%20601f436a6ffb474e8ed8004f8bf3537c/git.png"></p>
+<p>Because Git’s interface is a leaky abstraction, learning Git top-down (starting with its interface &#x2F; command-line interface) can lead to a lot of confusion. It’s possible to memorize a handful of commands and think of them as magic incantations, and follow the approach in the comic above whenever anything goes wrong.</p>
+<p>While Git admittedly has an ugly interface, its underlying design and ideas are beautiful. While an ugly interface has to be <em>memorized</em>, a beautiful design can be <em>understood</em>. For this reason, we give a bottom-up explanation of Git, starting with its data model and later covering the command-line interface. Once the data model is understood, the commands can be better understood in terms of how they manipulate the underlying data model.</p>
+<h1 id="Git’s-data-model"><a href="#Git’s-data-model" class="headerlink" title="Git’s data model"></a>Git’s data model</h1><p>There are many ad-hoc approaches you could take to version control. Git has a well-thought-out model that enables all the nice features of version control, like maintaining history, supporting branches, and enabling collaboration.</p>
+<h2 id="Snapshots"><a href="#Snapshots" class="headerlink" title="Snapshots"></a>Snapshots</h2><p>Git models the history of a collection of files and folders within some top-level directory as a series of snapshots. In Git terminology, a file is called a “blob”, and it’s just a bunch of bytes. A directory is called a “tree”, and it maps names to blobs or trees (so directories can contain other directories). A snapshot is the top-level tree that is being tracked. For example, we might have a tree as follows:</p>
+<pre class="language-none"><code class="language-none">&lt;root&gt; (tree)
+|
++- foo (tree)
+|  |
+|  + bar.txt (blob, contents &#x3D; &quot;hello world&quot;)
+|
++- baz.txt (blob, contents &#x3D; &quot;git is wonderful&quot;)
+</code></pre>
+
+<p>The top-level tree contains two elements, a tree “foo” (that itself contains one element, a blob “bar.txt”), and a blob “baz.txt”.</p>
+<h2 id="Modeling-history-relating-snapshots"><a href="#Modeling-history-relating-snapshots" class="headerlink" title="Modeling history: relating snapshots"></a>Modeling history: relating snapshots</h2><p>How should a version control system relate snapshots? One simple model would be to have a linear history. A history would be a list of snapshots in time-order. For many reasons, Git doesn’t use a simple model like this.</p>
+<p>In Git, a history is a directed acyclic graph (DAG) of snapshots. That may sound like a fancy math word, but don’t be intimidated. All this means is that each snapshot in Git refers to a set of “parents”, the snapshots that preceded it. It’s a set of parents rather than a single parent (as would be the case in a linear history) because a snapshot might descend from multiple parents, for example, due to combining (merging) two parallel branches of development.</p>
+<p>Git calls these snapshots “commit”s. Visualizing a commit history might look something like this:</p>
+<pre class="language-none"><code class="language-none">o &lt;-- o &lt;-- o &lt;-- o
+            ^
+             \
+              --- o &lt;-- o
+</code></pre>
+
+<p>In the ASCII art above, the <code>o</code>s correspond to individual commits (snapshots). The arrows point to the parent of each commit (it’s a “comes before” relation, not “comes after”). After the third commit, the history branches into two separate branches. This might correspond to, for example, two separate features being developed in parallel, independently from each other. In the future, these branches may be merged to create a new snapshot that incorporates both of the features, producing a new history that looks like this, with the newly created merge commit shown in bold:</p>
+<pre class="language-none"><code class="language-none">
+o &lt;-- o &lt;-- o &lt;-- o &lt;----o
+            ^            &#x2F;
+             \          v
+              --- o &lt;-- o
+</code></pre>
+
+<p>Commits in Git are immutable. This doesn’t mean that mistakes can’t be corrected, however; it’s just that “edits” to the commit history are actually creating entirely new commits, and references (see below) are updated to point to the new ones.</p>
+<h2 id="Data-model-as-pseudocode"><a href="#Data-model-as-pseudocode" class="headerlink" title="Data model, as pseudocode"></a>Data model, as pseudocode</h2><p>It may be instructive to see Git’s data model written down in pseudocode:</p>
+<pre class="language-none"><code class="language-none">&#x2F;&#x2F; a file is a bunch of bytes
+type blob &#x3D; array&lt;byte&gt;
+
+&#x2F;&#x2F; a directory contains named files and directories
+type tree &#x3D; map&lt;string, tree | blob&gt;
+
+&#x2F;&#x2F; a commit has parents, metadata, and the top-level tree
+type commit &#x3D; struct &#123;
+    parents: array&lt;commit&gt;
+    author: string
+    message: string
+    snapshot: tree
+&#125;
+</code></pre>
+
+<p>It’s a clean, simple model of history.</p>
+<h2 id="Objects-and-content-addressing"><a href="#Objects-and-content-addressing" class="headerlink" title="Objects and content-addressing"></a>Objects and content-addressing</h2><p>An “object” is a blob, tree, or commit:</p>
+<pre class="language-none"><code class="language-none">type object &#x3D; blob | tree | commit
+</code></pre>
+
+<p>In Git data store, all objects are content-addressed by their <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/SHA-1">SHA-1 hash</a>.</p>
+<pre class="language-none"><code class="language-none">objects &#x3D; map&lt;string, object&gt;
+
+def store(object):
+    id &#x3D; sha1(object)
+    objects[id] &#x3D; object
+
+def load(id):
+    return objects[id]
+</code></pre>
+
+<p>Blobs, trees, and commits are unified in this way: they are all objects. When they reference other objects, they don’t actually <em>contain</em> them in their on-disk representation, but have a reference to them by their hash.</p>
+<p>For example, the tree for the example directory structure <a target="_blank" rel="noopener" href="https://missing.csail.mit.edu/2020/version-control/#snapshots">above</a> (visualized using <code>git cat-file -p 698281bc680d1995c5f4caaf3359721a5a58d48d</code>), looks like this:</p>
+<pre class="language-none"><code class="language-none">100644 blob 4448adbf7ecd394f42ae135bbeed9676e894af85    baz.txt
+040000 tree c68d233a33c5c06e0340e4c224f0afca87c8ce87    foo
+</code></pre>
+
+<p>The tree itself contains pointers to its contents, <code>baz.txt</code> (a blob) and <code>foo</code> (a tree). If we look at the contents addressed by the hash corresponding to baz.txt with <code>git cat-file -p 4448adbf7ecd394f42ae135bbeed9676e894af85</code>, we get the following:</p>
+<pre class="language-none"><code class="language-none">git is wonderful
+</code></pre>
+
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p>Now, all snapshots can be identified by their SHA-1 hashes. That’s inconvenient, because humans aren’t good at remembering strings of 40 hexadecimal characters.</p>
+<p>Git’s solution to this problem is human-readable names for SHA-1 hashes, called “references”. References are pointers to commits. Unlike objects, which are immutable, references are mutable (can be updated to point to a new commit). For example, the <code>master</code> reference usually points to the latest commit in the main branch of development.</p>
+<pre class="language-none"><code class="language-none">references &#x3D; map&lt;string, string&gt;
+
+def update_reference(name, id):
+    references[name] &#x3D; id
+
+def read_reference(name):
+    return references[name]
+
+def load_reference(name_or_id):
+    if name_or_id in references:
+        return load(references[name_or_id])
+    else:
+        return load(name_or_id)
+</code></pre>
+
+<p>With this, Git can use human-readable names like “master” to refer to a particular snapshot in the history, instead of a long hexadecimal string.</p>
+<p>One detail is that we often want a notion of “where we currently are” in the history, so that when we take a new snapshot, we know what it is relative to (how we set the <code>parents</code> field of the commit). In Git, that “where we currently are” is a special reference called “HEAD”.</p>
+<h2 id="Repositories"><a href="#Repositories" class="headerlink" title="Repositories"></a>Repositories</h2><p>Finally, we can define what (roughly) is a Git <em>repository</em>: it is the data <code>objects</code> and <code>references</code>.</p>
+<p>On disk, all Git stores are objects and references: that’s all there is to Git’s data model. All <code>git</code> commands map to some manipulation of the commit DAG by adding objects and adding&#x2F;updating references.</p>
+<p>Whenever you’re typing in any command, think about what manipulation the command is making to the underlying graph data structure. Conversely, if you’re trying to make a particular kind of change to the commit DAG, e.g. “discard uncommitted changes and make the ‘master’ ref point to commit <code>5d83f9e</code>”, there’s probably a command to do it (e.g. in this case, <code>git checkout master; git reset --hard 5d83f9e</code>).</p>
+<h1 id="Staging-area"><a href="#Staging-area" class="headerlink" title="Staging area"></a>Staging area</h1><p>This is another concept that’s orthogonal to the data model, but it’s a part of the interface to create commits.</p>
+<p>One way you might imagine implementing snapshotting as described above is to have a “create snapshot” command that creates a new snapshot based on the <em>current state</em> of the working directory. Some version control tools work like this, but not Git. We want clean snapshots, and it might not always be ideal to make a snapshot from the current state. For example, imagine a scenario where you’ve implemented two separate features, and you want to create two separate commits, where the first introduces the first feature, and the next introduces the second feature. Or imagine a scenario where you have debugging print statements added all over your code, along with a bugfix; you want to commit the bugfix while discarding all the print statements.</p>
+<p>Git accommodates such scenarios by allowing you to specify which modifications should be included in the next snapshot through a mechanism called the “staging area”.</p>
+<h1 id="Git-command-line-interface"><a href="#Git-command-line-interface" class="headerlink" title="Git command-line interface"></a>Git command-line interface</h1><p>To avoid duplicating information, we’re not going to explain the commands below in detail. See the highly recommended <a target="_blank" rel="noopener" href="https://git-scm.com/book/en/v2">Pro Git</a> for more information, or watch the lecture video.</p>
+<h2 id="Basics"><a href="#Basics" class="headerlink" title="Basics"></a>Basics</h2><ul>
+<li><code>git help &lt;command&gt;</code>: get help for a git command</li>
+<li><code>git init</code>: creates a new git repo, with data stored in the <code>.git</code> directory</li>
+<li><code>git status</code>: tells you what’s going on</li>
+<li><code>git add &lt;filename&gt;</code>: adds files to staging area</li>
+<li><code>git commit</code>: creates a new commit<ul>
+<li>Write <a target="_blank" rel="noopener" href="https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html">good commit messages</a>!</li>
+<li>Even more reasons to write <a target="_blank" rel="noopener" href="https://chris.beams.io/posts/git-commit/">good commit messages</a>!</li>
+</ul>
+</li>
+<li><code>git log</code>: shows a flattened log of history</li>
+<li><code>git log --all --graph --decorate</code>: visualizes history as a DAG</li>
+<li><code>git diff &lt;filename&gt;</code>: show changes you made relative to the staging area</li>
+<li><code>git diff &lt;revision&gt; &lt;filename&gt;</code>: shows differences in a file between snapshots</li>
+<li><code>git checkout &lt;revision&gt;</code>: updates HEAD and current branch</li>
+</ul>
+<h2 id="Branching-and-merging"><a href="#Branching-and-merging" class="headerlink" title="Branching and merging"></a>Branching and merging</h2><ul>
+<li><code>git branch</code>: shows branches</li>
+<li><code>git branch &lt;name&gt;</code>: creates a branch</li>
+<li><code>git checkout -b &lt;name&gt;</code>: creates a branch and switches to it<ul>
+<li>same as <code>git branch &lt;name&gt;; git checkout &lt;name&gt;</code></li>
+</ul>
+</li>
+<li><code>git merge &lt;revision&gt;</code>: merges into current branch</li>
+<li><code>git mergetool</code>: use a fancy tool to help resolve merge conflicts</li>
+<li><code>git rebase</code>: rebase set of patches onto a new base</li>
+</ul>
+<h2 id="Remotes"><a href="#Remotes" class="headerlink" title="Remotes"></a>Remotes</h2><ul>
+<li><code>git remote</code>: list remotes</li>
+<li><code>git remote add &lt;name&gt; &lt;url&gt;</code>: add a remote</li>
+<li><code>git push &lt;remote&gt; &lt;local branch&gt;:&lt;remote branch&gt;</code>: send objects to remote, and update remote reference</li>
+<li><code>git branch --set-upstream-to=&lt;remote&gt;/&lt;remote branch&gt;</code>: set up correspondence between local and remote branch</li>
+<li><code>git fetch</code>: retrieve objects&#x2F;references from a remote</li>
+<li><code>git pull</code>: same as <code>git fetch; git merge</code></li>
+<li><code>git clone</code>: download repository from remote</li>
+</ul>
+<h2 id="Undo"><a href="#Undo" class="headerlink" title="Undo"></a>Undo</h2><ul>
+<li><code>git commit --amend</code>: edit a commit’s contents&#x2F;message</li>
+<li><code>git reset HEAD &lt;file&gt;</code>: unstage a file</li>
+<li><code>git checkout -- &lt;file&gt;</code>: discard changes</li>
+</ul>
+<h1 id="Advanced-Git"><a href="#Advanced-Git" class="headerlink" title="Advanced Git"></a>Advanced Git</h1><ul>
+<li><code>git config</code>: Git is <a target="_blank" rel="noopener" href="https://git-scm.com/docs/git-config">highly customizable</a></li>
+<li><code>git clone --depth=1</code>: shallow clone, without entire version history</li>
+<li><code>git add -p</code>: interactive staging</li>
+<li><code>git rebase -i</code>: interactive rebasing</li>
+<li><code>git blame</code>: show who last edited which line</li>
+<li><code>git stash</code>: temporarily remove modifications to working directory</li>
+<li><code>git bisect</code>: binary search history (e.g. for regressions)</li>
+<li><code>.gitignore</code>: <a target="_blank" rel="noopener" href="https://git-scm.com/docs/gitignore">specify</a> intentionally untracked files to ignore</li>
+</ul>
+<h1 id="Miscellaneous"><a href="#Miscellaneous" class="headerlink" title="Miscellaneous"></a>Miscellaneous</h1><ul>
+<li><strong>GUIs</strong>: there are many <a target="_blank" rel="noopener" href="https://git-scm.com/downloads/guis">GUI clients</a> out there for Git. We personally don’t use them and use the command-line interface instead.</li>
+<li><strong>Shell integration</strong>: it’s super handy to have a Git status as part of your shell prompt (<a target="_blank" rel="noopener" href="https://github.com/olivierverdier/zsh-git-prompt">zsh</a>, <a target="_blank" rel="noopener" href="https://github.com/magicmonty/bash-git-prompt">bash</a>). Often included in frameworks like <a target="_blank" rel="noopener" href="https://github.com/ohmyzsh/ohmyzsh">Oh My Zsh</a>.</li>
+<li><strong>Editor integration</strong>: similarly to the above, handy integrations with many features. <a target="_blank" rel="noopener" href="https://github.com/tpope/vim-fugitive">fugitive.vim</a> is the standard one for Vim.</li>
+<li><strong>Workflows</strong>: we taught you the data model, plus some basic commands; we didn’t tell you what practices to follow when working on big projects (and there are <a target="_blank" rel="noopener" href="https://nvie.com/posts/a-successful-git-branching-model/">many</a> <a target="_blank" rel="noopener" href="https://www.endoflineblog.com/gitflow-considered-harmful">different</a> <a target="_blank" rel="noopener" href="https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow">approaches</a>).</li>
+<li><strong>GitHub</strong>: Git is not GitHub. GitHub has a specific way of contributing code to other projects, called <a target="_blank" rel="noopener" href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">pull requests</a>.</li>
+<li><strong>Other Git providers</strong>: GitHub is not special: there are many Git repository hosts, like <a target="_blank" rel="noopener" href="https://about.gitlab.com/">GitLab</a> and <a target="_blank" rel="noopener" href="https://bitbucket.org/">BitBucket</a>.</li>
+</ul>
+<h1 id="Resources"><a href="#Resources" class="headerlink" title="Resources"></a>Resources</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://git-scm.com/book/en/v2">Pro Git</a> is <strong>highly recommended reading</strong>. Going through Chapters 1–5 should teach you most of what you need to use Git proficiently, now that you understand the data model. The later chapters have some interesting, advanced material.</li>
+<li><a target="_blank" rel="noopener" href="https://ohshitgit.com/">Oh Shit, Git!?!</a> is a short guide on how to recover from some common Git mistakes.</li>
+<li><a target="_blank" rel="noopener" href="https://eagain.net/articles/git-for-computer-scientists/">Git for Computer Scientists</a> is a short explanation of Git’s data model, with less pseudocode and more fancy diagrams than these lecture notes.</li>
+<li><a target="_blank" rel="noopener" href="https://jwiegley.github.io/git-from-the-bottom-up/">Git from the Bottom Up</a> is a detailed explanation of Git’s implementation details beyond just the data model, for the curious.</li>
+<li><a target="_blank" rel="noopener" href="https://smusamashah.github.io/blog/2017/10/14/explain-git-in-simple-words">How to explain git in simple words</a></li>
+<li><a target="_blank" rel="noopener" href="https://learngitbranching.js.org/">Learn Git Branching</a> is a browser-based game that teaches you Git.</li>
+</ul>
+<h1 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h1><ol>
+<li>If you don’t have any past experience with Git, either try reading the first couple chapters of <a target="_blank" rel="noopener" href="https://git-scm.com/book/en/v2">Pro Git</a> or go through a tutorial like <a target="_blank" rel="noopener" href="https://learngitbranching.js.org/">Learn Git Branching</a>. As you’re working through it, relate Git commands to the data model.</li>
+<li>Clone the <a target="_blank" rel="noopener" href="https://github.com/missing-semester/missing-semester">repository for the class website</a>. <ol>
+<li>Explore the version history by visualizing it as a graph.</li>
+<li>Who was the last person to modify <code>README.md</code>? (Hint: use <code>git log</code> with an argument).</li>
+<li>What was the commit message associated with the last modification to the <code>collections:</code> line of <code>_config.yml</code>? (Hint: use <code>git blame</code> and <code>git  show</code>).</li>
+</ol>
+</li>
+<li>One common mistake when learning Git is to commit large files that should not be managed by Git or adding sensitive information. Try adding a file to a repository, making some commits and then deleting that file from history (you may want to look at <a target="_blank" rel="noopener" href="https://help.github.com/articles/removing-sensitive-data-from-a-repository/">this</a>).</li>
+<li>Clone some repository from GitHub, and modify one of its existing files. What happens when you do <code>git stash</code>? What do you see when running <code>git log --all --oneline</code>? Run <code>git stash pop</code> to undo what you did with <code>git stash</code>. In what scenario might this be useful?</li>
+<li>Like many command line tools, Git provides a configuration file (or dotfile) called <code>~/.gitconfig</code>. Create an alias in <code>~/.gitconfig</code> so that when you run <code>git graph</code>, you get the output of <code>git log --all --graph --decorate --oneline</code>. Information about git aliases can be found <a target="_blank" rel="noopener" href="https://git-scm.com/docs/git-config#Documentation/git-config.txt-alias">here</a>.</li>
+<li>You can define global ignore patterns in <code>~/.gitignore_global</code> after running <code>git config --global core.excludesfile ~/.gitignore_global</code>. Do this, and set up your global gitignore file to ignore OS-specific or editor-specific temporary files, like <code>.DS_Store</code>.</li>
+<li>Fork the <a target="_blank" rel="noopener" href="https://github.com/missing-semester/missing-semester">repository for the class website</a>, find a typo or some other improvement you can make, and submit a pull request on GitHub (you may want to look at <a target="_blank" rel="noopener" href="https://github.com/firstcontributions/first-contributions">this</a>). Please only submit PRs that are useful (don’t spam us, please!). If you can’t find an improvement to make, you can skip this exercise.</li>
+</ol>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/"
+                    data-tooltip="Debugging and Profiling"
+                    aria-label="PREVIOUS: Debugging and Profiling"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/ai/autogen/"
+                    data-tooltip="autogen"
+                    aria-label="NEXT: autogen"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Debugging%20and%20Profiling/"
+                    data-tooltip="Debugging and Profiling"
+                    aria-label="PREVIOUS: Debugging and Profiling"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2023/12/12/ai/autogen/"
+                    data-tooltip="autogen"
+                    aria-label="NEXT: autogen"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href=""
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/"
+                    title="global.share_on_wechat"
+                    aria-label="global.share_on_wechat"
+                >
+                    <i class="fa-foo_bar" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="Table of Contents">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href=""
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.foo_bar.com/sharer/sharer.php?u=https://kirk-zhang58.github.io/2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version%20Control%20(Git)/"
+                        aria-label="global.share_on_wechat"
+                    >
+                        <i class="fa-foo_bar" aria-hidden="true"></i><span>global.share_on_wechat</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">kirkzhang</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Canton
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-rejca0yeyo8jtv4zo5d19sxydkf6sqbqktdggflqfhvi7djqtgunc35t58di.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'ca29b9a1203b5920918d',
+              clientSecret: 'b1b2a10320acecd54ae9427f140164b2e63d13f5',
+              repo: 'SimonTeo58.github.io',
+              owner: 'SimonTeo58',
+              admin: ['SimonTeo58'],
+              id: '2023/12/12/MIT_TheMissingSemesterofYourCSEducation/Version Control (Git)/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>
