@@ -306,27 +306,387 @@
                  class="
                         hasCoverMetaIn
                         ">
-                <p><img src="/./../picture/home_page.jpg" alt="come on"></p>
-<h1 id="张士明-kirkzhang"><a href="#张士明-kirkzhang" class="headerlink" title="张士明(kirkzhang)"></a>张士明(kirkzhang)</h1><p>Knowledge isn’t free. You have to pay attention. 🧠🧠🧠</p>
-<ul>
-<li>email: <a href="mailto:&#x7a;&#x78;&#x63;&#55;&#52;&#49;&#x32;&#48;&#56;&#x35;&#56;&#x34;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;">&#x7a;&#x78;&#x63;&#55;&#52;&#49;&#x32;&#48;&#56;&#x35;&#56;&#x34;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;</a></li>
-<li>homepag: <a target="_blank" rel="noopener" href="https://simonteo58.github.io/">https://simonteo58.github.io/</a></li>
-<li>github: <a target="_blank" rel="noopener" href="https://github.com/SimonTeo58">https://github.com/SimonTeo58</a></li>
-</ul>
-<h2 id="Education"><a href="#Education" class="headerlink" title="Education"></a>Education</h2><h3 id="湖南工学院-2014-9-2018-09"><a href="#湖南工学院-2014-9-2018-09" class="headerlink" title="湖南工学院 2014.9 - 2018.09"></a><strong>湖南工学院</strong> <code>2014.9 - 2018.09</code></h3><pre><code>bachelor - 无机非金属材料学士学位
-</code></pre>
-<h2 id="Experience"><a href="#Experience" class="headerlink" title="Experience"></a>Experience</h2><h3 id="HSBC-Tech-China-contractor-2020-6-present"><a href="#HSBC-Tech-China-contractor-2020-6-present" class="headerlink" title="HSBC Tech China(contractor) 2020.6 - present"></a><strong>HSBC Tech China(contractor)</strong> <code>2020.6 - present</code></h3><p><pr><em>Mid-software-engineer</em></br></p>
+                <section class="postShorten-group main-content-wrap">
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2023/12/12/database/mysql/mysql_manual/"
+                            aria-label=": mysql manual"
+                        >
+                            mysql manual
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/mysql/">mysql</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <blockquote>
+<p> install mysql on ubuntu <a target="_blank" rel="noopener" href="https://hevodata.com/learn/installing-mysql-on-ubuntu-20-04/">https://hevodata.com/learn/installing-mysql-on-ubuntu-20-04/</a></p>
+</blockquote>
 <ol>
-<li>as a software-engineer solving xxxxxxx</li>
-<li>commonly using shell script figured out testing cases</li>
-<li>keep testing envirement stable ,and located root casuse of testing cases that tester put them in</li>
-<li>associated with software vendor to change system setup, more like source code and configuration</li>
-<li>familiar with debit card card system of MasterCard</li>
+<li><p>创建数据库</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">CREATE DATABASE &#39;newdatabase&#39;;</code></pre>
+</li>
+<li><p>设置创建用户并设置密码</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- # Host: %表示支持任意连接，localhost表示只允许本地连接
+ CREATE USER &#39;newuser&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;newpassword&#39;;
+ CREATE USER &#39;newuser&#39;@ &#39;%&#39; IDENTIFIED BY &#39;newpassword&#39;;
+</code></pre>
+</li>
+<li><p>授权</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">-- 如果需要给用户创建数据库的权限，则可以这样设置
+GRANT ALL PRIVILEGES ON *.* to my_user@&#39;%&#39;; -- 这里的my_user 跟第五步是相同的
+
+GRANT ALL PRIVILEGES ON newdatabase.* TO &#39;newuser&#39;@&#39;localhost&#39;;
+FLUSH PRIVILEGES;</code></pre>
+</li>
+<li><p>重新登陆</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">mysql -u kirkzhang -p</code></pre></li>
 </ol>
+
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2023/12/12/database/mysql/mysql_manual/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2023/12/12/database/oracle/Oracle_EBR/"
+                            aria-label=": Edition-Based Redefinition Technical Deep Dive"
+                        >
+                            Edition-Based Redefinition Technical Deep Dive
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>摘要: 当应用程序的数据库组件在应用程序升级过程中被更新时，大型的关键的应用程序可能会经历几十个小时，甚至更长的停机时间。app的数据库组件在应用程序升级期间进行更新。Oracle数据库推出了基于版本的重新定义（EBR），这是一项革命性的功能，可以在不间断的情况下在线升级应用程序。革命性的功能，它允许在线应用升级，并保证应用的不间断可用性。</p>
+                    
+                        <a
+                            href="/2023/12/12/database/oracle/Oracle_EBR/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": Edition-Based Redefinition Technical Deep Dive"
+                        >
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
+        
+            <a
+                href="/2023/12/12/database/oracle/Oracle_EBR/"
+                aria-label=": Edition-Based Redefinition Technical Deep Dive"
+            >
+                <div class="postShorten-thumbnailimg">
+                    <img alt="" src="https://user-images.githubusercontent.com/46363359/201715474-35abea08-9840-4b33-a645-210948d5dafc.jpg"/>
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/"
+                            aria-label=": Oracle Database 12c SQL"
+                        >
+                            Oracle Database 12c SQL
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>作者寄语:This book is dedicated to my family.Even though you’re far away, you are still in my heart.</p>
+<p>About the Author: Jason Price is a freelance consultant and former product manager of Oracle Corporation. He has contributed to many of Oracle’s products</p>
+                    
+                        <a
+                            href="/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": Oracle Database 12c SQL"
+                        >
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
+        
+            <a
+                href="/2023/12/12/database/oracle/OracleDatabase12cSQL/Oracle_Database_12_c_SQL/"
+                aria-label=": Oracle Database 12c SQL"
+            >
+                <div class="postShorten-thumbnailimg">
+                    <img alt="" src="https://user-images.githubusercontent.com/46363359/201714685-eb48eab8-93a3-4c3f-8d8c-0a0587c735c9.jpg"/>
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2023/12/12/database/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes/"
+                            aria-label=": Oracle PLSQL Recipes PL/SQL Fundamentals"
+                        >
+                            Oracle PLSQL Recipes PL/SQL Fundamentals
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2023-12-12T19:30:59+08:00">
+	
+		    Dec 12, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/oracle/">oracle</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>因为项目中要用到所以学习一下</p>
+                    
+                        <a
+                            href="/2023/12/12/database/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": Oracle PLSQL Recipes PL/SQL Fundamentals"
+                        >
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
+        
+            <a
+                href="/2023/12/12/database/oracle/Oracle_PLSQL_Recipes/Oracle_PLSQL_Recipes/"
+                aria-label=": Oracle PLSQL Recipes PL/SQL Fundamentals"
+            >
+                <div class="postShorten-thumbnailimg">
+                    <img alt="" src="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/2022/10/30/vim/neovim/"
+                            aria-label=": Neovim"
+                        >
+                            Neovim
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2022-10-30T13:58:59+08:00">
+	
+		    Oct 30, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/neovim/">neovim</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <blockquote>
+<p>官方文档: <a target="_blank" rel="noopener" href="https://neovim.io/doc/user/">https://neovim.io/doc/user/</a></p>
+</blockquote>
+<p>摘要: 后面具体学习时候再补充</p>
+<h2 id="Neovim-Installation"><a href="#Neovim-Installation" class="headerlink" title="Neovim Installation"></a>Neovim Installation</h2><p>针对不同的平台直接在github上下载对应的版本的文件，然后直接解压放到<code>/usr/bin/nvim</code></p>
+<h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><p>nvim的配置文件放在了<code>~/.config/nvim</code>目录下，创建<code>init.lua</code>文件和<code>lua</code>目录，在<code>lua</code>目录下放置你的配置文件，简单的<code>init.lua</code>入选所示</p>
+<pre class="language-lua" data-language="lua"><code class="language-lua">--[[ init.lua ]]
+
+-- LEADER
+-- These keybindings need to be defined before the first &#x2F;
+-- is called; otherwise, it will default to &quot;\&quot;
+vim.g.mapleader &#x3D; &quot;,&quot;
+vim.g.localleader &#x3D; &quot;\\&quot;
+
+-- IMPORTS
+-- require(&#39;vars&#39;)      -- Variables
+-- require(&#39;opts&#39;)      -- Options
+-- require(&#39;keys&#39;)      -- Keymaps
+-- require(&#39;plug&#39;)      -- Plugins</code></pre>
+
+<h2 id="Set-Variables"><a href="#Set-Variables" class="headerlink" title="Set Variables"></a>Set Variables</h2><p>你的变量的可以放在<code>var.lua</code>文件中就可以进行全局变量的定义</p>
+<h2 id="Manage-plugins-with-Packer"><a href="#Manage-plugins-with-Packer" class="headerlink" title="Manage plugins with Packer"></a>Manage plugins with Packer</h2><p>here is list including more awesosme neovim <a target="_blank" rel="noopener" href="https://github.com/rockerBOO/awesome-neovim">plugins</a> </p>
+<p>where i installed the Packer at the <code>~/.config/nvim/</code></p>
+
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a
+                                href="/2022/10/30/vim/neovim/#post-footer"
+                                class="postShorten-excerpt_link link"
+                                aria-label=""
+                            >
+                                Comment and share
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+            <a
+                href="/2022/10/30/vim/neovim/"
+                aria-label=": Neovim"
+            >
+                <div class="postShorten-thumbnailimg">
+                    <img alt="" src="https://user-images.githubusercontent.com/46363359/199011812-44a2e355-c72a-4252-bac9-37ecded0cb54.jpg"/>
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    <div class="pagination-bar">
+    <ul class="pagination">
+        
+          <li class="pagination-prev">
+            <a
+                class="btn btn--default btn--small"
+                href="/page/7/"
+                aria-label="NEWER POSTS"
+            >
+              <i class="fa fa-angle-left text-base icon-mr"></i>
+              <span>NEWER POSTS</span>
+            </a>
+          </li>
+        
+        
+        <li class="pagination-number">page 8 of 8</li>
+    </ul>
+</div>
+
+</section>
+
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2023 kirkzhang. All Rights Reserved.
+        Copyrights &copy; 2024 kirkzhang. All Rights Reserved.
     </span>
 </footer>
 
